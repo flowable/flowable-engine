@@ -79,6 +79,7 @@ public class HitPolicyOutputOrderTest {
 
         assertFalse(result.isFailed());
         assertNull(result.getExceptionMessage());
+        assertNotNull(result.getValidationMessage());
 
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);
     }
@@ -102,6 +103,7 @@ public class HitPolicyOutputOrderTest {
 
         assertTrue(result.isFailed());
         assertNotNull(result.getExceptionMessage());
+        assertNull(result.getValidationMessage());
     }
 
     @Test

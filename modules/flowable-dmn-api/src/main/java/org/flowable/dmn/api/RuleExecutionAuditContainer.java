@@ -35,6 +35,8 @@ public class RuleExecutionAuditContainer {
     @JsonProperty("exception")
     protected String exceptionMessage;
 
+    protected String validationMessage;
+
     protected List<ExpressionExecution> conditionResults = new ArrayList<>();
     protected List<ExpressionExecution> conclusionResults = new ArrayList<>();
 
@@ -89,6 +91,14 @@ public class RuleExecutionAuditContainer {
 
     public void setExceptionMessage(String exceptionMessage) {
         this.exceptionMessage = exceptionMessage;
+    }
+
+    public String getValidationMessage() {
+        return validationMessage;
+    }
+
+    public void setValidationMessage(String validationMessage) {
+        this.validationMessage = validationMessage;
     }
 
     public List<ExpressionExecution> getConditionResults() {

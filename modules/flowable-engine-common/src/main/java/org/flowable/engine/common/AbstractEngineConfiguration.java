@@ -47,11 +47,11 @@ import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.CommonDbSchemaManager;
-import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
-import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.db.LogSqlExecutionTimePlugin;
+import org.flowable.engine.common.impl.db.MybatisTypeAliasConfigurator;
+import org.flowable.engine.common.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.engine.common.impl.event.EventDispatchAction;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
@@ -166,8 +166,8 @@ public abstract class AbstractEngineConfiguration {
     protected Set<String> customMybatisXMLMappers;
 
     protected Set<String> dependentEngineMyBatisXmlMappers;
-    protected List<CustomMybatisTypeAliasConfig> dependentEngineMybatisTypeAliasConfigs;
-    protected List<CustomMyBatisTypeHandlerConfig> dependentEngineMybatisTypeHandlerConfigs;
+    protected List<MybatisTypeAliasConfigurator> dependentEngineMybatisTypeAliasConfigs;
+    protected List<MybatisTypeHandlerConfigurator> dependentEngineMybatisTypeHandlerConfigs;
 
     // SESSION FACTORIES ///////////////////////////////////////////////
     protected List<SessionFactory> customSessionFactories;
@@ -225,9 +225,9 @@ public abstract class AbstractEngineConfiguration {
      * will not be used here - since the schema is taken into account already, adding a prefix for the table-check will result in wrong table-names.
      */
     protected boolean tablePrefixIsSchema;
-    
-    /** 
-     * Enables the MyBatis plugin that logs the execution time of sql statements. 
+
+    /**
+     * Enables the MyBatis plugin that logs the execution time of sql statements.
      */
     protected boolean enableLogSqlExecutionTime;
 
@@ -544,7 +544,6 @@ public abstract class AbstractEngineConfiguration {
             dbSqlSessionFactory = createDbSqlSessionFactory();
         }
         dbSqlSessionFactory.setDatabaseType(databaseType);
-        dbSqlSessionFactory.setIdGenerator(idGenerator);
         dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
         dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
         dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
@@ -633,7 +632,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public String pathToEngineDbProperties() {
-        return "org/flowable/db/properties/" + databaseType + ".properties";
+        return "org/flowable/common/db/properties/" + databaseType + ".properties";
     }
 
     public Configuration initMybatisConfiguration(Environment environment, Reader reader, Properties properties) {
@@ -648,11 +647,11 @@ public abstract class AbstractEngineConfiguration {
 
         initCustomMybatisMappers(configuration);
         initMybatisTypeHandlers(configuration);
-        
+
         if (isEnableLogSqlExecutionTime()) {
             initMyBatisLogSqlExecutionTimePlugin(configuration);
         }
-        
+
         configuration = parseMybatisConfiguration(parser);
         return configuration;
     }
@@ -668,7 +667,7 @@ public abstract class AbstractEngineConfiguration {
     public void initMybatisTypeHandlers(Configuration configuration) {
         // To be extended
     }
-    
+
     public void initMyBatisLogSqlExecutionTimePlugin(Configuration configuration) {
         configuration.addInterceptor(new LogSqlExecutionTimePlugin());
     }
@@ -677,13 +676,13 @@ public abstract class AbstractEngineConfiguration {
         Configuration configuration = parser.parse();
 
         if (dependentEngineMybatisTypeAliasConfigs != null) {
-            for (CustomMybatisTypeAliasConfig typeAliasConfig : dependentEngineMybatisTypeAliasConfigs) {
-                configuration.getTypeAliasRegistry().registerAlias(typeAliasConfig.getAliasName(), typeAliasConfig.getTypeHandlerClass());
+            for (MybatisTypeAliasConfigurator typeAliasConfig : dependentEngineMybatisTypeAliasConfigs) {
+                typeAliasConfig.configure(configuration.getTypeAliasRegistry());
             }
         }
         if (dependentEngineMybatisTypeHandlerConfigs != null) {
-            for (CustomMyBatisTypeHandlerConfig typeHandlerConfig : dependentEngineMybatisTypeHandlerConfigs) {
-                configuration.getTypeHandlerRegistry().register(typeHandlerConfig.getJavaTypeClass(), typeHandlerConfig.getJdbcType(), typeHandlerConfig.getTypeHandlerClass());
+            for (MybatisTypeHandlerConfigurator typeHandlerConfig : dependentEngineMybatisTypeHandlerConfigs) {
+                typeHandlerConfig.configure(configuration.getTypeHandlerRegistry());
             }
         }
 
@@ -1135,20 +1134,20 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public List<CustomMybatisTypeAliasConfig> getDependentEngineMybatisTypeAliasConfigs() {
+    public List<MybatisTypeAliasConfigurator> getDependentEngineMybatisTypeAliasConfigs() {
         return dependentEngineMybatisTypeAliasConfigs;
     }
 
-    public AbstractEngineConfiguration setDependentEngineMybatisTypeAliasConfigs(List<CustomMybatisTypeAliasConfig> dependentEngineMybatisTypeAliasConfigs) {
+    public AbstractEngineConfiguration setDependentEngineMybatisTypeAliasConfigs(List<MybatisTypeAliasConfigurator> dependentEngineMybatisTypeAliasConfigs) {
         this.dependentEngineMybatisTypeAliasConfigs = dependentEngineMybatisTypeAliasConfigs;
         return this;
     }
 
-    public List<CustomMyBatisTypeHandlerConfig> getDependentEngineMybatisTypeHandlerConfigs() {
+    public List<MybatisTypeHandlerConfigurator> getDependentEngineMybatisTypeHandlerConfigs() {
         return dependentEngineMybatisTypeHandlerConfigs;
     }
 
-    public AbstractEngineConfiguration setDependentEngineMybatisTypeHandlerConfigs(List<CustomMyBatisTypeHandlerConfig> dependentEngineMybatisTypeHandlerConfigs) {
+    public AbstractEngineConfiguration setDependentEngineMybatisTypeHandlerConfigs(List<MybatisTypeHandlerConfigurator> dependentEngineMybatisTypeHandlerConfigs) {
         this.dependentEngineMybatisTypeHandlerConfigs = dependentEngineMybatisTypeHandlerConfigs;
         return this;
     }
@@ -1215,7 +1214,7 @@ public abstract class AbstractEngineConfiguration {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
         return this;
     }
-    
+
     public boolean isEnableLogSqlExecutionTime() {
         return enableLogSqlExecutionTime;
     }
