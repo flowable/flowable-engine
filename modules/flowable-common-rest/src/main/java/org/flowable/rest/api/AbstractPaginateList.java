@@ -81,7 +81,7 @@ public abstract class AbstractPaginateList<RES, REQ> {
         }
 
         // Sort order
-        if (sort != null && !properties.isEmpty()) {
+        if (sort != null && properties != null && !properties.isEmpty()) {
             QueryProperty queryProperty = properties.get(sort);
             if (queryProperty == null) {
                 throw new FlowableIllegalArgumentException("Value for param 'sort' is not valid, '" + sort + "' is not a valid property");

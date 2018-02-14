@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.rest.service.api;
+package org.flowable.rest.util;
 
 import java.text.MessageFormat;
 

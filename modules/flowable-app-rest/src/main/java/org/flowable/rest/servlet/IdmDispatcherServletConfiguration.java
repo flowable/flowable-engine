@@ -19,10 +19,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
-@ComponentScan({ "org.flowable.rest.exception", "org.flowable.rest.form.service.api" })
+@ComponentScan({ "org.flowable.rest.exception", "org.flowable.rest.idm.service.api" })
 @EnableAsync
-public class FormDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
+public class IdmDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(FormDispatcherServletConfiguration.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(IdmDispatcherServletConfiguration.class);
 
 }

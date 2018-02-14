@@ -290,10 +290,15 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-            	<groupId>org.flowable</groupId>
-            	<artifactId>flowable-idm-spring</artifactId>
-            	<version>${project.version}</version>
-        	</dependency>
+                	<groupId>org.flowable</groupId>
+                	<artifactId>flowable-idm-spring</artifactId>
+                	<version>${project.version}</version>
+        	    </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-idm-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>    
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-dmn-api</artifactId>
@@ -1094,6 +1099,7 @@
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-app-rest</module>
 				<module>modules/flowable-idm-spring</module>
+                <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable5-engine</module>
 				<module>modules/flowable5-compatibility</module>
@@ -1284,6 +1290,7 @@
 				<module>modules/flowable-form-spring-configurator</module>
 				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-idm-spring</module>
+                <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
@@ -1427,8 +1434,6 @@
 			</modules>
 		</profile>
 		<profile>
-			<!-- Profile used by the start-rest.sh script to build the Explorer webapp
-				and all its dependencies -->
 			<id>buildRestappDependencies</id>
 			<modules>
 				<module>modules/flowable-bpmn-model</module>
@@ -1443,6 +1448,7 @@
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
+                <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-api</module>
 				<module>modules/flowable-dmn-engine</module>

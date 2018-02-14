@@ -53,6 +53,7 @@ public class WebConfigurer implements ServletContextListener {
         EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
 
         initSpringProcessRest(servletContext, rootContext);
+        initSpringIdmRest(servletContext, rootContext);
         initSpringDMNRest(servletContext, rootContext);
         initSpringFormRest(servletContext, rootContext);
         initSpringContentRest(servletContext, rootContext);
@@ -65,8 +66,15 @@ public class WebConfigurer implements ServletContextListener {
     /**
      * Initializes Process Spring and Spring MVC .
      */
-    private ServletRegistration.Dynamic initSpringProcessRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+    protected ServletRegistration.Dynamic initSpringProcessRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
         return initSpringRestComponent(servletContext, rootContext, "process", "/service", ProcessDispatcherServletConfiguration.class);
+    }
+    
+    /**
+     * Initializes Idm Spring and Spring MVC.
+     */
+    protected ServletRegistration.Dynamic initSpringIdmRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+        return initSpringRestComponent(servletContext, rootContext, "idm", "/idm-api", IdmDispatcherServletConfiguration.class);
     }
 
     /**
