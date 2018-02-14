@@ -133,6 +133,16 @@ public class DatabaseConfiguration {
                 dataSource.setConnectionTestQuery(testQuery);
             }
             
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Configuring datasource with following properties");
+                LOGGER.info("Datasource driver: {}", jdbcDriver);
+                LOGGER.info("Datasource url: {}", jdbcUrl);
+                LOGGER.info("Datasource user name: {}", jdbcUsername);
+                LOGGER.info("Min pool size | Max pool size | {} | {}", 
+                        minIdle != null ? minIdle : "default",
+                        maxPoolSize != null ? maxPoolSize : "default");
+            }
+            
             return dataSource;
         }
 

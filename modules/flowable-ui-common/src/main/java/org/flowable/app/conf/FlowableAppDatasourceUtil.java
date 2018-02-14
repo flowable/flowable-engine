@@ -125,7 +125,9 @@ public class FlowableAppDatasourceUtil {
                 LOGGER.info("Datasource driver: {}", driver);
                 LOGGER.info("Datasource url: {}", url);
                 LOGGER.info("Datasource user name: {}", username);
-                LOGGER.info("Min pool size | Max pool size | {} | {}", dataSource.getMinimumIdle(), dataSource.getMaximumPoolSize());
+                LOGGER.info("Min pool size | Max pool size | {} | {}", 
+                        minIdle != null ? minIdle : "default",
+                        maxPoolSize != null ? maxPoolSize : "default");
             }
             
             return dataSource;

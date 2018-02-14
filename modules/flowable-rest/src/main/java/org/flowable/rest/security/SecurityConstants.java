@@ -10,14 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.constant;
+package org.flowable.rest.security;
 
 /**
  * @author Joram Barrez
  */
-public interface GroupTypes {
-
-    String TYPE_ASSIGNMENT = "assignment";
-    String TYPE_SECURITY_ROLE = "security-role";
+public interface SecurityConstants {
+    
+    String PRIVILEGE_ACCESS_REST_API = "access-rest-api";
 
 }
