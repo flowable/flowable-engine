@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -273,15 +274,33 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         String outputVariableType = ruleClauseContainer.getOutputClause().getTypeRef();
 
         LiteralExpression outputEntryExpression = ruleClauseContainer.getOutputEntry();
-
+        
+        String updatedListName = "updatedVariablesList";
+        
         if (StringUtils.isNotEmpty(outputEntryExpression.getText())) {
             Object executionVariable = null;
+                Map<String, Object> stackVariables = executionContext.getStackVariables();
+                ArrayList<String> updatedList = null;
+                if(!stackVariables.containsKey(updatedListName) || stackVariables.get(updatedListName) == null || stackVariables.get(updatedListName) == "") {
+                    stackVariables.put(updatedListName, new ArrayList<String>()) ;
+                }
+                if(stackVariables.get(updatedListName) instanceof ArrayList<?>) {
+                    	updatedList = (ArrayList<String>) stackVariables.get(updatedListName);
+                    	updatedList.add(outputVariableId);
+                    	stackVariables.put(updatedListName, updatedList);
+                }
+
+                executionContext.setStackVariables(stackVariables);
             try {
                 Object resultValue = ELExpressionExecutor.executeOutputExpression(ruleClauseContainer.getOutputClause(), outputEntryExpression, expressionManager, executionContext);
                 executionVariable = ExecutionVariableFactory.getExecutionVariable(outputVariableType, resultValue);
 
                 // create result
                 if (getHitPolicyBehavior(hitPolicy) instanceof ComposeRuleResultBehavior) {
+					if (updatedList != null) {
+						((ComposeRuleResultBehavior) getHitPolicyBehavior(hitPolicy)).composeRuleResult(ruleNumber,
+								updatedListName, updatedList, executionContext);
+					}
                     ((ComposeRuleResultBehavior) getHitPolicyBehavior(hitPolicy)).composeRuleResult(ruleNumber, outputVariableId, executionVariable, executionContext);
                 }
 
