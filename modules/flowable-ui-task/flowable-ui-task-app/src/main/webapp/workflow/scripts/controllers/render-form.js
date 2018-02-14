@@ -744,6 +744,13 @@ angular.module('flowableApp')
                 return postData;
             };
 
+            $scope.togglePasswordFieldType = function(field){
+        			if(field.params.type === undefined || !field.params.type)
+        				field.params.type = true;	
+        			else
+        				field.params.type = false;	
+            };
+
             // Place methods that are used by controls into an object which is pushed won the container hierarchy
             // Note that these callbacks must be mapped inside the formElement directive as well (workflow-directives.js)
             $scope.controlCallbacks = {
@@ -760,7 +767,8 @@ angular.module('flowableApp')
                 handleReadonlyClick: $scope.handleReadonlyClick,
                 clearDate: $scope.clearDate,
                 selectToday: $scope.selectToday,
-                closeDatePopup: $scope.closeDatePopup
+                closeDatePopup: $scope.closeDatePopup,
+                togglePasswordFieldType: $scope.togglePasswordFieldType
             };
 
             if ($scope.taskId) {
