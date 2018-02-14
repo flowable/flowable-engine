@@ -123,8 +123,10 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
             identityService.addUserPrivilegeMapping(taskAppPrivilege.getId(), adminId);
         }
         
-        // Rest access is handled in the REST app
-        findOrCreatePrivilege(DefaultPrivileges.ACCESS_REST_API, privilegeMap);
+        Privilege restApiAccessPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_REST_API, privilegeMap);
+        if (!privilegeMappingExists(adminId, restApiAccessPrivilege)) {
+            identityService.addUserPrivilegeMapping(restApiAccessPrivilege.getId(), adminId);
+        }
     }
     
     protected Privilege findOrCreatePrivilege(String privilegeId, Map<String, Privilege> privilegeMap) {

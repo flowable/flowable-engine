@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
-@ComponentScan({"org.flowable.rest.content.exception", "org.flowable.rest.content.service.api"})
+@ComponentScan({"org.flowable.rest.exception", "org.flowable.rest.content.service.api"})
 @EnableAsync
 public class ContentDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 
