@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.security.DefaultPrivileges;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
@@ -129,12 +130,20 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
         }
     }
     
-    protected Privilege findOrCreatePrivilege(String privilegeId, Map<String, Privilege> privilegeMap) {
+    protected Privilege findOrCreatePrivilege(String privilegeName, Map<String, Privilege> privilegeMap) {
         Privilege privilege = null;
-        if (privilegeMap.containsKey(privilegeId)) {
-            privilege = privilegeMap.get(privilegeId);
+        if (privilegeMap.containsKey(privilegeName)) {
+            privilege = privilegeMap.get(privilegeName);
         } else {
-            privilege = identityService.createPrivilege(privilegeId);
+            try {
+                privilege = identityService.createPrivilege(privilegeName);
+            } catch (Exception e) {
+                privilege = identityService.createPrivilegeQuery().privilegeName(privilegeName).singleResult();
+            }
+        }
+        
+        if (privilege == null) {
+            throw new FlowableException("Could not find or create " + DefaultPrivileges.ACCESS_REST_API + " privilege");
         }
         
         return privilege;

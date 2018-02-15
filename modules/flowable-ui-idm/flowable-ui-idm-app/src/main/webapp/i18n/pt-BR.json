@@ -215,6 +215,7 @@
       "access-admin":"Acesso ao aplicativo de administração",
       "access-modeler":"Acesso ao aplicativo de modelagem",
       "access-task":"Acesso ao aplicativo de workflow",
+      "access-rest-api": "Acesso ao REST API",
       "NO-SELECTION":"Nenhum privilégio selecionado",
       "USERS":"Usuários",
       "GROUPS":"Grupos",

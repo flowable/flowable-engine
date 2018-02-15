@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
@@ -94,7 +95,16 @@ public class BootstrapConfiguration {
         if (privilege != null) {
             restApiPrivilegeMappingExists = restApiPrivilegeMappingExists(restAdminId, privilege);
         } else {
-            privilege = idmIdentityService.createPrivilege(SecurityConstants.PRIVILEGE_ACCESS_REST_API);
+            try {
+                privilege = idmIdentityService.createPrivilege(SecurityConstants.PRIVILEGE_ACCESS_REST_API);
+            } catch (Exception e) {
+                // Could be created by another server, retrying fetch
+                privilege = idmIdentityService.createPrivilegeQuery().privilegeName(SecurityConstants.PRIVILEGE_ACCESS_REST_API).singleResult();
+            }
+        }
+        
+        if (privilege == null) {
+            throw new FlowableException("Could not find or create " + SecurityConstants.PRIVILEGE_ACCESS_REST_API + " privilege");
         }
         
         if (!restApiPrivilegeMappingExists) {

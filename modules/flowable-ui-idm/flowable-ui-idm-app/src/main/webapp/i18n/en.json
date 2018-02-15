@@ -217,6 +217,7 @@
           "access-admin": "Access admin application",
           "access-modeler": "Access modeler application",
 		  "access-task": "Access the workflow application",
+		  "access-rest-api": "Access the REST API",
           "NO-SELECTION": "No privilege selected",
           "USERS": "Users",
           "GROUPS": "Groups",
