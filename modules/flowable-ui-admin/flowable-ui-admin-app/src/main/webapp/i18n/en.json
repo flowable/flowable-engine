@@ -36,6 +36,7 @@
             "CONFIGURATION": "Configuration",
             "CONFIGURATION-ENGINE": "Engine",
             "DECISION-TABLES": "Decision tables",
+            "DECISION-TABLE-EXECUTIONS": "Executions",
             "CONTENT-ITEMS": "Content items"
         },
         "RESULT-SIZES": {
@@ -840,14 +841,15 @@
         "TITLE": {
             "DECISION-AUDITS": "Decision audits"
         },
-        "DECISION-AUDITS-MESSAGE": "This decision table has {{total}} audits, showing {{size}}.",
-        "DECISION-AUDITS-MESSAGE-EMPTY": "This decision table has no audits",
+        "DECISION-EXECUTION-MESSAGE": "This decision table has {{total}} executions, showing {{size}}.",
+        "DECISION-EXECUTION-MESSAGE-EMPTY": "This decision table has no executions",
         "ACTION": {
             "EDIT-CATEGORY": "Edit category",
             "SHOW-ALL-JOBS": "Show all jobs",
             "SHOW-ALL-PROCESSES": "Show all processes",
             "SHOW-DIAGRAM": "Show process diagram",
-            "SHOW-DECISION-TABLE": "Show decision table"
+            "SHOW-DECISION-TABLE": "Show decision table",
+            "SHOW-ALL-EXECUTIONS": "Show all executions"
         },
         "POPUP": {
             "TITLE": "Decision Table: ",
@@ -857,6 +859,75 @@
                 "FIRST": "First (Single pass)",
                 "ANY": "Any (Single pass)"
             }
+        }
+    },
+    "DECISION-TABLE-EXECUTIONS": {
+        "TITLE": "Decision table executions",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decision table executions.",
+        "LIST-MESSAGE-EMPTY": "No matching decision table executions.",
+        "FILTER": {
+            "DEFINITION-ID": "Definition ID",
+            "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "TENANTID": "Tenant identifier"
+        },
+        "SORT": {
+            "START-TIME": "Start Time",
+            "END-TIME": "End Time",
+            "TENANT-ID": "Tenant ID"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "DECISION-DEFINITION-KEY": "Decision Key",
+            "DECISION-DEFINITION-NAME": "Decision Name",
+            "FAILED": "Failed",
+            "END-TIME": "End Time",
+            "TENANT-ID": "Tenant ID"
+        }
+    },
+    "DECISION-TABLE-EXECUTION": {
+        "TITLE": "Decision table execution",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decision tables.",
+        "LIST-MESSAGE-EMPTY": "No matching decision tables.",
+        "DEFINITION-ID": "Decision Definition ID",
+        "DEPLOYMENT-ID": "Deployment ID",
+        "DEFINITION-KEY": "Decision Key",
+        "DEFINITION-NAME": "Decision Name",
+        "DEFINITION-VERSION": "Decision Version",
+        "PROCESS-INSTANCE-ID": "Process Instance ID",
+        "EXECUTION-START-TIME": "Start Time",
+        "EXECUTION-END-TIME": "End Time",
+        "FAILED": "Failed",
+        "FILTER": {
+            "DEFINITION-ID": "Definition ID",
+            "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "TENANTID": "Tenant identifier"
+        },
+        "SORT": {
+            "START-TIME": "Start Time",
+            "END-TIME": "End Time",
+            "TENANT-ID": "Tenant ID"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "DECISION-DEFINITION-ID": "Definition ID",
+            "DECISION-KEY": "Decision Key",
+            "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "FAILED": "Failed",
+            "START-TIME": "Start Time",
+            "END-TIME": "End Time",
+            "TENANT-ID": "Tenant ID"
+        },
+        "AUDIT-DATA": {
+            "HEADER": "Audit Data",
+            "HIT-POLICY": "Hit Policy",
+            "STRICT-MODE": "Strict Mode enabled",
+            "EXCEPTION-MESSAGE": "Exception message",
+            "VALIDATION-MESSAGE": "Validation message",
+            "RESULT": "Result",
+            "RULE-EXECUTIONS": "Rule Executions",
+            "INPUT-VARIABLES": "Input Variables",
+            "VARIABLE-KEY": "Key",
+            "VARIABLE-VALUE": "Value"
         }
     },
     "FORM-DEFINITIONS": {

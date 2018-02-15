@@ -19,7 +19,7 @@
 
 var flowableAdminApp = angular.module('flowableAdminApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngSanitize',
     'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'ngFileUpload', 'ui.keypress',
-    'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav']);
+    'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav', 'jsonFormatter']);
 
 flowableAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider', '$provide',
@@ -150,6 +150,16 @@ flowableAdminApp
                     controller: 'DecisionTableController',
                     reloadOnSearch: true
                 })
+                .when('/decision-table-executions', {
+                    templateUrl: 'views/decision-table-executions.html',
+                    controller: 'DecisionTableExecutionsController',
+                    reloadOnSearch: true
+                })
+                .when('/decision-table-execution/:executionId', {
+                    templateUrl: 'views/decision-table-execution.html',
+                    controller: 'DecisionTableExecutionController',
+                    reloadOnSearch: true
+                })
                 .when('/form-deployments', {
                     templateUrl: 'views/form-deployments.html',
                     controller: 'FormDeploymentsController',
@@ -252,6 +262,11 @@ flowableAdminApp
         
         $httpProvider.interceptors.push('NotPermittedInterceptor');
     }])
+
+    .config(function (JSONFormatterConfigProvider) {
+
+        JSONFormatterConfigProvider.hoverPreviewEnabled = true;
+    })
 
     /* Filters */
 

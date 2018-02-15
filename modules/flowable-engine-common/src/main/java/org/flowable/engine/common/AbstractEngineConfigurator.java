@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,19 @@
  */
 package org.flowable.engine.common;
 
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.db.MybatisTypeAliasConfigurator;
+import org.flowable.engine.common.impl.db.MybatisTypeHandlerConfigurator;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -19,53 +32,36 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.EngineConfigurator;
-import org.flowable.engine.common.EngineDeployer;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
-import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 /**
  * Convenience class for external engines (IDM/DMN/Form/...) to work together with the process engine
  * while also sharing as much internal resources as possible.
- * 
+ *
  * @author Joram Barrez
  */
 public abstract class AbstractEngineConfigurator implements EngineConfigurator {
-    
+
     protected boolean enableMybatisXmlMappingValidation;
-    
+
     @Override
     public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
         registerCustomDeployers(engineConfiguration);
         registerCustomMybatisMappings(engineConfiguration);
 
-        List<CustomMybatisTypeAliasConfig> typeAliasConfigs = getMybatisTypeAliases();
+        List<MybatisTypeAliasConfigurator> typeAliasConfigs = getMybatisTypeAliases();
         if (typeAliasConfigs != null) {
-            for (CustomMybatisTypeAliasConfig customMybatisTypeAliasConfig : typeAliasConfigs) {
+            for (MybatisTypeAliasConfigurator customMybatisTypeAliasConfig : typeAliasConfigs) {
                 if (engineConfiguration.getDependentEngineMybatisTypeAliasConfigs() == null) {
-                    engineConfiguration.setDependentEngineMybatisTypeAliasConfigs(new ArrayList<CustomMybatisTypeAliasConfig>());
+                    engineConfiguration.setDependentEngineMybatisTypeAliasConfigs(new ArrayList<MybatisTypeAliasConfigurator>());
                 }
                 engineConfiguration.getDependentEngineMybatisTypeAliasConfigs().add(customMybatisTypeAliasConfig);
             }
         }
-        
-        List<CustomMyBatisTypeHandlerConfig> typeHandlerConfigs = getMybatisTypeHandlers();
+
+        List<MybatisTypeHandlerConfigurator> typeHandlerConfigs = getMybatisTypeHandlers();
         if (typeHandlerConfigs != null) {
-            for (CustomMyBatisTypeHandlerConfig typeHandler : typeHandlerConfigs) {
+            for (MybatisTypeHandlerConfigurator typeHandler : typeHandlerConfigs) {
                 if (engineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() == null) {
-                    engineConfiguration.setDependentEngineMybatisTypeHandlerConfigs(new ArrayList<CustomMyBatisTypeHandlerConfig>());
+                    engineConfiguration.setDependentEngineMybatisTypeHandlerConfigs(new ArrayList<MybatisTypeHandlerConfigurator>());
                 }
                 engineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() .add(typeHandler);
             }
@@ -81,25 +77,25 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
             engineConfiguration.getCustomPostDeployers().addAll(deployers);
         }
     }
-    
+
     protected abstract List<EngineDeployer> getCustomDeployers();
-    
+
     /**
      * @return The path to the Mybatis cfg file that's normally used for the engine (so the full cfg, not an individual mapper).
      *         Return null in case no custom mappers should be loaded.
      */
     protected abstract String getMybatisCfgPath();
-    
+
     protected void registerCustomMybatisMappings(AbstractEngineConfiguration engineConfiguration) {
         String cfgPath = getMybatisCfgPath();
         if (cfgPath != null) {
             Set<String> resources = new HashSet<>();
-            
+
             ClassLoader classLoader = engineConfiguration.getClassLoader();
             if (classLoader == null) {
                 classLoader = this.getClass().getClassLoader();
             }
-            
+
             try (InputStream inputStream = classLoader.getResourceAsStream(cfgPath)) {
                 DocumentBuilderFactory docBuilderFactory = createDocumentBuilderFactory();
                 DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -114,7 +110,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
             } catch (ParserConfigurationException | SAXException e) {
                 throw new FlowableException("Could not parse Mybatis configuration file", e);
             }
-            
+
             if (engineConfiguration.getCustomMybatisXMLMappers() == null) {
                 engineConfiguration.setCustomMybatisXMLMappers(resources);
             } else {
@@ -122,7 +118,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
             }
         }
     }
-    
+
     protected DocumentBuilderFactory createDocumentBuilderFactory() throws ParserConfigurationException {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         if (!enableMybatisXmlMappingValidation) {
@@ -134,18 +130,18 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         }
         return docBuilderFactory;
     }
-    
+
     /**
      * Override when custom type aliases are needed.
      */
-    protected List<CustomMybatisTypeAliasConfig> getMybatisTypeAliases() {
+    protected List<MybatisTypeAliasConfigurator> getMybatisTypeAliases() {
         return null;
     }
-    
+
     /**
      * Override when custom type handlers are needed.
      */
-    protected List<CustomMyBatisTypeHandlerConfig> getMybatisTypeHandlers() {
+    protected List<MybatisTypeHandlerConfigurator> getMybatisTypeHandlers() {
         return null;
     }
 
@@ -153,13 +149,13 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         initEngineConfigurations(engineConfiguration, targetEngineConfiguration);
         initCommandContextFactory(engineConfiguration, targetEngineConfiguration);
         initIdGenerator(engineConfiguration, targetEngineConfiguration);
-        
+
         if (targetEngineConfiguration.isUsingRelationalDatabase()) {
             initDataSource(engineConfiguration, targetEngineConfiguration);
             initDbSqlSessionFactory(engineConfiguration, targetEngineConfiguration);
             initDbProperties(engineConfiguration, targetEngineConfiguration);
         }
-        
+
         initSessionFactories(engineConfiguration, targetEngineConfiguration);
         initEventDispatcher(engineConfiguration, targetEngineConfiguration);
         initClock(engineConfiguration, targetEngineConfiguration);
@@ -168,10 +164,10 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
     protected void initEngineConfigurations(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setEngineConfigurations(engineConfiguration.getEngineConfigurations());
     }
-    
+
     protected void initServiceConfigurations(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         for (String serviceConfigurationKey : engineConfiguration.getServiceConfigurations().keySet()) {
-            if (targetEngineConfiguration.getServiceConfigurations() == null 
+            if (targetEngineConfiguration.getServiceConfigurations() == null
                     || !targetEngineConfiguration.getServiceConfigurations().containsKey(serviceConfigurationKey)) {
                 targetEngineConfiguration.addServiceConfiguration(serviceConfigurationKey, engineConfiguration.getServiceConfigurations().get(serviceConfigurationKey));
             }
@@ -181,9 +177,11 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
     protected void initCommandContextFactory(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setCommandContextFactory(engineConfiguration.getCommandContextFactory());
     }
-    
+
     protected void initIdGenerator(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
-        targetEngineConfiguration.setIdGenerator(engineConfiguration.getIdGenerator());
+        if (targetEngineConfiguration.getIdGenerator() == null) {
+            targetEngineConfiguration.setIdGenerator(engineConfiguration.getIdGenerator());
+        }
     }
 
     protected void initDataSource(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
@@ -198,13 +196,13 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         DbSqlSessionFactory dbSqlSessionFactory = engineConfiguration.getDbSqlSessionFactory();
         targetEngineConfiguration.setDbSqlSessionFactory(engineConfiguration.getDbSqlSessionFactory());
         targetEngineConfiguration.setSqlSessionFactory(engineConfiguration.getSqlSessionFactory());
-        
+
         if (getEntityInsertionOrder() != null) {
             for (Class<? extends Entity> clazz : getEntityInsertionOrder()) {
                 dbSqlSessionFactory.getInsertionOrder().add(clazz);
             }
         }
-        
+
         if (getEntityDeletionOrder() != null) {
             for (Class<? extends Entity> clazz : getEntityDeletionOrder()) {
                 dbSqlSessionFactory.getDeletionOrder().add(clazz);
@@ -235,13 +233,13 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
             targetEngineConfiguration.setEventDispatcher(engineConfiguration.getEventDispatcher());
         }
     }
-    
+
     protected void initClock(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setClock(engineConfiguration.getClock());
     }
-    
+
     protected abstract List<Class<? extends Entity>> getEntityInsertionOrder();
-    
+
     protected abstract List<Class<? extends Entity>> getEntityDeletionOrder();
 
     public boolean isEnableMybatisXmlMappingValidation() {
@@ -251,5 +249,5 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
     public void setEnableMybatisXmlMappingValidation(boolean enableMybatisXmlMappingValidation) {
         this.enableMybatisXmlMappingValidation = enableMybatisXmlMappingValidation;
     }
-    
+
 }
