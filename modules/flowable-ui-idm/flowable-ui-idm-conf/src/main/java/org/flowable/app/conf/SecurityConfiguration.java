@@ -26,6 +26,7 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -60,15 +61,20 @@ public class SecurityConfiguration {
     // GLOBAL CONFIG
     //
 
+    @Qualifier("defaultIdmIdentityService")
     @Autowired
     protected IdmIdentityService identityService;
-
+    
     @Autowired
     protected PasswordEncoder passwordEncoder;
 
+    @Qualifier("customAuthenticationProvider")
+    @Autowired(required = false)
+    protected AuthenticationProvider customAuthenticationProvider;
+    
     @Autowired
     protected Environment env;
-
+    
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) {
 
@@ -79,7 +85,8 @@ public class SecurityConfiguration {
             } catch (Exception e) {
                 LOGGER.error("Could not configure ldap authentication mechanism:", e);
             }
-
+        } else if (customAuthenticationProvider != null) {
+            auth.authenticationProvider(customAuthenticationProvider);
         } else {
             // Default auth (database backed)
             try {
