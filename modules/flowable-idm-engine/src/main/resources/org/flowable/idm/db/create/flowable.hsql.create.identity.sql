@@ -38,7 +38,7 @@ create table ACT_ID_USER (
   EMAIL_ varchar(255),
   PWD_ varchar(255),
   PICTURE_ID_ varchar(64),
-  TENANT_ID_ varchar(255) default value '',
+  TENANT_ID_ varchar(255),
   primary key (ID_)
 );
 
