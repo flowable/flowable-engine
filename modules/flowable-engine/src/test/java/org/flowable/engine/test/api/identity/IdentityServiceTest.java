@@ -70,7 +70,7 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setEmail("johndoe@alfresco.com");
-        user.setTenantId("alfresco");
+        user.setTenantId("originalTenantId");
         identityService.saveUser(user);
 
         // Fetch and update the user
