@@ -38,6 +38,7 @@ create table ACT_ID_USER (
     EMAIL_ varchar(255),
     PWD_ varchar(255),
     PICTURE_ID_ varchar(64),
+    TENANT_ID_ varchar(255) default value '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -83,16 +84,16 @@ alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_GROUP
     foreign key (GROUP_ID_)
     references ACT_ID_GROUP (ID_);
-    
+
 alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_USER
     foreign key (USER_ID_)
     references ACT_ID_USER (ID_);
 
-alter table ACT_ID_PRIV_MAPPING 
-    add constraint ACT_FK_PRIV_MAPPING 
-    foreign key (PRIV_ID_) 
+alter table ACT_ID_PRIV_MAPPING
+    add constraint ACT_FK_PRIV_MAPPING
+    foreign key (PRIV_ID_)
     references ACT_ID_PRIV (ID_);
-    
+
 create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
-create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);   
+create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);
