@@ -15,12 +15,12 @@
       #{lastName ,jdbcType=VARCHAR},
       #{email ,jdbcType=VARCHAR},
       #{tenantId ,jdbcType=VARCHAR},
-      #{password ,jdbcType=VARCHAR},
+      #{password ,jdbcType=VARCHAR}
     )
   </insert>
 
   <insert id="bulkInsertUser" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, EMAIL_, TENANT_ID_ PWD_) VALUES
+    INSERT INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, EMAIL_, TENANT_ID_, PWD_) VALUES
       <foreach collection="list" item="user" index="index" separator=",">
         (#{user.id ,jdbcType=VARCHAR},
          1,
