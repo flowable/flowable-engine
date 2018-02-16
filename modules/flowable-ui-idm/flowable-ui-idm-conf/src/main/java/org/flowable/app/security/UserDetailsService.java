@@ -22,6 +22,7 @@ import org.flowable.app.idm.service.UserService;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -39,6 +40,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Autowired
     protected UserCache userCache;
 
+    @Qualifier("defaultIdmIdentityService")
     @Autowired
     protected IdmIdentityService identityService;
 

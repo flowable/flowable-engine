@@ -14,12 +14,14 @@ package org.flowable.app.idm.service;
 
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * @author Joram Barrez
  */
 public class AbstractIdmService {
 
+    @Qualifier("defaultIdmIdentityService")
     @Autowired
     protected IdmIdentityService identityService;
 

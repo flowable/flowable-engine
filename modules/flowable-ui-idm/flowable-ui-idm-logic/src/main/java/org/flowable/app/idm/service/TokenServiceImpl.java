@@ -15,11 +15,13 @@ package org.flowable.app.idm.service;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TokenServiceImpl extends AbstractIdmService implements TokenService {
 
+    @Qualifier("defaultIdmIdentityService")
     @Autowired
     protected IdmIdentityService identityService;
 

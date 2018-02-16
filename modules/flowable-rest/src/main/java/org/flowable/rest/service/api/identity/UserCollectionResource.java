@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -77,6 +77,7 @@ public class UserCollectionResource {
             @ApiImplicitParam(name = "lastNameLike", dataType = "string", value = "Only return users with a lastname like the given value. Use % as wildcard-character.", paramType = "query"),
             @ApiImplicitParam(name = "emailLike", dataType = "string", value = "Only return users with an email like the given value. Use % as wildcard-character.", paramType = "query"),
             @ApiImplicitParam(name = "memberOfGroup", dataType = "string", value = "Only return users which are a member of the given group.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return users which are a members of the given tenant.", paramType = "query"),
             @ApiImplicitParam(name = "potentialStarter", dataType = "string", value = "Only return users  which members are potential starters for a process-definition with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,firstName,lastname,email", paramType = "query"),
     })
@@ -111,6 +112,9 @@ public class UserCollectionResource {
         if (allRequestParams.containsKey("memberOfGroup")) {
             query.memberOfGroup(allRequestParams.get("memberOfGroup"));
         }
+        if (allRequestParams.containsKey("tenantId")) {
+            query.tenantId(allRequestParams.get("tenantId"));
+        }
 
         return new UserPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
     }
@@ -137,6 +141,7 @@ public class UserCollectionResource {
         created.setFirstName(userRequest.getFirstName());
         created.setLastName(userRequest.getLastName());
         created.setPassword(userRequest.getPassword());
+        created.setTenantId(userRequest.getTenantId());
         identityService.saveUser(created);
 
         response.setStatus(HttpStatus.CREATED.value());

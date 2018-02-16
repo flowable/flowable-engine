@@ -25,6 +25,7 @@ import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
@@ -41,6 +42,7 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
 
+    @Qualifier("defaultIdmIdentityService")
     @Autowired
     private IdmIdentityService identityService;
 
@@ -52,8 +54,10 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
         if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
 
             if (!env.getProperty("ldap.enabled", Boolean.class, false)) {
-                // First create the default IDM entities
-                createDefaultAdminUserAndPrivileges();
+                if (env.getProperty("idm.bootstrap.enabled", Boolean.class, true)){
+                    // First create the default IDM entities
+                    createDefaultAdminUserAndPrivileges();
+                }
             
             } else {
                 if (identityService.createPrivilegeQuery().privilegeName(DefaultPrivileges.ACCESS_IDM).count() == 0) {

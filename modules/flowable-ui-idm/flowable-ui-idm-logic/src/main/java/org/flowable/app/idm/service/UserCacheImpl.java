@@ -29,6 +29,7 @@ import org.flowable.app.idm.model.UserInformation;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
@@ -50,6 +51,7 @@ public class UserCacheImpl implements UserCache {
     @Autowired
     protected Environment environment;
 
+    @Qualifier("defaultIdmIdentityService")
     @Autowired
     protected IdmIdentityService identityService;
 

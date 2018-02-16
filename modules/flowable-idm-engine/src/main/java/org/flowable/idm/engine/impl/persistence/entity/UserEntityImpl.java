@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,6 +33,7 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
     protected String lastName;
     protected String email;
     protected String password;
+    protected String tenantId;
 
     protected ByteArrayRef pictureByteArrayRef;
 
@@ -46,6 +47,7 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
         persistentState.put("lastName", lastName);
         persistentState.put("email", email);
         persistentState.put("password", password);
+        persistentState.put("tenantId", tenantId);
 
         if (pictureByteArrayRef != null) {
             persistentState.put("pictureByteArrayId", pictureByteArrayRef.getId());
@@ -134,4 +136,13 @@ public class UserEntityImpl extends AbstractEntity implements UserEntity, Serial
         return pictureByteArrayRef;
     }
 
+    @Override
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    @Override
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 }
