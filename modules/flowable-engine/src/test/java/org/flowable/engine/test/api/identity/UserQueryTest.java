@@ -323,7 +323,7 @@ public class UserQueryTest extends PluggableFlowableTestCase {
 
         // paging
         assertEquals(2, identityService.createNativeUserQuery().sql(baseQuerySql).listPage(0, 2).size());
-        assertEquals(2, identityService.createNativeUserQuery().sql(baseQuerySql).listPage(1, 3).size());
+        assertEquals(3, identityService.createNativeUserQuery().sql(baseQuerySql).listPage(1, 4).size());
         assertEquals(1, identityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "kermit").listPage(0, 1).size());
     }
 
