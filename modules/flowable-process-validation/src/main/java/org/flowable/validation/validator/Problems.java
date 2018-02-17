@@ -43,6 +43,7 @@ public interface Problems {
     String SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE = "flowable-servicetask-result-var-name-with-delegate";
     String SERVICE_TASK_MISSING_IMPLEMENTATION = "flowable-servicetask-missing-implementation";
     String SERVICE_TASK_WEBSERVICE_INVALID_OPERATION_REF = "flowable-servicetask-webservice-invalid-operation-ref";
+    String SERVICE_TASK_USE_LOCAL_SCOPE_FOR_RESULT_VAR_WITHOUT_RESULT_VARIABLE_NAME = "flowable-servicetask-use-local-scope-for-result-var-without-result-variable-name";
 
     String SEND_TASK_INVALID_IMPLEMENTATION = "flowable-sendtask-invalid-implementation";
     String SEND_TASK_INVALID_TYPE = "flowable-sendtask-invalid-type";

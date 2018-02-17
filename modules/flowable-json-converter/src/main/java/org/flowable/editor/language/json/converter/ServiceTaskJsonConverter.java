@@ -137,6 +137,10 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
                 propertiesNode.put(PROPERTY_SERVICETASK_RESULT_VARIABLE, serviceTask.getResultVariableName());
             }
 
+            if (serviceTask.isUseLocalScopeForResultVariable()) {
+                propertiesNode.put(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, serviceTask.isUseLocalScopeForResultVariable());
+            }
+
             addFieldExtensions(serviceTask.getFieldExtensions(), propertiesNode);
         }
     }
@@ -159,6 +163,10 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
 
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode))) {
             task.setResultVariableName(getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode));
+        }
+
+        if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, elementNode)) {
+            task.setUseLocalScopeForResultVariable(true);
         }
 
         task.setSkipExpression(getPropertyValueAsString(PROPERTY_SKIP_EXPRESSION, elementNode));

@@ -175,6 +175,7 @@ public interface StencilConstants {
     final String PROPERTY_SERVICETASK_FIELD_STRING_VALUE = "stringValue";
     final String PROPERTY_SERVICETASK_FIELD_STRING = "string";
     final String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
+    final String PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "servicetaskUseLocalScopeForResultVariable";
 
     final String PROPERTY_FORM_PROPERTIES = "formproperties";
     final String PROPERTY_FORM_ID = "id";
