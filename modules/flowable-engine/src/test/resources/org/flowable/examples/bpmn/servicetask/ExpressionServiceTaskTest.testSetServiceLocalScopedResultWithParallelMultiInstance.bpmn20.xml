@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
+    <process id="setServiceLocalScopedResultWithParallelMultiInstance" isExecutable="true">
+        <startEvent id="theStart"/>
+        <endEvent id="theEnd"/>
+        <subProcess id="subProcess" name="subProcess">
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="beans" flowable:elementVariable="bean"/>
+            <startEvent id="subProcessStart"/>
+            <serviceTask id="valueExpressionWithLocalResultVariableInSubProcess" flowable:expression="#{bean.value}" flowable:resultVariable="subProcessVar" flowable:useLocalScopeForResultVariable="true"/>
+            <userTask id="subProcessWaitState"/>
+            <exclusiveGateway id="gateway" default="defaultFlow"/>
+            <endEvent id="subProcessEnd"/>
+            <sequenceFlow id="flow2" sourceRef="subProcessStart" targetRef="valueExpressionWithLocalResultVariableInSubProcess"/>
+            <sequenceFlow id="flow3" sourceRef="valueExpressionWithLocalResultVariableInSubProcess" targetRef="gateway"/>
+            <sequenceFlow id="defaultFlow" sourceRef="gateway" targetRef="subProcessEnd"/>
+            <sequenceFlow id="flow5" sourceRef="subProcessWaitState" targetRef="subProcessEnd"/>
+            <sequenceFlow id="flow4" sourceRef="gateway" targetRef="subProcessWaitState">
+                <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{subProcessVar == 'OK'}]]></conditionExpression>
+            </sequenceFlow>
+        </subProcess>
+        <userTask id="processWaitState"/>
+        <sequenceFlow id="flow7" sourceRef="processWaitState" targetRef="theEnd"/>
+        <sequenceFlow id="flow6" sourceRef="subProcess" targetRef="processWaitState"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="subProcess"/>
+    </process>
+</definitions>
