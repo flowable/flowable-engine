@@ -97,7 +97,7 @@ angular.module('flowableModeler').directive('formBuilderElement', ['$rootScope',
                 {
                     "id": "advanced",
                     "name": $translate.instant('FORM-BUILDER.TABS.ADVANCED-OPTIONS'),
-                    "show": ['text', 'multi-line-text', 'integer', 'decimal','hyperlink']
+                    "show": ['text', 'password', 'multi-line-text', 'integer', 'decimal','hyperlink']
                 }
             ];
 

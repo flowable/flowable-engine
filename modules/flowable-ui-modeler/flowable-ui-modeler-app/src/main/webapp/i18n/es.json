@@ -434,6 +434,7 @@
     "FORM-BUILDER": {
         "PALLETTE": {
             "TEXT": "Texto",
+            "PASSWORD": "Contraseña",
             "MULTILINE-TEXT": "Texto en varias lineas",
             "NUMBER": "Numero",
             "CHECKBOX": "Checkbox",
@@ -485,6 +486,7 @@
             "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos",
 	          "MAX-LENGTH":"Longitud máxima:",
             "MIN-LENGTH":"Longitud mínima:",
+            "PASSWORD-UNMASK-OPTION": "Opción de enmascaramiento/desenmascaramiento de contraseña",
 	          "HYPERLINK-URL": "URL hiperlink",
 	          "REGEX-PATTERN":"Estándar  Regex",
             "MASK":{

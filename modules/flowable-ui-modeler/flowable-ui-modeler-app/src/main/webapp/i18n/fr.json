@@ -537,6 +537,7 @@
     "FORM-BUILDER": {
         "PALLETTE": {
             "TEXT": "Texte",
+            "PASSWORD": "Mot de passe",
             "MULTILINE-TEXT": "Texte Multiligne",
             "NUMBER": "Nombre",
             "CHECKBOX": "Case à cocher",
@@ -591,6 +592,7 @@
             "SIZE": "Taille",
 	          "MAX-LENGTH":"Longueur maximale:",
             "MIN-LENGTH":"Longueur minimum:",
+            "PASSWORD-UNMASK-OPTION": "Option de masquage / démasquage de mot de passe",
 	          "HYPERLINK-URL": "URL line hypertexte",
 	          "REGEX-PATTERN":"Regex standard",
             "MASK":{

@@ -397,6 +397,9 @@ angular.module('flowableApp')
                     return $scope.controlCallbacks.closeDatePopup(field);
                 };
 
+                $scope.togglePasswordFieldType = function(field){
+                		return $scope.controlCallbacks.togglePasswordFieldType(field);
+                };
             }
         }
     }]);
