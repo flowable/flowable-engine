@@ -15,7 +15,7 @@ The following installation instructions are verified on link:$$http://www.eclips
 Go to *Help -> Install New Software*. In the following panel, click on _Add_ button and fill in the following fields:
 
 * **Name:** Flowable BPMN 2.0 designer
-* **Location:** http://flowable.org/designer/update/
+* **Location:** http://www.flowable.org/designer/update/
 
 image::images/designer.add.update.site.png[align="center"]
 

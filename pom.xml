@@ -1531,7 +1531,7 @@
 
 	<!-- Various information, not used by the build -->
 
-	<url>http://flowable.org</url>
+	<url>http://www.flowable.org</url>
 	<licenses>
 		<license>
 			<name>Apache v2</name>
