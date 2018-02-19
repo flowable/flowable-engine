@@ -280,6 +280,20 @@ angular.module('flowableModeler')
                 console.log($scope.model.columnDefs);
             };
 
+            $scope.doAfterValidate = function (isValid, value, row, prop, source) {
+                if (isCustomExpression(value)) {
+                    return true;
+                }
+            };
+
+            var isCustomExpression = function (val) {
+                if (val != null && (String(val).startsWith('${') || String(val).startsWith('#{'))) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
             var createNewInputExpression = function (inputExpression) {
                 var newInputExpression;
                 if (inputExpression) {
