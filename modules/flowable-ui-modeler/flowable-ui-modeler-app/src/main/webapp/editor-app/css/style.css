@@ -1025,6 +1025,14 @@ hot-table .column-header.label {
     height: 18px;
 }
 
+#decisionTableGrid .custom-expression-operator * {
+    visibility: hidden;
+}
+
+#decisionTableGrid .custom-expression-operator {
+    color: transparent;
+}
+
 #decision-table-allowed-values {
     font-size: 14px;
 }

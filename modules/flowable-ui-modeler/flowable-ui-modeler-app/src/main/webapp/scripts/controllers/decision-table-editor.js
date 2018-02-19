@@ -28,6 +28,10 @@ angular.module('flowableModeler')
 
             var hotDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
+            var stringOperators = ['==', '!='];
+            var numberOperators = ['==', '!=', '<', '>', '>=', '<='];
+            var booleanOperators = ['==', '!='];
+            var dateOperators = ['==', '!=', '<', '>', '>=', '<='];
             var operators = ['==', '!=', '<', '>', '>=', '<='];
             var collectOperators = {
                 'SUM': '+',
@@ -282,16 +286,52 @@ angular.module('flowableModeler')
 
             $scope.doAfterValidate = function (isValid, value, row, prop, source) {
                 if (isCustomExpression(value)) {
+                    disableCorrespondingOperatorCell(row, prop);
                     return true;
+                } else {
+                    enableCorrespondingOperatorCell(row, prop);
                 }
             };
 
             var isCustomExpression = function (val) {
-                if (val != null && (String(val).startsWith('${') || String(val).startsWith('#{'))) {
-                    return true;
-                } else {
-                    return false;
+                return !!(val != null
+                    && (String(val).startsWith('${') || String(val).startsWith('#{')));
+            };
+
+            var disableCorrespondingOperatorCell = function (row, prop) {
+                var currentCol = hotDecisionTableEditorInstance.propToCol(prop);
+                if (currentCol < 1) {
+                    return;
                 }
+                var operatorCol = currentCol - 1;
+                var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                if (operatorCellMeta.className.indexOf('custom-expression-operator') !== -1) {
+                    return;
+                }
+
+                var currentEditor = hotDecisionTableEditorInstance.getCellEditor(row, operatorCol);
+
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className + ' custom-expression-operator');
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'originalEditor', currentEditor);
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', false);
+            };
+
+            var enableCorrespondingOperatorCell = function (row, prop) {
+                var currentCol = hotDecisionTableEditorInstance.propToCol(prop);
+                if (currentCol < 1) {
+                    return;
+                }
+                var operatorCol = currentCol - 1;
+                var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                if (operatorCellMeta.className.indexOf('custom-expression-operator') == -1) {
+                    return;
+                }
+
+                operatorCellMeta.className = operatorCellMeta.className.replace('custom-expression-operator', '');
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className);
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', operatorCellMeta.originalEditor);
             };
 
             var createNewInputExpression = function (inputExpression) {
@@ -506,7 +546,7 @@ angular.module('flowableModeler')
                     width: '60',
                     className: 'input-operator-cell',
                     type: 'dropdown',
-                    source: operators
+                    source: getOperatorsForColumnType(inputExpression.type)
                 };
 
                 if ($scope.currentDecisionTable.inputExpressions.length !== 1) {
@@ -516,6 +556,21 @@ angular.module('flowableModeler')
                 }
 
                 return columnDefinition;
+            };
+
+            var getOperatorsForColumnType = function (type) {
+                switch (type) {
+                    case 'number':
+                        return numberOperators;
+                    case 'date':
+                        return dateOperators;
+                    case 'boolean':
+                        return booleanOperators;
+                    case 'string':
+                        return stringOperators;
+                    default:
+                        return operators;
+                }
             };
 
             var composeInputExpressionColumnDefinition = function (inputExpression) {

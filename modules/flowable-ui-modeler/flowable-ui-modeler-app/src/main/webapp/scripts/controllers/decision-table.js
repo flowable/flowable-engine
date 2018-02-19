@@ -259,16 +259,52 @@ angular.module('flowableModeler')
 
             $scope.doAfterValidate = function (isValid, value, row, prop, source) {
                 if (isCustomExpression(value)) {
+                    disableCorrespondingOperatorCell(row, prop);
                     return true;
+                } else {
+                    enableCorrespondingOperatorCell(row, prop);
                 }
             };
 
             var isCustomExpression = function (val) {
-                if (val != null && (String(val).startsWith('${') || String(val).startsWith('#{'))) {
-                    return true;
-                } else {
-                    return false;
+                return !!(val != null
+                    && (String(val).startsWith('${') || String(val).startsWith('#{')));
+            };
+
+            var disableCorrespondingOperatorCell = function (row, prop) {
+                var currentCol = hotReadOnlyDecisionTableEditorInstance.propToCol(prop);
+                if (currentCol < 1) {
+                    return;
                 }
+                var operatorCol = currentCol - 1;
+                var operatorCellMeta = hotReadOnlyDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                if (operatorCellMeta.className.indexOf('custom-expression-operator') !== -1) {
+                    return;
+                }
+
+                var currentEditor = hotReadOnlyDecisionTableEditorInstance.getCellEditor(row, operatorCol);
+
+                hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className + ' custom-expression-operator');
+                hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'originalEditor', currentEditor);
+                hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', false);
+            };
+
+            var enableCorrespondingOperatorCell = function (row, prop) {
+                var currentCol = hotReadOnlyDecisionTableEditorInstance.propToCol(prop);
+                if (currentCol < 1) {
+                    return;
+                }
+                var operatorCol = currentCol - 1;
+                var operatorCellMeta = hotReadOnlyDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                if (operatorCellMeta.className.indexOf('custom-expression-operator') == -1) {
+                    return;
+                }
+
+                operatorCellMeta.className = operatorCellMeta.className.replace('custom-expression-operator', '');
+                hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className);
+                hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', operatorCellMeta.originalEditor);
             };
 
             var createNewInputExpression = function (inputExpression) {
