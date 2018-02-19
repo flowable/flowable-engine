@@ -64,6 +64,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             taskEntity.setSubScopeId(planItemInstanceEntity.getId());
             taskEntity.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
             taskEntity.setScopeType(VariableScopeType.CMMN);
+            taskEntity.setTenantId(planItemInstanceEntity.getTenantId());
 
             taskEntity.setTaskDefinitionKey(humanTask.getId());
 
