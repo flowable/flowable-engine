@@ -3,7 +3,7 @@ MAINTAINER Simon Yang <simon.yang@relational.com.au>
 
 # Add the service itself
 ARG JAR_FILE
-ADD target/${JAR_FILE} /designer.jar
+ADD target/designer.jar /designer.jar
 
 ADD waitForOracle /waitForOracle/
 RUN chmod +x /waitForOracle/wait-for-something.sh

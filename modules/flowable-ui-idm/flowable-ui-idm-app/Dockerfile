@@ -3,7 +3,7 @@ MAINTAINER Simon Yang <simon.yang@relational.com.au>
 
 # Add the service itself
 ARG JAR_FILE
-ADD target/${JAR_FILE} /rds-idm.jar
+ADD target/rds-idm.jar /rds-idm.jar
 ADD src/main/docker/wait-for-something.sh /wait-for-something.sh
 RUN chmod +x /wait-for-something.sh
 
