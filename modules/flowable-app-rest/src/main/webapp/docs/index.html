@@ -41,6 +41,9 @@
           case "specfile/process/flowable.json":
               api = "process";
               break;
+          case "specfile/idm/flowable.json":
+              api = "idm";
+              break;    
           case "specfile/dmn/flowable.json":
               api = "dmn";
               break;
@@ -102,6 +105,9 @@
               case "process":
                   specFile = "specfile/process/flowable.json";
                   break;
+              case "idm":
+                  specFile = "specfile/idm/flowable.json";
+                  break;    
               case "dmn":
                   specFile = "specfile/dmn/flowable.json";
                   break;
@@ -133,6 +139,7 @@
         API:
         <select id="api-select" style="margin-left: 5px;">
           <option value="process">Process</option>
+          <option value="idm">IDM</option>
           <option value="dmn">DMN</option>
           <option value="form">Form</option>
           <option value="content">Content</option>

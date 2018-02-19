@@ -158,4 +158,15 @@ public class ProcessInstanceClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
+
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/decision-executions", method = RequestMethod.GET)
+    public JsonNode getDecisionExecutions(@PathVariable String processInstanceId) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.DMN);
+        try {
+            return clientService.getDecisionExecutions(serverConfig, processInstanceId);
+        } catch (FlowableServiceException e) {
+            LOGGER.error("Error getting decision executions {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 }

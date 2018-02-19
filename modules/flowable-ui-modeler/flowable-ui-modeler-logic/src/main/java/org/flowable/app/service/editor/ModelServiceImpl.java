@@ -61,7 +61,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,7 +198,7 @@ public class ModelServiceImpl implements ModelService {
         String json = null;
         if (Integer.valueOf(AbstractModel.MODEL_TYPE_FORM).equals(model.getModelType())) {
             try {
-                json = objectMapper.writeValueAsString(new FormModel());
+                json = objectMapper.writeValueAsString(new SimpleFormModel());
             } catch (Exception e) {
                 LOGGER.error("Error creating form model", e);
                 throw new InternalServerErrorException("Error creating form");

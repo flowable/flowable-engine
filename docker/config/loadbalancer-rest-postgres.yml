@@ -10,6 +10,10 @@ services:
       - datasource.username=flowable
       - datasource.password=flowable
       - rest.docs.swagger.enabled=false
+      - rest-admin.userid=rest-admin
+      - rest-admin.password=test
+      - rest-admin.firstname=Rest
+      - rest-admin.lastname=Admin
     expose:
       - "9977"
     entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]

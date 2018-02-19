@@ -28,7 +28,7 @@ import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,9 +111,9 @@ public class FlowableFormService {
     }
 
     protected FormRepresentation createFormRepresentation(AbstractModel model) {
-        FormModel formDefinition = null;
+        SimpleFormModel formDefinition = null;
         try {
-            formDefinition = objectMapper.readValue(model.getModelEditorJson(), FormModel.class);
+            formDefinition = objectMapper.readValue(model.getModelEditorJson(), SimpleFormModel.class);
         } catch (Exception e) {
             LOGGER.error("Error deserializing form", e);
             throw new InternalServerErrorException("Could not deserialize form definition");

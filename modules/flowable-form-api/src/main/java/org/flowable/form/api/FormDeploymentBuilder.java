@@ -14,8 +14,6 @@ package org.flowable.form.api;
 
 import java.io.InputStream;
 
-import org.flowable.form.model.FormModel;
-
 /**
  * Builder for creating new deployments.
  * 
@@ -38,7 +36,7 @@ public interface FormDeploymentBuilder {
 
     FormDeploymentBuilder addFormBytes(String resourceName, byte[] formBytes);
 
-    FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition);
+    FormDeploymentBuilder addFormDefinition(String resourceName, String formDefinition);
 
     /**
      * Gives the deployment the given name.

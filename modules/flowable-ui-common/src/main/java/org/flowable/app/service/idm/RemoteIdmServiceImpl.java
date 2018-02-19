@@ -109,7 +109,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         }
         return new ArrayList<>();
     }
-    
+
     @Override
     public List<RemoteUser> findUsersByGroup(String groupId) {
         JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId) + "/users", adminUser, adminPassword);
@@ -118,7 +118,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         }
         return new ArrayList<>();
     }
-    
+
     @Override
     public RemoteGroup getGroup(String groupId) {
         JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId), adminUser, adminPassword);
@@ -192,6 +192,9 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         user.setLastName(json.get("lastName").asText());
         user.setEmail(json.get("email").asText());
         user.setFullName(json.get("fullName").asText());
+        if (json.has("tenantId") && !json.get("tenantId").isNull()) {
+            user.setTenantId(json.get("tenantId").asText());
+        }
 
         if (json.has("groups")) {
             for (JsonNode groupNode : ((ArrayNode) json.get("groups"))) {

@@ -152,12 +152,12 @@
 			<dependency>
 				<groupId>javax.servlet</groupId>
 				<artifactId>javax.servlet-api</artifactId>
-				<version>3.0.1</version>
+				<version>3.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.mail</groupId>
 				<artifactId>javax.mail</artifactId>
-				<version>1.5.6</version>
+				<version>1.6.1</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
@@ -290,10 +290,15 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-            	<groupId>org.flowable</groupId>
-            	<artifactId>flowable-idm-spring</artifactId>
-            	<version>${project.version}</version>
-        	</dependency>
+                	<groupId>org.flowable</groupId>
+                	<artifactId>flowable-idm-spring</artifactId>
+                	<version>${project.version}</version>
+        	    </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-idm-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>    
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-dmn-api</artifactId>
@@ -640,11 +645,6 @@
 				<version>5.5.0.Final</version>
 			</dependency>
 			<dependency>
-				<groupId>org.json</groupId>
-				<artifactId>json</artifactId>
-				<version>20070829</version>
-			</dependency>
-			<dependency>
 				<groupId>org.mule.modules</groupId>
 				<artifactId>mule-module-cxf</artifactId>
 				<version>${mule.version}</version>
@@ -665,10 +665,10 @@
               <version>1.3.1</version>
             </dependency>
             <dependency>
-              <groupId>com.mchange</groupId>
-              <artifactId>c3p0</artifactId>
-              <version>0.9.5.2</version>
-           </dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>2.7.7</version>
+            </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
@@ -868,11 +868,6 @@
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-joda</artifactId>
 				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.imgscalr</groupId>
-				<artifactId>imgscalr-lib</artifactId>
-				<version>4.2</version>
 			</dependency>
 			<!-- Camel integration -->
 			<dependency>
@@ -1104,6 +1099,7 @@
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-app-rest</module>
 				<module>modules/flowable-idm-spring</module>
+                <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable5-engine</module>
 				<module>modules/flowable5-compatibility</module>
@@ -1294,6 +1290,7 @@
 				<module>modules/flowable-form-spring-configurator</module>
 				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-idm-spring</module>
+                <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
@@ -1437,8 +1434,6 @@
 			</modules>
 		</profile>
 		<profile>
-			<!-- Profile used by the start-rest.sh script to build the Explorer webapp
-				and all its dependencies -->
 			<id>buildRestappDependencies</id>
 			<modules>
 				<module>modules/flowable-bpmn-model</module>
@@ -1453,6 +1448,7 @@
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
+                <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-api</module>
 				<module>modules/flowable-dmn-engine</module>
@@ -1535,7 +1531,7 @@
 
 	<!-- Various information, not used by the build -->
 
-	<url>http://flowable.org</url>
+	<url>http://www.flowable.org</url>
 	<licenses>
 		<license>
 			<name>Apache v2</name>

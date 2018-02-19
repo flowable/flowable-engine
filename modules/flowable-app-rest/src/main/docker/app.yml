@@ -9,6 +9,10 @@ services:
             - datasource.url=jdbc:postgresql://flowable-rest-db:5432/flowable
             - datasource.username=flowable
             - datasource.password=flowable
+            - rest-admin.userid=rest-admin
+            - rest-admin.password=test
+            - rest-admin.firstname=Rest
+            - rest-admin.lastname=Admin
         ports:
             - 8080:8080
         depends_on:

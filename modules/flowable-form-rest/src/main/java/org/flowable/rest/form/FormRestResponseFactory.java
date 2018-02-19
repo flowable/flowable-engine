@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
-import org.flowable.form.model.FormInstanceModel;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.rest.form.service.api.form.FormInstanceModelResponse;
 import org.flowable.rest.form.service.api.form.FormInstanceResponse;
 import org.flowable.rest.form.service.api.form.FormModelResponse;
@@ -34,11 +34,11 @@ import org.flowable.rest.form.service.api.repository.FormDeploymentResponse;
  */
 public class FormRestResponseFactory {
 
-    public FormModelResponse createFormModelResponse(FormModel formModel) {
+    public FormModelResponse createFormModelResponse(FormInfo formModel) {
         return createFormModelResponse(formModel, createUrlBuilder());
     }
 
-    public FormModelResponse createFormModelResponse(FormModel formModel, FormRestUrlBuilder urlBuilder) {
+    public FormModelResponse createFormModelResponse(FormInfo formModel, FormRestUrlBuilder urlBuilder) {
         FormModelResponse response = new FormModelResponse(formModel);
         response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM_MODEL));
 
@@ -66,21 +66,21 @@ public class FormRestResponseFactory {
         return response;
     }
 
-    public List<FormInstanceModelResponse> createFormInstanceModelResponse(List<FormInstanceModel> formInstanceModels) {
+    public List<FormInstanceModelResponse> createFormInstanceModelResponse(List<FormInstanceInfo> formInstanceModels) {
         FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
         List<FormInstanceModelResponse> responseList = new ArrayList<>();
-        for (FormInstanceModel formInstanceModel : formInstanceModels) {
+        for (FormInstanceInfo formInstanceModel : formInstanceModels) {
             responseList.add(createFormInstanceModelResponse(formInstanceModel, urlBuilder));
         }
 
         return responseList;
     }
 
-    public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel) {
+    public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceInfo formInstanceModel) {
         return createFormInstanceModelResponse(formInstanceModel, createUrlBuilder());
     }
 
-    public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceModel formInstanceModel, FormRestUrlBuilder urlBuilder) {
+    public FormInstanceModelResponse createFormInstanceModelResponse(FormInstanceInfo formInstanceModel, FormRestUrlBuilder urlBuilder) {
         FormInstanceModelResponse response = new FormInstanceModelResponse(formInstanceModel);
         response.setUrl(urlBuilder.buildUrl(FormRestUrls.URL_FORM_INSTANCE_MODEL));
 

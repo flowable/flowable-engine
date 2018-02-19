@@ -9,6 +9,11 @@
       <label class="control-label form-field-label">{{formElement.name}}</label><span class="marker" ng-if="formElement.required">*</span>
       <input type="text" class="form-control" style="cursor:default;background-color:#fff;" value="Text" disabled>
   </div>
+  
+    <div ng-switch-when="password" class="form-group">
+      <label class="control-label form-field-label">{{formElement.name}}</label><span class="marker" ng-if="formElement.required">*</span>
+      <input type="text" class="form-control" style="cursor:default;background-color:#fff;" value="Password" disabled>
+  	</div>
 
   <div ng-switch-when="multi-line-text" class="form-group">
       <label class="control-label form-field-label">{{formElement.name}}</label><span class="marker" ng-if="formElement.required">*</span>

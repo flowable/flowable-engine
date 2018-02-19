@@ -12,23 +12,33 @@
  */
 package org.flowable.rest.form.service.api.form;
 
-import org.flowable.form.model.FormModel;
+import java.util.List;
+
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.model.FormField;
+import org.flowable.form.model.FormOutcome;
+import org.flowable.form.model.SimpleFormModel;
 
 /**
  * @author Yvo Swillens
  */
-public class FormModelResponse extends FormModel {
+public class FormModelResponse extends FormInfo {
 
     private static final long serialVersionUID = 1L;
 
     protected String url;
+    protected List<FormField> fields;
+    protected List<FormOutcome> outcomes;
+    protected String outcomeVariableName;
 
-    public FormModelResponse(FormModel formModel) {
-        setId(formModel.getId());
-        setName(formModel.getName());
-        setDescription(formModel.getDescription());
-        setKey(formModel.getKey());
-        setVersion(formModel.getVersion());
+    public FormModelResponse(FormInfo formInfo) {
+        setId(formInfo.getId());
+        setName(formInfo.getName());
+        setDescription(formInfo.getDescription());
+        setKey(formInfo.getKey());
+        setVersion(formInfo.getVersion());
+        
+        SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
         setFields(formModel.getFields());
         setOutcomes(formModel.getOutcomes());
         setOutcomeVariableName(formModel.getOutcomeVariableName());
@@ -40,5 +50,29 @@ public class FormModelResponse extends FormModel {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public List<FormField> getFields() {
+        return fields;
+    }
+
+    public void setFields(List<FormField> fields) {
+        this.fields = fields;
+    }
+
+    public List<FormOutcome> getOutcomes() {
+        return outcomes;
+    }
+
+    public void setOutcomes(List<FormOutcome> outcomes) {
+        this.outcomes = outcomes;
+    }
+
+    public String getOutcomeVariableName() {
+        return outcomeVariableName;
+    }
+
+    public void setOutcomeVariableName(String outcomeVariableName) {
+        this.outcomeVariableName = outcomeVariableName;
     }
 }

@@ -59,7 +59,7 @@ public class DefaultProcessValidatorTest {
         Assert.assertNotNull(bpmnModel);
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-        Assert.assertEquals(69, allErrors.size());
+        Assert.assertEquals(70, allErrors.size());
 
         String setName = ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS; // shortening it a bit
 
@@ -123,6 +123,8 @@ public class DefaultProcessValidatorTest {
         problems = findErrors(allErrors, setName, Problems.SERVICE_TASK_MISSING_IMPLEMENTATION, 1);
         assertCommonProblemFieldForActivity(problems.get(0));
         problems = findErrors(allErrors, setName, Problems.SERVICE_TASK_WEBSERVICE_INVALID_OPERATION_REF, 1);
+        assertCommonProblemFieldForActivity(problems.get(0));
+        problems = findErrors(allErrors, setName, Problems.SERVICE_TASK_USE_LOCAL_SCOPE_FOR_RESULT_VAR_WITHOUT_RESULT_VARIABLE_NAME, 1);
         assertCommonProblemFieldForActivity(problems.get(0));
 
         // Send task

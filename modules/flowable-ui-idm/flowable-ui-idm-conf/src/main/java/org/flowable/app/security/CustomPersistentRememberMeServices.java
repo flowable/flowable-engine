@@ -27,6 +27,7 @@ import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
@@ -72,6 +73,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     @Autowired
     private CustomUserDetailService customUserDetailService;
 
+    @Qualifier("defaultIdmIdentityService")
     @Autowired
     private IdmIdentityService identityService;
 

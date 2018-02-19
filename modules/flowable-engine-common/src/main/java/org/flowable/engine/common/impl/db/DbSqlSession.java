@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,19 @@
  */
 
 package org.flowable.engine.common.impl.db;
+
+import org.apache.ibatis.session.SqlSession;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.Page;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.Session;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.engine.common.impl.persistence.entity.AlwaysUpdatedPersistentObject;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -24,18 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.ibatis.session.SqlSession;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.entity.AlwaysUpdatedPersistentObject;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -43,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class DbSqlSession implements Session {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DbSqlSession.class);
-    
+
     public static String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
 
     protected EntityCache entityCache;
@@ -56,7 +57,7 @@ public class DbSqlSession implements Session {
     protected Map<Class<? extends Entity>, Map<String, Entity>> deletedObjects = new HashMap<>();
     protected Map<Class<? extends Entity>, List<BulkDeleteOperation>> bulkDeleteOperations = new HashMap<>();
     protected List<Entity> updatedObjects = new ArrayList<>();
-    
+
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache) {
         this.dbSqlSessionFactory = dbSqlSessionFactory;
         this.entityCache = entityCache;
@@ -71,12 +72,12 @@ public class DbSqlSession implements Session {
         this.connectionMetadataDefaultSchema = schema;
         this.entityCache = entityCache;
     }
-    
+
     // insert ///////////////////////////////////////////////////////////////////
 
     public void insert(Entity entity) {
         if (entity.getId() == null) {
-            String id = dbSqlSessionFactory.getIdGenerator().getNextId();
+            String id = Context.getCommandContext().getCurrentEngineConfiguration().getIdGenerator().getNextId();
             entity.setId(id);
         }
 
@@ -105,9 +106,9 @@ public class DbSqlSession implements Session {
 
     // delete
     // ///////////////////////////////////////////////////////////////////
-    
+
     /**
-     * Executes a {@link BulkDeleteOperation}, with the sql in the statement parameter. 
+     * Executes a {@link BulkDeleteOperation}, with the sql in the statement parameter.
      * The passed class determines when this operation will be executed: it will be executed depending on the place of the class in the {@link EntityDependencyOrder}.
      */
     public void delete(String statement, Object parameter, Class<? extends Entity> entityClass) {
@@ -116,7 +117,7 @@ public class DbSqlSession implements Session {
         }
         bulkDeleteOperations.get(entityClass).add(new BulkDeleteOperation(dbSqlSessionFactory.mapStatement(statement), parameter));
     }
-    
+
     public void delete(Entity entity) {
         Class<? extends Entity> clazz = entity.getClass();
         if (!deletedObjects.containsKey(clazz)) {
@@ -128,7 +129,7 @@ public class DbSqlSession implements Session {
 
     // select
     // ///////////////////////////////////////////////////////////////////
-    
+
     @SuppressWarnings({ "rawtypes" })
     public List selectList(String statement) {
         return selectList(statement, null, -1, -1);
@@ -138,7 +139,7 @@ public class DbSqlSession implements Session {
     public List selectList(String statement, Object parameter) {
         return selectList(statement, parameter, -1, -1);
     }
-    
+
     @SuppressWarnings("rawtypes")
     public List selectList(String statement, Object parameter, Page page) {
         if (page != null) {
@@ -147,13 +148,13 @@ public class DbSqlSession implements Session {
             return selectList(statement, parameter, -1, -1);
         }
     }
-    
+
     @SuppressWarnings("rawtypes")
     public List selectList(String statement, ListQueryParameterObject parameter) {
         parameter.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
         return selectListWithRawParameter(statement, parameter);
     }
-    
+
     @SuppressWarnings("rawtypes")
     public List selectList(String statement, Object parameter, int firstResult, int maxResults) {
         return selectList(statement, new ListQueryParameterObject(parameter, firstResult, maxResults));
@@ -163,18 +164,18 @@ public class DbSqlSession implements Session {
     public List selectListNoCacheCheck(String statement, Object parameter) {
         return selectListWithRawParameter(statement, new ListQueryParameterObject(parameter, -1, -1), false);
     }
-    
+
     @SuppressWarnings({ "rawtypes" })
     public List selectListWithRawParameterNoCacheCheck(String statement, Object parameter) {
         return selectListWithRawParameter(statement, parameter, false);
     }
-    
+
     @SuppressWarnings({ "rawtypes" })
     public List selectListWithRawParameterNoCacheCheck(String statement, ListQueryParameterObject parameter) {
         parameter.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
         return selectListWithRawParameter(statement, parameter, false);
     }
-    
+
     @SuppressWarnings("rawtypes")
     public List selectListNoCacheCheck(String statement, ListQueryParameterObject parameter) {
         ListQueryParameterObject parameterToUse = parameter;
@@ -183,7 +184,7 @@ public class DbSqlSession implements Session {
         }
         return selectListWithRawParameter(statement, parameter, false);
     }
-    
+
     @SuppressWarnings("rawtypes")
     public List selectListWithRawParameter(String statement, Object parameter) {
         // All other selectList methods eventually end up here, passing it into the method
@@ -191,7 +192,7 @@ public class DbSqlSession implements Session {
         // Dedicated xNoCacheCheck methods will pass a false for that setting.
         return selectListWithRawParameter(statement, parameter, true);
     }
-    
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List selectListWithRawParameter(String statement, Object parameter, boolean useCache) {
         statement = dbSqlSessionFactory.mapStatement(statement);
@@ -291,7 +292,7 @@ public class DbSqlSession implements Session {
 
     /**
      * Clears all deleted and inserted objects from the cache, and removes inserts and deletes that cancel each other.
-     * 
+     *
      * Also removes deletes with duplicate ids.
      */
     protected void removeUnnecessaryOperations() {
@@ -491,12 +492,12 @@ public class DbSqlSession implements Session {
             }
 
             LOGGER.debug("updating: {}", updatedObject);
-            
+
             int updatedRecords = sqlSession.update(updateStatement, updatedObject);
             if (updatedRecords == 0) {
                 throw new FlowableOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
             }
-            
+
             // See https://activiti.atlassian.net/browse/ACT-1290
             if (updatedObject instanceof HasRevision) {
                 ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
@@ -513,7 +514,7 @@ public class DbSqlSession implements Session {
         }
 
         // Handle in entity dependency order
-        for (Class<? extends Entity> entityClass : dbSqlSessionFactory.getDeletionOrder()) { 
+        for (Class<? extends Entity> entityClass : dbSqlSessionFactory.getDeletionOrder()) {
             if (deletedObjects.containsKey(entityClass)) {
                 flushDeleteEntities(entityClass, deletedObjects.get(entityClass).values());
                 deletedObjects.remove(entityClass);
@@ -561,7 +562,7 @@ public class DbSqlSession implements Session {
             }
         }
     }
-    
+
     @Override
     public void close() {
         sqlSession.close();
@@ -574,7 +575,7 @@ public class DbSqlSession implements Session {
     public void rollback() {
         sqlSession.rollback();
     }
-    
+
     public <T> T getCustomMapper(Class<T> type) {
         return sqlSession.getMapper(type);
     }
@@ -585,7 +586,7 @@ public class DbSqlSession implements Session {
     public SqlSession getSqlSession() {
         return sqlSession;
     }
-    
+
     public DbSqlSessionFactory getDbSqlSessionFactory() {
         return dbSqlSessionFactory;
     }

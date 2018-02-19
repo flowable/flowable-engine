@@ -178,6 +178,7 @@ import org.flowable.engine.impl.form.FormTypes;
 import org.flowable.engine.impl.form.JuelFormEngine;
 import org.flowable.engine.impl.form.LongFormType;
 import org.flowable.engine.impl.form.StringFormType;
+import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.DefaultHistoryTaskManager;
 import org.flowable.engine.impl.history.DefaultHistoryVariableManager;
@@ -273,6 +274,7 @@ import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.parse.BpmnParseHandler;
+import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
@@ -703,6 +705,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<EventHandler> customEventHandlers;
 
     protected FailedJobCommandFactory failedJobCommandFactory;
+    
+    protected FormFieldHandler formFieldHandler;
 
     /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
@@ -856,6 +860,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFailedJobCommandFactory();
         initEventDispatcher();
         initProcessValidator();
+        initFormFieldHandler();
         initDatabaseEventLogging();
         initFlowable5CompatibilityHandler();
         initVariableServiceConfiguration();
@@ -2034,6 +2039,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator();
         }
     }
+    
+    public void initFormFieldHandler() {
+        if (this.formFieldHandler == null) {
+            this.formFieldHandler = new DefaultFormFieldHandler();
+        }
+    }
 
     public void initFunctionDelegates() {
         if (this.flowableFunctionDelegates == null) {
@@ -2950,6 +2961,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessValidator(ProcessValidator processValidator) {
         this.processValidator = processValidator;
+        return this;
+    }
+
+    public FormFieldHandler getFormFieldHandler() {
+        return formFieldHandler;
+    }
+
+    public ProcessEngineConfigurationImpl setFormFieldHandler(FormFieldHandler formFieldHandler) {
+        this.formFieldHandler = formFieldHandler;
         return this;
     }
 

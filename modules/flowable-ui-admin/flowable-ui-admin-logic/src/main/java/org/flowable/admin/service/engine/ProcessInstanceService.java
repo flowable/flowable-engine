@@ -48,6 +48,7 @@ public class ProcessInstanceService {
     public static final String HISTORIC_TASK_LIST_URL = "history/historic-task-instances";
     public static final String HISTORIC_VARIABLE_INSTANCE_LIST_URL = "history/historic-variable-instances";
     public static final String HISTORIC_ACTIVITY_INSTANCE_LIST_URL = "history/historic-activity-instances";
+    public static final String HISTORIC_DECISION_EXECUTION_LIST_URL = "dmn-history/historic-decision-executions";
     public static final String CURRENT_ACTIVITY_INSTANCE_LIST_URL = "runtime/executions/{0}/activities";
     public static final String RUNTIME_PROCESS_INSTANCE_URL = "runtime/process-instances/{0}";
     public static final String RUNTIME_PROCESS_INSTANCE_VARIABLES = "runtime/process-instances/{0}/variables";
@@ -117,6 +118,15 @@ public class ProcessInstanceService {
     public JsonNode getTasks(ServerConfig serverConfig, String processInstanceId) {
         URIBuilder builder = clientUtil.createUriBuilder(HISTORIC_TASK_LIST_URL);
         builder.addParameter("processInstanceId", processInstanceId);
+        builder.addParameter("size", DEFAULT_SUBTASK_RESULT_SIZE);
+
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
+
+    public JsonNode getDecisionExecutions(ServerConfig serverConfig, String processInstanceId) {
+        URIBuilder builder = clientUtil.createUriBuilder(HISTORIC_DECISION_EXECUTION_LIST_URL);
+        builder.addParameter("instanceId", processInstanceId);
         builder.addParameter("size", DEFAULT_SUBTASK_RESULT_SIZE);
 
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));

@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
-@ComponentScan({"org.flowable.rest.dmn.exception", "org.flowable.rest.dmn.service.api"})
+@ComponentScan({"org.flowable.rest.exception", "org.flowable.rest.dmn.service.api"})
 @EnableAsync
 public class DmnDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 

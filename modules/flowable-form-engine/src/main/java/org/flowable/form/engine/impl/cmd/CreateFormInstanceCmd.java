@@ -15,9 +15,9 @@ package org.flowable.form.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
-import org.flowable.form.model.FormModel;
 
 /**
  * @author Tijs Rademakers
@@ -26,16 +26,16 @@ public class CreateFormInstanceCmd extends AbstractSaveFormInstanceCmd implement
 
     private static final long serialVersionUID = 1L;
 
-    public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
-        super(formModel, variables, taskId, processInstanceId, processDefinitionId);
+    public CreateFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+        super(formInfo, variables, taskId, processInstanceId, processDefinitionId);
     }
     
     public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
         super(formModelId, variables, taskId, processInstanceId, processDefinitionId);
     }
     
-    public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
-        super(formModel, variables, taskId, scopeId, scopeType, scopeDefinitionId);
+    public CreateFormInstanceCmd(FormInfo formInfo, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        super(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId);
     }
     
     public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {

@@ -24,5 +24,7 @@ public interface DefaultPrivileges {
     String ACCESS_ADMIN = "access-admin";
 
     String ACCESS_TASK = "access-task";
+    
+    String ACCESS_REST_API = "access-rest-api";
 
 }

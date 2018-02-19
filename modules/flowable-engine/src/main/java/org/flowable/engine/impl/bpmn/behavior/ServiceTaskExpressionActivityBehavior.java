@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -37,6 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Frederik Heremans
  * @author Slawomir Wojtasiak (Patch for ACT-1159)
  * @author Falko Menge
+ * @author Filip Hrisafov
  */
 public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior {
 
@@ -47,15 +49,16 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
     protected Expression skipExpression;
     protected String resultVariable;
     protected List<MapExceptionEntry> mapExceptions;
+    protected boolean useLocalScopeForResultVariable;
 
-    public ServiceTaskExpressionActivityBehavior(String serviceTaskId, Expression expression,
-            Expression skipExpression, String resultVariable, List<MapExceptionEntry> mapExceptions) {
+    public ServiceTaskExpressionActivityBehavior(ServiceTask serviceTask, Expression expression, Expression skipExpression) {
 
-        this.serviceTaskId = serviceTaskId;
+        this.serviceTaskId = serviceTask.getId();
         this.expression = expression;
         this.skipExpression = skipExpression;
-        this.resultVariable = resultVariable;
-        this.mapExceptions = mapExceptions;
+        this.resultVariable = serviceTask.getResultVariableName();
+        this.mapExceptions = serviceTask.getMapExceptions();
+        this.useLocalScopeForResultVariable = serviceTask.isUseLocalScopeForResultVariable();
     }
 
     @Override
@@ -77,7 +80,11 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
 
                 value = expression.getValue(execution);
                 if (resultVariable != null) {
-                    execution.setVariable(resultVariable, value);
+                    if (useLocalScopeForResultVariable) {
+                        execution.setVariableLocal(resultVariable, value);
+                    } else {
+                        execution.setVariable(resultVariable, value);
+                    }
                 }
             }
 
