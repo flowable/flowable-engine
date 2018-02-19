@@ -180,8 +180,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     @Override
     public ServiceTaskExpressionActivityBehavior createServiceTaskExpressionActivityBehavior(ServiceTask serviceTask) {
         Expression expression = expressionManager.createExpression(serviceTask.getImplementation());
-        return new ServiceTaskExpressionActivityBehavior(serviceTask.getId(), expression,
-                getSkipExpressionFromServiceTask(serviceTask), serviceTask.getResultVariableName(), serviceTask.getMapExceptions());
+        return new ServiceTaskExpressionActivityBehavior(serviceTask, expression, getSkipExpressionFromServiceTask(serviceTask));
     }
 
     @Override

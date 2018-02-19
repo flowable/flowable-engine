@@ -26,6 +26,28 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.3.0</h3>
+
+<h4>Highlights</h4>
+
+<h4>Upgrade notes</h4>
+
+<p>
+All Flowable apps (IDM, Modeler, Task, Admin and REST) now read their configuration from the <i>flowable-app.properties</i> file, which is included in each WAR file in the <i>META-INF/flowable-app</i> folder.
+Consequently, a shared <i>flowable-app.properties</i> can be put on the classpath for all apps.
+All all property files (e.g. <i>db.properties</i> for the REST app) are still read and work in a backwards compatible way.  
+</p>
+
+<p>
+The default way user credentials are authenticated and verified when calling the Flowable REST API has changed. A user now needs to have the <i>access-rest-api</i> privilege (before, any valid credentials could be used).
+An admin user can be given this privilege by setting the <i>rest-admin.userid</i> and <i>rest-admin.password</i> properties in the <i>flowable-app.properties</i> file. On bootup, the admin user will be created if it doesn't exist yet or it will be given the <i>access-rest-api</i> privilege. This admin user can now give other users this privilige using the Flowable IDM app or through a REST call (doing an HTTP post to <i>privileges/{privilegeId}/users</i> with the userId in the body). 
+</p>
+
+<p>
+By default, all Flowable apps (IDM, Modeler, Task, Admin and REST) are configured to use an in-memory H2 database that is shared between all apps by default. Before, each app had their own in-memory H2 database.
+</p>
+
+
 <h3>Release Notes - Flowable - 6.2.1</h3>
 
 <h4>Highlights</h4>

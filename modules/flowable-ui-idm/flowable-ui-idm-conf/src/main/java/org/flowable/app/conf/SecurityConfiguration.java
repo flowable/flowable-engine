@@ -203,6 +203,9 @@ public class SecurityConfiguration {
     @Configuration
     @Order(1)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+        
+        @Autowired
+        protected Environment env;
 
         protected void configure(HttpSecurity http) throws Exception {
 
@@ -211,12 +214,28 @@ public class SecurityConfiguration {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .csrf()
-                    .disable()
-                    .antMatcher("/api" + "/**")
-                    .authorizeRequests()
-                    .antMatchers("/api" + "/**").authenticated()
-                    .and().httpBasic();
+                    .disable();
+
+            if (isEnableRestApi()) {
+                
+                if (RestApiUtil.isVerifyRestApiPrivilege(env)) {
+                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                } else {
+                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").authenticated().and().httpBasic();
+                    
+                }
+                
+            } else {
+                http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").denyAll();
+                
+            }
+            
         }
+        
+        protected boolean isEnableRestApi() {
+            return env.getProperty("rest.idm-app.enabled", Boolean.class, true);
+        }
+        
     }
 
 }

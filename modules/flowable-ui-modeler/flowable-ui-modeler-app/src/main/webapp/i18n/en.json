@@ -545,6 +545,7 @@
         "PALLETTE": {
             "TEXT": "Text",
             "MULTILINE-TEXT": "Multiline text",
+            "PASSWORD": "Password",
             "NUMBER": "Number",
             "CHECKBOX": "Checkbox",
             "DATE": "Date",
@@ -598,6 +599,7 @@
             "SIZE": "Size",
 	          "MAX-LENGTH":"Maximum length:",
             "MIN-LENGTH":"Minimum length:",
+            "PASSWORD-UNMASK-OPTION": "password masking/unmasking option",
 	          "HYPERLINK-URL": "Hyperlink URL",
 	          "REGEX-PATTERN":"Regex standard",
             "MASK":{

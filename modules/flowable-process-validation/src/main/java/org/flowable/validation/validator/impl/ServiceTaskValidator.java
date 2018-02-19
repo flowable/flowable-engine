@@ -79,6 +79,10 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                         .getImplementationType()))) {
             addError(errors, Problems.SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE, process, serviceTask, "'resultVariableName' not supported for service tasks using 'class' or 'delegateExpression");
         }
+
+        if (serviceTask.isUseLocalScopeForResultVariable() && StringUtils.isEmpty(serviceTask.getResultVariableName())) {
+            addWarning(errors, Problems.SERVICE_TASK_USE_LOCAL_SCOPE_FOR_RESULT_VAR_WITHOUT_RESULT_VARIABLE_NAME, process, serviceTask, "'useLocalScopeForResultVariable' is set, but no 'resultVariableName' is set. The property would not be used");
+        }
     }
 
     protected void verifyWebservice(BpmnModel bpmnModel, Process process, ServiceTask serviceTask, List<ValidationError> errors) {

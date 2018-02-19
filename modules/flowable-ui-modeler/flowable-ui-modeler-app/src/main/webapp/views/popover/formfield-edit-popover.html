@@ -61,7 +61,7 @@
                         </div>
                     </div>
 
-                    <div ng-show="formElement.type === 'functional-group' || formElement.type === 'people' || formElement.type === 'dropdown' || formElement.type === 'date' || formElement.type === 'text' || formElement.type === 'multi-line-text' || formElement.type === 'integer' || formElement.type === 'decimal'">
+                    <div ng-show="formElement.type === 'functional-group' || formElement.type === 'people' || formElement.type === 'dropdown' || formElement.type === 'date' || formElement.type === 'text' || formElement.type === 'password' || formElement.type === 'multi-line-text' || formElement.type === 'integer' || formElement.type === 'decimal'">
                         <label translate="FORM-BUILDER.COMPONENT.PLACEHOLDER"></label>
                         <input type="text" class="form-control" ng-model="formElement.placeholder">
                     </div>
@@ -107,7 +107,28 @@
                         </div>
                     </div>
                 </div>
-
+                <div ng-if="activeTab.id == 'advanced' && (formElement.type === 'password')">
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.MIN-LENGTH"></label> <input
+				 type="text" number-input-check maxlength="5" class="form-control"
+				 ng-model="formElement.params.minLength">
+		     </div>
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.MAX-LENGTH"></label> <input
+			         type="text" number-input-check maxlength="5" class="form-control"
+			         ng-model="formElement.params.maxLength">
+              </div>
+                        <div class="row">
+                           <div class="form-group col-md-12">
+                               <div class="checkbox">
+                                   <label>
+                                       <input type="checkbox" ng-model="formElement.params.passwordunmask">
+                                       {{'FORM-BUILDER.COMPONENT.PASSWORD-UNMASK-OPTION' | translate}}?
+                                   </label>
+                               </div>
+                            </div>
+                        </div>
+              </div>
                 <div ng-if="activeTab.id == 'advanced' && (formElement.type === 'text' || formElement.type === 'multi-line-text' || formElement.type === 'decimal' || formElement.type === 'integer')">
 		     <div class="form-group">
 			  <label translate="FORM-BUILDER.COMPONENT.MIN-LENGTH"></label> <input

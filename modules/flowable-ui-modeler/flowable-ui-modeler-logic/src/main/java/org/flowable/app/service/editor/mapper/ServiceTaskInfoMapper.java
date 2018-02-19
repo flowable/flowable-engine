@@ -39,5 +39,6 @@ public class ServiceTaskInfoMapper extends AbstractInfoMapper {
         createPropertyNode("Result variable name", serviceTask.getResultVariableName());
         createFieldPropertyNodes("Field extensions", serviceTask.getFieldExtensions());
         createListenerPropertyNodes("Execution listeners", serviceTask.getExecutionListeners());
+        createPropertyNode("Use local scope for result variable", serviceTask.isUseLocalScopeForResultVariable());
     }
 }

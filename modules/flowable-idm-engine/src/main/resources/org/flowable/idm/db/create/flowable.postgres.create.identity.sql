@@ -100,3 +100,7 @@ alter table ACT_ID_PRIV_MAPPING
 
 create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
 create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);
+
+alter table ACT_ID_PRIV
+    add constraint ACT_UNIQ_PRIV_NAME
+    unique (NAME_);

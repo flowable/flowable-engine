@@ -192,7 +192,9 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         user.setLastName(json.get("lastName").asText());
         user.setEmail(json.get("email").asText());
         user.setFullName(json.get("fullName").asText());
-        user.setTenantId(json.get("tenantId").asText());
+        if (json.has("tenantId") && !json.get("tenantId").isNull()) {
+            user.setTenantId(json.get("tenantId").asText());
+        }
 
         if (json.has("groups")) {
             for (JsonNode groupNode : ((ArrayNode) json.get("groups"))) {

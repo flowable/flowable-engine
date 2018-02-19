@@ -68,7 +68,7 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.rest.conf.ApplicationConfiguration;
-import org.flowable.rest.service.api.RestUrlBuilder;
+import org.flowable.rest.util.RestUrlBuilder;
 import org.flowable.rest.util.TestServerUtil;
 import org.flowable.rest.util.TestServerUtil.TestServer;
 import org.joda.time.format.DateTimeFormatter;

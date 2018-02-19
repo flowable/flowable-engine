@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -36,6 +37,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.examples.bpmn.servicetask.ValueBean;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
@@ -1669,6 +1671,29 @@ assertProcessEnded(procId);
         taskService.complete(task.getId(), vars);
         List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().list();
         assertEquals(0, instances.size());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.simpleMultiInstanceWithCollectionVariable.bpmn20.xml")
+    public void testCollectionVariableMissing() {
+        try {
+            runtimeService.startProcessInstanceByKey("simple_multi");
+            fail("Should have failed with missing collection variable");
+        } catch (FlowableIllegalArgumentException e) {
+            assertEquals("Variable 'elements' is not found", e.getMessage());
+        }
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.simpleMultiInstanceWithCollectionVariable.bpmn20.xml")
+    public void testCollectionVariableIsNotACollection() {
+        Map<String, Object> vars = new HashMap<>();
+        ValueBean valueBean = new ValueBean("test");
+        vars.put("elements", valueBean);
+        try {
+            runtimeService.startProcessInstanceByKey("simple_multi", vars);
+            fail("Should have failed with collection variable not a collection");
+        } catch (FlowableIllegalArgumentException e) {
+            assertEquals("Variable 'elements':" + valueBean + " is not a Collection", e.getMessage());
+        }
     }
 
     protected void resetTestCounts() {
