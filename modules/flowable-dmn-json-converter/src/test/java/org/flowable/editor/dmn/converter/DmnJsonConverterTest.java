@@ -65,6 +65,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_14 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type4.json";
     private static final String JSON_RESOURCE_15 = "org/flowable/editor/dmn/converter/decisiontable_aggregation.json";
     private static final String JSON_RESOURCE_16 = "org/flowable/editor/dmn/converter/decisiontable_special_characters.json";
+    private static final String JSON_RESOURCE_17 = "org/flowable/editor/dmn/converter/decisiontable_custom_input_expression.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -257,6 +258,12 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
         assertNotNull(dmnDefinition);
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertEquals("-", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("-", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("-", decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
     }
 
     @Test
@@ -433,6 +440,16 @@ public class DmnJsonConverterTest {
     @Test
     public void testConvertJsonToDmnStringSpecialCharacters() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_16);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertEquals("== \"TEST\"",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("== \"TEST\"",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+    }
+
+    @Test
+    public void testConvertJsonToDmnCustomExpressions() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_17);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 

@@ -293,6 +293,11 @@ angular.module('flowableModeler')
                 }
             };
 
+            // dummy validator for text fields in order to trigger the post validation hook
+            var textValidator = function(value, callback) {
+                callback(true);
+            };
+
             var isCustomExpression = function (val) {
                 return !!(val != null
                     && (String(val).startsWith('${') || String(val).startsWith('#{')));
@@ -306,7 +311,11 @@ angular.module('flowableModeler')
                 var operatorCol = currentCol - 1;
                 var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
 
-                if (operatorCellMeta.className.indexOf('custom-expression-operator') !== -1) {
+                if (operatorCellMeta == null || operatorCellMeta.prop.endsWith("_operator") === false) {
+                    return;
+                }
+
+                if (operatorCellMeta.className != null && operatorCellMeta.className.indexOf('custom-expression-operator') !== -1) {
                     return;
                 }
 
@@ -326,7 +335,11 @@ angular.module('flowableModeler')
                 var operatorCol = currentCol - 1;
                 var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
 
-                if (operatorCellMeta.className.indexOf('custom-expression-operator') == -1) {
+                if (operatorCellMeta == null || operatorCellMeta.prop.endsWith("_operator") === false) {
+                    return;
+                }
+
+                if (operatorCellMeta == null || operatorCellMeta.className == null || operatorCellMeta.className.indexOf('custom-expression-operator') == -1) {
                     return;
                 }
 
@@ -641,9 +654,11 @@ angular.module('flowableModeler')
 
                 } else if (type === 'dropdown') {
                     columnDefinition.source = ['true', 'false', '-'];
+                } else if (type === 'text') {
+                    columnDefinition.validator = textValidator;
                 }
 
-                if (type !== 'string') {
+                if (type !== 'text') {
                     columnDefinition.allowEmpty = false;
                 }
 
