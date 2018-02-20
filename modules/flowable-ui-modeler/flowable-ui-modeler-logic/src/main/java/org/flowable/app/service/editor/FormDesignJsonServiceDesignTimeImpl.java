@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.flowable.app.service.editor;
 
@@ -33,12 +33,16 @@ public class FormDesignJsonServiceDesignTimeImpl extends FormDesignJsonServiceBa
 {
   @Autowired
   ModelRepository modelRepo;
-  
+
   @Override
   public String getFormDesignJsonByKey(String formKey)
   {
     List<Model> models =  modelRepo.findByKeyAndType(formKey, AbstractModel.MODEL_TYPE_FORM_RDS);
-    Assert.isTrue(models.size()==1, "Should get 1 and only 1 rds_form by key, but now get " + models.size());
+    if (models.size() != 1)
+    {
+      throw new IllegalArgumentException(
+          "Should get 1 and only 1 rds_form by key [" + formKey + "], but now get " + models.size());
+    }
     Model model = models.get(0);
     return model.getModelEditorJson();
   }
@@ -56,8 +60,8 @@ public class FormDesignJsonServiceDesignTimeImpl extends FormDesignJsonServiceBa
     }
     return resultList;
   }
-  
-  
+
+
   @Override
   public ObjectNode findByKeyWithReferencedBy(String formKey)
   {
@@ -65,7 +69,7 @@ public class FormDesignJsonServiceDesignTimeImpl extends FormDesignJsonServiceBa
     Assert.isTrue(models.size()==1, "Should get 1 and only 1 rds_form by key, but now get " + models.size());
     Model model = models.get(0);
     String formDesignJson = model.getModelEditorJson();
-     
+
     ObjectNode result = JsonUtils.newObject();
     result.set("key", JsonUtils.textNode(formKey));
     result.set("definition", JsonUtils.textNode(formDesignJson));
@@ -77,7 +81,7 @@ public class FormDesignJsonServiceDesignTimeImpl extends FormDesignJsonServiceBa
       referencedByArrayNode.add(referencedByKey);
     }
     result.set("referencedBy", referencedByArrayNode);
-    
+
     result.set("lastUpdated", JsonUtils.numberNode(model.getLastUpdated().getTime()));
     result.set("name", JsonUtils.textNode(model.getName()));
     result.set("desc", JsonUtils.textNode(model.getDescription()));
