@@ -32,7 +32,7 @@ angular.module('flowableModeler')
             var numberOperators = ['==', '!=', '<', '>', '>=', '<='];
             var booleanOperators = ['==', '!='];
             var dateOperators = ['==', '!=', '<', '>', '>=', '<='];
-            var operators = ['==', '!=', '<', '>', '>=', '<='];
+            var allOperators = ['==', '!=', '<', '>', '>=', '<='];
             var collectOperators = {
                 'SUM': '+',
                 'MIN': '<',
@@ -315,6 +315,7 @@ angular.module('flowableModeler')
                 hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className + ' custom-expression-operator');
                 hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'originalEditor', currentEditor);
                 hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', false);
+                hotDecisionTableEditorInstance.setDataAtCell(row, operatorCol, null);
             };
 
             var enableCorrespondingOperatorCell = function (row, prop) {
@@ -332,6 +333,7 @@ angular.module('flowableModeler')
                 operatorCellMeta.className = operatorCellMeta.className.replace('custom-expression-operator', '');
                 hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className);
                 hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', operatorCellMeta.originalEditor);
+                hotDecisionTableEditorInstance.setDataAtCell(row, operatorCol, '==');
             };
 
             var createNewInputExpression = function (inputExpression) {
@@ -569,7 +571,7 @@ angular.module('flowableModeler')
                     case 'string':
                         return stringOperators;
                     default:
-                        return operators;
+                        return allOperators;
                 }
             };
 
