@@ -219,14 +219,76 @@
 
     <sql id="selectCaseInstancesByQueryCriteriaColumns">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.*
-        <if test="includeCaseVariables">,
-        VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
-        VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
-        VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
-        VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+        <if test="_databaseId != 'db2' and _databaseId != 'mssql'">
+            select distinct RES.*
+            <if test="includeCaseVariables">,
+                VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
+                VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as
+                VAR_TASK_ID_,
+                VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
+                VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+            </if>
+            <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         </if>
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
+            select distinct
+            TEMPRES_ID_ as ID_,
+            TEMPRES_REV_ as REV_,
+            TEMPRES_PARENT_ID_ as PARENT_ID_,
+            TEMPRES_CASE_DEF_ID_ as CASE_DEF_ID_,
+            TEMPRES_BUSINESS_KEY_ as BUSINESS_KEY_,
+            TEMPRES_NAME_ as NAME_,
+            TEMPRES_STATE_ as STATE_,
+            TEMPRES_START_TIME_ as START_TIME_,
+            TEMPRES_START_USER_ID_ as START_USER_ID_,
+            TEMPRES_CALLBACK_ID_ as CALLBACK_ID_,
+            TEMPRES_CALLBACK_TYPE_ as CALLBACK_TYPE_,
+            TEMPRES_IS_COMPLETEABLE_ as IS_COMPLETEABLE_,
+            TEMPRES_TENANT_ID_ as TENANT_ID_
+            <if test="includeCaseVariables">,
+                TEMPVAR_ID_ as VAR_ID_,
+                TEMPVAR_NAME_ as VAR_NAME_,
+                TEMPVAR_TYPE_ as VAR_TYPE_,
+                TEMPVAR_REV_ as VAR_REV_,
+                TEMPVAR_PROC_INST_ID_ as VAR_PROC_INST_ID_,
+                TEMPVAR_EXECUTION_ID_ as VAR_EXECUTION_ID_,
+                TEMPVAR_TASK_ID_ as VAR_TASK_ID_,
+                TEMPVAR_BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_,
+                TEMPVAR_DOUBLE_ as VAR_DOUBLE_,
+                TEMPVAR_TEXT_ as VAR_TEXT_,
+                TEMPVAR_TEXT2_ as VAR_TEXT2_,
+                TEMPVAR_LONG_ as VAR_LONG_
+            </if>
+            <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
+            RES.ID_ as TEMPRES_ID_,
+            RES.REV_ as TEMPRES_REV_,
+            RES.PARENT_ID_ as TEMPRES_PARENT_ID_,
+            RES.CASE_DEF_ID_ as TEMPRES_CASE_DEF_ID_,
+            RES.BUSINESS_KEY_ as TEMPRES_BUSINESS_KEY_,
+            RES.NAME_ as TEMPRES_NAME_,
+            RES.STATE_ as TEMPRES_STATE_,
+            RES.START_TIME_ as TEMPRES_START_TIME_,
+            RES.START_USER_ID_ as TEMPRES_START_USER_ID_,
+            RES.CALLBACK_ID_ as TEMPRES_CALLBACK_ID_,
+            RES.CALLBACK_TYPE_ as TEMPRES_CALLBACK_TYPE_,
+            RES.IS_COMPLETEABLE_ as TEMPRES_IS_COMPLETEABLE_,
+            RES.TENANT_ID_ as TEMPRES_TENANT_ID_
+            <if test="includeCaseVariables">,
+                VAR.ID_ as TEMPVAR_ID_,
+                VAR.NAME_ as TEMPVAR_NAME_,
+                VAR.TYPE_ as TEMPVAR_TYPE_,
+                VAR.REV_ as TEMPVAR_REV_,
+                VAR.PROC_INST_ID_ as TEMPVAR_PROC_INST_ID_,
+                VAR.EXECUTION_ID_ as TEMPVAR_EXECUTION_ID_,
+                VAR.TASK_ID_ as TEMPVAR_TASK_ID_,
+                VAR.BYTEARRAY_ID_ as TEMPVAR_BYTEARRAY_ID_,
+                VAR.DOUBLE_ as TEMPVAR_DOUBLE_,
+                VAR.TEXT_ as TEMPVAR_TEXT_,
+                VAR.TEXT2_ as TEMPVAR_TEXT2_,
+                VAR.LONG_ as TEMPVAR_LONG_
+            </if>
+        </if>
+
     </sql>
 
     <sql id="selectCaseInstancesByQueryCriteriaSql">
