@@ -11,9 +11,9 @@ node {
             sh 'pwd'
             sh 'mvn clean install -PbuildDockerImage'
             docker.withRegistry('https://192.168.178.57:18079', 'rds-docker-nexus-credentials') {
-                def gaspPublic = docker.build("gasp/idm")
-                //gaspPublic.push("${pom.version}")
-                gaspPublic.push("latest")
+                def idmImage = docker.build("gasp/idm")
+                //idmImage.push("${pom.version}")
+                idmImage.push("latest")
             }
         }
     }
@@ -23,9 +23,9 @@ node {
             sh 'pwd'
             sh 'mvn clean install -PbuildDockerImage'
             docker.withRegistry('https://192.168.178.57:18079', 'rds-docker-nexus-credentials') {
-                def gaspInternal = docker.build("gasp/designer")
-                //gaspInternal.push("${pom.version}")
-                gaspInternal.push("latest")
+                def designerImage = docker.build("gasp/designer")
+                //designerImage.push("${pom.version}")
+                designerImage.push("latest")
             }
         }
     }
