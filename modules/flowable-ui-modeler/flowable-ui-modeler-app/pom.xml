@@ -350,6 +350,14 @@
                         <configuration>
                             <path>/</path>
                             <finalName>${project.build.finalName}.jar</finalName>
+                            <extraResources>
+                                <extraResource>
+                                    <directory>${project.basedir}/src/main/docker/</directory>
+                                    <includes>
+                                        <include>app-cfg.js</include>
+                                    </includes>
+                                </extraResource>
+                            </extraResources>
                         </configuration>
                         <executions>
                             <execution>
@@ -359,44 +367,8 @@
                                 </goals>
                                 <phase>package</phase>
                                 <configuration>
-                                    <path>/flowable-modeler</path>
+                                    <path>/designer</path>
                                 </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.4.13</version>
-                        <configuration>
-                            <imageName>flowable/${project.build.finalName}</imageName>
-                            <baseImage>flowable/java8_server</baseImage>
-                            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=8888", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
-                            <forceTags>true</forceTags>
-                            <imageTags>
-                                <imageTag>${project.version}</imageTag>
-                                <imageTag>latest</imageTag>
-                            </imageTags>
-                            <resources>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${project.build.directory}</directory>
-                                    <include>${project.build.finalName}.jar</include>
-                                </resource>
-                                <resource>
-                                  <targetPath>/</targetPath>
-                                  <directory>${project.basedir}/src/main/docker</directory>
-                                  <include>wait-for-something.sh</include>
-                                </resource>
-                            </resources>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>build-image</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
                             </execution>
                         </executions>
                     </plugin>
