@@ -1753,7 +1753,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initAsyncHistoryExecutor() {
-        if (asyncHistoryExecutor == null) {
+        if (isAsyncHistoryEnabled && asyncHistoryExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
 
             // Message queue mode
@@ -1792,8 +1792,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             asyncHistoryExecutor = defaultAsyncHistoryExecutor;
         }
 
-        asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
-        asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
+        if (asyncHistoryExecutor != null) {
+            asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
+            asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
+        }
     }
 
     // history

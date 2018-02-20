@@ -17,6 +17,8 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +26,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAsyncHistoryJobHandler.class);
+    
     protected boolean isAsyncHistoryJsonGroupingEnabled;
 
     @Override
@@ -47,6 +51,9 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
                 throw e;
 
             } catch (Exception e) {
+                
+                LOGGER.warn("Could not execute history job", e);
+                
                 // The transaction will be rolled back and the job retries decremented,
                 // which is different from unacquiring the job where the retries are not changed.
                 throw new FlowableException("Could not deserialize async history json for job (id=" + job.getId() + ")", e);
