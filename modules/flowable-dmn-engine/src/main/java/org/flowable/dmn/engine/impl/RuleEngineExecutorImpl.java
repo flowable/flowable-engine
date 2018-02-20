@@ -12,7 +12,6 @@
  */
 package org.flowable.dmn.engine.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -274,7 +273,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         String outputVariableType = ruleClauseContainer.getOutputClause().getTypeRef();
 
         LiteralExpression outputEntryExpression = ruleClauseContainer.getOutputEntry();
-        
         if (StringUtils.isNotEmpty(outputEntryExpression.getText())) {
             Object executionVariable = null;
             try {
