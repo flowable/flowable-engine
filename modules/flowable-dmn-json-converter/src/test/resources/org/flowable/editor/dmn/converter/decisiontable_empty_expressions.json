@@ -25,16 +25,19 @@
     ],
     "rules": [
         {
-            "3": "== \"TEST\"",
-            "4": "\"1\""
+            "3_operator": "==",
+            "3_expression": "-",
+            "4": "WAS IGNORE 1"
         },
         {
-            "3": "!= \"TEST\"",
-            "4": ""
+            "3_operator": "!=",
+            "3_expression": "-",
+            "4": "WAS IGNORE 2"
         },
         {
-            "3": "",
-            "4": "\"3\""
+            "3_operator": null,
+            "3_expression": "-",
+            "4": "WAS IGNORE 3"
         }
     ]
 }

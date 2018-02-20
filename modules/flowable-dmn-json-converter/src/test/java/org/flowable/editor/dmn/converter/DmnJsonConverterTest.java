@@ -257,6 +257,12 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
         assertNotNull(dmnDefinition);
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertEquals("-", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("-", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("-", decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
     }
 
     @Test

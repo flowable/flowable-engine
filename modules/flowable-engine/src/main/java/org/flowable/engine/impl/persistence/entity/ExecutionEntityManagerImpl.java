@@ -27,6 +27,7 @@ import java.util.Map;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
@@ -38,6 +39,7 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
@@ -377,7 +379,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         List<String> processInstanceIds = executionDataManager.findProcessInstanceIdsByProcessDefinitionId(processDefinitionId);
 
         for (String processInstanceId : processInstanceIds) {
-            deleteProcessInstance(processInstanceId, deleteReason, cascade);
+            deleteProcessInstanceCascade(findById(processInstanceId), deleteReason, cascade);
         }
 
         if (cascade) {
@@ -387,13 +389,33 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
     @Override
     public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade) {
-        ExecutionEntity execution = findById(processInstanceId);
+        ExecutionEntity processInstanceExecution = findById(processInstanceId);
 
-        if (execution == null) {
+        if (processInstanceExecution == null) {
             throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
         }
 
-        deleteProcessInstanceCascade(execution, deleteReason, cascade);
+        deleteProcessInstanceCascade(processInstanceExecution, deleteReason, cascade);
+        
+        // Special care needed for a process instance of a call activity: the parent process instance needs to be triggered for completion
+        // This can't be added to the deleteProcessInstanceCascade method, as this will also trigger all child and/or multi-instance
+        // process instances for child call activities, which shouldn't happen.
+        if (processInstanceExecution.getSuperExecutionId() != null) {
+            ExecutionEntity superExecution = processInstanceExecution.getSuperExecution();
+            if (superExecution != null
+                    && superExecution.getCurrentFlowElement() instanceof FlowNode
+                    && ((FlowNode) superExecution.getCurrentFlowElement()).getBehavior() instanceof SubProcessActivityBehavior) {
+                SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) ((FlowNode) superExecution.getCurrentFlowElement()).getBehavior();
+                try {
+                    subProcessActivityBehavior.completing(superExecution, processInstanceExecution);
+                    superExecution.setSubProcessInstance(null);
+                    subProcessActivityBehavior.completed(superExecution);
+                } catch (Exception e) {
+                    throw new FlowableException("Could not complete parent process instance for call activity with process instance execution " 
+                                + processInstanceExecution.getId(), e);
+                }
+            }
+        }
     }
 
     protected void deleteProcessInstanceCascade(ExecutionEntity execution, String deleteReason, boolean deleteHistory) {
