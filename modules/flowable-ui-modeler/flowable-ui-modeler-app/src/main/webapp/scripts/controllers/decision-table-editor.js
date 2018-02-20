@@ -285,7 +285,7 @@ angular.module('flowableModeler')
             };
 
             $scope.doAfterValidate = function (isValid, value, row, prop, source) {
-                if (isCustomExpression(value)) {
+                if (isCustomExpression(value) || isDashValue(value)) {
                     disableCorrespondingOperatorCell(row, prop);
                     return true;
                 } else {
@@ -301,6 +301,10 @@ angular.module('flowableModeler')
             var isCustomExpression = function (val) {
                 return !!(val != null
                     && (String(val).startsWith('${') || String(val).startsWith('#{')));
+            };
+
+            var isDashValue = function (val) {
+                return !!(val != null && "-" === val);
             };
 
             var disableCorrespondingOperatorCell = function (row, prop) {
