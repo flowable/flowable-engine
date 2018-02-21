@@ -153,7 +153,7 @@ Example database configuration:
 <property name="jdbcPassword" value="" />
 ----
 
-Our benchmarks have shown that the MyBatis connection pool is not the most efficient or resilient when dealing with a lot of concurrent requests. As such, we advise the use of a +javax.sql.DataSource+ implementation and inject it into the process engine configuration (ror example DBCP, C3P0, Hikari, Tomcat Connection Pool, and so on):
+Our benchmarks have shown that the MyBatis connection pool is not the most efficient or resilient when dealing with a lot of concurrent requests. As such, we advise the use of a +javax.sql.DataSource+ implementation and inject it into the process engine configuration (for example HikariCP, Tomcat JDBC Connection Pool, and so on):
 
 [source,xml,linenums]
 ----
