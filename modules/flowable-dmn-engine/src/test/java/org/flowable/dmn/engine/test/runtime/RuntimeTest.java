@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -337,6 +338,41 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
 
         Assert.assertNotNull(result);
 
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/contains_1.dmn")
+    public void testContains() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        List inputVariable1 = Arrays.asList("test1","test2","test3");
+
+        processVariablesInput.put("inputVariable1", inputVariable1);
+
+        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+            .decisionKey("decision")
+            .variables(processVariablesInput)
+            .executeWithSingleResult();
+
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/contains_1.dmn")
+    public void testContainsNotInCollection() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        List inputVariable1 = Arrays.asList("test1","test3");
+
+        processVariablesInput.put("inputVariable1", inputVariable1);
+
+        DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
+            .decisionKey("decision")
+            .variables(processVariablesInput)
+            .executeWithAuditTrail();
+
+        Assert.assertFalse(result.isFailed());
+        Assert.assertFalse(result.getRuleExecutions().get(1).isValid());
     }
 
 }
