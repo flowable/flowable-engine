@@ -244,8 +244,8 @@
             TEMPRES_CALLBACK_ID_ as CALLBACK_ID_,
             TEMPRES_CALLBACK_TYPE_ as CALLBACK_TYPE_,
             TEMPRES_IS_COMPLETEABLE_ as IS_COMPLETEABLE_,
-            TEMPRES_TENANT_ID_ as TENANT_ID_
-            <if test="includeCaseVariables">,
+            TEMPRES_TENANT_ID_ as TENANT_ID_,
+            <if test="includeCaseVariables">
                 TEMPVAR_ID_ as VAR_ID_,
                 TEMPVAR_NAME_ as VAR_NAME_,
                 TEMPVAR_TYPE_ as VAR_TYPE_,
