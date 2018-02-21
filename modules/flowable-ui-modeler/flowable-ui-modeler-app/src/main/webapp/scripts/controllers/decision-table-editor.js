@@ -32,6 +32,7 @@ angular.module('flowableModeler')
             var numberOperators = ['==', '!=', '<', '>', '>=', '<='];
             var booleanOperators = ['==', '!='];
             var dateOperators = ['==', '!=', '<', '>', '>=', '<='];
+            var collectionOperators = ['IN', '==', '!='];
             var allOperators = ['==', '!=', '<', '>', '>=', '<='];
             var collectOperators = {
                 'SUM': '+',
@@ -55,7 +56,7 @@ angular.module('flowableModeler')
                 columnVariableIdMap: {},
                 startOutputExpression: 0,
                 selectedRow: undefined,
-                availableVariableTypes: ['string', 'number', 'boolean', 'date']
+                availableVariableTypes: ['string', 'number', 'boolean', 'date', 'collection']
             };
 
             // Hot Model init
@@ -587,6 +588,8 @@ angular.module('flowableModeler')
                         return booleanOperators;
                     case 'string':
                         return stringOperators;
+                    case 'collection':
+                        return collectionOperators;
                     default:
                         return allOperators;
                 }
