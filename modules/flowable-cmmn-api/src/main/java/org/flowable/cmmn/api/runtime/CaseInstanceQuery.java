@@ -182,6 +182,12 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      */
     CaseInstanceQuery includeCaseVariables();
 
+    /**
+     * Limit case instance variables
+     */
+    CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit);
+
+
     CaseInstanceQuery orderByCaseInstanceId();
     CaseInstanceQuery orderByCaseDefinitionKey();
     CaseInstanceQuery orderByCaseDefinitionId();

@@ -54,6 +54,8 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
 
+    protected Integer caseInstanceVariablesLimit;
+
     public CaseInstanceQueryImpl() {
     }
 
@@ -253,7 +255,17 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return this;
     }
 
-    // results ////////////////////////////////////////////////////
+    @Override
+    public CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit) {
+        this.caseInstanceVariablesLimit = caseInstanceVariablesLimit;
+        return this;
+    }
+
+    public Integer getCaseInstanceVariablesLimit() {
+        return this.caseInstanceVariablesLimit;
+    }
+
+// results ////////////////////////////////////////////////////
 
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
@@ -262,6 +274,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public List<CaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
+        if (this.isIncludeCaseVariables()) {
+            return CommandContextUtil.getCaseInstanceEntityManager(commandContext).findWithVariablesByCriteria(this);
+        }
         return CommandContextUtil.getCaseInstanceEntityManager(commandContext).findByCriteria(this);
     }
 
@@ -349,4 +364,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return includeCaseVariables;
     }
 
+    public String getMssqlOrDB2OrderBy() {
+        String specialOrderBy = super.getOrderByColumns();
+        if (specialOrderBy != null && specialOrderBy.length() > 0) {
+            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
+        }
+        return specialOrderBy;
+    }
 }
