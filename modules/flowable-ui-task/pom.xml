@@ -13,12 +13,6 @@
     <version>6.3.0-SNAPSHOT</version>
   </parent>
   
-  <properties>
-    	<!-- Maven build properties -->
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.7</java.version>
-  </properties>
-
 	<prerequisites>
 		<maven>3.0.0</maven>
 	</prerequisites>
@@ -105,7 +99,7 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-			<argLine>-XX:MaxPermSize=128m -Xmx256m</argLine>
+			<argLine>-Xmx256m</argLine>
 			<forkCount>1</forkCount>
 			<reuseForks>true</reuseForks>
 			<!-- Force alphabetical order to have a reproducible build -->

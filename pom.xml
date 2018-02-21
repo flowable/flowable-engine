@@ -17,7 +17,7 @@
 	<version>6.3.0-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jdk.version>1.7</jdk.version>
+		<jdk.version>1.8</jdk.version>
 		<spring.framework.version>4.3.14.RELEASE</spring.framework.version>
 		<spring.security.version>4.2.4.RELEASE</spring.security.version>
 		<jackson.version>2.9.3</jackson.version>
@@ -1478,44 +1478,24 @@
 				<skipTests>true</skipTests>
 			</properties>
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.zeroturnaround</groupId>
-						<artifactId>jrebel-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>generate-rebel-xml</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>java8</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<additionalparam>-Xdoclint:none</additionalparam>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
 		</profile>
 	</profiles>
 

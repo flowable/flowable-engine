@@ -14,11 +14,6 @@
   </parent>
   
   <properties>
-    	<!-- Maven build properties -->
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.7</java.version>
-		
-		<!-- Web container version -->
 		<tomcat.version>7.0.53</tomcat.version>
   </properties>
 
@@ -90,7 +85,7 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-			<argLine>-XX:MaxPermSize=128m -Xmx256m</argLine>
+			<argLine>-Xmx256m</argLine>
 			<forkCount>1</forkCount>
 			<reuseForks>true</reuseForks>
 			<!-- Force alphabetical order to have a reproducible build -->
