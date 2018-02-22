@@ -647,6 +647,8 @@ angular.module('flowableModeler')
                         '<div class="header-add-new-expression">' +
                         '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
                         '</div>';
+                } else if (type === 'text') {
+                    columnDefinition.validator = textValidator;
                 }
 
                 if (type === 'date') {
@@ -661,8 +663,6 @@ angular.module('flowableModeler')
 
                 } else if (type === 'dropdown') {
                     columnDefinition.source = ['true', 'false', '-'];
-                } else if (type === 'text') {
-                    columnDefinition.validator = textValidator;
                 }
 
                 if (type !== 'text') {
