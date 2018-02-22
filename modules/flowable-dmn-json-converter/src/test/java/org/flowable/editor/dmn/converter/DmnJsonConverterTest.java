@@ -66,6 +66,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_15 = "org/flowable/editor/dmn/converter/decisiontable_aggregation.json";
     private static final String JSON_RESOURCE_16 = "org/flowable/editor/dmn/converter/decisiontable_special_characters.json";
     private static final String JSON_RESOURCE_17 = "org/flowable/editor/dmn/converter/decisiontable_custom_input_expression.json";
+    private static final String JSON_RESOURCE_18 = "org/flowable/editor/dmn/converter/decisiontable_collections.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -457,6 +458,18 @@ public class DmnJsonConverterTest {
 
         assertEquals("${inputVar4 != null}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("#{inputVar4 > date:now()}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+    }
+
+    @Test
+    public void testConvertJsonToDmnCollections() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_18);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertEquals("${collection:contains(collection1, 'testValue')}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("-",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("== testValue",  decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("!= testValue",  decisionTable.getRules().get(3).getInputEntries().get(0).getInputEntry().getText());
     }
 
     /* Helper methods */

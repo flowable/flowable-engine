@@ -331,6 +331,17 @@ public class DmnJsonConverter {
                     // if expression is dash value or custom expression skip composition
                     if ("-".equals(expressionValue) || expressionValue.startsWith("${") || expressionValue.startsWith("#{")) {
                         inputEntry.setText(expressionValue);
+                    } else if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                        && StringUtils.isNotEmpty(expressionValue) && "IN".equals(operatorValue)) {
+
+                        // wrap in built in contains function
+                        StringBuilder stringBuilder = new StringBuilder("${collection:contains(");
+                        stringBuilder.append(ruleInputClauseContainer.getInputClause().getInputExpression().getText());
+                        stringBuilder.append(", '");
+                        stringBuilder.append(expressionValue);
+                        stringBuilder.append("')}");
+
+                        inputEntry.setText(stringBuilder.toString());
                     } else {
                         StringBuilder stringBuilder = new StringBuilder();
                         if (StringUtils.isNotEmpty(operatorValue)) {
@@ -340,22 +351,19 @@ public class DmnJsonConverter {
 
                         // add quotes for string
                         if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                            && !"-".equals(expressionValue)
                             && !expressionValue.startsWith("\"")
                             && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
 
                             stringBuilder.append("\"");
                             stringBuilder.append(expressionValue);
                             stringBuilder.append("\"");
-
                         } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                            && !"-".equals(expressionValue) && StringUtils.isNotEmpty(expressionValue)) {
+                            && StringUtils.isNotEmpty(expressionValue)) {
 
                             // wrap in built in toDate function
                             stringBuilder.append("date:toDate('");
                             stringBuilder.append(expressionValue);
                             stringBuilder.append("')");
-
                         } else {
                             stringBuilder.append(expressionValue);
                         }

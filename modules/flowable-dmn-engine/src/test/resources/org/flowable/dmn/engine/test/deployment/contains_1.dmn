@@ -1,18 +1,37 @@
-<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="full" name="Full" namespace="http://www.flowable.org/dmn">
-  <decision id="decision" name="Full Decision">
-    <decisionTable id="decisionTable" hitPolicy="FIRST">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_3fa3bde4-1645-11e8-b1df-be031b97f836" name="asdasd" namespace="http://www.flowable.org/dmn">
+  <decision id="decision" name="collection decision">
+    <decisionTable id="decisionTable_3fa3bde4-1645-11e8-b1df-be031b97f836" hitPolicy="RULE ORDER">
       <input>
-        <inputExpression id="inputExpression1" typeRef="collection">
-          <text>inputVariable1</text>
+        <inputExpression id="inputExpression_1" typeRef="collection">
+          <text>collection1</text>
         </inputExpression>
+        <inputValues>
+          <text>"test1","test2"</text>
+        </inputValues>
       </input>
-      <output id="output1" label="Output 1" name="outputVariable1" typeRef="string"></output>
+      <output id="outputExpression_2" name="output1" typeRef="string"></output>
       <rule>
-        <inputEntry id="inputEntry1">
-          <text><![CDATA[${collection:contains(inputVariable1, "test2")}]]></text>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[${collection:contains(collection1, 'test1')}]]></text>
         </inputEntry>
-        <outputEntry id="outputEntry1">
-          <text>"result1"</text>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA["test1 in collection"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[== collection2]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA["collection1 same as collection2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[!= collection3]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_3_2">
+          <text><![CDATA["collection1 not same as collection3"]]></text>
         </outputEntry>
       </rule>
     </decisionTable>

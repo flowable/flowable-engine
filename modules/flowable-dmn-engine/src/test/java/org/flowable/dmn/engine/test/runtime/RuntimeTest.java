@@ -346,15 +346,22 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         Map<String, Object> processVariablesInput = new HashMap<>();
 
         List inputVariable1 = Arrays.asList("test1","test2","test3");
+        List inputVariable2 = Arrays.asList("test1","test2","test3");
+        List inputVariable3 = Arrays.asList("test1","test2");
 
-        processVariablesInput.put("inputVariable1", inputVariable1);
+        processVariablesInput.put("collection1", inputVariable1);
+        processVariablesInput.put("collection2", inputVariable2);
+        processVariablesInput.put("collection3", inputVariable3);
 
-        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+        DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
             .variables(processVariablesInput)
-            .executeWithSingleResult();
+            .executeWithAuditTrail();
 
-        Assert.assertNotNull(result);
+        Assert.assertFalse(result.isFailed());
+        Assert.assertTrue(result.getRuleExecutions().get(1).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(2).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(3).isValid());
     }
 
     @Test
@@ -362,9 +369,11 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
     public void testContainsNotInCollection() {
         Map<String, Object> processVariablesInput = new HashMap<>();
 
-        List inputVariable1 = Arrays.asList("test1","test3");
+        List inputVariable1 = Arrays.asList("test2","test3");
 
-        processVariablesInput.put("inputVariable1", inputVariable1);
+        processVariablesInput.put("collection1", inputVariable1);
+        processVariablesInput.put("collection2", null);
+        processVariablesInput.put("collection3", null);
 
         DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
             .decisionKey("decision")
@@ -373,6 +382,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
 
         Assert.assertFalse(result.isFailed());
         Assert.assertFalse(result.getRuleExecutions().get(1).isValid());
+        Assert.assertFalse(result.getRuleExecutions().get(2).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(3).isValid());
     }
 
 }
