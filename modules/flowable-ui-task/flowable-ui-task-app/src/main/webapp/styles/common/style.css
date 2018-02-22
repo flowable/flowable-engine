@@ -1,7 +1,7 @@
 /**
  Colors:
 
-  - Header: #333333
+  - Header: #1f3245
   - Subheader: #e8edf1
   - Subheader border: #a4acb9
   - Highlight buttons/text: #36a7c4
@@ -499,7 +499,7 @@ a.dropdown-toggle {
 /* Navigation */
 
 .navbar {
-    background-color: #333333;
+    background-color: #1f3245;
     border: none;
     min-height: 40px;
 }
@@ -544,6 +544,14 @@ a.dropdown-toggle {
 .navbar-nav {
     height: 40px;
     margin-left: 50px;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+	color: #a8bac1;
+}
+
+.navbar-inverse .navbar-nav > .active > a {
+	background-color: #1f3245;
 }
 
 .navbar-nav > li > a {
