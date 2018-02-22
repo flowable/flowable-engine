@@ -559,23 +559,24 @@ a.dropdown-toggle {
 .navbar-nav > li.active:after {
     top: 100%;
     left: 50%;
-    border: solid transparent;
     content: " ";
     height: 0;
     width: 0;
     position: absolute;
     pointer-events: none;
-    border-color: rgba(0, 0, 0, 0);
-    border-top-color: #000000;
-    border-width: 6px;
+    border: 6px solid rgba(0, 0, 0, 0);
+    border-top-color: #1f3245;
     margin-left: -6px;
+}
+
+.navbar-nav > li.active:hover:after {
+    border-top-color: #000000;
 }
 
 .navbar-nav > li.active {
     background-color: #000000;
     position: relative;
 }
-
 
 .navbar-nav > li.active > a {
     color: #36a7c4;
