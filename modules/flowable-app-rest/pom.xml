@@ -22,19 +22,6 @@
     <finalName>flowable-rest</finalName>
     <plugins>
       <plugin>
-        <groupId>org.zeroturnaround</groupId>
-        <artifactId>jrebel-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-rebel-xml</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
 	    <groupId>org.apache.tomcat.maven</groupId>
         <artifactId>tomcat7-maven-plugin</artifactId>
 		<configuration>
@@ -72,25 +59,6 @@
           <configuration>
             <lifecycleMappingMetadata>
               <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.zeroturnaround
-                    </groupId>
-                    <artifactId>
-                      jrebel-maven-plugin
-                    </artifactId>
-                    <versionRange>
-                      [1.0.7,)
-                    </versionRange>
-                    <goals>
-                      <goal>generate</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
                 <pluginExecution>
                 	<pluginExecutionFilter>
                 		<groupId>com.github.kongchen</groupId>

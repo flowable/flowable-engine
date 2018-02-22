@@ -19,7 +19,6 @@ import java.util.Map;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.util.CollectionUtil;
-import org.flowable.engine.common.impl.util.JvmUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -406,10 +405,8 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnJavaScriptScriptTask.bpmn20.xml" })
     public void testCatchErrorOnJavaScriptScriptTask() {
-        if (JvmUtil.isJDK8()) {
-            String procId = runtimeService.startProcessInstanceByKey("catchErrorOnScriptTask").getId();
-            assertProcessEnded(procId);
-        }
+        String procId = runtimeService.startProcessInstanceByKey("catchErrorOnScriptTask").getId();
+        assertProcessEnded(procId);
     }
 
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testUncaughtErrorOnScriptTaskWithEmptyErrorEventDefinition.bpmn20.xml" })

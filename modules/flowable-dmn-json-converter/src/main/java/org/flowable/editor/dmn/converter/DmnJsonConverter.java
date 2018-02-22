@@ -363,7 +363,6 @@ public class DmnJsonConverter {
 
                     ruleInputClauseContainer.setInputEntry(inputEntry);
                     rule.addInputEntry(ruleInputClauseContainer);
-
                 }
                 for (String id : ruleOutputContainerMap.keySet()) {
                     RuleOutputClauseContainer ruleOutputClauseContainer = new RuleOutputClauseContainer();

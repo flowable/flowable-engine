@@ -339,10 +339,6 @@ For more information on Spring Boot, see link:$$http://projects.spring.io/spring
 
 The Spring Boot - Flowable integration has been developed together with Spring committers. 
 
-==== Compatibility
-
-Spring Boot requires a JDK 7 runtime. Please check the Spring Boot documentation.
-
 ==== Getting started
 
 Spring Boot is all about convention over configuration. To get started, simply add the _spring-boot-starters-basic_ dependency to your project. For example for Maven:
