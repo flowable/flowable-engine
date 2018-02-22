@@ -317,7 +317,8 @@
         </if>
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
             <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
-                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SCOPE_ID_ and SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
+                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SCOPE_ID_ and
+                A${index}.SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
             </if>
         </foreach>
         <where>
