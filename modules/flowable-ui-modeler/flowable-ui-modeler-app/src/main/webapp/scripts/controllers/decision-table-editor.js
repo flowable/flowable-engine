@@ -632,7 +632,7 @@ angular.module('flowableModeler')
 
                 if (inputExpression.entries && inputExpression.entries.length > 0) {
                     var entriesOptionValues = inputExpression.entries.slice(0, inputExpression.entries.length);
-                    entriesOptionValues.push('-', '', ' ');
+                    entriesOptionValues.push('-');
 
                     columnDefinition.type = 'dropdown';
                     columnDefinition.strict = true;
