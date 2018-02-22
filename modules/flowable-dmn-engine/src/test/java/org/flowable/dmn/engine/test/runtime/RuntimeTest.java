@@ -386,4 +386,18 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         Assert.assertTrue(result.getRuleExecutions().get(3).isValid());
     }
 
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/contains_1.dmn")
+    public void testContainsNotACollection() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        processVariablesInput.put("collection1", "not a collection");
+
+        DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
+            .decisionKey("decision")
+            .variables(processVariablesInput)
+            .executeWithAuditTrail();
+
+        Assert.assertTrue(result.isFailed());
+    }
 }
