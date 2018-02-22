@@ -31,7 +31,7 @@ angular.module('flowableModeler')
                 columnDefs: [],
                 columnVariableIdMap: {},
                 readOnly: true,
-                availableVariableTypes: ['string', 'number', 'boolean', 'date']
+                availableVariableTypes: ['string', 'number', 'boolean', 'date', 'collection']
             };
 
             // Hot Model init
@@ -45,7 +45,7 @@ angular.module('flowableModeler')
 
             var hotReadOnlyDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
-            var operators = ['==', '!=', '<', '>', '>=', '<='];
+            var operators = ['==', '!=', '<', '>', '>=', '<=', 'IN'];
             var columnIdCounter = 0;
             var dateFormat = 'YYYY-MM-DD';
 
