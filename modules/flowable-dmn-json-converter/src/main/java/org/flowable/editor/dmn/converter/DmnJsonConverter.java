@@ -328,7 +328,8 @@ public class DmnJsonConverter {
                         expressionValue = expressionValueNode.asText();
                     }
 
-                    if ("-".equals(expressionValue)) {
+                    // if expression is dash value or custom expression skip composition
+                    if ("-".equals(expressionValue) || expressionValue.startsWith("${") || expressionValue.startsWith("#{")) {
                         inputEntry.setText(expressionValue);
                     } else {
                         StringBuilder stringBuilder = new StringBuilder();

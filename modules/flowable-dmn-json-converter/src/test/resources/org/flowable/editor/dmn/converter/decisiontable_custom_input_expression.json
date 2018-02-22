@@ -14,51 +14,6 @@
       "entries": [],
       "newVariable": false,
       "complexExpression": false
-    },
-    {
-      "id": "6",
-      "variableId": "dateTest2",
-      "variableType": null,
-      "type": "date",
-      "label": "",
-      "entries": [],
-      "newVariable": false,
-      "complexExpression": false
-    },
-    {
-      "id": "7",
-      "variableId": "boolTest1",
-      "variableType": null,
-      "type": "boolean",
-      "label": "",
-      "entries": [],
-      "newVariable": false,
-      "complexExpression": false
-    },
-    {
-      "id": "5",
-      "variableId": "numberTest2",
-      "variableType": null,
-      "type": "number",
-      "label": "",
-      "entries": [
-        "1",
-        "2",
-        "3",
-        "4"
-      ],
-      "newVariable": false,
-      "complexExpression": false
-    },
-    {
-      "id": "4",
-      "variableId": "sdf",
-      "variableType": null,
-      "type": "number",
-      "label": "",
-      "entries": [],
-      "newVariable": false,
-      "complexExpression": false
     }
   ],
   "outputExpressions": [
@@ -71,60 +26,18 @@
       "entries": [],
       "newVariable": false,
       "complexExpression": false
-    },
-    {
-      "id": "3",
-      "variableId": "output2",
-      "variableType": null,
-      "type": "number",
-      "label": "",
-      "entries": [],
-      "newVariable": false,
-      "complexExpression": false
     }
   ],
   "rules": [
     {
-      "2": "less than 5",
-      "3": 1,
       "1_operator": null,
       "1_expression": "${inputVar4 != null}",
-      "4_expression": 4,
-      "4_operator": "==",
-      "5_expression": "2",
-      "5_operator": "==",
-      "6_expression": "2018-02-08",
-      "6_operator": "==",
-      "7_expression": "true",
-      "7_operator": "=="
+      "2": "result 1"
     },
     {
-      "2": "less than 10",
-      "3": 2,
-      "1_operator": "==",
-      "1_expression": 20,
-      "4_expression": "#{inputVar2 > 5}",
-      "4_operator": null,
-      "5_expression": "2",
-      "5_operator": "==",
-      "6_expression": "2018-02-09",
-      "6_operator": "==",
-      "7_expression": "true",
-      "7_operator": "!="
-    },
-    {
-      "2": "less than 20",
-      "3": 3,
-      "1_operator": ">",
-      "1_expression": "20",
-      "4_expression": "-",
-      "4_operator": ">",
-      "5_expression": "3",
-      "5_operator": "<",
-      "6_expression": "${inputVar1 > date:now()}",
-      "6_operator": null,
-      "7_expression": "true",
-      "7_operator": "=="
+      "1_operator": "!=",
+      "1_expression": "#{inputVar4 > date:now()}",
+      "2": "result 2"
     }
   ]
 }

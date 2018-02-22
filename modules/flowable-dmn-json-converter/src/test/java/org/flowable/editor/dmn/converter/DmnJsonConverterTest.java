@@ -313,8 +313,10 @@ public class DmnJsonConverterTest {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_7);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
-        assertNotNull(dmnDefinition);
-    }
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertEquals("== date:toDate('14-06-2017')",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("!= date:toDate('16-06-2017')",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());    }
 
     @Test
     public void testConvertJsonToDmnEmptyOperator() {
@@ -453,8 +455,8 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
-        assertEquals("== \"TEST\"",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("== \"TEST\"",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${inputVar4 != null}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("#{inputVar4 > date:now()}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
     }
 
     /* Helper methods */
