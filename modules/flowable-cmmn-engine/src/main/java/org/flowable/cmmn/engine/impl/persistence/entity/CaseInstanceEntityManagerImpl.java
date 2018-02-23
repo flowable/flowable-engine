@@ -86,7 +86,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         if (caseInstanceQuery.getCaseInstanceVariablesLimit() != null) {
             caseInstanceQuery.setMaxResults(caseInstanceQuery.getCaseInstanceVariablesLimit());
         } else {
-            caseInstanceQuery.setMaxResults(1000);
+            caseInstanceQuery.setMaxResults(cmmnEngineConfiguration.getCaseQueryLimit());
         }
         caseInstanceQuery.setFirstResult(0);
 

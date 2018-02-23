@@ -291,7 +291,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected int taskQueryLimit;
     protected int historicTaskQueryLimit;
 
-    protected int caseQueryLimit;
+    protected int caseQueryLimit = 20000;
 
     // Variable support
     protected VariableTypes variableTypes;
