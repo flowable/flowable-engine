@@ -41,6 +41,10 @@ public class DataSourceProcessEngineAutoConfiguration {
     @EnableConfigurationProperties(FlowableProperties.class)
     public static class DataSourceProcessEngineConfiguration extends AbstractProcessEngineAutoConfiguration {
 
+        public DataSourceProcessEngineConfiguration(FlowableProperties flowableProperties) {
+            super(flowableProperties);
+        }
+
         @Bean
         @ConditionalOnMissingBean
         public PlatformTransactionManager transactionManager(DataSource dataSource) {

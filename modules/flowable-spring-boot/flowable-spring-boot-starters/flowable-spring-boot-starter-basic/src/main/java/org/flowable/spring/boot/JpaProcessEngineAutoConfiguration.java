@@ -44,6 +44,10 @@ public class JpaProcessEngineAutoConfiguration {
     @EnableConfigurationProperties(FlowableProperties.class)
     public static class JpaConfiguration extends AbstractProcessEngineAutoConfiguration {
 
+        public JpaConfiguration(FlowableProperties flowableProperties) {
+            super(flowableProperties);
+        }
+
         @Bean
         @ConditionalOnMissingBean
         public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {

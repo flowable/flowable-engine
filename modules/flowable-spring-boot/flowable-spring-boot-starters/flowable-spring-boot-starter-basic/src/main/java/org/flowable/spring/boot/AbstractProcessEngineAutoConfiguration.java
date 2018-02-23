@@ -13,9 +13,8 @@
 package org.flowable.spring.boot;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -37,27 +36,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.StringUtils;
 
 /**
  * Provides sane definitions for the various beans required to be productive with Flowable in Spring.
  *
  * @author Josh Long
+ * @author Filip Hrisafov
+ * @author Javier Casal
  */
 public abstract class AbstractProcessEngineAutoConfiguration
         extends AbstractProcessEngineConfiguration {
 
-    protected FlowableProperties flowableProperties;
-
-    @Autowired
-    private ResourcePatternResolver resourceLoader;
-
     @Autowired(required = false)
-    private ProcessEngineConfigurationConfigurer processEngineConfigurationConfigurer;
+    private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
+
+    public AbstractProcessEngineAutoConfiguration(FlowableProperties flowableProperties) {
+        super(flowableProperties);
+    }
 
     @Bean
     public SpringAsyncExecutor springAsyncExecutor(TaskExecutor taskExecutor) {
@@ -69,23 +67,29 @@ public abstract class AbstractProcessEngineAutoConfiguration
         return new SpringCallerRunsRejectedJobsHandler();
     }
 
-    protected SpringProcessEngineConfiguration baseSpringProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-            SpringAsyncExecutor springAsyncExecutor) throws IOException {
+    protected SpringProcessEngineConfiguration baseSpringProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager, SpringAsyncExecutor springAsyncExecutor) throws IOException {
 
-        List<Resource> procDefResources = this.discoverProcessDefinitionResources(
-                this.resourceLoader, this.flowableProperties.getProcessDefinitionLocationPrefix(),
-                this.flowableProperties.getProcessDefinitionLocationSuffixes(),
-                this.flowableProperties.isCheckProcessDefinitions());
+        SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
-        SpringProcessEngineConfiguration conf = super.processEngineConfigurationBean(
-                procDefResources.toArray(new Resource[procDefResources.size()]), dataSource,
-                platformTransactionManager, springAsyncExecutor);
+        List<Resource> resources = this.discoverDeploymentResources(
+            flowableProperties.getProcessDefinitionLocationPrefix(),
+            flowableProperties.getProcessDefinitionLocationSuffixes(),
+            flowableProperties.isCheckProcessDefinitions()
+        );
+
+        if (resources != null && !resources.isEmpty()) {
+            conf.setDeploymentResources(resources.toArray(new Resource[0]));
+        }
+
+        if (springAsyncExecutor != null) {
+            conf.setAsyncExecutor(springAsyncExecutor);
+        }
+
+        configureSpringEngine(conf, platformTransactionManager);
+        configureEngine(conf, dataSource);
 
         conf.setDeploymentName(defaultText(flowableProperties.getDeploymentName(), conf.getDeploymentName()));
-        conf.setDatabaseSchema(defaultText(flowableProperties.getDatabaseSchema(), conf.getDatabaseSchema()));
-        conf.setDatabaseSchemaUpdate(defaultText(flowableProperties.getDatabaseSchemaUpdate(), conf.getDatabaseSchemaUpdate()));
 
-        conf.setDbHistoryUsed(flowableProperties.isDbHistoryUsed());
         conf.setDisableIdmEngine(!flowableProperties.isDbIdentityUsed());
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
@@ -100,60 +104,16 @@ public abstract class AbstractProcessEngineAutoConfiguration
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
 
-        if (flowableProperties.getCustomMybatisMappers() != null) {
-            conf.setCustomMybatisMappers(getCustomMybatisMapperClasses(flowableProperties.getCustomMybatisMappers()));
-        }
-
-        if (flowableProperties.getCustomMybatisXMLMappers() != null) {
-            conf.setCustomMybatisXMLMappers(new HashSet<>(flowableProperties.getCustomMybatisXMLMappers()));
-        }
-
-        if (flowableProperties.getCustomMybatisMappers() != null) {
-            conf.setCustomMybatisMappers(getCustomMybatisMapperClasses(flowableProperties.getCustomMybatisMappers()));
-        }
-
-        if (flowableProperties.getCustomMybatisXMLMappers() != null) {
-            conf.setCustomMybatisXMLMappers(new HashSet<>(flowableProperties.getCustomMybatisXMLMappers()));
-        }
-
-        if (processEngineConfigurationConfigurer != null) {
-            processEngineConfigurationConfigurer.configure(conf);
-        }
+        processEngineConfigurationConfigurers.forEach(configurator -> configurator.configure(conf));
 
         return conf;
     }
 
-    protected Set<Class<?>> getCustomMybatisMapperClasses(List<String> customMyBatisMappers) {
-        Set<Class<?>> mybatisMappers = new HashSet<>();
-        for (String customMybatisMapperClassName : customMyBatisMappers) {
-            try {
-                Class customMybatisClass = Class.forName(customMybatisMapperClassName);
-                mybatisMappers.add(customMybatisClass);
-            } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException("Class " + customMybatisMapperClassName + " has not been found.", e);
-            }
-        }
-        return mybatisMappers;
-    }
-
-    protected String defaultText(String deploymentName, String deploymentName1) {
-        if (StringUtils.hasText(deploymentName))
-            return deploymentName;
-        return deploymentName1;
-    }
-
-    @Autowired
-    protected void setFlowableProperties(FlowableProperties flowableProperties) {
-        this.flowableProperties = flowableProperties;
-    }
-
-    protected FlowableProperties getFlowableProperties() {
-        return this.flowableProperties;
-    }
-
     @Bean
     public ProcessEngineFactoryBean processEngine(SpringProcessEngineConfiguration configuration) throws Exception {
-        return super.springProcessEngineBean(configuration);
+        ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
+        processEngineFactoryBean.setProcessEngineConfiguration(configuration);
+        return processEngineFactoryBean;
     }
 
     @Bean
