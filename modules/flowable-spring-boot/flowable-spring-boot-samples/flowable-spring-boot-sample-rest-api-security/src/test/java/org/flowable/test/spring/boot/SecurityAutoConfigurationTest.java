@@ -7,6 +7,7 @@ import org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.SecurityAutoConfiguration;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,8 @@ public class SecurityAutoConfigurationTest {
         this.applicationContext.refresh();
         UserDetailsService userDetailsService = this.applicationContext.getBean(UserDetailsService.class);
         Assert.assertNotNull("the userDetailsService should not be null", userDetailsService);
-        Assert.assertEquals("there should only be 1 authority", 1, userDetailsService.loadUserByUsername("jlong").getAuthorities().size());
-        Assert.assertEquals("there should be 2 authorities", 2, userDetailsService.loadUserByUsername("jbarrez").getAuthorities().size());
+        Assert.assertEquals("there should only be 1 authority", 1, userDetailsService.loadUserByUsername("jlong2").getAuthorities().size());
+        Assert.assertEquals("there should be 2 authorities", 2, userDetailsService.loadUserByUsername("jbarrez2").getAuthorities().size());
     }
 
     @Configuration
@@ -72,16 +73,19 @@ public class SecurityAutoConfigurationTest {
             return new InitializingBean() {
                 @Override
                 public void afterPropertiesSet() throws Exception {
+                    // We have to use different names than from the CommandLineRunner. The reason is that during
+                    // testing we are using an in memory database that is not linked to the application context
+                    // but it lives in the JVM
 
                     // install groups & users
-                    Group userGroup = group("user");
-                    Group adminGroup = group("admin");
+                    Group userGroup = group("user2");
+                    Group adminGroup = group("admin2");
 
-                    User joram = user("jbarrez", "Joram", "Barrez");
+                    User joram = user("jbarrez2", "Joram", "Barrez");
                     identityService.createMembership(joram.getId(), userGroup.getId());
                     identityService.createMembership(joram.getId(), adminGroup.getId());
 
-                    User josh = user("jlong", "Josh", "Long");
+                    User josh = user("jlong2", "Josh", "Long");
                     identityService.createMembership(josh.getId(), userGroup.getId());
                 }
             };
