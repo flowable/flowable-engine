@@ -41,7 +41,7 @@ public class FlowableProperties {
     private boolean isDbIdentityUsed = true;
     private boolean isDbHistoryUsed = true;
     private HistoryLevel historyLevel = HistoryLevel.AUDIT;
-    private String processDefinitionLocationPrefix = "classpath:/processes/";
+    private String processDefinitionLocationPrefix = "classpath*:/processes/";
     private List<String> processDefinitionLocationSuffixes = Arrays.asList("**.bpmn20.xml", "**.bpmn");
     private String restApiMapping = "/api/*";
     private String restApiServletName = "flowableRestApi";
