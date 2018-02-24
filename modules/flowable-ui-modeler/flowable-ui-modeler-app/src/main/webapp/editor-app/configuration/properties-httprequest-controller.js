@@ -11,14 +11,14 @@
  * limitations under the License.
  */
 
-angular.module('flowableModeler').controller('FlowableMultiInstanceCtrl', [ '$scope', function($scope) {
+angular.module('flowableModeler').controller('FlowableHttpRequestMethodCtrl', [ '$scope', function($scope) {
 
     if ($scope.property.value == undefined && $scope.property.value == null)
     {
-    	$scope.property.value = 'None';
+    	   $scope.property.value = 'GET';
     }
         
-    $scope.multiInstanceChanged = function() {
-    	$scope.updatePropertyInModel($scope.property);
+    $scope.httpRequestMethodChanged = function() {
+        	$scope.updatePropertyInModel($scope.property);
     };
 }]);

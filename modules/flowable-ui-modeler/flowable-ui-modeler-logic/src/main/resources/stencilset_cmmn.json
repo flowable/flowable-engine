@@ -659,6 +659,28 @@
       ]
     },
     {
+      "name" : "httptasksaveresponseparameterstransientpackage",
+      "properties" : [ {
+        "id" : "httptasksaveresponseparameterstransient",
+        "type" : "String",
+        "title" : "Save response as a transient variable",
+        "value" : "",
+        "description" : "Flag indicating to store the response variable(s) transient",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "httptasksaveresponseasjsonpackage",
+      "properties" : [ {
+        "id" : "httptasksaveresponseasjson",
+        "type" : "String",
+        "title" : "Save response as JSON",
+        "value" : "",
+        "description" : "Flag indicating to store the response variable as a JSON variable instead of a String",
+        "popular" : true
+      } ]
+    },
+    {
     "name" : "casetaskcasereferencepackage",
     "properties" : [ {
       "id" : "casetaskcasereference",
@@ -981,6 +1003,11 @@
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
+        "servicetaskclasspackage",
+        "asyncpackage",
+        "requiredrulepackage",
+        "repetitionrulepackage",
+        "manualactivationrulepackage",
         "httptaskrequestmethodpackage",
         "httptaskrequesturlpackage",
         "httptaskrequestheaderspackage",
@@ -994,11 +1021,8 @@
         "httptasksaverequestvariablespackage",
         "httptasksaveresponseparameterspackage",
         "httptaskresultvariableprefixpackage",
-        "servicetaskclasspackage",
-        "asyncpackage",
-        "requiredrulepackage",
-        "repetitionrulepackage",
-        "manualactivationrulepackage"
+        "httptasksaveresponseparameterstransientpackage",
+        "httptasksaveresponseasjsonpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
