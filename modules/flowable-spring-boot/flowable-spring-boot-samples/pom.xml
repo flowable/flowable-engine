@@ -22,6 +22,7 @@
         <module>flowable-spring-boot-sample-actuator</module>
         <module>flowable-spring-boot-sample-integration</module>
         <module>flowable-spring-boot-sample-custom-mybatis-mapper</module>
+        <module>flowable-spring-boot-sample-form</module>
     </modules>
     <dependencies>
         <dependency>
