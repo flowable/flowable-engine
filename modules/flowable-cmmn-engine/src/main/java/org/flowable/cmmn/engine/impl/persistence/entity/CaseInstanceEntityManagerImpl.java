@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -55,12 +56,12 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     protected DataManager<CaseInstanceEntity> getDataManager() {
         return caseInstanceDataManager;
     }
-    
+
     @Override
     public CaseInstanceQuery createCaseInstanceQuery() {
         return new CaseInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }
-    
+
     @Override
     public List<CaseInstanceEntity> findCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
         return caseInstanceDataManager.findCaseInstancesByCaseDefinitionId(caseDefinitionId);
@@ -71,31 +72,68 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         return caseInstanceDataManager.findByCriteria((CaseInstanceQueryImpl) query);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQuery query) {
+        // paging doesn't work for combining case instances and variables due
+        // to an outer join, so doing it in-memory
+
+        CaseInstanceQueryImpl caseInstanceQuery = (CaseInstanceQueryImpl) query;
+        int firstResult = caseInstanceQuery.getFirstResult();
+        int maxResults = caseInstanceQuery.getMaxResults();
+
+        // setting max results, limit to 20000 results for performance reasons
+        if (caseInstanceQuery.getCaseInstanceVariablesLimit() != null) {
+            caseInstanceQuery.setMaxResults(caseInstanceQuery.getCaseInstanceVariablesLimit());
+        } else {
+            caseInstanceQuery.setMaxResults(cmmnEngineConfiguration.getCaseQueryLimit());
+        }
+        caseInstanceQuery.setFirstResult(0);
+
+        List<CaseInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectCaseInstanceWithVariablesByQueryCriteria", caseInstanceQuery);
+
+        if (instanceList != null && !instanceList.isEmpty()) {
+            if (firstResult > 0) {
+                if (firstResult <= instanceList.size()) {
+                    int toIndex = firstResult + Math.min(maxResults, instanceList.size() - firstResult);
+                    return instanceList.subList(firstResult, toIndex);
+                } else {
+                    return Collections.EMPTY_LIST;
+                }
+            } else {
+                int toIndex = maxResults > 0 ? Math.min(maxResults, instanceList.size()) : instanceList.size();
+                return instanceList.subList(0, toIndex);
+            }
+        }
+        return Collections.EMPTY_LIST;
+
+    }
+
     @Override
     public long countByCriteria(CaseInstanceQuery query) {
         return caseInstanceDataManager.countByCriteria((CaseInstanceQueryImpl) query);
     }
-    
+
     @Override
     public void delete(String caseInstanceId, String deleteReason) {
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
         // Variables
         getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
-        
+
         // Tasks
         TaskEntityManager taskEntityManager = getTaskEntityManager();
         List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         for (TaskEntity taskEntity : taskEntities) {
             TaskHelper.deleteTask(taskEntity, deleteReason, false, true);
         }
-        
+
         // Sentry part instances
         getSentryPartInstanceEntityManager().deleteByCaseInstanceId(caseInstanceId);
 
         // Runtime milestones
         getMilestoneInstanceEntityManager().deleteByCaseInstanceId(caseInstanceId);
-        
+
         // Plan item instances
         PlanItemInstanceEntityManager planItemInstanceEntityManager = getPlanItemInstanceEntityManager();
         // Plan item instances are removed per stage, in reversed order
@@ -105,7 +143,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
             planItemInstanceEntityManager.deleteByStageInstanceId(stagePlanItemInstances.get(i).getId());
         }
         planItemInstanceEntityManager.deleteByCaseInstanceId(caseInstanceId); // root plan item instances
-        
+
         // Jobs have dependencies (byte array refs that need to be deleted, so no immediate delete for the moment)
         JobEntityManager jobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
         List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(new JobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
@@ -131,7 +169,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         // Actual case instance
         delete(caseInstanceEntity);
     }
-    
+
     protected void collectStagePlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer, ArrayList<PlanItemInstanceEntity> stagePlanItemInstanceEntities) {
         for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceContainer.getChildPlanItemInstances()) {
             if (planItemInstanceEntity.isStage()) {
@@ -140,7 +178,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
             }
         }
     }
-    
+
     @Override
     public void updateLockTime(String caseInstanceId) {
         Date expirationTime = getCmmnEngineConfiguration().getClock().getCurrentTime();
@@ -150,10 +188,10 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         lockCal.setTime(expirationTime);
         lockCal.add(Calendar.MILLISECOND, lockMillis);
         Date lockDate = lockCal.getTime();
-        
+
         caseInstanceDataManager.updateLockTime(caseInstanceId, lockDate, expirationTime);
     }
-    
+
     @Override
     public void clearLockTime(String caseInstanceId) {
         caseInstanceDataManager.clearLockTime(caseInstanceId);

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,18 +63,20 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         }
 
         initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
-        
+
         ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engineConfiguration;
         initProcessInstanceService(processEngineConfiguration);
         initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
-        
+
         cmmnEngineConfiguration.setExecuteServiceDbSchemaManagers(false);
         cmmnEngineConfiguration.setEnableTaskRelationshipCounts(processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
         cmmnEngineConfiguration.setTaskQueryLimit(processEngineConfiguration.getTaskQueryLimit());
         cmmnEngineConfiguration.setHistoricTaskQueryLimit(processEngineConfiguration.getHistoricTaskQueryLimit());
+        // use the same query limit for executions and cases
+        cmmnEngineConfiguration.setCaseQueryLimit(processEngineConfiguration.getExecutionQueryLimit());
 
         initCmmnEngine();
-        
+
         initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
     }
 
