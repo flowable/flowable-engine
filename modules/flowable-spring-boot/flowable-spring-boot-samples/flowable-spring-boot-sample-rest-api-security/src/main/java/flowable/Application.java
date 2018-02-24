@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
@@ -17,6 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableAutoConfiguration
 public class Application {
 
+    @Order(99)
     @Configuration
     static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
         @Override
@@ -37,6 +39,11 @@ public class Application {
             public void run(String... strings) throws Exception {
 
                 // install groups & users
+                Group adminGroup = identityService.newGroup("admin");
+                adminGroup.setName("admin");
+                adminGroup.setType("security-role");
+                identityService.saveGroup(adminGroup);
+
                 Group group = identityService.newGroup("user");
                 group.setName("users");
                 group.setType("security-role");
@@ -55,6 +62,7 @@ public class Application {
                 identityService.saveUser(josh);
 
                 identityService.createMembership("jbarrez", "user");
+                identityService.createMembership("jbarrez", "admin");
                 identityService.createMembership("jlong", "user");
             }
         };
