@@ -33,10 +33,13 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single Task resource.
@@ -48,6 +51,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single task, spawned by a process. GET runtime/tasks/{taskId}
      */
+    @Test
     @Deployment
     public void testGetProcessTask() throws Exception {
         Calendar now = Calendar.getInstance();
@@ -97,6 +101,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single task, created using the API. GET runtime/tasks/{taskId}
      */
+    @Test
     public void testGetProcessAdhoc() throws Exception {
         try {
 
@@ -154,6 +159,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single task without passing in any value, no values should be altered. PUT runtime/tasks/{taskId}
      */
+    @Test
     public void testUpdateTaskNoOverrides() throws Exception {
         try {
             Calendar now = Calendar.getInstance();
@@ -201,6 +207,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single task. PUT runtime/tasks/{taskId}
      */
+    @Test
     public void testUpdateTask() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -250,6 +257,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating an unexisting task. PUT runtime/tasks/{taskId}
      */
+    @Test
     public void testUpdateUnexistingTask() throws Exception {
         ObjectNode requestNode = objectMapper.createObjectNode();
 
@@ -262,6 +270,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single task. DELETE runtime/tasks/{taskId}
      */
+    @Test
     public void testDeleteTask() throws Exception {
         try {
 
@@ -337,6 +346,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating an unexisting task. PUT runtime/tasks/{taskId}
      */
+    @Test
     public void testDeleteUnexistingTask() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, "unexistingtask"));
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
@@ -345,6 +355,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a task that is part of a process. PUT runtime/tasks/{taskId}
      */
+    @Test
     @Deployment
     public void testDeleteTaskInProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -358,6 +369,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test completing a single task. POST runtime/tasks/{taskId}
      */
+    @Test
     @Deployment
     public void testCompleteTask() throws Exception {
         try {
@@ -443,6 +455,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test claiming a single task and all exceptional cases related to claiming. POST runtime/tasks/{taskId}
      */
+    @Test
     public void testClaimTask() throws Exception {
         try {
 
@@ -504,6 +517,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testReclaimTask() throws Exception {
 
@@ -554,6 +568,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test delegating a single task and all exceptional cases related to delegation. POST runtime/tasks/{taskId}
      */
+    @Test
     public void testDelegateTask() throws Exception {
         try {
 
@@ -602,6 +617,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test resolving a single task and all exceptional cases related to resolution. POST runtime/tasks/{taskId}
      */
+    @Test
     public void testResolveTask() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -644,6 +660,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test executing an invalid action on a single task. POST runtime/tasks/{taskId}
      */
+    @Test
     public void testInvalidTaskAction() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -674,6 +691,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test actions on an unexisting task. POST runtime/tasks/{taskId}
      */
+    @Test
     public void testActionsUnexistingTask() throws Exception {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "complete");

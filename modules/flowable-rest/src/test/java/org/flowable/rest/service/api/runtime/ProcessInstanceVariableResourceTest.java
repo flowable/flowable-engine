@@ -32,9 +32,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single task variable.
@@ -46,6 +49,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
     /**
      * Test getting a process instance variable. GET runtime/process-instances/{processInstanceId}/variables/{variableName}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
     public void testGetProcessInstanceVariable() throws Exception {
 
@@ -77,6 +81,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
     /**
      * Test getting a process instance variable data. GET runtime/process-instances/{processInstanceId}/variables/{variableName}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
     public void testGetProcessInstanceVariableData() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -94,6 +99,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
     /**
      * Test getting a process instance variable data. GET runtime/process-instances/{processInstanceId}/variables/{variableName}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
     public void testGetProcessInstanceVariableDataSerializable() throws Exception {
 
@@ -119,6 +125,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
     /**
      * Test getting a process instance variable, for illegal vars. GET runtime/process-instances/{processInstanceId}/variables/{variableName}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
     public void testGetProcessInstanceVariableDataForIllegalVariables() throws Exception {
 
@@ -139,6 +146,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
      * 
      * DELETE runtime/process-instances/{processInstanceId}/variables/{variableName}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
     public void testDeleteProcessVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("myVariable", (Object) "processValue"));
@@ -160,6 +168,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
      * 
      * PUT runtime/process-instances/{processInstanceId}/variables/{variableName}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
     public void testUpdateProcessVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
@@ -195,6 +204,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
     /**
      * Test updating a single process variable using a binary stream. PUT runtime/process-instances/{processInstanceId}/variables/{variableName}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
     public void testUpdateBinaryProcessVariable() throws Exception {
 

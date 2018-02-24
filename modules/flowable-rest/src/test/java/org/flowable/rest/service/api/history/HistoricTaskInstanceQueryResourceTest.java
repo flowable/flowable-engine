@@ -31,12 +31,15 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic task instance query resource.
@@ -50,6 +53,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
     /**
      * Test querying historic task instance. POST query/historic-task-instances
      */
+    @Test
     @Deployment
     public void testQueryTaskInstances() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();

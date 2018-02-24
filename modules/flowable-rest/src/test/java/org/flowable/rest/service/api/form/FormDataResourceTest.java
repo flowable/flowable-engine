@@ -28,11 +28,14 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a Form data resource.
@@ -43,6 +46,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
+    @Test
     @Deployment
     public void testGetFormData() throws Exception {
         Map<String, Object> variableMap = new HashMap<>();
@@ -182,6 +186,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?processDefinitionId2=123"), HttpStatus.SC_BAD_REQUEST));
     }
 
+    @Test
     @Deployment
     public void testSubmitFormData() throws Exception {
         Map<String, Object> variableMap = new HashMap<>();

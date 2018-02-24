@@ -232,6 +232,7 @@
             org.flowable.camel.impl;resolution:=optional,
             org.springframework*;resolution:=optional,
             org.drools*;resolution:=optional,
+            org.kie*;resolution:=optional,
             com.fasterxml*;resolution:=optional,
             javax.transaction;resolution:=optional,
             javax.enterprise.concurrent;resolution:=optional,
