@@ -13,9 +13,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to single a Process Definition resource.
@@ -27,6 +30,7 @@ public class ProcessDefinitionIdentityLinksResourceTest extends BaseSpringRestTe
     /**
      * Test getting identitylinks for a process definition.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetIdentityLinksForProcessDefinition() throws Exception {
 
@@ -67,12 +71,14 @@ public class ProcessDefinitionIdentityLinksResourceTest extends BaseSpringRestTe
         assertTrue(userCandidateFound);
     }
 
+    @Test
     public void testGetIdentityLinksForUnexistingProcessDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_IDENTITYLINKS_COLLECTION, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
-
+    
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testAddCandidateStarterToProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -119,6 +125,7 @@ public class ProcessDefinitionIdentityLinksResourceTest extends BaseSpringRestTe
         repositoryService.deleteCandidateStarterUser(processDefinition.getId(), "admin");
     }
 
+    @Test
     public void testAddCandidateStarterToUnexistingProcessDefinition() throws Exception {
         // Create user candidate
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -130,6 +137,7 @@ public class ProcessDefinitionIdentityLinksResourceTest extends BaseSpringRestTe
         closeResponse(response);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetCandidateStarterFromProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -159,6 +167,7 @@ public class ProcessDefinitionIdentityLinksResourceTest extends BaseSpringRestTe
         assertTrue(responseNode.get("url").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_IDENTITYLINK, processDefinition.getId(), "groups", "admin")));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testDeleteCandidateStarterFromProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -185,12 +194,14 @@ public class ProcessDefinitionIdentityLinksResourceTest extends BaseSpringRestTe
         assertEquals(0, remainingLinks.size());
     }
 
+    @Test
     public void testDeleteCandidateStarterFromUnexistingProcessDefinition() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_IDENTITYLINK, "unexisting", "groups", "admin"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
 
+    @Test
     public void testGetCandidateStarterFromUnexistingProcessDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_IDENTITYLINK, "unexisting", "groups", "admin"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);

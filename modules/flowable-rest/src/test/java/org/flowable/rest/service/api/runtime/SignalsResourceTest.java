@@ -27,16 +27,20 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
  */
 public class SignalsResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" })
     public void testSignalEventReceivedSync() throws Exception {
 
@@ -93,6 +97,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" })
     public void testSignalEventReceivedAsync() throws Exception {
 
@@ -144,6 +149,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" })
     public void testQueryEventSubscriptions() throws Exception {
         Calendar hourAgo = Calendar.getInstance();
@@ -184,6 +190,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, eventSubscription.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" })
     public void testGetEventSubscription() throws Exception {
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
