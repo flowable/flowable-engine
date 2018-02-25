@@ -23,7 +23,7 @@
 		<jackson.version>2.9.3</jackson.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.20.2</camel.version>
-		<cxf.version>3.2.1</cxf.version>
+		<cxf.version>3.2.2</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
