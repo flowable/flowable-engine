@@ -28,9 +28,12 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -40,6 +43,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all comments for a task. GET runtime/tasks/{taskId}/comments
      */
+    @Test
     public void testGetComments() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -83,6 +87,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a comment for a task. POST runtime/tasks/{taskId}/comments
      */
+    @Test
     public void testCreateComment() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -118,6 +123,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml" })
     public void testCreateCommentWithProcessInstanceId() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -152,6 +158,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a comment for a task. GET runtime/tasks/{taskId}/comments/{commentId}
      */
+    @Test
     public void testGetComment() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -196,6 +203,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a comment for a task. DELETE runtime/tasks/{taskId}/comments/{commentId}
      */
+    @Test
     public void testDeleteComment() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -229,6 +237,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a comment for a completed task. GET runtime/tasks/{taskId}/comments/{commentId}
      */
+    @Test
     public void testGetCommentWithCompletedTask() throws Exception {
         try {
             Task task = taskService.newTask();

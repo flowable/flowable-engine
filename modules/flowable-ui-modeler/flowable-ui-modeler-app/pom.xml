@@ -198,11 +198,6 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.5</version>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
@@ -214,16 +209,6 @@
                     <systemProperties>
                         <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
                     </systemProperties>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <downloadJavadocs>true</downloadJavadocs>
                 </configuration>
             </plugin>
 

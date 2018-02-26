@@ -34,9 +34,12 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single task variable.
@@ -48,6 +51,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a task variable. GET runtime/tasks/{taskId}/variables/{variableName}
      */
+    @Test
     @Deployment
     public void testGetTaskVariable() throws Exception {
         try {
@@ -128,6 +132,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a task variable. GET runtime/tasks/{taskId}/variables/{variableName}/data
      */
+    @Test
     public void testGetTaskVariableData() throws Exception {
         try {
             // Test variable behaviour on standalone tasks
@@ -157,6 +162,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a task variable. GET runtime/tasks/{taskId}/variables/{variableName}/data
      */
+    @Test
     public void testGetTaskVariableDataSerializable() throws Exception {
         try {
             TestSerializableVariable originalSerializable = new TestSerializableVariable();
@@ -191,6 +197,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a task variable. GET runtime/tasks/{taskId}/variables/{variableName}/data
      */
+    @Test
     public void testGetTaskVariableDataForIllegalVariables() throws Exception {
         try {
             // Test variable behaviour on standalone tasks
@@ -218,6 +225,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
      * 
      * DELETE runtime/tasks/{taskId}/variables/{variableName}
      */
+    @Test
     @Deployment
     public void testDeleteTaskVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
@@ -256,6 +264,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
      * 
      * PUT runtime/tasks/{taskId}/variables/{variableName}
      */
+    @Test
     @Deployment
     public void testUpdateTaskVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
@@ -334,6 +343,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single task variable using a binary stream. PUT runtime/tasks/{taskId}/variables/{variableName}
      */
+    @Test
     public void testUpdateBinaryTaskVariable() throws Exception {
         try {
             Task task = taskService.newTask();
