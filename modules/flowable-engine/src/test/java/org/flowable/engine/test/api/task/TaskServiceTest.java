@@ -13,8 +13,7 @@
 
 package org.flowable.engine.test.api.task;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -1731,11 +1730,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.setVariableLocal(currentTask.getId(), "variable1", "value1");
 
-        catchException(taskService).getVariableLocal(currentTask.getId(), "variable1", Boolean.class);
-
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> taskService.getVariableLocal(currentTask.getId(), "variable1", Boolean.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
@@ -1770,11 +1766,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.setVariable(currentTask.getId(), "variable1", "value1");
 
-        catchException(taskService).getVariable(currentTask.getId(), "variable1", Boolean.class);
-
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> taskService.getVariable(currentTask.getId(), "variable1", Boolean.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     public void testClaimTime() {
