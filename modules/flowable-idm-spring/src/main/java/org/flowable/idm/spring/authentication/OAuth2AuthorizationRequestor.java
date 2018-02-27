@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.flowable.idm.api;
+package org.flowable.idm.spring.authentication;
 
 import javax.servlet.http.HttpServletRequest;
 
