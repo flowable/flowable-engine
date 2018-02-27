@@ -882,7 +882,7 @@ hot-table .column-header.label {
 
 #decisionTableGrid tr .input-operator-cell {
     text-align: center;
-    min-width: 50px; !important;
+    min-width: 70px; !important;
 }
 
 #decisionTableGrid td.htInvalid {

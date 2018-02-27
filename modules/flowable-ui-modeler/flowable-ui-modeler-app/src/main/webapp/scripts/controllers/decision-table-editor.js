@@ -32,7 +32,7 @@ angular.module('flowableModeler')
             var numberOperators = ['==', '!=', '<', '>', '>=', '<='];
             var booleanOperators = ['==', '!='];
             var dateOperators = ['==', '!=', '<', '>', '>=', '<='];
-            var collectionOperators = ['IN', '==', '!='];
+            var collectionOperators = ['IN', 'NOT IN', 'ANY', '==', '!='];
             var allOperators = ['==', '!=', '<', '>', '>=', '<='];
             var collectOperators = {
                 'SUM': '+',
@@ -563,7 +563,7 @@ angular.module('flowableModeler')
                     data: inputExpression.id + '_operator',
                     expressionType: 'input-operator',
                     expression: inputExpression,
-                    width: '60',
+                    width: '70',
                     className: 'input-operator-cell',
                     type: 'dropdown',
                     source: getOperatorsForColumnType(inputExpression.type)
