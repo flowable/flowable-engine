@@ -435,25 +435,6 @@
                 </plugins>
             </build>
         </profile>
-         <profile>
-            <id>jdk7</id>
-            <activation>
-                <jdk>1.7</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/PasswordEncoderTest.java</exclude> <!-- Uses 3th party lib that doesn't work against jdk 7 -->
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
 	</profiles>
 
 </project>

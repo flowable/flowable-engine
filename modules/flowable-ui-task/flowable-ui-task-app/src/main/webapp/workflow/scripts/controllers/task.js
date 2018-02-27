@@ -159,7 +159,7 @@ angular.module('flowableApp')
     $rootScope.setMainPageById('tasks');
 
 
-    $scope.setTaskAssignee = function(user) {
+    $scope.setTaskAssigneeValue = function(user) {
         var alertData = {
             firstName: user.firstName,
             lastName: user.lastName,
@@ -172,7 +172,7 @@ angular.module('flowableApp')
         });
     };
 
-    $scope.setTaskAssigneeByEmail = function(email) {
+    $scope.setTaskAssigneeValueByEmail = function(email) {
         TaskService.assignTaskByEmail($scope.model.task.id, email).then(function() {
             $scope.model.task.assignee = {email: email}; // Faking a user (since it will only be an email address)
         });

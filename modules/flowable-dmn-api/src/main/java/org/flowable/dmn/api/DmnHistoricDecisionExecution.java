@@ -53,4 +53,13 @@ public interface DmnHistoricDecisionExecution {
 
     /** detailed information of the decision execution */
     String getExecutionJson();
+
+    /** reference to decision key */
+    String getDecisionKey();
+
+    /** reference to decision name */
+    String getDecisionName();
+
+    /** reference to decision version */
+    String getDecisionVersion();
 }

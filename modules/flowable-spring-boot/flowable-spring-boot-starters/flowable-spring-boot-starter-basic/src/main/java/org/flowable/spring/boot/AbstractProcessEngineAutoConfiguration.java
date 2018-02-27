@@ -27,6 +27,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringAsyncExecutor;
 import org.flowable.spring.SpringCallerRunsRejectedJobsHandler;
@@ -202,6 +203,13 @@ public abstract class AbstractProcessEngineAutoConfiguration
     @Override
     public IdentityService identityServiceBean(ProcessEngine processEngine) {
         return super.identityServiceBean(processEngine);
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    @Override
+    public IdmIdentityService idmIdentityServiceBean(ProcessEngine processEngine) {
+        return super.idmIdentityServiceBean(processEngine);
     }
 
     @Bean

@@ -12,16 +12,13 @@
  */
 package org.flowable.admin.conf;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import java.beans.PropertyVetoException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.flowable.admin.domain.generator.MinimalDataGenerator;
+import org.flowable.app.conf.FlowableAppDatasourceUtil;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -34,7 +31,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -61,77 +57,7 @@ public class DatabaseConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        LOGGER.info("Configuring Datasource");
-
-        String dataSourceJndiName = env.getProperty("datasource.jndi.name");
-        if (StringUtils.isNotEmpty(dataSourceJndiName)) {
-
-            LOGGER.info("Using jndi datasource '{}'", dataSourceJndiName);
-            JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
-            dsLookup.setResourceRef(env.getProperty("datasource.jndi.resourceRef", Boolean.class, Boolean.TRUE));
-            DataSource dataSource = dsLookup.getDataSource(dataSourceJndiName);
-            return dataSource;
-
-        } else {
-
-            String dataSourceDriver = env.getProperty("datasource.driver", "com.mysql.jdbc.Driver");
-            String dataSourceUrl = env.getProperty("datasource.url", "jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8");
-
-            String dataSourceUsername = env.getProperty("datasource.username", "flowable");
-            String dataSourcePassword = env.getProperty("datasource.password", "flowable");
-
-            Integer minPoolSize = env.getProperty("datasource.min-pool-size", Integer.class, 5);
-
-            Integer maxPoolSize = env.getProperty("datasource.max-pool-size", Integer.class, 20);
-
-            Integer acquireIncrement = env.getProperty("datasource.acquire-increment", Integer.class, 1);
-
-            String preferredTestQuery = env.getProperty("datasource.preferred-test-query");
-
-            Boolean testConnectionOnCheckin = env.getProperty("datasource.test-connection-on-checkin", Boolean.class, true);
-
-            Boolean testConnectionOnCheckOut = env.getProperty("datasource.test-connection-on-checkout", Boolean.class, true);
-
-            Integer maxIdleTime = env.getProperty("datasource.max-idle-time", Integer.class, 1800);
-
-            Integer maxIdleTimeExcessConnections = env.getProperty("datasource.max-idle-time-excess-connections", Integer.class, 1800);
-
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Configuring Datasource with following properties (omitted password for security)");
-                LOGGER.info("Datasource driver: {}", dataSourceDriver);
-                LOGGER.info("Datasource url: {}", dataSourceUrl);
-                LOGGER.info("Datasource user name: {}", dataSourceUsername);
-                LOGGER.info("Min pool size | Max pool size | Acquire increment: {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
-            }
-
-            ComboPooledDataSource ds = new ComboPooledDataSource();
-            try {
-                ds.setDriverClass(dataSourceDriver);
-            } catch (PropertyVetoException e) {
-                LOGGER.error("Could not set Jdbc Driver class", e);
-                return null;
-            }
-
-            // Connection settings
-            ds.setJdbcUrl(dataSourceUrl);
-            ds.setUser(dataSourceUsername);
-            ds.setPassword(dataSourcePassword);
-
-            // Pool config: see http://www.mchange.com/projects/c3p0/#configuration
-            ds.setMinPoolSize(minPoolSize);
-            ds.setInitialPoolSize(minPoolSize);
-            ds.setMaxPoolSize(maxPoolSize);
-            ds.setAcquireIncrement(acquireIncrement);
-            if (preferredTestQuery != null) {
-                ds.setPreferredTestQuery(preferredTestQuery);
-            }
-            ds.setTestConnectionOnCheckin(testConnectionOnCheckin);
-            ds.setTestConnectionOnCheckout(testConnectionOnCheckOut);
-            ds.setMaxIdleTimeExcessConnections(maxIdleTimeExcessConnections);
-            ds.setMaxIdleTime(maxIdleTime);
-
-            return ds;
-        }
+        return FlowableAppDatasourceUtil.createDataSource(env);
     }
 
     @Bean

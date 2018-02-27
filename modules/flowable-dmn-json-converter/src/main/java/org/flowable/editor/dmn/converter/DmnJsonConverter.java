@@ -328,38 +328,41 @@ public class DmnJsonConverter {
                         expressionValue = expressionValueNode.asText();
                     }
 
-                    StringBuilder stringBuilder = new StringBuilder();
-                    if (StringUtils.isNotEmpty(operatorValue)) {
-                        stringBuilder = new StringBuilder(operatorValue);
-                        stringBuilder.append(" ");
-                    }
-
-                    // add quotes for string
-                    if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                        && !"-".equals(expressionValue)
-                        && !expressionValue.startsWith("\"")
-                        && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
-                        
-                        stringBuilder.append("\"");
-                        stringBuilder.append(expressionValue);
-                        stringBuilder.append("\"");
-                        
-                    } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                        && !"-".equals(expressionValue) && StringUtils.isNotEmpty(expressionValue)){
-                        
-                        // wrap in built in toDate function
-                        stringBuilder.append("date:toDate('");
-                        stringBuilder.append(expressionValue);
-                        stringBuilder.append("')");
-                        
+                    if ("-".equals(expressionValue)) {
+                        inputEntry.setText(expressionValue);
                     } else {
-                        stringBuilder.append(expressionValue);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        if (StringUtils.isNotEmpty(operatorValue)) {
+                            stringBuilder = new StringBuilder(operatorValue);
+                            stringBuilder.append(" ");
+                        }
+
+                        // add quotes for string
+                        if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                            && !"-".equals(expressionValue)
+                            && !expressionValue.startsWith("\"")
+                            && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
+
+                            stringBuilder.append("\"");
+                            stringBuilder.append(expressionValue);
+                            stringBuilder.append("\"");
+
+                        } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
+                            && !"-".equals(expressionValue) && StringUtils.isNotEmpty(expressionValue)) {
+
+                            // wrap in built in toDate function
+                            stringBuilder.append("date:toDate('");
+                            stringBuilder.append(expressionValue);
+                            stringBuilder.append("')");
+
+                        } else {
+                            stringBuilder.append(expressionValue);
+                        }
+                        inputEntry.setText(stringBuilder.toString());
                     }
 
-                    inputEntry.setText(stringBuilder.toString());
                     ruleInputClauseContainer.setInputEntry(inputEntry);
                     rule.addInputEntry(ruleInputClauseContainer);
-
                 }
                 for (String id : ruleOutputContainerMap.keySet()) {
                     RuleOutputClauseContainer ruleOutputClauseContainer = new RuleOutputClauseContainer();

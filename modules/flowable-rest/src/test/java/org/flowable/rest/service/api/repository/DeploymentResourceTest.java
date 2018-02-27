@@ -18,8 +18,11 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single Deployment resource.
@@ -31,6 +34,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying singe bpmn-file. POST repository/deployments
      */
+    @Test
     public void testPostNewDeploymentBPMNFile() throws Exception {
         try {
             // Upload a valid BPMN-file using multipart-data
@@ -83,6 +87,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying bar-file. POST repository/deployments
      */
+    @Test
     public void testPostNewDeploymentBarFile() throws Exception {
         try {
             // Create zip with bpmn-file and resource
@@ -147,6 +152,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying bar-file. POST repository/deployments
      */
+    @Test
     public void testPostNewDeploymentBarFileWithTenantId() throws Exception {
         try {
             // Create zip with bpmn-file and resource
@@ -194,6 +200,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying an invalid file. POST repository/deployments
      */
+    @Test
     public void testPostNewDeploymentInvalidFile() throws Exception {
         // Upload a valid BPMN-file using multipart-data
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION));
@@ -205,6 +212,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single deployment. GET repository/deployments/{deploymentId}
      */
+    @Test
     @org.flowable.engine.test.Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetDeployment() throws Exception {
         Deployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
@@ -241,6 +249,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting deployment. GET repository/deployments/{deploymentId}
      */
+    @Test
     public void testGetUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
@@ -250,6 +259,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single deployment. DELETE repository/deployments/{deploymentId}
      */
+    @Test
     @org.flowable.engine.test.Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testDeleteDeployment() throws Exception {
         Deployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
@@ -267,6 +277,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting an unexisting deployment. DELETE repository/deployments/{deploymentId}
      */
+    @Test
     public void testDeleteUnexistingDeployment() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);

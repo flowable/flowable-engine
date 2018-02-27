@@ -121,7 +121,9 @@ import org.flowable.engine.impl.bpmn.parser.factory.AbstractBehaviorFactory;
 import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.flowable.engine.impl.bpmn.parser.factory.DefaultActivityBehaviorFactory;
 import org.flowable.engine.impl.bpmn.parser.factory.DefaultListenerFactory;
+import org.flowable.engine.impl.bpmn.parser.factory.DefaultXMLImporterFactory;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
+import org.flowable.engine.impl.bpmn.parser.factory.XMLImporterFactory;
 import org.flowable.engine.impl.bpmn.parser.handler.AdhocSubProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.BoundaryEventParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.BusinessRuleParseHandler;
@@ -345,6 +347,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
 
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
+
+    public static final String DEFAULT_WS_IMPORTER = "org.flowable.engine.impl.webservice.CxfWSDLImporter";
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/db/mapping/mappings.xml";
 
@@ -698,7 +702,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int historicProcessInstancesQueryLimit = 20000;
 
     protected String wsSyncFactoryClassName = DEFAULT_WS_SYNC_FACTORY;
-    protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<>();
+    protected XMLImporterFactory wsWsdlImporterFactory;
+    protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<QName, URL>();
 
     protected DelegateInterceptor delegateInterceptor;
 
@@ -833,6 +838,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initCommandExecutors();
         initServices();
         initIdGenerator();
+        initWsdlImporterFactory();
         initBehaviorFactory();
         initListenerFactory();
         initBpmnParser();
@@ -1544,6 +1550,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
+    public void initWsdlImporterFactory() {
+        if (wsWsdlImporterFactory == null) {
+            DefaultXMLImporterFactory defaultListenerFactory = new DefaultXMLImporterFactory();
+            wsWsdlImporterFactory = defaultListenerFactory;
+        }
+    }
+
     public void initBehaviorFactory() {
         if (activityBehaviorFactory == null) {
             DefaultActivityBehaviorFactory defaultActivityBehaviorFactory = new DefaultActivityBehaviorFactory();
@@ -1762,7 +1775,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initAsyncHistoryExecutor() {
-        if (asyncHistoryExecutor == null) {
+        if (isAsyncHistoryEnabled && asyncHistoryExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
 
             // Message queue mode
@@ -1801,8 +1814,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             asyncHistoryExecutor = defaultAsyncHistoryExecutor;
         }
 
-        asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
-        asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
+        if (asyncHistoryExecutor != null) {
+            asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
+            asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
+        }
     }
 
     // history
@@ -2412,6 +2427,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setWsSyncFactoryClassName(String wsSyncFactoryClassName) {
         this.wsSyncFactoryClassName = wsSyncFactoryClassName;
+        return this;
+    }
+
+    public XMLImporterFactory getWsdlImporterFactory() {
+        return wsWsdlImporterFactory;
+    }
+
+    public ProcessEngineConfigurationImpl setWsdlImporterFactory(XMLImporterFactory wsWsdlImporterFactory) {
+        this.wsWsdlImporterFactory = wsWsdlImporterFactory;
         return this;
     }
 

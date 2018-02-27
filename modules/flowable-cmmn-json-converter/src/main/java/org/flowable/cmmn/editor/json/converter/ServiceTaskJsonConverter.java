@@ -95,6 +95,8 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_REQUEST_VARIABLES, "saveRequestVariables", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS, "saveResponseParameters", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX, "resultVariablePrefix", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT, "saveResponseParametersTransient", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON, "saveResponseVariableAsJson", serviceTask, propertiesNode);
 
         } else {
 

@@ -22,8 +22,11 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to get and delete a historic process instance.
@@ -35,6 +38,7 @@ public class HistoricProcessInstanceResourceTest extends BaseSpringRestTestCase 
     /**
      * Test retrieval of historic process instance. GET history/historic-process-instances/{processInstanceId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetProcessInstance() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

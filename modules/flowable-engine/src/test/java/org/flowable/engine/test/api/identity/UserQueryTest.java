@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,10 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Joram Barrez
@@ -30,9 +34,10 @@ public class UserQueryTest extends PluggableFlowableTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        createUser("kermit", "Kermit", "Thefrog", "kermit@muppetshow.com");
-        createUser("fozzie", "Fozzie", "Bear", "fozzie@muppetshow.com");
-        createUser("gonzo", "Gonzo", "The great", "gonzo@muppetshow.com");
+        createUser("kermit", "Kermit", "Thefrog", "kermit@muppetshow.com", "flowable");
+        createUser("fozzie", "Fozzie", "Bear", "fozzie@muppetshow.com", "flowable");
+        createUser("gonzo", "Gonzo", "The great", "gonzo@muppetshow.com", "flowable");
+        createUser("homer", "Homer", "Simpson", "homer@simpson.tv", "simpsons");
 
         identityService.saveGroup(identityService.newGroup("muppets"));
         identityService.saveGroup(identityService.newGroup("frogs"));
@@ -43,11 +48,12 @@ public class UserQueryTest extends PluggableFlowableTestCase {
         identityService.createMembership("gonzo", "muppets");
     }
 
-    private User createUser(String id, String firstName, String lastName, String email) {
+    private User createUser(String id, String firstName, String lastName, String email, String tenantId) {
         User user = identityService.newUser(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
+        user.setTenantId(tenantId);
         identityService.saveUser(user);
         return user;
     }
@@ -57,6 +63,7 @@ public class UserQueryTest extends PluggableFlowableTestCase {
         identityService.deleteUser("kermit");
         identityService.deleteUser("fozzie");
         identityService.deleteUser("gonzo");
+        identityService.deleteUser("homer");
 
         identityService.deleteGroup("muppets");
         identityService.deleteGroup("frogs");
@@ -66,7 +73,7 @@ public class UserQueryTest extends PluggableFlowableTestCase {
 
     public void testQueryByNoCriteria() {
         UserQuery query = identityService.createUserQuery();
-        verifyQueryResults(query, 3);
+        verifyQueryResults(query, 4);
     }
 
     public void testQueryById() {
@@ -106,7 +113,7 @@ public class UserQueryTest extends PluggableFlowableTestCase {
 
     public void testQueryByFirstNameLike() {
         UserQuery query = identityService.createUserQuery().userFirstNameLike("%o%");
-        verifyQueryResults(query, 2);
+        verifyQueryResults(query, 3);
 
         query = identityService.createUserQuery().userFirstNameLike("Ker%");
         verifyQueryResults(query, 1);
@@ -158,7 +165,7 @@ public class UserQueryTest extends PluggableFlowableTestCase {
         verifyQueryResults(query, 2);
 
         query = identityService.createUserQuery().userFullNameLike("%e%");
-        verifyQueryResults(query, 3);
+        verifyQueryResults(query, 4);
     }
 
     public void testQueryByInvalidLastNameLike() {
@@ -209,16 +216,16 @@ public class UserQueryTest extends PluggableFlowableTestCase {
 
     public void testQuerySorting() {
         // asc
-        assertEquals(3, identityService.createUserQuery().orderByUserId().asc().count());
-        assertEquals(3, identityService.createUserQuery().orderByUserEmail().asc().count());
-        assertEquals(3, identityService.createUserQuery().orderByUserFirstName().asc().count());
-        assertEquals(3, identityService.createUserQuery().orderByUserLastName().asc().count());
+        assertEquals(4, identityService.createUserQuery().orderByUserId().asc().count());
+        assertEquals(4, identityService.createUserQuery().orderByUserEmail().asc().count());
+        assertEquals(4, identityService.createUserQuery().orderByUserFirstName().asc().count());
+        assertEquals(4, identityService.createUserQuery().orderByUserLastName().asc().count());
 
         // desc
-        assertEquals(3, identityService.createUserQuery().orderByUserId().desc().count());
-        assertEquals(3, identityService.createUserQuery().orderByUserEmail().desc().count());
-        assertEquals(3, identityService.createUserQuery().orderByUserFirstName().desc().count());
-        assertEquals(3, identityService.createUserQuery().orderByUserLastName().desc().count());
+        assertEquals(4, identityService.createUserQuery().orderByUserId().desc().count());
+        assertEquals(4, identityService.createUserQuery().orderByUserEmail().desc().count());
+        assertEquals(4, identityService.createUserQuery().orderByUserFirstName().desc().count());
+        assertEquals(4, identityService.createUserQuery().orderByUserLastName().desc().count());
 
         // Combined with criteria
         UserQuery query = identityService.createUserQuery().userLastNameLike("%ea%").orderByUserFirstName().asc();
@@ -264,6 +271,28 @@ public class UserQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    public void testQueryByTenantId() {
+        UserQuery query = identityService.createUserQuery().tenantId("flowable");
+        verifyQueryResults(query, 3);
+
+        query = identityService.createUserQuery().tenantId("simpsons");
+        verifyQueryResults(query, 1);
+    }
+
+    public void testQueryByInvalidTenantId() {
+        UserQuery query = identityService.createUserQuery().tenantId("invalidTenantId");
+        verifyQueryResults(query, 0);
+    }
+
+    public void testQueryByNullTenantId() {
+        try {
+            identityService.createUserQuery().tenantId(null);
+            fail("FlowableIllegalArgumentException expected");
+        } catch (FlowableIllegalArgumentException e) {
+            assertThat(e.getMessage(), containsString("TenantId is null"));
+        }
+    }
+
     private void verifyQueryResults(UserQuery query, int countExpected) {
         assertEquals(countExpected, query.list().size());
         assertEquals(countExpected, query.count());
@@ -288,13 +317,13 @@ public class UserQueryTest extends PluggableFlowableTestCase {
     public void testNativeQuery() {
         String baseQuerySql = "SELECT * FROM ACT_ID_USER";
 
-        assertEquals(3, identityService.createNativeUserQuery().sql(baseQuerySql).list().size());
+        assertEquals(4, identityService.createNativeUserQuery().sql(baseQuerySql).list().size());
 
         assertEquals(1, identityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "kermit").list().size());
 
         // paging
         assertEquals(2, identityService.createNativeUserQuery().sql(baseQuerySql).listPage(0, 2).size());
-        assertEquals(2, identityService.createNativeUserQuery().sql(baseQuerySql).listPage(1, 3).size());
+        assertEquals(3, identityService.createNativeUserQuery().sql(baseQuerySql).listPage(1, 4).size());
         assertEquals(1, identityService.createNativeUserQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "kermit").listPage(0, 1).size());
     }
 

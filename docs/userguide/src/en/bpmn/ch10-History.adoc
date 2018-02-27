@@ -23,7 +23,7 @@ Since the DB contains historic entities for past as well as ongoing instances, y
 
 In the API, it's possible to query all 6 of the History entities. The HistoryService exposes the methods +createHistoricProcessInstanceQuery()+, +createHistoricVariableInstanceQuery()+, +createHistoricActivityInstanceQuery()+, +getHistoricIdentityLinksForTask()+, +getHistoricIdentityLinksForProcessInstance()+, +createHistoricDetailQuery()+ and +createHistoricTaskInstanceQuery()+.
 
-Below are a couple of examples that show some of the possibilities of the query API for history. Full description of the possibilities can be found in the link:$$http://flowable.org/javadocs/index.html$$[javadocs], in the +org.flowable.engine.history+ package.
+Below are a couple of examples that show some of the possibilities of the query API for history. Full description of the possibilities can be found in the link:$$http://www.flowable.org/javadocs/index.html$$[javadocs], in the +org.flowable.engine.history+ package.
 
 [[historyQueryProcessInstance]]
 

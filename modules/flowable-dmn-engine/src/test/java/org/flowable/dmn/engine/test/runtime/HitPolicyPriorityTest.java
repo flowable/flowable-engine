@@ -122,6 +122,7 @@ public class HitPolicyPriorityTest {
         assertEquals(0, result.getDecisionResult().size());
         assertTrue(result.isFailed());
         assertNotNull(result.getExceptionMessage());
+        assertNull(result.getValidationMessage());
     }
 
     @Test
@@ -145,6 +146,7 @@ public class HitPolicyPriorityTest {
 
         assertFalse(result.isFailed());
         assertNull(result.getExceptionMessage());
+        assertNotNull(result.getValidationMessage());
 
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);
     }

@@ -129,6 +129,8 @@ public interface CmmnStencilConstants {
     String PROPERTY_HTTPTASK_SAVE_REQUEST_VARIABLES = "httptasksaverequestvariables";
     String PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS = "httptasksaveresponseparameters";
     String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
+    String PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT = "httptasksaveresponseparameterstransient";
+    String PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON = "httptasksaveresponseasjson";
 
     String PROPERTY_TIMER_EXPRESSION = "timerexpression";
     String PROPERTY_TIMER_START_TRIGGER_SOURCE_REF = "timerstarttriggersourceref";

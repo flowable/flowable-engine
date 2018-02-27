@@ -183,6 +183,13 @@ public class FlowableEngineConfiguration {
         
         SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
         dmnEngineConfiguration.setHistoryEnabled(true);
+
+        // disables strict mode if set
+        if (environment.getProperty("flowable.dmn.strict-mode", Boolean.class, true) == false) {
+            LOGGER.info("disabling DMN engine strict mode");
+            dmnEngineConfiguration.setStrictMode(false);
+        }
+
         SpringDmnEngineConfigurator dmnEngineConfigurator = new SpringDmnEngineConfigurator();
         dmnEngineConfigurator.setDmnEngineConfiguration(dmnEngineConfiguration);
         processEngineConfiguration.addConfigurator(dmnEngineConfigurator);

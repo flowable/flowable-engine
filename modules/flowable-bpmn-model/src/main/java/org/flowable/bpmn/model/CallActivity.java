@@ -105,6 +105,7 @@ public class CallActivity extends Activity {
         setCalledElement(otherElement.getCalledElement());
         setBusinessKey(otherElement.getBusinessKey());
         setInheritBusinessKey(otherElement.isInheritBusinessKey());
+        setInheritVariables(otherElement.isInheritVariables());
         setSameDeployment(otherElement.isSameDeployment());
         setUseLocalScopeForOutParameters(otherElement.isUseLocalScopeForOutParameters());
 

@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of HttpActivityBehavior using Apache HTTP Client
  *
  * @author Harsha Teja Kanna.
+ * @author Joram Barrez
  */
 public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
 
@@ -86,12 +87,16 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
     protected Expression handleStatusCodes;
     // Flag to ignore exceptions (Optional)
     protected Expression ignoreException;
-    // Flag to save request variables. default is false (Optional)
+    // Flag to save request variables. Default is false (Optional)
     protected Expression saveRequestVariables;
-    // Flag to save response variables. default is false (Optional)
+    // Flag to save response variables. Default is false (Optional)
     protected Expression saveResponseParameters;
     // Variable name for response body
     protected Expression responseVariableName;
+    // Flag to save the response variables as a transient variable. Default is false (Optional).
+    protected Expression saveResponseParametersTransient;
+    // Flag to save the response variable as an ObjectNode instead of a String
+    protected Expression saveResponseVariableAsJson;
     // Prefix for the execution variable names (Optional)
     protected Expression resultVariablePrefix;
     // Exception mapping
@@ -129,7 +134,8 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
         }
         httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(retryCount, false));
 
-        this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator());
+        this.httpActivityExecutor = new HttpActivityExecutor(httpClientBuilder, new ProcessErrorPropagator(), 
+                CommandContextUtil.getProcessEngineConfiguration().getObjectMapper());
     }
 
     @Override
@@ -147,6 +153,8 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
             request.setIgnoreErrors(getBooleanFromField(ignoreException, execution));
             request.setSaveRequest(getBooleanFromField(saveRequestVariables, execution));
             request.setSaveResponse(getBooleanFromField(saveResponseParameters, execution));
+            request.setSaveResponseTransient(getBooleanFromField(saveResponseParametersTransient, execution));
+            request.setSaveResponseAsJson(getBooleanFromField(saveResponseVariableAsJson, execution));
             request.setPrefix(getStringFromField(resultVariablePrefix, execution));
 
             String failCodes = getStringFromField(failStatusCodes, execution);
@@ -187,17 +195,21 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
         }
 
         httpActivityExecutor.validate(request);
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        HttpClientConfig httpClientConfig = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
 
-        httpActivityExecutor.execute(request,
+        httpActivityExecutor.execute(
+                request,
                 execution,
                 execution.getId(),
-                createHttpRequestHandler(httpServiceTask.getHttpRequestHandler(), CommandContextUtil.getProcessEngineConfiguration()),
-                createHttpResponseHandler(httpServiceTask.getHttpResponseHandler(), CommandContextUtil.getProcessEngineConfiguration()),
+                createHttpRequestHandler(httpServiceTask.getHttpRequestHandler(), processEngineConfiguration),
+                createHttpResponseHandler(httpServiceTask.getHttpResponseHandler(), processEngineConfiguration),
                 getStringFromField(responseVariableName, execution),
                 mapExceptions,
-                CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getSocketTimeout(),
-                CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getConnectTimeout(),
-                CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getConnectionRequestTimeout());
+                httpClientConfig.getSocketTimeout(),
+                httpClientConfig.getConnectTimeout(),
+                httpClientConfig.getConnectionRequestTimeout());
 
         leave(execution);
     }

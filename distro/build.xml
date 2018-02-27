@@ -12,15 +12,6 @@
 		<os family="windows" />
 	</condition>
 
-	<condition property="usingJdk8OrHigher" value=",java8" else="">
-		<not>
-			<or>
-				<!-- Flowable supports java 7 as minimum -->
-				<equals arg1="${ant.java.version}" arg2="1.7" />
-			</or>
-		</not>
-	</condition>
-
 	<target name="clean">
 		<delete dir="target" />
 	</target>
@@ -44,24 +35,24 @@
 			<equals arg1="${nodocs}" arg2="true" />
 		</condition>
 		<exec executable="${mvn.executable}" dir=".." failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${nodocs.profile}${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-idm" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-modeler" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-task" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-admin" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 	</target>
 
