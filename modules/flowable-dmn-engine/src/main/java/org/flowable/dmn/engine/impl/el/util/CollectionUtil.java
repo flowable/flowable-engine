@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.engine.impl.el.util;
 
+import org.springframework.util.CollectionUtils;
+
 import java.util.Collection;
 
 /**
@@ -25,14 +27,67 @@ public class CollectionUtil {
             throw new IllegalArgumentException("collection cannot be null");
         }
 
-        if (Collection.class.isAssignableFrom(collection.getClass()) == false) {
-            throw new IllegalArgumentException("collection must be of type java.util.Collection");
+        if (value == null) {
+            throw new IllegalArgumentException("value cannot be null");
+        }
+
+        DMNParseUtil.isCollection(collection);
+
+        if (DMNParseUtil.isDMNCollection(value)) {
+            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
+
+            if (valueCollection != null) {
+                return ((Collection) collection).containsAll(valueCollection);
+            } else return false;
+        } else {
+            return ((Collection) collection).contains(value);
+        }
+    }
+
+    public static boolean notContains(Object collection, Object value) {
+
+        if (collection == null) {
+            throw new IllegalArgumentException("collection cannot be null");
         }
 
         if (value == null) {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        return ((Collection)collection).contains(value);
+        DMNParseUtil.isCollection(collection);
+
+        if (DMNParseUtil.isDMNCollection(value)) {
+            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
+
+            if (valueCollection != null) {
+                return !((Collection) collection).containsAll(valueCollection);
+            } else return true;
+        } else {
+            return !((Collection) collection).contains(value);
+        }
     }
+
+    public static boolean containsAny(Object collection, Object value) {
+
+        if (collection == null) {
+            throw new IllegalArgumentException("collection cannot be null");
+        }
+
+        if (value == null) {
+            throw new IllegalArgumentException("value cannot be null");
+        }
+
+        DMNParseUtil.isCollection(collection);
+
+        if (DMNParseUtil.isDMNCollection(value)) {
+            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
+
+            if (valueCollection != null) {
+                return CollectionUtils.containsAny((Collection) collection, valueCollection);
+            } else return false;
+        } else {
+            return ((Collection) collection).contains(value);
+        }
+    }
+
 }
