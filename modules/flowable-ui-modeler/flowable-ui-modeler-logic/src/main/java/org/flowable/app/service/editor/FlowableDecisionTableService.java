@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.servlet.ServletOutputStream;
@@ -29,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.Model;
@@ -284,7 +284,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         }
 
         String filteredImageString = saveRepresentation.getDecisionTableImageBase64().replace("data:image/png;base64,", "");
-        byte[] imageBytes = Base64.decodeBase64(filteredImageString);
+        byte[] imageBytes = Base64.getDecoder().decode(filteredImageString);
         model = modelService.saveModel(model, editorJson, imageBytes, saveRepresentation.isNewVersion(), saveRepresentation.getComment(), user);
         DecisionTableRepresentation result = new DecisionTableRepresentation(model);
         result.setDecisionTableDefinition(saveRepresentation.getDecisionTableRepresentation().getDecisionTableDefinition());

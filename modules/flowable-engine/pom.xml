@@ -83,10 +83,6 @@
             <artifactId>commons-email</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -225,7 +221,6 @@
             com.sun*;resolution:=optional,
             javax.activation*;resolution:=optional,
             javax.persistence*;resolution:=optional,
-            org.apache.commons.codec*;resolution:=optional,
             org.apache.commons.mail*;resolution:=optional,
             org.apache.xerces*;resolution:=optional,
             org.flowable.camel;resolution:=optional,

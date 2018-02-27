@@ -18,6 +18,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -139,7 +139,7 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
     private String generateRandom(int size) {
         byte[] s = new byte[size];
         random.nextBytes(s);
-        return new String(Base64.encode(s));
+        return new String(Base64.getEncoder().encode(s));
     }
 
     @Override

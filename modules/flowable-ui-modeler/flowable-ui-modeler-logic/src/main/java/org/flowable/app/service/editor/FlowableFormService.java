@@ -15,9 +15,9 @@ package org.flowable.app.service.editor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.domain.editor.ModelHistory;
@@ -103,7 +103,7 @@ public class FlowableFormService {
         }
 
         String filteredImageString = saveRepresentation.getFormImageBase64().replace("data:image/png;base64,", "");
-        byte[] imageBytes = Base64.decodeBase64(filteredImageString);
+        byte[] imageBytes = Base64.getDecoder().decode(filteredImageString);
         model = modelService.saveModel(model, editorJson, imageBytes, saveRepresentation.isNewVersion(), saveRepresentation.getComment(), user);
         FormRepresentation result = new FormRepresentation(model);
         result.setFormDefinition(saveRepresentation.getFormRepresentation().getFormDefinition());
