@@ -119,6 +119,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
                 if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(parentTaskEntity)) {
                     CountingTaskEntity countingParentTaskEntity = (CountingTaskEntity) parentTaskEntity;
                     countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() + 1);
+                    parentTaskEntity.forceUpdate();
                 }
                 
             // Parent task removed and was set before   
@@ -127,6 +128,25 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
                 if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(parentTaskEntity)) {
                     CountingTaskEntity countingParentTaskEntity = (CountingTaskEntity) parentTaskEntity;
                     countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() - 1);
+                    parentTaskEntity.forceUpdate();
+                }
+              
+            // Parent task was changed    
+            } else if (task.getParentTaskId() != null && originalTaskEntity.getParentTaskId() != null 
+                    && !task.getParentTaskId().equals(originalTaskEntity.getParentTaskId())) {
+                
+                TaskEntity originalParentTaskEntity = taskService.getTask(originalTaskEntity.getParentTaskId());
+                if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(originalParentTaskEntity)) {
+                    CountingTaskEntity countingOriginalParentTaskEntity = (CountingTaskEntity) originalParentTaskEntity;
+                    countingOriginalParentTaskEntity.setSubTaskCount(countingOriginalParentTaskEntity.getSubTaskCount() - 1);
+                    originalParentTaskEntity.forceUpdate();
+                }
+                
+                TaskEntity parentTaskEntity = taskService.getTask(task.getParentTaskId());
+                if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(parentTaskEntity)) {
+                    CountingTaskEntity countingParentTaskEntity = (CountingTaskEntity) parentTaskEntity;
+                    countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() + 1);
+                    parentTaskEntity.forceUpdate();
                 }
                 
             }

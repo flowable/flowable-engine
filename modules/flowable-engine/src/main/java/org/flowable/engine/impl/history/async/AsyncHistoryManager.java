@@ -456,7 +456,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_TEXT_VALUE2, variable.getTextValue2());
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_DOUBLE_VALUE, variable.getDoubleValue());
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_LONG_VALUE, variable.getLongValue());
-            if (variable.getByteArrayRef() != null) {
+            if (variable.getByteArrayRef() != null && variable.getByteArrayRef().getId() != null) {
                 putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, convertToBase64(variable));
             }
             
@@ -592,6 +592,10 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     }
 
     private static String convertToBase64(VariableInstanceEntity variable) {
-        return new String(Base64.getEncoder().encode(variable.getBytes()), StandardCharsets.US_ASCII);
+        byte[] bytes = variable.getBytes();
+        if (bytes != null && bytes.length > 0) {
+            return new String(Base64.getEncoder().encode(variable.getBytes()), StandardCharsets.US_ASCII);
+        } 
+        return "";
     }
 }

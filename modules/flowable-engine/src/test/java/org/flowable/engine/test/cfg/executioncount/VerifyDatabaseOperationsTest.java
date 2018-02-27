@@ -681,6 +681,5 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             return "org.flowable.engine.impl.persistence.entity." + className;
         }
         
-        return fullClassName;
     }
 }
