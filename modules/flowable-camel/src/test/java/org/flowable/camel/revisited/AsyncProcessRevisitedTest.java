@@ -52,7 +52,8 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
 
     @Deployment(resources = { "process/revisited/async-revisited.bpmn20.xml" })
     public void testRunProcess() throws Exception {
-        NotifyBuilder oneExchangeSendToFlowable = new NotifyBuilder(camelContext).from("seda:continueAsync2").whenDone(1).create();
+        NotifyBuilder oneExchangeSendToFlowableReceive1 = new NotifyBuilder(camelContext).from("seda:continueAsync1").whenExactlyCompleted(1).create();
+        NotifyBuilder oneExchangeSendToFlowableReceive2 = new NotifyBuilder(camelContext).from("seda:continueAsync2").whenExactlyCompleted(1).create();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncCamelProcessRevisited");
 
@@ -60,7 +61,8 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
         assertEquals(3, executionList.size());
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000, 200);
 
-        assertTrue(oneExchangeSendToFlowable.matchesMockWaitTime());
+        assertTrue(oneExchangeSendToFlowableReceive1.matchesMockWaitTime());
+        assertTrue(oneExchangeSendToFlowableReceive2.matchesMockWaitTime());
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 }
