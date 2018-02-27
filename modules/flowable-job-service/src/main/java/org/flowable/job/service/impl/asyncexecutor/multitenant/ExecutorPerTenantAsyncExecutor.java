@@ -261,18 +261,6 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     }
 
     @Override
-    public int getRetryWaitTimeInMillis() {
-        return determineAsyncExecutor().getRetryWaitTimeInMillis();
-    }
-
-    @Override
-    public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
-        for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
-            asyncExecutor.setRetryWaitTimeInMillis(retryWaitTimeInMillis);
-        }
-    }
-
-    @Override
     public int getResetExpiredJobsInterval() {
         return determineAsyncExecutor().getResetExpiredJobsInterval();
     }

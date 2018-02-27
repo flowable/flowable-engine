@@ -328,16 +328,6 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     }
 
     @Override
-    public int getRetryWaitTimeInMillis() {
-        return retryWaitTimeInMillis;
-    }
-
-    @Override
-    public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
-        this.retryWaitTimeInMillis = retryWaitTimeInMillis;
-    }
-
-    @Override
     public int getResetExpiredJobsInterval() {
         return resetExpiredJobsInterval;
     }

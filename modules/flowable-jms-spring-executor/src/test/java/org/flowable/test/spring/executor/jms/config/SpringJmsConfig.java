@@ -64,6 +64,7 @@ public class SpringJmsConfig {
         configuration.setDatabaseSchemaUpdate(SpringProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         configuration.setAsyncExecutorMessageQueueMode(true);
         configuration.setAsyncExecutorActivate(true);
+        configuration.setAsyncExecutorDefaultTimerJobAcquireWaitTime(500);
         configuration.setJobManager(jobManager());
         return configuration;
     }

@@ -104,7 +104,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
                 });
             }
 
-            // Job queue full, returning true so (if wanted) the acquiring can be throttled
+            // Job queue full, returning false so (if wanted) the acquiring can be throttled
             return false;
         }
     }

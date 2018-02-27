@@ -13,33 +13,49 @@
 package org.flowable.engine.test.jobexecutor;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
 /**
  * @author Saeid Mirzaei
  */
-
 public class JobExecutorFailRetryTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testFailedServiceTask() {
-
         // process throws no exception. Service task passes at the first time.
-        RetryFailingDelegate.shallThrow = false; // do not throw exception in Service delegate
-        RetryFailingDelegate.resetTimeList();
-        runtimeService.startProcessInstanceByKey("failedJobRetry");
+        RetryFailingDelegate.initialize(0);
+        ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("failedJobRetry");
 
         waitForJobExecutorToProcessAllJobs(1000, 200);
-        assertEquals(1, RetryFailingDelegate.times.size()); // check number of calls of delegate
+        assertEquals(1, RetryFailingDelegate.getNumCalls()); // check number of calls of delegate
+        
+        assertProcessEnded(instance1.getId());
 
-        // process throws exception two times, with 6 seconds in between
-        RetryFailingDelegate.shallThrow = true; // throw exception in Service delegate
-        RetryFailingDelegate.resetTimeList();
-        runtimeService.startProcessInstanceByKey("failedJobRetry");
+        // process throws exception 2 times, with 3 seconds in between
+        RetryFailingDelegate.initialize(2); // throw exception 2 times
+        ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("failedJobRetry");
 
-        executeJobExecutorForTime(14000, 500);
-        assertEquals(2, RetryFailingDelegate.times.size()); // check number of calls of delegate
-        long timeDiff = RetryFailingDelegate.times.get(1) - RetryFailingDelegate.times.get(0);
-        assertTrue(timeDiff > 6000 && timeDiff < 12000); // check time difference between calls. Just roughly
+        executeJobExecutorForTime(9000, 500);
+        assertEquals(3, RetryFailingDelegate.getNumCalls());
+        assertBetween(RetryFailingDelegate.getTimeDiff(), 3000, 5000); // check time difference between last 2 calls. Just roughly
+        
+        assertProcessEnded(instance2.getId());
+
+        // process throws exception 3 times, with 3 seconds in between
+        RetryFailingDelegate.initialize(3); // throw exception 2 times
+        ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("failedJobRetry");
+
+        executeJobExecutorForTime(9000, 500);
+        assertEquals(3, RetryFailingDelegate.getNumCalls());
+        assertBetween(RetryFailingDelegate.getTimeDiff(), 3000, 5000);
+        
+        // since there are 3 retries, which all fail, the process should NOT be complete.
+        assertEquals(1, processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(instance3.getId()).count());
+    }
+
+    private static void assertBetween(long timeDiff, int lowerBound, int higherBound) {
+        assertTrue(timeDiff + " must be at least " + lowerBound, timeDiff >= lowerBound);
+        assertTrue(timeDiff + " must be at most " + higherBound, timeDiff <= higherBound);
     }
 }

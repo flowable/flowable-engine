@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import javax.jms.ConnectionFactory;
-
 import org.flowable.engine.ProcessEngine;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.spring.impl.test.CleanTestExecutionListener;
@@ -42,9 +40,6 @@ public class SpringJmsTest {
 
     @Autowired
     private ProcessEngine processEngine;
-
-    @Autowired
-    private ConnectionFactory connectionFactory;
 
     @Test
     public void testMessageQueueAsyncExecutor() {

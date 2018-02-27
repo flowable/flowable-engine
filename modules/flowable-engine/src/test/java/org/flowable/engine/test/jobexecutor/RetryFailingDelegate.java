@@ -18,25 +18,41 @@ import java.util.List;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RetryFailingDelegate implements JavaDelegate {
+    private static final Logger logger = LoggerFactory.getLogger(RetryFailingDelegate.class);
 
     public static final String EXCEPTION_MESSAGE = "Expected exception.";
 
-    public static boolean shallThrow;
-    public static List<Long> times;
+    private static int shallThrow;
+    private static List<Long> times;
 
-    public static void resetTimeList() {
+    public static void initialize(int num) {
+        shallThrow = num;
         times = new ArrayList<>();
+    }
+    
+    public static int getNumCalls() {
+        return times.size();
+    }
+    
+    public static long getTimeDiff() {
+        assert times.size() >= 2;
+        return times.get(1) - times.get(0);
     }
 
     @Override
     public void execute(DelegateExecution execution) {
-
         times.add(System.currentTimeMillis());
 
-        if (shallThrow) {
+        if (shallThrow > 0) {
+            logger.info("Throwing exception {} more times", shallThrow);
+            shallThrow--;
             throw new FlowableException(EXCEPTION_MESSAGE);
+        } else {
+            logger.info("Not throwing exception", shallThrow);
         }
     }
 }

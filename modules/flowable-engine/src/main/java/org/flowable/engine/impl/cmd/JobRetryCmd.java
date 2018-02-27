@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
  * @author Saeid Mirzaei
  * @author Joram Barrez
  */
-
 public class JobRetryCmd implements Command<Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRetryCmd.class.getName());
@@ -102,7 +101,7 @@ public class JobRetryCmd implements Command<Object> {
                 DurationHelper durationHelper = new DurationHelper(failedJobRetryTimeCycleValue, processEngineConfig.getClock());
                 int jobRetries = job.getRetries();
                 if (job.getExceptionMessage() == null) {
-                    // change default retries to the ones configured
+                    // this is the first failure; change default retries to the ones configured
                     jobRetries = durationHelper.getTimes();
                 }
 

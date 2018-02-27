@@ -81,10 +81,6 @@ public interface AsyncExecutor {
 
     void setMaxTimerJobsPerAcquisition(int maxJobs);
 
-    int getRetryWaitTimeInMillis();
-
-    void setRetryWaitTimeInMillis(int retryWaitTimeInMillis);
-
     int getResetExpiredJobsInterval();
 
     void setResetExpiredJobsInterval(int resetExpiredJobsInterval);
