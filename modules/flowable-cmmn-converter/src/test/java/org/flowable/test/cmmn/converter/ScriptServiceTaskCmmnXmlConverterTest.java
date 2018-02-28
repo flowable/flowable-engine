@@ -14,7 +14,6 @@ package org.flowable.test.cmmn.converter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
@@ -23,20 +22,17 @@ import java.util.List;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FieldExtension;
-import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ScriptServiceTask;
-import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * @author Tijs Rademakers
  */
-public class ScriptTaskCmmnXmlConverterTest extends AbstractConverterTest {
+public class ScriptServiceTaskCmmnXmlConverterTest extends AbstractConverterTest {
 
     private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/script-task.cmmn";
 
