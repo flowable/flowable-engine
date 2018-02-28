@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
+import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.TaskWithFieldExtensions;
 
@@ -31,8 +32,10 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
 
         if (StringUtils.isNotEmpty(task.getType())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE, task.getType());
+        }
 
-            if (ServiceTask.JAVA_TASK.equals(task.getType())) {
+        switch (task.getType()) {
+            case ServiceTask.JAVA_TASK:
                 if (StringUtils.isNotEmpty(task.getImplementation())) {
                     if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(task.getImplementationType())) {
                         xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementation());
@@ -48,13 +51,22 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
                 if (StringUtils.isNotEmpty(task.getResultVariableName())) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, task.getResultVariableName());
                 }
+                break;
 
-            }
-        }
-        if (HttpServiceTask.HTTP_TASK.equals(task.getType())) {
-            if (StringUtils.isNotEmpty(task.getImplementation())) {
-                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementation());
-            }
+            case HttpServiceTask.HTTP_TASK:
+                if (StringUtils.isNotEmpty(task.getImplementation())) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementation());
+                }
+                break;
+
+            case ScriptServiceTask.SCRIPT_TASK:
+                if (StringUtils.isNotBlank(task.getImplementationType())) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementationType());
+                }
+                if (StringUtils.isNotEmpty(task.getResultVariableName())) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, task.getResultVariableName());
+                }
+                break;
         }
 
         writeExtensions(task, xtw);

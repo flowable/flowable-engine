@@ -123,6 +123,8 @@ public interface CmmnXmlConstants {
     
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
 
+    String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
+    
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";
     String ELEMENT_DI_SHAPE = "CMMNShape";
