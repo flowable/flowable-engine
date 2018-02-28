@@ -35,10 +35,7 @@ public class CollectionUtil {
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
-
-            if (valueCollection != null) {
-                return ((Collection) collection).containsAll(valueCollection);
-            } else return false;
+            return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
         } else {
             return ((Collection) collection).contains(value);
         }
@@ -58,10 +55,7 @@ public class CollectionUtil {
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
-
-            if (valueCollection != null) {
-                return !((Collection) collection).containsAll(valueCollection);
-            } else return true;
+            return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
         } else {
             return !((Collection) collection).contains(value);
         }
@@ -81,10 +75,7 @@ public class CollectionUtil {
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
-
-            if (valueCollection != null) {
-                return CollectionUtils.containsAny((Collection) collection, valueCollection);
-            } else return false;
+            return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else {
             return ((Collection) collection).contains(value);
         }

@@ -44,7 +44,7 @@
       </rule>
       <rule>
         <inputEntry id="inputEntry_1_5">
-          <text><![CDATA[${collection:notContains(collection1, '["test4", "test5"]')}]]></text>
+          <text><![CDATA[${collection:notContains(collection1, '"test4", "test5"')}]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_5">
           <text><![CDATA["test4 and test5 not in collection1"]]></text>
@@ -52,7 +52,7 @@
       </rule>
       <rule>
         <inputEntry id="inputEntry_1_6">
-          <text><![CDATA[${collection:notContains(collection2, '[11, 12]')}]]></text>
+          <text><![CDATA[${collection:notContains(collection2, '11, 12')}]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_6">
           <text><![CDATA["11 and 12 not in collection2"]]></text>
@@ -60,7 +60,7 @@
       </rule>
       <rule>
         <inputEntry id="inputEntry_1_7">
-          <text><![CDATA[${collection:notContains(collection1, '["test1", "test2"]')}]]></text>
+          <text><![CDATA[${collection:notContains(collection1, '"test1", "test2"')}]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_7">
           <text><![CDATA["test1 and test2 not in collection1"]]></text>
@@ -68,7 +68,7 @@
       </rule>
       <rule>
         <inputEntry id="inputEntry_1_8">
-          <text><![CDATA[${collection:notContains(collection2, '[10, 20]')}]]></text>
+          <text><![CDATA[${collection:notContains(collection2, '10, 20')}]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_8">
           <text><![CDATA["10 and 20 not in collection2"]]></text>

@@ -34,18 +34,12 @@ public class DMNParseUtil {
         }
 
         String stringValue = String.valueOf(value);
-        return (stringValue.startsWith("[") && stringValue.endsWith("]"));
+        return stringValue.contains(",");
     }
 
     public static Collection getCollectionFromDMNCollection(Object value) {
-        if (!isDMNCollection(value)) {
-            return null;
-        }
-
         String stringValue = String.valueOf(value);
-        stringValue = stringValue.substring(1, stringValue.length() - 1);
         List<Object> items = split(stringValue);
-
         return items;
     }
 
@@ -57,7 +51,7 @@ public class DMNParseUtil {
 
 
     //TODO: DATES
-    private static Object formatElementValue(String value) {
+    protected static Object formatElementValue(String value) {
         if (value.isEmpty()) {
             return null;
         }
