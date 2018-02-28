@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.scripting;
+package org.flowable.engine.common.impl.scripting;
 
 /**
  * @author Tom Baeyens

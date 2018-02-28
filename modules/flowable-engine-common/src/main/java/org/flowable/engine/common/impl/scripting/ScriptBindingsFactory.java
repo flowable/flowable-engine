@@ -11,14 +11,14 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.scripting;
+package org.flowable.engine.common.impl.scripting;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.script.Bindings;
+import org.flowable.engine.common.AbstractEngineConfiguration;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -27,11 +27,11 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class ScriptBindingsFactory {
 
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected AbstractEngineConfiguration engineConfiguration;
     protected List<ResolverFactory> resolverFactories;
 
-    public ScriptBindingsFactory(ProcessEngineConfigurationImpl processEngineConfiguration, List<ResolverFactory> resolverFactories) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public ScriptBindingsFactory(AbstractEngineConfiguration engineConfiguration, List<ResolverFactory> resolverFactories) {
+        this.engineConfiguration = engineConfiguration;
         this.resolverFactories = resolverFactories;
     }
 
@@ -46,7 +46,7 @@ public class ScriptBindingsFactory {
     protected List<Resolver> createResolvers(VariableScope variableScope) {
         List<Resolver> scriptResolvers = new ArrayList<>();
         for (ResolverFactory scriptResolverFactory : resolverFactories) {
-            Resolver resolver = scriptResolverFactory.createResolver(processEngineConfiguration, variableScope);
+            Resolver resolver = scriptResolverFactory.createResolver(engineConfiguration, variableScope);
             if (resolver != null) {
                 scriptResolvers.add(resolver);
             }
