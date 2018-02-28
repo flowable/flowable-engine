@@ -115,6 +115,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
      */
     @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn"})
     public void testGetTasks() throws Exception {
+        org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
         try {
             Calendar adhocTaskCreate = Calendar.getInstance();
             adhocTaskCreate.set(Calendar.MILLISECOND, 0);
@@ -140,6 +141,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             taskService.addUserIdentityLink(adhocTask.getId(), "misspiggy", IdentityLinkType.PARTICIPANT);
 
             cmmnEngineConfiguration.getClock().setCurrentTime(processTaskCreate.getTime());
+            
+            deployment = repositoryService.createDeployment().addClasspathResource(
+                            "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+            
             CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
                             .businessKey("myBusinessKey").tenantId("myTenant").start();
             Task caseTask = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -292,6 +297,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
                 if (task.getExecutionId() == null) {
                     taskService.deleteTask(task.getId(), true);
                 }
+            }
+            
+            if (deployment != null) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
             }
         }
     }

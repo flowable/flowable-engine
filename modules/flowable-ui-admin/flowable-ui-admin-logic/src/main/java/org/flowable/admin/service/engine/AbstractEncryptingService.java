@@ -14,6 +14,7 @@ package org.flowable.admin.service.engine;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -21,7 +22,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.security.crypto.codec.Base64;
 
 /**
  * Superclass for services that want to encrypt certain properties
@@ -57,7 +57,7 @@ public abstract class AbstractEncryptingService implements EnvironmentAware {
             Cipher cipher = Cipher.getInstance(AES_CYPHER);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, initializationVectorSpec);
             byte[] encrypted = cipher.doFinal(value.getBytes());
-            return new String(Base64.encode(encrypted), UTF8_ENCODING);
+            return new String(Base64.getEncoder().encode(encrypted), UTF8_ENCODING);
         } catch (GeneralSecurityException nsae) {
             throw new RuntimeException(nsae);
         } catch (UnsupportedEncodingException uee) {
@@ -70,7 +70,7 @@ public abstract class AbstractEncryptingService implements EnvironmentAware {
         try {
             cipher = Cipher.getInstance(AES_CYPHER);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, initializationVectorSpec);
-            byte[] original = cipher.doFinal(Base64.decode(encrypted.getBytes(UTF8_ENCODING)));
+            byte[] original = cipher.doFinal(Base64.getDecoder().decode(encrypted.getBytes(UTF8_ENCODING)));
             return new String(original, UTF8_ENCODING);
         } catch (GeneralSecurityException nsae) {
             throw new RuntimeException(nsae);

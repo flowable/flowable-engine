@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="testTransientJsonResponseVariable" name="testTransientJsonResponseVariable" isExecutable="true">
+    <startEvent id="startEvent1"></startEvent>
+    <serviceTask id="sid-63AB434F-C592-4FE0-A3E9-913D099DF5AE" name="Get" flowable:type="http">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string><![CDATA[GET]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:string><![CDATA[http://localhost:9798/test]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="responseVariableName">
+          <flowable:string><![CDATA[myResponse]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="saveResponseParametersTransient">
+          <flowable:expression><![CDATA[${true}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="saveResponseVariableAsJson">
+          <flowable:expression><![CDATA[${true}]]></flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="sid-99858995-887F-40BB-9723-153C140FB4C2" sourceRef="startEvent1" targetRef="sid-63AB434F-C592-4FE0-A3E9-913D099DF5AE"></sequenceFlow>
+    <serviceTask id="sid-AE9249E6-2696-4724-8AF4-D7D91F28C99E" name="Post" flowable:type="http">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string><![CDATA[POST]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:string><![CDATA[http://localhost:9798/hello]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestBody">
+          <flowable:expression><![CDATA[{
+  "name": "${myResponse.name.firstName}"
+}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="responseVariableName">
+          <flowable:string><![CDATA[postResponse]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="saveResponseVariableAsJson">
+          <flowable:expression><![CDATA[${true}]]></flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="sid-9247F080-DE64-4BE2-8655-1611128EBB82" sourceRef="sid-63AB434F-C592-4FE0-A3E9-913D099DF5AE" targetRef="sid-AE9249E6-2696-4724-8AF4-D7D91F28C99E"></sequenceFlow>
+    <userTask id="sid-B9B8123D-C125-42C7-B78C-FCD351F1B288" name="The task"></userTask>
+    <sequenceFlow id="sid-7A66AD55-7000-46D9-BD1E-F2F5EF74E1F0" sourceRef="sid-AE9249E6-2696-4724-8AF4-D7D91F28C99E" targetRef="sid-B9B8123D-C125-42C7-B78C-FCD351F1B288"></sequenceFlow>
+    <endEvent id="sid-6F2DFC8F-CB64-48E2-8E23-2D4BF9D3AFDD"></endEvent>
+    <sequenceFlow id="sid-56C95486-2A4C-4ACE-81BA-511636E15401" sourceRef="sid-B9B8123D-C125-42C7-B78C-FCD351F1B288" targetRef="sid-6F2DFC8F-CB64-48E2-8E23-2D4BF9D3AFDD"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testTransientJsonResponseVariable">
+    <bpmndi:BPMNPlane bpmnElement="testTransientJsonResponseVariable" id="BPMNPlane_testTransientJsonResponseVariable">
+      <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="176.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-63AB434F-C592-4FE0-A3E9-913D099DF5AE" id="BPMNShape_sid-63AB434F-C592-4FE0-A3E9-913D099DF5AE">
+        <omgdc:Bounds height="80.0" width="100.0" x="186.5" y="151.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-AE9249E6-2696-4724-8AF4-D7D91F28C99E" id="BPMNShape_sid-AE9249E6-2696-4724-8AF4-D7D91F28C99E">
+        <omgdc:Bounds height="80.0" width="100.0" x="390.0" y="151.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-B9B8123D-C125-42C7-B78C-FCD351F1B288" id="BPMNShape_sid-B9B8123D-C125-42C7-B78C-FCD351F1B288">
+        <omgdc:Bounds height="80.0" width="100.0" x="535.0" y="151.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-6F2DFC8F-CB64-48E2-8E23-2D4BF9D3AFDD" id="BPMNShape_sid-6F2DFC8F-CB64-48E2-8E23-2D4BF9D3AFDD">
+        <omgdc:Bounds height="28.0" width="28.0" x="680.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-56C95486-2A4C-4ACE-81BA-511636E15401" id="BPMNEdge_sid-56C95486-2A4C-4ACE-81BA-511636E15401">
+        <omgdi:waypoint x="634.949999999996" y="191.0"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="191.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-9247F080-DE64-4BE2-8655-1611128EBB82" id="BPMNEdge_sid-9247F080-DE64-4BE2-8655-1611128EBB82">
+        <omgdi:waypoint x="286.4499999998613" y="191.0"></omgdi:waypoint>
+        <omgdi:waypoint x="389.9999999999897" y="191.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-99858995-887F-40BB-9723-153C140FB4C2" id="BPMNEdge_sid-99858995-887F-40BB-9723-153C140FB4C2">
+        <omgdi:waypoint x="129.94999876217267" y="191.0"></omgdi:waypoint>
+        <omgdi:waypoint x="186.4999999999878" y="191.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-7A66AD55-7000-46D9-BD1E-F2F5EF74E1F0" id="BPMNEdge_sid-7A66AD55-7000-46D9-BD1E-F2F5EF74E1F0">
+        <omgdi:waypoint x="489.94999999999067" y="191.0"></omgdi:waypoint>
+        <omgdi:waypoint x="535.0" y="191.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.history.async;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -393,7 +394,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_DOUBLE_VALUE, variable.getDoubleValue());
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_LONG_VALUE, variable.getLongValue());
             if (variable.getByteArrayRef() != null) {
-                putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, Base64.encodeBase64String(variable.getBytes()));
+                putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, convertToBase64(variable));
             }
             
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_VARIABLE_CREATED, data);
@@ -426,7 +427,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_DOUBLE_VALUE, variable.getDoubleValue());
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_LONG_VALUE, variable.getLongValue());
             if (variable.getBytes() != null) {
-                putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, Base64.encodeBase64String(variable.getBytes()));
+                putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, convertToBase64(variable));
             }
             
             if (useActivityId && sourceActivityExecution != null) {
@@ -456,7 +457,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_DOUBLE_VALUE, variable.getDoubleValue());
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_LONG_VALUE, variable.getLongValue());
             if (variable.getByteArrayRef() != null) {
-                putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, Base64.encodeBase64String(variable.getBytes()));
+                putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, convertToBase64(variable));
             }
             
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_VARIABLE_UPDATED, data);
@@ -590,4 +591,12 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
         }
     }
 
+    private static String convertToBase64(VariableInstanceEntity variable) {
+        byte[] bytes = variable.getBytes();
+        if (bytes != null) {
+            return new String(Base64.getEncoder().encode(variable.getBytes()), StandardCharsets.US_ASCII);
+        } else {
+            return null;
+        }
+    }
 }

@@ -659,6 +659,10 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     }
 
     protected void addField(String name, String propertyName, JsonNode elementNode, ServiceTask task) {
+        addField(name, propertyName, null, elementNode, task);
+    }
+    
+    protected void addField(String name, String propertyName, String defaultValue, JsonNode elementNode, ServiceTask task) {
         FieldExtension field = new FieldExtension();
         field.setFieldName(name);
         String value = getPropertyValueAsString(propertyName, elementNode);
@@ -668,6 +672,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
             } else {
                 field.setStringValue(value);
             }
+            task.getFieldExtensions().add(field);
+        } else if (StringUtils.isNotEmpty(defaultValue)) {
+            field.setStringValue(defaultValue);
             task.getFieldExtensions().add(field);
         }
     }

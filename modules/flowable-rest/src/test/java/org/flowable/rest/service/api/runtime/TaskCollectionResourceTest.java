@@ -33,9 +33,12 @@ import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Task collection resource.
@@ -47,6 +50,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a task. POST runtime/tasks
      */
+    @Test
     public void testCreateTask() throws Exception {
         try {
             Task parentTask = taskService.newTask();
@@ -101,6 +105,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a task. POST runtime/tasks
      */
+    @Test
     public void testCreateTaskNoBody() throws Exception {
         try {
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
@@ -119,6 +124,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a collection of tasks. GET runtime/tasks
      */
+    @Test
     @Deployment
     public void testGetTasks() throws Exception {
         try {

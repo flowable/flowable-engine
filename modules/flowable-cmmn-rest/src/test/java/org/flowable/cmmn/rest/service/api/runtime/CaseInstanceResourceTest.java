@@ -52,14 +52,22 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertEquals(responseNode.get("url").asText(), url);
         assertEquals(responseNode.get("caseDefinitionUrl").asText(), buildUrl(RestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
 
-        caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").tenantId("myTenant").start();
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_OK);
-
-        // Check resulting instance tenant id
-        responseNode = objectMapper.readTree(response.getEntity().getContent());
-        closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("myTenant", responseNode.get("tenantId").textValue());
+        org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
+                        "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+        
+        try {
+            caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").tenantId("myTenant").start();
+            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_OK);
+    
+            // Check resulting instance tenant id
+            responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertNotNull(responseNode);
+            assertEquals("myTenant", responseNode.get("tenantId").textValue());
+            
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
 
     /**

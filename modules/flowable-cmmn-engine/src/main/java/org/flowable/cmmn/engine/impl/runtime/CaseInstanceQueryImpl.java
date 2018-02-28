@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanceQuery, CaseInstance> implements CaseInstanceQuery {
 
     private static final long serialVersionUID = 1L;
-    
+
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
     protected Set<String> caseDefinitionKeys;
@@ -53,6 +53,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected boolean includeCaseVariables;
+
+    protected Integer caseInstanceVariablesLimit;
 
     public CaseInstanceQueryImpl() {
     }
@@ -118,7 +121,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         this.caseInstanceId = caseInstanceId;
         return this;
     }
-    
+
     @Override
     public CaseInstanceQueryImpl caseInstanceIds(Set<String> caseInstanceIds) {
         if (caseInstanceIds == null) {
@@ -154,7 +157,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         this.caseInstanceParentId = parentId;
         return this;
     }
-    
+
     @Override
     public CaseInstanceQueryImpl caseInstanceStartedBefore(Date beforeTime) {
         if (beforeTime == null) {
@@ -181,25 +184,25 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         this.startedBy = userId;
         return this;
     }
-    
+
     @Override
     public CaseInstanceQuery caseInstanceCallbackId(String callbackId) {
         this.callbackId = callbackId;
         return this;
     }
-    
+
     @Override
     public CaseInstanceQuery caseInstanceCallbackType(String callbackType) {
         this.callbackType = callbackType;
         return this;
     }
-    
+
     @Override
     public CaseInstanceQuery caseInstanceIsCompleteable() {
         this.completeable = true;
         return this;
     }
-    
+
     @Override
     public CaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
         if (tenantId == null) {
@@ -208,7 +211,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         this.tenantId = tenantId;
         return this;
     }
-    
+
     @Override
     public CaseInstanceQueryImpl caseInstanceTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
@@ -223,7 +226,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         this.withoutTenantId = true;
         return this;
     }
-    
+
     // ordering ////////////////////////////////////////////////////
 
     @Override
@@ -243,7 +246,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         this.orderProperty = CaseInstanceQueryProperty.CASE_DEFINITION_KEY;
         return this;
     }
-    
+
     @Override
     public CaseInstanceQueryImpl orderByStartTime() {
         this.orderProperty = CaseInstanceQueryProperty.CASE_START_TIME;
@@ -256,7 +259,23 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return this;
     }
 
-    // results ////////////////////////////////////////////////////
+    @Override
+    public CaseInstanceQueryImpl includeCaseVariables() {
+        this.includeCaseVariables = true;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit) {
+        this.caseInstanceVariablesLimit = caseInstanceVariablesLimit;
+        return this;
+    }
+
+    public Integer getCaseInstanceVariablesLimit() {
+        return this.caseInstanceVariablesLimit;
+    }
+
+// results ////////////////////////////////////////////////////
 
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
@@ -265,6 +284,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public List<CaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
+        if (this.isIncludeCaseVariables()) {
+            return CommandContextUtil.getCaseInstanceEntityManager(commandContext).findWithVariablesByCriteria(this);
+        }
         return CommandContextUtil.getCaseInstanceEntityManager(commandContext).findByCriteria(this);
     }
 
@@ -327,7 +349,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public String getStartedBy() {
         return startedBy;
     }
-    
+
     public String getCallbackId() {
         return callbackId;
     }
@@ -335,7 +357,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public String getCallbackType() {
         return callbackType;
     }
-    
+
     public boolean isCompleteable() {
         return completeable;
     }
@@ -350,5 +372,17 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public boolean isIncludeCaseVariables() {
+        return includeCaseVariables;
+    }
+
+    public String getMssqlOrDB2OrderBy() {
+        String specialOrderBy = super.getOrderByColumns();
+        if (specialOrderBy != null && specialOrderBy.length() > 0) {
+            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
+        }
+        return specialOrderBy;
     }
 }

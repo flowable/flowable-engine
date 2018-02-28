@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Joram Barrez
  */
 public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<CaseInstanceEntity> implements CaseInstanceDataManager {
-    
+
     protected CaseInstanceByCaseDefinitionIdMatcher caseInstanceByCaseDefinitionIdMatcher = new CaseInstanceByCaseDefinitionIdMatcher();
 
     public MybatisCaseInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
@@ -55,14 +56,14 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         caseInstanceEntityImpl.internalSetVariableInstances(new HashMap<String, VariableInstanceEntity>(1));
         return caseInstanceEntityImpl;
     }
-    
+
     @Override
     public CaseInstanceEntity findById(String caseInstanceId) {
         return findCaseInstanceEntityEagerFetchPlanItemInstances(caseInstanceId, null);
     }
-    
+
     public CaseInstanceEntity findCaseInstanceEntityEagerFetchPlanItemInstances(String caseInstanceId, String planItemInstanceId) {
-        
+
         // Could have been fetched before
         EntityCache entityCache = getEntityCache();
         CaseInstanceEntity cachedCaseInstanceEntity = entityCache.findInCache(getManagedEntityClass(), caseInstanceId);
@@ -77,35 +78,35 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         } else if (planItemInstanceId != null) {
             params.put("planItemInstanceId", planItemInstanceId);
         }
-        
+
         // The case instance will be fetched and will have all plan item instances in the childPlanItemInstances property.
         // Those children need to be properly moved to the correct parent
         CaseInstanceEntityImpl caseInstanceEntity = (CaseInstanceEntityImpl) getDbSqlSession().selectOne("selectCaseInstanceEagerFetchPlanItemInstances", params);
-        
+
         if (caseInstanceEntity != null) {
             List<PlanItemInstanceEntity> allPlanItemInstances = caseInstanceEntity.getChildPlanItemInstances();
             ArrayList<PlanItemInstanceEntity> directPlanItemInstances = new ArrayList<>();
             HashMap<String, PlanItemInstanceEntity> planItemInstanceMap = new HashMap<>(allPlanItemInstances.size());
-            
+
             // Map all plan item instances to its id
             for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
-                
+
                 // Mapping
                 planItemInstanceMap.put(planItemInstanceEntity.getId(), planItemInstanceEntity);
-                
+
                 // Cache
                 entityCache.put(planItemInstanceEntity, true);
-                
+
                 // plan items of case plan model
                 if (planItemInstanceEntity.getStageInstanceId() == null) {
                     directPlanItemInstances.add(planItemInstanceEntity);
                 }
-                
-                // Always add empty list, so no check is needed later and plan items 
+
+                // Always add empty list, so no check is needed later and plan items
                 // without children have a non-null value, not triggering the fetch
                 planItemInstanceEntity.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>());
             }
-            
+
             // Add to correct parent
             if (directPlanItemInstances.size() != planItemInstanceMap.size()) {
                 for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
@@ -115,16 +116,16 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                     }
                 }
             }
-            
+
             caseInstanceEntity.setChildPlanItemInstances(directPlanItemInstances);
             return caseInstanceEntity;
-            
+
         } else {
             return null;
-            
+
         }
     }
-    
+
     @Override
     public List<CaseInstanceEntity> findCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
         return getList("selectCaseInstancesByCaseDefinitionId", caseDefinitionId, caseInstanceByCaseDefinitionIdMatcher, true);
@@ -138,11 +139,47 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         return getDbSqlSession().selectListNoCacheCheck("selectCaseInstancesByQueryCriteria", query);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQueryImpl query) {
+        // paging doesn't work for combining case instances and variables due
+        // to an outer join, so doing it in-memory
+
+        CaseInstanceQueryImpl caseInstanceQuery = (CaseInstanceQueryImpl) query;
+        int firstResult = caseInstanceQuery.getFirstResult();
+        int maxResults = caseInstanceQuery.getMaxResults();
+
+        // setting max results, limit to 20000 results for performance reasons
+        if (caseInstanceQuery.getCaseInstanceVariablesLimit() != null) {
+            caseInstanceQuery.setMaxResults(caseInstanceQuery.getCaseInstanceVariablesLimit());
+        } else {
+            caseInstanceQuery.setMaxResults(cmmnEngineConfiguration.getCaseQueryLimit());
+        }
+        caseInstanceQuery.setFirstResult(0);
+
+        List<CaseInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectCaseInstanceWithVariablesByQueryCriteria", caseInstanceQuery);
+
+        if (instanceList != null && !instanceList.isEmpty()) {
+            if (firstResult > 0) {
+                if (firstResult <= instanceList.size()) {
+                    int toIndex = firstResult + Math.min(maxResults, instanceList.size() - firstResult);
+                    return instanceList.subList(firstResult, toIndex);
+                } else {
+                    return Collections.EMPTY_LIST;
+                }
+            } else {
+                int toIndex = maxResults > 0 ? Math.min(maxResults, instanceList.size()) : instanceList.size();
+                return instanceList.subList(0, toIndex);
+            }
+        }
+        return Collections.EMPTY_LIST;
+    }
+
     @Override
     public long countByCriteria(CaseInstanceQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectCaseInstanceCountByQueryCriteria", query);
     }
-    
+
     @Override
     public void updateLockTime(String caseInstanceId, Date lockDate, Date expirationTime) {
         HashMap<String, Object> params = new HashMap<>();
@@ -155,7 +192,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
             throw new FlowableOptimisticLockingException("Could not lock case instance");
         }
     }
-    
+
     @Override
     public void clearLockTime(String caseInstanceId) {
         HashMap<String, Object> params = new HashMap<>();

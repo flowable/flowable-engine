@@ -90,26 +90,33 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?withoutTenantId=true";
         assertResultsPresentInDataResponse(url, id);
 
-        caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").tenantId("myTenant").start();
-        String idWithTenant = caseInstance.getId();
-
-        // Test tenant id
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantId=myTenant";
-        assertResultsPresentInDataResponse(url, idWithTenant);
-
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantId=anotherTenant";
-        assertResultsPresentInDataResponse(url);
-
-        // Test tenant id like
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantIdLike=" + encode("%enant");
-        assertResultsPresentInDataResponse(url, idWithTenant);
-
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantIdLike=" + encode("%what");
-        assertResultsPresentInDataResponse(url);
-
-        // Test without tenant id
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?withoutTenantId=true";
-        assertResultsPresentInDataResponse(url, id);
+        org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
+                        "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+        
+        try {
+            caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").tenantId("myTenant").start();
+            String idWithTenant = caseInstance.getId();
+    
+            // Test tenant id
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantId=myTenant";
+            assertResultsPresentInDataResponse(url, idWithTenant);
+    
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantId=anotherTenant";
+            assertResultsPresentInDataResponse(url);
+    
+            // Test tenant id like
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantIdLike=" + encode("%enant");
+            assertResultsPresentInDataResponse(url, idWithTenant);
+    
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantIdLike=" + encode("%what");
+            assertResultsPresentInDataResponse(url);
+    
+            // Test without tenant id
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?withoutTenantId=true";
+            assertResultsPresentInDataResponse(url, id);
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
 
     /**
