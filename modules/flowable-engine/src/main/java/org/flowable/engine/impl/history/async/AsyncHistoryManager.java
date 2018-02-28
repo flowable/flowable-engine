@@ -592,6 +592,11 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     }
 
     private static String convertToBase64(VariableInstanceEntity variable) {
-        return new String(Base64.getEncoder().encode(variable.getBytes()), StandardCharsets.US_ASCII);
+        byte[] bytes = variable.getBytes();
+        if (bytes != null) {
+            return new String(Base64.getEncoder().encode(variable.getBytes()), StandardCharsets.US_ASCII);
+        } else {
+            return null;
+        }
     }
 }
