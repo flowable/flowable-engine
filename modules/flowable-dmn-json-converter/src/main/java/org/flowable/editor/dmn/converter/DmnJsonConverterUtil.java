@@ -183,7 +183,7 @@ public class DmnJsonConverterUtil {
         String expressionType = null;
         if (!"-".equals(expressionValue)) {
             expressionType = "string";
-            if (NumberUtils.isNumber(expressionValue)) {
+            if (NumberUtils.isCreatable(expressionValue)) {
                 expressionType = "number";
             } else {
                 try {
