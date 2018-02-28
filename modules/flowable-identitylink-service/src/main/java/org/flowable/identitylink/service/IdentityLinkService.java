@@ -30,7 +30,11 @@ public interface IdentityLinkService {
     
     List<IdentityLinkEntity> findIdentityLinksByProcessInstanceId(String processInstanceId);
     
+    List<IdentityLinkEntity> findIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
+    
     List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId);
+    
+    List<IdentityLinkEntity> findIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
     
     IdentityLinkEntity addCandidateUser(String taskId, String userId);
     
@@ -42,9 +46,13 @@ public interface IdentityLinkService {
     
     IdentityLinkEntity createProcessInstanceIdentityLink(String processInstanceId, String userId, String groupId, String type);
     
+    IdentityLinkEntity createScopeIdentityLink(String scopeDefinitionId, String scopeId, String scopeType, String userId, String groupId, String type);
+    
     IdentityLinkEntity createTaskIdentityLink(String taskId, String userId, String groupId, String type);
     
     IdentityLinkEntity createProcessDefinitionIdentityLink(String processDefinitionId, String userId, String groupId);
+    
+    IdentityLinkEntity createScopeDefinitionIdentityLink(String scopeDefinitionId, String scopeType, String userId, String groupId);
     
     IdentityLinkEntity createIdentityLink();
     
@@ -54,9 +62,13 @@ public interface IdentityLinkService {
     
     List<IdentityLinkEntity> deleteProcessInstanceIdentityLink(String processInstanceId, String userId, String groupId, String type);
     
+    List<IdentityLinkEntity> deleteScopeIdentityLink(String scopeId, String scopeType, String userId, String groupId, String type);
+    
     List<IdentityLinkEntity> deleteTaskIdentityLink(String taskId, List<IdentityLinkEntity> currentIdentityLinks, String userId, String groupId, String type);
     
     List<IdentityLinkEntity> deleteProcessDefinitionIdentityLink(String processDefinitionId, String userId, String groupId);
+    
+    List<IdentityLinkEntity> deleteScopeDefinitionIdentityLink(String scopeDefinitionId, String scopeType, String userId, String groupId);
     
     List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId);
     

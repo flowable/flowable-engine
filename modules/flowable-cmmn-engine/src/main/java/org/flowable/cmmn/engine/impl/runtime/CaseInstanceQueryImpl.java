@@ -51,6 +51,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String callbackType;
     protected boolean completeable;
     protected String tenantId;
+    protected String tenantIdLike;
     protected boolean withoutTenantId;
 
     public CaseInstanceQueryImpl() {
@@ -202,9 +203,18 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     @Override
     public CaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
         if (tenantId == null) {
-            throw new FlowableIllegalArgumentException("caseInstance tenant id is null");
+            throw new FlowableIllegalArgumentException("tenant id is null");
         }
         this.tenantId = tenantId;
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        this.tenantIdLike = tenantIdLike;
         return this;
     }
     
@@ -332,6 +342,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getTenantId() {
         return tenantId;
+    }
+    
+    public String getTenantIdLike() {
+        return tenantIdLike;
     }
 
     public boolean isWithoutTenantId() {

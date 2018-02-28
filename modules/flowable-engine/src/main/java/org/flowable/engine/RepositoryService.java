@@ -487,7 +487,7 @@ public interface RepositoryService {
     List<DmnDecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId);
 
     /**
-     * Retrieves the {@link java.text.Normalizer.Form}s associated with the given process definition.
+     * Retrieves the {@link FormDefinition}s associated with the given process definition.
      *
      * @param processDefinitionId
      *            id of the process definition, cannot be null.

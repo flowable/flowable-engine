@@ -26,6 +26,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
@@ -96,6 +98,14 @@ public abstract class AbstractCmmnManager {
     
     protected HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
         return cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();
+    }
+    
+    protected IdentityLinkEntityManager getIdentityLinkEntityManager() {
+        return cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+    }
+    
+    protected HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
+        return cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkEntityManager();
     }
     
     protected TaskEntityManager getTaskEntityManager() {

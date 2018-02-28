@@ -538,7 +538,7 @@
       <if test="orQueryObject.deploymentId != null || (orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0)">
         left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P_OR${orIndex} ON RES.PROC_DEF_ID_ = DEPLOY_P_OR${orIndex}.ID_
       </if>
-      <if test="orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentId.size() &gt; 0)">
+      <if test="orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0)">
         left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C_OR${orIndex} ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C_OR${orIndex}.ID_
       </if>
       <if test="orQueryObject.queryVariableValues.size() &gt; 0">

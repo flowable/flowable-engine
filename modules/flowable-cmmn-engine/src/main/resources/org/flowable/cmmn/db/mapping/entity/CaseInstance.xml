@@ -201,9 +201,7 @@
 
     <sql id="selectCaseInstancesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_RU_CASE_INST RES
-        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null">
-            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
-        </if>
+        inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
             <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
                 inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SCOPE_ID_ and SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn' 
@@ -223,7 +221,7 @@
                 RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
             <if test="caseDefinitionKey != null">
-                and CASE_DEF.KEY_ = #{caseDefinitionId}
+                and CASE_DEF.KEY_ = #{caseDefinitionKey}
             </if>
             <if test="caseDefinitionIds != null">
                 and RES.CASE_DEF_ID_ IN
@@ -269,6 +267,9 @@
             </if>
             <if test="tenantId != null">
                 and RES.TENANT_ID_ = #{tenantId}
+            </if>
+            <if test="tenantIdLike != null">
+                and RES.TENANT_ID_ like #{tenantIdLike}
             </if>
             <if test="withoutTenantId">
                 and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''

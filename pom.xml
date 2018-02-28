@@ -128,6 +128,11 @@
 				<artifactId>httpclient</artifactId>
 				<version>4.5.3</version>
 			</dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.4.6</version>
+            </dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
@@ -384,6 +389,11 @@
 				<artifactId>flowable-cmmn-image-generator</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-cmmn-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-form-model</artifactId>
@@ -1083,6 +1093,7 @@
                 <module>modules/flowable-cmmn-engine-configurator</module>
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
+                <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-form-model</module>
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
@@ -1205,6 +1216,7 @@
                 <module>modules/flowable-cmmn-json-converter</module>
                 <module>modules/flowable-cmmn-engine</module>
                 <module>modules/flowable-cmmn-engine-configurator</module>
+                <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
@@ -1282,6 +1294,7 @@
                 <module>modules/flowable-cmmn-engine-configurator</module>
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
+                <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-form-model</module>
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
@@ -1449,6 +1462,15 @@
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
                 <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-cmmn-api</module>
+                <module>modules/flowable-cmmn-model</module>
+                <module>modules/flowable-cmmn-converter</module>
+                <module>modules/flowable-cmmn-json-converter</module>
+                <module>modules/flowable-cmmn-engine</module>
+                <module>modules/flowable-cmmn-engine-configurator</module>
+                <module>modules/flowable-cmmn-spring</module>
+                <module>modules/flowable-cmmn-spring-configurator</module>
+                <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-api</module>
 				<module>modules/flowable-dmn-engine</module>

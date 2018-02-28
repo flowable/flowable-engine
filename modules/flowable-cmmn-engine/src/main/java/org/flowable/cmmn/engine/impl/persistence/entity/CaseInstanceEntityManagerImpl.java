@@ -77,17 +77,19 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     }
     
     @Override
-    public void delete(String caseInstanceId, String deleteReason) {
+    public void delete(String caseInstanceId, boolean cascade, String deleteReason) {
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
         // Variables
         getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         
+        getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
+        
         // Tasks
         TaskEntityManager taskEntityManager = getTaskEntityManager();
         List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         for (TaskEntity taskEntity : taskEntities) {
-            TaskHelper.deleteTask(taskEntity, deleteReason, false, true);
+            TaskHelper.deleteTask(taskEntity, deleteReason, cascade, true);
         }
         
         // Sentry part instances

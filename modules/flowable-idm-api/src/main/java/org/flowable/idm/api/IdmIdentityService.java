@@ -12,9 +12,9 @@
  */
 package org.flowable.idm.api;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-
 import java.util.List;
+
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 /**
  * Service to manage {@link User}s and {@link Group}s.
@@ -129,6 +129,11 @@ public interface IdmIdentityService {
      * Checks if the password is valid for the given user. Arguments userId and password are nullsafe.
      */
     boolean checkPassword(String userId, String password);
+    
+    /**
+     * Passes the authenticated user id for this particular thread. All service method (from any service) invocations done by the same thread will have access to this authenticatedUserId.
+     */
+    void setAuthenticatedUserId(String authenticatedUserId);
 
     /**
      * Sets the picture for a given user.
