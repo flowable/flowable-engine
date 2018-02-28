@@ -292,6 +292,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected int historicTaskQueryLimit;
 
     protected int caseQueryLimit = 20000;
+    protected int historicCaseQueryLimit = 20000;
 
     // Variable support
     protected VariableTypes variableTypes;
@@ -1787,6 +1788,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setCaseQueryLimit(int caseQueryLimit) {
         this.caseQueryLimit = caseQueryLimit;
         return this;
+    }
+
+    public int getHistoricCaseQueryLimit() {
+        return historicCaseQueryLimit;
+    }
+
+    public void setHistoricCaseQueryLimit(int historicCaseQueryLimit) {
+        this.historicCaseQueryLimit = historicCaseQueryLimit;
     }
 
     public boolean isSerializableVariableTypeTrackDeserializedObjects() {

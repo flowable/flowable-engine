@@ -12,10 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import java.util.Date;
-
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -33,5 +35,6 @@ public interface HistoricCaseInstanceEntity extends Entity, HistoricCaseInstance
     void setCallbackId(String callbackId);
     void setCallbackType(String callbackType);
     void setTenantId(String tenantId);
-    
+
+    List<HistoricVariableInstanceEntity> getQueryVariables();
 }

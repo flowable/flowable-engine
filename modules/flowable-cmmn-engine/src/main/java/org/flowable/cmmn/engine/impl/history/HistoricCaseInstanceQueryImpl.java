@@ -56,6 +56,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String callbackType;
     protected String tenantId;
     protected boolean withoutTenantId;
+    protected boolean includeCaseVariables;
+    protected Integer caseVariablesLimit;
+
 
     public HistoricCaseInstanceQueryImpl() {
     }
@@ -309,7 +312,26 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public List<HistoricCaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findByCriteria(this);
+        List<HistoricCaseInstance> results;
+        if (includeCaseVariables) {
+            results = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findWithVariablesByQueryCriteria(this);
+        } else {
+            results = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findByCriteria(this);
+        }
+
+        return results;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery includeCaseVariables() {
+        this.includeCaseVariables = true;
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery limitCaseVariables(Integer historicCaseVariablesLimit) {
+        this.caseVariablesLimit = historicCaseVariablesLimit;
+        return this;
     }
 
     public String getCaseDefinitionId() {
@@ -396,4 +418,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return withoutTenantId;
     }
 
+    public boolean isIncludeCaseVariables() {
+        return includeCaseVariables;
+    }
+
+    public Integer getCaseVariablesLimit() {
+        return caseVariablesLimit;
+    }
+    
 }
