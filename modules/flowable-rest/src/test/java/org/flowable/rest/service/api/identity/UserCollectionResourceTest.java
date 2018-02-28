@@ -24,9 +24,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -36,6 +39,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all users.
      */
+    @Test
     @Deployment
     public void testGetUsers() throws Exception {
         List<User> savedUsers = new ArrayList<>();
@@ -104,6 +108,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateUser() throws Exception {
         try {
             ObjectNode requestNode = objectMapper.createObjectNode();
@@ -135,6 +140,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateUserExceptions() throws Exception {
         // Create without ID
         ObjectNode requestNode = objectMapper.createObjectNode();

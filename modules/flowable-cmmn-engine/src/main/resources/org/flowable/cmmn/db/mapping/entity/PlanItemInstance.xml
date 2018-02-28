@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
 
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
+        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                          NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
@@ -32,9 +32,9 @@
     </insert>
 
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
-    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
-                                                     NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) 
-    values 
+    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
+                                                     NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
+    values
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
         	#{planItemInstance.id ,jdbcType=VARCHAR},
@@ -64,7 +64,7 @@
     <insert id="bulkInsertPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="planItemInstance" index="index">
-            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
+            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                       NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
@@ -99,7 +99,7 @@
         <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
             CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
         </if>
-        <if test="originalPersistentState.caseInstanceId != caseInstanceId">    
+        <if test="originalPersistentState.caseInstanceId != caseInstanceId">
             CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.stageInstanceId != stageInstanceId">
@@ -120,7 +120,7 @@
         <if test="originalPersistentState.name != name">
             NAME_ = #{name, jdbcType=VARCHAR},
         </if>
-        <if test="originalPersistentState.state != state">            
+        <if test="originalPersistentState.state != state">
             STATE_ = #{state, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.startTime != startTime">
@@ -150,26 +150,26 @@
         <if test="originalPersistentState.tenantId != tenantId">
             TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
         </if>
-    </set>     
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
 </update>
-  
+
   <delete id="deletePlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
     delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id} and REV_ = #{revision}
   </delete>
-  
+
   <delete id="deletePlanItemInstancesByCaseDefinitionId" parameterType="string">
     delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_DEF_ID_ = #{value}
   </delete>
-  
+
   <delete id="deletePlanItemInstancesByStageInstanceId" parameterType="string">
     delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where STAGE_INST_ID_ = #{value}
   </delete>
-  
+
   <delete id="deletePlanItemInstancesByCaseInstanceId" parameterType="string">
     delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{value}
   </delete>
-  
+
   <resultMap id="planItemInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -193,11 +193,11 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <!-- Do not forget to update selectCaseInstanceAndAllPlanItemInstances select when adding/changing columns of planItemInstance -->
   </resultMap>
-  
+
   <select id="selectPlanItemInstance" parameterType="string" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
   </select>
-  
+
    <select id="selectPlanItemInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
@@ -205,12 +205,12 @@
         ${orderBy}
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
-  
+
   <select id="selectPlanItemInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultType="long">
         select count(RES.ID_)
         <include refid="selectPlanItemInstancesByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectPlanItemInstancesByQueryCriteriaSql">
     from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
     <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
@@ -220,7 +220,8 @@
                 inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SUB_SCOPE_ID_ and A${index}.SCOPE_TYPE_ = 'cmmn'
             </when>
             <otherwise>
-                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.CASE_INST_ID_ = A${index}.SCOPE_ID_ and SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
+                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.CASE_INST_ID_ = A${index}.SCOPE_ID_ and
+                A${index}.SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
             </otherwise>
         </choose>
       </if>
@@ -236,7 +237,7 @@
             and RES.STAGE_INST_ID_ = #{stageInstanceId}
         </if>
         <if test="planItemInstanceId != null">
-            and RES.ID_ = #{planItemInstanceId}        
+            and RES.ID_ = #{planItemInstanceId}
         </if>
         <if test="elementId != null">
             and RES.ELEMENT_ID_ = #{elementId}
@@ -283,7 +284,7 @@
               and EXISTS (
                 select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
                 <if test="!queryVariableValue.local">
-                    and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn' 
+                    and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
                 </if>
                 <if test="queryVariableValue.local">
                     and RES.ID_ = SUB_SCOPE_ID_ and SCOPE_TYPE_ = 'cmmn'
@@ -364,9 +365,9 @@
         </choose>
       </foreach>
     </where>
-    
+
   </sql>
-  
+
   <sql id="variableOperator">
     <choose>
       <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
@@ -379,5 +380,5 @@
       <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
     </choose>
   </sql>
-  
+
 </mapper>

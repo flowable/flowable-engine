@@ -22,11 +22,11 @@ import org.activiti.engine.impl.pvm.PvmProcessDefinition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.rules.RulesAgendaFilter;
 import org.activiti.engine.impl.rules.RulesHelper;
-import org.drools.KnowledgeBase;
-import org.drools.runtime.StatefulKnowledgeSession;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 
 /**
  * activity implementation of the BPMN 2.0 business rule task.
@@ -51,8 +51,8 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
         PvmProcessDefinition processDefinition = activityExecution.getActivity().getProcessDefinition();
         String deploymentId = processDefinition.getDeploymentId();
 
-        KnowledgeBase knowledgeBase = RulesHelper.findKnowledgeBaseByDeploymentId(deploymentId);
-        StatefulKnowledgeSession ksession = knowledgeBase.newStatefulKnowledgeSession();
+        KieBase knowledgeBase = RulesHelper.findKnowledgeBaseByDeploymentId(deploymentId);
+        KieSession ksession = knowledgeBase.newKieSession();
 
         if (variablesInputExpressions != null) {
             Iterator<Expression> itVariable = variablesInputExpressions.iterator();
@@ -76,7 +76,7 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
             ksession.fireAllRules();
         }
 
-        Collection<Object> ruleOutputObjects = ksession.getObjects();
+        Collection<? extends Object> ruleOutputObjects = ksession.getObjects();
         if (ruleOutputObjects != null && !ruleOutputObjects.isEmpty()) {
             Collection<Object> outputVariables = new ArrayList<>();
             outputVariables.addAll(ruleOutputObjects);

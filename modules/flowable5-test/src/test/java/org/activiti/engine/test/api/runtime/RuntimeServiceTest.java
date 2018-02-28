@@ -13,8 +13,7 @@
 
 package org.activiti.engine.test.api.runtime;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -973,10 +972,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
-        catchException(runtimeService).getVariable(processInstance.getId(), "var1", String.class);
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> runtimeService.getVariable(processInstance.getId(), "var1", String.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     @Deployment(resources = {
@@ -1003,10 +1000,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
-        catchException(runtimeService).getVariableLocal(processInstance.getId(), "var1", String.class);
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> runtimeService.getVariableLocal(processInstance.getId(), "var1", String.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     // Test for https://activiti.atlassian.net/browse/ACT-2186

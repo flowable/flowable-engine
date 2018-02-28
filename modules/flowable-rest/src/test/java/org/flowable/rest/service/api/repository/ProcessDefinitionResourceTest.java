@@ -15,9 +15,12 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to single a Process Definition resource.
@@ -29,6 +32,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single process definition. GET repository/process-definitions/{processDefinitionResource}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetProcessDefinition() throws Exception {
 
@@ -58,6 +62,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single process definition with a graphical notation defined. GET repository/process-definitions/{processDefinitionResource}
      */
+    @Test
     @Deployment
     public void testGetProcessDefinitionWithGraphicalNotation() throws Exception {
 
@@ -88,6 +93,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting process-definition. GET repository/process-definitions/{processDefinitionId}
      */
+    @Test
     public void testGetUnexistingProcessDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
@@ -97,6 +103,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test suspending a process definition. POST repository/process-definitions/{processDefinitionId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testSuspendProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -122,6 +129,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test suspending a process definition on a certain date. POST repository/process-definitions/{processDefinitionId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testSuspendProcessDefinitionDelayed() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -165,6 +173,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test suspending already suspended process definition. POST repository/process-definitions/{processDefinitionId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testSuspendAlreadySuspendedProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -185,6 +194,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test activating a suspended process definition. POST repository/process-definitions/{processDefinitionId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testActivateProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -213,6 +223,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test activating a suspended process definition delayed. POST repository/process-definitions/{processDefinitionId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testActivateProcessDefinitionDelayed() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -259,6 +270,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test activating already active process definition. POST repository/process-definitions/{processDefinitionId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testActivateAlreadyActiveProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -278,6 +290,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
      * 
      * POST repository/process-definitions/{processDefinitionId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testIllegalAction() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -292,6 +305,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetProcessDefinitionResourceData() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -306,6 +320,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         assertTrue(content.contains("The One Task Process"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetProcessDefinitionModel() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -327,6 +342,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting model for an unexisting process-definition .
      */
+    @Test
     public void testGetModelForUnexistingProcessDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_MODEL, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
@@ -336,6 +352,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting resource content for an unexisting process-definition .
      */
+    @Test
     public void testGetResourceContentForUnexistingProcessDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_RESOURCE_CONTENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
@@ -345,6 +362,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test activating a suspended process definition delayed. POST repository/process-definitions/{processDefinitionId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testUpdateProcessDefinitionCategory() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();

@@ -18,6 +18,7 @@ import com.google.common.cache.LoadingCache;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +29,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
 import org.flowable.app.security.CookieConstants;
@@ -292,11 +292,12 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             cookieValue = cookieValue + "=";
         }
 
-        if (!Base64.isBase64(cookieValue.getBytes())) {
+        String cookieAsPlainText = null;
+        try {
+            cookieAsPlainText = new String(Base64.getDecoder().decode(cookieValue.getBytes()));
+        } catch (IllegalArgumentException e) {
             throw new InvalidCookieException("Cookie token was not Base64 encoded; value was '" + cookieValue + "'");
         }
-
-        String cookieAsPlainText = new String(Base64.decodeBase64(cookieValue.getBytes()));
 
         String[] tokens = StringUtils.delimitedListToStringArray(cookieAsPlainText, DELIMITER);
 

@@ -30,6 +30,8 @@ public class HttpRequest {
     protected boolean ignoreErrors;
     protected boolean saveRequest;
     protected boolean saveResponse;
+    protected boolean saveResponseTransient;
+    protected boolean saveResponseAsJson;
     protected String prefix;
 
     public String getMethod() {
@@ -118,6 +120,22 @@ public class HttpRequest {
 
     public void setSaveResponse(boolean saveResponse) {
         this.saveResponse = saveResponse;
+    }
+    
+    public boolean isSaveResponseTransient() {
+        return saveResponseTransient;
+    }
+
+    public void setSaveResponseTransient(boolean saveResponseTransient) {
+        this.saveResponseTransient = saveResponseTransient;
+    }
+    
+    public boolean isSaveResponseAsJson() {
+        return saveResponseAsJson;
+    }
+
+    public void setSaveResponseAsJson(boolean saveResponseAsJson) {
+        this.saveResponseAsJson = saveResponseAsJson;
     }
 
     public String getPrefix() {

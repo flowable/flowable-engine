@@ -10,18 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.standalone.escapeclause;
 
-import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+angular.module('flowableModeler').controller('FlowableHttpRequestMethodCtrl', [ '$scope', function($scope) {
 
-public abstract class AbstractEscapeClauseTestCase extends ResourceFlowableTestCase {
-
-    public AbstractEscapeClauseTestCase() {
-        this(null);
+    if ($scope.property.value == undefined && $scope.property.value == null)
+    {
+    	   $scope.property.value = 'GET';
     }
-
-    public AbstractEscapeClauseTestCase(String activitiConfigurationResource) {
-        super("org/flowable/standalone/escapeclause/flowable.cfg.xml");
-    }
-
-}
+        
+    $scope.httpRequestMethodChanged = function() {
+        	$scope.updatePropertyInModel($scope.property);
+    };
+}]);

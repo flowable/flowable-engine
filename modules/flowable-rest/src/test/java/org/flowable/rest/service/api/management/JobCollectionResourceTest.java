@@ -1,5 +1,9 @@
 package org.flowable.rest.service.api.management;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.Calendar;
 import java.util.Collections;
 
@@ -12,6 +16,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.
@@ -20,6 +25,7 @@ import org.flowable.rest.service.api.RestUrls;
  */
 public class JobCollectionResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/management/JobCollectionResourceTest.testTimerProcess.bpmn20.xml" })
     public void testGetJobs() throws Exception {
         Calendar hourAgo = Calendar.getInstance();

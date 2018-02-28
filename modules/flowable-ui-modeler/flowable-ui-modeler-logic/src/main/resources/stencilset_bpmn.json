@@ -548,7 +548,7 @@
     "name" : "httptaskrequestmethodpackage",
     "properties" : [ {
       "id" : "httptaskrequestmethod",
-      "type" : "String",
+      "type" : "flowable-http-request-method",
       "title" : "Request method",
       "value" : "",
       "description" : "Request method (For example - GET,POST,PUT etc).",
@@ -634,7 +634,30 @@
       "description" : "Flag to ignore exceptions.",
       "popular" : true
     } ]
-  }, {
+  }, 
+  {
+    "name" : "httptasksaveresponseparameterstransientpackage",
+    "properties" : [ {
+      "id" : "httptasksaveresponseparameterstransient",
+      "type" : "String",
+      "title" : "Save response as a transient variable",
+      "value" : "",
+      "description" : "Flag indicating to store the response variable(s) transient",
+      "popular" : true
+    } ]
+  }, 
+  {
+    "name" : "httptasksaveresponseasjsonpackage",
+    "properties" : [ {
+      "id" : "httptasksaveresponseasjson",
+      "type" : "String",
+      "title" : "Save response as JSON",
+      "value" : "",
+      "description" : "Flag indicating to store the response variable as a JSON variable instead of a String",
+      "popular" : true
+    } ]
+  },
+  {
       "name": "skipexpressionpackage",
       "properties": [
         {
@@ -1289,7 +1312,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n    \n\t<g id=\"sendTask\" transform=\"translate(4,3)\">\n\t\n\t<!-- path here -->\n\t\t<path oryx:anchors=\"top left\"\n\t\t\tstyle=\"fill:#16964d;stroke:none;\"\n     \t\td=\"m 16.704699,5.9229055 q 0.358098,0 0.608767,0.2506681 0.250669,0.250668 0.250669,0.6087677 0,0.3580997 -0.250669,0.6087677 -0.250669,0.2506679 -0.608767,0.2506679 -0.358098,0 -0.608767,-0.2506679 -0.250669,-0.250668 -0.250669,-0.6087677 0,-0.3580997 0.250669,-0.6087677 0.250669,-0.2506681 0.608767,-0.2506681 z m 2.578308,-2.0053502 q -2.229162,0 -3.854034,0.6759125 -1.624871,0.6759067 -3.227361,2.2694472 -0.716197,0.725146 -1.575633,1.7457293 L 7.2329969,8.7876913 Q 7.0897576,8.8055849 7.000233,8.9309334 L 4.9948821,12.368677 q -0.035811,0.06267 -0.035811,0.143242 0,0.107426 0.080572,0.205905 l 0.5729577,0.572957 q 0.125334,0.116384 0.2864786,0.07162 l 2.4708789,-0.760963 2.5156417,2.515645 -0.76096,2.470876 q -0.009,0.02687 -0.009,0.08057 0,0.125338 0.08058,0.205905 l 0.572957,0.572958 q 0.170096,0.152194 0.349146,0.04476 l 3.437744,-2.005351 q 0.125335,-0.08953 0.143239,-0.232763 l 0.17905,-3.392986 q 1.02058,-0.859435 1.745729,-1.575629 1.67411,-1.6830612 2.309735,-3.2049805 0.635625,-1.5219191 0.635625,-3.8585111 0,-0.1253369 -0.08505,-0.2148575 -0.08505,-0.089526 -0.201431,-0.089526 z \"\n     \t/>\n\t</g>\n\t\n\t<g id=\"parallel\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" d=\"M46 70 v8 M50 70 v8 M54 70 v8\" stroke-width=\"2\" />\n\t</g>\n\t\n\t<g id=\"sequential\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M46,76h10M46,72h10 M46,68h10\"/>\n\t</g>\n\n\t<g id=\"compensation\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" d=\"M 62 74 L 66 70 L 66 78 L 62 74 L 62 70 L 58 74 L 62 78 L 62 74\" stroke-width=\"1\" />\n\t</g>\n  </g>\n</svg>",
     "icon" : "activity/list/type.http.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "asynchronousdefinitionpackage", "exclusivedefinitionpackage", "executionlistenerspackage", "multiinstance_typepackage", "multiinstance_cardinalitypackage", "multiinstance_collectionpackage", "multiinstance_variablepackage", "multiinstance_conditionpackage", "isforcompensationpackage", "httptaskrequestmethodpackage", "httptaskrequesturlpackage", "httptaskrequestheaderspackage", "httptaskrequestbodypackage", "httptaskrequesttimeoutpackage", "httptaskdisallowredirectspackage", "httptaskfailstatuscodespackage", "httptaskhandlestatuscodespackage", "httptaskignoreexceptionpackage", "httptaskresponsevariablenamepackage", "httptasksaverequestvariablespackage", "httptasksaveresponseparameterspackage", "httptaskresultvariableprefixpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "asynchronousdefinitionpackage", "exclusivedefinitionpackage", "executionlistenerspackage", "multiinstance_typepackage", "multiinstance_cardinalitypackage", "multiinstance_collectionpackage", "multiinstance_variablepackage", "multiinstance_conditionpackage", "isforcompensationpackage", "httptaskrequestmethodpackage", "httptaskrequesturlpackage", "httptaskrequestheaderspackage", "httptaskrequestbodypackage", "httptaskrequesttimeoutpackage", "httptaskdisallowredirectspackage", "httptaskfailstatuscodespackage", "httptaskhandlestatuscodespackage", "httptaskignoreexceptionpackage", "httptaskresponsevariablenamepackage", "httptasksaverequestvariablespackage", "httptasksaveresponseparameterspackage", "httptaskresultvariableprefixpackage", "httptasksaveresponseparameterstransientpackage", "httptasksaveresponseasjsonpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "sequence_start", "sequence_end", "ActivitiesMorph", "all" ]
   }, {
