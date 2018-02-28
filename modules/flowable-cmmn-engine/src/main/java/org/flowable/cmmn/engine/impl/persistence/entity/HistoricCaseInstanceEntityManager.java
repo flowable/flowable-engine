@@ -28,7 +28,10 @@ public interface HistoricCaseInstanceEntityManager extends EntityManager<Histori
     List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId);
     
     List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query);
-    
+
+    @SuppressWarnings("unchecked")
+    List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQuery query);
+
     long countByCriteria(HistoricCaseInstanceQuery query);
     
 }
