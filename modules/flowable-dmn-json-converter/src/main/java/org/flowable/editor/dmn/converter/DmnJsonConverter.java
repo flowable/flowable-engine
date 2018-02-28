@@ -199,7 +199,7 @@ public class DmnJsonConverter {
             }
         }
     }
-    
+
     protected void processInputExpressions(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, DecisionTable decisionTable) {
         // input expressions
         JsonNode inputExpressions = modelNode.get("inputExpressions");
@@ -242,10 +242,10 @@ public class DmnJsonConverter {
             }
         }
     }
-    
-    protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap, 
-                    List<String> complexExpressionIds, DecisionTable decisionTable) {
-        
+
+    protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap,
+                                            List<String> complexExpressionIds, DecisionTable decisionTable) {
+
         // output expressions
         JsonNode outputExpressions = modelNode.get("outputExpressions");
 
@@ -289,9 +289,9 @@ public class DmnJsonConverter {
             }
         }
     }
-    
-    protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap, 
-                    List<String> complexExpressionIds, DecisionTable decisionTable) {
+
+    protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap,
+                                List<String> complexExpressionIds, DecisionTable decisionTable) {
         // rules
         JsonNode rules = modelNode.get("rules");
 
@@ -332,16 +332,12 @@ public class DmnJsonConverter {
                     if ("-".equals(expressionValue) || expressionValue.startsWith("${") || expressionValue.startsWith("#{")) {
                         inputEntry.setText(expressionValue);
                     } else if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                        && StringUtils.isNotEmpty(expressionValue) && "IN".equals(operatorValue)) {
+                        && StringUtils.isNotEmpty(expressionValue)) {
 
-                        // wrap in built in contains function
-                        StringBuilder stringBuilder = new StringBuilder("${collection:contains(");
-                        stringBuilder.append(ruleInputClauseContainer.getInputClause().getInputExpression().getText());
-                        stringBuilder.append(", '");
-                        stringBuilder.append(expressionValue);
-                        stringBuilder.append("')}");
+                        String inputExpressionVariable = ruleInputClauseContainer.getInputClause().getInputExpression().getText();
+                        String formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
 
-                        inputEntry.setText(stringBuilder.toString());
+                        inputEntry.setText(formattedCollectionExpression);
                     } else {
                         StringBuilder stringBuilder = new StringBuilder();
                         if (StringUtils.isNotEmpty(operatorValue)) {

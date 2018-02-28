@@ -21,7 +21,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -194,5 +197,86 @@ public class DmnJsonConverterUtil {
             }
         }
         return expressionType;
+    }
+
+    public static String formatCollectionExpression(String containsOperator, String inputVariable, String expressionValue) {
+        String containsPrefixAndMethod = getDMNContainsExpressionMethod(containsOperator);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (containsPrefixAndMethod != null) {
+            stringBuilder.append("${");
+            stringBuilder.append(containsPrefixAndMethod);
+            stringBuilder.append("(");
+            stringBuilder.append(inputVariable);
+            stringBuilder.append(", ");
+
+            String formattedExpressionValue = formatCollectionExpressionValue(expressionValue);
+            stringBuilder.append(formattedExpressionValue);
+
+            stringBuilder.append(")}");
+        } else {
+            stringBuilder.append(containsOperator);
+            stringBuilder.append(" ");
+            stringBuilder.append(formatCollectionExpressionValue(expressionValue));
+        }
+
+       return stringBuilder.toString();
+
+    }
+
+    protected static String getDMNContainsExpressionMethod(String containsOperator) {
+        if (StringUtils.isEmpty(containsOperator)) {
+            throw new IllegalArgumentException("containsOperator must be provided");
+        }
+
+        String containsPrefixAndMethod;
+
+        switch (containsOperator) {
+            case "IN":
+                containsPrefixAndMethod = "collection:contains";
+                break;
+            case "NOT IN":
+                containsPrefixAndMethod = "collection:notContains";
+                break;
+            case "ANY":
+                containsPrefixAndMethod = "collection:containsAny";
+                break;
+            default:
+                containsPrefixAndMethod = null;
+        }
+
+        return containsPrefixAndMethod;
+    }
+
+    protected static String formatCollectionExpressionValue(String expressionValue) {
+        if (StringUtils.isEmpty(expressionValue)) {
+            return  "\"\"";
+        }
+
+        StringBuilder formattedExpressionValue = new StringBuilder();
+
+        // if multiple values
+        if (expressionValue.contains(",")) {
+            formattedExpressionValue.append("'");
+
+            List<String> formattedValues = split(expressionValue, true);
+            formattedExpressionValue.append(StringUtils.join(formattedValues, ','));
+        } else {
+            String formattedValue = expressionValue;
+            formattedExpressionValue.append(formattedValue);
+        }
+
+        // if multiple values
+        if (expressionValue.contains(",")) {
+            formattedExpressionValue.append("'");
+        }
+
+        return formattedExpressionValue.toString();
+    }
+
+    protected static List<String> split(String str, boolean multipleValues) {
+        return Stream.of(str.split(","))
+            .map(elem -> elem.trim())
+            .collect(Collectors.toList());
     }
 }

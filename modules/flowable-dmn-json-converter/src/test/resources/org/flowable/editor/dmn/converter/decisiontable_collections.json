@@ -29,8 +29,33 @@
   ],
   "rules": [
     {
+      "1_operator": "NOT IN",
+      "1_expression": "\"testValue\"",
+      "2": "result 1"
+    },
+    {
       "1_operator": "IN",
-      "1_expression": "testValue",
+      "1_expression": "\"testValue\"",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "IN",
+      "1_expression": "testVar1, testVar2",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "IN",
+      "1_expression": "\"testValue1\", \"testValue2\"",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "IN",
+      "1_expression": "10, 20",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "IN",
+      "1_expression": "10",
       "2": "result 1"
     },
     {
@@ -39,13 +64,38 @@
       "2": "result 2"
     },
     {
+      "1_operator": "NOT IN",
+      "1_expression": "\"testValue\"",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "NOT IN",
+      "1_expression": "-",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "ANY",
+      "1_expression": "\"testValue\"",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "ANY",
+      "1_expression": "-",
+      "2": "result 2"
+    },
+    {
       "1_operator": "==",
-      "1_expression": "testValue",
+      "1_expression": "\"testValue\"",
+      "2": "result 3"
+    },
+    {
+      "1_operator": "==",
+      "1_expression": "testCollection",
       "2": "result 3"
     },
     {
       "1_operator": "!=",
-      "1_expression": "testValue",
+      "1_expression": "\"testValue\"",
       "2": "result 4"
     }
   ]
