@@ -425,5 +425,13 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public Integer getCaseVariablesLimit() {
         return caseVariablesLimit;
     }
-    
+
+    public String getMssqlOrDB2OrderBy() {
+        String specialOrderBy = super.getOrderByColumns();
+        if (specialOrderBy != null && specialOrderBy.length() > 0) {
+            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
+        }
+        return specialOrderBy;
+    }
+
 }
