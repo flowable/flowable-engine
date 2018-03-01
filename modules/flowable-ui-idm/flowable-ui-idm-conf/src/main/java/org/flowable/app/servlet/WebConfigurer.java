@@ -109,11 +109,11 @@ public class WebConfigurer implements ServletContextListener {
         LOGGER.debug("Registering Flowable OAuth2 API");
         AnnotationConfigWebApplicationContext oAuth2DispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
         oAuth2DispatcherServletConfiguration.setParent(rootContext);
-        oAuth2DispatcherServletConfiguration.register(OAuth2DispatcherServletConfiguration.class);
+        oAuth2DispatcherServletConfiguration.register(OAuthDispatcherServletConfiguration.class);
 
         ServletRegistration.Dynamic oAuth2DispatcherServlet = servletContext.addServlet("oAuth2Dispatcher",
                 new DispatcherServlet(oAuth2DispatcherServletConfiguration));
-        oAuth2DispatcherServlet.addMapping("/oauth2/*");
+        oAuth2DispatcherServlet.addMapping("/oauth/*");
         oAuth2DispatcherServlet.setLoadOnStartup(1);
         oAuth2DispatcherServlet.setAsyncSupported(true);
     }

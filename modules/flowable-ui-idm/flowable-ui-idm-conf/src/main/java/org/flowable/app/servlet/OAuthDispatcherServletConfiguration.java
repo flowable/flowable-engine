@@ -29,9 +29,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.util.List;
 
 @Configuration
-@ComponentScan(value = { "org.flowable.app.oauth2"})
+@ComponentScan(value = { "org.flowable.app.oauth", "org.flowable.app.rest.oauth"})
 @EnableAsync
-public class OAuth2DispatcherServletConfiguration extends WebMvcConfigurationSupport {
+public class OAuthDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
     protected ObjectMapper objectMapper;

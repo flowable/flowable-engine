@@ -3,9 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.flowable.idm.spring.authentication;
-
-import javax.servlet.http.HttpServletRequest;
+package org.flowable.app.security;
 
 /**
  *
@@ -13,6 +11,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface OAuth2AuthorizationRequestor {
 
-    public String buildAuthorizationURL(HttpServletRequest request, String config);
+    public String getName();
+    
+    public boolean canAuthorize(String id);
+
+    public String buildAuthorizationURL();
 
 }
