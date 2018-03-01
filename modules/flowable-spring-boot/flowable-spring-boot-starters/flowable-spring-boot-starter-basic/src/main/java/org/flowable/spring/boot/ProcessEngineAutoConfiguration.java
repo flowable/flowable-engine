@@ -26,15 +26,20 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringAsyncExecutor;
 import org.flowable.spring.SpringCallerRunsRejectedJobsHandler;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -47,27 +52,35 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Filip Hrisafov
  * @author Javier Casal
  */
-public abstract class AbstractProcessEngineAutoConfiguration
-        extends AbstractProcessEngineConfiguration {
+@Configuration
+@EnableConfigurationProperties(FlowableProperties.class)
+@AutoConfigureAfter({
+    FlowableTransactionAutoConfiguration.class
+})
+public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
 
     @Autowired(required = false)
     private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
 
-    public AbstractProcessEngineAutoConfiguration(FlowableProperties flowableProperties) {
+    public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties) {
         super(flowableProperties);
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public SpringAsyncExecutor springAsyncExecutor(TaskExecutor taskExecutor) {
         return new SpringAsyncExecutor(taskExecutor, springRejectedJobsHandler());
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public SpringRejectedJobsHandler springRejectedJobsHandler() {
         return new SpringCallerRunsRejectedJobsHandler();
     }
 
-    protected SpringProcessEngineConfiguration baseSpringProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager, SpringAsyncExecutor springAsyncExecutor) throws IOException {
+    @Bean
+    @ConditionalOnMissingBean
+    public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager, SpringAsyncExecutor springAsyncExecutor) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
@@ -118,58 +131,52 @@ public abstract class AbstractProcessEngineAutoConfiguration
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public RuntimeService runtimeServiceBean(ProcessEngine processEngine) {
-        return super.runtimeServiceBean(processEngine);
+        return processEngine.getRuntimeService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public RepositoryService repositoryServiceBean(ProcessEngine processEngine) {
-        return super.repositoryServiceBean(processEngine);
+        return processEngine.getRepositoryService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public TaskService taskServiceBean(ProcessEngine processEngine) {
-        return super.taskServiceBean(processEngine);
+        return processEngine.getTaskService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public HistoryService historyServiceBean(ProcessEngine processEngine) {
-        return super.historyServiceBean(processEngine);
+        return processEngine.getHistoryService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public ManagementService managementServiceBeanBean(ProcessEngine processEngine) {
-        return super.managementServiceBeanBean(processEngine);
+        return processEngine.getManagementService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public FormService formServiceBean(ProcessEngine processEngine) {
-        return super.formServiceBean(processEngine);
+        return processEngine.getFormService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public IdentityService identityServiceBean(ProcessEngine processEngine) {
-        return super.identityServiceBean(processEngine);
+        return processEngine.getIdentityService();
     }
-    
+
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public IdmIdentityService idmIdentityServiceBean(ProcessEngine processEngine) {
-        return super.idmIdentityServiceBean(processEngine);
+        //TODO This needs to go into it's own Idm engine configuration
+        return ((IdmEngineConfiguration) processEngine.getProcessEngineConfiguration().getEngineConfigurations()
+            .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
     @Bean
