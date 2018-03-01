@@ -10,13 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.spring.boot;
+package org.flowable.spring.boot.form;
 
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.FlowableProperties;
+import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;

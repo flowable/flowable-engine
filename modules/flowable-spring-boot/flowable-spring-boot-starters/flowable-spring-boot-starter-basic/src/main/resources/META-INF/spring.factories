@@ -6,6 +6,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.flowable.spring.boot.RestApiAutoConfiguration,\
     org.flowable.spring.boot.ProcessEngineAutoConfiguration,\
     org.flowable.spring.boot.FlowableTransactionAutoConfiguration,\
-    org.flowable.spring.boot.FormEngineAutoConfiguration,\
-    org.flowable.spring.boot.FormEngineServicesAutoConfiguration,\
+    org.flowable.spring.boot.form.FormEngineAutoConfiguration,\
+    org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.SecurityAutoConfiguration

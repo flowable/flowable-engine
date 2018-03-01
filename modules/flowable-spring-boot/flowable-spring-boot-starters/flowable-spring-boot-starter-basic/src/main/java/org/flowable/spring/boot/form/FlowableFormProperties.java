@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.spring.boot;
+package org.flowable.spring.boot.form;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
