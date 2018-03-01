@@ -18,7 +18,6 @@ import java.util.List;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeAliasRegistry;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.AbstractEngineConfigurator;
 import org.flowable.engine.common.EngineDeployer;
@@ -28,6 +27,7 @@ import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
+import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
 import org.flowable.idm.engine.impl.persistence.ByteArrayRefTypeHandler;
 import org.flowable.idm.engine.impl.persistence.entity.ByteArrayRef;
 

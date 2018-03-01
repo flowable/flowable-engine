@@ -23,6 +23,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceMatcher;
+import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByScopeIdAndTypeMatcher;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByTaskIdMatcher;
 
 /**
@@ -30,9 +31,9 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cache
  */
 public class MybatisIdentityLinkDataManager extends AbstractDataManager<IdentityLinkEntity> implements IdentityLinkDataManager {
 
-    protected CachedEntityMatcher<IdentityLinkEntity> identityLinkByProcessInstanceMatcher = new IdentityLinksByProcessInstanceMatcher();
-    
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByTaskIdMatcher = new IdentityLinksByTaskIdMatcher();
+    protected CachedEntityMatcher<IdentityLinkEntity> identityLinkByProcessInstanceMatcher = new IdentityLinksByProcessInstanceMatcher();
+    protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByScopeIdAndTypeMatcher = new IdentityLinksByScopeIdAndTypeMatcher();
 
     @Override
     public Class<? extends IdentityLinkEntity> getManagedEntityClass() {
@@ -65,6 +66,23 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
         }
         
         return getList("selectIdentityLinksByProcessInstance", processInstanceId, identityLinkByProcessInstanceMatcher, true);
+    }
+    
+    @Override
+    public List<IdentityLinkEntity> findIdentityLinksByScopeIdAndType(String scopeId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeId", scopeId);
+        parameters.put("scopeType", scopeType);
+        return getList("selectIdentityLinksByScopeIdAndType", parameters, identityLinksByScopeIdAndTypeMatcher, true);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<IdentityLinkEntity> findIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeDefinitionId", scopeDefinitionId);
+        parameters.put("scopeType", scopeType);
+        return getDbSqlSession().selectList("selectIdentityLinksByScopeDefinitionAndType", parameters);
     }
 
     @Override
@@ -104,7 +122,30 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
         parameters.put("groupId", groupId);
         return getDbSqlSession().selectList("selectIdentityLinkByProcessDefinitionUserAndGroup", parameters);
     }
-    
+
+
+    @SuppressWarnings("unchecked")
+    public List<IdentityLinkEntity> findIdentityLinkByScopeIdScopeTypeUserGroupAndType(String scopeId, String scopeType, String userId, String groupId, String type) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeId", scopeId);
+        parameters.put("scopeType", scopeType);
+        parameters.put("userId", userId);
+        parameters.put("groupId", groupId);
+        parameters.put("type", type);
+        return getDbSqlSession().selectList("selectIdentityLinkByScopeIdScopeTypeUserGroupAndType", parameters);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<IdentityLinkEntity> findIdentityLinkByScopeDefinitionScopeTypeUserAndGroup(String scopeDefinitionId, String scopeType, String userId, String groupId) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeDefinitionId", scopeDefinitionId);
+        parameters.put("scopeType", scopeType);
+        parameters.put("userId", userId);
+        parameters.put("groupId", groupId);
+        return getDbSqlSession().selectList("selectIdentityLinkByScopeDefinitionScopeTypeUserAndGroup", parameters);
+    }
+
     @Override
     public void deleteIdentityLinksByTaskId(String taskId) {
         DbSqlSession dbSqlSession = getDbSqlSession();
@@ -128,6 +169,14 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
         } else {
             bulkDelete("deleteIdentityLinksByProcessInstanceId", identityLinkByProcessInstanceMatcher, processInstanceId);
         }
+    }
+
+    @Override
+    public void deleteIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeId", scopeId);
+        parameters.put("scopeType", scopeType);
+        getDbSqlSession().delete("deleteIdentityLinksByScopeIdAndScopeType", parameters, IdentityLinkEntityImpl.class);
     }
 
 }

@@ -27,6 +27,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataM
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -89,10 +90,13 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
         CaseInstanceEntityManager caseInstanceEntityManager = getCaseInstanceEntityManager();
         List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(new CaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
         for (CaseInstance caseInstance : caseInstances) {
-            caseInstanceEntityManager.delete(caseInstance.getId(), null);
+            caseInstanceEntityManager.delete(caseInstance.getId(), true, null);
         }
         
         if (cascadeHistory) {
+            
+            HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = getHistoricIdentityLinkEntityManager();
+            historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(caseDefinitionId, VariableScopeType.CMMN);
             
             // Historic mile stone
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = getHistoricMilestoneInstanceEntityManager();

@@ -33,8 +33,8 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
 
     long countByCriteria(CaseInstanceQuery query);
 
-    void delete(String caseInstanceId, String deleteReason);
-
+    void delete(String caseInstanceId, boolean cascade, String deleteReason);
+    
     void updateLockTime(String caseInstanceId);
 
     void clearLockTime(String caseInstanceId);
