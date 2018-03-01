@@ -209,6 +209,7 @@
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         <include refid="commonSelectCaseInstancesByQueryCriteriaSql" />
         ${orderBy}
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
@@ -304,6 +305,7 @@
 
     <sql id="selectCaseInstancesWithVariablesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         <if test="includeCaseVariables">
             left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.SCOPE_ID_ and VAR.TASK_ID_ is null and
             VAR.SCOPE_TYPE_= 'cmmn' and VAR.SUB_SCOPE_ID_ is null
@@ -312,9 +314,6 @@
     </sql>
 
     <sql id="commonSelectCaseInstancesByQueryCriteriaSql">
-        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null">
-            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
-        </if>
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
             <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
                 inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SCOPE_ID_ and
@@ -335,7 +334,7 @@
                 RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
             <if test="caseDefinitionKey != null">
-                and CASE_DEF.KEY_ = #{caseDefinitionId}
+                and CASE_DEF.KEY_ = #{caseDefinitionKey}
             </if>
             <if test="caseDefinitionIds != null">
                 and RES.CASE_DEF_ID_ IN
@@ -381,6 +380,9 @@
             </if>
             <if test="tenantId != null">
                 and RES.TENANT_ID_ = #{tenantId}
+            </if>
+            <if test="tenantIdLike != null">
+                and RES.TENANT_ID_ like #{tenantIdLike}
             </if>
             <if test="withoutTenantId">
                 and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''

@@ -36,6 +36,7 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -189,9 +190,15 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         variableInstance.setTaskId(id);
-        variableInstance.setExecutionId(executionId);
-        variableInstance.setProcessInstanceId(processInstanceId);
-        variableInstance.setProcessDefinitionId(processDefinitionId);
+        if (VariableScopeType.CMMN.equals(this.scopeType)) {
+            variableInstance.setScopeId(this.scopeId);
+            variableInstance.setScopeType(this.scopeType);
+            variableInstance.setSubScopeId(this.subScopeId);
+        } else {
+            variableInstance.setExecutionId(this.executionId);
+            variableInstance.setProcessInstanceId(this.processInstanceId);
+            variableInstance.setProcessDefinitionId(this.processDefinitionId);
+        }
     }
 
     @Override

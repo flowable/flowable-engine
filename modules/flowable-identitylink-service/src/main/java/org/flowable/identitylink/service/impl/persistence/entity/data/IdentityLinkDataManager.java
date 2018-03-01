@@ -27,13 +27,23 @@ public interface IdentityLinkDataManager extends DataManager<IdentityLinkEntity>
     List<IdentityLinkEntity> findIdentityLinksByProcessInstanceId(String processInstanceId);
 
     List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId);
+    
+    List<IdentityLinkEntity> findIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
+    
+    List<IdentityLinkEntity> findIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
 
     List<IdentityLinkEntity> findIdentityLinkByTaskUserGroupAndType(String taskId, String userId, String groupId, String type);
 
     List<IdentityLinkEntity> findIdentityLinkByProcessInstanceUserGroupAndType(String processInstanceId, String userId, String groupId, String type);
 
     List<IdentityLinkEntity> findIdentityLinkByProcessDefinitionUserAndGroup(String processDefinitionId, String userId, String groupId);
+    
+    List<IdentityLinkEntity> findIdentityLinkByScopeIdScopeTypeUserGroupAndType(String scopeId, String scopeType, String userId, String groupId, String type);
+
+    List<IdentityLinkEntity> findIdentityLinkByScopeDefinitionScopeTypeUserAndGroup(String scopeDefinitionId, String scopeType, String userId, String groupId);
 
     void deleteIdentityLinksByProcDef(String processDefId);
+    
+    void deleteIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
 
 }

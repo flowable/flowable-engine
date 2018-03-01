@@ -25,7 +25,11 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanc
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -90,9 +94,11 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
             List<HistoricMilestoneInstance> historicMilestoneInstances = historicMilestoneInstanceEntityManager
                 .findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseInstanceId(historicCaseInstance.getId()));
-           for (HistoricMilestoneInstance historicMilestoneInstance : historicMilestoneInstances) {
-               historicMilestoneInstanceEntityManager.delete(historicMilestoneInstance.getId());
-           }
+            for (HistoricMilestoneInstance historicMilestoneInstance : historicMilestoneInstances) {
+                historicMilestoneInstanceEntityManager.delete(historicMilestoneInstance.getId());
+            }
+            
+            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), VariableScopeType.CMMN);
             
             if (historicCaseInstance != null) {
                 historicCaseInstanceEntityManager.delete(historicCaseInstance);
@@ -104,6 +110,32 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             for (HistoricCaseInstance child : selectList) {
                 recordCaseInstanceDeleted(child.getId());
             }
+        }
+    }
+    
+    @Override
+    public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE && (identityLink.getScopeId() != null || identityLink.getTaskId() != null)) {
+            HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+            HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
+            historicIdentityLinkEntity.setId(identityLink.getId());
+            historicIdentityLinkEntity.setGroupId(identityLink.getGroupId());
+            historicIdentityLinkEntity.setScopeDefinitionId(identityLink.getScopeDefinitionId());
+            historicIdentityLinkEntity.setScopeId(identityLink.getScopeId());
+            if (identityLink.getScopeId() != null) {
+                historicIdentityLinkEntity.setScopeType(VariableScopeType.CMMN);
+            }
+            historicIdentityLinkEntity.setTaskId(identityLink.getTaskId());
+            historicIdentityLinkEntity.setType(identityLink.getType());
+            historicIdentityLinkEntity.setUserId(identityLink.getUserId());
+            historicIdentityLinkService.insertHistoricIdentityLink(historicIdentityLinkEntity, false);
+        }
+    }
+    
+    @Override
+    public void recordIdentityLinkDeleted(String identityLinkId) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLinkId);
         }
     }
 

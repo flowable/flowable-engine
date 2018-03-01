@@ -31,6 +31,7 @@ public class HistoricVariableInstanceQueryProperty implements QueryProperty {
     private static final Map<String, HistoricVariableInstanceQueryProperty> properties = new HashMap<>();
 
     public static final HistoricVariableInstanceQueryProperty PROCESS_INSTANCE_ID = new HistoricVariableInstanceQueryProperty("PROC_INST_ID_");
+    public static final HistoricVariableInstanceQueryProperty SCOPE_ID = new HistoricVariableInstanceQueryProperty("SCOPE_ID_");
     public static final HistoricVariableInstanceQueryProperty VARIABLE_NAME = new HistoricVariableInstanceQueryProperty("NAME_");
 
     private String name;
