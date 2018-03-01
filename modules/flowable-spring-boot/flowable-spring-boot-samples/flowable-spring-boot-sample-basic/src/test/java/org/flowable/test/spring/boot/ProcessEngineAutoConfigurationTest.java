@@ -5,7 +5,8 @@ import java.util.List;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -19,14 +20,16 @@ public class ProcessEngineAutoConfigurationTest {
     @Test
     public void processEngineWithBasicDataSource() throws Exception {
         AnnotationConfigApplicationContext context = this.context(
-                DataSourceAutoConfiguration.class, DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class);
+                DataSourceAutoConfiguration.class, FlowableTransactionAutoConfiguration.class,
+                ProcessEngineAutoConfiguration.class);
         Assert.assertNotNull("the processEngine should not be null!", context.getBean(ProcessEngine.class));
     }
 
     @Test
     public void launchProcessDefinition() throws Exception {
         AnnotationConfigApplicationContext applicationContext = this.context(
-                DataSourceAutoConfiguration.class, DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class);
+                DataSourceAutoConfiguration.class, FlowableTransactionAutoConfiguration.class,
+                ProcessEngineAutoConfiguration.class);
         RepositoryService repositoryService = applicationContext.getBean(RepositoryService.class);
         Assert.assertNotNull("we should have a default repositoryService included", repositoryService);
         Assert.assertEquals(2, repositoryService.createProcessDefinitionQuery().count());

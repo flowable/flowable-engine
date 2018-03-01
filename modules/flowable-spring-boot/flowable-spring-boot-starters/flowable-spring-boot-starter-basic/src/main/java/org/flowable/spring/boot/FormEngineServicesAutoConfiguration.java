@@ -34,8 +34,7 @@ import org.springframework.context.annotation.Configuration;
 })
 @AutoConfigureAfter({
     FormEngineAutoConfiguration.class,
-    DataSourceProcessEngineAutoConfiguration.class,
-    JpaProcessEngineAutoConfiguration.class
+    ProcessEngineAutoConfiguration.class
 })
 public class FormEngineServicesAutoConfiguration {
 

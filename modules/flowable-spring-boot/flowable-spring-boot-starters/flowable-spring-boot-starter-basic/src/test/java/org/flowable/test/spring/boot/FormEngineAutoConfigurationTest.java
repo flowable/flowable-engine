@@ -9,10 +9,10 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.FormEngineAutoConfiguration;
 import org.flowable.spring.boot.FormEngineServicesAutoConfiguration;
-import org.flowable.spring.boot.JpaProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -53,9 +53,9 @@ public class FormEngineAutoConfigurationTest {
             DataSourceAutoConfiguration.class,
             DataSourceTransactionManagerAutoConfiguration.class,
             FormEngineAutoConfiguration.class,
-            DataSourceProcessEngineAutoConfiguration.class,
             HibernateJpaAutoConfiguration.class,
-            JpaProcessEngineAutoConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class,
             FormEngineServicesAutoConfiguration.class
         );
 

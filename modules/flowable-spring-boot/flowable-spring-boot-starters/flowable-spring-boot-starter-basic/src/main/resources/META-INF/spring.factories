@@ -2,10 +2,10 @@
 # Flowable auto-configurations
 
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-    org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration,\
     org.flowable.spring.boot.EndpointAutoConfiguration,\
     org.flowable.spring.boot.RestApiAutoConfiguration,\
-    org.flowable.spring.boot.JpaProcessEngineAutoConfiguration,\
+    org.flowable.spring.boot.ProcessEngineAutoConfiguration,\
+    org.flowable.spring.boot.FlowableTransactionAutoConfiguration,\
     org.flowable.spring.boot.FormEngineAutoConfiguration,\
     org.flowable.spring.boot.FormEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.SecurityAutoConfiguration
