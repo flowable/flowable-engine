@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,12 +55,12 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     protected DataManager<CaseInstanceEntity> getDataManager() {
         return caseInstanceDataManager;
     }
-    
+
     @Override
     public CaseInstanceQuery createCaseInstanceQuery() {
         return new CaseInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }
-    
+
     @Override
     public List<CaseInstanceEntity> findCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
         return caseInstanceDataManager.findCaseInstancesByCaseDefinitionId(caseDefinitionId);
@@ -72,30 +72,36 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     }
 
     @Override
+    public List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQuery query) {
+        return caseInstanceDataManager.findWithVariablesByCriteria((CaseInstanceQueryImpl) query);
+    }
+
+    @Override
     public long countByCriteria(CaseInstanceQuery query) {
         return caseInstanceDataManager.countByCriteria((CaseInstanceQueryImpl) query);
     }
-    
+
     @Override
-    public void delete(String caseInstanceId, String deleteReason) {
+    public void delete(String caseInstanceId, boolean cascade, String deleteReason) {
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
         // Variables
         getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
+        getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         
         // Tasks
         TaskEntityManager taskEntityManager = getTaskEntityManager();
         List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         for (TaskEntity taskEntity : taskEntities) {
-            TaskHelper.deleteTask(taskEntity, deleteReason, false, true);
+            TaskHelper.deleteTask(taskEntity, deleteReason, cascade, true);
         }
-        
+
         // Sentry part instances
         getSentryPartInstanceEntityManager().deleteByCaseInstanceId(caseInstanceId);
 
         // Runtime milestones
         getMilestoneInstanceEntityManager().deleteByCaseInstanceId(caseInstanceId);
-        
+
         // Plan item instances
         PlanItemInstanceEntityManager planItemInstanceEntityManager = getPlanItemInstanceEntityManager();
         // Plan item instances are removed per stage, in reversed order
@@ -105,7 +111,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
             planItemInstanceEntityManager.deleteByStageInstanceId(stagePlanItemInstances.get(i).getId());
         }
         planItemInstanceEntityManager.deleteByCaseInstanceId(caseInstanceId); // root plan item instances
-        
+
         // Jobs have dependencies (byte array refs that need to be deleted, so no immediate delete for the moment)
         JobEntityManager jobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
         List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(new JobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
@@ -131,7 +137,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         // Actual case instance
         delete(caseInstanceEntity);
     }
-    
+
     protected void collectStagePlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer, ArrayList<PlanItemInstanceEntity> stagePlanItemInstanceEntities) {
         for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceContainer.getChildPlanItemInstances()) {
             if (planItemInstanceEntity.isStage()) {
@@ -140,7 +146,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
             }
         }
     }
-    
+
     @Override
     public void updateLockTime(String caseInstanceId) {
         Date expirationTime = getCmmnEngineConfiguration().getClock().getCurrentTime();
@@ -150,10 +156,10 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         lockCal.setTime(expirationTime);
         lockCal.add(Calendar.MILLISECOND, lockMillis);
         Date lockDate = lockCal.getTime();
-        
+
         caseInstanceDataManager.updateLockTime(caseInstanceId, lockDate, expirationTime);
     }
-    
+
     @Override
     public void clearLockTime(String caseInstanceId) {
         caseInstanceDataManager.clearLockTime(caseInstanceId);

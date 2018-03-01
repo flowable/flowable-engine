@@ -265,10 +265,11 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         if (!xmlImporterMap.containsKey(theImport.getNamespace())) {
 
             if (theImport.getImportType().equals("http://schemas.xmlsoap.org/wsdl/")) {
-                Class<?> wsdlImporterClass;
                 try {
-                    wsdlImporterClass = Class.forName("org.flowable.engine.impl.webservice.CxfWSDLImporter", true, Thread.currentThread().getContextClassLoader());
-                    XMLImporter importerInstance = (XMLImporter) wsdlImporterClass.newInstance();
+                    ProcessEngineConfigurationImpl processEngineConfig = CommandContextUtil.getProcessEngineConfiguration();
+                    XMLImporter importerInstance = processEngineConfig.getWsdlImporterFactory()
+                            .createXMLImporter(theImport);
+
                     xmlImporterMap.put(theImport.getNamespace(), importerInstance);
                     importerInstance.importFrom(theImport, sourceSystemId);
 
@@ -276,9 +277,8 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
                     wsServiceMap.putAll(importerInstance.getServices());
                     wsOperationMap.putAll(importerInstance.getOperations());
 
-                } catch (ClassNotFoundException e) {
-                    throw new FlowableException("Could not find importer class for type " + theImport.getImportType(),
-                            e);
+                } catch (FlowableException e) {
+                    throw e;
                 } catch (Exception e) {
                     throw new FlowableException(String.format("Error importing '%s' as '%s'", theImport.getLocation(),
                             theImport.getImportType()), e);

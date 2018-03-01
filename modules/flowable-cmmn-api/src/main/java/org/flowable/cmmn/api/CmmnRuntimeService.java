@@ -12,12 +12,16 @@
  */
 package org.flowable.cmmn.api;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Joram Barrez
@@ -50,18 +54,92 @@ public interface CmmnRuntimeService {
     
     Object getLocalVariable(String planItemInstanceId, String variableName);
     
+    /**
+     * Check whether or not this case instance has variable set with the given name, Searching for the variable is done in all scopes that are visible to the given case instance.
+     */
+    boolean hasVariable(String caseInstanceId, String variableName);
+    
     void setVariables(String caseInstanceId, Map<String, Object> variables);
+    
+    void setVariable(String caseInstanceId, String variableName, Object variableValue);
     
     void setLocalVariables(String planItemInstanceId, Map<String, Object> variables);
     
+    void setLocalVariable(String caseInstanceId, String variableName, Object variableValue);
+    
     void removeVariable(String caseInstanceId, String variableName);
     
+    void removeVariables(String caseInstanceId, Collection<String> variableNames);
+    
     void removeLocalVariable(String planItemInstanceId, String variableName);
+    
+    void removeLocalVariables(String caseInstanceId, Collection<String> variableNames);
     
     CaseInstanceQuery createCaseInstanceQuery();
     
     PlanItemInstanceQuery createPlanItemInstanceQuery();
     
     MilestoneInstanceQuery createMilestoneInstanceQuery();
+    
+    /**
+     * Involves a user with a case instance. The type of identity link is defined by the given identityLinkType.
+     * 
+     * @param caseInstanceId
+     *            id of the case instance, cannot be null.
+     * @param userId
+     *            id of the user involve, cannot be null.
+     * @param identityLinkType
+     *            type of identityLink, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the process instance doesn't exist.
+     */
+    void addUserIdentityLink(String caseInstanceId, String userId, String identityLinkType);
+
+    /**
+     * Involves a group with a case instance. The type of identityLink is defined by the given identityLink.
+     * 
+     * @param caseInstanceId
+     *            id of the case instance, cannot be null.
+     * @param groupId
+     *            id of the group to involve, cannot be null.
+     * @param identityLinkType
+     *            type of identity, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the process instance or group doesn't exist.
+     */
+    void addGroupIdentityLink(String caseInstanceId, String groupId, String identityLinkType);
+
+    /**
+     * Removes the association between a user and a process instance for the given identityLinkType.
+     * 
+     * @param caseInstanceId
+     *            id of the case instance, cannot be null.
+     * @param userId
+     *            id of the user involve, cannot be null.
+     * @param identityLinkType
+     *            type of identityLink, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the task or user doesn't exist.
+     */
+    void deleteUserIdentityLink(String caseInstanceId, String userId, String identityLinkType);
+
+    /**
+     * Removes the association between a group and a process instance for the given identityLinkType.
+     * 
+     * @param caseInstanceId
+     *            id of the case instance, cannot be null.
+     * @param groupId
+     *            id of the group to involve, cannot be null.
+     * @param identityLinkType
+     *            type of identity, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the task or group doesn't exist.
+     */
+    void deleteGroupIdentityLink(String caseInstanceId, String groupId, String identityLinkType);
+
+    /**
+     * Retrieves the {@link IdentityLink}s associated with the given case instance. Such an identity link informs how a certain user is involved with a case instance.
+     */
+    List<IdentityLink> getIdentityLinksForCaseInstance(String instanceId);
     
 }

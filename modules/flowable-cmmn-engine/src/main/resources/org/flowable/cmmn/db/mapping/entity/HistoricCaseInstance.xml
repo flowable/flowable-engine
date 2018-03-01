@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -105,7 +105,7 @@
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
             </if>
-        </set>    
+        </set>
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>
 
@@ -155,7 +155,7 @@
         </if>
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
             <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
-                inner join ${prefix}ACT_HI_VARINST A${index} on RES.ID_ = A${index}.SCOPE_ID_ and SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn' 
+                inner join ${prefix}ACT_HI_VARINST A${index} on RES.ID_ = A${index}.SCOPE_ID_ and A${index}.SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
             </if>
         </foreach>
         <where>
@@ -164,7 +164,7 @@
             </if>
             <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() &gt; 0">
                 and RES.ID_ IN
-                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" 
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds"
                          open="(" separator="," close=")">
                   #{caseInstanceId}
                 </foreach>
@@ -173,7 +173,7 @@
                 and RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
             <if test="caseDefinitionKey != null">
-                and CASE_DEF.KEY_ = #{caseDefinitionId}
+                and CASE_DEF.KEY_ = #{caseDefinitionKey}
             </if>
             <if test="caseDefinitionKeys != null">
                 and CASE_DEF.KEY_ IN
@@ -195,7 +195,7 @@
             </if>
             <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
                 and CASE_DEF.DEPLOYMENT_ID_ IN
-                <foreach item="deploymentId" index="index" collection="deploymentIds" 
+                <foreach item="deploymentId" index="index" collection="deploymentIds"
                          open="(" separator="," close=")">
                   #{deploymentId}
                 </foreach>
@@ -308,11 +308,11 @@
             </foreach>
         </where>
     </sql>
-    
+
     <select id="selectHistoricCaseInstancesByCaseDefinitionId" resultMap="historicCaseInstanceResultMap">
         select * from ${prefix}ACT_CMMN_HI_CASE_INST where CASE_DEF_ID_ = #{parameter}
     </select>
-    
+
     <sql id="variableOperator">
         <choose>
           <when test="queryVariableValue.operator.equals('EQUALS')">=</when>

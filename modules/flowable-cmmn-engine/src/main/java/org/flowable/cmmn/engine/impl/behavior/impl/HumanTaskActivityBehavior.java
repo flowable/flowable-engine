@@ -77,7 +77,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleDueDate(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCategory(planItemInstanceEntity, expressionManager, taskEntity);
 
-            taskService.insertTask(taskEntity, true);
+            TaskHelper.insertTask(taskEntity, true);
 
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity);

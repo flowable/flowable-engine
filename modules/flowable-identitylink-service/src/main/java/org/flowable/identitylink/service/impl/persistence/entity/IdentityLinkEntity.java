@@ -37,6 +37,12 @@ public interface IdentityLinkEntity extends IdentityLink, Entity {
     String getProcessDefId();
 
     void setProcessDefId(String processDefId);
+    
+    void setScopeId(String scopeId);
+    
+    void setScopeType(String scopeType);
+    
+    void setScopeDefinitionId(String scopeDefinitionId);
 
     @Override
     String getProcessDefinitionId();
