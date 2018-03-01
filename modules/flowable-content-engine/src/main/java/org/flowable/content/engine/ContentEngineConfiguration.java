@@ -413,6 +413,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         return this;
     }
 
+    @Override
     public ContentManagementService getContentManagementService() {
         return contentManagementService;
     }
