@@ -8,11 +8,9 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.spring.FormEngineFactoryBean;
-import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
+import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,10 +22,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Javier Casal
  */
 @Configuration
-@ConditionalOnClass({
-    SpringFormEngineConfigurator.class
-})
-@ConditionalOnProperty(prefix = "flowable.form", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnFormEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableFormProperties.class
