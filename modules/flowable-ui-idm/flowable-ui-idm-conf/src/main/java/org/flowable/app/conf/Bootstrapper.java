@@ -16,9 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.security.DefaultPrivileges;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
@@ -56,36 +54,26 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
             if (!env.getProperty("ldap.enabled", Boolean.class, false)) {
                 if (env.getProperty("idm.bootstrap.enabled", Boolean.class, true)){
                     // First create the default IDM entities
-                    createDefaultAdminUserAndPrivileges();
+                    createDefaultAdmin();
                 }
-            
             } else {
-                if (identityService.createPrivilegeQuery().privilegeName(DefaultPrivileges.ACCESS_IDM).count() == 0) {
-                    String adminUserId = env.getProperty("admin.userid");
-                    if (StringUtils.isNotEmpty(adminUserId)) {
-                        initializeDefaultPrivileges(adminUserId);
-                    } else {
-                        LOGGER.warn("No user found with IDM access. Set admin.userid to give at least one user access to the IDM application to configure privileges.");
-                    }
+                if (identityService.createPrivilegeQuery().count() == 0) {
+                    String adminUserId = env.getRequiredProperty("admin.userid");
+                    initializeDefaultPrivileges(adminUserId);
                 }
             }
         }
     }
 
-    protected void createDefaultAdminUserAndPrivileges() {
-        String adminUserId = env.getProperty("admin.userid");
-        if (StringUtils.isNotEmpty(adminUserId)) {
-            User adminUser = identityService.createUserQuery().userId(adminUserId).singleResult();
-            if (adminUser == null) {
-                LOGGER.info("No admin user found, initializing default entities");
-                adminUser = initializeAdminUser();
-            } 
-            initializeDefaultPrivileges(adminUser.getId());
+    protected void createDefaultAdmin() {
+        if (identityService.createUserQuery().count() == 0) {
+            LOGGER.info("No users found, initializing default entities");
+            User user = initializeSuperUser();
+            initializeDefaultPrivileges(user.getId());
         }
-       
     }
 
-    protected User initializeAdminUser() {
+    protected User initializeSuperUser() {
         String adminUserId = env.getRequiredProperty("admin.userid");
         String adminPassword = env.getRequiredProperty("admin.password");
         String adminFirstname = env.getRequiredProperty("admin.firstname");
@@ -109,55 +97,27 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
         }
         
         Privilege idmAppPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_IDM, privilegeMap);
-        if (!privilegeMappingExists(adminId, idmAppPrivilege)) {
-            identityService.addUserPrivilegeMapping(idmAppPrivilege.getId(), adminId);
-        }
+        identityService.addUserPrivilegeMapping(idmAppPrivilege.getId(), adminId);
 
         Privilege adminAppPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_ADMIN, privilegeMap);
-        if (!privilegeMappingExists(adminId, adminAppPrivilege)) {
-            identityService.addUserPrivilegeMapping(adminAppPrivilege.getId(), adminId);
-        }
+        identityService.addUserPrivilegeMapping(adminAppPrivilege.getId(), adminId);
 
         Privilege modelerAppPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_MODELER, privilegeMap);
-        if (!privilegeMappingExists(adminId, modelerAppPrivilege)) {
-            identityService.addUserPrivilegeMapping(modelerAppPrivilege.getId(), adminId);
-        }
+        identityService.addUserPrivilegeMapping(modelerAppPrivilege.getId(), adminId);
 
         Privilege taskAppPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_TASK, privilegeMap);
-        if (!privilegeMappingExists(adminId, taskAppPrivilege)) {
-            identityService.addUserPrivilegeMapping(taskAppPrivilege.getId(), adminId);
-        }
-        
-        Privilege restApiAccessPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_REST_API, privilegeMap);
-        if (!privilegeMappingExists(adminId, restApiAccessPrivilege)) {
-            identityService.addUserPrivilegeMapping(restApiAccessPrivilege.getId(), adminId);
-        }
+        identityService.addUserPrivilegeMapping(taskAppPrivilege.getId(), adminId);
     }
     
-    protected Privilege findOrCreatePrivilege(String privilegeName, Map<String, Privilege> privilegeMap) {
+    protected Privilege findOrCreatePrivilege(String privilegeId, Map<String, Privilege> privilegeMap) {
         Privilege privilege = null;
-        if (privilegeMap.containsKey(privilegeName)) {
-            privilege = privilegeMap.get(privilegeName);
+        if (privilegeMap.containsKey(privilegeId)) {
+            privilege = privilegeMap.get(privilegeId);
         } else {
-            try {
-                privilege = identityService.createPrivilege(privilegeName);
-            } catch (Exception e) {
-                privilege = identityService.createPrivilegeQuery().privilegeName(privilegeName).singleResult();
-            }
-        }
-        
-        if (privilege == null) {
-            throw new FlowableException("Could not find or create " + DefaultPrivileges.ACCESS_REST_API + " privilege");
+            privilege = identityService.createPrivilege(privilegeId);
         }
         
         return privilege;
-    }
-    
-    protected boolean privilegeMappingExists(String restAdminId, Privilege privilege) {
-        return identityService.createPrivilegeQuery()
-                .userId(restAdminId)
-                .privilegeId(privilege.getId())
-                .singleResult() != null;
     }
 
 }
