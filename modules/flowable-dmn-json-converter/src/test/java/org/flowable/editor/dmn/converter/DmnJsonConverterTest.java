@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.flowable.dmn.model.Decision;
@@ -244,7 +245,7 @@ public class DmnJsonConverterTest {
         assertEquals("outputExpression_3", outputClause1.getId());
         assertEquals("newVariable1", outputClause1.getName());
         assertEquals("boolean", outputClause1.getTypeRef());
-        
+
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);
     }
