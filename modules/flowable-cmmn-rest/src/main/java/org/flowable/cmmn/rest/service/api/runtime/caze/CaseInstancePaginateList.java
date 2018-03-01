@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.rest.api.AbstractPaginateList;
 
 /**
@@ -24,9 +24,9 @@ import org.flowable.rest.api.AbstractPaginateList;
  */
 public class CaseInstancePaginateList extends AbstractPaginateList<CaseInstanceResponse, CaseInstance> {
 
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
-    public CaseInstancePaginateList(RestResponseFactory restResponseFactory) {
+    public CaseInstancePaginateList(CmmnRestResponseFactory restResponseFactory) {
         this.restResponseFactory = restResponseFactory;
     }
 

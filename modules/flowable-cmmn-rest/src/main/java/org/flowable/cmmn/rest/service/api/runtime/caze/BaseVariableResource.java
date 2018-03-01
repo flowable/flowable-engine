@@ -31,7 +31,7 @@ import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.engine.common.api.FlowableException;
@@ -59,7 +59,7 @@ public class BaseVariableResource {
     protected CmmnRuntimeService runtimeService;
     
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
     
     @Autowired
     protected Environment env;
@@ -101,11 +101,11 @@ public class BaseVariableResource {
             byte[] result = null;
 
             RestVariable variable = getVariableFromRequest(caseInstance, variableName, true);
-            if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
+            if (CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
 
-            } else if (RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+            } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());
@@ -124,7 +124,7 @@ public class BaseVariableResource {
     }
 
     protected RestVariable constructRestVariable(String variableName, Object value, String caseInstanceId, boolean includeBinary) {
-        return restResponseFactory.createRestVariable(variableName, value, null, caseInstanceId, RestResponseFactory.VARIABLE_CASE, includeBinary);
+        return restResponseFactory.createRestVariable(variableName, value, null, caseInstanceId, CmmnRestResponseFactory.VARIABLE_CASE, includeBinary);
     }
 
     protected List<RestVariable> processCaseVariables(CaseInstance caseInstance, int variableType) {
@@ -250,11 +250,11 @@ public class BaseVariableResource {
             }
 
             if (variableType != null) {
-                if (!RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variableType) && !RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variableType)) {
+                if (!CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variableType) && !CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variableType)) {
                     throw new FlowableIllegalArgumentException("Only 'binary' and 'serializable' are supported as variable type.");
                 }
             } else {
-                variableType = RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE;
+                variableType = CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE;
             }
 
             RestVariableScope scope = RestVariableScope.LOCAL;
@@ -262,7 +262,7 @@ public class BaseVariableResource {
                 scope = RestVariable.getScopeFromString(variableScope);
             }
 
-            if (variableType.equals(RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE)) {
+            if (variableType.equals(CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE)) {
                 // Use raw bytes as variable value
                 byte[] variableBytes = IOUtils.toByteArray(file.getInputStream());
                 setVariable(caseInstance, variableName, variableBytes, scope, isNew);

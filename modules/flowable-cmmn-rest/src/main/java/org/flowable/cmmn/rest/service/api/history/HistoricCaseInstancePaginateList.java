@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.history;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.rest.api.AbstractPaginateList;
 
 /**
@@ -24,9 +24,9 @@ import org.flowable.rest.api.AbstractPaginateList;
  */
 public class HistoricCaseInstancePaginateList extends AbstractPaginateList<HistoricCaseInstanceResponse, HistoricCaseInstance> {
 
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
-    public HistoricCaseInstancePaginateList(RestResponseFactory restResponseFactory) {
+    public HistoricCaseInstancePaginateList(CmmnRestResponseFactory restResponseFactory) {
         this.restResponseFactory = restResponseFactory;
     }
 

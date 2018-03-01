@@ -32,41 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ServerConfigService extends AbstractEncryptingService {
 
-    private static final String REST_PROCESS_APP_NAME = "rest.process.app.name";
-    private static final String REST_PROCESS_APP_DESCRIPTION = "rest.process.app.description";
-    private static final String REST_PROCESS_APP_HOST = "rest.process.app.host";
-    private static final String REST_PROCESS_APP_PORT = "rest.process.app.port";
-    private static final String REST_PROCESS_APP_CONTEXT_ROOT = "rest.process.app.contextroot";
-    private static final String REST_PROCESS_APP_REST_ROOT = "rest.process.app.restroot";
-    private static final String REST_PROCESS_APP_USER = "rest.process.app.user";
-    private static final String REST_PROCESS_APP_PASSWORD = "rest.process.app.password";
-
-    private static final String REST_DMN_APP_NAME = "rest.dmn.app.name";
-    private static final String REST_DMN_APP_DESCRIPTION = "rest.dmn.app.description";
-    private static final String REST_DMN_APP_HOST = "rest.dmn.app.host";
-    private static final String REST_DMN_APP_PORT = "rest.dmn.app.port";
-    private static final String REST_DMN_APP_CONTEXT_ROOT = "rest.dmn.app.contextroot";
-    private static final String REST_DMN_APP_REST_ROOT = "rest.dmn.app.restroot";
-    private static final String REST_DMN_APP_USER = "rest.dmn.app.user";
-    private static final String REST_DMN_APP_PASSWORD = "rest.dmn.app.password";
-
-    private static final String REST_FORM_APP_NAME = "rest.form.app.name";
-    private static final String REST_FORM_APP_DESCRIPTION = "rest.form.app.description";
-    private static final String REST_FORM_APP_HOST = "rest.form.app.host";
-    private static final String REST_FORM_APP_PORT = "rest.form.app.port";
-    private static final String REST_FORM_APP_CONTEXT_ROOT = "rest.form.app.contextroot";
-    private static final String REST_FORM_APP_REST_ROOT = "rest.form.app.restroot";
-    private static final String REST_FORM_APP_USER = "rest.form.app.user";
-    private static final String REST_FORM_APP_PASSWORD = "rest.form.app.password";
-
-    private static final String REST_CONTENT_APP_NAME = "rest.content.app.name";
-    private static final String REST_CONTENT_APP_DESCRIPTION = "rest.content.app.description";
-    private static final String REST_CONTENT_APP_HOST = "rest.content.app.host";
-    private static final String REST_CONTENT_APP_PORT = "rest.content.app.port";
-    private static final String REST_CONTENT_APP_CONTEXT_ROOT = "rest.content.app.contextroot";
-    private static final String REST_CONTENT_APP_REST_ROOT = "rest.content.app.restroot";
-    private static final String REST_CONTENT_APP_USER = "rest.content.app.user";
-    private static final String REST_CONTENT_APP_PASSWORD = "rest.content.app.password";
+    private static final String APP_NAME = "app.name";
+    private static final String APP_DESCRIPTION = "app.description";
+    private static final String APP_HOST = "app.host";
+    private static final String APP_PORT = "app.port";
+    private static final String APP_CONTEXT_ROOT = "app.contextroot";
+    private static final String APP_REST_ROOT = "app.restroot";
+    private static final String APP_USER = "app.user";
+    private static final String APP_PASSWORD = "app.password";
 
     @Autowired
     protected Environment environment;
@@ -80,6 +53,12 @@ public class ServerConfigService extends AbstractEncryptingService {
         for (ServerConfig serverConfig : serverConfigs) {
             save(serverConfig, true);
         }
+    }
+    
+    @Transactional
+    public void createCmmnDefaultServerConfig() {
+        ServerConfig serverConfig = getDefaultServerConfig(EndpointType.CMMN);
+        save(serverConfig, true);
     }
 
     @Transactional
@@ -144,57 +123,41 @@ public class ServerConfigService extends AbstractEncryptingService {
     public ServerConfig getDefaultServerConfig(EndpointType endpointType) {
 
         ServerConfig serverConfig = new ServerConfig();
+        String endpointTypeString = null;
 
         switch (endpointType) {
 
             case PROCESS:
-                serverConfig.setName(environment.getRequiredProperty(REST_PROCESS_APP_NAME));
-                serverConfig.setDescription(environment.getRequiredProperty(REST_PROCESS_APP_DESCRIPTION));
-                serverConfig.setServerAddress(environment.getRequiredProperty(REST_PROCESS_APP_HOST));
-                serverConfig.setPort(environment.getRequiredProperty(REST_PROCESS_APP_PORT, Integer.class));
-                serverConfig.setContextRoot(environment.getRequiredProperty(REST_PROCESS_APP_CONTEXT_ROOT));
-                serverConfig.setRestRoot(environment.getRequiredProperty(REST_PROCESS_APP_REST_ROOT));
-                serverConfig.setUserName(environment.getRequiredProperty(REST_PROCESS_APP_USER));
-                serverConfig.setPassword(environment.getRequiredProperty(REST_PROCESS_APP_PASSWORD));
-                serverConfig.setEndpointType(endpointType.getEndpointCode());
+                endpointTypeString = "process";
+                break;
+                
+            case CMMN:
+                endpointTypeString = "cmmn";
                 break;
 
             case DMN:
-                serverConfig.setName(environment.getRequiredProperty(REST_DMN_APP_NAME));
-                serverConfig.setDescription(environment.getRequiredProperty(REST_DMN_APP_DESCRIPTION));
-                serverConfig.setServerAddress(environment.getRequiredProperty(REST_DMN_APP_HOST));
-                serverConfig.setPort(environment.getRequiredProperty(REST_DMN_APP_PORT, Integer.class));
-                serverConfig.setContextRoot(environment.getRequiredProperty(REST_DMN_APP_CONTEXT_ROOT));
-                serverConfig.setRestRoot(environment.getRequiredProperty(REST_DMN_APP_REST_ROOT));
-                serverConfig.setUserName(environment.getRequiredProperty(REST_DMN_APP_USER));
-                serverConfig.setPassword(environment.getRequiredProperty(REST_DMN_APP_PASSWORD));
-                serverConfig.setEndpointType(endpointType.getEndpointCode());
+                endpointTypeString = "dmn";
                 break;
 
             case FORM:
-                serverConfig.setName(environment.getRequiredProperty(REST_FORM_APP_NAME));
-                serverConfig.setDescription(environment.getRequiredProperty(REST_FORM_APP_DESCRIPTION));
-                serverConfig.setServerAddress(environment.getRequiredProperty(REST_FORM_APP_HOST));
-                serverConfig.setPort(environment.getRequiredProperty(REST_FORM_APP_PORT, Integer.class));
-                serverConfig.setContextRoot(environment.getRequiredProperty(REST_FORM_APP_CONTEXT_ROOT));
-                serverConfig.setRestRoot(environment.getRequiredProperty(REST_FORM_APP_REST_ROOT));
-                serverConfig.setUserName(environment.getRequiredProperty(REST_FORM_APP_USER));
-                serverConfig.setPassword(environment.getRequiredProperty(REST_FORM_APP_PASSWORD));
-                serverConfig.setEndpointType(endpointType.getEndpointCode());
+                endpointTypeString = "form";
                 break;
 
             case CONTENT:
-                serverConfig.setName(environment.getRequiredProperty(REST_CONTENT_APP_NAME));
-                serverConfig.setDescription(environment.getRequiredProperty(REST_CONTENT_APP_DESCRIPTION));
-                serverConfig.setServerAddress(environment.getRequiredProperty(REST_CONTENT_APP_HOST));
-                serverConfig.setPort(environment.getRequiredProperty(REST_CONTENT_APP_PORT, Integer.class));
-                serverConfig.setContextRoot(environment.getRequiredProperty(REST_CONTENT_APP_CONTEXT_ROOT));
-                serverConfig.setRestRoot(environment.getRequiredProperty(REST_CONTENT_APP_REST_ROOT));
-                serverConfig.setUserName(environment.getRequiredProperty(REST_CONTENT_APP_USER));
-                serverConfig.setPassword(environment.getRequiredProperty(REST_CONTENT_APP_PASSWORD));
-                serverConfig.setEndpointType(endpointType.getEndpointCode());
+                endpointTypeString = "content";
                 break;
         }
+        
+        String propertyPrefix = "rest." + endpointTypeString + ".";
+        serverConfig.setName(environment.getRequiredProperty(propertyPrefix + APP_NAME));
+        serverConfig.setDescription(environment.getRequiredProperty(propertyPrefix + APP_DESCRIPTION));
+        serverConfig.setServerAddress(environment.getRequiredProperty(propertyPrefix + APP_HOST));
+        serverConfig.setPort(environment.getRequiredProperty(propertyPrefix + APP_PORT, Integer.class));
+        serverConfig.setContextRoot(environment.getRequiredProperty(propertyPrefix + APP_CONTEXT_ROOT));
+        serverConfig.setRestRoot(environment.getRequiredProperty(propertyPrefix + APP_REST_ROOT));
+        serverConfig.setUserName(environment.getRequiredProperty(propertyPrefix + APP_USER));
+        serverConfig.setPassword(environment.getRequiredProperty(propertyPrefix + APP_PASSWORD));
+        serverConfig.setEndpointType(endpointType.getEndpointCode());
 
         return serverConfig;
     }
@@ -203,6 +166,7 @@ public class ServerConfigService extends AbstractEncryptingService {
         List<ServerConfig> serverConfigs = new ArrayList<>();
 
         serverConfigs.add(getDefaultServerConfig(EndpointType.PROCESS));
+        serverConfigs.add(getDefaultServerConfig(EndpointType.CMMN));
         serverConfigs.add(getDefaultServerConfig(EndpointType.DMN));
         serverConfigs.add(getDefaultServerConfig(EndpointType.FORM));
         serverConfigs.add(getDefaultServerConfig(EndpointType.CONTENT));

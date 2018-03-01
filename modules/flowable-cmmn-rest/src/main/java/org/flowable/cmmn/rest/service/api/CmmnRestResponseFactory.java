@@ -61,7 +61,7 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.type.VariableScopeType;
 
 /**
- * Default implementation of a {@link RestResponseFactory}.
+ * Default implementation of a {@link CmmnRestResponseFactory}.
  * 
  * Added a new "createProcessInstanceResponse" method (with a different signature) to conditionally return the process variables that exist within the process instance when the first wait state is
  * encountered (or when the process instance completes). Also added the population of a "completed" flag - within both the original "createProcessInstanceResponse" method and the new one with the
@@ -70,7 +70,7 @@ import org.flowable.variable.api.type.VariableScopeType;
  * @author Frederik Heremans
  * @author Ryan Johnston (@rjfsu)
  */
-public class RestResponseFactory {
+public class CmmnRestResponseFactory {
 
     public static final int VARIABLE_TASK = 1;
     public static final int VARIABLE_EXECUTION = 2;
@@ -85,7 +85,7 @@ public class RestResponseFactory {
 
     protected List<RestVariableConverter> variableConverters = new ArrayList<>();
 
-    public RestResponseFactory() {
+    public CmmnRestResponseFactory() {
         initializeVariableConverters();
     }
 

@@ -24,6 +24,7 @@
         },
         "MENU": {
             "PROCESS-ENGINE": "Process Engine",
+            "CMMN-ENGINE": "CMMN Engine",
             "FORM-ENGINE": "Form Engine",
             "CONTENT-ENGINE": "Content Engine",
             "DMN-ENGINE": "DMN Engine",
@@ -640,6 +641,7 @@
         },
         "TITLE": {
             "PROCESS-ENDPOINT": "Process API Endpoint configuration",
+            "CMMN-ENDPOINT": "CMMN API Endpoint configuration",
             "DMN-ENDPOINT": "DMN API Endpoint configuration",
             "FORM-ENDPOINT": "Form API Endpoint configuration",
             "CONTENT-ENDPOINT": "Content API Endpoint configuration"
