@@ -13,15 +13,16 @@
 package org.flowable.spring.boot;
 
 import org.flowable.engine.ProcessEngine;
-import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.engine.FormEngines;
 import org.flowable.form.spring.FormEngineFactoryBean;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -45,32 +46,57 @@ import org.springframework.context.annotation.Configuration;
 })
 public class FormEngineServicesAutoConfiguration {
 
+
+    /**
+     * If a process engine is present that means that the FormEngine was created as part of it.
+     * Therefore extract it from the FormEngines.
+     */
+    @Configuration
+    @ConditionalOnMissingBean({
+        FormEngine.class
+    })
+    @ConditionalOnBean({
+        ProcessEngine.class
+    })
+    static class AlreadyInitializedFormEngineConfiguration {
+        @Bean
+        public FormEngine formEngine() {
+            if (!FormEngines.isInitialized()) {
+                throw new IllegalStateException("Form engine has not been initialized");
+            }
+            return FormEngines.getDefaultFormEngine();
+        }
+    }
     /**
      * If there is no process engine configuration, then trigger a creation of the form engine.
      */
-    @Bean
+    @Configuration
     @ConditionalOnMissingBean({
         FormEngine.class,
         ProcessEngine.class
     })
-    public FormEngineFactoryBean formEngine(FormEngineConfiguration formEngineConfiguration) {
-        FormEngineFactoryBean factory = new FormEngineFactoryBean();
-        factory.setFormEngineConfiguration(formEngineConfiguration);
-        return factory;
+    static class StandaloneFormEngineConfiguration {
+
+        @Bean
+        public FormEngineFactoryBean formEngine(FormEngineConfiguration formEngineConfiguration) {
+            FormEngineFactoryBean factory = new FormEngineFactoryBean();
+            factory.setFormEngineConfiguration(formEngineConfiguration);
+            return factory;
+        }
     }
 
     @Bean
-    public FormService formService(FormEngineConfigurationApi formEngine) {
+    public FormService formService(FormEngine formEngine) {
         return formEngine.getFormService();
     }
 
     @Bean
-    public FormRepositoryService formRepositoryService(FormEngineConfigurationApi formEngine) {
+    public FormRepositoryService formRepositoryService(FormEngine formEngine) {
         return formEngine.getFormRepositoryService();
     }
 
     @Bean
-    public FormManagementService formManagementService(FormEngineConfigurationApi formEngine) {
+    public FormManagementService formManagementService(FormEngine formEngine) {
         return formEngine.getFormManagementService();
     }
 }
