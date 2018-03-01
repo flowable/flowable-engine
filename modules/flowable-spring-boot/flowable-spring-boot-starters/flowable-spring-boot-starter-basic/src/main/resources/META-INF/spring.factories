@@ -8,4 +8,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.flowable.spring.boot.FlowableTransactionAutoConfiguration,\
     org.flowable.spring.boot.form.FormEngineAutoConfiguration,\
     org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration,\
+    org.flowable.spring.boot.content.ContentEngineAutoConfiguration,\
+    org.flowable.spring.boot.content.ContentEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.SecurityAutoConfiguration
