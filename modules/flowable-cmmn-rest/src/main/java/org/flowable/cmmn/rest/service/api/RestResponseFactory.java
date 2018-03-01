@@ -43,6 +43,7 @@ import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceResponse;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskResponse;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -58,7 +59,6 @@ import org.flowable.rest.variable.StringRestVariableConverter;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.flowable.variable.api.type.VariableScopeType;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.
@@ -517,12 +517,12 @@ public class RestResponseFactory {
         result.setPriority(taskInstance.getPriority());
         result.setTenantId(taskInstance.getTenantId());
         result.setCategory(taskInstance.getCategory());
-        if (taskInstance.getScopeDefinitionId() != null && VariableScopeType.CMMN.equals(taskInstance.getScopeType())) {
+        if (taskInstance.getScopeDefinitionId() != null && ScopeTypes.CMMN.equals(taskInstance.getScopeType())) {
             result.setCaseDefinitionId(taskInstance.getScopeDefinitionId());
             result.setCaseDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION, taskInstance.getScopeDefinitionId()));
         }
         
-        if (taskInstance.getScopeId() != null && VariableScopeType.CMMN.equals(taskInstance.getScopeType())) {
+        if (taskInstance.getScopeId() != null && ScopeTypes.CMMN.equals(taskInstance.getScopeType())) {
             result.setCaseInstanceId(taskInstance.getScopeId());
             result.setCaseInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE, taskInstance.getScopeId()));
         }
@@ -561,7 +561,7 @@ public class RestResponseFactory {
     public HistoricVariableInstanceResponse createHistoricVariableInstanceResponse(HistoricVariableInstance variableInstance, RestUrlBuilder urlBuilder) {
         HistoricVariableInstanceResponse result = new HistoricVariableInstanceResponse();
         result.setId(variableInstance.getId());
-        if (variableInstance.getScopeId() != null && VariableScopeType.CMMN.equals(variableInstance.getScopeType())) {
+        if (variableInstance.getScopeId() != null && ScopeTypes.CMMN.equals(variableInstance.getScopeType())) {
             result.setCaseInstanceId(variableInstance.getScopeId());
             result.setCaseInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE, variableInstance.getScopeId()));
         }
@@ -593,7 +593,7 @@ public class RestResponseFactory {
             result.setTaskUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE, identityLink.getTaskId()));
         }
         
-        if (StringUtils.isNotEmpty(identityLink.getScopeId()) && VariableScopeType.CMMN.equals(identityLink.getScopeType())) {
+        if (StringUtils.isNotEmpty(identityLink.getScopeId()) && ScopeTypes.CMMN.equals(identityLink.getScopeType())) {
             result.setCaseInstanceId(identityLink.getScopeId());
             result.setCaseInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE, identityLink.getScopeId()));
         }

@@ -740,6 +740,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (caseInstanceDataManager == null) {
             caseInstanceDataManager = new MybatisCaseInstanceDataManagerImpl(this);
         }
+        if (dbSqlSessionFactory != null && caseInstanceDataManager instanceof AbstractDataManager) {
+            dbSqlSessionFactory.addLogicalEntityClassMapping("caseInstance", ((AbstractDataManager) caseInstanceDataManager).getManagedEntityClass());
+        }
         if (planItemInstanceDataManager == null) {
             planItemInstanceDataManager = new MybatisPlanItemInstanceDataManagerImpl(this);
         }

@@ -27,9 +27,9 @@ import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVaria
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.task.api.Task;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -67,7 +67,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
             } else {
                 // Revert to execution-variable when not present local on the task
                 Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-                if (VariableScopeType.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
+                if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                     value = runtimeService.getVariable(task.getScopeId(), variableName);
                     variableScope = RestVariableScope.GLOBAL;
                     variableFound = true;
@@ -76,7 +76,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
         } else if (variableScope == RestVariableScope.GLOBAL) {
             Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-            if (VariableScopeType.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
+            if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                 value = runtimeService.getVariable(task.getScopeId(), variableName);
                 variableFound = true;
             }
@@ -99,7 +99,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         boolean variableFound = false;
 
         if (scope == RestVariableScope.GLOBAL) {
-            if (VariableScopeType.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
+            if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                 variableFound = true;
             }
 
@@ -223,7 +223,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         if (scope == RestVariableScope.LOCAL) {
             taskService.setVariableLocal(task.getId(), name, value);
         } else {
-            if (VariableScopeType.CMMN.equals(task.getScopeType()) && task.getScopeId() != null) {
+            if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null) {
                 // Explicitly set on execution, setting non-local variable on
                 // task will override local-variable if exists
                 runtimeService.setVariable(task.getScopeId(), name, value);

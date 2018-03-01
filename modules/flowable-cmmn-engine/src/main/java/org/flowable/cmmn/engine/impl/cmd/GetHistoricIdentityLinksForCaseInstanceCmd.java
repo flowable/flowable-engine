@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.variable.api.type.VariableScopeType;
 
 /**
  * @author Tijs Rademakers
@@ -40,7 +40,7 @@ public class GetHistoricIdentityLinksForCaseInstanceCmd implements Command<List<
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<HistoricIdentityLink> execute(CommandContext commandContext) {
-        return (List) CommandContextUtil.getHistoricIdentityLinkService().findHistoricIdentityLinksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
+        return (List) CommandContextUtil.getHistoricIdentityLinkService().findHistoricIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
     }
 
 }

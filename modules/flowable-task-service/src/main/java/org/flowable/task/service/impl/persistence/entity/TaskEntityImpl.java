@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.SuspensionState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -36,7 +37,6 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -191,7 +191,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         variableInstance.setTaskId(id);
-        if (VariableScopeType.CMMN.equals(this.scopeType)) {
+        if (ScopeTypes.CMMN.equals(this.scopeType)) {
             variableInstance.setScopeId(this.scopeId);
             variableInstance.setScopeType(this.scopeType);
             variableInstance.setSubScopeId(this.subScopeId);

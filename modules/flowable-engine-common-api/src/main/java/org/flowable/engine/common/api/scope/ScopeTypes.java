@@ -10,12 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.variable.api.type;
+package org.flowable.engine.common.api.scope;
 
 /**
  * @author Joram Barrez
  */
-public interface VariableScopeType {
+public interface ScopeTypes {
 
     String CMMN = "cmmn";
 }

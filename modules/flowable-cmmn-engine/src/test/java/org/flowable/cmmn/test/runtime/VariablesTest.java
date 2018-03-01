@@ -29,8 +29,8 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.junit.Test;
 
 /**
@@ -124,21 +124,21 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertEquals("test", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
         HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
+        assertEquals(ScopeTypes.CMMN, historicVariableInstance.getScopeType());
         assertEquals("test", historicVariableInstance.getValue());
         assertNull(historicVariableInstance.getSubScopeId());
         
         assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar"));
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("intVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
+        assertEquals(ScopeTypes.CMMN, historicVariableInstance.getScopeType());
         assertEquals(123, historicVariableInstance.getValue());
         assertNull(historicVariableInstance.getSubScopeId());
         
         assertEquals(123.123, cmmnRuntimeService.getVariable(caseInstance.getId(), "doubleVar"));
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("doubleVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
+        assertEquals(ScopeTypes.CMMN, historicVariableInstance.getScopeType());
         assertEquals(123.123, historicVariableInstance.getValue());
         assertNull(historicVariableInstance.getSubScopeId());
         

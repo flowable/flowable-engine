@@ -25,6 +25,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
@@ -37,7 +38,6 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManage
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
-import org.flowable.variable.api.type.VariableScopeType;
 
 /**
  * @author Joram Barrez
@@ -86,12 +86,12 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
         // Variables
-        getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
-        getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
+        getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         
         // Tasks
         TaskEntityManager taskEntityManager = getTaskEntityManager();
-        List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
+        List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         for (TaskEntity taskEntity : taskEntities) {
             TaskHelper.deleteTask(taskEntity, deleteReason, cascade, true);
         }
@@ -114,22 +114,22 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
 
         // Jobs have dependencies (byte array refs that need to be deleted, so no immediate delete for the moment)
         JobEntityManager jobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
-        List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(new JobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
+        List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(new JobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job job : jobs) {
             jobEntityManager.delete(job.getId());
         }
         TimerJobEntityManager timerJobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager();
-        List<Job> timerJobs = timerJobEntityManager.findJobsByQueryCriteria(new TimerJobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
+        List<Job> timerJobs = timerJobEntityManager.findJobsByQueryCriteria(new TimerJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job timerJob : timerJobs) {
             timerJobEntityManager.delete(timerJob.getId());
         }
         SuspendedJobEntityManager suspendedJobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager();
-        List<Job> suspendedJobs = suspendedJobEntityManager.findJobsByQueryCriteria(new SuspendedJobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
+        List<Job> suspendedJobs = suspendedJobEntityManager.findJobsByQueryCriteria(new SuspendedJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job suspendedJob : suspendedJobs) {
             suspendedJobEntityManager.delete(suspendedJob.getId());
         }
         DeadLetterJobEntityManager deadLetterJobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getDeadLetterJobEntityManager();
-        List<Job> deadLetterJobs = deadLetterJobEntityManager.findJobsByQueryCriteria(new DeadLetterJobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
+        List<Job> deadLetterJobs = deadLetterJobEntityManager.findJobsByQueryCriteria(new DeadLetterJobQueryImpl().scopeId(caseInstanceId).scopeType(ScopeTypes.CMMN));
         for (Job deadLetterJob : deadLetterJobs) {
             deadLetterJobEntityManager.delete(deadLetterJob.getId());
         }

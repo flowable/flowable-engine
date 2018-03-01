@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
@@ -173,10 +174,15 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
 
     @Override
     public void deleteIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("scopeId", scopeId);
-        parameters.put("scopeType", scopeType);
-        getDbSqlSession().delete("deleteIdentityLinksByScopeIdAndScopeType", parameters, IdentityLinkEntityImpl.class);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (ScopeTypes.CMMN.equals(scopeType) && isEntityInserted(dbSqlSession, "caseInstance", scopeId)) {
+            deleteCachedEntities(dbSqlSession, identityLinksByScopeIdAndTypeMatcher, scopeId);
+        } else {
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("scopeId", scopeId);
+            parameters.put("scopeType", scopeType);
+            bulkDelete("deleteIdentityLinksByScopeIdAndScopeType", identityLinksByScopeIdAndTypeMatcher, parameters);
+        }
     }
 
 }
