@@ -51,7 +51,7 @@ public class FlowableFormProperties {
     /**
      * Whether the form engine needs to be started.
      */
-    private boolean enable = true;
+    private boolean enabled = true;
 
     public String getDeploymentName() {
         return deploymentName;
@@ -85,11 +85,11 @@ public class FlowableFormProperties {
         this.deployResources = deployResources;
     }
 
-    public boolean isEnable() {
-        return enable;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setEnable(boolean enable) {
-        this.enable = enable;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
