@@ -19,10 +19,10 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.variable.api.type.VariableScopeType;
 
 /**
  * @author Tijs Rademakers
@@ -47,7 +47,7 @@ public class GetIdentityLinksForCaseInstanceCmd implements Command<List<Identity
         }
 
         return (List) CommandContextUtil.getIdentityLinkService(commandContext).findIdentityLinksByScopeIdAndType(
-                        caseInstanceId, VariableScopeType.CMMN);
+                        caseInstanceId, ScopeTypes.CMMN);
     }
 
 }

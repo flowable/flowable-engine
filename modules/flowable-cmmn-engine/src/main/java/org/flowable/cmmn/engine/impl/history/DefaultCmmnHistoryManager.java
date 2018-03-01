@@ -24,12 +24,12 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -98,7 +98,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
                 historicMilestoneInstanceEntityManager.delete(historicMilestoneInstance.getId());
             }
             
-            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), VariableScopeType.CMMN);
+            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
             
             if (historicCaseInstance != null) {
                 historicCaseInstanceEntityManager.delete(historicCaseInstance);
@@ -123,7 +123,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicIdentityLinkEntity.setScopeDefinitionId(identityLink.getScopeDefinitionId());
             historicIdentityLinkEntity.setScopeId(identityLink.getScopeId());
             if (identityLink.getScopeId() != null) {
-                historicIdentityLinkEntity.setScopeType(VariableScopeType.CMMN);
+                historicIdentityLinkEntity.setScopeType(ScopeTypes.CMMN);
             }
             historicIdentityLinkEntity.setTaskId(identityLink.getTaskId());
             historicIdentityLinkEntity.setType(identityLink.getType());

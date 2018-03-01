@@ -70,8 +70,10 @@ public interface IdentityLinkService {
     
     List<IdentityLinkEntity> deleteScopeDefinitionIdentityLink(String scopeDefinitionId, String scopeType, String userId, String groupId);
     
-    List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId);
+    void deleteIdentityLinksByTaskId(String taskId);
     
     void deleteIdentityLinksByProcessDefinitionId(String processDefinitionId);
+    
+    void deleteIdentityLinksByProcessInstanceId(String processInstanceId);
     
 }

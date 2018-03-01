@@ -29,13 +29,13 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
@@ -63,7 +63,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             taskEntity.setScopeId(planItemInstanceEntity.getCaseInstanceId());
             taskEntity.setSubScopeId(planItemInstanceEntity.getId());
             taskEntity.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
-            taskEntity.setScopeType(VariableScopeType.CMMN);
+            taskEntity.setScopeType(ScopeTypes.CMMN);
             taskEntity.setTenantId(planItemInstanceEntity.getTenantId());
 
             taskEntity.setTaskDefinitionKey(humanTask.getId());
@@ -279,7 +279,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         }
 
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
-        List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), VariableScopeType.CMMN);
+        List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
         if (taskEntities == null || taskEntities.isEmpty()) {
             throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
         }
@@ -298,7 +298,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             TaskService taskService = CommandContextUtil.getTaskService(commandContext);
-            List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), VariableScopeType.CMMN);
+            List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
             for (TaskEntity taskEntity : taskEntities) {
                 TaskHelper.deleteTask(taskEntity, "cmmn-state-transition-" + transition, false, true);
             }

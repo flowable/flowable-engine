@@ -249,6 +249,11 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
         eventSubscriptionDataManager.deleteEventSubscriptionsForProcessDefinition(processDefinitionId);
     }
+    
+    @Override
+    public void deleteEventSubscriptionsByExecutionId(String executionId) {
+        eventSubscriptionDataManager.deleteEventSubscriptionsByExecutionId(executionId);
+    }
 
     // Processing /////////////////////////////////////////////////////////////
 

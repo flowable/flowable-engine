@@ -42,8 +42,12 @@ public interface IdentityLinkDataManager extends DataManager<IdentityLinkEntity>
 
     List<IdentityLinkEntity> findIdentityLinkByScopeDefinitionScopeTypeUserAndGroup(String scopeDefinitionId, String scopeType, String userId, String groupId);
 
+    void deleteIdentityLinksByTaskId(String taskId);
+
     void deleteIdentityLinksByProcDef(String processDefId);
     
+    void deleteIdentityLinksByProcessInstanceId(String processInstanceId);
+
     void deleteIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
 
 }

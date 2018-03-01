@@ -15,10 +15,10 @@ package org.flowable.cmmn.engine.impl.util;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.api.type.VariableScopeType;
 
 /**
  * @author Tijs Rademakers
@@ -27,7 +27,7 @@ public class IdentityLinkUtil {
     
     public static IdentityLinkEntity createCaseInstanceIdentityLink(CaseInstance caseInstance, String userId, String groupId, String type) {
         IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createScopeIdentityLink(
-                        caseInstance.getCaseDefinitionId(), caseInstance.getId(), VariableScopeType.CMMN, userId, groupId, type);
+                        caseInstance.getCaseDefinitionId(), caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
         
         CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
         
@@ -43,7 +43,7 @@ public class IdentityLinkUtil {
 
     public static void deleteCaseInstanceIdentityLinks(CaseInstance caseInstance, String userId, String groupId, String type) {
         List<IdentityLinkEntity> removedIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().deleteScopeIdentityLink(
-                        caseInstance.getId(), VariableScopeType.CMMN, userId, groupId, type);
+                        caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
         
         for (IdentityLinkEntity identityLinkEntity : removedIdentityLinkEntities) {
             CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
@@ -60,10 +60,10 @@ public class IdentityLinkUtil {
         CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
 
         taskEntity.getIdentityLinks().add(identityLinkEntity);
-        if (identityLinkEntity.getUserId() != null && taskEntity.getScopeId() != null && VariableScopeType.CMMN.equals(taskEntity.getScopeType())) {
+        if (identityLinkEntity.getUserId() != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
             CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(taskEntity.getScopeId());
             if (caseInstance != null) {
-                List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService().findIdentityLinksByScopeIdAndType(taskEntity.getScopeId(), VariableScopeType.CMMN);
+                List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService().findIdentityLinksByScopeIdAndType(taskEntity.getScopeId(), ScopeTypes.CMMN);
                 for (IdentityLinkEntity identityLink : identityLinks) {
                     if (identityLink.isUser() && identityLink.getUserId().equals(identityLinkEntity.getUserId())) {
                         return;

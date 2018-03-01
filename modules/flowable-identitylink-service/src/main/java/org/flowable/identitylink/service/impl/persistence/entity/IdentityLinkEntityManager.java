@@ -60,8 +60,6 @@ public interface IdentityLinkEntityManager extends EntityManager<IdentityLinkEnt
 
     List<IdentityLinkEntity> addCandidateGroups(String taskId, Collection<String> candidateGroups);
 
-    void deleteIdentityLink(IdentityLinkEntity identityLink);
-
     List<IdentityLinkEntity> deleteProcessInstanceIdentityLink(String processInstanceId, String userId, String groupId, String type);
     
     List<IdentityLinkEntity> deleteScopeIdentityLink(String scopeId, String scopeType, String userId, String groupId, String type);
@@ -72,10 +70,12 @@ public interface IdentityLinkEntityManager extends EntityManager<IdentityLinkEnt
     
     List<IdentityLinkEntity> deleteScopeDefinitionIdentityLink(String scopeDefinitionId, String scopeType, String userId, String groupId);
 
-    List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId);
+    void deleteIdentityLinksByTaskId(String taskId);
 
     void deleteIdentityLinksByProcDef(String processDefId);
     
+    void deleteIdentityLinksByProcessInstanceId(String processInstanceId);
+
     void deleteIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
 
 }

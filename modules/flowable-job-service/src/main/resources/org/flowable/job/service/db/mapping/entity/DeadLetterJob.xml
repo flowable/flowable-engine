@@ -30,6 +30,10 @@
     <delete id="deleteDeadLetterJob" parameterType="org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl">
         delete from ${prefix}ACT_RU_DEADLETTER_JOB where ID_ = #{id} and REV_ = #{revision}
     </delete>
+    
+    <delete id="deleteDeadLetterJobsByExecutionId" parameterType="string">
+        delete from ${prefix}ACT_RU_DEADLETTER_JOB where PROCESS_INSTANCE_ID_ = #{id}
+    </delete>
 
     <select id="selectDeadLetterJob" parameterType="string" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_DEADLETTER_JOB where ID_ = #{id, jdbcType=VARCHAR}

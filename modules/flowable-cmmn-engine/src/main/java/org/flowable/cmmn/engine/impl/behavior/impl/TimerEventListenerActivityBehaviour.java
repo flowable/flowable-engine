@@ -25,6 +25,7 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
@@ -34,7 +35,6 @@ import org.flowable.engine.common.runtime.Clock;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -125,7 +125,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             timer.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
             timer.setScopeId(planItemInstanceEntity.getCaseInstanceId());
             timer.setSubScopeId(planItemInstanceEntity.getId());
-            timer.setScopeType(VariableScopeType.CMMN);
+            timer.setScopeType(ScopeTypes.CMMN);
             timer.setTenantId(planItemInstanceEntity.getTenantId());
             
             if (isRepeating && timerValue instanceof String) {
