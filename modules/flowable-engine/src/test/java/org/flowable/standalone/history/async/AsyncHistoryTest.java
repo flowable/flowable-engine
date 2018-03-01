@@ -56,7 +56,8 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
             List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
             
             int expectedNrOfJobs = 11;
-            if (expectedNrOfJobs > processEngineConfiguration.getAsyncHistoryJsonGroupingThreshold()) {
+            if ( processEngineConfiguration.isAsyncHistoryJsonGroupingEnabled() && 
+                    expectedNrOfJobs > processEngineConfiguration.getAsyncHistoryJsonGroupingThreshold()) {
                 expectedNrOfJobs = 2; // 1 job  for start, 1 for complete
             }
             
