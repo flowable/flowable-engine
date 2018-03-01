@@ -10,8 +10,6 @@ import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.flowable.app.security.FlowableAppUser;
-import org.flowable.app.security.OAuth2AuthorizationHandler;
-import org.flowable.app.security.OAuth2AuthorizationRequestor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.flowable.app.security.OAuthAuthorizationHandler;
+import org.flowable.app.security.OAuthAuthorizationRequestor;
 
 /**
  *
@@ -35,10 +35,10 @@ public class OAuthController {
     private static final Logger LOG = LoggerFactory.getLogger(OAuthController.class);
 
     @Autowired(required = false)
-    protected Collection<OAuth2AuthorizationRequestor> oAuth2Requestors;
+    protected Collection<OAuthAuthorizationRequestor> oAuth2Requestors;
 
     @Autowired(required = false)
-    protected Collection<OAuth2AuthorizationHandler> oAuth2Handlers;
+    protected Collection<OAuthAuthorizationHandler> oAuth2Handlers;
 
     @Autowired
     protected RememberMeServices customPersistentRememberMeServices;
@@ -51,8 +51,8 @@ public class OAuthController {
             LOG.error(e);
             throw new RuntimeException(e);
         }
-        OAuth2AuthorizationRequestor selectedRequestor = null;
-        for (OAuth2AuthorizationRequestor c : oAuth2Requestors) {
+        OAuthAuthorizationRequestor selectedRequestor = null;
+        for (OAuthAuthorizationRequestor c : oAuth2Requestors) {
             if (config == null || config.isEmpty()) {
                 LOG.debug("No specific Requestor selected. Defaulting to the first one!");
                 selectedRequestor = c;
@@ -87,8 +87,8 @@ public class OAuthController {
             LOG.error(e);
             throw new RuntimeException(e);
         }
-        OAuth2AuthorizationHandler selectedHandler = null;
-        for (OAuth2AuthorizationHandler c : oAuth2Handlers) {
+        OAuthAuthorizationHandler selectedHandler = null;
+        for (OAuthAuthorizationHandler c : oAuth2Handlers) {
             if (c.canHandle(state)) {
                 selectedHandler = c;
                 break;

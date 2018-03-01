@@ -9,10 +9,10 @@ package org.flowable.app.security;
  *
  * @author ahmedghonim
  */
-public interface OAuth2AuthorizationRequestor {
+public interface OAuthAuthorizationRequestor {
 
     public String getName();
-    
+
     public boolean canAuthorize(String id);
 
     public String buildAuthorizationURL();

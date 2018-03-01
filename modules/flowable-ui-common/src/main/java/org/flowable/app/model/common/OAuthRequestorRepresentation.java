@@ -12,10 +12,10 @@
  */
 package org.flowable.app.model.common;
 
-import org.flowable.app.security.OAuth2AuthorizationRequestor;
+import org.flowable.app.security.OAuthAuthorizationRequestor;
 
 /**
- * @author Joram Barrez
+ * @author Ahmed Ghonim
  */
 public class OAuthRequestorRepresentation extends AbstractRepresentation {
 
@@ -25,7 +25,7 @@ public class OAuthRequestorRepresentation extends AbstractRepresentation {
 
     }
 
-    public OAuthRequestorRepresentation(OAuth2AuthorizationRequestor requestor) {
+    public OAuthRequestorRepresentation(OAuthAuthorizationRequestor requestor) {
         this.name = requestor.getName();
     }
 

@@ -9,7 +9,7 @@ package org.flowable.app.security;
  *
  * @author ahmedghonim
  */
-public interface OAuth2AuthorizationHandler {
+public interface OAuthAuthorizationHandler {
 
     public boolean canHandle(String state);
 
