@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
@@ -184,6 +185,8 @@ public class DmnJsonConverterTest {
         assertEquals("true", outputEntry23.getText());
         assertSame(conclusion1, ruleClauseContainer23.getOutputClause());
 
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -241,6 +244,9 @@ public class DmnJsonConverterTest {
         assertEquals("outputExpression_3", outputClause1.getId());
         assertEquals("newVariable1", outputClause1.getName());
         assertEquals("boolean", outputClause1.getTypeRef());
+        
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -250,6 +256,9 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
         assertNotNull(dmnDefinition);
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -265,6 +274,9 @@ public class DmnJsonConverterTest {
         assertEquals("-", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-", decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -288,6 +300,9 @@ public class DmnJsonConverterTest {
         assertEquals("outputExpression_14", rules.get(0).getOutputEntries().get(0).getOutputClause().getId());
         assertEquals("outputExpression_13", rules.get(0).getOutputEntries().get(1).getOutputClause().getId());
         assertEquals("outputExpression_15", rules.get(0).getOutputEntries().get(2).getOutputClause().getId());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -307,6 +322,9 @@ public class DmnJsonConverterTest {
         assertEquals("THIRD", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(0));
         assertEquals("FIRST", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(1));
         assertEquals("SECOND", decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(2));
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -317,7 +335,11 @@ public class DmnJsonConverterTest {
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
         assertEquals("== date:toDate('14-06-2017')",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("!= date:toDate('16-06-2017')",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());    }
+        assertEquals("!= date:toDate('16-06-2017')",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
+    }
 
     @Test
     public void testConvertJsonToDmnEmptyOperator() {
@@ -339,6 +361,9 @@ public class DmnJsonConverterTest {
         assertEquals("", decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputEntry().getText());
         assertNotNull(decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputClause());
         assertNotNull(decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputClause());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -348,6 +373,9 @@ public class DmnJsonConverterTest {
 
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
         assertEquals("refVar1 * refVar2", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -383,6 +411,9 @@ public class DmnJsonConverterTest {
         assertEquals("1", rule2.getOutputEntries().get(1).getOutputEntry().getText());
         assertEquals("false", rule2.getOutputEntries().get(2).getOutputEntry().getText());
         assertEquals("date:toDate('2016-06-01')", rule2.getOutputEntries().get(3).getOutputEntry().getText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -396,6 +427,9 @@ public class DmnJsonConverterTest {
         assertEquals("boolean", decisionTable.getInputs().get(2).getInputExpression().getTypeRef());
         assertEquals("date", decisionTable.getInputs().get(3).getInputExpression().getTypeRef());
         assertEquals("string", decisionTable.getOutputs().get(0).getTypeRef());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -409,6 +443,9 @@ public class DmnJsonConverterTest {
         assertEquals("boolean", decisionTable.getInputs().get(2).getInputExpression().getTypeRef());
         assertEquals("date", decisionTable.getInputs().get(3).getInputExpression().getTypeRef());
         assertEquals("string", decisionTable.getOutputs().get(0).getTypeRef());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -419,6 +456,9 @@ public class DmnJsonConverterTest {
 
         assertEquals("string", decisionTable.getInputs().get(0).getInputExpression().getTypeRef());
         assertEquals("string", decisionTable.getOutputs().get(0).getTypeRef());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -429,6 +469,9 @@ public class DmnJsonConverterTest {
 
         assertEquals("number", decisionTable.getInputs().get(0).getInputExpression().getTypeRef());
         assertEquals("boolean", decisionTable.getOutputs().get(0).getTypeRef());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -438,6 +481,9 @@ public class DmnJsonConverterTest {
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
         assertEquals("SUM", decisionTable.getAggregation().getValue());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -448,6 +494,9 @@ public class DmnJsonConverterTest {
 
         assertEquals("== \"TEST\"",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("== \"TEST\"",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -458,6 +507,9 @@ public class DmnJsonConverterTest {
 
         assertEquals("${inputVar4 != null}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("#{inputVar4 > date:now()}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     @Test
@@ -481,6 +533,8 @@ public class DmnJsonConverterTest {
         assertEquals("== testCollection",  decisionTable.getRules().get(12).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("!= \"testValue\"",  decisionTable.getRules().get(13).getInputEntries().get(0).getInputEntry().getText());
 
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
     }
 
     /* Helper methods */

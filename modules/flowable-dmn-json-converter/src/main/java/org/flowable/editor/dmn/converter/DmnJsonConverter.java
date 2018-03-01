@@ -107,7 +107,10 @@ public class DmnJsonConverter {
         modelNode.put("name", definition.getName());
         modelNode.put("description", definition.getDescription());
         modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
-        modelNode.put("collectOperator", decisionTable.getAggregation().name());
+
+        if (decisionTable.getAggregation() != null) {
+            modelNode.put("collectOperator", decisionTable.getAggregation().name());
+        }
 
         // input expressions
         ArrayNode inputExpressionsNode = objectMapper.createArrayNode();
