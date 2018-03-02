@@ -24,6 +24,7 @@
         <module>flowable-spring-boot-sample-custom-mybatis-mapper</module>
         <module>flowable-spring-boot-sample-dmn</module>
         <module>flowable-spring-boot-sample-form</module>
+        <module>flowable-spring-boot-sample-content</module>
     </modules>
     <dependencies>
         <dependency>

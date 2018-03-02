@@ -70,6 +70,12 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-content-spring-configurator</artifactId>
+			<optional>true</optional>
+		</dependency>
+
 		<!-- integration -->
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
