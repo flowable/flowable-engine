@@ -26,17 +26,18 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  */
 public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
 
-    protected SpringDmnEngineConfiguration dmnEngineConfiguration;
-
     @Override
     public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (dmnEngineConfiguration == null) {
             dmnEngineConfiguration = new SpringDmnEngineConfiguration();
+        } else if (!(dmnEngineConfiguration instanceof SpringDmnEngineConfiguration)) {
+            throw new IllegalArgumentException("Expected dmnEngine configuration to be of type"
+                + SpringDmnEngineConfiguration.class + " but was " + dmnEngineConfiguration.getClass());
         }
         initialiseCommonProperties(engineConfiguration, dmnEngineConfiguration);
         
         SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
-        dmnEngineConfiguration.setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
+        ((SpringDmnEngineConfiguration) dmnEngineConfiguration).setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
         dmnEngineConfiguration.setExpressionManager(new SpringDmnExpressionManager(
                         springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
 
@@ -53,15 +54,4 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
 
         return dmnEngineConfiguration.buildDmnEngine();
     }
-
-    @Override
-    public SpringDmnEngineConfiguration getDmnEngineConfiguration() {
-        return dmnEngineConfiguration;
-    }
-
-    public SpringDmnEngineConfigurator setDmnEngineConfiguration(SpringDmnEngineConfiguration dmnEngineConfiguration) {
-        this.dmnEngineConfiguration = dmnEngineConfiguration;
-        return this;
-    }
-
 }
