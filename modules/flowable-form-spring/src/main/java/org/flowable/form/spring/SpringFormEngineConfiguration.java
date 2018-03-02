@@ -29,9 +29,9 @@ import org.flowable.form.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.spring.common.SpringEngineConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -41,7 +41,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author David Syer
  * @author Joram Barrez
  */
-public class SpringFormEngineConfiguration extends FormEngineConfiguration implements ApplicationContextAware {
+public class SpringFormEngineConfiguration extends FormEngineConfiguration implements SpringEngineConfiguration {
 
     protected PlatformTransactionManager transactionManager;
     protected String deploymentName = "SpringAutoDeployment";

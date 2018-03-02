@@ -40,8 +40,7 @@ public class DefaultManagementMBeanAssembler implements ManagementMBeanAssembler
     public ModelMBean assemble(Object obj, ObjectName name) throws JMException {
         ModelMBeanInfo mbi = null;
 
-        // use the default provided mbean which has been annotated with JMX
-        // annotations
+        // use the default provided mbean which has been annotated with JMX annotations
         LOGGER.trace("Assembling MBeanInfo for: {} from @ManagedResource object: {}", name, obj);
         mbi = assembler.getMBeanInfo(obj, null, name.toString());
 
