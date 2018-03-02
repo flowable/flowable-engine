@@ -12,6 +12,7 @@
  */
 package org.flowable.app.conf;
 
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.rest.application.ContentTypeResolver;
 import org.flowable.rest.application.DefaultContentTypeResolver;
 import org.flowable.rest.content.ContentRestResponseFactory;
@@ -33,6 +34,12 @@ public class RestApiConfiguration {
     @Bean()
     public RestResponseFactory processResponseFactory() {
         RestResponseFactory restResponseFactory = new RestResponseFactory();
+        return restResponseFactory;
+    }
+    
+    @Bean()
+    public CmmnRestResponseFactory cmmnResponseFactory() {
+        CmmnRestResponseFactory restResponseFactory = new CmmnRestResponseFactory();
         return restResponseFactory;
     }
 

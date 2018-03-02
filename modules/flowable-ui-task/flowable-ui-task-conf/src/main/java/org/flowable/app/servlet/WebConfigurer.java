@@ -96,6 +96,7 @@ public class WebConfigurer implements ServletContextListener {
         appDispatcherServlet.setAsyncSupported(true);
 
         initSpringProcessRest(servletContext, rootContext);
+        initSpringCMMNRest(servletContext, rootContext);
         initSpringDMNRest(servletContext, rootContext);
         initSpringFormRest(servletContext, rootContext);
         initSpringContentRest(servletContext, rootContext);
@@ -106,6 +107,13 @@ public class WebConfigurer implements ServletContextListener {
      */
     private ServletRegistration.Dynamic initSpringProcessRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
         return initSpringRestComponent(servletContext, rootContext, "process-api", ProcessDispatcherServletConfiguration.class);
+    }
+    
+    /**
+     * Initializes CMMN Spring and Spring MVC.
+     */
+    protected ServletRegistration.Dynamic initSpringCMMNRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+        return initSpringRestComponent(servletContext, rootContext, "cmmn-api", CmmnDispatcherServletConfiguration.class);
     }
 
     /**

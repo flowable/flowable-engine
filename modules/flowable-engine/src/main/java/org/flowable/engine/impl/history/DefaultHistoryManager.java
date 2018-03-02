@@ -342,8 +342,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     // Identity link related history
     @Override
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
-        // It makes no sense storing historic counterpart for an identity-link that is related
-        // to a process-definition only as this is never kept in history
+        // It makes no sense storing historic counterpart for an identity link that is related
+        // to a process definition only as this is never kept in history
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT) && (identityLink.getProcessInstanceId() != null || identityLink.getTaskId() != null)) {
             HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
             HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();

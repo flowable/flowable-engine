@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.SuspensionState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -90,9 +91,9 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected boolean isCanceled;
 
     private boolean isCountEnabled;
-    private int variableCount;
-    private int identityLinkCount;
-    
+    protected int variableCount;
+    protected int identityLinkCount;
+    protected int subTaskCount;
 
     protected Date claimTime;
 
@@ -170,6 +171,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         persistentState.put("isCountEnabled", this.isCountEnabled);
         persistentState.put("variableCount", this.variableCount);
         persistentState.put("identityLinkCount", this.identityLinkCount);
+        persistentState.put("subTaskCount", this.subTaskCount);
 
         return persistentState;
     }
@@ -189,9 +191,15 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         variableInstance.setTaskId(id);
-        variableInstance.setExecutionId(executionId);
-        variableInstance.setProcessInstanceId(processInstanceId);
-        variableInstance.setProcessDefinitionId(processDefinitionId);
+        if (ScopeTypes.CMMN.equals(this.scopeType)) {
+            variableInstance.setScopeId(this.scopeId);
+            variableInstance.setScopeType(this.scopeType);
+            variableInstance.setSubScopeId(this.subScopeId);
+        } else {
+            variableInstance.setExecutionId(this.executionId);
+            variableInstance.setProcessInstanceId(this.processInstanceId);
+            variableInstance.setProcessDefinitionId(this.processDefinitionId);
+        }
     }
 
     @Override
@@ -730,4 +738,12 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         return identityLinkCount;
     }
 
+    public int getSubTaskCount() {
+        return subTaskCount;
+    }
+
+    public void setSubTaskCount(int subTaskCount) {
+        this.subTaskCount = subTaskCount;
+    }
+    
 }

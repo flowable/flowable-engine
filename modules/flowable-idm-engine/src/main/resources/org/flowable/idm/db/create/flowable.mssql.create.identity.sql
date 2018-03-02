@@ -68,7 +68,7 @@ create table ACT_ID_TOKEN (
 
 create table ACT_ID_PRIV (
     ID_ nvarchar(64) not null,
-    NAME_ nvarchar(255),
+    NAME_ nvarchar(255) not null,
     primary key (ID_)
 );
 

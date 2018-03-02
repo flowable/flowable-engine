@@ -54,9 +54,20 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
             taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
             List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
-            assertEquals(11, jobs.size());
+            
+            int expectedNrOfJobs = 11;
+            if ( processEngineConfiguration.isAsyncHistoryJsonGroupingEnabled() && 
+                    expectedNrOfJobs > processEngineConfiguration.getAsyncHistoryJsonGroupingThreshold()) {
+                expectedNrOfJobs = 2; // 1 job  for start, 1 for complete
+            }
+            
+            assertEquals(expectedNrOfJobs, jobs.size());
             for (HistoryJob job : jobs) {
-                assertEquals(AsyncHistoryJobHandler.JOB_TYPE, job.getJobHandlerType());
+                if (processEngineConfiguration.isAsyncHistoryJsonGzipCompressionEnabled()) {
+                    assertEquals(AsyncHistoryJobZippedHandler.JOB_TYPE, job.getJobHandlerType());
+                } else {
+                    assertEquals(AsyncHistoryJobHandler.JOB_TYPE, job.getJobHandlerType());
+                }
                 assertNotNull(((HistoryJobEntity) job).getAdvancedJobHandlerConfigurationByteArrayRef());
             }
 

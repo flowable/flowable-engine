@@ -85,7 +85,9 @@ public class LDAPTestCase extends SpringFlowableTestCase {
         // Need to do this 'manually', or otherwise the ldap server won't be
         // shut down properly
         // on the QA machine, failing the next tests
-        apacheDSContainer.stop();
+        if (apacheDSContainer != null) {
+            apacheDSContainer.stop();
+        }
     }
 
     private int countTotalTests() {

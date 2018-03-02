@@ -4,27 +4,6 @@
   
 <mapper namespace="org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl">
 
-  <!-- DELETE -->
-
-  <delete id="deleteSignalEventSubscription" parameterType="org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl">
-    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
-  </delete>
-  
-  <delete id="deleteCompensateEventSubscription" parameterType="org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl">
-    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
-  </delete>
-  
-  <delete id="deleteMessageEventSubscription" parameterType="org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl">
-    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
-  </delete>
-  
-  <delete id="deleteEventSubscriptionsForProcessDefinition" parameterType="string">
-    delete from ${prefix}ACT_RU_EVENT_SUBSCR 
-    where PROC_DEF_ID_ = #{processDefinitionId} 
-    and EXECUTION_ID_ is null
-    and PROC_INST_ID_ is null
-  </delete>
-  
   <!-- RESULTMAP -->
 
   <resultMap id="eventSubscriptionResultMap" type="org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl">
@@ -617,5 +596,30 @@
     </set>
     where TENANT_ID_ = #{oldTenantId, jdbcType=VARCHAR}
   </update>
+  
+  <!-- DELETE -->
+
+  <delete id="deleteSignalEventSubscription" parameterType="org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl">
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+  
+  <delete id="deleteCompensateEventSubscription" parameterType="org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl">
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+  
+  <delete id="deleteMessageEventSubscription" parameterType="org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl">
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+  
+  <delete id="deleteEventSubscriptionsForProcessDefinition" parameterType="string">
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR 
+    where PROC_DEF_ID_ = #{processDefinitionId} 
+    and EXECUTION_ID_ is null
+    and PROC_INST_ID_ is null
+  </delete>
+  
+  <delete id="deleteEventSubscriptionsByExecutionId" parameterType="string">
+     delete from ${prefix}ACT_RU_EVENT_SUBSCR where EXECUTION_ID_ = #{id}
+  </delete>
 
 </mapper>

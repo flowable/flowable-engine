@@ -146,7 +146,7 @@ public class ProfilingDbSqlSession extends DbSqlSession {
         if (getCurrentCommandExecution() != null) {
             if (bulkDeleteOperations.containsKey(entityClass)) {
                 for (BulkDeleteOperation bulkDeleteOperation : bulkDeleteOperations.get(entityClass)) {
-                    getCurrentCommandExecution().addDbDelete("Bulk-delete-" + bulkDeleteOperation.getClass());
+                    getCurrentCommandExecution().addDbDelete("Bulk-delete-" + bulkDeleteOperation.getStatement());
                 }
             }
         }

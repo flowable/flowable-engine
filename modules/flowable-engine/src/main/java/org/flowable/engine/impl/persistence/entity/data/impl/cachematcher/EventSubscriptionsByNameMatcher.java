@@ -15,7 +15,7 @@ package org.flowable.engine.impl.persistence.entity.data.impl.cachematcher;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 
 /**

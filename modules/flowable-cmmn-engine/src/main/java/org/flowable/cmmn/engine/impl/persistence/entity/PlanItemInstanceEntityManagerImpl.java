@@ -24,10 +24,10 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
@@ -134,7 +134,7 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
             VariableInstanceEntityManager variableInstanceEntityManager 
                 = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
             List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
-                    .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), VariableScopeType.CMMN);
+                    .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), ScopeTypes.CMMN);
             for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
                 variableInstanceEntityManager.delete(variableInstanceEntity);
             }

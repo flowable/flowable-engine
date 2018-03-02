@@ -14,8 +14,8 @@ package org.flowable.app.conf;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.flowable.engine.common.runtime.Clock;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;

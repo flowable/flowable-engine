@@ -20,10 +20,10 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.junit.Test;
 
 /**
@@ -95,7 +95,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertEquals(planItemInstance.getId(), task.getSubScopeId());
         assertEquals(planItemInstance.getCaseInstanceId(), task.getScopeId());
         assertEquals(planItemInstance.getCaseDefinitionId(), task.getScopeDefinitionId());
-        assertEquals(VariableScopeType.CMMN, task.getScopeType());
+        assertEquals(ScopeTypes.CMMN, task.getScopeType());
         
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertEquals(0, cmmnTaskService.createTaskQuery().count());

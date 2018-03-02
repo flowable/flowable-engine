@@ -66,4 +66,14 @@ public class TestMultipleFlowableEventListener implements FlowableEventListener 
     public void setEventClasses(Class<?>... eventClasses) {
         this.eventClasses = Arrays.asList(eventClasses);
     }
+    
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return false;
+    }
+
+    @Override
+    public String getOnTransaction() {
+        return null;
+    }
 }

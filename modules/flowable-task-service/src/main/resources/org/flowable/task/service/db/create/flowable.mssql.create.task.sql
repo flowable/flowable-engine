@@ -26,6 +26,7 @@ create table ACT_RU_TASK (
     IS_COUNT_ENABLED_ tinyint,
     VAR_COUNT_ int, 
     ID_LINK_COUNT_ int,
+    SUB_TASK_COUNT_ int,
     primary key (ID_)
 );
 

@@ -34,8 +34,7 @@ public class Utils {
         String hostName = null;
         boolean canAccessSystemProps = true;
         try {
-            // we'll do it this way mostly to determine if we should lookup the
-            // hostName
+            // we'll do it this way mostly to determine if we should lookup the hostName
             SecurityManager sm = System.getSecurityManager();
             if (sm != null) {
                 sm.checkPropertiesAccess();

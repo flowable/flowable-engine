@@ -52,6 +52,7 @@
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav" ng-show="authenticated">
                         <li ng-class="{'active-process': navigation.main == 'process-engine'}"><a href="#process-engine" translate="GENERAL.MENU.PROCESS-ENGINE"></a></li>
+                        <li ng-class="{'active-cmmn': navigation.main == 'cmmn-engine'}"><a href="#cmmn-engine" translate="GENERAL.MENU.CMMN-ENGINE"></a></li>
                         <li ng-class="{'active-form': navigation.main == 'form-engine'}"><a href="#form-engine" translate="GENERAL.MENU.FORM-ENGINE"></a></li>
                         <li ng-class="{'active-dmn': navigation.main == 'dmn-engine'}"><a href="#dmn-engine" translate="GENERAL.MENU.DMN-ENGINE"></a></li>
                         <li ng-class="{'active-content': navigation.main == 'content-engine'}"><a href="#content-engine" translate="GENERAL.MENU.CONTENT-ENGINE"></a></li>
@@ -66,6 +67,12 @@
                             <li ng-class="{'active': navigation.sub == 'tasks'}"><a href="#tasks" translate="GENERAL.MENU.TASKS"></a></li>
                             <li ng-class="{'active': navigation.sub == 'jobs'}"><a href="#jobs" translate="GENERAL.MENU.JOBS"></a></li>
                             <li ng-class="{'active': navigation.sub == 'event-subscriptions'}"><a href="#event-subscriptions" translate="GENERAL.MENU.EVENT-SUBSCRIPTIONS"></a></li>
+                        </ul>
+                        <ul class="nav navbar-nav" ng-if="navigation.main == 'cmmn-engine'">
+                            <li ng-class="{'active': navigation.sub == 'deployments'}"><a href="#cmmndeployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'definitions'}"><a href="#cmmn-definitions" translate="GENERAL.MENU.DEFINITIONS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'instances'}"><a href="#case-instances" translate="GENERAL.MENU.INSTANCES"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'tasks'}"><a href="#cmmn-tasks" translate="GENERAL.MENU.TASKS"></a></li>
                         </ul>
                         <ul class="nav navbar-nav" ng-if="navigation.main == 'form-engine'">
                             <li ng-class="{active: navigation.sub == 'deployments'}"><a href="#form-deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
@@ -159,6 +166,8 @@
         <script src="scripts/services.js"></script>
         <script src="scripts/directives.js"></script>
         <script src="scripts/constants.js"></script>
+        <script src="scripts/cmmn-deployments-controllers.js"></script>
+        <script src="scripts/cmmn-deployment-controllers.js"></script>
         <script src="scripts/decision-table-deployments-controllers.js"></script>
         <script src="scripts/decision-table-deployment-controllers.js"></script>
         <script src="scripts/decision-tables-controllers.js"></script>

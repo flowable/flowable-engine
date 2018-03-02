@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.Base64;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -97,7 +97,7 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
         HttpPost httpPost = new HttpPost(deployApiUrl);
         httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.encodeBase64((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
+                Base64.getEncoder().encode((basicAuthUser + ":" + basicAuthPassword).getBytes(Charset.forName("UTF-8")))));
 
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
         entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);

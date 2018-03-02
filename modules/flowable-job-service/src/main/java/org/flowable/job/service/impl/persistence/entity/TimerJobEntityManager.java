@@ -88,5 +88,5 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
      * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
-
+    
 }

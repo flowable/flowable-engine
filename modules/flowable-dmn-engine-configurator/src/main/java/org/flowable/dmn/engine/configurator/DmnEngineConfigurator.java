@@ -20,10 +20,10 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.AbstractEngineConfigurator;
-import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfigurator;
+import org.flowable.engine.common.impl.EngineDeployer;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 

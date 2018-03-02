@@ -14,9 +14,9 @@
 package org.flowable.cmmn.engine.impl.task;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
 /**
@@ -32,7 +32,7 @@ public class DefaultCmmnTaskVariableScopeResolver implements InternalTaskVariabl
 
     @Override
     public VariableScopeImpl resolveParentVariableScope(TaskEntity taskEntity) {
-        if (VariableScopeType.CMMN.equals(taskEntity.getScopeType())) {
+        if (ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
             if (taskEntity.getSubScopeId() != null) {
                 return (VariableScopeImpl) cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(taskEntity.getSubScopeId());
             } else if (taskEntity.getScopeId() != null) {
