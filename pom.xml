@@ -22,8 +22,8 @@
 		<spring.security.version>4.2.4.RELEASE</spring.security.version>
 		<jackson.version>2.9.3</jackson.version>
 		<mule.version>3.8.0</mule.version>
-		<camel.version>2.17.1</camel.version>
-		<cxf.version>3.1.6</cxf.version>
+		<camel.version>2.20.2</camel.version>
+		<cxf.version>3.2.2</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
@@ -128,6 +128,11 @@
 				<artifactId>httpclient</artifactId>
 				<version>4.5.3</version>
 			</dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.4.6</version>
+            </dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
@@ -142,12 +147,12 @@
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
-				<version>2.2.11</version>
+				<version>2.3.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-xjc</artifactId>
-				<version>2.2.11</version>
+				<version>2.3.0</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -174,7 +179,7 @@
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
 				<artifactId>jaxb-api</artifactId>
-				<version>2.2.11</version>
+				<version>2.2.3</version>
 			</dependency>
 			<dependency>
 				<groupId>io.swagger</groupId>
@@ -384,6 +389,11 @@
 				<artifactId>flowable-cmmn-image-generator</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-cmmn-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-form-model</artifactId>
@@ -637,12 +647,12 @@
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-core</artifactId>
-				<version>5.5.0.Final</version>
+				<version>7.6.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-compiler</artifactId>
-				<version>5.5.0.Final</version>
+				<version>7.6.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mule.modules</groupId>
@@ -672,7 +682,7 @@
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
-				<version>1.8.2</version>
+				<version>1.10.19</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -903,9 +913,9 @@
 				<version>1.3.0</version>
 			</dependency>
 			<dependency>
-				<groupId>com.googlecode.catch-exception</groupId>
-				<artifactId>catch-exception</artifactId>
-				<version>1.2.0</version>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-core</artifactId>
+				<version>3.9.1</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -972,7 +982,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.1.0</version>
+				<version>3.5.0</version>
 				<extensions>true</extensions>
 				<configuration>
 					<excludeDependencies>${flowable.osgi.exclude.dependencies}</excludeDependencies>
@@ -1083,6 +1093,7 @@
                 <module>modules/flowable-cmmn-engine-configurator</module>
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
+                <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-form-model</module>
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
@@ -1205,6 +1216,9 @@
                 <module>modules/flowable-cmmn-json-converter</module>
                 <module>modules/flowable-cmmn-engine</module>
                 <module>modules/flowable-cmmn-engine-configurator</module>
+                <module>modules/flowable-cmmn-spring</module>
+                <module>modules/flowable-cmmn-spring-configurator</module>
+                <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
@@ -1282,6 +1296,7 @@
                 <module>modules/flowable-cmmn-engine-configurator</module>
                 <module>modules/flowable-cmmn-spring</module>
                 <module>modules/flowable-cmmn-spring-configurator</module>
+                <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-form-model</module>
 				<module>modules/flowable-form-json-converter</module>
 				<module>modules/flowable-form-engine</module>
@@ -1449,6 +1464,15 @@
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
                 <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-cmmn-api</module>
+                <module>modules/flowable-cmmn-model</module>
+                <module>modules/flowable-cmmn-converter</module>
+                <module>modules/flowable-cmmn-json-converter</module>
+                <module>modules/flowable-cmmn-engine</module>
+                <module>modules/flowable-cmmn-engine-configurator</module>
+                <module>modules/flowable-cmmn-spring</module>
+                <module>modules/flowable-cmmn-spring-configurator</module>
+                <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-api</module>
 				<module>modules/flowable-dmn-engine</module>
@@ -1497,6 +1521,15 @@
                 </plugins>
             </build>
 		</profile>
+        <profile>
+            <id>java9</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <properties>
+                <argLine>--add-modules java.xml.bind</argLine>
+            </properties>
+        </profile>
 	</profiles>
 
     <reporting>

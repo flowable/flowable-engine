@@ -148,5 +148,15 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
             this.createdEvents.clear();
             this.completedEvents.clear();
         }
+        
+        @Override
+        public boolean isFireOnTransactionLifecycleEvent() {
+            return false;
+        }
+
+        @Override
+        public String getOnTransaction() {
+            return null;
+        }
     }
 }

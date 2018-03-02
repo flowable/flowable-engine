@@ -19,8 +19,8 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngines;
-import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.EngineInfo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

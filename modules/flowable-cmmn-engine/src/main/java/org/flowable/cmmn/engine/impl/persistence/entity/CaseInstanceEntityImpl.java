@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.variable.api.type.VariableScopeType;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -28,7 +28,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
  * @author Joram Barrez
  */
 public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseInstanceEntity {
-    
+
     protected String businessKey;
     protected String name;
     protected String parentId;
@@ -40,13 +40,15 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     protected String callbackType;
     protected boolean completeable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
-    
+
     protected Date lockTime;
-    
+
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
-    
+
+    protected List<VariableInstanceEntity> queryVariables;
+
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("businessKey", businessKey);
@@ -63,7 +65,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
         persistentState.put("lockTime", lockTime);
         return persistentState;
     }
-    
+
     public String getBusinessKey() {
         return businessKey;
     }
@@ -141,12 +143,12 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
         return childPlanItemInstances;
     }
-    
+
     @Override
     public void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances) {
         this.childPlanItemInstances = childPlanItemInstances;
     }
-    
+
     @Override
     public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
         if (satisfiedSentryPartInstances == null) {
@@ -155,18 +157,18 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
         }
         return satisfiedSentryPartInstances;
     }
-    
+
     @Override
     public void setSatisfiedSentryPartInstances(List<SentryPartInstanceEntity> sentryPartInstanceEntities) {
         this.satisfiedSentryPartInstances = sentryPartInstanceEntities;
     }
-    
-    
+
+
     // VariableScopeImpl methods
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.CMMN);
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, ScopeTypes.CMMN);
     }
 
     @Override
@@ -180,22 +182,42 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         variableInstance.setScopeId(id);
-        variableInstance.setScopeType(VariableScopeType.CMMN);
+        variableInstance.setScopeType(ScopeTypes.CMMN);
     }
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.CMMN, variableName);
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, ScopeTypes.CMMN, variableName);
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.CMMN, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, ScopeTypes.CMMN, variableNames);
     }
 
     @Override
     protected boolean isPropagateToHistoricVariable() {
         return true;
     }
-    
+
+    @Override
+    public Map<String, Object> getCaseVariables() {
+        Map<String, Object> caseVariables = new HashMap<>();
+        if (this.queryVariables != null) {
+            for (VariableInstanceEntity queryVariable : queryVariables) {
+                if (queryVariable.getId() != null && queryVariable.getTaskId() == null) {
+                    caseVariables.put(queryVariable.getName(), queryVariable.getValue());
+                }
+            }
+        }
+        return caseVariables;
+    }
+
+    public List<VariableInstanceEntity> getQueryVariables() {
+        return queryVariables;
+    }
+
+    public void setQueryVariables(List<VariableInstanceEntity> queryVariables) {
+        this.queryVariables = queryVariables;
+    }
 }

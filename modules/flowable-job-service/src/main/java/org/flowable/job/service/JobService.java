@@ -33,6 +33,10 @@ public interface JobService {
     
     List<JobEntity> findJobsByExecutionId(String executionId);
     
+    List<SuspendedJobEntity> findSuspendedJobsByExecutionId(String executionId);
+    
+    List<DeadLetterJobEntity> findDeadLetterJobsByExecutionId(String executionId);
+    
     List<JobEntity> findJobsByProcessInstanceId(String processInstanceId);
     
     List<SuspendedJobEntity> findSuspendedJobsByProcessInstanceId(String processInstanceId);
@@ -47,7 +51,7 @@ public interface JobService {
     
     void unacquireWithDecrementRetries(JobInfo job);
     
-    void setAsyncJobProperties(JobEntity job, boolean isExclusive);
+    void createAsyncJob(JobEntity job, boolean isExclusive);
     
     JobEntity createJob();
     

@@ -33,6 +33,22 @@ public class BulkDeleteOperation {
     public void execute(SqlSession sqlSession, Class<? extends Entity> clazz) {
         sqlSession.delete(statement, parameter);
     }
+    
+    public String getStatement() {
+        return statement;
+    }
+
+    public void setStatement(String statement) {
+        this.statement = statement;
+    }
+
+    public Object getParameter() {
+        return parameter;
+    }
+
+    public void setParameter(Object parameter) {
+        this.parameter = parameter;
+    }
 
     @Override
     public String toString() {

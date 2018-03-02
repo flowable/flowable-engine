@@ -41,7 +41,7 @@ import org.flowable.engine.common.api.delegate.event.AbstractFlowableEventListen
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

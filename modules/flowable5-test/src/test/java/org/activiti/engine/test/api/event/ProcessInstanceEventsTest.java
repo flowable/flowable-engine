@@ -546,5 +546,15 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
             return filteredEvents;
         }
 
+        @Override
+        public boolean isFireOnTransactionLifecycleEvent() {
+            return false;
+        }
+
+        @Override
+        public String getOnTransaction() {
+            return null;
+        }
+
     }
 }

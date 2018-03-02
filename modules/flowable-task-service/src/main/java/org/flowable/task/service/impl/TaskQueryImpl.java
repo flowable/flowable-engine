@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.db.SuspensionState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
@@ -28,7 +29,6 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.util.CommandContextUtil;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
@@ -691,10 +691,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery caseInstanceId(String caseInstanceId) {
         if (orActive) {
             currentOrQueryObject.scopeId(caseInstanceId);
-            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+            currentOrQueryObject.scopeType(ScopeTypes.CMMN);
         } else {
             this.scopeId(caseInstanceId);
-            this.scopeType(VariableScopeType.CMMN);
+            this.scopeType(ScopeTypes.CMMN);
         }
         return this;
     }
@@ -703,10 +703,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery caseDefinitionId(String caseDefinitionId) {
         if (orActive) {
             currentOrQueryObject.scopeDefinitionId(caseDefinitionId);
-            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+            currentOrQueryObject.scopeType(ScopeTypes.CMMN);
         } else {
             this.scopeDefinitionId(caseDefinitionId);
-            this.scopeType(VariableScopeType.CMMN);
+            this.scopeType(ScopeTypes.CMMN);
         }
         return this;
     }
@@ -715,10 +715,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery planItemInstanceId(String planItemInstanceId) {
         if (orActive) {
             currentOrQueryObject.subScopeId(planItemInstanceId);
-            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+            currentOrQueryObject.scopeType(ScopeTypes.CMMN);
         } else {
             this.subScopeId(planItemInstanceId);
-            this.scopeType(VariableScopeType.CMMN);
+            this.scopeType(ScopeTypes.CMMN);
         }
         return this;
     }

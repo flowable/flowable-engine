@@ -29,9 +29,9 @@ import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.junit.Test;
 
 /**
@@ -50,7 +50,7 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateAvailable().singleResult());
         
         assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
-        assertEquals(1L, cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(VariableScopeType.CMMN).count());
+        assertEquals(1L, cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count());
         
         // User task should not be active before the timer triggers
         assertEquals(0L, cmmnTaskService.createTaskQuery().count());

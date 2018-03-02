@@ -28,13 +28,13 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,9 +95,9 @@ public class StartCaseInstanceWithFormCmd implements Command<CaseInstance>, Seri
 
         if (formInfo != null) {
             formService.createFormInstanceWithScopeId(formVariables, formInfo, null, caseInstance.getId(),
-                    VariableScopeType.CMMN, caseInstance.getCaseDefinitionId());
+                    ScopeTypes.CMMN, caseInstance.getCaseDefinitionId());
             FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldHandler();
-            formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null, caseInstance.getId(), VariableScopeType.CMMN, caseInstanceBuilder.getVariables());
+            formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null, caseInstance.getId(), ScopeTypes.CMMN, caseInstanceBuilder.getVariables());
         }
 
         return caseInstance;

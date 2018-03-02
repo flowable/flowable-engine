@@ -15,7 +15,7 @@ package org.flowable.engine.common.impl.calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.flowable.engine.common.runtime.ClockReader;
+import org.flowable.engine.common.impl.runtime.ClockReader;
 
 /**
  * Provides an interface for versioned due date resolvers.

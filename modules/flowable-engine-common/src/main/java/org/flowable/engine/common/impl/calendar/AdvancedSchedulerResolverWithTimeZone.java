@@ -18,7 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.runtime.ClockReader;
+import org.flowable.engine.common.impl.runtime.ClockReader;
 
 /**
  * Resolves a due date taking into account the specified time zone.

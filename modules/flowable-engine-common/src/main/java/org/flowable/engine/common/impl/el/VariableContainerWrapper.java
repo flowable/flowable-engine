@@ -41,5 +41,10 @@ public class VariableContainerWrapper implements VariableContainer {
     public void setVariable(String variableName, Object variableValue) {
         variables.put(variableName, variableValue);
     }
+    
+    @Override
+    public void setTransientVariable(String variableName, Object variableValue) {
+        throw new UnsupportedOperationException();
+    }
 
 }

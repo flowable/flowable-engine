@@ -21,15 +21,11 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<SuspendedJobEntity> implements SuspendedJobEntityManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SuspendedJobEntityManagerImpl.class);
 
     protected SuspendedJobDataManager jobDataManager;
 
@@ -90,7 +86,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
             getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
-
+    
     protected SuspendedJobEntity createSuspendedJob(AbstractRuntimeJobEntity job) {
         SuspendedJobEntity newSuspendedJobEntity = create();
         newSuspendedJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());

@@ -322,11 +322,18 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
     }
 
     protected void addField(String name, String propertyName, JsonNode elementNode, ServiceTask task) {
+       addField(name, propertyName, null, elementNode, task);
+    }
+    
+    protected void addField(String name, String propertyName, String defaultValue, JsonNode elementNode, ServiceTask task) {
         FieldExtension field = new FieldExtension();
         field.setFieldName(name);
         String value = CmmnJsonConverterUtil.getPropertyValueAsString(propertyName, elementNode);
         if (StringUtils.isNotEmpty(value)) {
             field.setStringValue(value);
+            task.getFieldExtensions().add(field);
+        } else if (StringUtils.isNotEmpty(defaultValue)) {
+            field.setStringValue(defaultValue);
             task.getFieldExtensions().add(field);
         }
     }

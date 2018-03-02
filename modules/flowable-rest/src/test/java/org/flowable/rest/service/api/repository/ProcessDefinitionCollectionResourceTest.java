@@ -9,8 +9,11 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Deployment collection.
@@ -23,6 +26,7 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
     /**
      * Test getting process definitions. GET repository/process-definitions
      */
+    @Test
     public void testGetProcessDefinitions() throws Exception {
 
         try {

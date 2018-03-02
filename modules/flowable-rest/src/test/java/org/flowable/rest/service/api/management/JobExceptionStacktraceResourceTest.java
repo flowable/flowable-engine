@@ -13,6 +13,9 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.
@@ -24,6 +27,7 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting the stacktrace for a failed job
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/management/JobExceptionStacktraceResourceTest.testTimerProcess.bpmn20.xml" })
     public void testGetJobStacktrace() throws Exception {
         // Start process, forcing error on job-execution
@@ -60,6 +64,7 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting the stacktrace for an unexisting job.
      */
+    @Test
     public void testGetStackForUnexistingJob() throws Exception {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_EXCEPTION_STRACKTRACE, "unexistingjob")), HttpStatus.SC_NOT_FOUND));
     }
@@ -67,6 +72,7 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting the stacktrace for an unexisting job.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/management/JobExceptionStacktraceResourceTest.testTimerProcess.bpmn20.xml" })
     public void testGetStackForJobWithoutException() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess", Collections.singletonMap("error", (Object) Boolean.FALSE));

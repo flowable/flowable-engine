@@ -39,5 +39,19 @@ public interface IdentityLinkInfo {
      * The process instance id associated with this identity link.
      */
     String getProcessInstanceId();
-
+    
+    /**
+     * The scope id associated with this identity link
+     */
+    String getScopeId();
+    
+    /**
+     * The scope type associated with this identity link
+     */
+    String getScopeType();
+    
+    /**
+     * The scope definition id associated with this identity link
+     */
+    String getScopeDefinitionId();
 }

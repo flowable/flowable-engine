@@ -4,6 +4,7 @@ dist: trusty
 sudo: required
 
 jdk:
+  - oraclejdk9
   - oraclejdk8
   - openjdk8
 
@@ -20,4 +21,4 @@ before_script:
   - echo MAVEN_OPTS=\"-Xmx2048m -Xms1024m -Djava.awt.headless=true\" > ~/.mavenrc
 
 script:
-  mvn test -Pcheck,errorLogging
+  mvn test -Pdistro,errorLogging -DskipTests=false

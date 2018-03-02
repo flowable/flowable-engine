@@ -16,7 +16,7 @@ package org.flowable.task.service.impl.persistence;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;

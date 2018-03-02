@@ -9,8 +9,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to listing the resources that are part of a deployment.
@@ -22,6 +25,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all resources for a single deployment. GET repository/deployments/{deploymentId}/resources
      */
+    @Test
     public void testGetDeploymentResources() throws Exception {
 
         try {
@@ -64,6 +68,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all resources for a single unexisting deployment. GET repository/deployments/{deploymentId}/resources
      */
+    @Test
     public void testGetDeploymentResourcesUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCES, "unexisting"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));

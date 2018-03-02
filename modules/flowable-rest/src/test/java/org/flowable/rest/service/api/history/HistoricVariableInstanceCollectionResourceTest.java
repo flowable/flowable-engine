@@ -25,9 +25,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for REST-operation related to the historic variable instance query resource.
@@ -39,6 +42,7 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
     /**
      * Test querying historic variable instance. GET history/historic-variable-instances
      */
+    @Test
     @Deployment
     public void testQueryVariableInstances() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();

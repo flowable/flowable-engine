@@ -72,7 +72,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public void setAsyncJobProperties(JobEntity jobEntity, boolean exclusive) {
+    public void createAsyncJob(JobEntity jobEntity, boolean exclusive) {
         // When the async executor is activated, the job is directly passed on to the async executor thread
         if (isAsyncExecutorActive()) {
             internalCreateLockedAsyncJob(jobEntity, exclusive);
@@ -391,6 +391,12 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void hintAsyncExecutor(JobEntity job) {
+        
+        // Verify that correct properties have been set when the async executor will be hinted
+        if (job.getLockOwner() == null || job.getLockExpirationTime() == null) {
+            createAsyncJob(job, job.isExclusive());
+        }
+        
         if (Context.getTransactionContext() != null) {
             JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, getAsyncExecutor());
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);

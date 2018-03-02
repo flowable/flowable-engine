@@ -19,7 +19,8 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -77,7 +78,14 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
 
     @Override
     public List<TimerJobEntity> findJobsByExecutionId(final String executionId) {
-        return getList("selectTimerJobsByExecutionId", executionId, timerJobsByExecutionIdMatcher, true);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // If the execution has been inserted in the same command execution as this query, there can't be any in the database
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            return getListFromCache(timerJobsByExecutionIdMatcher, executionId);
+        }
+        
+        return getList(dbSqlSession, "selectTimerJobsByExecutionId", executionId, timerJobsByExecutionIdMatcher, true);
     }
 
     @Override
@@ -112,5 +120,5 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateTimerJobTenantIdForDeployment", params);
     }
-
+    
 }

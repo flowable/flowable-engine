@@ -34,10 +34,13 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to Task variables.
@@ -49,6 +52,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test getting all task variables. GET runtime/tasks/{taskId}/variables
      */
+    @Test
     @Deployment
     public void testGetTaskVariables() throws Exception {
 
@@ -144,6 +148,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     @Deployment
     public void testCreateSingleTaskVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -218,6 +223,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable using a binary stream. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateSingleBinaryTaskVariable() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -262,6 +268,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable using a binary stream. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateSingleSerializableTaskVariable() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -315,6 +322,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable, testing edge case exceptions. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateSingleTaskVariableEdgeCases() throws Exception {
         try {
             // Test adding variable to unexisting task
@@ -379,6 +387,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable, testing default types when omitted. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateSingleTaskVariableDefaultTypes() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -442,6 +451,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a multiple task variable in a single call. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateMultipleTaskVariables() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -535,6 +545,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test deleting all local task variables. DELETE runtime/tasks/{taskId}/variables
      */
+    @Test
     @Deployment
     public void testDeleteAllLocalVariables() throws Exception {
         // Start process with all types of variables
