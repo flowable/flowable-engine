@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.spring.common.SpringEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

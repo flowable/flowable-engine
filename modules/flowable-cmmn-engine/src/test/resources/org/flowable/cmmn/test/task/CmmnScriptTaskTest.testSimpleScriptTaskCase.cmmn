@@ -11,7 +11,7 @@
     <case id="scriptCase">
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
             <planItem id="planItemTaskA" name="Plan Item One" definitionRef="taskA" />
-                <task id="taskA" isBlocking="true" name="Script Task Item" flowable:type="script" flowable:class="juel" flowable:resultVariableName="scriptResult" flowable:autoStoreVariables="false">
+                <task id="taskA" isBlocking="true" name="Script Task Item" flowable:type="script" flowable:class="JavaScript" flowable:resultVariableName="scriptResult" flowable:autoStoreVariables="false">
                     <documentation>This is a test documentation</documentation>
                 <extensionElements>
                     <flowable:field name="script">

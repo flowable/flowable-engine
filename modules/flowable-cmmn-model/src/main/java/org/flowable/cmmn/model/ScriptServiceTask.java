@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.model;
 
+import org.flowable.engine.common.api.FlowableException;
+
+import java.util.Optional;
+
 /**
  * @author Dennis
  */
@@ -34,11 +38,11 @@ public class ScriptServiceTask extends ServiceTask {
     }
 
     public String getScript() {
-        return implementation;
-    }
-
-    public void setScript(String script) {
-        this.implementation = script;
+        Optional<String> script = fieldExtensions.stream()
+                .filter(e -> e.getFieldName().equalsIgnoreCase("script"))
+                .findFirst()
+                .map(FieldExtension::getStringValue);
+        return script.orElseThrow(() -> new FlowableException("Missing script"));
     }
 
     public boolean isAutoStoreVariables() {

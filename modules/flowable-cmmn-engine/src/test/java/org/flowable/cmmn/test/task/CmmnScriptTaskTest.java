@@ -12,15 +12,7 @@
  */
 package org.flowable.cmmn.test.task;
 
-//import java.util.List;
-//import java.util.Map;
-//import org.flowable.cmmn.api.history.HistoricCaseInstance;
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertNotNull;
-//import static org.junit.Assert.assertNull;
-
-//import org.flowable.cmmn.api.runtime.CaseInstance;
-//import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 //import org.flowable.engine.common.impl.history.HistoryLevel;
@@ -30,6 +22,8 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 //import org.flowable.variable.api.history.HistoricVariableInstance;
 //import org.flowable.variable.api.type.VariableScopeType;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Joram Barrez
@@ -41,10 +35,10 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
     public void testSimpleScriptTaskCase() {
         System.out.println("==== START testSimpleScriptTaskCase"); //TODO remove
 
-//        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-//                .caseDefinitionKey("scriptCase")
-//                .start();
-//        assertNotNull(caseInstance);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("scriptCase")
+                .start();
+        assertNotNull(caseInstance);
 
 //        System.out.println("==== GET PLANITEM INSTANCE"); //TODO remove
 //        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
