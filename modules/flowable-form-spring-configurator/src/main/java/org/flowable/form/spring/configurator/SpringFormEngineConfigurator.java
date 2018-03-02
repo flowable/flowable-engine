@@ -25,16 +25,17 @@ import org.flowable.spring.common.SpringEngineConfiguration;
  */
 public class SpringFormEngineConfigurator extends FormEngineConfigurator {
 
-    protected SpringFormEngineConfiguration formEngineConfiguration;
-
     @Override
     public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (formEngineConfiguration == null) {
             formEngineConfiguration = new SpringFormEngineConfiguration();
+        } else if (!(formEngineConfiguration instanceof SpringFormEngineConfiguration)) {
+            throw new IllegalArgumentException("Expected formEngine configuration to be of type"
+                + SpringFormEngineConfiguration.class + " but was " + formEngineConfiguration.getClass());
         }
         initialiseCommonProperties(engineConfiguration, formEngineConfiguration);
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
-        formEngineConfiguration.setTransactionManager(springEngineConfiguration.getTransactionManager());
+        ((SpringFormEngineConfiguration) formEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
 
         initFormEngine();
         
@@ -49,15 +50,4 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
 
         return formEngineConfiguration.buildFormEngine();
     }
-
-    @Override
-    public SpringFormEngineConfiguration getFormEngineConfiguration() {
-        return formEngineConfiguration;
-    }
-
-    public SpringFormEngineConfigurator setFormEngineConfiguration(SpringFormEngineConfiguration formEngineConfiguration) {
-        this.formEngineConfiguration = formEngineConfiguration;
-        return this;
-    }
-
 }

@@ -67,11 +67,12 @@ public class DefaultManagementAgent implements ManagementAgent {
     public void register(Object obj, ObjectName name, boolean forceRegistration) throws JMException {
         try {
             Object mbean = assembler.assemble(obj, name);
-            if (mbean != null)
+            if (mbean != null) {
                 // and register the mbean
                 registerMBeanWithServer(mbean, name, forceRegistration);
-            else
+            } else {
                 registerMBeanWithServer(obj, name, forceRegistration);
+            }
 
         } catch (NotCompliantMBeanException e) {
             LOGGER.error("Mbean {} is not compliant MBean.", name, e);
@@ -103,8 +104,7 @@ public class DefaultManagementAgent implements ManagementAgent {
             instance = server.registerMBean(obj, name);
         }
 
-        // need to use the name returned from the server as some JEE servers may
-        // modify the name
+        // need to use the name returned from the server as some JEE servers may modify the name
         if (instance != null) {
             ObjectName registeredName = instance.getObjectName();
             LOGGER.debug("Registered MBean with ObjectName: {}", registeredName);
@@ -182,7 +182,6 @@ public class DefaultManagementAgent implements ManagementAgent {
     public void findAndRegisterMbeans() throws Exception {
         register(new ProcessDefinitionsMBean(jmxConfigurator.getProcessEngineConfig()), new ObjectName(jmxConfigurator.getDomain(), "type", "Deployments"));
         register(new JobExecutorMBean(jmxConfigurator.getProcessEngineConfig()), new ObjectName(jmxConfigurator.getDomain(), "type", "JobExecutor"));
-
     }
 
     public void createJmxConnector(String host) throws IOException {
@@ -203,8 +202,7 @@ public class DefaultManagementAgent implements ManagementAgent {
             registry = LocateRegistry.createRegistry(registryPort);
             LOGGER.debug("Created JMXConnector RMI registry on port {}", registryPort);
         } catch (RemoteException ex) {
-            // The registry may had been created, we could get the registry
-            // instead
+            // The registry may had been created, we could get the registry instead
         }
 
         // must start with leading slash
