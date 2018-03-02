@@ -13,9 +13,8 @@
 package org.flowable.spring.boot;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -27,65 +26,83 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringAsyncExecutor;
 import org.flowable.spring.SpringCallerRunsRejectedJobsHandler;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.StringUtils;
 
 /**
  * Provides sane definitions for the various beans required to be productive with Flowable in Spring.
  *
  * @author Josh Long
+ * @author Filip Hrisafov
+ * @author Javier Casal
  */
-public abstract class AbstractProcessEngineAutoConfiguration
-        extends AbstractProcessEngineConfiguration {
-
-    protected FlowableProperties flowableProperties;
-
-    @Autowired
-    private ResourcePatternResolver resourceLoader;
+@Configuration
+@EnableConfigurationProperties(FlowableProperties.class)
+@AutoConfigureAfter({
+    FlowableTransactionAutoConfiguration.class
+})
+public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
 
     @Autowired(required = false)
-    private ProcessEngineConfigurationConfigurer processEngineConfigurationConfigurer;
+    private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
+
+    public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties) {
+        super(flowableProperties);
+    }
 
     @Bean
+    @ConditionalOnMissingBean
     public SpringAsyncExecutor springAsyncExecutor(TaskExecutor taskExecutor) {
         return new SpringAsyncExecutor(taskExecutor, springRejectedJobsHandler());
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public SpringRejectedJobsHandler springRejectedJobsHandler() {
         return new SpringCallerRunsRejectedJobsHandler();
     }
 
-    protected SpringProcessEngineConfiguration baseSpringProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-            SpringAsyncExecutor springAsyncExecutor) throws IOException {
+    @Bean
+    @ConditionalOnMissingBean
+    public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager, SpringAsyncExecutor springAsyncExecutor) throws IOException {
 
-        List<Resource> procDefResources = this.discoverProcessDefinitionResources(
-                this.resourceLoader, this.flowableProperties.getProcessDefinitionLocationPrefix(),
-                this.flowableProperties.getProcessDefinitionLocationSuffixes(),
-                this.flowableProperties.isCheckProcessDefinitions());
+        SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
-        SpringProcessEngineConfiguration conf = super.processEngineConfigurationBean(
-                procDefResources.toArray(new Resource[procDefResources.size()]), dataSource,
-                platformTransactionManager, springAsyncExecutor);
+        List<Resource> resources = this.discoverDeploymentResources(
+            flowableProperties.getProcessDefinitionLocationPrefix(),
+            flowableProperties.getProcessDefinitionLocationSuffixes(),
+            flowableProperties.isCheckProcessDefinitions()
+        );
+
+        if (resources != null && !resources.isEmpty()) {
+            conf.setDeploymentResources(resources.toArray(new Resource[0]));
+        }
+
+        if (springAsyncExecutor != null) {
+            conf.setAsyncExecutor(springAsyncExecutor);
+        }
+
+        configureSpringEngine(conf, platformTransactionManager);
+        configureEngine(conf, dataSource);
 
         conf.setDeploymentName(defaultText(flowableProperties.getDeploymentName(), conf.getDeploymentName()));
-        conf.setDatabaseSchema(defaultText(flowableProperties.getDatabaseSchema(), conf.getDatabaseSchema()));
-        conf.setDatabaseSchemaUpdate(defaultText(flowableProperties.getDatabaseSchemaUpdate(), conf.getDatabaseSchemaUpdate()));
 
-        conf.setDbHistoryUsed(flowableProperties.isDbHistoryUsed());
         conf.setDisableIdmEngine(!flowableProperties.isDbIdentityUsed());
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
@@ -100,116 +117,66 @@ public abstract class AbstractProcessEngineAutoConfiguration
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
 
-        if (flowableProperties.getCustomMybatisMappers() != null) {
-            conf.setCustomMybatisMappers(getCustomMybatisMapperClasses(flowableProperties.getCustomMybatisMappers()));
-        }
-
-        if (flowableProperties.getCustomMybatisXMLMappers() != null) {
-            conf.setCustomMybatisXMLMappers(new HashSet<>(flowableProperties.getCustomMybatisXMLMappers()));
-        }
-
-        if (flowableProperties.getCustomMybatisMappers() != null) {
-            conf.setCustomMybatisMappers(getCustomMybatisMapperClasses(flowableProperties.getCustomMybatisMappers()));
-        }
-
-        if (flowableProperties.getCustomMybatisXMLMappers() != null) {
-            conf.setCustomMybatisXMLMappers(new HashSet<>(flowableProperties.getCustomMybatisXMLMappers()));
-        }
-
-        if (processEngineConfigurationConfigurer != null) {
-            processEngineConfigurationConfigurer.configure(conf);
-        }
+        processEngineConfigurationConfigurers.forEach(configurator -> configurator.configure(conf));
 
         return conf;
     }
 
-    protected Set<Class<?>> getCustomMybatisMapperClasses(List<String> customMyBatisMappers) {
-        Set<Class<?>> mybatisMappers = new HashSet<>();
-        for (String customMybatisMapperClassName : customMyBatisMappers) {
-            try {
-                Class customMybatisClass = Class.forName(customMybatisMapperClassName);
-                mybatisMappers.add(customMybatisClass);
-            } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException("Class " + customMybatisMapperClassName + " has not been found.", e);
-            }
-        }
-        return mybatisMappers;
-    }
-
-    protected String defaultText(String deploymentName, String deploymentName1) {
-        if (StringUtils.hasText(deploymentName))
-            return deploymentName;
-        return deploymentName1;
-    }
-
-    @Autowired
-    protected void setFlowableProperties(FlowableProperties flowableProperties) {
-        this.flowableProperties = flowableProperties;
-    }
-
-    protected FlowableProperties getFlowableProperties() {
-        return this.flowableProperties;
-    }
-
     @Bean
     public ProcessEngineFactoryBean processEngine(SpringProcessEngineConfiguration configuration) throws Exception {
-        return super.springProcessEngineBean(configuration);
+        ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
+        processEngineFactoryBean.setProcessEngineConfiguration(configuration);
+        return processEngineFactoryBean;
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public RuntimeService runtimeServiceBean(ProcessEngine processEngine) {
-        return super.runtimeServiceBean(processEngine);
+        return processEngine.getRuntimeService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public RepositoryService repositoryServiceBean(ProcessEngine processEngine) {
-        return super.repositoryServiceBean(processEngine);
+        return processEngine.getRepositoryService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public TaskService taskServiceBean(ProcessEngine processEngine) {
-        return super.taskServiceBean(processEngine);
+        return processEngine.getTaskService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public HistoryService historyServiceBean(ProcessEngine processEngine) {
-        return super.historyServiceBean(processEngine);
+        return processEngine.getHistoryService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public ManagementService managementServiceBeanBean(ProcessEngine processEngine) {
-        return super.managementServiceBeanBean(processEngine);
+        return processEngine.getManagementService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public FormService formServiceBean(ProcessEngine processEngine) {
-        return super.formServiceBean(processEngine);
+        return processEngine.getFormService();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public IdentityService identityServiceBean(ProcessEngine processEngine) {
-        return super.identityServiceBean(processEngine);
+        return processEngine.getIdentityService();
     }
-    
+
     @Bean
     @ConditionalOnMissingBean
-    @Override
     public IdmIdentityService idmIdentityServiceBean(ProcessEngine processEngine) {
-        return super.idmIdentityServiceBean(processEngine);
+        //TODO This needs to go into it's own Idm engine configuration
+        return ((IdmEngineConfiguration) processEngine.getProcessEngineConfiguration().getEngineConfigurations()
+            .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
     @Bean
