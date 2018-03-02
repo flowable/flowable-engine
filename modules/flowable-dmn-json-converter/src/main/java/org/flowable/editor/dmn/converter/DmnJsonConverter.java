@@ -155,7 +155,41 @@ public class DmnJsonConverter {
             for (RuleInputClauseContainer ruleClauseContainer : rule.getInputEntries()) {
                 InputClause inputClause = ruleClauseContainer.getInputClause();
                 UnaryTests inputEntry = ruleClauseContainer.getInputEntry();
-                ruleNode.put(inputClause.getInputExpression().getId(), inputEntry.getText());
+
+                String inputExpressionId = inputClause.getInputExpression().getId();
+                String operatorId = inputExpressionId + "_operator";
+                String expressionId = inputExpressionId + "_expression";
+                String expressionText = inputEntry.getText();
+                String operatorValue = null;
+                String expressionValue = null;
+
+                if (StringUtils.isNotEmpty(expressionText)) {
+                    if (expressionText.startsWith("${") || expressionText.startsWith("#{")) {
+                        expressionValue = expressionText;
+                    } else {
+                        if (expressionText.indexOf(' ') != -1) {
+                            operatorValue = expressionText.substring(0, expressionText.indexOf(' '));
+                            expressionValue = expressionText.substring(expressionText.indexOf(' ') + 1);
+                        } else { // no prefixed operator
+                            expressionValue = expressionText;
+                        }
+
+                        // remove outer escape quotes
+                        if (expressionValue.startsWith("\"") && expressionValue.endsWith("\"")) {
+                            expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
+                        }
+
+                        // if build in date function
+                        if (expressionValue.startsWith("fn_date(")) {
+                            expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
+                        } else if (expressionValue.startsWith("date:toDate(")) {
+                            expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
+                        }
+                    }
+                }
+
+                ruleNode.put(operatorId, operatorValue);
+                ruleNode.put(expressionId, expressionValue);
             }
 
             for (RuleOutputClauseContainer ruleClauseContainer : rule.getOutputEntries()) {
