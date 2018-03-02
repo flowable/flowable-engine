@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.sql.DataSource;
+import org.flowable.engine.api.ProcessEngineConfigurationApi;
 
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
@@ -77,7 +78,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration {
+public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration implements ProcessEngineConfigurationApi {
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
     protected int idBlockSize = 2500;
@@ -174,20 +175,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     // createJtaProcessEngineConfiguration() {
     // return new JtaProcessEngineConfiguration();
     // }
-
-    public abstract RepositoryService getRepositoryService();
-
-    public abstract RuntimeService getRuntimeService();
-
-    public abstract FormService getFormService();
-
-    public abstract TaskService getTaskService();
-
-    public abstract HistoryService getHistoryService();
-
-    public abstract IdentityService getIdentityService();
-
-    public abstract ManagementService getManagementService();
 
     public abstract ProcessEngineConfiguration getProcessEngineConfiguration();
 

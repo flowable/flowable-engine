@@ -185,8 +185,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
+import org.flowable.engine.common.ScriptingEngineAwareEngineConfiguration;
+import org.flowable.engine.common.impl.scripting.BeansResolverFactory;
+import org.flowable.engine.common.impl.scripting.ResolverFactory;
+import org.flowable.engine.common.impl.scripting.ScriptBindingsFactory;
+import org.flowable.engine.common.impl.scripting.ScriptingEngines;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi {
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration
+        implements CmmnEngineConfigurationApi, ScriptingEngineAwareEngineConfiguration<CmmnEngineConfiguration> {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -229,7 +236,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
-    
+
     protected boolean executeServiceDbSchemaManagers = true;
 
     protected boolean enableSafeCmmnXml;
@@ -249,11 +256,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
 
+    protected ScriptingEngines scriptingEngines;
+    protected List<ResolverFactory> resolverFactories;
+
     /**
-     * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
-     * information.
+     * Using field injection together with a delegate expression for a service task / execution listener / task listener
+     * is not thread-sade , see user guide section 'Field Injection' for more information.
      * <p>
-     * Set this flag to false to throw an exception at runtime when a field is injected and a delegateExpression is used.
+     * Set this flag to false to throw an exception at runtime when a field is injected and a delegateExpression is
+     * used.
      */
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
@@ -261,7 +272,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
     protected DbSchemaManager jobDbSchemaManager;
-    
+
     /**
      * Case diagram generator. Default value is DefaultCaseDiagramGenerator
      */
@@ -274,7 +285,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String annotationFontName = "Arial";
 
     // CONFIGURATORS ////////////////////////////////////////////////////////////
-
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
     protected List<EngineConfigurator> configurators; // The injected configurators
     protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
@@ -302,10 +312,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
-    
+
     // Async executor
     protected JobServiceConfiguration jobServiceConfiguration;
-    
+
     protected AsyncExecutor asyncExecutor;
     protected JobManager jobManager;
     protected List<JobHandler> customJobHandlers;
@@ -314,82 +324,79 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers;
     protected boolean addDefaultExceptionHandler = true;
     protected FailedJobCommandFactory failedJobCommandFactory;
-    
+
     protected FormFieldHandler formFieldHandler;
-    
+
     /**
      * Boolean flag to be set to activate the {@link AsyncExecutor} automatically after the engine has booted up.
      */
     protected boolean asyncExecutorActivate;
-    
+
     /**
      * Experimental!
      * <p>
      * Set this to true when using the message queue based job executor.
      */
     protected boolean asyncExecutorMessageQueueMode;
-    
+
     /**
      * The number of retries for a job.
      */
     protected int asyncExecutorNumberOfRetries = 3;
-    
+
     /**
-     * Define the default lock time for an async job in seconds. 
-     * The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. 
-     * It will be retried again.
+     * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and
+     * when it expires the async executor assumes that the job has failed. It will be retried again.
      */
     protected int lockTimeAsyncJobWaitTime = 60;
-    
-    /** 
-     * Define the default wait time for a failed job in seconds 
+
+    /**
+     * Define the default wait time for a failed job in seconds
      */
     protected int defaultFailedJobWaitTime = 10;
-    
-    /** 
-     * Defines the default wait time for a failed async job in seconds 
+
+    /**
+     * Defines the default wait time for a failed async job in seconds
      */
     protected int asyncFailedJobWaitTime = 10;
 
     /**
-     * The minimal number of threads that are kept alive in the threadpool for job execution. 
-     * Default value = 2.
-     * 
+     * The minimal number of threads that are kept alive in the threadpool for job execution. Default value = 2.
+     *
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected int asyncExecutorCorePoolSize = 2;
 
     /**
-     * The maximum number of threads that are created in the threadpool for job execution. 
-     * Default value = 10.
-     * 
+     * The maximum number of threads that are created in the threadpool for job execution. Default value = 10.
+     *
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected int asyncExecutorMaxPoolSize = 10;
 
     /**
-     * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. 
-     * Default setting is 5 seconds. Having a setting > 0 takes resources, but in the case of many
-     * job executions it avoids creating new threads all the time. 
-     * If 0, threads will be destroyed after they've been used for job execution.
-     * 
+     * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Default
+     * setting is 5 seconds. Having a setting > 0 takes resources, but in the case of many job executions it avoids
+     * creating new threads all the time. If 0, threads will be destroyed after they've been used for job execution.
+     *
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected long asyncExecutorThreadKeepAliveTime = 5000L;
 
     /**
-     * The size of the queue on which jobs to be executed are placed, before they are actually executed. 
-     * Default value = 100.
-     * 
+     * The size of the queue on which jobs to be executed are placed, before they are actually executed. Default value =
+     * 100.
+     *
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected int asyncExecutorThreadPoolQueueSize = 100;
 
     /**
-     * The queue onto which jobs will be placed before they are actually executed. 
-     * Threads form the async executor threadpool will take work from this queue.
+     * The queue onto which jobs will be placed before they are actually executed. Threads form the async executor
+     * threadpool will take work from this queue.
      * <p>
-     * By default null. If null, an {@link ArrayBlockingQueue} will be created of size {@link #asyncExecutorThreadPoolQueueSize}.
+     * By default null. If null, an {@link ArrayBlockingQueue} will be created of size
+     * {@link #asyncExecutorThreadPoolQueueSize}.
      * <p>
      * When the queue is full, the job will be executed by the calling thread (ThreadPoolExecutor.CallerRunsPolicy())
      * <p>
@@ -398,63 +405,61 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected BlockingQueue<Runnable> asyncExecutorThreadPoolQueue;
 
     /**
-     * The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution when
-     * a shutdown on the executor (or engine) is requested. Default value = 60.
+     * The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution when a
+     * shutdown on the executor (or engine) is requested. Default value = 60.
      * <p>
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected long asyncExecutorSecondsToWaitOnShutdown = 60L;
 
     /**
-     * The number of timer jobs that are acquired during one query 
-     * Before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue.
+     * The number of timer jobs that are acquired during one query Before a job is executed, an acquirement thread
+     * fetches jobs from the database and puts them on the queue.
      * <p>
-     * Default value = 1, as this lowers the potential on optimistic locking exceptions. 
-     * A larger value means more timer jobs will be fetched in one request.
-     * Change this value if you know what you are doing.
+     * Default value = 1, as this lowers the potential on optimistic locking exceptions. A larger value means more timer
+     * jobs will be fetched in one request. Change this value if you know what you are doing.
      * <p>
      */
     protected int asyncExecutorMaxTimerJobsPerAcquisition = 1;
 
     /**
-     * The number of async jobs that are acquired during one query (before a job is executed, 
-     * an acquirement thread fetches jobs from the database and puts them on the queue).
+     * The number of async jobs that are acquired during one query (before a job is executed, an acquirement thread
+     * fetches jobs from the database and puts them on the queue).
      * <p>
-     * Default value = 1, as this lowers the potential on optimistic locking exceptions. 
-     * A larger value means more jobs will be fetched at the same time.
-     * Change this value if you know what you are doing.
+     * Default value = 1, as this lowers the potential on optimistic locking exceptions. A larger value means more jobs
+     * will be fetched at the same time. Change this value if you know what you are doing.
      * <p>
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected int asyncExecutorMaxAsyncJobsDuePerAcquisition = 1;
 
     /**
-     * The time (in milliseconds) the timer acquisition thread will wait to execute the next acquirement query. 
-     * This happens when no new timer jobs were found or when less timer jobs have been fetched
-     * than set in {@link #asyncExecutorMaxTimerJobsPerAcquisition}. Default value = 10 seconds.
+     * The time (in milliseconds) the timer acquisition thread will wait to execute the next acquirement query. This
+     * happens when no new timer jobs were found or when less timer jobs have been fetched than set in
+     * {@link #asyncExecutorMaxTimerJobsPerAcquisition}. Default value = 10 seconds.
      * <p>
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected int asyncExecutorDefaultTimerJobAcquireWaitTime = 10 * 1000;
 
     /**
-     * The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. 
-     * This happens when no new async jobs were found or when less async jobs have been
-     * fetched than set in {@link #asyncExecutorMaxAsyncJobsDuePerAcquisition}. Default value = 10 seconds.
+     * The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This
+     * happens when no new async jobs were found or when less async jobs have been fetched than set in
+     * {@link #asyncExecutorMaxAsyncJobsDuePerAcquisition}. Default value = 10 seconds.
      * <p>
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected int asyncExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
 
     /**
-     * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait 
-     * when the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
+     * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when
+     * the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
      */
     protected int asyncExecutorDefaultQueueSizeFullWaitTime;
 
     /**
-     * When a job is acquired, it is locked so other async executors can't lock and execute it. 
-     * While doing this, the 'name' of the lock owner is written into a column of the job.
+     * When a job is acquired, it is locked so other async executors can't lock and execute it. While doing this, the
+     * 'name' of the lock owner is written into a column of the job.
      * <p>
      * By default, a random UUID will be generated when the executor is created.
      * <p>
@@ -465,8 +470,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String asyncExecutorLockOwner;
 
     /**
-     * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. 
-     * During this period of time, no other async executor will try to acquire and lock this job.
+     * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this
+     * period of time, no other async executor will try to acquire and lock this job.
      * <p>
      * Default value = 5 minutes;
      * <p>
@@ -475,8 +480,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected int asyncExecutorTimerLockTimeInMillis = 5 * 60 * 1000;
 
     /**
-     * The amount of time (in milliseconds) an async job is locked when acquired by the async executor. 
-     * During this period of time, no other async executor will try to acquire and lock this job.
+     * The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this
+     * period of time, no other async executor will try to acquire and lock this job.
      * <p>
      * Default value = 5 minutes;
      * <p>
@@ -485,11 +490,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected int asyncExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
 
     /**
-     * The amount of time (in milliseconds) that is between two consecutive checks of 'expired jobs'. 
-     * Expired jobs are jobs that were locked (a lock owner + time was written by some executor, but the job was never completed).
+     * The amount of time (in milliseconds) that is between two consecutive checks of 'expired jobs'. Expired jobs are
+     * jobs that were locked (a lock owner + time was written by some executor, but the job was never completed).
      * <p>
-     * During such a check, jobs that are expired are again made available, meaning the lock owner and lock time will be removed. 
-     * Other executors will now be able to pick it up.
+     * During such a check, jobs that are expired are again made available, meaning the lock owner and lock time will be
+     * removed. Other executors will now be able to pick it up.
      * <p>
      * A job is deemed expired if the current time has passed the lock time.
      * <p>
@@ -499,19 +504,20 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     /**
      * The amount of time (in milliseconds) a job can maximum be in the 'executable' state before being deemed expired.
-     * Note that this won't happen when using the threadpool based executor, as the acquire thread will fetch these kind of jobs earlier.
-     * However, in the message queue based execution, it could be some job is posted to a queue but then never is locked nor executed.
+     * Note that this won't happen when using the threadpool based executor, as the acquire thread will fetch these kind
+     * of jobs earlier. However, in the message queue based execution, it could be some job is posted to a queue but
+     * then never is locked nor executed.
      * <p>
      * By default 24 hours, as this should be a very exceptional case.
      */
     protected int asyncExecutorResetExpiredJobsMaxTimeout = 24 * 60 * 60 * 1000;
 
     /**
-     * The default {@link AsyncExecutor} has a 'cleanup' thread that resets expired jobs so they can be re-acquired by other executors. 
-     * This setting defines the size of the page being used when fetching these expired jobs.
+     * The default {@link AsyncExecutor} has a 'cleanup' thread that resets expired jobs so they can be re-acquired by
+     * other executors. This setting defines the size of the page being used when fetching these expired jobs.
      */
     protected int asyncExecutorResetExpiredJobsPageSize = 3;
-    
+
     protected BusinessCalendarManager businessCalendarManager;
 
     /**
@@ -601,6 +607,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initFailedJobCommandFactory();
         initJobServiceConfiguration();
         initAsyncExecutor();
+        initScriptingEngines();
     }
 
     public void initCaseDiagramGenerator() {
@@ -613,7 +620,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initDbSchemaManager() {
         super.initDbSchemaManager();
         initCmmnDbSchemaManager();
-        
+
         if (executeServiceDbSchemaManagers) {
             initIdentityLinkDbSchemaManager();
             initVariableDbSchemaManager();
@@ -645,7 +652,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
         }
     }
-    
+
     protected void initJobDbSchemaManager() {
         if (this.jobDbSchemaManager == null) {
             this.jobDbSchemaManager = new JobDbSchemaManager();
@@ -882,7 +889,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
         initDefaultCaseInstanceCallbacks();
     }
-    
+
     public void initFormFieldHandler() {
         if (this.formFieldHandler == null) {
             this.formFieldHandler = new DefaultFormFieldHandler();
@@ -892,6 +899,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initDefaultCaseInstanceCallbacks() {
         this.caseInstanceStateChangeCallbacks.put(PlanItemInstanceCallbackType.CHILD_CASE,
                 Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildCaseInstanceStateChangeCallback()));
+    }
+
+    protected void initScriptingEngines() {
+        if (resolverFactories == null) {
+            resolverFactories = new ArrayList<>();
+            resolverFactories.add(new CmmnVariableScopeResolverFactory());
+            resolverFactories.add(new BeansResolverFactory());
+        }
+        if (scriptingEngines == null) {
+            
+            scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
+        }
     }
 
     @Override
@@ -1088,7 +1107,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG, this.identityLinkServiceConfiguration);
     }
-    
+
     public void initBusinessCalendarManager() {
         if (businessCalendarManager == null) {
             MapBusinessCalendarManager mapBusinessCalendarManager = new MapBusinessCalendarManager();
@@ -1099,7 +1118,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             businessCalendarManager = mapBusinessCalendarManager;
         }
     }
-    
+
     public void initJobHandlers() {
         jobHandlers = new HashMap<>();
         jobHandlers.put(TriggerTimerEventJobHandler.TYPE, new TriggerTimerEventJobHandler());
@@ -1112,7 +1131,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
         }
     }
-    
+
     public void initFailedJobCommandFactory() {
         if (this.failedJobCommandFactory == null) {
             this.failedJobCommandFactory = new FailedJobCommandFactory() {
@@ -1123,7 +1142,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             };
         }
     }
-    
+
     public void initJobServiceConfiguration() {
         this.jobServiceConfiguration = new JobServiceConfiguration();
         this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
@@ -1136,16 +1155,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         this.jobServiceConfiguration.setJobHandlers(this.jobHandlers);
         this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
-        
+
         List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
         if (customAsyncRunnableExecutionExceptionHandlers != null) {
             exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
         }
-        
+
         if (addDefaultExceptionHandler) {
             exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
         }
-        
+
         this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
         this.jobServiceConfiguration.setAsyncExecutorNumberOfRetries(this.asyncExecutorNumberOfRetries);
         this.jobServiceConfiguration.setAsyncExecutorResetExpiredJobsMaxTimeout(this.asyncExecutorResetExpiredJobsMaxTimeout);
@@ -1164,7 +1183,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, this.jobServiceConfiguration);
     }
-    
+
     public void initAsyncExecutor() {
         if (asyncExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncExecutor = new DefaultAsyncJobExecutor();
@@ -1660,7 +1679,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskDbSchemaManager = taskDbSchemaManager;
         return this;
     }
-    
+
     public DbSchemaManager getJobDbSchemaManager() {
         return jobDbSchemaManager;
     }
@@ -1876,7 +1895,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.idmEngineConfigurator = idmEngineConfigurator;
         return this;
     }
-    
+
     public JobServiceConfiguration getJobServiceConfiguration() {
         return jobServiceConfiguration;
     }
@@ -1912,7 +1931,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.jobHandlers = jobHandlers;
         return this;
     }
-    
+
     public InternalJobManager getInternalJobManager() {
         return internalJobManager;
     }
@@ -1940,7 +1959,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.addDefaultExceptionHandler = addDefaultExceptionHandler;
         return this;
     }
-    
+
     public FailedJobCommandFactory getFailedJobCommandFactory() {
         return failedJobCommandFactory;
     }
@@ -1994,7 +2013,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.asyncExecutorNumberOfRetries = asyncExecutorNumberOfRetries;
         return this;
     }
-    
+
     public int getLockTimeAsyncJobWaitTime() {
         return lockTimeAsyncJobWaitTime;
     }
@@ -2184,7 +2203,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.asyncExecutorExecuteAsyncRunnableFactory = asyncExecutorExecuteAsyncRunnableFactory;
         return this;
     }
-    
+
     public HttpClientConfig getHttpClientConfig() {
         return httpClientConfig;
     }
@@ -2199,5 +2218,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
+    }
+
+    @Override
+    public ScriptingEngines getScriptingEngines() {
+        return scriptingEngines;
+    }
+
+    @Override
+    public CmmnEngineConfiguration setScriptingEngines(ScriptingEngines scriptingEngines) {
+        this.scriptingEngines = scriptingEngines;
+        return this;
     }
 }

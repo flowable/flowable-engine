@@ -15,17 +15,6 @@
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
         
             <planItem id="planItemTaskA" definitionRef="taskA" />
-<!--            
-            <planItem id="planItemTaskB" definitionRef="taskB">
-                <entryCriterion id="criterion" sentryRef="sentryTaskB" />
-            </planItem>           
-            
-                        <sentry id="sentryTaskB">
-                            <planItemOnPart id="onPart1" sourceRef="planItemTaskA">
-                                <standardEvent>complete</standardEvent>
-                            </planItemOnPart>
-                        </sentry>
-            -->            
             <task id="taskA" name="A" flowable:type="script" flowable:class="javascript" flowable:resultVariableName="scriptResult" flowable:autoStoreVariables="false">
                 <extensionElements>
                     <flowable:field name="script">
