@@ -50,4 +50,13 @@ public class TestFlowable6EntityEventListener implements FlowableEventListener {
         return true;
     }
 
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return false;
+    }
+
+    @Override
+    public String getOnTransaction() {
+        return null;
+    }
 }

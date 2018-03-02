@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -51,9 +52,12 @@ public class CompleteTaskCmd implements Command<Void> {
         }
         
         String planItemInstanceId = taskEntity.getSubScopeId();
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
-        if (planItemInstanceEntity == null) {
-            throw new FlowableException("Could not find plan item instance for task " + taskId);
+        PlanItemInstanceEntity planItemInstanceEntity = null;
+        if (planItemInstanceId != null) {
+            planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+            if (planItemInstanceEntity == null) {
+                throw new FlowableException("Could not find plan item instance for task " + taskId);
+            }
         }
         
         if (variables != null) {
@@ -63,7 +67,11 @@ public class CompleteTaskCmd implements Command<Void> {
             taskEntity.setTransientVariables(transientVariables);
         }
         
-        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
+        if (planItemInstanceEntity != null) {
+            CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
+        } else {
+            TaskHelper.deleteTask(taskEntity, null, false, true);
+        }
         
         return null;
     }

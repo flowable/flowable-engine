@@ -15,14 +15,15 @@ package org.flowable.task.service.impl.persistence;
 public interface CountingTaskEntity {
 
     boolean isCountEnabled();
-
     void setCountEnabled(boolean isCountEnabled);
 
     void setVariableCount(int variableCount);
-
     int getVariableCount();
 
     void setIdentityLinkCount(int identityLinkCount);
-
     int getIdentityLinkCount();
+    
+    void setSubTaskCount(int subTaskCount);
+    int getSubTaskCount();
+    
 }

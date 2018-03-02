@@ -48,4 +48,6 @@ public interface TaskEntityManager extends EntityManager<TaskEntity> {
     void updateTaskTenantIdForDeployment(String deploymentId, String newTenantId);
     
     void updateAllTaskRelatedEntityCountFlags(boolean configProperty);
+    
+    void deleteTasksByExecutionId(String executionId);
 }

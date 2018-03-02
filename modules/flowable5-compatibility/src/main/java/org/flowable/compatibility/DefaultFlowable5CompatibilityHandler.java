@@ -57,7 +57,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;

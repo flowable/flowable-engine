@@ -24,7 +24,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.impl.event.logger.handler.ActivityCompensatedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.ActivityCompletedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.ActivityErrorReceivedEventHandler;

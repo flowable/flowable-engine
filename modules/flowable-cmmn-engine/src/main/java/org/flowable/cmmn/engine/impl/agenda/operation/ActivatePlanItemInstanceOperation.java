@@ -21,10 +21,10 @@ import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.Task;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,11 +93,11 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         job.setScopeId(planItemInstanceEntity.getCaseInstanceId());
         job.setSubScopeId(planItemInstanceEntity.getId());
         job.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
-        job.setScopeType(VariableScopeType.CMMN);
+        job.setScopeType(ScopeTypes.CMMN);
         job.setTenantId(planItemInstanceEntity.getTenantId());
         job.setJobHandlerType(AsyncActivatePlanItemInstanceJobHandler.TYPE);
         
-        jobService.setAsyncJobProperties(job, task.isExclusive());
+        jobService.createAsyncJob(job, task.isExclusive());
         jobService.scheduleAsyncJob(job);
     }
     

@@ -44,4 +44,13 @@ public class TestFlowableEventListener implements FlowableEventListener {
         return false;
     }
 
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return false;
+    }
+
+    @Override
+    public String getOnTransaction() {
+        return null;
+    }
 }

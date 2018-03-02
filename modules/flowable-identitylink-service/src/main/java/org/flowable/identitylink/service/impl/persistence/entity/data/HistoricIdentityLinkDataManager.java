@@ -26,4 +26,9 @@ public interface HistoricIdentityLinkDataManager extends DataManager<HistoricIde
 
     List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId);
 
+    List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    void deleteHistoricIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
+    
+    void deleteHistoricIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
 }

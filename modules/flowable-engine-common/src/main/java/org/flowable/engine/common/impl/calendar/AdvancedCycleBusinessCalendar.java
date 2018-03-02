@@ -18,7 +18,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.runtime.ClockReader;
+import org.flowable.engine.common.impl.runtime.ClockReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

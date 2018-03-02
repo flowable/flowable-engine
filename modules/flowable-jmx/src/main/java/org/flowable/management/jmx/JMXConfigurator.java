@@ -14,7 +14,7 @@ package org.flowable.management.jmx;
 
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

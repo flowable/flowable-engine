@@ -50,4 +50,6 @@ public interface TaskService {
     void insertTask(TaskEntity taskEntity, boolean fireCreateEvent);
     
     void deleteTask(TaskEntity task, boolean fireEvents);
+    
+    void deleteTasksByExecutionId(String executionid);
 }

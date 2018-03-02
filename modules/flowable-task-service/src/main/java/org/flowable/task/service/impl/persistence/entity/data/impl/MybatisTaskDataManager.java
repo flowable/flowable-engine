@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -52,7 +53,14 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
 
     @Override
     public List<TaskEntity> findTasksByExecutionId(final String executionId) {
-        return getList("selectTasksByExecutionId", executionId, tasksByExecutionIdMatcher, true);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // If the process instance has been inserted in the same command execution as this query, there can't be any in the database
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            return getListFromCache(tasksByExecutionIdMatcher, executionId);
+        }
+        
+        return getList(dbSqlSession, "selectTasksByExecutionId", executionId, tasksByExecutionIdMatcher, true);
     }
 
     @Override
@@ -153,6 +161,16 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     @Override
     public void updateAllTaskRelatedEntityCountFlags(boolean newValue) {
         getDbSqlSession().update("updateTaskRelatedEntityCountEnabled", newValue);
+    }
+    
+    @Override
+    public void deleteTasksByExecutionId(String executionId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            deleteCachedEntities(dbSqlSession, tasksByExecutionIdMatcher, executionId);
+        } else {
+            bulkDelete("deleteTasksByExecutionId", tasksByExecutionIdMatcher, executionId);
+        }
     }
 
 }
