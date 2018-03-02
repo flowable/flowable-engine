@@ -11,23 +11,20 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.common.runtime;
+package org.flowable.engine.common.impl.runtime;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
- * This interface provides clock reading functionality
+ * This interface provides full access to the clock
  */
-public interface ClockReader {
+public interface Clock extends ClockReader {
 
-    Date getCurrentTime();
+    void setCurrentTime(Date currentTime);
 
-    Calendar getCurrentCalendar();
+    void setCurrentCalendar(Calendar currentTime);
 
-    Calendar getCurrentCalendar(TimeZone timeZone);
-
-    TimeZone getCurrentTimeZone();
+    void reset();
 
 }

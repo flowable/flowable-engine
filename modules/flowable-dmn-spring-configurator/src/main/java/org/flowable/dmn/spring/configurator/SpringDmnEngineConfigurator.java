@@ -16,8 +16,8 @@ import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.SpringDmnExpressionManager;
-import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**

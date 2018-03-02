@@ -10,16 +10,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.common;
-
-import java.util.Map;
-
-import org.flowable.engine.common.api.repository.EngineDeployment;
+package org.flowable.engine.common.impl;
 
 /**
+ * Represents information about the initialization of the engine.
+ * 
  * @author Tijs Rademakers
  */
-public interface EngineDeployer {
+public class EngineInfo {
 
-    void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings);
+    String name;
+    String resourceUrl;
+    String exception;
+
+    public EngineInfo(String name, String resourceUrl, String exception) {
+        this.name = name;
+        this.resourceUrl = resourceUrl;
+        this.exception = exception;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getResourceUrl() {
+        return resourceUrl;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
 }

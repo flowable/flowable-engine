@@ -10,21 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.flowable.engine.common.impl;
 
-package org.flowable.engine.common.runtime;
+import java.util.Map;
 
-import java.util.Calendar;
-import java.util.Date;
+import org.flowable.engine.common.api.repository.EngineDeployment;
 
 /**
- * This interface provides full access to the clock
+ * @author Tijs Rademakers
  */
-public interface Clock extends ClockReader {
+public interface EngineDeployer {
 
-    void setCurrentTime(Date currentTime);
-
-    void setCurrentCalendar(Calendar currentTime);
-
-    void reset();
-
+    void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings);
 }

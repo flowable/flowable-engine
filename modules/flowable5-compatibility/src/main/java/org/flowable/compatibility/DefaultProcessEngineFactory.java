@@ -26,7 +26,7 @@ import org.activiti.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.activiti.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.parse.BpmnParseHandler;
-import org.flowable.engine.common.EngineDeployer;
+import org.flowable.engine.common.impl.EngineDeployer;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;

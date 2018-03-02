@@ -13,7 +13,8 @@
 package org.flowable.job.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.flowable.engine.common.AbstractServiceConfiguration;
+
+import org.flowable.engine.common.impl.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.history.HistoryLevel;
