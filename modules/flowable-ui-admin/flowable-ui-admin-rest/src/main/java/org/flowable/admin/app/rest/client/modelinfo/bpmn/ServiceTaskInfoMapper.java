@@ -28,5 +28,6 @@ public class ServiceTaskInfoMapper extends AbstractInfoMapper {
             createPropertyNode("Delegate expression", serviceTask.getImplementation());
         }
         createPropertyNode("Result variable name", serviceTask.getResultVariableName());
+        createPropertyNode("Use local scope for result variable", serviceTask.isUseLocalScopeForResultVariable());
     }
 }

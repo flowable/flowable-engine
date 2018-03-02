@@ -14,6 +14,7 @@ package org.flowable.app.conf;
 
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.filter.FlowableCookieFilter;
 import org.flowable.app.filter.FlowableCookieFilterCallback;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
@@ -125,18 +126,44 @@ public class SecurityConfiguration {
     @Configuration
     @Order(1)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+        
+        @Autowired
+        protected Environment env;
 
         protected void configure(HttpSecurity http) throws Exception {
 
-            http
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
-                    .csrf()
-                    .disable()
-                    .antMatcher("/*-api/**").authorizeRequests()
-                    .antMatchers("/*-api/**").authenticated()
-                    .and().httpBasic();
+            http.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().csrf().disable();
+            
+            if (isEnableRestApi()) {
+                
+                if (isVerifyRestApiPrivilege()) {
+                    http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                } else {
+                    http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").authenticated().and().httpBasic();
+                    
+                }
+                
+            } else {
+                http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").denyAll();
+                
+            }
+                   
         }
+        
+        protected boolean isVerifyRestApiPrivilege() {
+            String authMode = env.getProperty("rest.authentication.mode");
+            if (StringUtils.isNotEmpty(authMode)) {
+                return "verify-privilege".equals(authMode);
+            }
+            return true; // checking privilege is the default
+        }
+        
+        protected boolean isEnableRestApi() {
+            return env.getProperty("rest.task-app.enabled", Boolean.class, true);
+        }
+        
     }
+    
 }

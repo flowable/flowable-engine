@@ -123,10 +123,6 @@
             <artifactId>liquibase-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
@@ -152,21 +148,12 @@
 
         <!-- COMMON dependencies -->
 		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
   			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -176,10 +163,6 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
-		<dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
 
 		<!-- JODA TIME -->
 		<dependency>
@@ -252,10 +235,6 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
         </dependency>
-        <dependency>
-			<groupId>commons-validator</groupId>
-			<artifactId>commons-validator</artifactId>
-		</dependency>
 
     </dependencies>
 

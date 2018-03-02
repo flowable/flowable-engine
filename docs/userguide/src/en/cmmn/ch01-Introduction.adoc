@@ -11,7 +11,7 @@ Flowable is distributed under link:$$http://www.apache.org/licenses/LICENSE-2.0.
 
 === Download
 
-link:$$http://flowable.org/downloads.html$$[http://flowable.org/downloads.html]
+link:$$http://www.flowable.org/downloads.html$$[http://www.flowable.org/downloads.html]
 
 [[sources]]
 

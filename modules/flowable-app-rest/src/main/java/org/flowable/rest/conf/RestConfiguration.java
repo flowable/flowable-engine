@@ -5,6 +5,7 @@ import org.flowable.rest.application.DefaultContentTypeResolver;
 import org.flowable.rest.content.ContentRestResponseFactory;
 import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
 import org.flowable.rest.form.FormRestResponseFactory;
+import org.flowable.rest.idm.service.api.IdmRestResponseFactory;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,33 +17,34 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RestConfiguration {
 
-    @Bean()
+    @Bean
     public ContentTypeResolver contentTypeResolver() {
         ContentTypeResolver resolver = new DefaultContentTypeResolver();
         return resolver;
     }
 
-    @Bean()
+    @Bean
     public RestResponseFactory processResponseFactory() {
-        RestResponseFactory restResponseFactory = new RestResponseFactory();
-        return restResponseFactory;
+        return new RestResponseFactory();
+    }
+    
+    @Bean
+    public IdmRestResponseFactory idmRestResponseFactory() {
+        return new IdmRestResponseFactory();
     }
 
-    @Bean()
+    @Bean
     public DmnRestResponseFactory dmnResponseFactory() {
-        DmnRestResponseFactory restResponseFactory = new DmnRestResponseFactory();
-        return restResponseFactory;
+        return new DmnRestResponseFactory();
     }
 
-    @Bean()
+    @Bean
     public FormRestResponseFactory formResponseFactory() {
-        FormRestResponseFactory restResponseFactory = new FormRestResponseFactory();
-        return restResponseFactory;
+        return new FormRestResponseFactory();
     }
 
-    @Bean()
+    @Bean
     public ContentRestResponseFactory contentResponseFactory() {
-        ContentRestResponseFactory restResponseFactory = new ContentRestResponseFactory();
-        return restResponseFactory;
+        return new ContentRestResponseFactory();
     }
 }

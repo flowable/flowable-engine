@@ -11,7 +11,7 @@ Flowable (V6)
 	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)
 
 
-Homepage: http://flowable.org/
+Homepage: http://www.flowable.org/
 
 ## flowable / flowəb(ə)l /
 * a compact and highly efficient workflow and Business Process Management (BPM) platform for developers, system admins and business users.
@@ -26,7 +26,7 @@ Flowable is distributed under the Apache V2 license (http://www.apache.org/licen
 
 ### Download
 
-The Flowable downloads can be found on http://flowable.org/downloads.html.
+The Flowable downloads can be found on http://www.flowable.org/downloads.html.
 
 ### Sources
 

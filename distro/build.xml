@@ -49,19 +49,19 @@
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-idm" failonerror="true">
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<arg line="-Pdistro${nodocs.profile}${usingJdk8OrHigher} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-modeler" failonerror="true">
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<arg line="-Pdistro${nodocs.profile}${usingJdk8OrHigher} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-task" failonerror="true">
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<arg line="-Pdistro${nodocs.profile}${usingJdk8OrHigher} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-admin" failonerror="true">
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<arg line="-Pdistro${nodocs.profile}${usingJdk8OrHigher} -DskipTests clean install" />
 		</exec>
 	</target>
 

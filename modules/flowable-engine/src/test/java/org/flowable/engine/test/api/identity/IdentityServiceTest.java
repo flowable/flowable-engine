@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,6 +70,7 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setEmail("johndoe@alfresco.com");
+        user.setTenantId("originalTenantId");
         identityService.saveUser(user);
 
         // Fetch and update the user
@@ -77,12 +78,32 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
         user.setEmail("updated@alfresco.com");
         user.setFirstName("Jane");
         user.setLastName("Donnel");
+        user.setTenantId("flowable");
         identityService.saveUser(user);
 
         user = identityService.createUserQuery().userId("johndoe").singleResult();
         assertEquals("Jane", user.getFirstName());
         assertEquals("Donnel", user.getLastName());
         assertEquals("updated@alfresco.com", user.getEmail());
+        assertEquals("flowable", user.getTenantId());
+
+        identityService.deleteUser(user.getId());
+    }
+
+    public void testCreateUserWithoutTenantId() {
+        // First, create a new user
+        User user = identityService.newUser("johndoe");
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setEmail("johndoe@alfresco.com");
+        identityService.saveUser(user);
+
+        // Fetch and update the user
+        user = identityService.createUserQuery().userId("johndoe").singleResult();
+        assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("johndoe@alfresco.com", user.getEmail());
+        assertEquals(null, user.getTenantId());
 
         identityService.deleteUser(user.getId());
     }
@@ -349,7 +370,7 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
             User user = identityService.newUser("johndoe");
             user.setPassword("xxx");
             identityService.saveUser(user);
-    
+
             user = identityService.createUserQuery().userId("johndoe").list().get(0);
             user.setFirstName("John Doe");
             identityService.saveUser(user);
@@ -357,19 +378,19 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
             assertFalse(johndoe.getPassword().equals("xxx"));
             assertEquals("John Doe", johndoe.getFirstName());
             assertTrue(identityService.checkPassword("johndoe", "xxx"));
-    
+
             user = identityService.createUserQuery().userId("johndoe").list().get(0);
             user.setPassword("yyy");
             identityService.saveUser(user);
             assertTrue(identityService.checkPassword("johndoe", "xxx"));
-    
+
             user = identityService.createUserQuery().userId("johndoe").list().get(0);
             user.setPassword("yyy");
             identityService.updateUserPassword(user);
             assertTrue(identityService.checkPassword("johndoe", "yyy"));
-    
+
             identityService.deleteUser("johndoe");
-            
+
         } finally {
             idmEngineConfiguration.setPasswordEncoder(ClearTextPasswordEncoder.getInstance());
         }

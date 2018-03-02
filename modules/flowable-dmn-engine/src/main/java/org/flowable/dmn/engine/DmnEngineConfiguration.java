@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -132,7 +132,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     protected DmnResourceEntityManager resourceEntityManager;
     protected HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager;
     protected TableDataManager tableDataManager;
-    
+
     // EXPRESSION MANAGER /////////////////////////////////////////////
     protected ExpressionManager expressionManager;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
@@ -150,12 +150,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     protected List<Deployer> customPostDeployers;
     protected List<Deployer> deployers;
     protected DeploymentManager deploymentManager;
-    
+
     protected boolean historyEnabled;
 
     protected int decisionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<DecisionTableCacheEntry> decisionCache;
-    
+
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     // HIT POLICIES
@@ -165,7 +165,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
     /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
-     * 
+     *
      * Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence the reason why it is disabled by default. If your platform allows the use of StaxSource during XML parsing,
      * do enable it.
      */
@@ -231,16 +231,16 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
             initDbSchemaManager();
             initDbSchema();
         }
-        
+
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         initBeans();
         initTransactionFactory();
-        
+
         if (usingRelationalDatabase) {
             initSqlSessionFactory();
         }
-        
+
         initSessionFactories();
         initServices();
         initDataManagers();
@@ -305,7 +305,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
     // data model
     // ///////////////////////////////////////////////////////////////
-    
+
     public void initDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new DmnDbSchemaManager();
@@ -325,9 +325,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
-            
+
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-            
+
             commandContextFactory.setSessionFactories(sessionFactories);
         }
 
@@ -344,7 +344,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
             dbSqlSessionFactory = createDbSqlSessionFactory();
             dbSqlSessionFactory.setDatabaseType(databaseType);
             dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-            dbSqlSessionFactory.setIdGenerator(idGenerator);
             dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
             dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
             dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
@@ -353,12 +352,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         }
         initDbSqlSessionFactoryEntitySettings();
     }
-    
+
     @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
     }
-    
+
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
         defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
@@ -385,7 +384,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
-    
+
     public void initFunctionDelegates() {
         if (this.flowableFunctionDelegates == null) {
             this.flowableFunctionDelegates = new ArrayList<>();
@@ -399,7 +398,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
             this.flowableFunctionDelegates.addAll(this.customFlowableFunctionDelegates);
         }
     }
-    
+
     public void initExpressionManager() {
         if (expressionManager == null) {
             expressionManager = new DefaultExpressionManager(beans);
@@ -671,7 +670,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         this.ruleService = ruleService;
         return this;
     }
-    
+
     @Override
     public DmnHistoryService getDmnHistoryService() {
         return dmnHistoryService;
@@ -743,11 +742,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         this.dmnParseFactory = dmnParseFactory;
         return this;
     }
-    
+
     public boolean isHistoryEnabled() {
         return historyEnabled;
     }
-    
+
     public DmnEngineConfiguration setHistoryEnabled(boolean historyEnabled) {
         this.historyEnabled = historyEnabled;
         return this;
@@ -797,7 +796,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         this.resourceDataManager = resourceDataManager;
         return this;
     }
-    
+
     public HistoricDecisionExecutionDataManager getHistoricDecisionExecutionDataManager() {
         return historicDecisionExecutionDataManager;
     }
@@ -824,7 +823,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         this.decisionTableEntityManager = decisionTableEntityManager;
         return this;
     }
-    
+
     public HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager() {
         return historicDecisionExecutionEntityManager;
     }
@@ -963,7 +962,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     public Map<String, AbstractHitPolicy> getCustomHitPolicyBehaviors() {
         return customHitPolicyBehaviors;
     }
-    
+
     public ObjectMapper getObjectMapper() {
         return objectMapper;
     }

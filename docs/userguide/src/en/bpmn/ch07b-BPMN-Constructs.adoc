@@ -2641,7 +2641,7 @@ The getter method of property ++ready++, ++getReady++ (without parameters), will
 
 To implement a class that can be called during process execution, the class needs to implement the _org.flowable.engine.delegate.JavaDelegate_ interface and provide the required logic in the _execute_ method. When process execution arrives at this particular step, it will execute the logic defined in that method and leave the activity in the default BPMN 2.0 way.
 
-Let's create, for example, a Java class that can be used to change a process variable String to uppercase. This class needs to implement the _org.flowable.engine.delegate.JavaDelegate_ interface, which requires us to implement the _execute(DelegateExecution)_ method. It's this operation that will be called by the engine and which needs to contain the business logic. Process instance information, such as process variables, can be accessed and manipulated through the link:$$http://flowable.org/javadocs/org/flowable/engine/delegate/DelegateExecution.html$$[DelegateExecution] interface (click on the link for a detailed Javadoc of its operations).
+Let's create, for example, a Java class that can be used to change a process variable String to uppercase. This class needs to implement the _org.flowable.engine.delegate.JavaDelegate_ interface, which requires us to implement the _execute(DelegateExecution)_ method. It's this operation that will be called by the engine and which needs to contain the business logic. Process instance information, such as process variables, can be accessed and manipulated through the link:$$http://www.flowable.org/javadocs/org/flowable/engine/delegate/DelegateExecution.html$$[DelegateExecution] interface (click on the link for a detailed Javadoc of its operations).
 
 [source,java,linenums]
 ----
@@ -2984,7 +2984,10 @@ public class TestExecutionListener implements ExecutionListener {
 
 ===== Service task results
 
-The return value of a service execution (for service task using expression only) can be assigned to an existing or to a new process variable by specifying the process variable name as a literal value for the _'flowable:resultVariable'_ attribute of a service task definition. Any existing value for a specific process variable will be overwritten by the result value of the service execution. When a result variable name is not specified, the service execution result value gets ignored.
+The return value of a service execution (for service task using expression only) can be assigned to an existing or to a new process variable by specifying the process variable name as a literal value for the _'flowable:resultVariable'_ attribute of a service task definition.
+Any existing value for a specific process variable will be overwritten by the result value of the service execution.
+If _`flowable:useLocalScopeForResultVariable'_ is used, then the variable will be assigned to a local variable.
+When a result variable name is not specified, the service execution result value gets ignored.
 
 [source,xml,linenums]
 ----

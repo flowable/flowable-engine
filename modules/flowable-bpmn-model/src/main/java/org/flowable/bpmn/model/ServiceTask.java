@@ -33,6 +33,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
     protected String extensionId;
     protected List<CustomProperty> customProperties = new ArrayList<>();
     protected String skipExpression;
+    protected boolean useLocalScopeForResultVariable;
 
     public String getImplementation() {
         return implementation;
@@ -102,6 +103,14 @@ public class ServiceTask extends TaskWithFieldExtensions {
         this.skipExpression = skipExpression;
     }
 
+    public boolean isUseLocalScopeForResultVariable() {
+        return useLocalScopeForResultVariable;
+    }
+
+    public void setUseLocalScopeForResultVariable(boolean useLocalScopeForResultVariable) {
+        this.useLocalScopeForResultVariable = useLocalScopeForResultVariable;
+    }
+
     @Override
     public ServiceTask clone() {
         ServiceTask clone = new ServiceTask();
@@ -118,6 +127,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
         setOperationRef(otherElement.getOperationRef());
         setExtensionId(otherElement.getExtensionId());
         setSkipExpression(otherElement.getSkipExpression());
+        setUseLocalScopeForResultVariable(otherElement.isUseLocalScopeForResultVariable());
 
         fieldExtensions = new ArrayList<>();
         if (otherElement.getFieldExtensions() != null && !otherElement.getFieldExtensions().isEmpty()) {

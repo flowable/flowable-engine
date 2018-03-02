@@ -189,6 +189,44 @@
                   <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/process</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
+                <!-- IDM -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.rest.idm.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/idm-api</basePath>
+                  <info>
+                    <title>Flowable IDM REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/idm</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
                 <!-- DMN -->
                 <!-- ++++++++++ -->
                 <apiSource>
@@ -536,6 +574,10 @@
     </dependency>
     <dependency>
       <groupId>org.flowable</groupId>
+      <artifactId>flowable-idm-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flowable</groupId>
       <artifactId>flowable-dmn-rest</artifactId>
     </dependency>
     <dependency>
@@ -588,7 +630,6 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>2.4.6</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
@@ -597,7 +638,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

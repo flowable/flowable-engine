@@ -80,6 +80,7 @@ import org.flowable.rest.service.api.runtime.process.EventSubscriptionResponse;
 import org.flowable.rest.service.api.runtime.process.ExecutionResponse;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.flowable.rest.service.api.runtime.task.TaskResponse;
+import org.flowable.rest.util.RestUrlBuilder;
 import org.flowable.rest.variable.BooleanRestVariableConverter;
 import org.flowable.rest.variable.DateRestVariableConverter;
 import org.flowable.rest.variable.DoubleRestVariableConverter;
