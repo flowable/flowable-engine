@@ -111,6 +111,31 @@
 .login-form-1 .login-button.clicked.error {
   color: #e74c3c;
 }
+.login-form-1 .oauth-container h4.text-background{
+	position: relative;
+    z-index: 1;
+}
+.login-form-1 .oauth-container h4.text-background:before{
+	border-top: 2px solid #dfdfdf;
+	content:"";
+	margin: 0 auto;
+	position: absolute;
+    top: 50%; left: 0; right: 0; bottom: 0;
+    width: 95%;
+    z-index: -1;
+}
+.login-form-1 .oauth-container h4.text-background span{
+    background: #efefef; 
+    padding: 0 10px; 
+    color: #828282;
+}
+.login-form-1 .oauth-container a.btn-auth{
+    background: #ffffff; 
+    color: #999999; 
+}
+.login-form-1 .oauth-container a.btn-auth:hover{
+    color: #555555; 
+}
 .login-form-main-message {
   background: #ffffff;
   color: #999999;

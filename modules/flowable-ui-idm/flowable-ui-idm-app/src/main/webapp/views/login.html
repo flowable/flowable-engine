@@ -24,6 +24,10 @@
                     <p translate="LOGIN.INVALID-CREDENTIALS"></p>
                 </div>
             </form>
+            <div class="oauth-container" ng-if="model.oAuthProviders.data.length != 0">
+            		<h4 class="text-background"><span>or</span></h4>
+            		<a ng-repeat="oauth in model.oAuthProviders.data" href="{{model.oAuthProviders.baseURL}}/oauth/authorize?name={{oauth.name}}" class="btn btn-auth">{{oauth.name}}</a>
+            </div>
         </div>
     </div>
 </div>
