@@ -1,0 +1,115 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_risk_rating" name="Risk Rating Decision Table" namespace="http://www.flowable.org/dmn">
+  <decision id="RiskRating" name="Risk Rating Decision Table">
+    <decisionTable id="decisionTable_risk_rating" hitPolicy="OUTPUT ORDER">
+      <input label="Age">
+        <inputExpression id="inputExpression_1" typeRef="number">
+          <text>age</text>
+        </inputExpression>
+      </input>
+      <input label="Risk category">
+        <inputExpression id="inputExpression_3" typeRef="string">
+          <text>riskcategory</text>
+        </inputExpression>
+        <inputValues>
+          <text>"LOW","MEDIUM","HIGH"</text>
+        </inputValues>
+      </input>
+      <input label="Debt review">
+        <inputExpression id="inputExpression_4" typeRef="boolean">
+          <text>debtreview</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" label="Routing" name="routing" typeRef="string">
+        <outputValues>
+          <text>"DECLINE","REFER","ACCEPT"</text>
+        </outputValues>
+      </output>
+      <output id="outputExpression_5" label="Review level" name="reviewlevel" typeRef="string">
+        <outputValues>
+          <text>"LEVEL 2","LEVEL 1","NONE"</text>
+        </outputValues>
+      </output>
+      <output id="outputExpression_6" label="Reason" name="reason" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_1">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_4_1">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA["ACCEPT"]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_5_1">
+          <text><![CDATA["NONE"]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_6_1">
+          <text><![CDATA["Acceptable"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[<18]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_4_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA["DECLINE"]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_5_2">
+          <text><![CDATA["NONE"]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_6_2">
+          <text><![CDATA["Applicant too young"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_3">
+          <text><![CDATA["HIGH"]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_4_3">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_3">
+          <text><![CDATA["REFER"]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_5_3">
+          <text><![CDATA["LEVEL 1"]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_6_3">
+          <text><![CDATA["High risk application"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_4">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_4">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_4_4">
+          <text><![CDATA[true]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_4">
+          <text><![CDATA["REFER"]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_5_4">
+          <text><![CDATA["LEVEL 2"]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_6_4">
+          <text><![CDATA["Applicant under debt review"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
