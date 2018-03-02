@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -37,7 +38,6 @@ public class IdentityLinkUtil {
     public static void deleteTaskIdentityLinks(TaskEntity taskEntity, String userId, String groupId, String type) {
         List<IdentityLinkEntity> removedIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().deleteTaskIdentityLink(
                         taskEntity.getId(), taskEntity.getIdentityLinks(), userId, groupId, type);
-        
         handleTaskIdentityLinkDeletions(taskEntity, removedIdentityLinkEntities, true);
     }
 
@@ -58,6 +58,11 @@ public class IdentityLinkUtil {
     
     public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+        
+        CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
+        if (countingTaskEntity.isCountEnabled()) {
+            countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
+        }
 
         taskEntity.getIdentityLinks().add(identityLinkEntity);
         if (identityLinkEntity.getUserId() != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
@@ -77,6 +82,10 @@ public class IdentityLinkUtil {
     
     public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascaseHistory) {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
+            if (countingTaskEntity.isCountEnabled()) {
+                countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() - 1);
+            }
             if (cascaseHistory) {
                 CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
             }
