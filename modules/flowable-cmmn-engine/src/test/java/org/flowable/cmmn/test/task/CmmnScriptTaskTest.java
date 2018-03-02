@@ -12,23 +12,23 @@
  */
 package org.flowable.cmmn.test.task;
 
-import java.util.List;
-import java.util.Map;
-import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+//import java.util.List;
+//import java.util.Map;
+//import org.flowable.cmmn.api.history.HistoricCaseInstance;
+//import static org.junit.Assert.assertEquals;
+//import static org.junit.Assert.assertNotNull;
+//import static org.junit.Assert.assertNull;
 
-import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
+//import org.flowable.cmmn.api.runtime.CaseInstance;
+//import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskQuery;
-import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.flowable.variable.api.type.VariableScopeType;
+//import org.flowable.engine.common.impl.history.HistoryLevel;
+//import org.flowable.task.api.Task;
+//import org.flowable.task.api.TaskQuery;
+//import org.flowable.task.api.history.HistoricTaskInstance;
+//import org.flowable.variable.api.history.HistoricVariableInstance;
+//import org.flowable.variable.api.type.VariableScopeType;
 import org.junit.Test;
 
 /**

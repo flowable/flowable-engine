@@ -13,7 +13,7 @@
 
 package org.flowable.engine.common.impl.scripting;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**

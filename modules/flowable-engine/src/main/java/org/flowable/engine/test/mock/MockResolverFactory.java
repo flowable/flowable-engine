@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.test.mock;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.scripting.Resolver;
 import org.flowable.engine.common.impl.scripting.ResolverFactory;
 import org.flowable.variable.api.delegate.VariableScope;

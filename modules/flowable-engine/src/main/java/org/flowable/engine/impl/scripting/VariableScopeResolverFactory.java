@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.scripting;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.scripting.Resolver;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.common.impl.scripting.ResolverFactory;

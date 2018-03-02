@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.script.Bindings;
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 
 import org.flowable.variable.api.delegate.VariableScope;
 
