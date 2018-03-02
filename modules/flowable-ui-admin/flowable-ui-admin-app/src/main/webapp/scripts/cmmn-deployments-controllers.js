@@ -100,7 +100,6 @@ flowableAdminApp.controller('CmmnDeploymentsController', ['$rootScope', '$scope'
        * ACTIONS
        */
 
-
       $scope.uploadDeployment = function () {
           var modalInstance = $modal.open({
               templateUrl: 'views/upload-deployment.html',
@@ -119,7 +118,7 @@ flowableAdminApp.controller('CmmnDeploymentsController', ['$rootScope', '$scope'
     }]);
 
 
-/**\
+/**
  * Controller for the upload a model from the Case Modeler.
  */
  flowableAdminApp.controller('UploadCmmnDeploymentCtrl',

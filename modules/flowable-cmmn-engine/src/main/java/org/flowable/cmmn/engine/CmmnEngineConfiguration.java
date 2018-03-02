@@ -195,7 +195,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_CMMN_";
 
-    protected String cmmnEngineName = "default";
+    protected String cmmnEngineName = CmmnEngines.NAME_DEFAULT;
 
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 

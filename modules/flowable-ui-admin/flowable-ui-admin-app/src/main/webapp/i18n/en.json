@@ -768,6 +768,42 @@
         	"DELETE-ERROR": "Could not delete app. {{message || ''}}"
         }
     },
+    "CMMN-DEPLOYMENTS": {
+        "TITLE": "Deployments",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching deployments.",
+        "LIST-MESSAGE-EMPTY": "No matching deployments.",
+        "FILTER": {
+            "NAME": "Name (case sensitive)",
+            "TENANTID": "Tenant identifier (case sensitive)"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Name"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "DEPLOY-TIME": "Deploy time",
+            "CATEGORY": "Category",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "UPLOAD": "Upload process or package",
+            "DELETE": "Delete deployment"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Select a .bpmn, .bpmn20.xml process file to deploy or upload a package of processes (with assets) contained in .zip or .bar file.",
+                "DROPZONE": "Or drop a file here",
+                "NO-DROP": "File drop is not supported by your browser",
+                "CANCEL-UPLOAD": "Cancel upload",
+                "ERROR": "Could not upload this file"
+            },
+            "DELETE": {
+                "CONFIRM-MESSAGE": "Delete deployment '{{name}}'?"
+                }
+        }
+    },
     "DECISION-TABLE-DEPLOYMENTS": {
         "TITLE": "Decision Table Deployments",
         "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching deployments.",
