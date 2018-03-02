@@ -26,7 +26,6 @@
       <option name="JD_PARAM_DESCRIPTION_ON_NEW_LINE" value="true" />
     </JavaCodeStyleSettings>
     <codeStyleSettings language="JAVA">
-      <option name="KEEP_LINE_BREAKS" value="false" />
       <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
       <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
       <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
@@ -51,7 +50,7 @@
       <option name="TERNARY_OPERATION_WRAP" value="5" />
       <option name="ARRAY_INITIALIZER_WRAP" value="1" />
       <indentOptions>
-        <option name="CONTINUATION_INDENT_SIZE" value="16" />
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
       </indentOptions>
     </codeStyleSettings>
   </code_scheme>
