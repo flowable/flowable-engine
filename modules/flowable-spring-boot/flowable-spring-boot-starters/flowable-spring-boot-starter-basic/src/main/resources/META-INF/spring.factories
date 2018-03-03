@@ -14,4 +14,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.flowable.spring.boot.dmn.DmnEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.idm.IdmEngineAutoConfiguration,\
     org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration,\
+    org.flowable.spring.boot.cmmn.CmmnEngineAutoConfiguration,\
+    org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.SecurityAutoConfiguration
