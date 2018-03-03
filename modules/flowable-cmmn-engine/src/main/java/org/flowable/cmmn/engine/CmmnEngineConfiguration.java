@@ -1888,6 +1888,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return configurators;
     }
 
+    public CmmnEngineConfiguration addConfigurator(EngineConfigurator configurator) {
+        if (configurators == null) {
+            configurators = new ArrayList<>();
+        }
+        configurators.add(configurator);
+        return this;
+    }
+
     public CmmnEngineConfiguration setConfigurators(List<EngineConfigurator> configurators) {
         this.configurators = configurators;
         return this;
