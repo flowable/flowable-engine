@@ -6,6 +6,8 @@ import org.flowable.idm.api.User;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.SecurityAutoConfiguration;
+import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
+import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -45,7 +47,9 @@ public class SecurityAutoConfigurationTest {
     @Configuration
     @Import({ DataSourceAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,
+            IdmEngineAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
+            IdmEngineServicesAutoConfiguration.class,
             org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
             SecurityAutoConfiguration.class })
     public static class SecurityConfiguration {

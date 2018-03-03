@@ -26,14 +26,12 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringAsyncExecutor;
 import org.flowable.spring.SpringCallerRunsRejectedJobsHandler;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.SpringRejectedJobsHandler;
+import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -53,7 +51,10 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Javier Casal
  */
 @Configuration
-@EnableConfigurationProperties(FlowableProperties.class)
+@EnableConfigurationProperties({
+    FlowableProperties.class,
+    FlowableIdmProperties.class
+})
 @AutoConfigureAfter({
     FlowableTransactionAutoConfiguration.class
 })
@@ -61,9 +62,11 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
     @Autowired(required = false)
     private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
+    protected final FlowableIdmProperties idmProperties;
 
-    public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties) {
+    public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableIdmProperties idmProperties) {
         super(flowableProperties);
+        this.idmProperties = idmProperties;
     }
 
     @Bean
@@ -103,7 +106,7 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
         conf.setDeploymentName(defaultText(flowableProperties.getDeploymentName(), conf.getDeploymentName()));
 
-        conf.setDisableIdmEngine(!flowableProperties.isDbIdentityUsed());
+        conf.setDisableIdmEngine(!(flowableProperties.isDbIdentityUsed() && idmProperties.isEnabled()));
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
 
@@ -169,14 +172,6 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
     @ConditionalOnMissingBean
     public IdentityService identityServiceBean(ProcessEngine processEngine) {
         return processEngine.getIdentityService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public IdmIdentityService idmIdentityServiceBean(ProcessEngine processEngine) {
-        //TODO This needs to go into it's own Idm engine configuration
-        return ((IdmEngineConfiguration) processEngine.getProcessEngineConfiguration().getEngineConfigurations()
-            .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
     @Bean

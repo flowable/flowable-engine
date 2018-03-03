@@ -7,6 +7,8 @@ import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.RestApiAutoConfiguration;
 import org.flowable.spring.boot.SecurityAutoConfiguration;
+import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
+import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -36,7 +38,9 @@ public class RestApiAutoConfigurationTest {
             ServerPropertiesAutoConfiguration.class,
             DataSourceAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,
+            IdmEngineAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
+            IdmEngineServicesAutoConfiguration.class,
             SecurityAutoConfiguration.class,
             RestApiAutoConfiguration.class,
             JacksonAutoConfiguration.class

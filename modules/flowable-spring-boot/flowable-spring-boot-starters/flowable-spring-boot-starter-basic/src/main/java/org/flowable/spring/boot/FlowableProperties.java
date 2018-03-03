@@ -38,6 +38,10 @@ public class FlowableProperties {
     private boolean mailServerUseTls;
     private String databaseSchemaUpdate = "true";
     private String databaseSchema;
+    /**
+     * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#enabled}
+     */
+    @Deprecated
     private boolean isDbIdentityUsed = true;
     private boolean isDbHistoryUsed = true;
     private HistoryLevel historyLevel = HistoryLevel.AUDIT;
@@ -121,10 +125,18 @@ public class FlowableProperties {
         this.databaseSchema = databaseSchema;
     }
 
+    /**
+     * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#isEnabled()}
+     */
+    @Deprecated
     public boolean isDbIdentityUsed() {
         return isDbIdentityUsed;
     }
 
+    /**
+     * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#setEnabled(boolean)}
+     */
+    @Deprecated
     public void setDbIdentityUsed(boolean isDbIdentityUsed) {
         this.isDbIdentityUsed = isDbIdentityUsed;
     }
