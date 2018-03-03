@@ -49,7 +49,7 @@ public class SimpleProcessTest extends SpringFlowableTestCase {
             @Override
             public void configure() throws Exception {
                 from("direct:start").to("flowable:camelProcess");
-                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
+                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().exchangeProperties();
                 from("direct:receive").to("flowable:camelProcess:receive");
                 from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
             }
