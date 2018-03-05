@@ -15,6 +15,7 @@ package org.flowable.cmmn.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -49,6 +50,9 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
     protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected volatile boolean running = false;
+    protected List<String> enginesBuild = new ArrayList<>();
+    protected final Object lifeCycleMonitor = new Object();
 
     public SpringCmmnEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -61,7 +65,7 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     public CmmnEngine buildCmmnEngine() {
         CmmnEngine cmmnEngine = super.buildCmmnEngine();
         CmmnEngines.setInitialized(true);
-        autoDeployResources(cmmnEngine);
+        enginesBuild.add(cmmnEngine.getName());
         return cmmnEngine;
     }
 
@@ -179,4 +183,25 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         return result;
     }
 
+    @Override
+    public void start() {
+        synchronized (lifeCycleMonitor) {
+            if (!isRunning()) {
+                enginesBuild.forEach(name -> autoDeployResources(CmmnEngines.getCmmnEngine(name)));
+                running = true;
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        synchronized (lifeCycleMonitor) {
+            running = false;
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
 }
