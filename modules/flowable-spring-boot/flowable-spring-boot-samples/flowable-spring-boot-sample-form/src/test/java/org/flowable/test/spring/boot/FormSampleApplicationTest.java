@@ -10,41 +10,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.test.spring.boot.dmn;
+package org.flowable.test.spring.boot;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.form.api.FormDefinition;
+import org.flowable.form.api.FormRepositoryService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import flowable.DmnSampleApplication;
+import flowable.FormSampleApplication;
 
 /**
  * @author Filip Hrisafov
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = DmnSampleApplication.class)
-public class DmnSampleApplicationTest {
+@SpringBootTest(classes = FormSampleApplication.class)
+public class FormSampleApplicationTest {
 
     @Autowired
-    private DmnRuleService ruleService;
+    private FormRepositoryService repositoryService;
 
     @Test
     public void contextLoads() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("inputVariable1", 1);
-        variables.put("inputVariable2", "test1");
-        Map<String, Object> result = ruleService.createExecuteDecisionBuilder().decisionKey("simple").variables(variables).executeWithSingleResult();
-
-        assertThat(result).contains(entry("outputVariable1", "result1"));
-
+        List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().list();
+        assertThat(formDefinitions)
+            .extracting(FormDefinition::getKey, FormDefinition::getName)
+            .containsExactlyInAnyOrder(
+                tuple("form1", "My first form")
+            );
     }
 }
