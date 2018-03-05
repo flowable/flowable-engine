@@ -18,4 +18,6 @@ import org.flowable.idm.api.User;
 public interface CustomRememberMeService {
 
     Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent);
+    
+    Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent, String data);
 }

@@ -27,9 +27,10 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.List;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 
 @Configuration
-@ComponentScan(value = { "org.flowable.app.rest.api", "org.flowable.app.rest.exception" })
+@ComponentScan(value = {"org.flowable.app.rest.api", "org.flowable.app.rest.exception"})
 @EnableAsync
 public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
@@ -63,5 +64,10 @@ public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSuppor
                 break;
             }
         }
+    }
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.setUseSuffixPatternMatch(false);
     }
 }

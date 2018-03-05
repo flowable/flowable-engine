@@ -18,6 +18,7 @@ import com.google.common.cache.LoadingCache;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -170,14 +171,19 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
                     try {
                         RemoteToken token = tokenCache.get(tokens[0]);
+                        LOGGER.debug("GHONIM   Token found in cache");
                         if (!token.getValue().equals(tokens[1])) {
+                            LOGGER.debug("GHONIM   Token not valid");
                             // refetch the token from the database
                             tokenCache.invalidate(tokens[0]);
                             token = tokenCache.get(tokens[0]);
+                            LOGGER.debug("GHONIM   Token gotten!!!");
                             if (token.getValue().equals(tokens[1])) {
+                                LOGGER.debug("GHONIM   Token isvalid!!!");
                                 return token;
                             }
                         } else {
+                            LOGGER.debug("GHONIM   Token already valid");
                             return token;
                         }
 
@@ -288,6 +294,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected String[] decodeCookie(String cookieValue) throws InvalidCookieException {
+        LOGGER.debug("GHONIM COOKIE VALUE " + cookieValue);
         for (int j = 0; j < cookieValue.length() % 4; j++) {
             cookieValue = cookieValue + "=";
         }
@@ -298,9 +305,9 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         } catch (IllegalArgumentException e) {
             throw new InvalidCookieException("Cookie token was not Base64 encoded; value was '" + cookieValue + "'");
         }
-
+        LOGGER.debug("GHONIM DECODED " + cookieAsPlainText);
         String[] tokens = StringUtils.delimitedListToStringArray(cookieAsPlainText, DELIMITER);
-
+        LOGGER.debug("GHONIM TOKENS " + Arrays.deepToString(tokens));
         if ((tokens[0].equalsIgnoreCase("http") || tokens[0].equalsIgnoreCase("https")) && tokens[1].startsWith("//")) {
             // Assume we've accidentally split a URL (OpenID identifier)
             String[] newTokens = new String[tokens.length - 1];
@@ -308,7 +315,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             System.arraycopy(tokens, 2, newTokens, 1, newTokens.length - 1);
             tokens = newTokens;
         }
-
+        LOGGER.debug("GHONIM TOKENS2 " + Arrays.deepToString(tokens));
         return tokens;
     }
 

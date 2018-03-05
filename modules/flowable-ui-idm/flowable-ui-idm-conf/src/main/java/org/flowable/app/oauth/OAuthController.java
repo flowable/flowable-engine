@@ -8,12 +8,10 @@ package org.flowable.app.oauth;
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.flowable.app.security.FlowableAppUser;
+import org.flowable.app.security.OAuthAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -97,10 +95,9 @@ public class OAuthController {
             throw new RuntimeException(e);
         }
         LOG.debug(String.format("Using OAuth Handler '%1$s'!", selectedHandler.getClass().getCanonicalName()));
-        FlowableAppUser user = selectedHandler.handle(state, code);
-        if (user != null) {
-            Authentication auth2 = new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
-            customPersistentRememberMeServices.loginSuccess(request, response, auth2);
+        OAuthAuthentication auth = selectedHandler.handle(state, code);
+        if (auth != null) {
+            customPersistentRememberMeServices.loginSuccess(request, response, auth);
             return selectedHandler.successRedirectUrl(state);
         }
         return "redirect:/";

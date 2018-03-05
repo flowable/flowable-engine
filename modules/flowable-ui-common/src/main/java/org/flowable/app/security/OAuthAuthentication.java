@@ -5,16 +5,13 @@
  */
 package org.flowable.app.security;
 
+import org.springframework.security.core.Authentication;
+
 /**
  *
  * @author ahmedghonim
  */
-public interface OAuthAuthorizationHandler {
+public interface OAuthAuthentication extends Authentication {
 
-    public boolean canHandle(String state);
-
-    public OAuthAuthentication handle(String state, String code);
-
-    public String successRedirectUrl(String state);
-    
+    public String getTokenData();
 }
