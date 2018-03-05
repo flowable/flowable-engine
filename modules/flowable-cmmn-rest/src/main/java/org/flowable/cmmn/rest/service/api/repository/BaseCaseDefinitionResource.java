@@ -15,7 +15,7 @@ package org.flowable.cmmn.rest.service.api.repository;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class BaseCaseDefinitionResource {
 
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
     protected CmmnRepositoryService repositoryService;

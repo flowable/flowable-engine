@@ -4,7 +4,8 @@ import javax.persistence.EntityManagerFactory;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.SpringProcessEngineConfiguration;
-import org.flowable.spring.boot.JpaProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -19,7 +20,10 @@ public class ProcessEngineAutoConfigurationTest {
     @Test
     public void processEngineWithJpaEntityManager() throws Exception {
         AnnotationConfigApplicationContext context = this.context(DataSourceAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class, JpaProcessEngineAutoConfiguration.JpaConfiguration.class);
+                HibernateJpaAutoConfiguration.class,
+                FlowableTransactionAutoConfiguration.class,
+                ProcessEngineAutoConfiguration.class
+        );
         Assert.assertNotNull("entityManagerFactory should not be null", context.getBean(EntityManagerFactory.class));
         Assert.assertNotNull("the processEngine should not be null!", context.getBean(ProcessEngine.class));
         SpringProcessEngineConfiguration configuration = context.getBean(SpringProcessEngineConfiguration.class);

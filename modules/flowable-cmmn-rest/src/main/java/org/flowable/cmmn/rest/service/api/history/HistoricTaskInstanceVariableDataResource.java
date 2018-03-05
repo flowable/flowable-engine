@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.engine.common.api.FlowableException;
@@ -52,7 +52,7 @@ import io.swagger.annotations.Authorization;
 public class HistoricTaskInstanceVariableDataResource {
 
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
     protected CmmnHistoryService historyService;
@@ -70,11 +70,11 @@ public class HistoricTaskInstanceVariableDataResource {
         try {
             byte[] result = null;
             RestVariable variable = getVariableFromRequest(true, taskId, variableName, scope, request);
-            if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
+            if (CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
 
-            } else if (RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+            } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());
@@ -132,7 +132,7 @@ public class HistoricTaskInstanceVariableDataResource {
         if (value == null) {
             throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
         } else {
-            return restResponseFactory.createRestVariable(variableName, value, null, taskId, RestResponseFactory.VARIABLE_HISTORY_TASK, includeBinary);
+            return restResponseFactory.createRestVariable(variableName, value, null, taskId, CmmnRestResponseFactory.VARIABLE_HISTORY_TASK, includeBinary);
         }
     }
 }

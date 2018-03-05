@@ -116,10 +116,10 @@ import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.EngineConfigurator;
-import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.EngineConfigurator;
+import org.flowable.engine.common.impl.EngineDeployer;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
@@ -127,6 +127,7 @@ import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.history.HistoryLevel;
@@ -194,7 +195,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_CMMN_";
 
-    protected String cmmnEngineName = "default";
+    protected String cmmnEngineName = CmmnEngines.NAME_DEFAULT;
 
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 
@@ -739,6 +740,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (caseInstanceDataManager == null) {
             caseInstanceDataManager = new MybatisCaseInstanceDataManagerImpl(this);
         }
+        if (dbSqlSessionFactory != null && caseInstanceDataManager instanceof AbstractDataManager) {
+            dbSqlSessionFactory.addLogicalEntityClassMapping("caseInstance", ((AbstractDataManager) caseInstanceDataManager).getManagedEntityClass());
+        }
         if (planItemInstanceDataManager == null) {
             planItemInstanceDataManager = new MybatisPlanItemInstanceDataManagerImpl(this);
         }
@@ -1077,6 +1081,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
 
         this.taskServiceConfiguration.init();
+        
+        if (dbSqlSessionFactory != null && taskServiceConfiguration.getTaskDataManager() instanceof AbstractDataManager) {
+            dbSqlSessionFactory.addLogicalEntityClassMapping("task", ((AbstractDataManager) taskServiceConfiguration.getTaskDataManager()).getManagedEntityClass());
+        }
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG, this.taskServiceConfiguration);
     }

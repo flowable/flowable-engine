@@ -22,7 +22,7 @@ public class PerformanceSettings {
      * 
      * Less roundtrips to the database outweighs doing many, smaller fetches and often multiple executions from the same tree are needed anyway when executing process instances.
      */
-    protected boolean enableEagerExecutionTreeFetching;
+    protected boolean enableEagerExecutionTreeFetching = true;
 
     /**
      * Experimental setting: keeps a count on each execution that holds how many variables, jobs, tasks, event subscriptions, etc. the execution has.
@@ -30,12 +30,12 @@ public class PerformanceSettings {
      * This makes the delete more performant as a query is not needed anymore to check if there is related data. However, maintaining the count does mean more updates to the execution and potentially
      * more optimistic locking opportunities. Typically keeping the counts lead to better performance as deletes are a large part of the execution tree maintenance.
      */
-    protected boolean enableExecutionRelationshipCounts;
+    protected boolean enableExecutionRelationshipCounts = true;
 
     /**
      * Similar to <code>enableExecutionRelationshipCounts</code>, but on the task level. Keeps count of how many variables ad identity links the task has.
      */
-    protected boolean enableTaskRelationshipCounts;
+    protected boolean enableTaskRelationshipCounts = true;
 
     /**
      * If false, no check will be done on boot.

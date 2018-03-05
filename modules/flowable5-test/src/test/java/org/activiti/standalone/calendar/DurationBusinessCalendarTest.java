@@ -18,8 +18,8 @@ import java.util.Date;
 
 import org.activiti.engine.impl.test.PvmTestCase;
 import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.flowable.engine.common.runtime.Clock;
 
 /**
  * @author Tom Baeyens

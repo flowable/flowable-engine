@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -50,7 +50,7 @@ import io.swagger.annotations.Authorization;
 public class HistoricCaseInstanceVariableDataResource {
 
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
     protected CmmnHistoryService historyService;
@@ -67,11 +67,11 @@ public class HistoricCaseInstanceVariableDataResource {
         try {
             byte[] result = null;
             RestVariable variable = getVariableFromRequest(true, caseInstanceId, variableName, request);
-            if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
+            if (CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
 
-            } else if (RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+            } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());
@@ -103,7 +103,7 @@ public class HistoricCaseInstanceVariableDataResource {
         if (variable == null || variable.getValue() == null) {
             throw new FlowableObjectNotFoundException("Historic case instance '" + caseInstanceId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
         } else {
-            return restResponseFactory.createRestVariable(variableName, variable.getValue(), null, caseInstanceId, RestResponseFactory.VARIABLE_HISTORY_CASE, includeBinary);
+            return restResponseFactory.createRestVariable(variableName, variable.getValue(), null, caseInstanceId, CmmnRestResponseFactory.VARIABLE_HISTORY_CASE, includeBinary);
         }
     }
 }

@@ -23,7 +23,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
-import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 
 /**
@@ -99,7 +99,7 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     
     @Override
     public void deleteByCaseInstanceId(String caseInstanceId) {
-        bulkDelete("deletePlanItemInstancesByCaseInstanceId", caseInstanceId, getManagedEntityClass(), planItemInstanceByCaseInstanceIdCachedEntityMatcher);
+        bulkDelete("deletePlanItemInstancesByCaseInstanceId", planItemInstanceByCaseInstanceIdCachedEntityMatcher, caseInstanceId);
     }
     
     public static class PlanItemInstanceByCaseInstanceIdCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {

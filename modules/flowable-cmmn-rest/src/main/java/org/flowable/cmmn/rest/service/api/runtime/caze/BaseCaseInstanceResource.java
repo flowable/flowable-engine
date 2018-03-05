@@ -21,7 +21,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -45,7 +45,7 @@ public class BaseCaseInstanceResource {
     }
 
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
     protected CmmnRuntimeService runtimeService;

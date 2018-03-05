@@ -15,8 +15,8 @@ package org.flowable.content.spring.configurator;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.configurator.ContentEngineConfigurator;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
-import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.spring.common.SpringEngineConfiguration;
 
 /**
@@ -25,16 +25,17 @@ import org.flowable.spring.common.SpringEngineConfiguration;
  */
 public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
 
-    protected SpringContentEngineConfiguration contentEngineConfiguration;
-
     @Override
     public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (contentEngineConfiguration == null) {
             contentEngineConfiguration = new SpringContentEngineConfiguration();
+        } else if (!(contentEngineConfiguration instanceof SpringContentEngineConfiguration)) {
+            throw new IllegalArgumentException("Expected contentEngine configuration to be of type"
+                + SpringContentEngineConfiguration.class + " but was " + engineConfiguration.getClass());
         }
         initialiseCommonProperties(engineConfiguration, contentEngineConfiguration);
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
-        contentEngineConfiguration.setTransactionManager(springEngineConfiguration.getTransactionManager());
+        ((SpringContentEngineConfiguration) contentEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
         
         initContentEngine();
         
@@ -49,15 +50,4 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
 
         return contentEngineConfiguration.buildContentEngine();
     }
-
-    @Override
-    public SpringContentEngineConfiguration getContentEngineConfiguration() {
-        return contentEngineConfiguration;
-    }
-
-    public SpringContentEngineConfigurator setContentEngineConfiguration(SpringContentEngineConfiguration contentEngineConfiguration) {
-        this.contentEngineConfiguration = contentEngineConfiguration;
-        return this;
-    }
-
 }

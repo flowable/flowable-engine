@@ -18,9 +18,9 @@ import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.repository.EngineDeployment;
 import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.engine.common.impl.EngineDeployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

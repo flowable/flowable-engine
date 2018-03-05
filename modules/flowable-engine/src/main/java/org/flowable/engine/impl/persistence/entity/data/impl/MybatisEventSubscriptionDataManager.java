@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
@@ -56,7 +57,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractProcessDataMana
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByNameMatcher = new EventSubscriptionsByNameMatcher();
 
-    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscritionsByExecutionIdMatcher = new EventSubscriptionsByExecutionIdMatcher();
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByExecutionIdMatcher = new EventSubscriptionsByExecutionIdMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByProcInstTypeAndActivityMatcher = new EventSubscriptionsByProcInstTypeAndActivityMatcher();
 
@@ -177,7 +178,14 @@ public class MybatisEventSubscriptionDataManager extends AbstractProcessDataMana
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecution(final String executionId) {
-        return getList("selectEventSubscriptionsByExecution", executionId, eventSubscritionsByExecutionIdMatcher, true);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // If the execution has been inserted in the same command execution as this query, there can't be any in the database 
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            return getListFromCache(eventSubscriptionsByExecutionIdMatcher, executionId);
+        }
+        
+        return getList(dbSqlSession, "selectEventSubscriptionsByExecution", executionId, eventSubscriptionsByExecutionIdMatcher, true);
     }
 
     @Override
@@ -241,6 +249,16 @@ public class MybatisEventSubscriptionDataManager extends AbstractProcessDataMana
     @Override
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
         getDbSqlSession().delete("deleteEventSubscriptionsForProcessDefinition", processDefinitionId, EventSubscriptionEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteEventSubscriptionsByExecutionId(String executionId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            deleteCachedEntities(dbSqlSession, eventSubscriptionsByExecutionIdMatcher, executionId);
+        } else {
+            bulkDelete("deleteEventSubscriptionsByExecutionId", eventSubscriptionsByExecutionIdMatcher, executionId);
+        }
     }
 
     protected List<SignalEventSubscriptionEntity> toSignalEventSubscriptionEntityList(List<EventSubscriptionEntity> result) {

@@ -15,7 +15,7 @@ package org.flowable.cmmn.rest.service.api.history;
 
 import java.util.List;
 
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
@@ -24,9 +24,9 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
  */
 public class HistoricVariableInstancePaginateList extends AbstractPaginateList<HistoricVariableInstanceResponse, HistoricVariableInstance> {
 
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
-    public HistoricVariableInstancePaginateList(RestResponseFactory restResponseFactory) {
+    public HistoricVariableInstancePaginateList(CmmnRestResponseFactory restResponseFactory) {
         this.restResponseFactory = restResponseFactory;
     }
 

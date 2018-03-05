@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -172,7 +172,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 variablesToSet.put(var.getName(), actualVariableValue);
-                resultVariables.add(restResponseFactory.createRestVariable(var.getName(), actualVariableValue, varScope, task.getId(), RestResponseFactory.VARIABLE_TASK, false));
+                resultVariables.add(restResponseFactory.createRestVariable(var.getName(), actualVariableValue, varScope, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, false));
             }
 
             if (!variablesToSet.isEmpty()) {
@@ -212,7 +212,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     protected void addGlobalVariables(Task task, Map<String, RestVariable> variableMap) {
         if (task.getScopeId() != null) {
             Map<String, Object> rawVariables = runtimeService.getVariables(task.getScopeId());
-            List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), RestResponseFactory.VARIABLE_TASK, RestVariableScope.GLOBAL);
+            List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, RestVariableScope.GLOBAL);
 
             // Overlay global variables over local ones. In case they are
             // present the values are not overridden,
@@ -227,7 +227,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
     protected void addLocalVariables(Task task, Map<String, RestVariable> variableMap) {
         Map<String, Object> rawVariables = taskService.getVariablesLocal(task.getId());
-        List<RestVariable> localVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), RestResponseFactory.VARIABLE_TASK, RestVariableScope.LOCAL);
+        List<RestVariable> localVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, RestVariableScope.LOCAL);
 
         for (RestVariable var : localVariables) {
             variableMap.put(var.getName(), var);

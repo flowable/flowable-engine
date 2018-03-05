@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.editor.form.converter.FormJsonConverter;
-import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.el.DefaultExpressionManager;

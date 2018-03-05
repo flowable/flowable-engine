@@ -34,6 +34,11 @@ flowableAdminApp
                     controller: 'DeploymentsController',
                     reloadOnSearch: true
                 })
+                .when('/cmmn-engine', {
+                    templateUrl: 'views/cmmn-deployments.html',
+                    controller: 'CmmnDeploymentsController',
+                    reloadOnSearch: true
+                })
                 .when('/form-engine', {
                     templateUrl: 'views/form-deployments.html',
                     controller: 'FormDeploymentsController',
@@ -358,6 +363,8 @@ flowableAdminApp
                                     $rootScope.activeServers['form'] = data[i];
                                 } else if (data[i].endpointType === 4) {
                                     $rootScope.activeServers['content'] = data[i];
+                                } else if (data[i].endpointType === 5) {
+                                    $rootScope.activeServers['cmmn'] = data[i];
                                 } else {
                                     console.log('Warning! Invalid endpoint type received: '+data[i].endpointType);
                                 }

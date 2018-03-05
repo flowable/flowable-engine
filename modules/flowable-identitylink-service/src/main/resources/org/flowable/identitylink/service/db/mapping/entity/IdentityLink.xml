@@ -72,10 +72,18 @@
     </foreach>
   </delete>
   
-  <delete id="deleteIdentityLinkByProcDef" parameterType="string">
+  <delete id="deleteIdentityLinksByTaskId" parameterType="string">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where TASK_ID_ = #{id}
+  </delete>
+  
+  <delete id="deleteIdentityLinksByProcDef" parameterType="string">
     delete from ${prefix}ACT_RU_IDENTITYLINK where PROC_DEF_ID_ = #{id}
   </delete>
   
+  <delete id="deleteIdentityLinksByProcessInstanceId" parameterType="string">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where PROC_INST_ID_ = #{id}
+  </delete>
+
   <delete id="deleteIdentityLinksByScopeIdAndScopeType" parameterType="java.util.Map">
     delete from ${prefix}ACT_RU_IDENTITYLINK where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
@@ -106,7 +114,7 @@
     select * from ${prefix}ACT_RU_IDENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
-  <select id="selectIdentityLinksByTask" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+  <select id="selectIdentityLinksByTaskId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
     select * from ${prefix}ACT_RU_IDENTITYLINK where TASK_ID_ = #{parameter}
   </select>
   

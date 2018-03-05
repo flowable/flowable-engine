@@ -48,7 +48,7 @@ public interface JobManager {
     /**
      * Creates an async job so that it can be continued later in a background thread.
      */
-    void setAsyncJobProperties(JobEntity jobEntity, boolean exclusive);
+    void createAsyncJob(JobEntity jobEntity, boolean exclusive);
 
     /**
      * Schedules and async job. If the {@link AsyncExecutor} is running, it can be executed immediately after the transaction. Otherwise it can be picked up by other executors.

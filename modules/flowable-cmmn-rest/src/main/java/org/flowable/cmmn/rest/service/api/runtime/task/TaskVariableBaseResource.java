@@ -21,15 +21,15 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.CmmnRuntimeService;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.task.api.Task;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -67,7 +67,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
             } else {
                 // Revert to execution-variable when not present local on the task
                 Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-                if (VariableScopeType.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
+                if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                     value = runtimeService.getVariable(task.getScopeId(), variableName);
                     variableScope = RestVariableScope.GLOBAL;
                     variableFound = true;
@@ -76,7 +76,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
         } else if (variableScope == RestVariableScope.GLOBAL) {
             Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-            if (VariableScopeType.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
+            if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                 value = runtimeService.getVariable(task.getScopeId(), variableName);
                 variableFound = true;
             }
@@ -91,7 +91,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         if (!variableFound) {
             throw new FlowableObjectNotFoundException("Task '" + taskId + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
         } else {
-            return restResponseFactory.createRestVariable(variableName, value, variableScope, taskId, RestResponseFactory.VARIABLE_TASK, includeBinary);
+            return restResponseFactory.createRestVariable(variableName, value, variableScope, taskId, CmmnRestResponseFactory.VARIABLE_TASK, includeBinary);
         }
     }
 
@@ -99,7 +99,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         boolean variableFound = false;
 
         if (scope == RestVariableScope.GLOBAL) {
-            if (VariableScopeType.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
+            if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                 variableFound = true;
             }
 
@@ -153,11 +153,11 @@ public class TaskVariableBaseResource extends TaskBaseResource {
             }
 
             if (variableType != null) {
-                if (!RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variableType) && !RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variableType)) {
+                if (!CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variableType) && !CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variableType)) {
                     throw new FlowableIllegalArgumentException("Only 'binary' and 'serializable' are supported as variable type.");
                 }
             } else {
-                variableType = RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE;
+                variableType = CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE;
             }
 
             RestVariableScope scope = RestVariableScope.LOCAL;
@@ -165,7 +165,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 scope = RestVariable.getScopeFromString(variableScope);
             }
 
-            if (variableType.equals(RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE)) {
+            if (variableType.equals(CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE)) {
                 // Use raw bytes as variable value
                 byte[] variableBytes = IOUtils.toByteArray(file.getInputStream());
                 setVariable(task, variableName, variableBytes, scope, isNew);
@@ -205,7 +205,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
         setVariable(task, restVariable.getName(), actualVariableValue, scope, isNew);
 
-        return restResponseFactory.createRestVariable(restVariable.getName(), actualVariableValue, scope, task.getId(), RestResponseFactory.VARIABLE_TASK, false);
+        return restResponseFactory.createRestVariable(restVariable.getName(), actualVariableValue, scope, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, false);
     }
 
     protected void setVariable(Task task, String name, Object value, RestVariableScope scope, boolean isNew) {
@@ -223,7 +223,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         if (scope == RestVariableScope.LOCAL) {
             taskService.setVariableLocal(task.getId(), name, value);
         } else {
-            if (VariableScopeType.CMMN.equals(task.getScopeType()) && task.getScopeId() != null) {
+            if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null) {
                 // Explicitly set on execution, setting non-local variable on
                 // task will override local-variable if exists
                 runtimeService.setVariable(task.getScopeId(), name, value);

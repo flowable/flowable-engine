@@ -15,7 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime.task;
 
 import java.util.List;
 
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.task.api.Task;
 
@@ -24,9 +24,9 @@ import org.flowable.task.api.Task;
  */
 public class TaskPaginateList extends AbstractPaginateList<TaskResponse, Task> {
 
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
-    public TaskPaginateList(RestResponseFactory restResponseFactory) {
+    public TaskPaginateList(CmmnRestResponseFactory restResponseFactory) {
         this.restResponseFactory = restResponseFactory;
     }
 

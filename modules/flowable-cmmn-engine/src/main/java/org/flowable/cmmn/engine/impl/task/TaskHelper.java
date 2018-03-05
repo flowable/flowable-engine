@@ -12,12 +12,15 @@
  */
 package org.flowable.cmmn.engine.impl.task;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.identitylink.service.IdentityLinkType;
@@ -25,9 +28,11 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.api.type.VariableScopeType;
+import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -45,6 +50,20 @@ public class TaskHelper {
         CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
         CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(taskEntity);
     }
+    
+    public static void deleteTask(String taskId, String deleteReason, boolean cascade) {
+        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        if (task != null) {
+            if (task.getScopeId() != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
+                throw new FlowableException("The task cannot be deleted because is part of a running case instance");
+            }
+            deleteTask(task, deleteReason, cascade, true);
+            
+        } else if (cascade) {
+            deleteHistoricTask(taskId);
+
+        }
+    }
 
     public static void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean fireEvents) {
         if (!task.isDeleted()) {
@@ -57,8 +76,32 @@ public class TaskHelper {
                 deleteTask((TaskEntity) subTask, deleteReason, cascade, fireEvents);
             }
 
-            CommandContextUtil.getIdentityLinkService(commandContext).deleteIdentityLinksByTaskId(task.getId());
-            CommandContextUtil.getVariableService(commandContext).deleteVariableInstanceMap(task.getVariableInstanceEntities());
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) task;
+            
+            if (countingTaskEntity.isCountEnabled() && countingTaskEntity.getIdentityLinkCount() > 0) {    
+                CommandContextUtil.getIdentityLinkService(commandContext).deleteIdentityLinksByTaskId(task.getId());
+            }
+            
+            if (countingTaskEntity.isCountEnabled() && countingTaskEntity.getVariableCount() > 0) {
+                
+                Map<String, VariableInstanceEntity> taskVariables = task.getVariableInstanceEntities();
+                ArrayList<VariableByteArrayRef> variableByteArrayRefs = new ArrayList<>();
+                for (VariableInstanceEntity variableInstanceEntity : taskVariables.values()) {
+                    if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
+                        variableByteArrayRefs.add(variableInstanceEntity.getByteArrayRef());
+                    }
+                }
+                
+                for (VariableByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
+                    CommandContextUtil.getVariableServiceConfiguration(commandContext).getByteArrayEntityManager().deleteByteArrayById(variableByteArrayRef.getId());
+                }
+                
+                if (!taskVariables.isEmpty()) {
+                    CommandContextUtil.getVariableService(commandContext).deleteVariablesByTaskId(task.getId());
+                }
+                
+                CommandContextUtil.getVariableService(commandContext).deleteVariablesByTaskId(task.getId());
+            }
             
             if (cascade) {
                 deleteHistoricTask(task.getId());
@@ -69,39 +112,7 @@ public class TaskHelper {
             CommandContextUtil.getTaskService().deleteTask(task, fireEvents);
         }
     }
-    
-    public static void deleteTask(String taskId, String deleteReason, boolean cascade) {
 
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
-
-        if (task != null) {
-            if (task.getScopeId() != null && VariableScopeType.CMMN.equals(task.getScopeType())) {
-                throw new FlowableException("The task cannot be deleted because is part of a running case instance");
-            }
-
-            deleteTask(task, deleteReason, cascade, true);
-            
-        } else if (cascade) {
-            deleteHistoricTask(taskId);
-        }
-    }
-    
-    public static void deleteTask(TaskEntity task, boolean fireEvents) {
-        CommandContextUtil.getTaskService().deleteTask(task, fireEvents);
-    }
-    
-    public static void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade) {
-        List<TaskEntity> tasks = CommandContextUtil.getTaskService().findTasksByProcessInstanceId(processInstanceId);
-        
-        for (TaskEntity task : tasks) {
-            if (CommandContextUtil.getEventDispatcher().isEnabled() && !task.isCanceled()) {
-                task.setCanceled(true);
-            }
-
-            deleteTask(task, deleteReason, cascade, true);
-        }
-    }
-    
     public static void changeTaskAssignee(TaskEntity taskEntity, String assignee) {
         if ((taskEntity.getAssignee() != null && !taskEntity.getAssignee().equals(assignee))
                 || (taskEntity.getAssignee() == null && assignee != null)) {
@@ -127,7 +138,7 @@ public class TaskHelper {
     }
     
     protected static void addAssigneeIdentityLinks(TaskEntity taskEntity) {
-        if (taskEntity.getAssignee() != null && taskEntity.getScopeId() != null && VariableScopeType.CMMN.equals(taskEntity.getScopeType())) {
+        if (taskEntity.getAssignee() != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
             CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(taskEntity.getScopeId());
             IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, taskEntity.getAssignee(), null, IdentityLinkType.PARTICIPANT);
         }
@@ -138,7 +149,7 @@ public class TaskHelper {
             return;
         }
 
-        if (owner != null && taskEntity.getScopeId() != null && VariableScopeType.CMMN.equals(taskEntity.getScopeType())) {
+        if (owner != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
             CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(taskEntity.getScopeId());
             IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, owner, null, IdentityLinkType.PARTICIPANT);
         }

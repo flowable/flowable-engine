@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryProperty;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +58,7 @@ public class CaseDefinitionCollectionResource {
     }
 
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
     protected CmmnRepositoryService repositoryService;

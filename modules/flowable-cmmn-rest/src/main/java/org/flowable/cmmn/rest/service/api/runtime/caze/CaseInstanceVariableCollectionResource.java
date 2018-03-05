@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,7 +54,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
     public List<RestVariable> getVariables(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-        return processCaseVariables(caseInstance, RestResponseFactory.VARIABLE_CASE);
+        return processCaseVariables(caseInstance, CmmnRestResponseFactory.VARIABLE_CASE);
     }
 
     @ApiOperation(value = "Update a multiple/single (non)binary variable on a case instance", tags = { "Case Instance Variables" }, nickname = "createOrUpdateCaseVariable",
@@ -84,7 +84,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-        return createVariable(caseInstance, RestResponseFactory.VARIABLE_CASE, request, response);
+        return createVariable(caseInstance, CmmnRestResponseFactory.VARIABLE_CASE, request, response);
     }
 
     @ApiOperation(value = "Create variables or new binary variable on a case instance", tags = { "Case Instance Variables" }, nickname = "createCaseInstanceVariable",
@@ -114,7 +114,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data", "text/plain"})
     public Object createExecutionVariable(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request, HttpServletResponse response) {
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-        return createVariable(caseInstance, RestResponseFactory.VARIABLE_CASE, request, response);
+        return createVariable(caseInstance, CmmnRestResponseFactory.VARIABLE_CASE, request, response);
     }
 
     @ApiOperation(value = "Delete all variables", tags = { "Case Instance Variables" }, nickname = "deleteCaseVariable")

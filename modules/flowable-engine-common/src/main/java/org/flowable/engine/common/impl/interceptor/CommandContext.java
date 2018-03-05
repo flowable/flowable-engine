@@ -18,10 +18,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.AbstractServiceConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -27,7 +27,7 @@ import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.runtime.JobProcessor;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 

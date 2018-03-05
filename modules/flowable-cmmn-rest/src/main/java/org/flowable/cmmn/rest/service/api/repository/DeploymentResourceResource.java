@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.http.entity.ContentType;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
-import org.flowable.cmmn.rest.service.api.RestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.rest.application.ContentTypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ import io.swagger.annotations.Authorization;
 public class DeploymentResourceResource {
 
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
     protected ContentTypeResolver contentTypeResolver;
