@@ -30,6 +30,7 @@ import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringAsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -50,6 +51,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableProcessProperties.class,
     FlowableIdmProperties.class
 })
 @AutoConfigureAfter({

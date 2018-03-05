@@ -17,10 +17,13 @@ import java.util.List;
 
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * @author Josh Long
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 @ConfigurationProperties(prefix = "flowable")
 public class FlowableProperties {
@@ -47,8 +50,6 @@ public class FlowableProperties {
     private HistoryLevel historyLevel = HistoryLevel.AUDIT;
     private String processDefinitionLocationPrefix = "classpath*:/processes/";
     private List<String> processDefinitionLocationSuffixes = Arrays.asList("**.bpmn20.xml", "**.bpmn");
-    private String restApiMapping = "/api/*";
-    private String restApiServletName = "flowableRestApi";
     private boolean jpaEnabled = true; // true by default
     private List<String> customMybatisMappers;
     private List<String> customMybatisXMLMappers;
@@ -77,20 +78,38 @@ public class FlowableProperties {
         this.jpaEnabled = jpaEnabled;
     }
 
+    /**
+     * @deprecated use {@link org.flowable.spring.boot.process.FlowableProcessProperties#getServlet()#getPath()}
+     */
+    @DeprecatedConfigurationProperty(replacement = "flowable.process.servlet.path")
+    @Deprecated
     public String getRestApiMapping() {
-        return restApiMapping;
+        throw new IllegalStateException("Usage of deprecated property. Use FlowableProcessProperties");
     }
 
+    /**
+     * @deprecated use {@link org.flowable.spring.boot.process.FlowableProcessProperties#getServlet()#setPath()}
+     */
+    @Deprecated
     public void setRestApiMapping(String restApiMapping) {
-        this.restApiMapping = restApiMapping;
+        throw new IllegalStateException("Usage of deprecated property. Use FlowableProcessProperties");
     }
 
+    /**
+     * @deprecated use {@link org.flowable.spring.boot.process.FlowableProcessProperties#getServlet()#getName()}
+     */
+    @DeprecatedConfigurationProperty(replacement = "flowable.process.servlet.name")
+    @Deprecated
     public String getRestApiServletName() {
-        return restApiServletName;
+        throw new IllegalStateException("Usage of deprecated property. Use FlowableProcessProperties");
     }
 
+    /**
+     * @deprecated use {@link org.flowable.spring.boot.process.FlowableProcessProperties#getServlet()#setName()}
+     */
+    @Deprecated
     public void setRestApiServletName(String restApiServletName) {
-        this.restApiServletName = restApiServletName;
+        throw new IllegalStateException("Usage of deprecated property. Use FlowableProcessProperties");
     }
 
     public boolean isCheckProcessDefinitions() {
@@ -128,6 +147,7 @@ public class FlowableProperties {
     /**
      * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#isEnabled()}
      */
+    @DeprecatedConfigurationProperty(replacement = "flowable.idm.enabled")
     @Deprecated
     public boolean isDbIdentityUsed() {
         return isDbIdentityUsed;
