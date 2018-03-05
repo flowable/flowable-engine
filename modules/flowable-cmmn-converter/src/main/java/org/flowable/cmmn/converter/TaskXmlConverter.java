@@ -78,9 +78,10 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
                     break;
                     
                 case ScriptServiceTask.SCRIPT_TASK:
-                    ScriptServiceTask scriptTask = new ScriptServiceTask();                    
-                    if (StringUtils.isNotBlank(className)) {
-                        scriptTask.setScriptFormat(className.trim());
+                    ScriptServiceTask scriptTask = new ScriptServiceTask();
+                    String scriptFormat = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_SCRIPT_FORMAT);
+                    if (StringUtils.isNotBlank(scriptFormat)) {
+                        scriptTask.setScriptFormat(scriptFormat.trim());
                     }
                     String resVarName = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_RESULT_VARIABLE_NAME);
                     if (StringUtils.isNotBlank(resVarName)) {

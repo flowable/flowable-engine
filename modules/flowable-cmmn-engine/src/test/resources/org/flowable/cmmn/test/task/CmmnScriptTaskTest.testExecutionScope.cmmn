@@ -6,11 +6,12 @@
     
     <case id="scriptCase">
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
-            <planItem id="returnValueScript" definitionRef="returnValueScriptTask" />
-                <task id="returnValueScriptTask" name="Script with value" flowable:type="script" flowable:scriptFormat="JavaScript" flowable:resultVariableName="scriptResult">
+            <planItem id="planItemTaskA" name="Plan Item One" definitionRef="taskA" />
+                <task id="taskA" name="Script Task Item" flowable:type="script" flowable:scriptFormat="JavaScript">
+                    <documentation>This is a test documentation</documentation>
                 <extensionElements>
                     <flowable:field name="script">
-                        <string><![CDATA[var a = 5; a+2;]]></string>
+                        <string><![CDATA[var a = 5;execution.setVariable("int",a);execution.setVariable("string","my string value");]]></string>
                     </flowable:field>
                 </extensionElements>                
             </task>

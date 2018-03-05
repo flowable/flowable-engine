@@ -7,7 +7,7 @@
     <case id="scriptCase">
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
             <planItem id="returnValueScript" definitionRef="returnValueScriptTask" />
-                <task id="returnValueScriptTask" name="Script with value" flowable:type="script" flowable:class="JavaScript" flowable:resultVariableName="scriptResult" flowable:autoStoreVariables="true">
+                <task id="returnValueScriptTask" name="Script with value" flowable:type="script" flowable:scriptFormat="JavaScript" flowable:resultVariableName="scriptResult">
                 <extensionElements>
                     <flowable:field name="script">
                         <string><![CDATA[

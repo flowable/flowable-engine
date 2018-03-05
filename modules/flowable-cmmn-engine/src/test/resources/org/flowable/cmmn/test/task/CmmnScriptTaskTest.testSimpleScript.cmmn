@@ -7,7 +7,7 @@
     <case id="scriptCase">
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
             <planItem id="planItemTaskA" name="Plan Item One" definitionRef="taskA" />
-                <task id="taskA" name="Script Task Item" flowable:type="script" flowable:class="JavaScript">
+                <task id="taskA" name="Script Task Item" flowable:type="script" flowable:scriptFormat="JavaScript">
                     <documentation>This is a test documentation</documentation>
                 <extensionElements>
                     <flowable:field name="script">

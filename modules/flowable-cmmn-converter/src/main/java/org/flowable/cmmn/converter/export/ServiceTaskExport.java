@@ -61,7 +61,7 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
 
             case ScriptServiceTask.SCRIPT_TASK:
                 if (StringUtils.isNotBlank(task.getImplementationType())) {
-                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementationType());
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SCRIPT_FORMAT, task.getImplementationType());
                 }
                 if (StringUtils.isNotEmpty(task.getResultVariableName())) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, task.getResultVariableName());

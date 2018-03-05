@@ -52,6 +52,29 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testExecutionScope() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("scriptCase")
+                .start();
+        assertNotNull(caseInstance);
+
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertNotNull(variables);
+        assertEquals(2, variables.size());
+
+        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "int"));
+        Object integer = cmmnRuntimeService.getVariable(caseInstance.getId(), "int");
+        assertThat(integer, instanceOf(Integer.class));
+        assertEquals(5, integer);
+
+        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "string"));
+        Object string = cmmnRuntimeService.getVariable(caseInstance.getId(), "string");
+        assertThat(string, instanceOf(String.class));
+        assertEquals("my string value", string);
+    }
+
+    @Test
+    @CmmnDeployment
     public void testSimpleResult() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("scriptCase")
@@ -140,59 +163,4 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
                     '}';
         }
     }
-
-
-/*
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .singleResult();
-        assertNotNull(planItemInstance);
-        assertEquals("returnValueScriptTask", planItemInstance.getPlanItemDefinitionId());
-
-        System.out.printf("=== PLAN INSTANCE STATE %s%n", planItemInstance.getState());
-        System.out.printf("=== PLAN INSTANCE DEFINITION ID %s%n", planItemInstance.getPlanItemDefinitionId());
-        System.out.printf("=== PLAN INSTANCE DEFINITION TYPE %s%n", planItemInstance.getPlanItemDefinitionType());
-        System.out.printf("=== PLAN INSTANCE IS COMPLETABLE %s%n", planItemInstance.isCompleteable());
-
-
-        //assertThat(planItemInstance, instanceOf(ScriptServiceTask.class));
-
-        Map<String, Object> variablesBefore = cmmnRuntimeService.getVariables(caseInstance.getId());
-
-        List<HistoricVariableInstance> listv = cmmnHistoryService.createHistoricVariableInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .list();
-
-        listv.forEach(v -> System.out.println("===> VAR Name: " + v.getVariableName() + " Type:" + v.getVariableTypeName()));
-*/
-
-//        HistoricCaseInstance caseHistory = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-//        List<HistoricTaskInstance> list = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseHistory.getId()).list();
-//        System.out.println("==== TASK HISTORY");
-//        list.forEach(t -> System.out.printf("TASK ID:%s%n", t.getId()));
-//        deploymentId = cmmnRepositoryService.createDeployment()
-//                .addClasspathResource("org/flowable/cmmn/test/one-human-task-model.cmmn")
-//                .deploy()
-//                .getId();
-//        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-//        assertNotNull(task);
-//        assertEquals("Script Task Item", task.getName());
-//        assertEquals("This is a test documentation", task.getDescription());
-//        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-//            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-//            assertNotNull(historicTaskInstance);
-//            assertNull(historicTaskInstance.getEndTime());
-//        }
-//
-//        cmmnTaskService.complete(task.getId());
-//        assertCaseInstanceEnded(caseInstance);
-//
-//        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-//            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-//            assertNotNull(historicTaskInstance);
-//            assertEquals("The Task", historicTaskInstance.getName());
-//            assertEquals("This is a test documentation", historicTaskInstance.getDescription());
-//            assertNotNull(historicTaskInstance.getEndTime());
-//        }
-
 }

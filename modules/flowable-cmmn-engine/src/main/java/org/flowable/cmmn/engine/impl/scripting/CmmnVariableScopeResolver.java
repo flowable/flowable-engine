@@ -26,16 +26,17 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class CmmnVariableScopeResolver implements Resolver {
 
-    public static enum CmmnEngineVariableScopeNames {
+    public enum CmmnEngineVariableScopeNames {
         EngineConfiguration("cmmnEngineConfiguration"),
         RuntimeService("cmmnRuntimeService"),
         HistoryService("cmmnHistoryService"),
         ManagementService("cmmnManagementService"),
-        TaskService("cmmnTaskService");
+        TaskService("cmmnTaskService"),
+        Execution("execution");
 
         String name;
 
-        private CmmnEngineVariableScopeNames(String name) {
+        CmmnEngineVariableScopeNames(String name) {
             this.name = name;
         }
 
@@ -83,6 +84,8 @@ public class CmmnVariableScopeResolver implements Resolver {
                             return engineConfiguration.getCmmnRuntimeService();
                         case TaskService:
                             return engineConfiguration.getCmmnTaskService();
+                        case Execution:
+                            return variableScope;
                         default:
                             return null;
                     }

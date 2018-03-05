@@ -106,6 +106,8 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
 
+    String ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
+
     String ELEMENT_FIELD = "field";
     String ATTRIBUTE_FIELD_STRING = "stringValue";
     String ATTRIBUTE_FIELD_EXPRESSION = "expression";
