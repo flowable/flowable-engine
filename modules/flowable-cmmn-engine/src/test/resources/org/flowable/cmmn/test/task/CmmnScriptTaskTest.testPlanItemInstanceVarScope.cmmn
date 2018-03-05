@@ -11,7 +11,7 @@
                     <documentation>This is a test documentation</documentation>
                 <extensionElements>
                     <flowable:field name="script">
-                        <string><![CDATA[var a = 5;execution.setVariable("int",a);execution.setVariable("string","my string value");]]></string>
+                        <string><![CDATA[var a = 5;planItemInstance.setVariable("int",a);planItemInstance.setVariable("string","my string value");]]></string>
                     </flowable:field>
                 </extensionElements>                
             </task>

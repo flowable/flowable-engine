@@ -52,7 +52,7 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testExecutionScope() {
+    public void testPlanItemInstanceVarScope() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("scriptCase")
                 .start();

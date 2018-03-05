@@ -32,7 +32,7 @@ public class CmmnVariableScopeResolver implements Resolver {
         HistoryService("cmmnHistoryService"),
         ManagementService("cmmnManagementService"),
         TaskService("cmmnTaskService"),
-        Execution("execution");
+        Execution("planItemInstance");
 
         String name;
 
