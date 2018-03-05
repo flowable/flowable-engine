@@ -15,6 +15,7 @@ package org.flowable.form.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -50,6 +51,9 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
     private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected volatile boolean running = false;
+    protected List<String> enginesBuild = new ArrayList<>();
+    protected final Object lifeCycleMonitor = new Object();
 
     public SpringFormEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -62,7 +66,7 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
     public FormEngine buildFormEngine() {
         FormEngine formEngine = super.buildFormEngine();
         FormEngines.setInitialized(true);
-        autoDeployResources(formEngine);
+        enginesBuild.add(formEngine.getName());
         return formEngine;
     }
 
@@ -171,4 +175,30 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
         return result;
     }
 
+    @Override
+    public void start() {
+        synchronized (lifeCycleMonitor) {
+            if (!isRunning()) {
+                enginesBuild.forEach(name -> autoDeployResources(FormEngines.getFormEngine(name)));
+                running = true;
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        synchronized (lifeCycleMonitor) {
+            running = false;
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        return SpringEngineConfiguration.super.getPhase() - SpringEngineConfiguration.PHASE_DELTA * 2;
+    }
 }
