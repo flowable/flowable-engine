@@ -12,7 +12,9 @@
  */
 package org.flowable.spring.boot.form;
 
+import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,6 +55,12 @@ public class FlowableFormProperties {
      */
     private boolean enabled = true;
 
+    /**
+     * The servlet configuration for the Form Rest API.
+     */
+    @NestedConfigurationProperty
+    private final FlowableServlet servlet = new FlowableServlet("/form-api", "Flowable Form Rest API");
+
     public String getDeploymentName() {
         return deploymentName;
     }
@@ -91,5 +99,9 @@ public class FlowableFormProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public FlowableServlet getServlet() {
+        return servlet;
     }
 }

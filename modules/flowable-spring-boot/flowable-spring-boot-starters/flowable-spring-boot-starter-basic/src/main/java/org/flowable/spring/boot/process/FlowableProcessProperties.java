@@ -10,38 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.spring.boot.idm;
+package org.flowable.spring.boot.process;
 
 import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
- * Properties for configuring the idm engine.
- *
  * @author Filip Hrisafov
  */
-@ConfigurationProperties(prefix = "flowable.idm")
-public class FlowableIdmProperties {
+@ConfigurationProperties(prefix = "flowable.process")
+public class FlowableProcessProperties {
 
     /**
-     * Whether the idm engine needs to be started.
-     */
-    private boolean enabled = true;
-
-    /**
-     * The servlet configuration for the IDM Rest API.
+     * The servlet configuration for the Process Rest API.
      */
     @NestedConfigurationProperty
-    private final FlowableServlet servlet = new FlowableServlet("/idm-api", "Flowable IDM Rest API");
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+    private final FlowableServlet servlet = new FlowableServlet("/process-api", "Flowable BPMN Rest API");
 
     public FlowableServlet getServlet() {
         return servlet;

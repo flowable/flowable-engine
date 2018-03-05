@@ -35,8 +35,11 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Base dispatcher configuration that can be used to configure context for the REST API.
+ */
 @Configuration
-@ComponentScan({ "org.flowable.rest.exception", "org.flowable.rest.service.api" })
+@ComponentScan("org.flowable.rest.exception")
 @ConditionalOnClass(WebMvcConfigurationSupport.class)
 @EnableAsync
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {

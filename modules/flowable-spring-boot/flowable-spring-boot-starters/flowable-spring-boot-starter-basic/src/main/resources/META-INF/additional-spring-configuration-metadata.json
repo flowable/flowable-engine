@@ -1,0 +1,106 @@
+{
+  "properties": [
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.cmmn.servlet.load-on-startup",
+      "description": "Load on startup of the CMMN dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.cmmn.servlet.name",
+      "defaultValue": "Flowable CMMN Rest API",
+      "description": "The name of the CMMN servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.cmmn.servlet.path",
+      "defaultValue": "/cmmn-api",
+      "description": "The context path for the CMMN rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.content.servlet.load-on-startup",
+      "description": "Load on startup of the Content dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.content.servlet.name",
+      "defaultValue": "Flowable Content Rest API",
+      "description": "The name of the Content servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.content.servlet.path",
+      "defaultValue": "/content-api",
+      "description": "The context path for the Content rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.dmn.servlet.load-on-startup",
+      "description": "Load on startup of the DMN dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.dmn.servlet.name",
+      "defaultValue": "Flowable DMN Rest API",
+      "description": "The name of the DMN servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.dmn.servlet.path",
+      "defaultValue": "/dmn-api",
+      "description": "The context path for the DMN rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.form.servlet.load-on-startup",
+      "description": "Load on startup of the Form dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.form.servlet.name",
+      "defaultValue": "Flowable Form Rest API",
+      "description": "The name of the Form servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.form.servlet.path",
+      "defaultValue": "/form-api",
+      "description": "The context path for the Form rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.idm.servlet.load-on-startup",
+      "description": "Load on startup of the IDM dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.idm.servlet.name",
+      "defaultValue": "Flowable IDM Rest API",
+      "description": "The name of the IDM servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.idm.servlet.path",
+      "defaultValue": "/idm-api",
+      "description": "The context path for the IDM rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.process.servlet.load-on-startup",
+      "description": "Load on startup of the Process dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.process.servlet.name",
+      "defaultValue": "Flowable BPMN Rest API",
+      "description": "The name of the Process servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.process.servlet.path",
+      "defaultValue": "/process-api",
+      "description": "The context path for the Process rest servlet."
+    }
+  ]
+}
