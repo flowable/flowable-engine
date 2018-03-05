@@ -19,11 +19,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -274,11 +275,8 @@ public class DmnJsonConverterUtil {
     }
 
     protected static List<String> split(String str) {
-        String[] items = str.split(",");
-        List<String> processedItems = new ArrayList<>();
-        for (String item : items) {
-            processedItems.add(item.trim());
-        }
-        return processedItems;
+        return Stream.of(str.split(","))
+            .map(elem -> elem.trim())
+            .collect(Collectors.toList());
     }
 }

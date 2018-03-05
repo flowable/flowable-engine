@@ -12,9 +12,10 @@
  */
 package org.flowable.dmn.engine.impl.el.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Yvo Swillens
@@ -43,12 +44,9 @@ public class DMNParseUtil {
     }
 
     private static List<Object> split(String str) {
-        String[] items = str.split(",");
-        List<Object> processedItems = new ArrayList<>();
-        for (String item : items) {
-            processedItems.add(formatElementValue(item.trim()));
-        }
-        return processedItems;
+        return Stream.of(str.split(","))
+            .map(elem -> formatElementValue(elem.trim()))
+            .collect(Collectors.toList());
     }
 
 
