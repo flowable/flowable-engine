@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.engine.impl.cmd.SchemaOperationsCmmnEngineBuild;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,8 @@ public class CmmnEngineImpl implements CmmnEngine {
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnHistoryService cmmnHistoryService;
     
+    protected AsyncExecutor asyncExecutor;
+    
     public CmmnEngineImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         this.name = cmmnEngineConfiguration.getEngineName();
@@ -48,6 +51,8 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
+        
+        this.asyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
         
         if (cmmnEngineConfiguration.isUsingRelationalDatabase() && cmmnEngineConfiguration.getDatabaseSchemaUpdate() != null) {
             CommandExecutor commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
@@ -71,6 +76,10 @@ public class CmmnEngineImpl implements CmmnEngine {
     @Override
     public void close() {
         CmmnEngines.unregister(this);
+        
+        if (asyncExecutor != null && asyncExecutor.isActive()) {
+            asyncExecutor.shutdown();
+        }
     }
     
     public CmmnEngineConfiguration getCmmnEngineConfiguration() {
