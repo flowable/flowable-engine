@@ -18,7 +18,9 @@ import javax.sql.DataSource;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.idm.engine.IdmEngines;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -41,6 +43,12 @@ public class SpringIdmEngineConfiguration extends IdmEngineConfiguration impleme
         this.transactionsExternallyManaged = true;
     }
 
+    @Override
+    public IdmEngine buildIdmEngine() {
+        IdmEngine idmEngine = super.buildIdmEngine();
+        IdmEngines.setInitialized(true);
+        return idmEngine;
+    }
     public void setTransactionSynchronizationAdapterOrder(Integer transactionSynchronizationAdapterOrder) {
         this.transactionSynchronizationAdapterOrder = transactionSynchronizationAdapterOrder;
     }

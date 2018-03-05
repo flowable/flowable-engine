@@ -16,7 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
@@ -55,7 +56,14 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
 
     @Override
     public List<DeadLetterJobEntity> findJobsByExecutionId(String executionId) {
-        return getList("selectDeadLetterJobsByExecutionId", executionId, deadLetterByExecutionIdMatcher, true);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // If the execution has been inserted in the same command execution as this query, there can't be any in the database 
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            return getListFromCache(deadLetterByExecutionIdMatcher, executionId);
+        }
+        
+        return getList(dbSqlSession, "selectDeadLetterJobsByExecutionId", executionId, deadLetterByExecutionIdMatcher, true);
     }
 
     @Override
@@ -65,5 +73,5 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
     }
-
+    
 }

@@ -424,6 +424,10 @@ body {
 	color: rgb(162,204,70)
 }
 
+.component .title.cmmn {
+    color: rgb(253,229,65)
+}
+
 .component .title.dmn {
 	color: rgb(227,154,33)
 }

@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
@@ -59,6 +60,7 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     @Override
     public CmmnEngine buildCmmnEngine() {
         CmmnEngine cmmnEngine = super.buildCmmnEngine();
+        CmmnEngines.setInitialized(true);
         autoDeployResources(cmmnEngine);
         return cmmnEngine;
     }

@@ -52,4 +52,14 @@ public class TestHistoricActivityEventListener implements FlowableEventListener 
     public boolean isFailOnException() {
         return false;
     }
+    
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return false;
+    }
+
+    @Override
+    public String getOnTransaction() {
+        return null;
+    }
 }

@@ -145,6 +145,9 @@
 			<fileset dir="../modules/flowable-cmmn-spring-configurator/target">
                 <include name="flowable-cmmn-spring-configurator-*.jar" />
             </fileset>
+			<fileset dir="../modules/flowable-cmmn-rest/target">
+			    <include name="flowable-cmmn-rest-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-dmn-model/target">
 				<include name="flowable-dmn-model-*.jar" />
 			</fileset>

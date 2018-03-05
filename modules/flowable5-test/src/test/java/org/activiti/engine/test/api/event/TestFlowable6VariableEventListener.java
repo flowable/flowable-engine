@@ -46,5 +46,15 @@ public class TestFlowable6VariableEventListener implements FlowableEventListener
     public boolean isFailOnException() {
         return true;
     }
+    
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return false;
+    }
+
+    @Override
+    public String getOnTransaction() {
+        return null;
+    }
 
 }

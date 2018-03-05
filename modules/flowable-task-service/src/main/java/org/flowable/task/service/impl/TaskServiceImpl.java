@@ -97,5 +97,10 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     public void deleteTask(TaskEntity task, boolean fireEvents) {
         getTaskEntityManager().delete(task, fireEvents);
     }
+    
+    @Override
+    public void deleteTasksByExecutionId(String executionId) {
+        getTaskEntityManager().deleteTasksByExecutionId(executionId);
+    }
 
 }

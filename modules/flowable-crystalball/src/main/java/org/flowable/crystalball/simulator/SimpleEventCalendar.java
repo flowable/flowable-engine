@@ -18,7 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.runtime.ClockReader;
+import org.flowable.engine.common.impl.runtime.ClockReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

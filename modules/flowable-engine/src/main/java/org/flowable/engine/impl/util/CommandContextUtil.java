@@ -94,6 +94,10 @@ public class CommandContextUtil {
     }
     
     public static VariableService getVariableService() {
+        return getVariableService(getCommandContext());
+    }
+    
+    public static VariableService getVariableService(CommandContext commandContext) {
         VariableService variableService = null;
         VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
         if (variableServiceConfiguration != null) {
@@ -123,8 +127,12 @@ public class CommandContextUtil {
     }
     
     public static IdentityLinkService getIdentityLinkService() {
+        return getIdentityLinkService(getCommandContext());
+    }
+    
+    public static IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
         IdentityLinkService identityLinkService = null;
-        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration();
+        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration(commandContext);
         if (identityLinkServiceConfiguration != null) {
             identityLinkService = identityLinkServiceConfiguration.getIdentityLinkService();
         }
