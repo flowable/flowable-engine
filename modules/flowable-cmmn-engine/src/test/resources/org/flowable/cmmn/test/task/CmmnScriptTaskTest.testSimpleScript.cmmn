@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
-    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
-    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
-    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
     xmlns:flowable="http://flowable.org/cmmn"
     targetNamespace="http://flowable.org/cmmn">
 
@@ -11,7 +7,7 @@
     <case id="scriptCase">
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
             <planItem id="planItemTaskA" name="Plan Item One" definitionRef="taskA" />
-                <task id="taskA" isBlocking="true" name="Script Task Item" flowable:type="script" flowable:class="JavaScript" flowable:resultVariableName="scriptResult" flowable:autoStoreVariables="false">
+                <task id="taskA" name="Script Task Item" flowable:type="script" flowable:class="JavaScript">
                     <documentation>This is a test documentation</documentation>
                 <extensionElements>
                     <flowable:field name="script">
