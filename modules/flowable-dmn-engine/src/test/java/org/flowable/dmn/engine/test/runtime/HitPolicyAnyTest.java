@@ -71,6 +71,7 @@ public class HitPolicyAnyTest {
 
         assertEquals(0, result.getDecisionResult().size());
         assertTrue(result.isFailed());
+        assertNull(result.getValidationMessage());
         assertNotNull(result.getExceptionMessage());
     }
 
@@ -90,7 +91,14 @@ public class HitPolicyAnyTest {
 
         assertEquals(0, result.getDecisionResult().size());
         assertTrue(result.isFailed());
+
         assertNotNull(result.getExceptionMessage());
+        assertNotNull(result.getRuleExecutions().get(1).getExceptionMessage());
+        assertNotNull(result.getRuleExecutions().get(3).getExceptionMessage());
+
+        assertNull(result.getValidationMessage());
+        assertNull(result.getRuleExecutions().get(1).getValidationMessage());
+        assertNull(result.getRuleExecutions().get(3).getValidationMessage());
     }
 
     @Test
@@ -114,7 +122,14 @@ public class HitPolicyAnyTest {
         assertEquals(10D, outputMap.get("outputVariable1"));
         assertEquals("result2", outputMap.get("outputVariable2"));
         assertFalse(result.isFailed());
+
         assertNull(result.getExceptionMessage());
+        assertNull(result.getRuleExecutions().get(1).getExceptionMessage());
+        assertNull(result.getRuleExecutions().get(3).getExceptionMessage());
+
+        assertNotNull(result.getValidationMessage());
+        assertNotNull(result.getRuleExecutions().get(1).getValidationMessage());
+        assertNotNull(result.getRuleExecutions().get(3).getValidationMessage());
 
         // re enable strict mode
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);

@@ -42,7 +42,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.BreakpointJobHandler;
@@ -183,6 +183,13 @@ public class FlowableEngineConfiguration {
         
         SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
         dmnEngineConfiguration.setHistoryEnabled(true);
+
+        // disables strict mode if set
+        if (environment.getProperty("flowable.dmn.strict-mode", Boolean.class, true) == false) {
+            LOGGER.info("disabling DMN engine strict mode");
+            dmnEngineConfiguration.setStrictMode(false);
+        }
+
         SpringDmnEngineConfigurator dmnEngineConfigurator = new SpringDmnEngineConfigurator();
         dmnEngineConfigurator.setDmnEngineConfiguration(dmnEngineConfiguration);
         processEngineConfiguration.addConfigurator(dmnEngineConfigurator);

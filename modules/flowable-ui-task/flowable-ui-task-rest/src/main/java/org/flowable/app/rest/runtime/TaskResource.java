@@ -12,8 +12,6 @@
  */
 package org.flowable.app.rest.runtime;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.model.runtime.TaskUpdateRepresentation;
 import org.flowable.app.service.runtime.FlowableTaskService;
@@ -43,7 +41,7 @@ public class TaskResource {
     }
 
     @RequestMapping(value = "/rest/tasks/{taskId}/subtasks", method = RequestMethod.GET, produces = "application/json")
-    public List<TaskRepresentation> getSubTasks(@PathVariable String taskId, HttpServletResponse response) {
+    public List<TaskRepresentation> getSubTasks(@PathVariable String taskId) {
         return taskService.getSubTasks(taskId);
     }
 

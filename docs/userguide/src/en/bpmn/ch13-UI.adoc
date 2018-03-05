@@ -32,7 +32,7 @@ By default, the Flowable IDM application will create an admin user that has priv
 
 image::images/flowable_modeler_startup_screen.png[align="center"]
 
-Usually, you will want to change the default H2 in-memory database configuration to a MySQL or Postgres (or other persistent database) configuration. You can do this per app by changing the flowable-ui-app.properties file in the WEB-INF/classes/META-INF directory of each app. But it's easier to copy the flowable-ui-app.properties file from one of the apps or get it from link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/META-INF/flowable-ui-app/flowable-ui-app.properties$$[Github], and put it in the Tomcat lib folder. The UI applications will first look at a flowable-ui-app.properties file available on the classpath directly and this configuration will have precedence over the configuration file in the WAR. To change the default configuration to MySQL the following changes are needed to the properties file:
+Usually, you will want to change the default H2 in-memory database configuration to a MySQL or Postgres (or other persistent database) configuration. You can do this per app by changing the flowable-app.properties file in the _WEB-INF/classes/META-INF/flowable-app_ directory of each app. But it's easier to copy the flowable-app.properties file from one of the apps or get it from link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/META-INF/flowable-app/flowable-app.properties$$[Github], and put it on the classpath of all apps (for example in the Tomcat lib folder). The UI applications will first look at a flowable-app.properties file available on the classpath directly and this configuration will have precedence over the configuration file in the WAR. To change the default configuration to MySQL the following changes are needed to the properties file:
 
 [source,linenums]
 ----
@@ -72,12 +72,10 @@ The additional configuration options are described in the table below:
 |datasource.password|The password to be used for the JDBC connection
 |datasource.min-pool-size|The minimum datasource pool size
 |datasource.max-pool-size|The maximum datasource pool size
-|datasource.acquire-increment|Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted
-|datasource.preferred-test-query|Defines the query that will be executed for all connection tests
-|datasource.test-connection-on-checkin|Test the connection when checking in to the pool
-|datasource.test-connection-on-checkout|Test the connection on checkout from the pool
-|datasource.max-idle-time|Seconds a Connection can remain pooled but unused before being discarded. Zero means idle connections never expire
-|datasource.max-idle-time-excess-connections|Number of seconds that Connections in excess of minPoolSize should be permitted to remain idle in the pool before being culled
+|datasource.connection-timeout|The timeout, in milliseconds, that the connection pool will wait to acquire a connection
+|datasource.test-query|Defines the query that will be executed for all connection tests
+|datasource.max-idle-time|Seconds (not *not* milliseconds) a connection can remain pooled but unused before being discarded. Zero means idle connections never expire
+|datasource.connection.max-lifetime|The time, in milliseconds, a connection will be kept in the connection pool (if set)
 |email.host|Hostname of the email server for the Flowable Task application email service task
 |email.port|Port of the email server
 |email.useCredentials|Does the email server require authentication
@@ -96,11 +94,12 @@ The additional configuration options are described in the table below:
 |idm.admin.user|The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin.
 |idm.admin.password|The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.
 |deployment.api.url|The root URI to th REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine. Default url for the Flowable Task application is http://localhost:8080/flowable-task/process-api
-
+|rest.task-app|idm-app|modeler-app.enabled|Enables the REST API (this is not the REST api used by the UI, but an api that's availble over basic auth authentication). Default is true.
+|rest.authentication.mode|Sets the mode of verifying the user when accessing the REST API. By default this is 'verify-privilege', which means that the user passing the credentials with basic authentication needs to have the 'access-rest-api' privilege. Can be set to 'any-users', which means that any valid user/password pair passed as basic auth credentials can access the rest api (as it was in earlier versions of Flowable).
 |===============
 
 In addition to these properties that are used by multiple Flowable web applications, the Flowable admin application has a few more properties. The full
-content of the properties file can be viewed on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-admin/src/main/resources/META-INF/flowable-ui-app/flowable-ui-app.properties$$[Github]. The additional properties are mainly used for defining the initial values for the REST endpoints for the different engines. The Admin application uses the initial values to make a connection to the Flowable engines, but the values can be overridden in the Admin application configuration view and these values are stored in the __ACT\_ADM\_SERVER\_CONFIG__ table. An example of the BPMN Engine REST properties is shown below:
+content of the properties file can be viewed on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-admin/flowable-ui-admin-app/src/main/resources/META-INF/flowable-app/flowable-app.properties$$[Github]. The additional properties are mainly used for defining the initial values for the REST endpoints for the different engines. The Admin application uses the initial values to make a connection to the Flowable engines, but the values can be overridden in the Admin application configuration view and these values are stored in the __ACT\_ADM\_SERVER\_CONFIG__ table. An example of the BPMN Engine REST properties is shown below:
 
 [source,linenums]
 ----
@@ -130,6 +129,7 @@ When the Flowable IDM application is deployed and started, it will check if ther
 * access-admin: allows the user to login to the Flowable Admin application and manage the Flowable engines
 * access-modeler: enables access to the Flowable Modeler application
 * access-task: provides the privilege to login to the Flowable Task application
+* access-rest-api: allows the user to do call the REST API. Otherwise a 403 (forbidden) http status will be returned. Note that _rest.authentication.mode_ nees to be set to _verify-privilege_, which is the default.
 
 When logging in to link:$$http://localhost:8080/flowable-idm$$[http://localhost:8080/flowable-idm] with admin/test for the first time the following user overview screen is shown:
 

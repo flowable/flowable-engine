@@ -13,11 +13,7 @@
 package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -30,18 +26,15 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.content.api.ContentItem;
-import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormFieldHandler;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
-import org.flowable.form.model.FormField;
-import org.flowable.form.model.FormFieldTypes;
-import org.flowable.form.model.FormModel;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +42,8 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class StartCaseInstanceWithFormCmd implements Command<CaseInstance>, Serializable {
+    
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StartCaseInstanceWithFormCmd.class);
 
@@ -73,7 +68,7 @@ public class StartCaseInstanceWithFormCmd implements Command<CaseInstance>, Seri
             throw new FlowableObjectNotFoundException("No case definition found for id = '" + caseInstanceBuilder.getCaseDefinitionId() + "'", CaseDefinition.class);
         }
 
-        FormModel formModel = null;
+        FormInfo formInfo = null;
         Map<String, Object> formVariables = null;
         FormService formService = CommandContextUtil.getFormService();
 
@@ -84,9 +79,9 @@ public class StartCaseInstanceWithFormCmd implements Command<CaseInstance>, Seri
             if (planModel != null && StringUtils.isNotEmpty(planModel.getFormKey())) {
                 FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
                 if (formRepositoryService != null) {
-                    formModel = formRepositoryService.getFormModelByKey(planModel.getFormKey());
-                    if (formModel != null) {
-                        formVariables = formService.getVariablesFromFormSubmission(formModel, caseInstanceBuilder.getVariables(),
+                    formInfo = formRepositoryService.getFormModelByKey(planModel.getFormKey());
+                    if (formInfo != null) {
+                        formVariables = formService.getVariablesFromFormSubmission(formInfo, caseInstanceBuilder.getVariables(),
                                 caseInstanceBuilder.getOutcome());
                     }
                 } else {
@@ -98,51 +93,14 @@ public class StartCaseInstanceWithFormCmd implements Command<CaseInstance>, Seri
 
         CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceHelper().startCaseInstance(caseInstanceBuilder);
 
-        if (formModel != null) {
-            formService.createFormInstanceWithScopeId(formVariables, formModel, null, caseInstance.getId(),
-                    VariableScopeType.CMMN, caseInstance.getCaseDefinitionId());
-            processUploadFieldsIfNeeded(formModel, caseInstance.getId());
+        if (formInfo != null) {
+            formService.createFormInstanceWithScopeId(formVariables, formInfo, null, caseInstance.getId(),
+                    ScopeTypes.CMMN, caseInstance.getCaseDefinitionId());
+            FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldHandler();
+            formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null, caseInstance.getId(), ScopeTypes.CMMN, caseInstanceBuilder.getVariables());
         }
 
         return caseInstance;
-    }
-
-    /**
-     * When content is uploaded for a field, it is uploaded as a 'temporary related content'. Now that the task is completed, we need to associate the field/taskId/processInstanceId with the related
-     * content so we can retrieve it later.
-     */
-    protected void processUploadFieldsIfNeeded(FormModel formModel, String caseInstanceId) {
-        ContentService contentService = CommandContextUtil.getContentService();
-        if (contentService == null) {
-            return;
-        }
-
-        Map<String, Object> variables = this.caseInstanceBuilder.getVariables();
-        if (variables != null && formModel != null && formModel.getFields() != null) {
-            for (FormField formField : formModel.getFields()) {
-                if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
-
-                    String variableName = formField.getId();
-                    if (variables.containsKey(variableName)) {
-                        String variableValue = (String) variables.get(variableName);
-                        if (StringUtils.isNotEmpty(variableValue)) {
-                            String[] contentItemIds = StringUtils.split(variableValue, ",");
-                            Set<String> contentItemIdSet = new HashSet<>();
-                            Collections.addAll(contentItemIdSet, contentItemIds);
-
-                            List<ContentItem> contentItems = contentService.createContentItemQuery().ids(contentItemIdSet).list();
-
-                            for (ContentItem contentItem : contentItems) {
-                                contentItem.setScopeId(caseInstanceId);
-                                contentItem.setScopeType(VariableScopeType.CMMN);
-                                contentItem.setField(formField.getId());
-                                contentService.saveContentItem(contentItem);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
 }

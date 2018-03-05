@@ -13,9 +13,9 @@
 package org.flowable.engine.test.api.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 
-public class TestExceptionFlowableEventListener implements FlowableEventListener {
+public class TestExceptionFlowableEventListener extends AbstractFlowableEngineEventListener {
 
     private boolean failOnException;
 

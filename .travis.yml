@@ -4,8 +4,9 @@ dist: trusty
 sudo: required
 
 jdk:
+  - oraclejdk9
   - oraclejdk8
-  - openjdk7
+  - openjdk8
 
 cache:
   directories:
@@ -17,7 +18,7 @@ notifications:
     on_start: never     # options: [always|never|change] default: always
 
 before_script:
-  - echo MAVEN_OPTS=\"-Xmx2048m -Xms1024m -XX:MaxPermSize=512m -Djava.awt.headless=true\" > ~/.mavenrc
+  - echo MAVEN_OPTS=\"-Xmx2048m -Xms1024m -Djava.awt.headless=true\" > ~/.mavenrc
 
 script:
-  mvn test -Pcheck,errorLogging
+  mvn test -Pdistro,errorLogging -DskipTests=false

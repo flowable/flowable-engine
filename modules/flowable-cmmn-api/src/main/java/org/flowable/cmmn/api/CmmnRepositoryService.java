@@ -20,7 +20,9 @@ import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormDefinition;
 
 public interface CmmnRepositoryService {
 
@@ -94,5 +96,22 @@ public interface CmmnRepositoryService {
      *             if no case definition with the provided id can be found.
      */
     void setCaseDefinitionCategory(String caseDefinitionId, String category);
+    
+    /**
+     * Retrieves the {@link DmnDecisionTable}s associated with the given case definition.
+     *
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     *
+     */
+    List<DmnDecisionTable> getDecisionTablesForCaseDefinition(String caseDefinitionId);
 
+    /**
+     * Retrieves the {@link FormDefinition}s associated with the given case definition.
+     *
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     *
+     */
+    List<FormDefinition> getFormDefinitionsForCaseDefinition(String caseDefinitionId);
 }

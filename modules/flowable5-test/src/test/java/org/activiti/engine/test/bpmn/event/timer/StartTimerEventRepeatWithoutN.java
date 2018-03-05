@@ -42,6 +42,16 @@ public class StartTimerEventRepeatWithoutN extends PluggableFlowableTestCase {
         public boolean isFailOnException() {
             return false;
         }
+        
+        @Override
+        public boolean isFireOnTransactionLifecycleEvent() {
+            return false;
+        }
+
+        @Override
+        public String getOnTransaction() {
+            return null;
+        }
 
     }
 

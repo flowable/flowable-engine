@@ -38,6 +38,7 @@ create table ACT_ID_USER (
     EMAIL_ NVARCHAR2(255),
     PWD_ NVARCHAR2(255),
     PICTURE_ID_ NVARCHAR2(64),
+    TENANT_ID_ NVARCHAR2(255) default '',
     primary key (ID_)
 );
 
@@ -67,7 +68,7 @@ create table ACT_ID_TOKEN (
 
 create table ACT_ID_PRIV (
     ID_ NVARCHAR2(64) not null,
-    NAME_ NVARCHAR2(255),
+    NAME_ NVARCHAR2(255) not null,
     primary key (ID_)
 );
 
@@ -80,22 +81,26 @@ create table ACT_ID_PRIV_MAPPING (
 );
 
 create index ACT_IDX_MEMB_GROUP on ACT_ID_MEMBERSHIP(GROUP_ID_);
-alter table ACT_ID_MEMBERSHIP 
+alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_GROUP
-    foreign key (GROUP_ID_) 
+    foreign key (GROUP_ID_)
     references ACT_ID_GROUP (ID_);
 
 create index ACT_IDX_MEMB_USER on ACT_ID_MEMBERSHIP(USER_ID_);
-alter table ACT_ID_MEMBERSHIP 
+alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_USER
-    foreign key (USER_ID_) 
+    foreign key (USER_ID_)
     references ACT_ID_USER (ID_);
 
-create index ACT_IDX_PRIV_MAPPING on ACT_ID_PRIV_MAPPING(PRIV_ID_);    
-alter table ACT_ID_PRIV_MAPPING 
-    add constraint ACT_FK_PRIV_MAPPING 
-    foreign key (PRIV_ID_) 
+create index ACT_IDX_PRIV_MAPPING on ACT_ID_PRIV_MAPPING(PRIV_ID_);
+alter table ACT_ID_PRIV_MAPPING
+    add constraint ACT_FK_PRIV_MAPPING
+    foreign key (PRIV_ID_)
     references ACT_ID_PRIV (ID_);
-    
+
 create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
-create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);   
+create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);
+
+alter table ACT_ID_PRIV
+    add constraint ACT_UNIQ_PRIV_NAME
+    unique (NAME_);

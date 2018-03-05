@@ -233,7 +233,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
             
         } else {
-            TaskHelper.deleteTask(task, null, false, false);
+            TaskHelper.deleteTask(task, null, false, false, false); // false: no events fired for skipped user task
             leave(execution);
         }
     }

@@ -5,6 +5,18 @@
         <span class="marker" ng-if="field.required">*</span>
         <input id="{{activitiFieldIdPrefix + field.id}}" type="text" name="{{field.id}}" class="form-control ng-valid-required ng-dirty ng-valid-parse ng-invalid ng-valid-pattern" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" ng-required="field.required" ng-minlength="{{field.params.minLength || ''}}" maxlength="{{field.params.maxLength || ''}}" ng-pattern="field.params.regexPattern || ''" ui-mask="{{field.params.mask || ''}}">
     </div>
+    
+   <div ng-switch-when="password" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
+        <label class="control-label">{{field.name}}</label>
+        <span class="marker" ng-if="field.required">*</span>
+        <div class="input-group" ng-if="field.params.passwordunmask">
+        <input id="{{activitiFieldIdPrefix + field.id}}" type="{{field.params.type? 'text' : 'password' }}" name="{{field.id}}" class="form-control ng-valid-required ng-dirty ng-valid-parse ng-invalid ng-valid-pattern" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" ng-required="field.required" ng-minlength="{{field.params.minLength || ''}}" maxlength="{{field.params.maxLength || ''}}">
+        <span ng-if="field.params.passwordunmask" class="input-group-btn">
+        		<button class="btn glyphicon" ng-class="{'glyphicon-eye-open': !field.params.type, 'glyphicon-eye-close': field.params.type }" type="button" ng-click="togglePasswordFieldType(field)"></button>
+      	</span>
+      	</div>
+      	<input id="{{activitiFieldIdPrefix + field.id}}" type="password" name="{{field.id}}" class="form-control ng-valid-required ng-dirty ng-valid-parse ng-invalid ng-valid-pattern" placeholder="{{field.placeholder}}" ng-model="field.value" ng-change="onFieldValueChange(field)" ng-blur="onFieldBlur(field)" ng-focus="onFieldFocus(field)" ng-required="field.required" ng-minlength="{{field.params.minLength || ''}}" maxlength="{{field.params.maxLength || ''}}" ng-if="!field.params.passwordunmask">
+    </div>
 
     <div ng-switch-when="multi-line-text" class="form-group" ng-show="field.isVisible" ng-class="{'has-error': field.required && isEmpty(field)}">
         <label class="control-label">{{field.name}}</label>

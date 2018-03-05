@@ -12,8 +12,8 @@
  */
 package org.flowable.crystalball.simulator.impl.clock;
 
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.flowable.engine.common.runtime.Clock;
 import org.springframework.beans.factory.FactoryBean;
 
 /**

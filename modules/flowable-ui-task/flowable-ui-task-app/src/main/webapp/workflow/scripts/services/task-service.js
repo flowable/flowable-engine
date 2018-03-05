@@ -48,10 +48,9 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
         };
 
         this.getCaseInstanceTasks = function(caseInstanceId, isCompleted, isAdhoc) {
-
+            
             var data = {
-                caseInstanceId: caseInstanceId,
-                sort: 'created-desc'
+                caseInstanceId: caseInstanceId
             };
 
             if (isCompleted) {
@@ -187,7 +186,6 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
             return deferred.promise;
         };
 
-
         /*
          * Get all subTasks for a task
          */
@@ -208,8 +206,6 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
 
             return deferred.promise;
         };
-
-
 
         this.assignTask = function(taskId, userId) {
             var assignData = {

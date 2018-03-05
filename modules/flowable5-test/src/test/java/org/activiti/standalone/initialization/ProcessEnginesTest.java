@@ -17,7 +17,7 @@ import java.util.List;
 import org.activiti.engine.impl.test.PvmTestCase;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.common.EngineInfo;
+import org.flowable.engine.common.impl.EngineInfo;
 
 /**
  * @author Tom Baeyens

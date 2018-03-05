@@ -3,9 +3,12 @@ package org.flowable.test.spring.boot;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.RestApiAutoConfiguration;
 import org.flowable.spring.boot.SecurityAutoConfiguration;
+import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
+import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -34,7 +37,10 @@ public class RestApiAutoConfigurationTest {
             MultipartAutoConfiguration.class,
             ServerPropertiesAutoConfiguration.class,
             DataSourceAutoConfiguration.class,
-            DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            IdmEngineAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class,
+            IdmEngineServicesAutoConfiguration.class,
             SecurityAutoConfiguration.class,
             RestApiAutoConfiguration.class,
             JacksonAutoConfiguration.class

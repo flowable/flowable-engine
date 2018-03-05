@@ -176,4 +176,18 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         assertTrue(groups.contains("admins"));
         assertTrue(groups.contains("engineering"));
     }
+    
+    public void testPrivilegeUniqueName() {
+        Privilege privilege = idmIdentityService.createPrivilege("test");
+        
+        try {
+            idmIdentityService.createPrivilege("test");
+            fail();
+        } catch (Exception e) { 
+            e.printStackTrace();
+        }
+        
+        idmIdentityService.deletePrivilege(privilege.getId());
+    }
+    
 }

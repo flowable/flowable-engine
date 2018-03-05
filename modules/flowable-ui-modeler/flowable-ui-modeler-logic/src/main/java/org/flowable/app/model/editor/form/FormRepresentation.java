@@ -16,7 +16,7 @@ import java.util.Date;
 
 import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.model.common.AbstractRepresentation;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 
 public class FormRepresentation extends AbstractRepresentation {
 
@@ -27,7 +27,7 @@ public class FormRepresentation extends AbstractRepresentation {
     protected Integer version;
     protected String lastUpdatedBy;
     protected Date lastUpdated;
-    protected FormModel formDefinition;
+    protected SimpleFormModel formDefinition;
 
     public FormRepresentation(AbstractModel model) {
         this.id = model.getId();
@@ -98,11 +98,11 @@ public class FormRepresentation extends AbstractRepresentation {
         this.lastUpdated = lastUpdated;
     }
 
-    public FormModel getFormDefinition() {
+    public SimpleFormModel getFormDefinition() {
         return formDefinition;
     }
 
-    public void setFormDefinition(FormModel formDefinition) {
+    public void setFormDefinition(SimpleFormModel formDefinition) {
         this.formDefinition = formDefinition;
     }
 }

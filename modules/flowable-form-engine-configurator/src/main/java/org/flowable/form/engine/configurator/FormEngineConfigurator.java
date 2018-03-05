@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,12 +17,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.ibatis.type.JdbcType;
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.AbstractEngineConfigurator;
-import org.flowable.engine.common.EngineDeployer;
+import org.apache.ibatis.type.TypeAliasRegistry;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
-import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfigurator;
+import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.engine.common.impl.db.MybatisTypeAliasConfigurator;
+import org.flowable.engine.common.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.form.engine.FormEngine;
@@ -40,34 +42,44 @@ import org.flowable.form.engine.impl.persistence.entity.ResourceRef;
 public class FormEngineConfigurator extends AbstractEngineConfigurator {
 
     protected FormEngineConfiguration formEngineConfiguration;
-    
+
     @Override
     public int getPriority() {
         return EngineConfigurationConstants.PRIORITY_ENGINE_FORM;
     }
-    
+
     @Override
     protected List<EngineDeployer> getCustomDeployers() {
         List<EngineDeployer> deployers = new ArrayList<>();
         deployers.add(new FormDeployer());
         return deployers;
     }
-    
+
     @Override
     protected String getMybatisCfgPath() {
         return FormEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE;
     }
-    
+
     @Override
-    protected List<CustomMybatisTypeAliasConfig> getMybatisTypeAliases() {
-        return Collections.singletonList(new CustomMybatisTypeAliasConfig("ResourceRefTypeHandler", ResourceRefTypeHandler.class));
+    protected List<MybatisTypeAliasConfigurator> getMybatisTypeAliases() {
+        return Collections.<MybatisTypeAliasConfigurator>singletonList(new MybatisTypeAliasConfigurator() {
+            @Override
+            public void configure(TypeAliasRegistry typeAliasRegistry) {
+                typeAliasRegistry.registerAlias("ResourceRefTypeHandler", ResourceRefTypeHandler.class);
+            }
+        });
     }
-    
+
     @Override
-    protected List<CustomMyBatisTypeHandlerConfig> getMybatisTypeHandlers() {
-        return Collections.singletonList(new CustomMyBatisTypeHandlerConfig(ResourceRef.class,
-                JdbcType.VARCHAR,
-                ResourceRefTypeHandler.class));
+    protected List<MybatisTypeHandlerConfigurator> getMybatisTypeHandlers() {
+        return Collections.<MybatisTypeHandlerConfigurator>singletonList(new MybatisTypeHandlerConfigurator() {
+            @Override
+            public void configure(TypeHandlerRegistry typeHandlerRegistry) {
+                typeHandlerRegistry.register(ResourceRef.class,
+                        JdbcType.VARCHAR,
+                        ResourceRefTypeHandler.class);
+            }
+        });
     }
 
     @Override
@@ -75,19 +87,19 @@ public class FormEngineConfigurator extends AbstractEngineConfigurator {
         if (formEngineConfiguration == null) {
             formEngineConfiguration = new StandaloneFormEngineConfiguration();
         }
-        
+
         initialiseCommonProperties(engineConfiguration, formEngineConfiguration);
 
         initFormEngine();
-        
+
         initServiceConfigurations(engineConfiguration, formEngineConfiguration);
     }
-    
+
     @Override
     protected List<Class<? extends Entity>> getEntityInsertionOrder() {
         return EntityDependencyOrder.INSERT_ORDER;
     }
-    
+
     @Override
     protected List<Class<? extends Entity>> getEntityDeletionOrder() {
         return EntityDependencyOrder.DELETE_ORDER;

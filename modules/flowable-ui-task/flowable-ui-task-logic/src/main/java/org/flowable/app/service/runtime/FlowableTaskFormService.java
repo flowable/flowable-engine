@@ -21,9 +21,9 @@ import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
-import org.flowable.form.model.FormModel;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -68,7 +68,7 @@ public class FlowableTaskFormService {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    public FormModel getTaskForm(String taskId) {
+    public FormInfo getTaskForm(String taskId) {
         HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
         if (task.getProcessInstanceId() != null) {
             return taskService.getTaskFormModel(task.getId());
@@ -89,7 +89,7 @@ public class FlowableTaskFormService {
         checkCurrentUserCanModifyTask(task);
 
         if (task.getProcessInstanceId() != null) {
-            formService.saveFormInstanceByFormModelId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, 
+            formService.saveFormInstanceByFormDefinitionId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, 
                             task.getProcessInstanceId(), task.getProcessDefinitionId());
             
         } else {

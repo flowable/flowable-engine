@@ -45,6 +45,8 @@ import org.flowable.http.delegate.HttpResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * An executor behavior for HTTP requests.
  *
@@ -65,13 +67,15 @@ public class HttpActivityExecutor {
     protected final Timer timer = new Timer(true);
     protected final HttpClientBuilder clientBuilder;
     protected final ErrorPropagator errorPropagator;
+    protected ObjectMapper objectMapper;
 
-    public HttpActivityExecutor(HttpClientBuilder clientBuilder, ErrorPropagator errorPropagator) {
+    public HttpActivityExecutor(HttpClientBuilder clientBuilder, ErrorPropagator errorPropagator, ObjectMapper objectMapper) {
         this.clientBuilder = clientBuilder;
         this.errorPropagator = errorPropagator;
+        this.objectMapper = objectMapper;
     }
 
-    public void execute(HttpRequest request, VariableContainer execution, String executionId,
+    public void execute(HttpRequest request, VariableContainer variableContainer, String executionId,
                         HttpRequestHandler flowableHttpRequestHandler, HttpResponseHandler flowableHttpResponseHandler,
                         String responseVariableName,
                         List<MapExceptionEntry> mapExceptions, int socketTimeout, int connectTimeout, int connectionRequestTimeout) {
@@ -80,9 +84,8 @@ public class HttpActivityExecutor {
         CloseableHttpClient client = null;
         try {
             client = clientBuilder.build();
-            LOGGER.debug("HTTP client is initialized");
 
-            HttpResponse response = perform(client, execution, request, flowableHttpRequestHandler, flowableHttpResponseHandler,
+            HttpResponse response = perform(client, variableContainer, request, flowableHttpRequestHandler, flowableHttpResponseHandler,
                     socketTimeout,
                     connectTimeout,
                     connectionRequestTimeout);
@@ -90,17 +93,26 @@ public class HttpActivityExecutor {
             if (response != null) {
                 // Save response body only by default
                 if (request.isSaveResponse()) {
-                    execution.setVariable(request.getPrefix() + "ResponseProtocol", response.getProtocol());
-                    execution.setVariable(request.getPrefix() + "ResponseStatusCode", response.getStatusCode());
-                    execution.setVariable(request.getPrefix() + "ResponseReason", response.getReason());
-                    execution.setVariable(request.getPrefix() + "ResponseHeaders", response.getHeaders());
+                    if (request.isSaveResponseTransient()) {
+                        variableContainer.setTransientVariable(request.getPrefix() + "ResponseProtocol", response.getProtocol());
+                        variableContainer.setTransientVariable(request.getPrefix() + "ResponseStatusCode", response.getStatusCode());
+                        variableContainer.setTransientVariable(request.getPrefix() + "ResponseReason", response.getReason());
+                        variableContainer.setTransientVariable(request.getPrefix() + "ResponseHeaders", response.getHeaders());
+                    } else {
+                        variableContainer.setVariable(request.getPrefix() + "ResponseProtocol", response.getProtocol());
+                        variableContainer.setVariable(request.getPrefix() + "ResponseStatusCode", response.getStatusCode());
+                        variableContainer.setVariable(request.getPrefix() + "ResponseReason", response.getReason());
+                        variableContainer.setVariable(request.getPrefix() + "ResponseHeaders", response.getHeaders());
+                    }
                 }
 
                 if (!response.isBodyResponseHandled()) {
-                    if (StringUtils.isNotEmpty(responseVariableName)) {
-                        execution.setVariable(responseVariableName, response.getBody());
+                    String varName = StringUtils.isNotEmpty(responseVariableName) ? responseVariableName : request.getPrefix() + "ResponseBody";
+                    Object varValue = request.isSaveResponseAsJson() ? objectMapper.readTree(response.getBody()) : response.getBody();
+                    if (request.isSaveResponseTransient()) {
+                        variableContainer.setTransientVariable(varName, varValue);
                     } else {
-                        execution.setVariable(request.getPrefix() + "ResponseBody", response.getBody());
+                        variableContainer.setVariable(varName, varValue);
                     }
                 }
 
@@ -116,7 +128,7 @@ public class HttpActivityExecutor {
                                 || (code.startsWith("4") && handleCodes.contains("4XX"))
                                 || (code.startsWith("3") && handleCodes.contains("3XX"))) {
 
-                            errorPropagator.propagateError(execution, code);
+                            errorPropagator.propagateError(variableContainer, code);
                             return;
                         }
                     }
@@ -137,9 +149,9 @@ public class HttpActivityExecutor {
         } catch (Exception e) {
             if (request.isIgnoreErrors()) {
                 LOGGER.info("Error ignored while processing http task in execution {}", executionId, e);
-                execution.setVariable(request.getPrefix() + "ErrorMessage", e.getMessage());
+                variableContainer.setVariable(request.getPrefix() + "ErrorMessage", e.getMessage());
             } else {
-                if (!errorPropagator.mapException(e, execution, mapExceptions)) {
+                if (!errorPropagator.mapException(e, variableContainer, mapExceptions)) {
                     if (e instanceof FlowableException) {
                         throw (FlowableException) e;
                     } else {

@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.runtime.ClockReader;
+import org.flowable.engine.common.impl.runtime.ClockReader;
 import org.flowable.idm.api.Group;
 
 /**

@@ -1,7 +1,7 @@
 /**
  Colors:
 
-  - Header: #333333
+  - Header: #1f3245
   - Subheader: #e8edf1
   - Subheader border: #a4acb9
   - Highlight buttons/text: #36a7c4
@@ -493,7 +493,7 @@ a.dropdown-toggle {
 /* Navigation */
 
 .navbar {
-    background-color: #333333;
+    background-color: #1f3245;
     border: none;
     min-height: 40px;
 }
@@ -540,6 +540,14 @@ a.dropdown-toggle {
     margin-left: 50px;
 }
 
+.navbar-inverse .navbar-nav > li > a {
+	color: #a8bac1;
+}
+
+.navbar-inverse .navbar-nav > .active > a {
+	background-color: #1f3245;
+}
+
 .navbar-nav > li > a {
     line-height: 20px;
     padding: 10px;
@@ -551,16 +559,18 @@ a.dropdown-toggle {
 .navbar-nav > li.active:after {
     top: 100%;
     left: 50%;
-    border: solid transparent;
     content: " ";
     height: 0;
     width: 0;
     position: absolute;
     pointer-events: none;
-    border-color: rgba(0, 0, 0, 0);
-    border-top-color: #000000;
-    border-width: 6px;
+    border: 6px solid rgba(0, 0, 0, 0);
+    border-top-color: #1f3245;
     margin-left: -6px;
+}
+
+.navbar-nav > li.active:hover:after {
+    border-top-color: #000000;
 }
 
 .navbar-nav > li.active {

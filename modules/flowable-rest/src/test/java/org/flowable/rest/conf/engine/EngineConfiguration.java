@@ -24,7 +24,10 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -114,6 +117,12 @@ public class EngineConfiguration {
     @Bean
     public IdentityService identityService() {
         return processEngine().getIdentityService();
+    }
+    
+    @Bean
+    public IdmIdentityService idmIdentityService() {
+        return ((IdmEngineConfiguration) processEngine().getProcessEngineConfiguration().getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
     @Bean

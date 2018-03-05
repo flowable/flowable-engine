@@ -12,25 +12,58 @@
  */
 package org.flowable.rest.form.service.api.form;
 
-import org.flowable.form.model.FormInstanceModel;
-import org.flowable.form.model.FormModel;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormInstanceInfo;
+import org.flowable.form.model.FormField;
+import org.flowable.form.model.FormOutcome;
+import org.flowable.form.model.SimpleFormModel;
 
 /**
  * @author Yvo Swillens
  */
-public class FormInstanceModelResponse extends FormInstanceModel {
+public class FormInstanceModelResponse implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
+    
+    protected String id;
+    protected String name;
+    protected String description;
+    protected String key;
+    protected int version;
+    protected String formInstanceId;
+    protected String submittedBy;
+    protected Date submittedDate;
+    protected String selectedOutcome;
+    protected String taskId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
+    protected String tenantId;
+    protected String url;
+    protected List<FormField> fields;
+    protected List<FormOutcome> outcomes;
+    protected String outcomeVariableName;
 
-    private String url;
-
-    public FormInstanceModelResponse(FormModel formModel, String url) {
-        super(formModel);
+    public FormInstanceModelResponse(FormInfo formInfo, String url) {
+        this.id = formInfo.getId();
+        this.name = formInfo.getName();
+        this.key = formInfo.getKey();
+        this.version = formInfo.getVersion();
+        this.description = formInfo.getDescription();
         this.url = url;
+        
+        SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+        this.fields = formModel.getFields();
+        this.outcomes = formModel.getOutcomes();
+        this.outcomeVariableName = formModel.getOutcomeVariableName();
     }
 
-    public FormInstanceModelResponse(FormInstanceModel formInstanceModel) {
-
-        super(formInstanceModel);
-
+    public FormInstanceModelResponse(FormInstanceInfo formInstanceModel) {
+        this(formInstanceModel, null);
+        
         setFormInstanceId(formInstanceModel.getFormInstanceId());
         setSubmittedBy(formInstanceModel.getSubmittedBy());
         setSubmittedDate(formInstanceModel.getSubmittedDate());
@@ -41,11 +74,139 @@ public class FormInstanceModelResponse extends FormInstanceModel {
         setTenantId(formInstanceModel.getTenantId());
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public String getFormInstanceId() {
+        return formInstanceId;
+    }
+
+    public void setFormInstanceId(String formInstanceId) {
+        this.formInstanceId = formInstanceId;
+    }
+
+    public String getSubmittedBy() {
+        return submittedBy;
+    }
+
+    public void setSubmittedBy(String submittedBy) {
+        this.submittedBy = submittedBy;
+    }
+
+    public Date getSubmittedDate() {
+        return submittedDate;
+    }
+
+    public void setSubmittedDate(Date submittedDate) {
+        this.submittedDate = submittedDate;
+    }
+
+    public String getSelectedOutcome() {
+        return selectedOutcome;
+    }
+
+    public void setSelectedOutcome(String selectedOutcome) {
+        this.selectedOutcome = selectedOutcome;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
     public String getUrl() {
         return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public List<FormField> getFields() {
+        return fields;
+    }
+
+    public void setFields(List<FormField> fields) {
+        this.fields = fields;
+    }
+
+    public List<FormOutcome> getOutcomes() {
+        return outcomes;
+    }
+
+    public void setOutcomes(List<FormOutcome> outcomes) {
+        this.outcomes = outcomes;
+    }
+
+    public String getOutcomeVariableName() {
+        return outcomeVariableName;
+    }
+
+    public void setOutcomeVariableName(String outcomeVariableName) {
+        this.outcomeVariableName = outcomeVariableName;
     }
 }

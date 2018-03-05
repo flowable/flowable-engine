@@ -53,11 +53,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-form-model</artifactId>
+            <artifactId>flowable-form-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-form-api</artifactId>
+            <artifactId>flowable-form-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -138,7 +138,6 @@
             com.sun*;resolution:=optional,
             javax.activation*;resolution:=optional,
             javax.persistence*;resolution:=optional,
-            org.apache.commons.codec*;resolution:=optional,
             org.apache.commons.mail*;resolution:=optional,
             org.apache.xerces*;resolution:=optional,
             org.springframework*;resolution:=optional,

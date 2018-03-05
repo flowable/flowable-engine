@@ -21,6 +21,7 @@ import java.util.List;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -136,11 +137,16 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
      * @param checkCache
      *            If false, no cache check will be done, and the returned list will simply be the list from the database.
      */
-    @SuppressWarnings("unchecked")
     protected List<EntityImpl> getList(String dbQueryName, Object parameter,
             CachedEntityMatcher<EntityImpl> cachedEntityMatcher, boolean checkCache) {
+        return getList(getDbSqlSession(), dbQueryName, parameter, cachedEntityMatcher, checkCache);
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected List<EntityImpl> getList(DbSqlSession dbSqlSession, String dbQueryName, Object parameter,
+            CachedEntityMatcher<EntityImpl> cachedEntityMatcher, boolean checkCache) {
 
-        Collection<EntityImpl> result = getDbSqlSession().selectList(dbQueryName, parameter);
+        Collection<EntityImpl> result = dbSqlSession.selectList(dbQueryName, parameter);
 
         if (checkCache) {
 
@@ -189,7 +195,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         if (result.size() > 0) {
             Iterator<EntityImpl> resultIterator = result.iterator();
             while (resultIterator.hasNext()) {
-                if (getDbSqlSession().isEntityToBeDeleted(resultIterator.next())) {
+                if (dbSqlSession.isEntityToBeDeleted(resultIterator.next())) {
                     resultIterator.remove();
                 }
             }
@@ -204,7 +210,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
 
         DbSqlSession dbSqlSession = getDbSqlSession();
 
-        List<EntityImpl> result = new ArrayList<>(cachedObjects.size());
+        List<EntityImpl> result = new ArrayList<>(cachedObjects != null ? cachedObjects.size() : 1);
         if (cachedObjects != null && entityMatcher != null) {
             for (CachedEntity cachedObject : cachedObjects) {
                 EntityImpl cachedEntity = (EntityImpl) cachedObject.getEntity();
@@ -236,37 +242,49 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
      * to look in the cache to mark the cached entities as deleted. 
      * (This is necessary if entities are inserted and deleted in the same operation). 
      */
-    public void bulkDelete(String statement, Object parameter, Class<? extends EntityImpl> entityClass, CachedEntityMatcher<EntityImpl> cachedEntityMatcher) {
+    public void bulkDelete(String statement, CachedEntityMatcher<EntityImpl> cachedEntityMatcher, Object parameter) {
         DbSqlSession dbSqlSession = getDbSqlSession();
         
         // Regular bulk delete
-        dbSqlSession.delete(statement, parameter, entityClass);
+        dbSqlSession.delete(statement, parameter, getManagedEntityClass());
         
         // Special care needs to be taken for entities that have been in inserted in the same transaction
         // as when this bulk delete is issued: the entities needs to be added to the deleted list. 
         // This will not trigger an actual delete in the database, but will have as result that the entity will be
         // a) marked as deleted
         // b) the insert and the delete will cancel out each other, leaving only the bulk delete.
-        
-        verifyBulkDeleteForCachedEntities(dbSqlSession, getEntityCache().findInCacheAsCachedObjects(getManagedEntityClass()), parameter, cachedEntityMatcher);
+        deleteCachedEntities(dbSqlSession, cachedEntityMatcher, parameter);
+    }
+
+    protected void deleteCachedEntities(DbSqlSession dbSqlSession,  CachedEntityMatcher<EntityImpl> cachedEntityMatcher, Object parameter) {
+        deleteCachedEntities(dbSqlSession, getEntityCache().findInCacheAsCachedObjects(getManagedEntityClass()), cachedEntityMatcher, parameter);
         if (getManagedEntitySubClasses() != null && cachedEntityMatcher != null) {
             for (Class<? extends EntityImpl> entitySubClass : getManagedEntitySubClasses()) {
-                verifyBulkDeleteForCachedEntities(dbSqlSession, getEntityCache().findInCacheAsCachedObjects(entitySubClass), parameter, cachedEntityMatcher);
+                deleteCachedEntities(dbSqlSession, getEntityCache().findInCacheAsCachedObjects(entitySubClass), cachedEntityMatcher, parameter);
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected void verifyBulkDeleteForCachedEntities(DbSqlSession dbSqlSession, Collection<CachedEntity> cachedObjects, Object parameter, CachedEntityMatcher<EntityImpl> cachedEntityMatcher) {
+    protected void deleteCachedEntities(DbSqlSession dbSqlSession, Collection<CachedEntity> cachedObjects, 
+            CachedEntityMatcher<EntityImpl> cachedEntityMatcher,  Object parameter) {
         if (cachedObjects != null && cachedEntityMatcher != null) {
             for (CachedEntity cachedObject : cachedObjects) {
                 EntityImpl cachedEntity = (EntityImpl) cachedObject.getEntity();
-                if (cachedEntity.isInserted() && cachedEntityMatcher.isRetained(null, cachedObjects, cachedEntity, parameter)) {
-                    cachedEntity.setDeleted(true);
+                boolean entityMatches = cachedEntityMatcher.isRetained(null, cachedObjects, cachedEntity, parameter);
+                if (cachedEntity.isInserted() && entityMatches) {
                     dbSqlSession.delete(cachedEntity);
+                }
+                if (entityMatches) {
+                    cachedEntity.setDeleted(true);
                 }
             }
         }
+    }
+    
+    protected boolean isEntityInserted(DbSqlSession dbSqlSession, String entityLogicalName, String entityId) {
+        Class<?> executionEntityClass = dbSqlSession.getDbSqlSessionFactory().getLogicalNameToClassMapping().get(entityLogicalName);
+        return executionEntityClass != null && dbSqlSession.isEntityInserted(executionEntityClass, entityId);
     }
 
 }

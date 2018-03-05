@@ -43,7 +43,10 @@
     </property>
     
     <property name="asyncHistoryEnabled" value="true" />
-    <property name="asyncHistoryExecutorNumberOfRetries" value="99999999" />
+    <property name="asyncHistoryExecutorNumberOfRetries" value="10" />
+    <property name="asyncHistoryJsonGzipCompressionEnabled" value="true" />
+    <property name="asyncHistoryJsonGroupingEnabled" value="true" />
+    <property name="asyncHistoryJsonGroupingThreshold" value="1" />
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
   </bean>

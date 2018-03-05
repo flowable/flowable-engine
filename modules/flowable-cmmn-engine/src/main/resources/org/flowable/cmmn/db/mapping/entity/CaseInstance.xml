@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -100,24 +100,24 @@
             </if>
             <if test="originalPersistentState.completeable != completeable">
                 IS_COMPLETEABLE_ = #{completeable, jdbcType=VARCHAR}
-            </if> 
+            </if>
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
             </if>
-        </set>    
+        </set>
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
     </update>
-    
+
     <update id="updateCaseInstanceLockTime" parameterType="java.util.Map">
-        update ${prefix}ACT_CMMN_RU_CASE_INST 
+        update ${prefix}ACT_CMMN_RU_CASE_INST
         set
           LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP}
         where ID_ = #{id}
           and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{expirationTime, jdbcType=TIMESTAMP})
     </update>
-  
+
     <update id="clearCaseInstanceLockTime" parameterType="java.util.Map">
-        update ${prefix}ACT_CMMN_RU_CASE_INST 
+        update ${prefix}ACT_CMMN_RU_CASE_INST
         set LOCK_TIME_ = null
         where ID_ = #{id}
     </update>
@@ -141,19 +141,38 @@
         <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
-    
+
     <select id="selectCaseInstance" parameterType="string" resultMap="caseInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_CASE_INST where ID_ = #{id, jdbcType=VARCHAR}
     </select>
-    
+
+    <resultMap id="caseInstanceResultMapWithVariables" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl" extends="caseInstanceResultMap">
+        <collection property="queryVariables" column="SCOPE_ID_" javaType="ArrayList"
+                    ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
+            <id property="id" column="VAR_ID_"/>
+            <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR"/>
+            <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType"
+                    jdbcType="VARCHAR"/>
+            <result property="revision" column="VAR_REV_" jdbcType="INTEGER"/>
+            <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR"/>
+            <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR"/>
+            <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR"/>
+            <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
+            <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE"/>
+            <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR"/>
+            <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR"/>
+            <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT"/>
+        </collection>
+    </resultMap>
+
     <resultMap id="caseInstanceAndPlanItemInstancesResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl" extends="caseInstanceResultMap">
-        <collection property="childPlanItemInstances" 
-                    resultMap="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl.planItemInstanceResultMap" 
+        <collection property="childPlanItemInstances"
+                    resultMap="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl.planItemInstanceResultMap"
                     columnPrefix="PI_" />
     </resultMap>
-    
+
     <select id="selectCaseInstanceEagerFetchPlanItemInstances" parameterType="java.util.Map" resultMap="caseInstanceAndPlanItemInstancesResultMap">
-        select 
+        select
         C.*,
         P.ID_ as PI_ID_,
         P.REV_ as PI_REV_,
@@ -177,7 +196,7 @@
         P.TENANT_ID_ as PI_TENANT_ID_
         from ${prefix}ACT_CMMN_RU_CASE_INST C
         inner join ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P on C.ID_ = CASE_INST_ID_
-        where 
+        where
         <if test="caseInstanceId != null">
             C.ID_ = #{caseInstanceId, jdbcType=VARCHAR}
         </if>
@@ -189,24 +208,116 @@
     <select id="selectCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultMap="caseInstanceResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-        <include refid="selectCaseInstancesByQueryCriteriaSql" />
+        from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        <include refid="commonSelectCaseInstancesByQueryCriteriaSql" />
         ${orderBy}
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultType="long">
-        select count(RES.ID_)
-        <include refid="selectCaseInstancesByQueryCriteriaSql" />
+        select count(RES.ID_) from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        <include refid="commonSelectCaseInstancesByQueryCriteriaSql" />
     </select>
 
-    <sql id="selectCaseInstancesByQueryCriteriaSql">
-        from ${prefix}ACT_CMMN_RU_CASE_INST RES
-        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null">
-            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+    <select id="selectCaseInstanceWithVariablesByQueryCriteria"
+            parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl"
+            resultMap="caseInstanceResultMapWithVariables">
+        <include refid="selectCaseInstancesWithVariablesByQueryCriteriaColumns"/>
+        <include refid="selectCaseInstancesWithVariablesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
+    <sql id="selectCaseInstancesWithVariablesByQueryCriteriaColumns">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        <if test="_databaseId != 'db2' and _databaseId != 'mssql'">
+            select distinct RES.*
+            <if test="includeCaseVariables">,
+                VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
+                VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as
+                VAR_TASK_ID_,
+                VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
+                VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+            </if>
+            <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         </if>
+        <if test="_databaseId == 'db2' or _databaseId == 'mssql'">
+            select distinct
+            TEMPRES_ID_ as ID_,
+            TEMPRES_REV_ as REV_,
+            TEMPRES_PARENT_ID_ as PARENT_ID_,
+            TEMPRES_CASE_DEF_ID_ as CASE_DEF_ID_,
+            TEMPRES_BUSINESS_KEY_ as BUSINESS_KEY_,
+            TEMPRES_NAME_ as NAME_,
+            TEMPRES_STATE_ as STATE_,
+            TEMPRES_START_TIME_ as START_TIME_,
+            TEMPRES_START_USER_ID_ as START_USER_ID_,
+            TEMPRES_CALLBACK_ID_ as CALLBACK_ID_,
+            TEMPRES_CALLBACK_TYPE_ as CALLBACK_TYPE_,
+            TEMPRES_IS_COMPLETEABLE_ as IS_COMPLETEABLE_,
+            TEMPRES_TENANT_ID_ as TENANT_ID_,
+            <if test="includeCaseVariables">
+                TEMPVAR_ID_ as VAR_ID_,
+                TEMPVAR_NAME_ as VAR_NAME_,
+                TEMPVAR_TYPE_ as VAR_TYPE_,
+                TEMPVAR_REV_ as VAR_REV_,
+                TEMPVAR_PROC_INST_ID_ as VAR_PROC_INST_ID_,
+                TEMPVAR_EXECUTION_ID_ as VAR_EXECUTION_ID_,
+                TEMPVAR_TASK_ID_ as VAR_TASK_ID_,
+                TEMPVAR_BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_,
+                TEMPVAR_DOUBLE_ as VAR_DOUBLE_,
+                TEMPVAR_TEXT_ as VAR_TEXT_,
+                TEMPVAR_TEXT2_ as VAR_TEXT2_,
+                TEMPVAR_LONG_ as VAR_LONG_
+            </if>
+            <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
+            RES.ID_ as TEMPRES_ID_,
+            RES.REV_ as TEMPRES_REV_,
+            RES.PARENT_ID_ as TEMPRES_PARENT_ID_,
+            RES.CASE_DEF_ID_ as TEMPRES_CASE_DEF_ID_,
+            RES.BUSINESS_KEY_ as TEMPRES_BUSINESS_KEY_,
+            RES.NAME_ as TEMPRES_NAME_,
+            RES.STATE_ as TEMPRES_STATE_,
+            RES.START_TIME_ as TEMPRES_START_TIME_,
+            RES.START_USER_ID_ as TEMPRES_START_USER_ID_,
+            RES.CALLBACK_ID_ as TEMPRES_CALLBACK_ID_,
+            RES.CALLBACK_TYPE_ as TEMPRES_CALLBACK_TYPE_,
+            RES.IS_COMPLETEABLE_ as TEMPRES_IS_COMPLETEABLE_,
+            RES.TENANT_ID_ as TEMPRES_TENANT_ID_
+            <if test="includeCaseVariables">,
+                VAR.ID_ as TEMPVAR_ID_,
+                VAR.NAME_ as TEMPVAR_NAME_,
+                VAR.TYPE_ as TEMPVAR_TYPE_,
+                VAR.REV_ as TEMPVAR_REV_,
+                VAR.PROC_INST_ID_ as TEMPVAR_PROC_INST_ID_,
+                VAR.EXECUTION_ID_ as TEMPVAR_EXECUTION_ID_,
+                VAR.TASK_ID_ as TEMPVAR_TASK_ID_,
+                VAR.BYTEARRAY_ID_ as TEMPVAR_BYTEARRAY_ID_,
+                VAR.DOUBLE_ as TEMPVAR_DOUBLE_,
+                VAR.TEXT_ as TEMPVAR_TEXT_,
+                VAR.TEXT2_ as TEMPVAR_TEXT2_,
+                VAR.LONG_ as TEMPVAR_LONG_
+            </if>
+        </if>
+
+    </sql>
+
+    <sql id="selectCaseInstancesWithVariablesByQueryCriteriaSql">
+        from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        <if test="includeCaseVariables">
+            left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.SCOPE_ID_ and VAR.TASK_ID_ is null and
+            VAR.SCOPE_TYPE_= 'cmmn' and VAR.SUB_SCOPE_ID_ is null
+        </if>
+        <include refid="commonSelectCaseInstancesByQueryCriteriaSql"/>
+    </sql>
+
+    <sql id="commonSelectCaseInstancesByQueryCriteriaSql">
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
             <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
-                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SCOPE_ID_ and SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn' 
+                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SCOPE_ID_ and
+                A${index}.SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
             </if>
         </foreach>
         <where>
@@ -223,7 +334,7 @@
                 RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
             <if test="caseDefinitionKey != null">
-                and CASE_DEF.KEY_ = #{caseDefinitionId}
+                and CASE_DEF.KEY_ = #{caseDefinitionKey}
             </if>
             <if test="caseDefinitionIds != null">
                 and RES.CASE_DEF_ID_ IN
@@ -269,6 +380,9 @@
             </if>
             <if test="tenantId != null">
                 and RES.TENANT_ID_ = #{tenantId}
+            </if>
+            <if test="tenantIdLike != null">
+                and RES.TENANT_ID_ like #{tenantIdLike}
             </if>
             <if test="withoutTenantId">
                 and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
@@ -345,11 +459,11 @@
             </foreach>
         </where>
     </sql>
-    
+
     <select id="selectCaseInstancesByCaseDefinitionId" resultMap="caseInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_CASE_INST where CASE_DEF_ID_ = #{parameter}
     </select>
-    
+
     <sql id="variableOperator">
         <choose>
           <when test="queryVariableValue.operator.equals('EQUALS')">=</when>

@@ -91,14 +91,14 @@ body {
 }
 
 .navbar {
-	background-color: #384042;
+	background-color: #1f3245;
 	border: none;
 	min-height: 40px;
 	margin-bottom: 5px;
 }
 
 .nav.navbar-nav {
-	background-color: #384042;
+	background-color: #1f3245;
 	color: #eef1f1;
 	border: none;
 }
@@ -422,6 +422,10 @@ body {
 
 .component .title.process {
 	color: rgb(162,204,70)
+}
+
+.component .title.cmmn {
+    color: rgb(253,229,65)
 }
 
 .component .title.dmn {

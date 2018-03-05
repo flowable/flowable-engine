@@ -12,7 +12,7 @@
  */
 package org.flowable.identitylink.service;
 
-import org.flowable.engine.common.AbstractServiceConfiguration;
+import org.flowable.engine.common.impl.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;

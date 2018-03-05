@@ -22,19 +22,6 @@
     <finalName>flowable-rest</finalName>
     <plugins>
       <plugin>
-        <groupId>org.zeroturnaround</groupId>
-        <artifactId>jrebel-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-rebel-xml</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
 	    <groupId>org.apache.tomcat.maven</groupId>
         <artifactId>tomcat7-maven-plugin</artifactId>
 		<configuration>
@@ -73,29 +60,10 @@
             <lifecycleMappingMetadata>
               <pluginExecutions>
                 <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.zeroturnaround
-                    </groupId>
-                    <artifactId>
-                      jrebel-maven-plugin
-                    </artifactId>
-                    <versionRange>
-                      [1.0.7,)
-                    </versionRange>
-                    <goals>
-                      <goal>generate</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
                 	<pluginExecutionFilter>
                 		<groupId>com.github.kongchen</groupId>
                 		<artifactId>swagger-maven-plugin</artifactId>
-                		<versionRange>[3.1.4,)</versionRange>
+                		<versionRange>[3.1.5,)</versionRange>
                 		<goals>
                 			<goal>generate</goal>
                 		</goals>
@@ -187,6 +155,44 @@
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
                   <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/process</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
+                <!-- IDM -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.rest.idm.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/idm-api</basePath>
+                  <info>
+                    <title>Flowable IDM REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/idm</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
                 <!-- DMN -->
@@ -536,6 +542,10 @@
     </dependency>
     <dependency>
       <groupId>org.flowable</groupId>
+      <artifactId>flowable-idm-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flowable</groupId>
       <artifactId>flowable-dmn-rest</artifactId>
     </dependency>
     <dependency>
@@ -588,16 +598,18 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>2.4.6</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
     </dependency>
     <dependency>
+        <groupId>javax.xml.bind</groupId> <!-- Needed for swagger doc generation -->
+        <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

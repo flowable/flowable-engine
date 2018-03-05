@@ -22,6 +22,22 @@
                         <div ng-if="model.readOnly"  class="col-xs-8">
                             <div>{{popup.currentHitPolicy}}</div>
                         </div>
+                        <div class="col-xs-12"><br/></div>
+                        <div ng-if="popup.currentHitPolicy === 'COLLECT'" class="col-xs-4">
+                            <label>Collect operator</label>
+                        </div>
+                        <div ng-if="popup.currentHitPolicy === 'COLLECT' && !model.readOnly"  class="col-xs-8">
+                            <select class="form-control" name="collectOperator" id="collectOperator" ng-model="popup.currentCollectOperator">
+                                <option value="" selected="selected">None</option>
+                                <option ng-selected="{{option.id == popup.currentCollectOperator}}"
+                                        ng-repeat="option in popup.availableCollectOperators" value="{{option.id}}">
+                                    {{option.label | translate}}
+                                </option>
+                            </select>
+                        </div>
+                        <div ng-if="popup.currentHitPolicy === 'COLLECT' && model.readOnly"  class="col-xs-8">
+                            <div>{{popup.currentCollectOperator}}</div>
+                        </div>
                     </div>
                 </div>
 

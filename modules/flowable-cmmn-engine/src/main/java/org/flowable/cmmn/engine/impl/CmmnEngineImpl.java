@@ -19,6 +19,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.engine.impl.cmd.SchemaOperationsCmmnEngineBuild;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
@@ -54,6 +55,8 @@ public class CmmnEngineImpl implements CmmnEngine {
         }
 
         LOGGER.info("CmmnEngine {} created", name);
+        
+        CmmnEngines.registerCmmnEngine(this);
     }
     
     @Override
@@ -67,7 +70,7 @@ public class CmmnEngineImpl implements CmmnEngine {
     
     @Override
     public void close() {
-        // TODO (see ProcessEngineImpl)
+        CmmnEngines.unregister(this);
     }
     
     public CmmnEngineConfiguration getCmmnEngineConfiguration() {

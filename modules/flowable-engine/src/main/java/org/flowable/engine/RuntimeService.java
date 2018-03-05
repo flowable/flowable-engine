@@ -36,9 +36,10 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -321,7 +322,7 @@ public interface RuntimeService {
      * @param processInstanceId
      *            id of process instance for which the start form should be retrieved.
      */
-    FormModel getStartFormModel(String processDefinitionId, String processInstanceId);
+    FormInfo getStartFormModel(String processDefinitionId, String processInstanceId);
 
     /**
      * Delete an existing runtime process instance.

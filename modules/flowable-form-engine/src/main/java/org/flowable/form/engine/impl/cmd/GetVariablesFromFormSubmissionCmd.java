@@ -21,10 +21,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.engine.FlowableFormValidationException;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 import org.joda.time.LocalDate;
 
 /**
@@ -34,17 +35,17 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
 
     private static final long serialVersionUID = 1L;
 
-    protected FormModel formDefinition;
+    protected FormInfo formInfo;
     protected Map<String, Object> values;
     protected String outcome;
 
-    public GetVariablesFromFormSubmissionCmd(FormModel formDefinition, Map<String, Object> values) {
-        this.formDefinition = formDefinition;
+    public GetVariablesFromFormSubmissionCmd(FormInfo formInfo, Map<String, Object> values) {
+        this.formInfo = formInfo;
         this.values = values;
     }
 
-    public GetVariablesFromFormSubmissionCmd(FormModel formDefinition, Map<String, Object> values, String outcome) {
-        this(formDefinition, values);
+    public GetVariablesFromFormSubmissionCmd(FormInfo formInfo, Map<String, Object> values, String outcome) {
+        this(formInfo, values);
         this.outcome = outcome;
     }
 
@@ -56,7 +57,8 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
         }
 
         // Loop over all form fields and see if a value was provided
-        Map<String, FormField> fieldMap = formDefinition.allFieldsAsMap();
+        SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+        Map<String, FormField> fieldMap = formModel.allFieldsAsMap();
         Map<String, Object> variables = new HashMap<>();
         for (String fieldId : fieldMap.keySet()) {
             Object variableValue = null;
@@ -79,10 +81,10 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
         // Handle outcomes
         if (outcome != null) {
             String targetVariable = null;
-            if (formDefinition.getOutcomeVariableName() != null) {
-                targetVariable = formDefinition.getOutcomeVariableName();
+            if (formModel.getOutcomeVariableName() != null) {
+                targetVariable = formModel.getOutcomeVariableName();
             } else {
-                targetVariable = "form_" + formDefinition.getKey() + "_outcome";
+                targetVariable = "form_" + formModel.getKey() + "_outcome";
             }
 
             variables.put(targetVariable, outcome);

@@ -24,10 +24,15 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @PropertySources({
+    
+    @PropertySource(value = "classpath:/META-INF/flowable-app/flowable-app.properties"),
+    @PropertySource(value = "classpath:flowable-app.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "file:flowable-app.properties", ignoreResourceNotFound = true),
 
-        @PropertySource("classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties"),
-        @PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
+    // For backwards compatibility (pre 6.3.0)
+    @PropertySource(value = "classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
 
 })
 @ComponentScan(basePackages = {

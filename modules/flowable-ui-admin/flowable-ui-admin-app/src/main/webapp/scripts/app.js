@@ -19,7 +19,7 @@
 
 var flowableAdminApp = angular.module('flowableAdminApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngSanitize',
     'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'ngFileUpload', 'ui.keypress',
-    'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav']);
+    'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav', 'jsonFormatter']);
 
 flowableAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider', '$provide',
@@ -32,6 +32,11 @@ flowableAdminApp
                 .when('/process-engine', {
                     templateUrl: 'views/deployments.html',
                     controller: 'DeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/cmmn-engine', {
+                    templateUrl: 'views/cmmn-deployments.html',
+                    controller: 'CmmnDeploymentsController',
                     reloadOnSearch: true
                 })
                 .when('/form-engine', {
@@ -150,6 +155,16 @@ flowableAdminApp
                     controller: 'DecisionTableController',
                     reloadOnSearch: true
                 })
+                .when('/decision-table-executions', {
+                    templateUrl: 'views/decision-table-executions.html',
+                    controller: 'DecisionTableExecutionsController',
+                    reloadOnSearch: true
+                })
+                .when('/decision-table-execution/:executionId', {
+                    templateUrl: 'views/decision-table-execution.html',
+                    controller: 'DecisionTableExecutionController',
+                    reloadOnSearch: true
+                })
                 .when('/form-deployments', {
                     templateUrl: 'views/form-deployments.html',
                     controller: 'FormDeploymentsController',
@@ -253,6 +268,11 @@ flowableAdminApp
         $httpProvider.interceptors.push('NotPermittedInterceptor');
     }])
 
+    .config(function (JSONFormatterConfigProvider) {
+
+        JSONFormatterConfigProvider.hoverPreviewEnabled = true;
+    })
+
     /* Filters */
 
     .filter('dateformat', function() {
@@ -343,6 +363,8 @@ flowableAdminApp
                                     $rootScope.activeServers['form'] = data[i];
                                 } else if (data[i].endpointType === 4) {
                                     $rootScope.activeServers['content'] = data[i];
+                                } else if (data[i].endpointType === 5) {
+                                    $rootScope.activeServers['cmmn'] = data[i];
                                 } else {
                                     console.log('Warning! Invalid endpoint type received: '+data[i].endpointType);
                                 }
