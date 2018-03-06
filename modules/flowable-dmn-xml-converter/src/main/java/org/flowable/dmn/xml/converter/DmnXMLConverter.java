@@ -403,6 +403,8 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeCData(container.getInputEntry().getText());
                         xtw.writeEndElement();
 
+                        DmnXMLUtil.writeExtensionElements(container.getInputEntry(), xtw);
+
                         xtw.writeEndElement();
                     }
 
