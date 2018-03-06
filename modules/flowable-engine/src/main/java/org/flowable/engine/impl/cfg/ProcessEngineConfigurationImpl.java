@@ -1306,6 +1306,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.taskServiceConfiguration.setIdGenerator(this.taskIdGenerator);
 
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
@@ -1841,6 +1842,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
             dbIdGenerator.setCommandConfig(getDefaultCommandConfig().transactionRequiresNew());
             idGenerator = dbIdGenerator;
+        }
+        if (taskIdGenerator == null) {
+            taskIdGenerator = idGenerator;
         }
     }
 

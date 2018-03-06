@@ -280,6 +280,7 @@ public abstract class AbstractEngineConfiguration {
     protected Map<Object, Object> beans;
 
     protected IdGenerator idGenerator;
+    protected IdGenerator taskIdGenerator;
 
     protected Clock clock;
 
@@ -527,6 +528,9 @@ public abstract class AbstractEngineConfiguration {
     public void initIdGenerator() {
         if (idGenerator == null) {
             idGenerator = new StrongUuidGenerator();
+        }
+        if (taskIdGenerator == null) {
+            taskIdGenerator = idGenerator;
         }
     }
 
@@ -933,6 +937,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
+        return this;
+    }
+
+    public IdGenerator getTaskIdGenerator() {
+        return taskIdGenerator;
+    }
+
+    public AbstractEngineConfiguration setTaskIdGenerator(IdGenerator taskIdGenerator) {
+        this.taskIdGenerator = taskIdGenerator;
         return this;
     }
 

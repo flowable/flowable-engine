@@ -182,6 +182,9 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (targetEngineConfiguration.getIdGenerator() == null) {
             targetEngineConfiguration.setIdGenerator(engineConfiguration.getIdGenerator());
         }
+        if (targetEngineConfiguration.getTaskIdGenerator() == null) {
+            targetEngineConfiguration.setIdGenerator(engineConfiguration.getTaskIdGenerator());
+        }
     }
 
     protected void initDataSource(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
