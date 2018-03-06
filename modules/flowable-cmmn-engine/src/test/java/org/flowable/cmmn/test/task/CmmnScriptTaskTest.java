@@ -140,6 +140,40 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertEquals(10, ((IntValueHolder) result).getValue());
     }
 
+    @Test
+    @CmmnDeployment
+    public void testGroovyAutoStoreVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("scriptCase")
+                .variable("inputArray", new int[] { 1, 2, 3, 4, 5 })
+                .start();
+        assertNotNull(caseInstance);
+
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertNotNull(variables);
+        assertEquals(2,variables.size());
+
+        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum"));
+        Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "sum");
+        assertThat(result, instanceOf(Integer.class));
+        assertEquals(15, result);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testGroovyNoAutoStoreVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("scriptCase")
+                .variable("inputArray", new int[] { 1, 2, 3, 4, 5 })
+                .start();
+        assertNotNull(caseInstance);
+
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertNotNull(variables);
+        assertEquals(1,variables.size());
+
+        assertFalse(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum"));
+    }
 
     public static class IntValueHolder implements Serializable {
         private int value;
