@@ -74,16 +74,15 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
-        initIdGenerator();
+        checkIdGenerator();
         initDataManagers();
         initEntityManagers();
     }
 
-    protected void initIdGenerator() {
+    protected void checkIdGenerator() {
         if (this.idGenerator == null) {
             throw new FlowableException("Id generator for task configuration must be initialized");
         }
-        this.taskService.setIdGenerator(this.idGenerator);
     }
 
     // Data managers

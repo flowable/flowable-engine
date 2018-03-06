@@ -23,6 +23,7 @@ import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
@@ -134,6 +135,11 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessEngineLifecycleListener processEngineLifecycleListener;
 
     protected boolean enableProcessDefinitionInfoCache;
+
+    /**
+     * generator used to generate task ids
+     */
+    protected IdGenerator taskIdGenerator;
 
     /** use one of the static createXxxx methods instead */
     protected ProcessEngineConfiguration() {
@@ -661,6 +667,22 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setEnableProcessDefinitionInfoCache(boolean enableProcessDefinitionInfoCache) {
         this.enableProcessDefinitionInfoCache = enableProcessDefinitionInfoCache;
+        return this;
+    }
+
+    public void initIdGenerator() {
+        super.initIdGenerator();
+        if (taskIdGenerator == null) {
+            taskIdGenerator = idGenerator;
+        }
+    }
+
+    public IdGenerator getTaskIdGenerator() {
+        return taskIdGenerator;
+    }
+
+    public ProcessEngineConfiguration setTaskIdGenerator(IdGenerator taskIdGenerator) {
+        this.taskIdGenerator = taskIdGenerator;
         return this;
     }
 }

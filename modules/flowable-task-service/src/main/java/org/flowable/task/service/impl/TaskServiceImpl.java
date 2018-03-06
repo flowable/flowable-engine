@@ -27,11 +27,8 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
-    protected IdGenerator idGenerator;
-    
     public TaskServiceImpl(TaskServiceConfiguration taskServiceConfiguration) {
         super(taskServiceConfiguration);
-        this.idGenerator = taskServiceConfiguration.getIdGenerator();
     }
 
     @Override
@@ -91,9 +88,6 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
     @Override
     public void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {
-        if (StringUtils.isEmpty(taskEntity.getId())) {
-            taskEntity.setId(this.idGenerator.getNextId());
-        }
         getTaskEntityManager().insert(taskEntity, fireCreateEvent);
     }
 
@@ -106,10 +100,4 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     public void deleteTasksByExecutionId(String executionId) {
         getTaskEntityManager().deleteTasksByExecutionId(executionId);
     }
-
-    @Override
-    public void setIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-    }
-
 }

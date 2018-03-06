@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -36,16 +37,23 @@ import static org.junit.Assert.assertThat;
  */
 public class CmmnTaskServiceIdGeneratorTest extends FlowableCmmnTestCase {
 
+    private static CmmnEngineConfiguration previousCmmnEngineConfiguration;
+
     @BeforeClass
     public static void initCmmnEngine() {
         try (InputStream inputStream = FlowableCmmnTestCase.class.getClassLoader().getResourceAsStream("org/flowable/cmmn/test/task/taskid.generator.flowable.cmmn.cfg.xml")) {
             CmmnEngine cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine();
+            previousCmmnEngineConfiguration = CmmnTestRunner.getCmmnEngineConfiguration();
             CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngine.getCmmnEngineConfiguration());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @AfterClass
+    public static void restoreCmmnEngine() {
+        CmmnTestRunner.setCmmnEngineConfiguration(previousCmmnEngineConfiguration);
+    }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")

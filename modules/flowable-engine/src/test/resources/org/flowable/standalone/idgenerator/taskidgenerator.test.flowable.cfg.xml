@@ -12,7 +12,6 @@
 		<property name="databaseSchemaUpdate" value="true" />
 		
 		<property name="idGenerator" ref="idGenerator"/>
-
 		
 		<property name="taskIdGenerator">
 			<bean class="org.flowable.standalone.idgenerator.PrefixIdGenerator">

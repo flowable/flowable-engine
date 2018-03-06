@@ -25,6 +25,7 @@ import org.flowable.cmmn.engine.configurator.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.configurator.impl.process.DefaultProcessInstanceService;
 import org.flowable.cmmn.engine.impl.callback.ChildProcessInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.AbstractEngineConfigurator;
@@ -111,6 +112,23 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         }
 
         return cmmnEngineConfiguration.buildCmmnEngine();
+    }
+
+    @Override
+    protected void initIdGenerator(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        super.initIdGenerator(engineConfiguration, targetEngineConfiguration);
+        if (targetEngineConfiguration instanceof  CmmnEngineConfiguration) {
+            CmmnEngineConfiguration targetCmmnEngineConfiguration = (CmmnEngineConfiguration) targetEngineConfiguration;
+            if (targetCmmnEngineConfiguration.getTaskIdGenerator() == null) {
+                if (engineConfiguration instanceof ProcessEngineConfiguration) {
+                    targetCmmnEngineConfiguration.setTaskIdGenerator(((ProcessEngineConfiguration) engineConfiguration).getTaskIdGenerator());
+                } else if (engineConfiguration instanceof CmmnEngineConfiguration) {
+                    targetCmmnEngineConfiguration.setTaskIdGenerator(((CmmnEngineConfiguration) engineConfiguration).getTaskIdGenerator());
+                } else {
+                    targetCmmnEngineConfiguration.setTaskIdGenerator(engineConfiguration.getIdGenerator());
+                }
+            }
+        }
     }
 
     public CmmnEngineConfiguration getCmmnEngineConfiguration() {

@@ -32,10 +32,10 @@ public class TaskIdGeneratorTest extends ResourceFlowableTestCase {
     @Deployment(resources = "org/flowable/standalone/idgenerator/UuidGeneratorTest.testUuidGeneratorUsage.bpmn20.xml")
     public void testUuidGeneratorUsage() {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
 
         // Start processes
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 5; i++) {
             executorService.execute(() -> {
                 try {
                     runtimeService.startProcessInstanceByKey("simpleProcess");
@@ -72,13 +72,13 @@ public class TaskIdGeneratorTest extends ResourceFlowableTestCase {
 
         try {
             executorService.shutdown();
-            executorService.awaitTermination(1, TimeUnit.MINUTES);
+            executorService.awaitTermination(20, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
             fail();
         }
 
-        assertEquals(50, historyService.createHistoricProcessInstanceQuery().count());
+        assertEquals(5, historyService.createHistoricProcessInstanceQuery().count());
         historyService.createHistoricTaskInstanceQuery().list().
                 forEach(historicTask -> assertThat(historicTask.getId(), startsWith("TASK-")) );
     }

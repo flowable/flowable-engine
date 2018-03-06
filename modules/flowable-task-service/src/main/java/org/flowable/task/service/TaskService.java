@@ -53,6 +53,4 @@ public interface TaskService {
     void deleteTask(TaskEntity task, boolean fireEvents);
     
     void deleteTasksByExecutionId(String executionId);
-    
-    void setIdGenerator(IdGenerator idGenerator);
 }

@@ -127,6 +127,7 @@ import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
@@ -525,6 +526,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
+
+    /**
+     * generator used to generate task ids
+     */
+    protected IdGenerator taskIdGenerator;
 
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -2233,5 +2239,21 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
+    }
+
+    public void initIdGenerator() {
+        super.initIdGenerator();
+        if (taskIdGenerator == null) {
+            taskIdGenerator = idGenerator;
+        }
+    }
+
+    public IdGenerator getTaskIdGenerator() {
+        return taskIdGenerator;
+    }
+
+    public CmmnEngineConfiguration setTaskIdGenerator(IdGenerator taskIdGenerator) {
+        this.taskIdGenerator = taskIdGenerator;
+        return this;
     }
 }

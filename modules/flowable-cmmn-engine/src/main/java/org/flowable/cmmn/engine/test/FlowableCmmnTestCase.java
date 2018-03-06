@@ -56,11 +56,6 @@ public abstract class FlowableCmmnTestCase {
     protected CmmnHistoryService cmmnHistoryService;
 
     protected String deploymentId;
-    protected String configurationResource;
-
-    public FlowableCmmnTestCase() {
-        this.configurationResource = FLOWABLE_CMMN_CFG_XML;
-    }
 
     @BeforeClass
     public static void setupEngine() {
