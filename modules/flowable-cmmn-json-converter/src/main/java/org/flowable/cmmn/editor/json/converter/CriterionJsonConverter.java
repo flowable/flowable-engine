@@ -69,19 +69,24 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
 
         GraphicInfo parentGraphicInfo = null;
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
-        if (criterion.getAttachedToRefId().equals(planModel.getId())) {
-            parentGraphicInfo = cmmnModel.getGraphicInfo(planModel.getId());
-            
-        } else {
-            PlanItem parentPlanItem = cmmnModel.findPlanItem(criterion.getAttachedToRefId());
-            parentGraphicInfo = cmmnModel.getGraphicInfo(parentPlanItem.getId());
-        }
+        if (criterion.getAttachedToRefId() != null) {
+            if (criterion.getAttachedToRefId().equals(planModel.getId())) {
+                parentGraphicInfo = cmmnModel.getGraphicInfo(planModel.getId());
+                
+            } else {
+                PlanItem parentPlanItem = cmmnModel.findPlanItem(criterion.getAttachedToRefId());
+                parentGraphicInfo = cmmnModel.getGraphicInfo(parentPlanItem.getId());
+            }
         
-        dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
-        dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
-        dockersArrayNode.add(dockNode);
-        elementNode.set("dockers", dockersArrayNode);
-        elementNode.set("outgoing", getOutgoingArrayNodes(criterion.getId(), cmmnModel));
+            dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
+            dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
+            dockersArrayNode.add(dockNode);
+            elementNode.set("dockers", dockersArrayNode);
+            elementNode.set("outgoing", getOutgoingArrayNodes(criterion.getId(), cmmnModel));
+        } else {
+            elementNode.putArray("dockers");
+            elementNode.putArray("outgoing");
+        }
 
         // set properties
         putProperty(propertiesNode, "name", criterion.getSentry().getName());
