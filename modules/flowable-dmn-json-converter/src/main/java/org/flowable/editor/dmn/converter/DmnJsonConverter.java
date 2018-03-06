@@ -25,6 +25,8 @@ import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DecisionTableOrientation;
 import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.LiteralExpression;
@@ -163,27 +165,37 @@ public class DmnJsonConverter {
                 String operatorValue = null;
                 String expressionValue = null;
 
-                if (StringUtils.isNotEmpty(expressionText)) {
-                    if (expressionText.startsWith("${") || expressionText.startsWith("#{")) {
-                        expressionValue = expressionText;
-                    } else {
-                        if (expressionText.indexOf(' ') != -1) {
-                            operatorValue = expressionText.substring(0, expressionText.indexOf(' '));
-                            expressionValue = expressionText.substring(expressionText.indexOf(' ') + 1);
-                        } else { // no prefixed operator
+
+                if (inputEntry.getExtensionElements() != null && !inputEntry.getExtensionElements().isEmpty()) {
+                    if (inputEntry.getExtensionElements().containsKey("operator")) {
+                        operatorValue = inputEntry.getExtensionElements().get("operator").get(0).getElementText();
+                    }
+                    if (inputEntry.getExtensionElements().containsKey("expression")) {
+                        expressionValue = inputEntry.getExtensionElements().get("expression").get(0).getElementText();
+                    }
+                } else {
+                    if (StringUtils.isNotEmpty(expressionText)) {
+                        if (expressionText.startsWith("${") || expressionText.startsWith("#{")) {
                             expressionValue = expressionText;
-                        }
+                        } else {
+                            if (expressionText.indexOf(' ') != -1) {
+                                operatorValue = expressionText.substring(0, expressionText.indexOf(' '));
+                                expressionValue = expressionText.substring(expressionText.indexOf(' ') + 1);
+                            } else { // no prefixed operator
+                                expressionValue = expressionText;
+                            }
 
-                        // remove outer escape quotes
-                        if (expressionValue.startsWith("\"") && expressionValue.endsWith("\"")) {
-                            expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
-                        }
+                            // remove outer escape quotes
+                            if (expressionValue.startsWith("\"") && expressionValue.endsWith("\"")) {
+                                expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
+                            }
 
-                        // if build in date function
-                        if (expressionValue.startsWith("fn_date(")) {
-                            expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
-                        } else if (expressionValue.startsWith("date:toDate(")) {
-                            expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
+                            // if build in date function
+                            if (expressionValue.startsWith("fn_date(")) {
+                                expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
+                            } else if (expressionValue.startsWith("date:toDate(")) {
+                                expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
+                            }
                         }
                     }
                 }
@@ -375,6 +387,10 @@ public class DmnJsonConverter {
                         String formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
 
                         inputEntry.setText(formattedCollectionExpression);
+
+                        // extensions
+                        addExtensionElement("operator", operatorValue, inputEntry);
+                        addExtensionElement("expression", expressionValue, inputEntry);
                     } else {
                         StringBuilder stringBuilder = new StringBuilder();
                         if (StringUtils.isNotEmpty(operatorValue)) {
@@ -448,5 +464,15 @@ public class DmnJsonConverter {
                 decisionTable.addRule(rule);
             }
         }
+    }
+
+    protected void addExtensionElement(String name, String value, DmnElement element) {
+        DmnExtensionElement extensionElement = new DmnExtensionElement();
+        extensionElement.setNamespace(MODEL_NAMESPACE);
+        extensionElement.setNamespacePrefix("flowable");
+        extensionElement.setName(name);
+        extensionElement.setElementText(value);
+
+        element.addExtensionElement(extensionElement);
     }
 }

@@ -534,8 +534,18 @@ public class DmnJsonConverterTest {
         assertEquals("== testCollection",  decisionTable.getRules().get(12).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("!= \"testValue\"",  decisionTable.getRules().get(13).getInputEntries().get(0).getInputEntry().getText());
 
+        // extension elements
+        assertEquals("NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("\"testValue\"",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
+
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);
+        assertEquals("NOT IN", modelerJson.get("rules").get(0).get("inputExpression_1_operator").asText());
+        assertEquals("\"testValue\"", modelerJson.get("rules").get(0).get("inputExpression_1_expression").asText());
+        assertEquals("IN", modelerJson.get("rules").get(1).get("inputExpression_1_operator").asText());
+        assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get("inputExpression_1_expression").asText());
+        assertEquals("IN", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
+        assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get("inputExpression_1_expression").asText());
     }
 
     /* Helper methods */
