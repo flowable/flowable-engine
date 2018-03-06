@@ -399,11 +399,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
                         xtw.writeStartElement(ELEMENT_INPUT_ENTRY);
                         xtw.writeAttribute(ATTRIBUTE_ID, container.getInputEntry().getId());
 
+                        DmnXMLUtil.writeExtensionElements(container.getInputEntry(), xtw);
+
                         xtw.writeStartElement(ELEMENT_TEXT);
                         xtw.writeCData(container.getInputEntry().getText());
                         xtw.writeEndElement();
-
-                        DmnXMLUtil.writeExtensionElements(container.getInputEntry(), xtw);
 
                         xtw.writeEndElement();
                     }
