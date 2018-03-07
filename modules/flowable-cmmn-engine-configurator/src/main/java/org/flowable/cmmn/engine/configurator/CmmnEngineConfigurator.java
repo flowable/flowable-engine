@@ -118,7 +118,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     protected void initIdGenerator(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         super.initIdGenerator(engineConfiguration, targetEngineConfiguration);
         if (targetEngineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
-            HasTaskIdGeneratorEngineConfiguration<?> targetEgineConfiguration = (HasTaskIdGeneratorEngineConfiguration) targetEngineConfiguration;
+            HasTaskIdGeneratorEngineConfiguration targetEgineConfiguration = (HasTaskIdGeneratorEngineConfiguration) targetEngineConfiguration;
             if (targetEgineConfiguration.getTaskIdGenerator() == null) {
                 if (engineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
                     targetEgineConfiguration.setTaskIdGenerator(((HasTaskIdGeneratorEngineConfiguration) engineConfiguration).getTaskIdGenerator());

@@ -79,7 +79,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration implements HasTaskIdGeneratorEngineConfiguration<ProcessEngineConfiguration> {
+public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration implements HasTaskIdGeneratorEngineConfiguration {
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
     protected int idBlockSize = 2500;
@@ -684,8 +684,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     }
 
     @Override
-    public ProcessEngineConfiguration setTaskIdGenerator(IdGenerator taskIdGenerator) {
+    public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
         this.taskIdGenerator = taskIdGenerator;
-        return this;
     }
 }
