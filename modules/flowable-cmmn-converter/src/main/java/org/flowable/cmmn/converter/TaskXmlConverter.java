@@ -20,6 +20,7 @@ import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Task;
 
 import javax.xml.stream.XMLStreamReader;
+
 import org.flowable.cmmn.model.ScriptServiceTask;
 
 /**
@@ -39,7 +40,7 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        Task task = null;
+        Task task;
         String type = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_TYPE);
         String className = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CLASS);
 
@@ -68,7 +69,7 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
                     serviceTask.setResultVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_RESULT_VARIABLE_NAME));
                     task = serviceTask;
                     break;
-                    
+
                 case HttpServiceTask.HTTP_TASK:
                     HttpServiceTask httpServiceTask = new HttpServiceTask();
                     if (StringUtils.isNotBlank(className)) {
@@ -76,7 +77,7 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
                     }
                     task = httpServiceTask;
                     break;
-                    
+
                 case ScriptServiceTask.SCRIPT_TASK:
                     ScriptServiceTask scriptTask = new ScriptServiceTask();
                     String scriptFormat = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_SCRIPT_FORMAT);
@@ -94,10 +95,13 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
 
                     task = scriptTask;
                     break;
+                default:
+                    task = new Task();
             }
+        } else {
+            task = new Task();
         }
 
-        task = task != null ? task : new Task();
         convertCommonTaskAttributes(xtr, task);
         return task;
     }
