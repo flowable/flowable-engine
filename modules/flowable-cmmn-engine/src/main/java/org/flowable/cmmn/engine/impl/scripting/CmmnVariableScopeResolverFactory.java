@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.scripting;
+package org.flowable.cmmn.engine.impl.scripting;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.scripting.Resolver;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.common.impl.scripting.ResolverFactory;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -22,12 +22,12 @@ import org.flowable.variable.api.delegate.VariableScope;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class VariableScopeResolverFactory implements ResolverFactory {
+public class CmmnVariableScopeResolverFactory implements ResolverFactory {
 
     @Override
     public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope) {
         if (variableScope != null) {
-            return new VariableScopeResolver((ProcessEngineConfigurationImpl) engineConfiguration, variableScope);
+            return new CmmnVariableScopeResolver((CmmnEngineConfiguration) engineConfiguration, variableScope);
         }
         return null;
     }

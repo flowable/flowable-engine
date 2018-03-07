@@ -11,14 +11,18 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.scripting;
+package org.flowable.engine.common.impl.scripting;
+
+
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
-public interface Resolver {
+public interface ResolverFactory {
 
-    boolean containsKey(Object key);
+    Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope);
 
-    Object get(Object key);
 }

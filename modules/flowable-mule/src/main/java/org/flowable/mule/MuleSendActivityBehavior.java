@@ -32,7 +32,7 @@ import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
-import org.flowable.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.common.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.mule.DefaultMuleMessage;

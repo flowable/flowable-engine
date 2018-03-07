@@ -14,9 +14,9 @@ import org.flowable.engine.common.impl.javax.el.MapELResolver;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
-import org.flowable.engine.impl.scripting.BeansResolverFactory;
-import org.flowable.engine.impl.scripting.ResolverFactory;
-import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
+import org.flowable.engine.common.impl.scripting.BeansResolverFactory;
+import org.flowable.engine.common.impl.scripting.ResolverFactory;
+import org.flowable.engine.common.impl.scripting.ScriptBindingsFactory;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.osgi.OsgiScriptingEngines;
 

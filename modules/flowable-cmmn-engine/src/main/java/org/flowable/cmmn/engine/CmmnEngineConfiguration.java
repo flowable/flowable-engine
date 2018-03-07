@@ -113,9 +113,11 @@ import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
+import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
+import org.flowable.engine.common.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.EngineConfigurator;
@@ -142,6 +144,10 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.common.impl.scripting.BeansResolverFactory;
+import org.flowable.engine.common.impl.scripting.ResolverFactory;
+import org.flowable.engine.common.impl.scripting.ScriptBindingsFactory;
+import org.flowable.engine.common.impl.scripting.ScriptingEngines;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
@@ -191,7 +197,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, HasTaskIdGeneratorEngineConfiguration {
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, 
+        HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -253,6 +260,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected ExpressionManager expressionManager;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
+
+    protected ScriptingEngines scriptingEngines;
+    protected List<ResolverFactory> resolverFactories;
 
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
@@ -614,6 +624,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initFailedJobCommandFactory();
         initJobServiceConfiguration();
         initAsyncExecutor();
+        initScriptingEngines();
     }
 
     public void initCaseDiagramGenerator() {
@@ -908,6 +919,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initDefaultCaseInstanceCallbacks() {
         this.caseInstanceStateChangeCallbacks.put(PlanItemInstanceCallbackType.CHILD_CASE,
                 Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildCaseInstanceStateChangeCallback()));
+    }
+
+    protected void initScriptingEngines() {
+        if (resolverFactories == null) {
+            resolverFactories = new ArrayList<>();
+            resolverFactories.add(new CmmnVariableScopeResolverFactory());
+            resolverFactories.add(new BeansResolverFactory());
+        }
+        if (scriptingEngines == null) {
+            
+            scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
+        }
     }
 
     @Override
@@ -2266,5 +2289,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
         this.taskIdGenerator = taskIdGenerator;
+    }
+    
+    @Override
+    public ScriptingEngines getScriptingEngines() {
+        return scriptingEngines;
+    }
+
+    @Override
+    public CmmnEngineConfiguration setScriptingEngines(ScriptingEngines scriptingEngines) {
+        this.scriptingEngines = scriptingEngines;
+        return this;
     }
 }

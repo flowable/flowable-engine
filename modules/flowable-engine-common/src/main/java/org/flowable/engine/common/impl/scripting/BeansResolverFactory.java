@@ -11,9 +11,9 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.scripting;
+package org.flowable.engine.common.impl.scripting;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -21,21 +21,21 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class BeansResolverFactory implements ResolverFactory, Resolver {
 
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected AbstractEngineConfiguration engineConfiguration;
 
     @Override
-    public Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public Resolver createResolver(AbstractEngineConfiguration processEngineConfiguration, VariableScope variableScope) {
+        this.engineConfiguration = processEngineConfiguration;
         return this;
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return processEngineConfiguration.getBeans().containsKey(key);
+        return engineConfiguration.getBeans().containsKey(key);
     }
 
     @Override
     public Object get(Object key) {
-        return processEngineConfiguration.getBeans().get(key);
+        return engineConfiguration.getBeans().get(key);
     }
 }
