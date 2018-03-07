@@ -25,15 +25,15 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
     public void testGetCaseDefinitions() throws Exception {
 
         try {
-            CmmnDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").deploy();
+            CmmnDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn").deploy();
 
             CaseDefinition firstOneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").deploymentId(firstDeployment.getId()).singleResult();
             
-            CmmnDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
-                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/simpleCase.cmmn").deploy();
+            CmmnDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").addClasspathResource("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn")
+                    .addClasspathResource("org/flowable/rest/cmmn/service/api/repository/simpleCase.cmmn").deploy();
             
-            CmmnDeployment thirdDeployment = repositoryService.createDeployment().name("Deployment 3").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn")
-                            .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn").deploy();
+            CmmnDeployment thirdDeployment = repositoryService.createDeployment().name("Deployment 3").addClasspathResource("org/flowable/rest/cmmn/service/api/repository/repeatingStage.cmmn")
+                            .addClasspathResource("org/flowable/rest/cmmn/service/api/repository/repeatingStage.cmmn").deploy();
 
             CaseDefinition oneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").deploymentId(secondDeployment.getId()).singleResult();
             
@@ -94,7 +94,7 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
             assertResultsPresentInDataResponse(url, firstOneTaskCase.getId(), oneTaskCase.getId(), simpleCaseDef.getId());
 
             // Test resourceName filtering
-            url = baseUrl + "?resourceName=org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn";
+            url = baseUrl + "?resourceName=org/flowable/rest/cmmn/service/api/repository/repeatingStage.cmmn";
             assertResultsPresentInDataResponse(url, repeatingStageCase.getId());
 
             // Test resourceNameLike filtering

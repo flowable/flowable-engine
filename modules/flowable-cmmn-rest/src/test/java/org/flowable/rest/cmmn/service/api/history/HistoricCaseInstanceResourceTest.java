@@ -35,7 +35,7 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test retrieval of historic process instance. GET cmmn-history/historic-case-instances/{caseInstanceId}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetCaseInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
 

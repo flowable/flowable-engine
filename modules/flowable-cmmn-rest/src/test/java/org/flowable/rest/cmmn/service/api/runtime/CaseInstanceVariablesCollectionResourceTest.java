@@ -48,7 +48,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test getting all case variables. GET cmmn-runtime/case-instances/{caseInstanceId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetCaseVariables() throws Exception {
         Calendar cal = Calendar.getInstance();
 
@@ -80,7 +80,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test creating a single case variable. POST cmmn-runtime/case-instance/{caseInstanceId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCreateSingleProcessInstanceVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
@@ -110,7 +110,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test creating a single case variable using a binary stream. POST cmmn-runtime/case-instances/{caseInstanceId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCreateSingleBinaryProcessVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
@@ -144,7 +144,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test creating a single process variable using a binary stream containing a serializable. POST runtime/process-instances/{processInstanceId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCreateSingleSerializableProcessVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
@@ -188,7 +188,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test creating a single case variable, testing edge case exceptions. POST cmmn-runtime/case-instances/{caseInstanceId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCreateSingleCaseVariableEdgeCases() throws Exception {
         // Test adding variable to unexisting execution
         ArrayNode requestNode = objectMapper.createArrayNode();
@@ -232,7 +232,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test creating a single case variable, testing default types when omitted. POST cmmn-runtime/case-instances/{caseInstanceId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCreateSingleProcessVariableDefaultTypes() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
@@ -279,7 +279,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test creating multiple case variables in a single call. POST cmmn-runtime/case-instance/{caseInstanceId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCreateMultipleProcessVariables() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
@@ -356,7 +356,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test creating multiple case variables in a single call. POST cmmn-runtime/case-instance/{caseInstanceId}/variables?override=true
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCreateMultipleCaseVariablesWithOverride() throws Exception {
 
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -395,7 +395,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
     /**
      * Test deleting all case variables. DELETE cmmn-runtime/case-instance/{caseInstanceId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testDeleteAllCasesVariables() throws Exception {
         Map<String, Object> caseVariables = new HashMap<>();
         caseVariables.put("var1", "This is a CaseVariable");

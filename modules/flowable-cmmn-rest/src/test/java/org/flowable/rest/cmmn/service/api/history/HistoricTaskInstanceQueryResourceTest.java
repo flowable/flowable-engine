@@ -47,7 +47,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
     /**
      * Test querying historic task instance. POST cmmn-query/historic-task-instances
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryTaskInstances() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").businessKey("myBusinessKey").start();
         cmmnEngineConfiguration.getClock().setCurrentTime(new GregorianCalendar(2018, 0, 1).getTime());

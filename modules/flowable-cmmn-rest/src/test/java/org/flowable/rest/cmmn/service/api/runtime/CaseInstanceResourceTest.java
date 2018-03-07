@@ -34,7 +34,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single case instance.
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
 
@@ -53,7 +53,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertEquals(responseNode.get("caseDefinitionUrl").asText(), buildUrl(RestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
 
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
-                        "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+                        "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
         
         try {
             caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").tenantId("myTenant").start();
@@ -80,7 +80,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single case instance.
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testDeleteCaseInstance() {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
         closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_NO_CONTENT));

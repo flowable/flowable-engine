@@ -49,7 +49,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test getting all task variables. GET cmmn-runtime/tasks/{taskId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetTaskVariables() throws Exception {
 
         Calendar cal = Calendar.getInstance();
@@ -142,7 +142,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable. POST cmmn-runtime/tasks/{taskId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCreateSingleTaskVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -533,7 +533,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test deleting all local task variables. DELETE runtime/tasks/{taskId}/variables
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testDeleteAllLocalVariables() throws Exception {
         // Start process with all types of variables
         Map<String, Object> caseVariables = new HashMap<>();

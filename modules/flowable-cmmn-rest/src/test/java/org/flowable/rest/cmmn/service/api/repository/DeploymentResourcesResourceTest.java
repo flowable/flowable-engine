@@ -25,7 +25,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     public void testGetDeploymentResources() throws Exception {
 
         try {
-            CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
+            CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn")
                     .addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
             HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCES, deployment.getId()));

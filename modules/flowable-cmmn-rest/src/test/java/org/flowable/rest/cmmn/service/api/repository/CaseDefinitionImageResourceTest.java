@@ -26,7 +26,7 @@ import org.flowable.rest.cmmn.service.api.RestUrls;
  */
 public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/repeatingStage.cmmn"})
     public void testGetCaseDefinitionImage() throws Exception {
         CaseDefinition repeatingStageCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testRepeatingStage").singleResult();
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(
@@ -36,7 +36,7 @@ public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseDefinitionImageWithoutImage() throws Exception {
         CaseDefinition oneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(

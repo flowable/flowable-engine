@@ -107,7 +107,7 @@ public class SerializableVariablesDisabledTest {
 
     @Test
     public void testCreateSingleSerializableProcessVariable() throws Exception {
-        repositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn").deploy();
+        repositoryService.createDeployment().addClasspathResource("org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn").deploy();
 
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
@@ -139,7 +139,7 @@ public class SerializableVariablesDisabledTest {
     @Test
     public void testCreateSingleSerializableTaskVariable() throws Exception {
         repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn")
+                .addClasspathResource("org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn")
                 .deploy();
 
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();

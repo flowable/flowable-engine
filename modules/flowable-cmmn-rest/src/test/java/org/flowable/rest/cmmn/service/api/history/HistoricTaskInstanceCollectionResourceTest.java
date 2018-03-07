@@ -45,7 +45,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
     /**
      * Test querying historic task instance. GET cmmn-history/historic-task-instances
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryTaskInstances() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
         caseVariables.put("stringVar", "Azerty");
@@ -69,7 +69,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
         // Set tenant on deployment
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
-                        "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+                        "org/flowable/rest/cmmn/service/api/repository/twoHumanTaskCase.cmmn").tenantId("myTenant").deploy();
 
         try {
             CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId("myTenant").variables(caseVariables).start();

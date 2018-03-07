@@ -34,7 +34,7 @@ public class CaseInstanceIdentityLinkResourceTest extends BaseSpringRestTestCase
     /**
      * Test getting all identity links.
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetIdentityLinks() throws Exception {
 
         // Test candidate user/groups links + manual added identityLink

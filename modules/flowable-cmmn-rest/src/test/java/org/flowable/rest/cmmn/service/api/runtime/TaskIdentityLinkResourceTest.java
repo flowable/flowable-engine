@@ -40,7 +40,7 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all identity links. GET cmmn-runtime/tasks/{taskId}/identitylinks
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetIdentityLinks() throws Exception {
         // Test candidate user/groups links + manual added identityLink
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();

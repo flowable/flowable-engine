@@ -26,7 +26,7 @@ import org.flowable.rest.cmmn.service.api.RestUrls;
  */
 public class CaseInstanceDiagramResourceTest extends BaseSpringRestTestCase {
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/repeatingStage.cmmn" })
     public void testGetCaseDiagram() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingStage").start();
 
@@ -37,7 +37,7 @@ public class CaseInstanceDiagramResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetCaseDiagramWithoutDiagram() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_DIAGRAM, caseInstance.getId())), HttpStatus.SC_BAD_REQUEST));

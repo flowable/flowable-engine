@@ -39,7 +39,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
     /**
      * Test querying historic case instance based on variables. POST cmmn-query/historic-case-instances
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
         caseVariables.put("stringVar", "Azerty");

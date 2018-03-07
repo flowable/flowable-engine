@@ -41,7 +41,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks. GET runtime/tasks
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testQueryTasks() throws Exception {
         try {
             Calendar adhocTaskCreate = Calendar.getInstance();
@@ -251,7 +251,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks using task and case variables. GET cmmn-runtime/tasks
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testQueryTasksWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
         caseVariables.put("stringVar", "Azerty");

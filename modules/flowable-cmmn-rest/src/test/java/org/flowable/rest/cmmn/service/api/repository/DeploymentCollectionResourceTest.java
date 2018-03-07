@@ -30,12 +30,12 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             yesterday.add(Calendar.DAY_OF_MONTH, -1);
             cmmnEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
 
-            CmmnDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").category("DEF").addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
+            CmmnDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").category("DEF").addClasspathResource("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn")
                     .deploy();
 
             cmmnEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
             CmmnDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").category("ABC")
-                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+                    .addClasspathResource("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
 
             String baseUrl = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION);
             assertResultsPresentInDataResponse(baseUrl, firstDeployment.getId(), secondDeployment.getId());

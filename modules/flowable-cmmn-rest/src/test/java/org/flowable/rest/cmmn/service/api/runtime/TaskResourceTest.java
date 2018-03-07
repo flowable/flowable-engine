@@ -48,7 +48,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single task, spawned by a case. GET cmmn-runtime/tasks/{taskId}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseTask() throws Exception {
         Calendar now = Calendar.getInstance();
         cmmnEngineConfiguration.getClock().setCurrentTime(now.getTime());
@@ -334,7 +334,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a task that is part of a case. PUT cmmn-runtime/tasks/{taskId}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testDeleteTaskInCase() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -347,7 +347,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     /**
      * Test completing a single task. POST cmmn-runtime/tasks/{taskId}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testCompleteTask() throws Exception {
         try {
 
@@ -493,7 +493,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         }
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testReclaimTask() throws Exception {
 
         // Start case instance

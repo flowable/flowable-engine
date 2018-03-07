@@ -38,7 +38,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying case instance based on variables. POST query/case-instances
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
         caseVariables.put("stringVar", "Azerty");
@@ -127,7 +127,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying case instance based on variables. POST query/case-instances
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn", "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn", "org/flowable/rest/cmmn/service/api/repository/repeatingStage.cmmn" })
     public void testQueryCaseInstancesPagingAndSorting() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingStage").start();

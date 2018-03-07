@@ -26,7 +26,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single process definition. GET cmmn-repository/case-definitions/{caseDefinitionResource}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseDefinition() throws Exception {
 
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
@@ -55,7 +55,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single process definition with a graphical notation defined. GET cmmn-repository/case-definitions/{caseDefinitionResource}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/repeatingStage.cmmn" })
     public void testGetCaseDefinitionWithGraphicalNotation() throws Exception {
 
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
@@ -91,7 +91,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetProcessDefinitionResourceData() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
@@ -114,7 +114,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateProcessDefinitionCategory() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
         assertEquals(1, repositoryService.createCaseDefinitionQuery().caseDefinitionCategory("http://flowable.org/cmmn").count());

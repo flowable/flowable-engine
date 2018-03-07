@@ -30,7 +30,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             // Upload a valid BPMN-file using multipart-data
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION));
             httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("oneHumanTaskCase.cmmn", "application/xml",
-                    ReflectUtil.getResourceAsStream("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn"), null));
+                    ReflectUtil.getResourceAsStream("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn"), null));
             CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
 
             // Check deployment
@@ -81,14 +81,14 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         // Upload a valid BPMN-file using multipart-data
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("oneTaskProcess.invalidfile", "application/xml",
-                ReflectUtil.getResourceAsStream("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn"), null));
+                ReflectUtil.getResourceAsStream("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn"), null));
         closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
 
     /**
      * Test getting a single deployment. GET repository/deployments/{deploymentId}
      */
-    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetDeployment() throws Exception {
         CmmnDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
 
@@ -133,7 +133,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single deployment. DELETE repository/deployments/{deploymentId}
      */
-    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteDeployment() throws Exception {
         CmmnDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
         assertNotNull(existingDeployment);

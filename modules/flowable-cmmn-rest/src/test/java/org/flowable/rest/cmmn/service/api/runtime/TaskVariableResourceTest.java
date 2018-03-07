@@ -47,7 +47,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a task variable. GET cmmn-runtime/tasks/{taskId}/variables/{variableName}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetTaskVariable() throws Exception {
         try {
             // Test variable behaviour on standalone tasks
@@ -220,7 +220,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
      * 
      * DELETE cmmn-runtime/tasks/{taskId}/variables/{variableName}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testDeleteTaskVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variable("overlappingVariable", "processValue").start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -258,7 +258,7 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
      * 
      * PUT runtime/tasks/{taskId}/variables/{variableName}
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testUpdateTaskVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variable("overlappingVariable", "processValue").start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();

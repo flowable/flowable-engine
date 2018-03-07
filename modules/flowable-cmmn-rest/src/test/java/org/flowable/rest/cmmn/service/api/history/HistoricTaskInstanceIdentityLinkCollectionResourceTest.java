@@ -37,7 +37,7 @@ public class HistoricTaskInstanceIdentityLinkCollectionResourceTest extends Base
     /**
      * Test querying historic task instance. GET cmmn-history/historic-task-instances/{taskId}/identitylinks
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetIdentityLinks() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
         caseVariables.put("stringVar", "Azerty");

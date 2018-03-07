@@ -41,7 +41,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a list of case instance, using all possible filters.
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstances() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
         String id = caseInstance.getId();
@@ -82,7 +82,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a list of process instance, using all tenant filters.
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstancesTenant() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
         String id = caseInstance.getId();
@@ -92,7 +92,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, id);
 
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
-                        "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+                        "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
         
         try {
             caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").tenantId("myTenant").start();
@@ -123,7 +123,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test starting a case instance using caseDefinitionId, key caseDefinitionKey business-key.
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testStartCase() throws Exception {
         ObjectNode requestNode = objectMapper.createObjectNode();
 
@@ -186,7 +186,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test starting a case instance passing in variables to set.
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testStartCaseWithVariables() throws Exception {
         ArrayNode variablesNode = objectMapper.createArrayNode();
 
@@ -256,13 +256,13 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         assertEquals(longDateFormat.parse(isoString), caseVariables.get("dateVariable"));
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testStartCaseUsingKeyAndTenantId() throws Exception {
         org.flowable.cmmn.api.repository.CmmnDeployment tenantDeployment = null;
 
         try {
             // Deploy the same process, in another tenant
-            tenantDeployment = repositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn").tenantId("tenant1").deploy();
+            tenantDeployment = repositoryService.createDeployment().addClasspathResource("org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn").tenantId("tenant1").deploy();
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 

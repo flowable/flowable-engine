@@ -43,7 +43,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
     /**
      * Test querying historic case instance based on variables. GET history/historic-process-instances
      */
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryCaseInstances() throws Exception {
         Calendar startTime = Calendar.getInstance();
         cmmnEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
@@ -73,7 +73,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
         // Set tenant on deployment
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
-                        "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+                        "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
         
         try {
             startTime.add(Calendar.DAY_OF_YEAR, 1);

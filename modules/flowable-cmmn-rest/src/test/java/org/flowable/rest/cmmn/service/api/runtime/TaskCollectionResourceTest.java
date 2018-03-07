@@ -113,7 +113,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a collection of tasks. GET runtime/tasks
      */
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn"})
+    @CmmnDeployment(resources = {"org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn"})
     public void testGetTasks() throws Exception {
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
         try {
@@ -143,7 +143,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             cmmnEngineConfiguration.getClock().setCurrentTime(processTaskCreate.getTime());
             
             deployment = repositoryService.createDeployment().addClasspathResource(
-                            "org/flowable/cmmn/rest/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+                            "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
             
             CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
                             .businessKey("myBusinessKey").tenantId("myTenant").start();
