@@ -83,8 +83,8 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
         assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult"));
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result, instanceOf(Double.class));
-        assertEquals(7.0, result);
+        assertThat(result, instanceOf(Number.class));
+        assertEquals(7, ((Number)result).intValue());
     }
 
     @Test
@@ -99,8 +99,8 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
         assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult"));
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result, instanceOf(Double.class));
-        assertEquals(10.0, result);
+        assertThat(result, instanceOf(Number.class));
+        assertEquals(10, ((Number)result).intValue());
     }
 
     @Test
@@ -115,8 +115,8 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
         assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult"));
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result, instanceOf(Double.class));
-        assertEquals(12.0, result);
+        assertThat(result, instanceOf(Number.class));
+        assertEquals(12, ((Number)result).intValue());
 
         assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "a"));
         Object a = cmmnRuntimeService.getVariable(caseInstance.getId(), "a");
@@ -156,7 +156,7 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum"));
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "sum");
         assertThat(result, instanceOf(Integer.class));
-        assertEquals(15, result);
+        assertEquals(15, ((Number)result).intValue());
     }
 
     @Test
