@@ -17,9 +17,9 @@ import org.flowable.engine.common.impl.cfg.IdGenerator;
 /**
  * @author martin.grofcik
  */
-public interface HasTaskIdGeneratorEngineConfiguration<EngineConfiguration extends AbstractEngineConfiguration> {
+public interface HasTaskIdGeneratorEngineConfiguration {
     
     IdGenerator getTaskIdGenerator();
     
-    EngineConfiguration setTaskIdGenerator(IdGenerator taskIdGenerator);
+    void setTaskIdGenerator(IdGenerator taskIdGenerator);
 }

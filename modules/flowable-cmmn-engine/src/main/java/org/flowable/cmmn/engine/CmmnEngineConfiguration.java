@@ -191,7 +191,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, HasTaskIdGeneratorEngineConfiguration<CmmnEngineConfiguration> {
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, HasTaskIdGeneratorEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -2255,8 +2255,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     @Override
-    public CmmnEngineConfiguration setTaskIdGenerator(IdGenerator taskIdGenerator) {
+    public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
         this.taskIdGenerator = taskIdGenerator;
-        return this;
     }
 }
