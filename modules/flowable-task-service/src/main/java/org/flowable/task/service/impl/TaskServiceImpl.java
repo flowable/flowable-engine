@@ -14,6 +14,8 @@ package org.flowable.task.service.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -24,10 +26,6 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  * @author Joram Barrez
  */
 public class TaskServiceImpl extends ServiceImpl implements TaskService {
-
-    public TaskServiceImpl() {
-
-    }
 
     public TaskServiceImpl(TaskServiceConfiguration taskServiceConfiguration) {
         super(taskServiceConfiguration);
@@ -102,5 +100,4 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     public void deleteTasksByExecutionId(String executionId) {
         getTaskEntityManager().deleteTasksByExecutionId(executionId);
     }
-
 }

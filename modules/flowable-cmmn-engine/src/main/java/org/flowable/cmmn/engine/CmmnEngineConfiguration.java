@@ -120,6 +120,7 @@ import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.EngineConfigurator;
 import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
@@ -127,6 +128,7 @@ import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
@@ -189,7 +191,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi {
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, HasTaskIdGeneratorEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -526,6 +528,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
+
+    /**
+     * generator used to generate task ids
+     */
+    protected IdGenerator taskIdGenerator;
 
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -1064,6 +1071,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.taskServiceConfiguration.setIdGenerator(taskIdGenerator);
 
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
@@ -2241,5 +2249,22 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
+    }
+
+    public void initIdGenerator() {
+        super.initIdGenerator();
+        if (taskIdGenerator == null) {
+            taskIdGenerator = idGenerator;
+        }
+    }
+
+    @Override
+    public IdGenerator getTaskIdGenerator() {
+        return taskIdGenerator;
+    }
+
+    @Override
+    public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
+        this.taskIdGenerator = taskIdGenerator;
     }
 }

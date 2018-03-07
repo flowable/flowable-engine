@@ -14,6 +14,7 @@ package org.flowable.task.service;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -51,5 +52,5 @@ public interface TaskService {
     
     void deleteTask(TaskEntity task, boolean fireEvents);
     
-    void deleteTasksByExecutionId(String executionid);
+    void deleteTasksByExecutionId(String executionId);
 }

@@ -12,12 +12,6 @@
  */
 package org.flowable.cmmn.engine.configurator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -29,10 +23,17 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.AbstractEngineConfigurator;
 import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -112,6 +113,21 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         }
 
         return cmmnEngineConfiguration.buildCmmnEngine();
+    }
+
+    @Override
+    protected void initIdGenerator(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        super.initIdGenerator(engineConfiguration, targetEngineConfiguration);
+        if (targetEngineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
+            HasTaskIdGeneratorEngineConfiguration targetEgineConfiguration = (HasTaskIdGeneratorEngineConfiguration) targetEngineConfiguration;
+            if (targetEgineConfiguration.getTaskIdGenerator() == null) {
+                if (engineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
+                    targetEgineConfiguration.setTaskIdGenerator(((HasTaskIdGeneratorEngineConfiguration) engineConfiguration).getTaskIdGenerator());
+                } else {
+                    targetEgineConfiguration.setTaskIdGenerator(engineConfiguration.getIdGenerator());
+                }
+            }
+        }
     }
 
     public CmmnEngineConfiguration getCmmnEngineConfiguration() {
