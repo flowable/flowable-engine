@@ -395,7 +395,7 @@
     "APP-DEFINITION" : {
         "MESSAGE" : {
             "NOT-FOUND": "No app definition found with the given id",
-            "MISSING": "Activiti is running in integration mode, but the required app definition is missing"
+            "MISSING": "Flowable is running in integration mode, but the required app definition is missing"
         }
     }
 }
