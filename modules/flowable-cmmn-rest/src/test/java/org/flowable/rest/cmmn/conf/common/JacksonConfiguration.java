@@ -10,19 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.servlet;
+package org.flowable.rest.cmmn.conf.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableAsync;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * @author Joram Barrez
+ */
 @Configuration
-@ComponentScan({"org.flowable.rest.cmmn.exception", "org.flowable.rest.cmmn.service.api"})
-@EnableAsync
-public class CmmnDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
+public class JacksonConfiguration {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnDispatcherServletConfiguration.class);
+    @Bean()
+    public ObjectMapper objectMapper() {
+        // To avoid instantiating and configuring the mapper everywhere
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper;
+    }
 
 }

@@ -10,19 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.servlet;
+package org.flowable.rest.cmmn.conf;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
-@ComponentScan({"org.flowable.rest.cmmn.exception", "org.flowable.rest.cmmn.service.api"})
-@EnableAsync
-public class CmmnDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnDispatcherServletConfiguration.class);
+@ComponentScan(basePackages = { "org.flowable.rest.cmmn.conf.common", "org.flowable.rest.cmmn.conf.engine" })
+public class ApplicationConfiguration {
 
 }

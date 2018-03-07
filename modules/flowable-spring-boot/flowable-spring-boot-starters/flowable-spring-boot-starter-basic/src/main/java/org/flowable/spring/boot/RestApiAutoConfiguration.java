@@ -93,7 +93,7 @@ public class RestApiAutoConfiguration {
     }
 
     @Configuration
-    @ConditionalOnClass(org.flowable.cmmn.rest.service.api.RestUrls.class)
+    @ConditionalOnClass(org.flowable.rest.cmmn.service.api.RestUrls.class)
     @ConditionalOnBean(CmmnEngine.class)
     public static class CmmnEngineRestApiConfiguration extends BaseRestApiConfiguration {
 

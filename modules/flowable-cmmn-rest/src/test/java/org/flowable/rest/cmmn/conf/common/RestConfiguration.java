@@ -10,25 +10,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.spring.boot.cmmn;
+package org.flowable.rest.cmmn.conf.common;
 
 import org.flowable.rest.cmmn.service.api.CmmnRestResponseFactory;
-import org.flowable.spring.boot.DispatcherServletConfiguration;
+import org.flowable.rest.application.ContentTypeResolver;
+import org.flowable.rest.application.DefaultContentTypeResolver;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Component scan for the CMMN Rest API Configuration.
- *
- * @author Filip Hrisafov
+ * @author Joram Barrez
  */
-@Import(DispatcherServletConfiguration.class)
-@ComponentScan("org.flowable.rest.cmmn.service.api")
-public class CmmnEngineRestConfiguration {
+@Configuration
+public class RestConfiguration {
 
-    @Bean
-    public CmmnRestResponseFactory cmmnRestResponseFactory() {
-        return new CmmnRestResponseFactory();
+    @Bean()
+    public CmmnRestResponseFactory restResponseFactory() {
+        CmmnRestResponseFactory restResponseFactory = new CmmnRestResponseFactory();
+        return restResponseFactory;
+    }
+
+    @Bean()
+    public ContentTypeResolver contentTypeResolver() {
+        ContentTypeResolver resolver = new DefaultContentTypeResolver();
+        return resolver;
     }
 }
