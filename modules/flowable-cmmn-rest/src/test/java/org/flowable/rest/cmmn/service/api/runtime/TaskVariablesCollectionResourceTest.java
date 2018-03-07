@@ -32,7 +32,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
 import org.flowable.rest.cmmn.service.HttpMultipartHelper;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -83,7 +83,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         taskService.setVariablesLocal(task.getId(), taskVariables);
 
         // Request all variables (no scope provides) which include global an local
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId())), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId())), HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -105,7 +105,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         assertTrue(foundOverlapping);
 
         // Check local variables filtering
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()) + "?scope=local"), HttpStatus.SC_OK);
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()) + "?scope=local"), HttpStatus.SC_OK);
 
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -119,7 +119,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         }
 
         // Check global variables filtering
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()) + "?scope=global"), HttpStatus.SC_OK);
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()) + "?scope=global"), HttpStatus.SC_OK);
 
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -155,7 +155,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         variableNode.put("type", "string");
 
         // Create a new local variable
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
 
@@ -177,7 +177,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         variableNode.put("scope", "global");
         variableNode.put("type", "string");
 
-        httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+        httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_CREATED);
         responseNode = objectMapper.readTree(response.getEntity().getContent()).get(0);
@@ -197,7 +197,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         variableNode.put("value", "simple string value");
         variableNode.put("type", "string");
 
-        httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+        httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_CREATED);
         responseNode = objectMapper.readTree(response.getEntity().getContent()).get(0);
@@ -229,7 +229,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             additionalFields.put("type", "binary");
             additionalFields.put("scope", "local");
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, additionalFields));
             CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -240,7 +240,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             assertEquals("local", responseNode.get("scope").asText());
             assertEquals("binary", responseNode.get("type").asText());
             assertNotNull(responseNode.get("valueUrl").isNull());
-            assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "binaryVariable")));
+            assertTrue(responseNode.get("valueUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "binaryVariable")));
 
             // Check actual value of variable in engine
             Object variableValue = taskService.getVariableLocal(task.getId(), "binaryVariable");
@@ -281,7 +281,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             additionalFields.put("type", "serializable");
             additionalFields.put("scope", "local");
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
             CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
 
@@ -294,7 +294,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             assertEquals("local", responseNode.get("scope").asText());
             assertEquals("serializable", responseNode.get("type").asText());
             assertNotNull(responseNode.get("valueUrl").isNull());
-            assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "serializableVariable")));
+            assertTrue(responseNode.get("valueUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "serializableVariable")));
 
             // Check actual value of variable in engine
             Object variableValue = taskService.getVariableLocal(task.getId(), "serializableVariable");
@@ -323,7 +323,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             variableNode.put("scope", "local");
             variableNode.put("type", "string");
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, "unexisting"));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, "unexisting"));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_NOT_FOUND));
 
@@ -332,7 +332,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             taskService.saveTask(task);
             taskService.setVariable(task.getId(), "existingVariable", "Value 1");
 
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_CONFLICT));
 
@@ -342,7 +342,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             variableNode.put("scope", "global");
             variableNode.put("type", "string");
 
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
@@ -350,18 +350,18 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             variableNode.removeAll();
             variableNode.put("value", "simple string value");
 
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
             // Test passing in empty array
             requestNode.removeAll();
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
             // Test passing in object instead of array
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(objectMapper.createObjectNode().toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
@@ -389,7 +389,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             varNode.put("value", "String value");
             varNode.put("scope", "local");
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_CREATED));
 
@@ -400,7 +400,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             varNode.put("value", 123);
             varNode.put("scope", "local");
 
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_CREATED));
 
@@ -411,7 +411,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             varNode.put("value", 123.456);
             varNode.put("scope", "local");
 
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_CREATED));
 
@@ -422,7 +422,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             varNode.put("value", Boolean.TRUE);
             varNode.put("scope", "local");
 
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_CREATED));
 
@@ -500,7 +500,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             dateVarNode.put("type", "date");
 
             // Create local variables with a single request
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -548,7 +548,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         taskService.setVariablesLocal(task.getId(), taskVariables);
         assertEquals(2, taskService.getVariablesLocal(task.getId()).size());
 
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
         closeResponse(executeBinaryRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
         // Check if local variables are gone and global remain unchanged

@@ -27,7 +27,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -56,7 +56,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         cmmnEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_CASE_INSTANCES);
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES);
 
         assertResultsPresentInDataResponse(url + "?finished=true", caseInstance.getId());
 

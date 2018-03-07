@@ -24,7 +24,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 
@@ -77,7 +77,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(caseTask);
 
             // Check filter-less to fetch all tasks
-            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_QUERY);
+            String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_QUERY);
             ObjectNode requestNode = objectMapper.createObjectNode();
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId(), adhocTask.getId());
 
@@ -276,7 +276,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         variableArray.add(variableNode);
         requestNode.set("taskVariables", variableArray);
 
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_QUERY);
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_QUERY);
 
         // String equals
         variableNode.put("name", "stringVar");
@@ -425,7 +425,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             Collections.sort(taskIdList);
 
             // Check filter-less to fetch all tasks
-            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_QUERY);
+            String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_QUERY);
             ObjectNode requestNode = objectMapper.createObjectNode();
             String[] taskIds = new String[] { taskIdList.get(0), taskIdList.get(1), taskIdList.get(2) };
             assertResultsPresentInPostDataResponse(url + "?size=3&sort=id&order=asc", requestNode, taskIds);

@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author Frederik Heremans
  */
-public final class RestUrls {
+public final class CmmnRestUrls {
 
     /**
      * Base segment for all repository-related resources: <i>repository</i>

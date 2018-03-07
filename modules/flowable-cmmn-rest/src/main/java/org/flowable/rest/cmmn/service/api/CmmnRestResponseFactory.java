@@ -104,17 +104,17 @@ public class CmmnRestResponseFactory {
 
     public TaskResponse createTaskResponse(Task task, RestUrlBuilder urlBuilder) {
         TaskResponse response = new TaskResponse(task);
-        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_TASK, task.getId()));
+        response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_TASK, task.getId()));
 
         // Add references to other resources, if needed
         if (response.getParentTaskId() != null) {
-            response.setParentTaskUrl(urlBuilder.buildUrl(RestUrls.URL_TASK, response.getParentTaskId()));
+            response.setParentTaskUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_TASK, response.getParentTaskId()));
         }
         if (response.getCaseDefinitionId() != null) {
-            response.setCaseDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION, response.getCaseDefinitionId()));
+            response.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, response.getCaseDefinitionId()));
         }
         if (response.getCaseInstanceId() != null) {
-            response.setCaseInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_INSTANCE, response.getCaseInstanceId()));
+            response.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, response.getCaseInstanceId()));
         }
 
         if (task.getProcessVariables() != null) {
@@ -147,7 +147,7 @@ public class CmmnRestResponseFactory {
     }
 
     public CmmnDeploymentResponse createDeploymentResponse(CmmnDeployment deployment, RestUrlBuilder urlBuilder) {
-        return new CmmnDeploymentResponse(deployment, urlBuilder.buildUrl(RestUrls.URL_DEPLOYMENT, deployment.getId()));
+        return new CmmnDeploymentResponse(deployment, urlBuilder.buildUrl(CmmnRestUrls.URL_DEPLOYMENT, deployment.getId()));
     }
 
     public List<DeploymentResourceResponse> createDeploymentResourceResponseList(String deploymentId, List<String> resourceList, ContentTypeResolver contentTypeResolver) {
@@ -172,8 +172,8 @@ public class CmmnRestResponseFactory {
 
     public DeploymentResourceResponse createDeploymentResourceResponse(String deploymentId, String resourceId, String contentType, RestUrlBuilder urlBuilder) {
         // Create URL's
-        String resourceUrl = urlBuilder.buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deploymentId, resourceId);
-        String resourceContentUrl = urlBuilder.buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deploymentId, resourceId);
+        String resourceUrl = urlBuilder.buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deploymentId, resourceId);
+        String resourceContentUrl = urlBuilder.buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deploymentId, resourceId);
 
         // Determine type
         String type = "resource";
@@ -201,7 +201,7 @@ public class CmmnRestResponseFactory {
 
     public CaseDefinitionResponse createCaseDefinitionResponse(CaseDefinition caseDefinition, RestUrlBuilder urlBuilder) {
         CaseDefinitionResponse response = new CaseDefinitionResponse();
-        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION, caseDefinition.getId()));
+        response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()));
         response.setId(caseDefinition.getId());
         response.setKey(caseDefinition.getKey());
         response.setVersion(caseDefinition.getVersion());
@@ -213,10 +213,10 @@ public class CmmnRestResponseFactory {
 
         // Links to other resources
         response.setDeploymentId(caseDefinition.getDeploymentId());
-        response.setDeploymentUrl(urlBuilder.buildUrl(RestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId()));
-        response.setResource(urlBuilder.buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName()));
+        response.setDeploymentUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId()));
+        response.setResource(urlBuilder.buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName()));
         if (caseDefinition.getDiagramResourceName() != null) {
-            response.setDiagramResource(urlBuilder.buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getDiagramResourceName()));
+            response.setDiagramResource(urlBuilder.buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getDiagramResourceName()));
         }
         return response;
     }
@@ -280,11 +280,11 @@ public class CmmnRestResponseFactory {
                 }
 
                 if (variableType == VARIABLE_TASK) {
-                    restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_TASK_VARIABLE_DATA, id, name));
+                    restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, id, name));
                 } else if (variableType == VARIABLE_CASE) {
-                    restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, id, name));
+                    restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, id, name));
                 } else if (variableType == VARIABLE_HISTORY_TASK) {
-                    restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, id, name));
+                    restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, id, name));
                 }
             }
         }
@@ -300,10 +300,10 @@ public class CmmnRestResponseFactory {
         restVar.setType(type);
 
         if (taskId != null) {
-            restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_TASK_VARIABLE_DATA, taskId, name));
+            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, taskId, name));
         }
         if (caseInstanceId != null) {
-            restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstanceId, name));
+            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstanceId, name));
         }
 
         return restVar;
@@ -393,17 +393,17 @@ public class CmmnRestResponseFactory {
 
         String family = null;
         if (userId != null) {
-            family = RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS;
+            family = CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS;
         } else {
-            family = RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS;
+            family = CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS;
         }
         
         if (caseInstanceId != null) {
-            result.setUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstanceId, (userId != null ? userId : groupId), type));
+            result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstanceId, (userId != null ? userId : groupId), type));
         } else if (taskId != null) {
-            result.setUrl(urlBuilder.buildUrl(RestUrls.URL_TASK_IDENTITYLINK, taskId, family, (userId != null ? userId : groupId), type));
+            result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, taskId, family, (userId != null ? userId : groupId), type));
         } else if (caseDefinitionId != null) {
-            result.setUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinitionId, family, (userId != null ? userId : groupId)));
+            result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, caseDefinitionId, family, (userId != null ? userId : groupId)));
         }
         return result;
     }
@@ -427,8 +427,8 @@ public class CmmnRestResponseFactory {
         result.setId(caseInstance.getId());
         result.setName(caseInstance.getName());
         result.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
-        result.setCaseDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
-        result.setUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_INSTANCE, caseInstance.getId()));
+        result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
+        result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId()));
         result.setTenantId(caseInstance.getTenantId());
 
         return result;
@@ -441,8 +441,8 @@ public class CmmnRestResponseFactory {
         result.setBusinessKey(caseInstance.getBusinessKey());
         result.setId(caseInstance.getId());
         result.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
-        result.setCaseDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
-        result.setUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_INSTANCE, caseInstance.getId()));
+        result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
+        result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId()));
         result.setTenantId(caseInstance.getTenantId());
         result.setCompleted(false);
 
@@ -479,10 +479,10 @@ public class CmmnRestResponseFactory {
         result.setEndTime(caseInstance.getEndTime());
         result.setId(caseInstance.getId());
         result.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
-        result.setCaseDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
+        result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
         result.setStartTime(caseInstance.getStartTime());
         result.setStartUserId(caseInstance.getStartUserId());
-        result.setUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()));
+        result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()));
         result.setTenantId(caseInstance.getTenantId());
         return result;
     }
@@ -519,17 +519,17 @@ public class CmmnRestResponseFactory {
         result.setCategory(taskInstance.getCategory());
         if (taskInstance.getScopeDefinitionId() != null && ScopeTypes.CMMN.equals(taskInstance.getScopeType())) {
             result.setCaseDefinitionId(taskInstance.getScopeDefinitionId());
-            result.setCaseDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION, taskInstance.getScopeDefinitionId()));
+            result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, taskInstance.getScopeDefinitionId()));
         }
         
         if (taskInstance.getScopeId() != null && ScopeTypes.CMMN.equals(taskInstance.getScopeType())) {
             result.setCaseInstanceId(taskInstance.getScopeId());
-            result.setCaseInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE, taskInstance.getScopeId()));
+            result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, taskInstance.getScopeId()));
         }
         result.setStartTime(taskInstance.getStartTime());
         result.setTaskDefinitionKey(taskInstance.getTaskDefinitionKey());
         result.setWorkTimeInMillis(taskInstance.getWorkTimeInMillis());
-        result.setUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE, taskInstance.getId()));
+        result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, taskInstance.getId()));
         if (taskInstance.getProcessVariables() != null) {
             Map<String, Object> variableMap = taskInstance.getProcessVariables();
             for (String name : variableMap.keySet()) {
@@ -563,7 +563,7 @@ public class CmmnRestResponseFactory {
         result.setId(variableInstance.getId());
         if (variableInstance.getScopeId() != null && ScopeTypes.CMMN.equals(variableInstance.getScopeType())) {
             result.setCaseInstanceId(variableInstance.getScopeId());
-            result.setCaseInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE, variableInstance.getScopeId()));
+            result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, variableInstance.getScopeId()));
         }
         result.setTaskId(variableInstance.getTaskId());
         result.setVariable(createRestVariable(variableInstance.getVariableName(), variableInstance.getValue(), null, variableInstance.getId(), VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder));
@@ -590,12 +590,12 @@ public class CmmnRestResponseFactory {
         result.setGroupId(identityLink.getGroupId());
         result.setTaskId(identityLink.getTaskId());
         if (StringUtils.isNotEmpty(identityLink.getTaskId())) {
-            result.setTaskUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE, identityLink.getTaskId()));
+            result.setTaskUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, identityLink.getTaskId()));
         }
         
         if (StringUtils.isNotEmpty(identityLink.getScopeId()) && ScopeTypes.CMMN.equals(identityLink.getScopeType())) {
             result.setCaseInstanceId(identityLink.getScopeId());
-            result.setCaseInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE, identityLink.getScopeId()));
+            result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, identityLink.getScopeId()));
         }
         return result;
     }
@@ -615,7 +615,7 @@ public class CmmnRestResponseFactory {
 
     public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String caseDefinitionId, RestUrlBuilder urlBuilder) {
         DecisionTableResponse decisionTableResponse = new DecisionTableResponse(decisionTable);
-        decisionTableResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION_DECISION_TABLES_COLLECTION, caseDefinitionId));
+        decisionTableResponse.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION_DECISION_TABLES_COLLECTION, caseDefinitionId));
 
         return decisionTableResponse;
     }
@@ -635,7 +635,7 @@ public class CmmnRestResponseFactory {
 
     public FormDefinitionResponse createFormDefinitionResponse(FormDefinition formDefinition, String caseDefinitionId, RestUrlBuilder urlBuilder) {
         FormDefinitionResponse formDefinitionResponse = new FormDefinitionResponse(formDefinition);
-        formDefinitionResponse.setUrl(urlBuilder.buildUrl(RestUrls.URL_CASE_DEFINITION_FORM_DEFINITIONS_COLLECTION, caseDefinitionId));
+        formDefinitionResponse.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION_FORM_DEFINITIONS_COLLECTION, caseDefinitionId));
 
         return formDefinitionResponse;
     }

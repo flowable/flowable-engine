@@ -19,7 +19,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 /**
  * @author Tijs Rademakers
@@ -29,8 +29,8 @@ public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/repeatingStage.cmmn"})
     public void testGetCaseDefinitionImage() throws Exception {
         CaseDefinition repeatingStageCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testRepeatingStage").singleResult();
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(
-                        RestUrls.URL_CASE_DEFINITION_IMAGE, repeatingStageCase.getId())), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
+                        CmmnRestUrls.URL_CASE_DEFINITION_IMAGE, repeatingStageCase.getId())), HttpStatus.SC_OK);
         assertNotNull(response.getEntity().getContent());
         assertEquals("image/png", response.getEntity().getContentType().getValue());
         closeResponse(response);
@@ -39,8 +39,8 @@ public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseDefinitionImageWithoutImage() throws Exception {
         CaseDefinition oneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(
-                        RestUrls.URL_CASE_DEFINITION_IMAGE, oneTaskCase.getId())), HttpStatus.SC_NOT_FOUND);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
+                        CmmnRestUrls.URL_CASE_DEFINITION_IMAGE, oneTaskCase.getId())), HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
 
@@ -48,6 +48,6 @@ public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
      * Test getting an unexisting case definition.
      */
     public void testGetUnexistingCaseDefinition() {
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION_IMAGE, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IMAGE, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
     }
 }

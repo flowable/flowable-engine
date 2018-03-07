@@ -31,7 +31,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
 import org.flowable.rest.cmmn.service.HttpMultipartHelper;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -52,7 +52,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         runtimeService.setVariable(caseInstance.getId(), "variable", "caseValue");
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE, 
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE,
                         caseInstance.getId(), "variable")), HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -63,10 +63,10 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         assertEquals("string", responseNode.get("type").asText());
 
         // Unexisting case
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE, "unexisting", "variable")), HttpStatus.SC_NOT_FOUND));
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, "unexisting", "variable")), HttpStatus.SC_NOT_FOUND));
 
         // Unexisting variable
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE, 
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE,
                         caseInstance.getId(), "unexistingVariable")), HttpStatus.SC_NOT_FOUND));
     }
 
@@ -78,7 +78,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         runtimeService.setVariable(caseInstance.getId(), "var", "This is a binary piece of text".getBytes());
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, 
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA,
                         caseInstance.getId(), "var")), HttpStatus.SC_OK);
 
         String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), "utf-8");
@@ -99,7 +99,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         runtimeService.setVariable(caseInstance.getId(), "var", originalSerializable);
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, 
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA,
                         caseInstance.getId(), "var")), HttpStatus.SC_OK);
 
         // Read the serializable from the stream
@@ -121,11 +121,11 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         runtimeService.setVariable(caseInstance.getId(), "localTaskVariable", "this is a plain string variable");
 
         // Try getting data for non-binary variable
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, 
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA,
                         caseInstance.getId(), "localTaskVariable")), HttpStatus.SC_NOT_FOUND));
 
         // Try getting data for unexisting property
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, 
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA,
                         caseInstance.getId(), "unexistingVariable")), HttpStatus.SC_NOT_FOUND));
     }
 
@@ -139,13 +139,13 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(Collections.singletonMap("myVariable", (Object) "processValue")).start();
         
         // Delete variable
-        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE, 
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE,
                         caseInstance.getId(), "myVariable")), HttpStatus.SC_NO_CONTENT));
 
         assertFalse(runtimeService.hasVariable(caseInstance.getId(), "myVariable"));
 
         // Run the same delete again, variable is not there so 404 should be returned
-        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE, 
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE,
                         caseInstance.getId(), "myVariable")), HttpStatus.SC_NOT_FOUND));
     }
 
@@ -165,7 +165,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         requestNode.put("value", "updatedValue");
         requestNode.put("type", "string");
 
-        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "myVar"));
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "myVar"));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
 
@@ -181,7 +181,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
 
         // Try updating unexisting property
         requestNode.put("name", "unexistingVariable");
-        httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "unexistingVariable"));
+        httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "unexistingVariable"));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
     }
@@ -201,7 +201,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         additionalFields.put("name", "binaryVariable");
         additionalFields.put("type", "binary");
 
-        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "binaryVariable"));
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "binaryVariable"));
         httpPut.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, additionalFields));
         CloseableHttpResponse response = executeBinaryRequest(httpPut, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -211,7 +211,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         assertTrue(responseNode.get("value").isNull());
         assertEquals("binary", responseNode.get("type").asText());
         assertNotNull(responseNode.get("valueUrl").isNull());
-        assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "binaryVariable")));
+        assertTrue(responseNode.get("valueUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "binaryVariable")));
 
         // Check actual value of variable in engine
         Object variableValue = runtimeService.getVariable(caseInstance.getId(), "binaryVariable");

@@ -20,6 +20,7 @@ import org.flowable.form.engine.FormEngine;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.rest.application.ContentTypeResolver;
 import org.flowable.rest.application.DefaultContentTypeResolver;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.rest.content.ContentRestUrls;
 import org.flowable.rest.dmn.service.api.DmnRestUrls;
 import org.flowable.rest.form.FormRestUrls;
@@ -93,7 +94,7 @@ public class RestApiAutoConfiguration {
     }
 
     @Configuration
-    @ConditionalOnClass(org.flowable.rest.cmmn.service.api.RestUrls.class)
+    @ConditionalOnClass(CmmnRestUrls.class)
     @ConditionalOnBean(CmmnEngine.class)
     public static class CmmnEngineRestApiConfiguration extends BaseRestApiConfiguration {
 

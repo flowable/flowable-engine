@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.rest.cmmn.service.api.engine.RestIdentityLink;
 import org.flowable.task.api.Task;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,11 +52,11 @@ public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
 
         Task task = getTaskFromRequest(taskId);
 
-        if (family == null || (!RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
+        if (family == null || (!CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
             throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
         }
 
-        boolean isUser = family.equals(RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);
+        boolean isUser = family.equals(CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);
         List<RestIdentityLink> results = new ArrayList<>();
 
         List<IdentityLink> allLinks = taskService.getIdentityLinksForTask(task.getId());

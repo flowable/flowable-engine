@@ -8,7 +8,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -37,7 +37,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             CmmnDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").category("ABC")
                     .addClasspathResource("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
 
-            String baseUrl = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION);
+            String baseUrl = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION);
             assertResultsPresentInDataResponse(baseUrl, firstDeployment.getId(), secondDeployment.getId());
 
             // Check name filtering
@@ -73,7 +73,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
 
             // Check ordering by name
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=name&order=asc"),
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=name&order=asc"),
                     HttpStatus.SC_OK);
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
@@ -82,7 +82,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             assertEquals(secondDeployment.getId(), dataNode.get(1).get("id").textValue());
 
             // Check ordering by deploy time
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc"), HttpStatus.SC_OK);
+            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc"), HttpStatus.SC_OK);
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
             assertEquals(2L, dataNode.size());
@@ -90,7 +90,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             assertEquals(secondDeployment.getId(), dataNode.get(1).get("id").textValue());
 
             // Check ordering by tenantId
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=tenantId&order=desc"), HttpStatus.SC_OK);
+            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=tenantId&order=desc"), HttpStatus.SC_OK);
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
             assertEquals(2L, dataNode.size());
@@ -98,7 +98,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             assertEquals(firstDeployment.getId(), dataNode.get(1).get("id").textValue());
 
             // Check paging
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc&start=1&size=1"), HttpStatus.SC_OK);
+            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc&start=1&size=1"), HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
             dataNode = responseNode.get("data");

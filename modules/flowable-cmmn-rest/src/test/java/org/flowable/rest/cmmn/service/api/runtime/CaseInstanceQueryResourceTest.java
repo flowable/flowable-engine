@@ -22,7 +22,7 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -47,7 +47,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
 
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_QUERY);
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
 
         // Process variables
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -137,7 +137,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         requestNode.put("order", "desc");
         requestNode.put("sort", "caseDefinitionKey");
 
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_QUERY);
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);

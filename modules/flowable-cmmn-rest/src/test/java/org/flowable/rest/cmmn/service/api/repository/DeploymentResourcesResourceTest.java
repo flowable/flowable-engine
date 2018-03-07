@@ -8,7 +8,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -28,7 +28,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
             CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn")
                     .addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCES, deployment.getId()));
+            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCES, deployment.getId()));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
@@ -47,8 +47,8 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
 
             // Check URL's for the resource
             assertNotNull(txtNode);
-            assertTrue(txtNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt")));
-            assertTrue(txtNode.get("contentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt")));
+            assertTrue(txtNode.get("url").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt")));
+            assertTrue(txtNode.get("contentUrl").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt")));
             assertTrue(txtNode.get("mediaType").isNull());
             assertEquals("resource", txtNode.get("type").textValue());
 
@@ -65,7 +65,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
      * Test getting all resources for a single unexisting deployment. GET cmmn-repository/deployments/{deploymentId}/resources
      */
     public void testGetDeploymentResourcesUnexistingDeployment() throws Exception {
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCES, "unexisting"));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCES, "unexisting"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
     }
 }

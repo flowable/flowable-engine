@@ -11,7 +11,7 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -31,7 +31,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
 
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION, caseDefinition.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -46,9 +46,9 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check URL's
         assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
         assertEquals(caseDefinition.getDeploymentId(), responseNode.get("deploymentId").textValue());
-        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId())));
+        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId())));
         assertTrue(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())));
+                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())));
         assertTrue(responseNode.get("diagramResource").isNull());
     }
 
@@ -60,7 +60,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
 
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION, caseDefinition.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -75,18 +75,18 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check URL's
         assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
         assertEquals(caseDefinition.getDeploymentId(), responseNode.get("deploymentId").textValue());
-        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId())));
+        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId())));
         assertTrue(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())));
+                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())));
         assertTrue(URLDecoder.decode(responseNode.get("diagramResource").textValue(), "UTF-8").endsWith(
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getDiagramResourceName())));
+                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getDiagramResourceName())));
     }
 
     /**
      * Test getting an unexisting case-definition. GET repository/case-definitions/{caseDefinitionId}
      */
     public void testGetUnexistingCaseDefinition() throws Exception {
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION, "unexisting"));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
@@ -95,7 +95,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessDefinitionResourceData() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, caseDefinition.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, caseDefinition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
@@ -109,7 +109,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
      * Test getting resource content for an unexisting case definition .
      */
     public void testGetResourceContentForUnexistingCaseDefinition() throws Exception {
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, "unexisting"));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
@@ -122,7 +122,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("category", "updatedcategory");
 
-        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION, caseDefinition.getId()));
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
 

@@ -8,7 +8,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -43,7 +43,7 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
             repositoryService.setCaseDefinitionCategory(repeatingStageCase.getId(), "testCategory");
 
             // Test parameterless call
-            String baseUrl = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION_COLLECTION);
+            String baseUrl = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_COLLECTION);
             assertResultsPresentInDataResponse(baseUrl, firstOneTaskCase.getId(), oneTaskCase.getId(), simpleCaseDef.getId(), repeatingStageCase.getId());
 
             // Verify ACT-2141 Persistent isGraphicalNotation flag for case definitions

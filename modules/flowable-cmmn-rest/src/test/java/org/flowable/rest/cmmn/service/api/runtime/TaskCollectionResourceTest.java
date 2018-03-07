@@ -23,7 +23,7 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -63,7 +63,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             requestNode.put("tenantId", "test");
 
             // Execute the request
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -97,7 +97,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
      */
     public void testCreateTaskNoBody() throws Exception {
         try {
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION));
             httpPost.setEntity(null);
             closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
@@ -156,138 +156,138 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             taskService.setVariableLocal(caseTask.getId(), "localVariable", "localtest");
 
             // Check filter-less to fetch all tasks
-            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION);
+            String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION);
             assertResultsPresentInDataResponse(url, adhocTask.getId(), caseTask.getId());
 
             // Name filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?name=" + encode("Name one");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?name=" + encode("Name one");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Name like filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?nameLike=" + encode("%one");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLike=" + encode("%one");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Description filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?description=" + encode("Description one");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?description=" + encode("Description one");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?description=" + encode("Description two");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?description=" + encode("Description two");
             assertEmptyResultsPresentInDataResponse(url);
 
             // Description like filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?descriptionLike=" + encode("%one");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?descriptionLike=" + encode("%one");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?descriptionLike=" + encode("%two");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?descriptionLike=" + encode("%two");
             assertEmptyResultsPresentInDataResponse(url);
 
             // Priority filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?priority=100";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?priority=100";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Mininmum Priority filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?minimumPriority=70";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?minimumPriority=70";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Maximum Priority filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?maximumPriority=70";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?maximumPriority=70";
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Owner filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?owner=owner";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?owner=owner";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?owner=kermit";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?owner=kermit";
             assertEmptyResultsPresentInDataResponse(url);
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?ownerLike=" + encode("%ner");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?ownerLike=" + encode("%ner");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?ownerLike=" + encode("kerm%");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?ownerLike=" + encode("kerm%");
             assertEmptyResultsPresentInDataResponse(url);
 
             // Assignee filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?assignee=gonzo";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?assignee=gonzo";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?assignee=kermit";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?assignee=kermit";
             assertEmptyResultsPresentInDataResponse(url);
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?assigneeLike=" + encode("gon%");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?assigneeLike=" + encode("gon%");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?assigneeLike=" + encode("kerm%");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?assigneeLike=" + encode("kerm%");
             assertEmptyResultsPresentInDataResponse(url);
 
             // Unassigned filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?unassigned=true";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?unassigned=true";
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Candidate user filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=kermit";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?candidateUser=kermit";
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Candidate group filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales";
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Involved user filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Case instance filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?caseInstanceId=" + caseInstance.getId();
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceId=" + caseInstance.getId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // CreatedOn filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?createdOn=" + getISODateString(adhocTaskCreate.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdOn=" + getISODateString(adhocTaskCreate.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // CreatedAfter filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getISODateString(inBetweenTaskCreation.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getISODateString(inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // CreatedBefore filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getISODateString(inBetweenTaskCreation.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getISODateString(inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Subtask exclusion
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?excludeSubTasks=true";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?excludeSubTasks=true";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Task definition key filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?taskDefinitionKey=theTask";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?taskDefinitionKey=theTask";
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Task definition key like filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?taskDefinitionKeyLike=" + encode("theT%");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?taskDefinitionKeyLike=" + encode("theT%");
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Duedate filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getISODateString(adhocTaskCreate.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getISODateString(adhocTaskCreate.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Due after filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getISODateString(inBetweenTaskCreation.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getISODateString(inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Due before filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?dueBefore=" + getISODateString(inBetweenTaskCreation.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueBefore=" + getISODateString(inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Without tenantId filtering before tenant set
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutTenantId=true";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId();
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Tenant id filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?tenantId=myTenant";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?tenantId=myTenant";
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Category filtering
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
             
         } finally {

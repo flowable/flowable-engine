@@ -17,8 +17,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
-import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,7 +49,7 @@ public class TaskSubTaskCollectionResourceTest extends BaseSpringRestTestCase {
         taskService.saveTask(subTask2);
 
         // Request all sub tasks
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_SUBTASKS_COLLECTION, parentTask.getId())), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_SUBTASKS_COLLECTION, parentTask.getId())), HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertNotNull(responseNode);

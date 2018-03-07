@@ -39,7 +39,7 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.rest.cmmn.conf.ObjectVariableSerializationDisabledApplicationConfiguration;
 import org.flowable.rest.cmmn.service.HttpMultipartHelper;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.rest.cmmn.util.TestServerUtil;
 import org.flowable.rest.cmmn.util.TestServerUtil.TestServer;
 import org.flowable.idm.api.Group;
@@ -129,7 +129,7 @@ public class SerializableVariablesDisabledTest {
 
         // Upload a valid CMMN-file using multipart-data
         HttpPost httpPost = new HttpPost(serverUrlPrefix +
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_VARIABLE_COLLECTION, caseInstance.getId()));
+                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_COLLECTION, caseInstance.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
 
         // We have serializeable object disabled, we should get a 415.
@@ -163,7 +163,7 @@ public class SerializableVariablesDisabledTest {
         additionalFields.put("type", "serializable");
 
         HttpPost httpPost = new HttpPost(serverUrlPrefix +
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
+                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
 
         // We have serializeable object disabled, we should get a 415.

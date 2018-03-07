@@ -28,7 +28,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -60,7 +60,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertNotNull(task);
 
-        String url = buildUrl(RestUrls.URL_TASK, task.getId());
+        String url = buildUrl(CmmnRestUrls.URL_TASK, task.getId());
         CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
 
         // Check resulting task
@@ -79,8 +79,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         assertTrue(responseNode.get("delegationState").isNull());
         assertEquals("", responseNode.get("tenantId").textValue());
 
-        assertEquals(responseNode.get("caseInstanceUrl").asText(), buildUrl(RestUrls.URL_CASE_INSTANCE, task.getScopeId()));
-        assertEquals(responseNode.get("caseDefinitionUrl").asText(), buildUrl(RestUrls.URL_CASE_DEFINITION, task.getScopeDefinitionId()));
+        assertEquals(responseNode.get("caseInstanceUrl").asText(), buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, task.getScopeId()));
+        assertEquals(responseNode.get("caseDefinitionUrl").asText(), buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, task.getScopeDefinitionId()));
         assertEquals(responseNode.get("url").asText(), url);
     }
 
@@ -108,7 +108,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task.setPriority(20);
             taskService.saveTask(task);
 
-            String url = buildUrl(RestUrls.URL_TASK, task.getId());
+            String url = buildUrl(CmmnRestUrls.URL_TASK, task.getId());
             CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
 
             // Check resulting task
@@ -127,7 +127,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertTrue(responseNode.get("caseDefinitionId").isNull());
             assertEquals("", responseNode.get("tenantId").textValue());
 
-            assertEquals(responseNode.get("parentTaskUrl").asText(), buildUrl(RestUrls.URL_TASK, parentTask.getId()));
+            assertEquals(responseNode.get("parentTaskUrl").asText(), buildUrl(CmmnRestUrls.URL_TASK, parentTask.getId()));
             assertEquals(responseNode.get("url").asText(), url);
 
         } finally {
@@ -164,7 +164,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             ObjectNode requestNode = objectMapper.createObjectNode();
 
             // Execute the request with an empty request JSON-object
-            HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()));
+            HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, task.getId()));
             httpPut.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
 
@@ -213,7 +213,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             requestNode.put("parentTaskId", parentTask.getId());
 
             // Execute the request
-            HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()));
+            HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, task.getId()));
             httpPut.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
 
@@ -243,7 +243,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         ObjectNode requestNode = objectMapper.createObjectNode();
 
         // Execute the request with an empty request JSON-object
-        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, "unexistingtask"));
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, "unexistingtask"));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_NOT_FOUND));
     }
@@ -260,7 +260,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             String taskId = task.getId();
 
             // Execute the request
-            HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
             closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
             task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
@@ -277,7 +277,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             taskId = task.getId();
 
             // Execute the request
-            httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId) + "?cascadeHistory=true");
+            httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId) + "?cascadeHistory=true");
             closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
             task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
@@ -294,7 +294,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             taskId = task.getId();
 
             // Execute the request
-            httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId) + "?deleteReason=fortestingpurposes");
+            httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId) + "?deleteReason=fortestingpurposes");
             closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
             task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
@@ -327,7 +327,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
      * Test updating an unexisting task. PUT runtime/tasks/{taskId}
      */
     public void testDeleteUnexistingTask() throws Exception {
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, "unexistingtask"));
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, "unexistingtask"));
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
     }
 
@@ -340,7 +340,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertNotNull(task);
 
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()));
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, task.getId()));
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_FORBIDDEN));
     }
 
@@ -357,7 +357,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
             requestNode.put("action", "complete");
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
@@ -384,7 +384,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             var2.put("name", "var2");
             var2.put("value", "Second value");
 
-            httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
@@ -448,7 +448,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             ObjectNode requestNode = objectMapper.createObjectNode();
             requestNode.put("action", "claim");
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -500,7 +500,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         // Get task id
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION);
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION);
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
@@ -514,7 +514,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         requestNode.put("assignee", "kermit");
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
@@ -524,7 +524,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "claim");
         httpPost = new HttpPost(SERVER_URL_PREFIX +
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
         assertEquals(0L, taskService.createTaskQuery().taskAssignee("kermit").count());
@@ -533,7 +533,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "claim");
         requestNode.put("assignee", "kermit");
-        httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+        httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
         assertEquals(1L, taskService.createTaskQuery().taskAssignee("kermit").count());
@@ -553,7 +553,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             // Delegating without assignee fails
             ObjectNode requestNode = objectMapper.createObjectNode();
             requestNode.put("action", "delegate");
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
@@ -601,7 +601,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             // Resolve the task and check result
             ObjectNode requestNode = objectMapper.createObjectNode();
             requestNode.put("action", "resolve");
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
@@ -640,7 +640,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
             requestNode.put("action", "unexistingaction");
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
@@ -665,7 +665,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     public void testActionsUnexistingTask() throws Exception {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "complete");
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, "unexisting"));
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, "unexisting"));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_NOT_FOUND));
 

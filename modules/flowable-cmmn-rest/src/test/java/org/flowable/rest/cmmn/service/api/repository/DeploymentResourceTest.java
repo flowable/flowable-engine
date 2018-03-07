@@ -10,7 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
 import org.flowable.rest.cmmn.service.HttpMultipartHelper;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,7 +28,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     public void testPostNewDeploymentCmmnFile() throws Exception {
         try {
             // Upload a valid BPMN-file using multipart-data
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION));
             httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("oneHumanTaskCase.cmmn", "application/xml",
                     ReflectUtil.getResourceAsStream("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn"), null));
             CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
@@ -53,7 +53,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             assertEquals("oneHumanTaskCase", name);
 
             assertNotNull(url);
-            assertTrue(url.endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId)));
+            assertTrue(url.endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId)));
 
             // No deployment-category should have been set
             assertNull(category);
@@ -79,7 +79,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
      */
     public void testPostNewDeploymentInvalidFile() throws Exception {
         // Upload a valid BPMN-file using multipart-data
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION));
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("oneTaskProcess.invalidfile", "application/xml",
                 ReflectUtil.getResourceAsStream("org/flowable/rest/cmmn/service/api/repository/oneHumanTaskCase.cmmn"), null));
         closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
@@ -92,7 +92,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     public void testGetDeployment() throws Exception {
         CmmnDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -118,14 +118,14 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         assertNotNull(deployTime);
 
         assertNotNull(url);
-        assertTrue(url.endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId)));
+        assertTrue(url.endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, deploymentId)));
     }
 
     /**
      * Test getting an unexisting deployment. GET repository/deployments/{deploymentId}
      */
     public void testGetUnexistingDeployment() throws Exception {
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, "unexisting"));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
@@ -139,7 +139,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
         assertNotNull(existingDeployment);
 
         // Delete the deployment
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT);
         closeResponse(response);
 
@@ -151,7 +151,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
      * Test deleting an unexisting deployment. DELETE repository/deployments/{deploymentId}
      */
     public void testDeleteUnexistingDeployment() throws Exception {
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, "unexisting"));
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }

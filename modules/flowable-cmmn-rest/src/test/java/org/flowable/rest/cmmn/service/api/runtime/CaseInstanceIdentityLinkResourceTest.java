@@ -19,7 +19,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,7 +44,7 @@ public class CaseInstanceIdentityLinkResourceTest extends BaseSpringRestTestCase
 
         // Execute the request
         CloseableHttpResponse response = executeRequest(
-                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_IDENTITYLINKS_COLLECTION, caseInstance.getId())), HttpStatus.SC_OK);
+                new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_IDENTITYLINKS_COLLECTION, caseInstance.getId())), HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -62,13 +62,13 @@ public class CaseInstanceIdentityLinkResourceTest extends BaseSpringRestTestCase
                 if (link.get("user").textValue().equals("john")) {
                     assertEquals("customType", link.get("type").textValue());
                     assertTrue(link.get("group").isNull());
-                    assertTrue(link.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstance.getId(), "john", "customType")));
+                    assertTrue(link.get("url").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstance.getId(), "john", "customType")));
                     johnFound = true;
                 } else {
                     assertEquals("paul", link.get("user").textValue());
                     assertEquals("candidate", link.get("type").textValue());
                     assertTrue(link.get("group").isNull());
-                    assertTrue(link.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstance.getId(), "paul", "candidate")));
+                    assertTrue(link.get("url").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstance.getId(), "paul", "candidate")));
                     paulFound = true;
                 }
             }

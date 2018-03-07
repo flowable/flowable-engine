@@ -11,7 +11,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -32,15 +32,15 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
                     .addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
             // Build up the URL manually to make sure resource-id gets encoded correctly as one piece
-            HttpGet httpGet = new HttpGet(buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), encode(rawResourceName)));
+            HttpGet httpGet = new HttpGet(buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), encode(rawResourceName)));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
             // Check URL's for the resource
-            assertEquals(responseNode.get("url").textValue(), buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName));
-            assertEquals(responseNode.get("contentUrl").textValue(), buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName));
+            assertEquals(responseNode.get("url").textValue(), buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName));
+            assertEquals(responseNode.get("contentUrl").textValue(), buildUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), rawResourceName));
             assertEquals("text/xml", responseNode.get("mediaType").textValue());
             assertEquals("caseDefinition", responseNode.get("type").textValue());
 
@@ -57,7 +57,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
      * Test getting a single resource for an unexisting deployment. GET repository/deployments/{deploymentId}/resources/{resourceId}
      */
     public void testGetDeploymentResourceUnexistingDeployment() throws Exception {
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, "unexisting", "resource.png"));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, "unexisting", "resource.png"));
         httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "image/png,application/json"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
     }
@@ -69,7 +69,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
         try {
             CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "unexisting-resource.png"));
+            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "unexisting-resource.png"));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "image/png,application/json"));
             closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
 
@@ -89,7 +89,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
         try {
             CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt"));
+            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt"));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "text/plain"));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             String responseAsString = IOUtils.toString(response.getEntity().getContent(), "utf-8");

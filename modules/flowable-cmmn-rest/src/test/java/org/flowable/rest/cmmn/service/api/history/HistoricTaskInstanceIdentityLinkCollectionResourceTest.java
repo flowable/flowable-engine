@@ -22,7 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -51,7 +51,7 @@ public class HistoricTaskInstanceIdentityLinkCollectionResourceTest extends Base
         taskService.setAssignee(task.getId(), "fozzie");
         taskService.setOwner(task.getId(), "test");
 
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_IDENTITY_LINKS, task.getId());
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_IDENTITY_LINKS, task.getId());
 
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);

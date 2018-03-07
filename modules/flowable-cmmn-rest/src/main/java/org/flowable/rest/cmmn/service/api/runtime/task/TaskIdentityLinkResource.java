@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.rest.cmmn.service.api.engine.RestIdentityLink;
 import org.flowable.task.api.Task;
 import org.springframework.http.HttpStatus;
@@ -79,7 +79,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
         // Check if identitylink to delete exists
         getIdentityLink(family, identityId, type, task.getId());
 
-        if (RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family)) {
+        if (CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family)) {
             taskService.deleteUserIdentityLink(task.getId(), identityId, type);
         } else {
             taskService.deleteGroupIdentityLink(task.getId(), identityId, type);
@@ -89,7 +89,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
     }
 
     protected void validateIdentityLinkArguments(String family, String identityId, String type) {
-        if (family == null || (!RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
+        if (family == null || (!CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
             throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
         }
         if (identityId == null) {
@@ -101,7 +101,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
     }
 
     protected IdentityLink getIdentityLink(String family, String identityId, String type, String taskId) {
-        boolean isUser = family.equals(RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);
+        boolean isUser = family.equals(CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);
 
         // Perhaps it would be better to offer getting a single identitylink
         // from the API

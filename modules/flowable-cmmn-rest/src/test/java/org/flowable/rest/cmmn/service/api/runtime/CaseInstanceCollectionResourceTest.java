@@ -24,8 +24,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
-import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -47,35 +46,35 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         String id = caseInstance.getId();
 
         // Test without any parameters
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION);
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
         assertResultsPresentInDataResponse(url, id);
 
         // Process instance id
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?id=" + id;
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?id=" + id;
         assertResultsPresentInDataResponse(url, id);
 
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?id=anotherId";
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?id=anotherId";
         assertResultsPresentInDataResponse(url);
 
         // Process instance business key
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessKey=myBusinessKey";
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessKey=myBusinessKey";
         assertResultsPresentInDataResponse(url, id);
 
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessKey=anotherBusinessKey";
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessKey=anotherBusinessKey";
         assertResultsPresentInDataResponse(url);
 
         // Process definition key
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionKey=oneHumanTaskCase";
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionKey=oneHumanTaskCase";
         assertResultsPresentInDataResponse(url, id);
 
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionKey=caseTwo";
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionKey=caseTwo";
         assertResultsPresentInDataResponse(url);
 
         // Process definition id
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId();
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId();
         assertResultsPresentInDataResponse(url, id);
 
-        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionId=anotherId";
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionId=anotherId";
         assertResultsPresentInDataResponse(url);
     }
 
@@ -88,7 +87,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         String id = caseInstance.getId();
 
         // Test without tenant id
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?withoutTenantId=true";
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?withoutTenantId=true";
         assertResultsPresentInDataResponse(url, id);
 
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
@@ -99,21 +98,21 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
             String idWithTenant = caseInstance.getId();
     
             // Test tenant id
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantId=myTenant";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantId=myTenant";
             assertResultsPresentInDataResponse(url, idWithTenant);
     
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantId=anotherTenant";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantId=anotherTenant";
             assertResultsPresentInDataResponse(url);
     
             // Test tenant id like
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantIdLike=" + encode("%enant");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantIdLike=" + encode("%enant");
             assertResultsPresentInDataResponse(url, idWithTenant);
     
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantIdLike=" + encode("%what");
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?tenantIdLike=" + encode("%what");
             assertResultsPresentInDataResponse(url);
     
             // Test without tenant id
-            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION) + "?withoutTenantId=true";
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, id);
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
@@ -130,7 +129,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         // Start using case definition key
         requestNode.put("caseDefinitionKey", "oneHumanTaskCase");
 
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION));
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
 
@@ -147,8 +146,8 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         assertEquals(caseInstance.getId(), responseNode.get("id").textValue());
         assertTrue(responseNode.get("businessKey").isNull());
 
-        assertTrue(responseNode.get("url").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE, caseInstance.getId())));
-        assertTrue(responseNode.get("caseDefinitionUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId())));
+        assertTrue(responseNode.get("url").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId())));
+        assertTrue(responseNode.get("caseDefinitionUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId())));
         runtimeService.terminateCaseInstance(caseInstance.getId());
 
         // Start using case definition id
@@ -166,8 +165,8 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         assertEquals(caseInstance.getId(), responseNode.get("id").textValue());
         assertTrue(responseNode.get("businessKey").isNull());
 
-        assertTrue(responseNode.get("url").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE, caseInstance.getId())));
-        assertTrue(responseNode.get("caseDefinitionUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId())));
+        assertTrue(responseNode.get("url").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId())));
+        assertTrue(responseNode.get("caseDefinitionUrl").asText().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId())));
         runtimeService.terminateCaseInstance(caseInstance.getId());
 
         // Start using process definition id and business key
@@ -235,7 +234,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         requestNode.put("caseDefinitionKey", "oneHumanTaskCase");
         requestNode.set("variables", variablesNode);
 
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION));
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
         closeResponse(response);
@@ -270,7 +269,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
             requestNode.put("caseDefinitionKey", "oneHumanTaskCase");
             requestNode.put("tenantId", "tenant1");
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION));
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             closeResponse(response);
@@ -296,7 +295,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         ObjectNode requestNode = objectMapper.createObjectNode();
 
         // Try starting without id and key
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_COLLECTION));
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 

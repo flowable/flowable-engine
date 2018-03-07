@@ -20,7 +20,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,8 +39,8 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
     public void testGetCaseInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(
-                        RestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
+                        CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_OK);
 
         assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
 
@@ -56,7 +56,7 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertNotNull(task);
         taskService.complete(task.getId());
 
-        response = executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_NO_CONTENT);
+        response = executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_NO_CONTENT);
         assertEquals(HttpStatus.SC_NO_CONTENT, response.getStatusLine().getStatusCode());
         closeResponse(response);
     }

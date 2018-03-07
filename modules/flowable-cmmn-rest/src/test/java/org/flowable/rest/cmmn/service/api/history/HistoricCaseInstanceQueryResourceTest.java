@@ -22,7 +22,7 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -54,7 +54,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
 
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
 
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_CASE_INSTANCE_QUERY);
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_QUERY);
 
         // Process variables
         ObjectNode requestNode = objectMapper.createObjectNode();

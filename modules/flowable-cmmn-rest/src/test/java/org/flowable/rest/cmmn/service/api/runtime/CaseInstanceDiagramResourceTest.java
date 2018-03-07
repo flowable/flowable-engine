@@ -19,7 +19,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.rest.cmmn.service.BaseSpringRestTestCase;
-import org.flowable.rest.cmmn.service.api.RestUrls;
+import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
 
 /**
  * @author Tijs Rademakers
@@ -30,7 +30,7 @@ public class CaseInstanceDiagramResourceTest extends BaseSpringRestTestCase {
     public void testGetCaseDiagram() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingStage").start();
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_DIAGRAM, caseInstance.getId())),
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_DIAGRAM, caseInstance.getId())),
                 HttpStatus.SC_OK);
         assertNotNull(response.getEntity().getContent());
         assertEquals("image/png", response.getEntity().getContentType().getValue());
@@ -40,13 +40,13 @@ public class CaseInstanceDiagramResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/rest/cmmn/service/api/oneHumanTaskCase.cmmn" })
     public void testGetCaseDiagramWithoutDiagram() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_DIAGRAM, caseInstance.getId())), HttpStatus.SC_BAD_REQUEST));
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_DIAGRAM, caseInstance.getId())), HttpStatus.SC_BAD_REQUEST));
     }
 
     /**
      * Test getting an unexisting case instance.
      */
     public void testGetUnexistingCaseInstance() {
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_CASE_INSTANCE_DIAGRAM, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_DIAGRAM, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
     }
 }
