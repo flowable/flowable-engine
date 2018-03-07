@@ -12,12 +12,6 @@
  */
 package org.flowable.cmmn.engine.configurator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -25,15 +19,21 @@ import org.flowable.cmmn.engine.configurator.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.configurator.impl.process.DefaultProcessInstanceService;
 import org.flowable.cmmn.engine.impl.callback.ChildProcessInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.AbstractEngineConfigurator;
 import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -117,15 +117,13 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     @Override
     protected void initIdGenerator(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         super.initIdGenerator(engineConfiguration, targetEngineConfiguration);
-        if (targetEngineConfiguration instanceof  CmmnEngineConfiguration) {
-            CmmnEngineConfiguration targetCmmnEngineConfiguration = (CmmnEngineConfiguration) targetEngineConfiguration;
-            if (targetCmmnEngineConfiguration.getTaskIdGenerator() == null) {
-                if (engineConfiguration instanceof ProcessEngineConfiguration) {
-                    targetCmmnEngineConfiguration.setTaskIdGenerator(((ProcessEngineConfiguration) engineConfiguration).getTaskIdGenerator());
-                } else if (engineConfiguration instanceof CmmnEngineConfiguration) {
-                    targetCmmnEngineConfiguration.setTaskIdGenerator(((CmmnEngineConfiguration) engineConfiguration).getTaskIdGenerator());
+        if (targetEngineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
+            HasTaskIdGeneratorEngineConfiguration<?> targetEgineConfiguration = (HasTaskIdGeneratorEngineConfiguration) targetEngineConfiguration;
+            if (targetEgineConfiguration.getTaskIdGenerator() == null) {
+                if (engineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
+                    targetEgineConfiguration.setTaskIdGenerator(((HasTaskIdGeneratorEngineConfiguration) engineConfiguration).getTaskIdGenerator());
                 } else {
-                    targetCmmnEngineConfiguration.setTaskIdGenerator(engineConfiguration.getIdGenerator());
+                    targetEgineConfiguration.setTaskIdGenerator(engineConfiguration.getIdGenerator());
                 }
             }
         }

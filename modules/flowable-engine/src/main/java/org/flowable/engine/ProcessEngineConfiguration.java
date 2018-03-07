@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.history.HistoryLevel;
@@ -78,7 +79,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration {
+public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration implements HasTaskIdGeneratorEngineConfiguration<ProcessEngineConfiguration> {
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
     protected int idBlockSize = 2500;
@@ -677,10 +678,12 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         }
     }
 
+    @Override
     public IdGenerator getTaskIdGenerator() {
         return taskIdGenerator;
     }
 
+    @Override
     public ProcessEngineConfiguration setTaskIdGenerator(IdGenerator taskIdGenerator) {
         this.taskIdGenerator = taskIdGenerator;
         return this;
