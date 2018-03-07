@@ -26,13 +26,13 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Service for invoking Flowable REST services.
  */
 @Service
-public class CmmnDefinitionService {
+public class CaseDefinitionService {
 
     @Autowired
     protected FlowableClientService clientUtil;
 
-    public JsonNode listCmmnDefinitions(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-        URIBuilder builder = clientUtil.createUriBuilder("cmmn-repository/cmmn-definitions");
+    public JsonNode listCaseDefinitions(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
+        URIBuilder builder = clientUtil.createUriBuilder("cmmn-repository/case-definitions");
 
         for (String name : parameterMap.keySet()) {
             builder.addParameter(name, parameterMap.get(name)[0]);
@@ -41,13 +41,13 @@ public class CmmnDefinitionService {
         return clientUtil.executeRequest(get, serverConfig);
     }
 
-    public JsonNode getCmmnDefinition(ServerConfig serverConfig, String caseDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "cmmn-repository/cmmn-definitions/" + caseDefinitionId));
+    public JsonNode getCaseDefinition(ServerConfig serverConfig, String caseDefinitionId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "cmmn-repository/case-definitions/" + caseDefinitionId));
         return clientUtil.executeRequest(get, serverConfig);
     }
 
-    public JsonNode getCmmnDefinitionForms(ServerConfig serverConfig, String caseDefinitionId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/cmmn-definitions/" + caseDefinitionId + "/form-definitions"));
+    public JsonNode getCaseDefinitionForms(ServerConfig serverConfig, String caseDefinitionId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/case-definitions/" + caseDefinitionId + "/form-definitions"));
         return clientUtil.executeRequest(get, serverConfig);
     }
 }

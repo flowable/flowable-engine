@@ -15,6 +15,7 @@ package org.flowable.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.IdentityService;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.GetPotentialStarterGroupsCmd;
@@ -158,6 +159,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
     }
     
     protected IdmIdentityService getIdmIdentityService() {
-        return EngineServiceUtil.getIdmIdentityService(processEngineConfiguration);
+        IdmIdentityService idmIdentityService = EngineServiceUtil.getIdmIdentityService(processEngineConfiguration);
+        if (idmIdentityService == null) {
+            throw new FlowableException("Trying to use idm identity service when it is not initialized");
+        }
+        return idmIdentityService;
     }
 }

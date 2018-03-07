@@ -15,6 +15,7 @@ package org.flowable.test.spring.boot;
 import flowable.Application;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.idm.api.IdmIdentityService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,12 @@ public class BasicApplicationTest {
     @Autowired
     private RepositoryService repositoryService;
 
+    @Autowired
+    private IdmIdentityService idmIdentityService;
+
     @Test
     public void launchProcessDefinition() {
+        assertThat(idmIdentityService).as("Idm identity service").isNotNull();
         assertThat(repositoryService.createProcessDefinitionQuery().count())
             .as("All process definitions")
             .isEqualTo(2);

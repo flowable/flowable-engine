@@ -29,6 +29,7 @@ import org.flowable.dmn.spring.autodeployment.SingleResourceAutoDeploymentStrate
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.spring.common.SpringEngineConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -41,7 +42,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author David Syer
  * @author Joram Barrez
  */
-public class SpringDmnEngineConfiguration extends DmnEngineConfiguration implements ApplicationContextAware {
+public class SpringDmnEngineConfiguration extends DmnEngineConfiguration implements SpringEngineConfiguration {
 
     protected PlatformTransactionManager transactionManager;
     protected String deploymentName = "SpringAutoDeployment";
@@ -111,30 +112,38 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
         }
     }
 
+    @Override
     public PlatformTransactionManager getTransactionManager() {
         return transactionManager;
     }
 
+    @Override
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public String getDeploymentName() {
         return deploymentName;
     }
 
+    @Override
     public void setDeploymentName(String deploymentName) {
         this.deploymentName = deploymentName;
     }
 
+    @Override
     public Resource[] getDeploymentResources() {
         return deploymentResources;
     }
 
-    public void setDeploymentResources(Resource[] deploymentResources) {
+    @Override
+    public void
+    setDeploymentResources(Resource[] deploymentResources) {
         this.deploymentResources = deploymentResources;
     }
 
+    @Override
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
@@ -144,10 +153,12 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public String getDeploymentMode() {
         return deploymentMode;
     }
 
+    @Override
     public void setDeploymentMode(String deploymentMode) {
         this.deploymentMode = deploymentMode;
     }

@@ -202,7 +202,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_CMMN_";
 
-    protected String cmmnEngineName = "default";
+    protected String cmmnEngineName = CmmnEngines.NAME_DEFAULT;
 
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 
@@ -305,6 +305,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration
     protected int historicTaskQueryLimit;
 
     protected int caseQueryLimit = 20000;
+    protected int historicCaseQueryLimit = 20000;
 
     // Variable support
     protected VariableTypes variableTypes;
@@ -1826,6 +1827,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
+    public int getHistoricCaseQueryLimit() {
+        return historicCaseQueryLimit;
+    }
+
+    public void setHistoricCaseQueryLimit(int historicCaseQueryLimit) {
+        this.historicCaseQueryLimit = historicCaseQueryLimit;
+    }
+
     public boolean isSerializableVariableTypeTrackDeserializedObjects() {
         return serializableVariableTypeTrackDeserializedObjects;
     }
@@ -1909,6 +1918,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration
 
     public List<EngineConfigurator> getConfigurators() {
         return configurators;
+    }
+
+    public CmmnEngineConfiguration addConfigurator(EngineConfigurator configurator) {
+        if (configurators == null) {
+            configurators = new ArrayList<>();
+        }
+        configurators.add(configurator);
+        return this;
     }
 
     public CmmnEngineConfiguration setConfigurators(List<EngineConfigurator> configurators) {

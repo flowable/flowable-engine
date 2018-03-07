@@ -12,6 +12,15 @@
  */
 package org.flowable.spring.boot;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.sql.DataSource;
+
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.spring.common.SpringEngineConfiguration;
 import org.slf4j.Logger;
@@ -21,14 +30,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Base auto configuration for the different engines.
