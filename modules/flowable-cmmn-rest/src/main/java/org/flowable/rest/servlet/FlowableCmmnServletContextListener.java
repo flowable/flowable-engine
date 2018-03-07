@@ -17,7 +17,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnEngines;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class FlowableCmmnServletContextListener implements ServletContextListene
     public void contextInitialized(ServletContextEvent event) {
         LOGGER.info("Booting Flowable CMMN Engine");
         try {
-            cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromResourceDefault().buildCmmnEngine();
+            cmmnEngine = CmmnEngines.getDefaultCmmnEngine();
         } catch (Exception e) {
             LOGGER.error("Error starting the Flowable CMMN REST API", e);
         }
