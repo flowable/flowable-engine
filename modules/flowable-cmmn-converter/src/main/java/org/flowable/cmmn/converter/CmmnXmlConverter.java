@@ -18,26 +18,7 @@ import org.flowable.cmmn.converter.export.CaseExport;
 import org.flowable.cmmn.converter.export.CmmnDIExport;
 import org.flowable.cmmn.converter.export.DefinitionsRootExport;
 import org.flowable.cmmn.converter.export.StageExport;
-import org.flowable.cmmn.model.Association;
-import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.Case;
-import org.flowable.cmmn.model.CaseElement;
-import org.flowable.cmmn.model.CmmnDiEdge;
-import org.flowable.cmmn.model.CmmnDiShape;
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.Criterion;
-import org.flowable.cmmn.model.DecisionTask;
-import org.flowable.cmmn.model.HasEntryCriteria;
-import org.flowable.cmmn.model.HasExitCriteria;
-import org.flowable.cmmn.model.PlanFragment;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.ProcessTask;
-import org.flowable.cmmn.model.Sentry;
-import org.flowable.cmmn.model.SentryOnPart;
-import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.Task;
-import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.*;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.io.InputStreamProvider;
 import org.slf4j.Logger;
@@ -475,6 +456,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     criterion.setSentry(sentry);
                     planItem.addEntryCriterion(criterion);
                 }
+            } else if (planItemDefinition instanceof UserEventListener) {
+                //TODO... implement @Dennis Federico
+                throw new UnsupportedOperationException("Not implemented yet!");
             }
 
         }
