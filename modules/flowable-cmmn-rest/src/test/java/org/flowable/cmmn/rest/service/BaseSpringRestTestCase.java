@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.TimerTask;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -369,25 +368,6 @@ public class BaseSpringRestTestCase extends TestCase {
 
         if (caseInstance != null) {
             throw new AssertionFailedError("Expected finished case instance '" + caseInstanceId + "' but it was still in the db");
-        }
-    }
-
-    private static class InterruptTask extends TimerTask {
-        protected boolean timeLimitExceeded;
-        protected Thread thread;
-
-        public InterruptTask(Thread thread) {
-            this.thread = thread;
-        }
-
-        public boolean isTimeLimitExceeded() {
-            return timeLimitExceeded;
-        }
-
-        @Override
-        public void run() {
-            timeLimitExceeded = true;
-            thread.interrupt();
         }
     }
 
