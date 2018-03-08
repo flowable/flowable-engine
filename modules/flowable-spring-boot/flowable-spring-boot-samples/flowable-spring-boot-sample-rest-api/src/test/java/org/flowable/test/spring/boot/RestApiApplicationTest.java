@@ -20,8 +20,8 @@ import java.util.Base64;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.cmmn.service.api.repository.CaseDefinitionResponse;
 import org.flowable.rest.content.service.api.content.ContentItemResponse;
 import org.flowable.rest.dmn.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
