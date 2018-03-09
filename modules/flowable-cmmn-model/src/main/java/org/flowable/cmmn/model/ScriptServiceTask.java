@@ -23,7 +23,7 @@ public class ScriptServiceTask extends ServiceTask {
 
     public static final String SCRIPT_TASK = "script";
 
-    protected boolean autoStoreVariables; // see https://activiti.atlassian.net/browse/ACT-1626
+    protected boolean autoStoreVariables;
 
     public ScriptServiceTask() {
         this.type = SCRIPT_TASK;
