@@ -87,6 +87,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new DecisionXmlConverter());
         addElementConverter(new DecisionTaskXmlConverter());
         addElementConverter(new TimerEventListenerXmlConverter());
+        addElementConverter(new UserEventListenerXmlConverter());
         addElementConverter(new PlanItemStartTriggerXmlConverter());
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
@@ -456,11 +457,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     criterion.setSentry(sentry);
                     planItem.addEntryCriterion(criterion);
                 }
-            } else if (planItemDefinition instanceof UserEventListener) {
-                //TODO... implement @Dennis Federico
-                throw new UnsupportedOperationException("Not implemented yet!");
             }
-
         }
 
     }

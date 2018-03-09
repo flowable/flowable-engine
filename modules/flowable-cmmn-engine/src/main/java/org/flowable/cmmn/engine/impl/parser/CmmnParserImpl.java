@@ -132,12 +132,15 @@ public class CmmnParserImpl implements CmmnParser {
             } else if (planItemDefinition instanceof TimerEventListener) {
                 TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createTimerEventListenerActivityBehavior(planItem, timerEventListener));
+
             } else if (planItemDefinition instanceof UserEventListener) {
-                //TODO... implement @Dennis Federico
-                throw new UnsupportedOperationException("Not Implemented yet!!!");
+                UserEventListener userEventListener = (UserEventListener) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createUserEventListenerActivityBehavior(planItem, userEventListener));
+
             } else if (planItemDefinition instanceof ScriptServiceTask) {
                 //ScriptServiceTask Is-A ServiceTask thus should be check before
                 planItem.setBehavior(activityBehaviorFactory.createScriptTaskActivityBehavior(planItem, (ScriptServiceTask) planItemDefinition));
+
             } else if (planItemDefinition instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
 

@@ -76,6 +76,10 @@ public interface CmmnRuntimeService {
     void removeLocalVariables(String caseInstanceId, Collection<String> variableNames);
     
     CaseInstanceQuery createCaseInstanceQuery();
+
+    //TODO List<UserEvent> getUserEvents() ... delegates to PlanItemInstanceQuery
+
+    //TODO completeUserEvent(String id)
     
     PlanItemInstanceQuery createPlanItemInstanceQuery();
     
