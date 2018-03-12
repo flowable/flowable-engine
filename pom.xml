@@ -667,7 +667,7 @@
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
-				<version>3.4.5</version>
+				<version>3.4.6</version>
 			</dependency>
 			<dependency>
               <groupId>org.mybatis</groupId>
