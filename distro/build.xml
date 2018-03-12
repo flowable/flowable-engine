@@ -106,6 +106,9 @@
 			<fileset dir="../modules/flowable-job-service/target">
                 <include name="flowable-job-service-*.jar" />
             </fileset>
+			<fileset dir="../modules/flowable-job-spring-service/target">
+                <include name="flowable-job-spring-service-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-task-service-api/target">
                 <include name="flowable-task-service-api-*.jar" />
             </fileset>

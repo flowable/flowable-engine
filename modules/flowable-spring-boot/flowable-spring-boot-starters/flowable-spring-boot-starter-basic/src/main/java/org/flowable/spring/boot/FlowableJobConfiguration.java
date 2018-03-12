@@ -12,9 +12,9 @@
  */
 package org.flowable.spring.boot;
 
-import org.flowable.spring.SpringAsyncExecutor;
-import org.flowable.spring.SpringCallerRunsRejectedJobsHandler;
-import org.flowable.spring.SpringRejectedJobsHandler;
+import org.flowable.spring.job.service.SpringAsyncExecutor;
+import org.flowable.spring.job.service.SpringCallerRunsRejectedJobsHandler;
+import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
