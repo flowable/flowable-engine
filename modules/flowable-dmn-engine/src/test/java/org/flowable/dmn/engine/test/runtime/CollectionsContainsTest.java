@@ -43,11 +43,13 @@ public class CollectionsContainsTest {
         List inputVariable2 = Arrays.asList("test1", "test2", "test3");
         List inputVariable3 = Arrays.asList("test1", "test2");
         List inputVariable4 = Arrays.asList(5L, 10L, 20L, 50L);
+        List inputVariable5 = Arrays.asList("test3", "test5");
 
         processVariablesInput.put("collection1", inputVariable1);
         processVariablesInput.put("collection2", inputVariable2);
         processVariablesInput.put("collection3", inputVariable3);
         processVariablesInput.put("collection4", inputVariable4);
+        processVariablesInput.put("collection5", inputVariable5);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -64,6 +66,7 @@ public class CollectionsContainsTest {
         Assert.assertTrue(result.getRuleExecutions().get(4).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(7).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(8).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(11).isValid());
     }
 
     @Test
@@ -75,11 +78,13 @@ public class CollectionsContainsTest {
         List inputVariable2 = Arrays.asList("test1", "test2", "test3");
         List inputVariable3 = Arrays.asList("test1", "test2");
         List inputVariable4 = Arrays.asList(5L, 10L, 20L, 50L);
+        List inputVariable5 = Arrays.asList("test3", "test5");
 
         processVariablesInput.put("collection1", inputVariable1);
         processVariablesInput.put("collection2", inputVariable2);
         processVariablesInput.put("collection3", inputVariable3);
         processVariablesInput.put("collection4", inputVariable4);
+        processVariablesInput.put("collection5", inputVariable5);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -94,6 +99,7 @@ public class CollectionsContainsTest {
         Assert.assertFalse(result.getRuleExecutions().get(6).isValid());
         Assert.assertFalse(result.getRuleExecutions().get(9).isValid());
         Assert.assertFalse(result.getRuleExecutions().get(10).isValid());
+        Assert.assertFalse(result.getRuleExecutions().get(12).isValid());
     }
 
     @Test

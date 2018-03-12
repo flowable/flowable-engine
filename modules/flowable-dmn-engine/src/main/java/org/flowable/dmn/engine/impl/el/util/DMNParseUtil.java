@@ -22,10 +22,11 @@ import java.util.stream.Stream;
  */
 public class DMNParseUtil {
 
-    public static void isCollection(Object collection) {
+    public static boolean isCollection(Object collection) {
         if (Collection.class.isAssignableFrom(collection.getClass()) == false) {
-            throw new IllegalArgumentException("collection must be of type java.util.Collection");
+           return false;
         }
+        return true;
     }
 
     public static boolean isDMNCollection(Object value) {

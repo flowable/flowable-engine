@@ -68,7 +68,7 @@
           <text><![CDATA[${collection:contains(collection4, '10,50')}]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_8">
-          <text><![CDATA["10 and 50 not in collection4"]]></text>
+          <text><![CDATA["10 and 50 in collection4"]]></text>
         </outputEntry>
       </rule>
        <rule>
@@ -76,7 +76,7 @@
           <text><![CDATA[${collection:contains(collection1, '"test1","test4"')}]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_9">
-          <text><![CDATA["test1 and test4 not in collection1"]]></text>
+          <text><![CDATA["test1 and test4 in collection1"]]></text>
         </outputEntry>
       </rule>
       <rule>
@@ -85,6 +85,22 @@
         </inputEntry>
         <outputEntry id="outputEntry_2_10">
           <text><![CDATA["10 and 60 not in collection4"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_11">
+          <text><![CDATA[${collection:contains(collection1, collection3)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_11">
+          <text><![CDATA["collection3 (test1, test2) in collection1"]]></text>
+        </outputEntry>
+      </rule>
+       <rule>
+        <inputEntry id="inputEntry_1_12">
+          <text><![CDATA[${collection:contains(collection1, collection5)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_12">
+          <text><![CDATA["collection5 (test3 and test5) in collection1"]]></text>
         </outputEntry>
       </rule>
     </decisionTable>

@@ -74,6 +74,22 @@
           <text><![CDATA["11 and / or 24 not in collection2"]]></text>
         </outputEntry>
       </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_9">
+          <text><![CDATA[${collection:notContainsAny(collection1, collection3)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_9">
+          <text><![CDATA["any of collection3 (test4 and test5) not in collection2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_10">
+          <text><![CDATA[${collection:notContainsAny(collection1, collection4)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_10">
+          <text><![CDATA["any of collection 4 (test2 and test5) not in collection2"]]></text>
+        </outputEntry>
+      </rule>
     </decisionTable>
   </decision>
 </definitions>

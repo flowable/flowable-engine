@@ -31,11 +31,15 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        DMNParseUtil.isCollection(collection);
+        if (!DMNParseUtil.isCollection(collection)) {
+            throw new IllegalArgumentException("collection must be of type java.util.Collection");
+        }
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
             return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
+        } else if (DMNParseUtil.isCollection(value)) {
+            return ((Collection) collection).containsAll((Collection) value);
         } else {
             return ((Collection) collection).contains(value);
         }
@@ -51,11 +55,15 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        DMNParseUtil.isCollection(collection);
+        if (!DMNParseUtil.isCollection(collection)) {
+            throw new IllegalArgumentException("collection must be of type java.util.Collection");
+        }
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
             return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
+        } else if (DMNParseUtil.isCollection(value)) {
+            return !((Collection) collection).containsAll((Collection) value);
         } else {
             return !((Collection) collection).contains(value);
         }
@@ -71,11 +79,15 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        DMNParseUtil.isCollection(collection);
+        if (!DMNParseUtil.isCollection(collection)) {
+            throw new IllegalArgumentException("collection must be of type java.util.Collection");
+        }
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
             return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
+        } else if (DMNParseUtil.isCollection(value)) {
+            return CollectionUtils.containsAny((Collection) collection, (Collection) value);
         } else {
             return ((Collection) collection).contains(value);
         }
@@ -91,11 +103,15 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        DMNParseUtil.isCollection(collection);
+        if (!DMNParseUtil.isCollection(collection)) {
+            throw new IllegalArgumentException("collection must be of type java.util.Collection");
+        }
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
             return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
+        } else if (DMNParseUtil.isCollection(value)) {
+            return !CollectionUtils.containsAny((Collection) collection, (Collection) value);
         } else {
             return !((Collection) collection).contains(value);
         }

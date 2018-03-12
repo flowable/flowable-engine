@@ -47,7 +47,7 @@
           <text><![CDATA[${collection:notContains(collection1, '"test3", "test5"')}]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_5">
-          <text><![CDATA["test4 and test5 not in collection1"]]></text>
+          <text><![CDATA["test3 and test5 not in collection1"]]></text>
         </outputEntry>
       </rule>
       <rule>
@@ -72,6 +72,22 @@
         </inputEntry>
         <outputEntry id="outputEntry_2_8">
           <text><![CDATA["10 and 20 not in collection2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_9">
+          <text><![CDATA[${collection:notContains(collection1, collection3)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_9">
+          <text><![CDATA["collection3 (test2 and test6) not in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_10">
+          <text><![CDATA[${collection:notContains(collection1, collection4)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_10">
+          <text><![CDATA["collection4 (test2 and test3) not in collection1"]]></text>
         </outputEntry>
       </rule>
     </decisionTable>
