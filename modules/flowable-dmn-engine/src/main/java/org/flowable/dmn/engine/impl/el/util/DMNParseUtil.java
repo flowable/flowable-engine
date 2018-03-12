@@ -12,6 +12,13 @@
  */
 package org.flowable.dmn.engine.impl.el.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,11 +29,21 @@ import java.util.stream.Stream;
  */
 public class DMNParseUtil {
 
-    public static boolean isCollection(Object collection) {
-        if (Collection.class.isAssignableFrom(collection.getClass()) == false) {
-           return false;
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DMNParseUtil.class);
+
+    public static void isCollection(Object collection) {
+        if (!isJavaCollection(collection) && !isArrayNode(collection)) {
+            throw new IllegalArgumentException("collection must be of type java.util.Collection or com.fasterxml.jackson.databind.node.ArrayNode");
         }
-        return true;
+    }
+
+
+    public static boolean isJavaCollection(Object collection) {
+        return Collection.class.isAssignableFrom(collection.getClass());
+    }
+
+    public static boolean isArrayNode(Object collection) {
+        return ArrayNode.class.isAssignableFrom(collection.getClass());
     }
 
     public static boolean isDMNCollection(Object value) {
@@ -44,7 +61,36 @@ public class DMNParseUtil {
         return items;
     }
 
-    private static List<Object> split(String str) {
+    public static Collection getCollectionFromArrayNode(ArrayNode arrayNode) {
+        List<Object> values = new ArrayList<>();
+        for (JsonNode node : arrayNode) {
+            values.add(getJsonValue(node));
+        }
+        return values;
+    }
+
+    protected static Object getJsonValue(JsonNode jsonNode) {
+        switch (jsonNode.getNodeType()) {
+            case ARRAY:
+                LOGGER.warn("Nested ArrayNodes not supported");
+            case BINARY:
+                LOGGER.warn("Nested BinaryNodes not supported");
+            case BOOLEAN:
+                return jsonNode.booleanValue();
+            case NULL:
+                return null;
+            case NUMBER:
+                return getNumberValue(jsonNode.numberValue().toString());
+            case OBJECT:
+                LOGGER.warn("Nested ObjectNodes not supported");
+            case POJO:
+                LOGGER.warn("Nested PojoNodes not supported");
+            default:
+                return jsonNode.textValue();
+        }
+    }
+
+    protected static List<Object> split(String str) {
         return Stream.of(str.split(","))
             .map(elem -> formatElementValue(elem.trim()))
             .collect(Collectors.toList());
@@ -66,7 +112,19 @@ public class DMNParseUtil {
                 return result;
             }
         } else {
-            return Long.valueOf(value);
+           return getNumberValue(value);
+        }
+    }
+
+    protected static Object getNumberValue(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException nfe1) {
+            try {
+                return Double.parseDouble(value);
+            } catch (NumberFormatException nfe2) {
+                return null;
+            }
         }
     }
 }

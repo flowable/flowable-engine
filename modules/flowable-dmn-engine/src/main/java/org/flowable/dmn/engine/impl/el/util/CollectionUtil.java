@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.impl.el.util;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
@@ -31,14 +32,16 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        if (!DMNParseUtil.isCollection(collection)) {
-            throw new IllegalArgumentException("collection must be of type java.util.Collection");
+        DMNParseUtil.isCollection(collection);
+
+        if (DMNParseUtil.isArrayNode(collection)) {
+            collection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
         }
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
             return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
-        } else if (DMNParseUtil.isCollection(value)) {
+        } else if (DMNParseUtil.isJavaCollection(value)) {
             return ((Collection) collection).containsAll((Collection) value);
         } else {
             return ((Collection) collection).contains(value);
@@ -55,14 +58,12 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        if (!DMNParseUtil.isCollection(collection)) {
-            throw new IllegalArgumentException("collection must be of type java.util.Collection");
-        }
+        DMNParseUtil.isCollection(collection);
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
             return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
-        } else if (DMNParseUtil.isCollection(value)) {
+        } else if (DMNParseUtil.isJavaCollection(value)) {
             return !((Collection) collection).containsAll((Collection) value);
         } else {
             return !((Collection) collection).contains(value);
@@ -79,14 +80,12 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        if (!DMNParseUtil.isCollection(collection)) {
-            throw new IllegalArgumentException("collection must be of type java.util.Collection");
-        }
+        DMNParseUtil.isCollection(collection);
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
             return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
-        } else if (DMNParseUtil.isCollection(value)) {
+        } else if (DMNParseUtil.isJavaCollection(value)) {
             return CollectionUtils.containsAny((Collection) collection, (Collection) value);
         } else {
             return ((Collection) collection).contains(value);
@@ -103,14 +102,12 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        if (!DMNParseUtil.isCollection(collection)) {
-            throw new IllegalArgumentException("collection must be of type java.util.Collection");
-        }
+        DMNParseUtil.isCollection(collection);
 
         if (DMNParseUtil.isDMNCollection(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
             return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
-        } else if (DMNParseUtil.isCollection(value)) {
+        } else if (DMNParseUtil.isJavaCollection(value)) {
             return !CollectionUtils.containsAny((Collection) collection, (Collection) value);
         } else {
             return !((Collection) collection).contains(value);

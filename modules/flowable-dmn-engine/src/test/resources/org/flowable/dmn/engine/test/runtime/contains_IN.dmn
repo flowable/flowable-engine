@@ -95,12 +95,44 @@
           <text><![CDATA["collection3 (test1, test2) in collection1"]]></text>
         </outputEntry>
       </rule>
-       <rule>
+      <rule>
         <inputEntry id="inputEntry_1_12">
           <text><![CDATA[${collection:contains(collection1, collection5)}]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_12">
           <text><![CDATA["collection5 (test3 and test5) in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_13">
+          <text><![CDATA[${collection:contains(arrayNode1, '"test1", "test2"')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_13">
+          <text><![CDATA["test1 and test2 in arrayNode1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_14">
+          <text><![CDATA[${collection:contains(arrayNode2, '10, 20')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_14">
+          <text><![CDATA["10 and 20 in arrayNode2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_15">
+          <text><![CDATA[${collection:contains(arrayNode3, '10.5, 20.5')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_15">
+          <text><![CDATA["10.5 and 20.5 in arrayNode3"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_16">
+          <text><![CDATA[${collection:contains(arrayNode4, '10.5555, 20.5555')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_16">
+          <text><![CDATA["10.5555 and 20.5555 in arrayNode4"]]></text>
         </outputEntry>
       </rule>
     </decisionTable>
