@@ -241,6 +241,9 @@ public class DmnJsonConverterUtil {
             case "ANY":
                 containsPrefixAndMethod = "collection:containsAny";
                 break;
+            case "NOT ANY":
+                containsPrefixAndMethod = "collection:notContainsAny";
+                break;
             default:
                 containsPrefixAndMethod = null;
         }

@@ -81,4 +81,24 @@ public class CollectionUtil {
         }
     }
 
+    public static boolean notContainsAny(Object collection, Object value) {
+
+        if (collection == null) {
+            throw new IllegalArgumentException("collection cannot be null");
+        }
+
+        if (value == null) {
+            throw new IllegalArgumentException("value cannot be null");
+        }
+
+        DMNParseUtil.isCollection(collection);
+
+        if (DMNParseUtil.isDMNCollection(value)) {
+            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
+            return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
+        } else {
+            return !((Collection) collection).contains(value);
+        }
+    }
+
 }
