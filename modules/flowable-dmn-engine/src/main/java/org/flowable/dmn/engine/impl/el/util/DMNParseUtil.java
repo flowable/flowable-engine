@@ -75,16 +75,16 @@ public class DMNParseUtil {
                 LOGGER.warn("Nested ArrayNodes not supported");
             case BINARY:
                 LOGGER.warn("Nested BinaryNodes not supported");
+            case OBJECT:
+                LOGGER.warn("Nested ObjectNodes not supported");
+            case POJO:
+                LOGGER.warn("Nested PojoNodes not supported");
             case BOOLEAN:
                 return jsonNode.booleanValue();
             case NULL:
                 return null;
             case NUMBER:
                 return getNumberValue(jsonNode.numberValue().toString());
-            case OBJECT:
-                LOGGER.warn("Nested ObjectNodes not supported");
-            case POJO:
-                LOGGER.warn("Nested PojoNodes not supported");
             default:
                 return jsonNode.textValue();
         }
@@ -123,6 +123,7 @@ public class DMNParseUtil {
             try {
                 return Double.parseDouble(value);
             } catch (NumberFormatException nfe2) {
+                LOGGER.warn("Could not parse to Long or Double from: "+value);
                 return null;
             }
         }
