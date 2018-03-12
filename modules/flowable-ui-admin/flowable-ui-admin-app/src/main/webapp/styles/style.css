@@ -1583,7 +1583,7 @@ only screen and (min-resolution: 192dpi) {
 	overflow: visible;
 }
 .activiti-table .decision-table-display-cell-match {
-	border: 1px solid #36a7c4;
+	border: 1px solid #2980b9;
 }
 
 .activiti-table .decision-table-display-cell-nomatch,
