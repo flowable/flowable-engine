@@ -97,11 +97,20 @@ public class CollectionsContainsTest {
         List inputVariable4 = Arrays.asList(5L, 10L, 20L, 50L);
         List inputVariable5 = Arrays.asList("test3", "test5");
 
+        ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
+        ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
+        ArrayNode arrayNode3 = objectMapper.createArrayNode().add(5.5D).add(10.5D).add(20.5D).add(50.5D);
+        ArrayNode arrayNode4 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F).add(20.5555F).add(50.5555F);
+
         processVariablesInput.put("collection1", inputVariable1);
         processVariablesInput.put("collection2", inputVariable2);
         processVariablesInput.put("collection3", inputVariable3);
         processVariablesInput.put("collection4", inputVariable4);
         processVariablesInput.put("collection5", inputVariable5);
+        processVariablesInput.put("arrayNode1", arrayNode1);
+        processVariablesInput.put("arrayNode2", arrayNode2);
+        processVariablesInput.put("arrayNode3", arrayNode3);
+        processVariablesInput.put("arrayNode4", arrayNode4);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
