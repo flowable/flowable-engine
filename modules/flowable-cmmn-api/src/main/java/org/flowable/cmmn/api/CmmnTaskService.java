@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.cmmn.api.exception.FlowableTaskAlreadyClaimedException;
+import org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormInfo;
