@@ -66,7 +66,7 @@
 
 		<!-- MOVE ALL LIBS TO libs -->
 		<mkdir dir="${target.distro.root}/libs" />
-		<copy todir="${target.distro.root}/libs">
+		<copy todir="${target.distro.root}/libs" flatten="true">
 			<fileset dir="../modules/flowable-engine/target">
 				<include name="flowable-engine-*.jar" />
 			</fileset>
@@ -268,23 +268,8 @@
 			<fileset dir="../modules/flowable-http/target">
 				<include name="flowable-http-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-actuator/target">
-				<include name="flowable-spring-boot-starter-actuator-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-basic/target">
-				<include name="flowable-spring-boot-starter-basic-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-integration/target">
-				<include name="flowable-spring-boot-starter-integration-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-jpa/target">
-				<include name="flowable-spring-boot-starter-jpa-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-rest-api/target">
-				<include name="flowable-spring-boot-starter-rest-api-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-security/target">
-				<include name="flowable-spring-boot-starter-security-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/">
+				<include name="**/flowable-spring-boot-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-ui-common/target">
 				<include name="flowable-ui-common-*.jar" />

@@ -17,6 +17,7 @@
         <spring-integration-java-dsl.version>1.0.0.RELEASE</spring-integration-java-dsl.version>
     </properties>
     <modules>
+        <module>flowable-spring-boot-autoconfigure</module>
         <module>flowable-spring-boot-starter-basic</module>
         <module>flowable-spring-boot-starter-rest-api</module>
         <module>flowable-spring-boot-starter-integration</module>
