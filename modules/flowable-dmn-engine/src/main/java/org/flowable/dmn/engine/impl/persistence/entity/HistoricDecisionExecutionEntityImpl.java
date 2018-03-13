@@ -34,6 +34,7 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     protected String instanceId;
     protected String executionId;
     protected String activityId;
+    protected String scopeType;
     protected boolean failed;
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
     protected String executionJson;
@@ -49,6 +50,7 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
         persistentState.put("instanceId", this.instanceId);
         persistentState.put("executionId", this.executionId);
         persistentState.put("activityId", this.activityId);
+        persistentState.put("scopeType", this.scopeType);
         persistentState.put("tenantId", this.tenantId);
         return persistentState;
     }
@@ -124,6 +126,16 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     @Override
     public void setActivityId(String activityId) {
         this.activityId = activityId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     @Override

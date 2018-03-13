@@ -28,6 +28,7 @@ public class HistoricDecisionExecutionResponse {
     protected String activityId;
     protected String executionId;
     protected String instanceId;
+    protected String scopeType;
     protected boolean failed;
     protected Date startTime;
     protected Date endTime;
@@ -43,6 +44,7 @@ public class HistoricDecisionExecutionResponse {
         setActivityId(historicDecisionExecution.getActivityId());
         setExecutionId(historicDecisionExecution.getExecutionId());
         setInstanceId(historicDecisionExecution.getInstanceId());
+        setScopeType(historicDecisionExecution.getScopeType());
         setFailed(historicDecisionExecution.isFailed());
         setStartTime(historicDecisionExecution.getStartTime());
         setEndTime(historicDecisionExecution.getEndTime());
@@ -106,6 +108,14 @@ public class HistoricDecisionExecutionResponse {
 
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     public Boolean getFailed() {

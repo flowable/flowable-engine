@@ -28,6 +28,9 @@ public class FormInstanceQueryRequest extends PaginateRequest {
     private String processInstanceIdLike;
     private String processDefinitionId;
     private String processDefinitionIdLike;
+    private String scopeId;
+    private String scopeType;
+    private String scopeDefinitionId;
     private String submittedBy;
     private String submittedByLike;
     private String tenantId;
@@ -104,6 +107,30 @@ public class FormInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessDefinitionIdLike(String processDefinitionIdLike) {
         this.processDefinitionIdLike = processDefinitionIdLike;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     public String getSubmittedBy() {
