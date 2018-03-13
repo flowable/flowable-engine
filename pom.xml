@@ -20,7 +20,7 @@
 		<jdk.version>1.8</jdk.version>
 		<spring.framework.version>4.3.14.RELEASE</spring.framework.version>
 		<spring.security.version>4.2.4.RELEASE</spring.security.version>
-		<jackson.version>2.9.3</jackson.version>
+		<jackson.version>2.8.11</jackson.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.20.2</camel.version>
 		<cxf.version>3.2.2</cxf.version>
@@ -867,7 +867,7 @@
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
-				<version>${jackson.version}</version>
+				<version>${jackson.version}.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.datatype</groupId>
