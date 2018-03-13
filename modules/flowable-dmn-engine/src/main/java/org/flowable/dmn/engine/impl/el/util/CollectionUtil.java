@@ -43,6 +43,9 @@ public class CollectionUtil {
             return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return ((Collection) collection).containsAll((Collection) value);
+        } else if (DMNParseUtil.isArrayNode(value)) {
+            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
+            return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
         } else {
             return ((Collection) collection).contains(value);
         }
@@ -65,6 +68,9 @@ public class CollectionUtil {
             return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return !((Collection) collection).containsAll((Collection) value);
+        } else if (DMNParseUtil.isArrayNode(value)) {
+            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
+            return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
         } else {
             return !((Collection) collection).contains(value);
         }
@@ -87,6 +93,9 @@ public class CollectionUtil {
             return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return CollectionUtils.containsAny((Collection) collection, (Collection) value);
+        } else if (DMNParseUtil.isArrayNode(value)) {
+            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
+            return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else {
             return ((Collection) collection).contains(value);
         }
@@ -109,6 +118,9 @@ public class CollectionUtil {
             return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return !CollectionUtils.containsAny((Collection) collection, (Collection) value);
+        } else if (DMNParseUtil.isArrayNode(value)) {
+            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
+            return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else {
             return !((Collection) collection).contains(value);
         }
