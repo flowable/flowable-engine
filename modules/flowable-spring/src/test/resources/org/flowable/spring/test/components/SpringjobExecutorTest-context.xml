@@ -45,7 +45,7 @@
     <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
     <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
 
-    <bean id="springAsyncExecutor" class="org.flowable.spring.SpringAsyncExecutor">
+    <bean id="springAsyncExecutor" class="org.flowable.spring.job.service.SpringAsyncExecutor">
         <property name="taskExecutor">
             <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
         </property>
