@@ -14,7 +14,6 @@ package org.flowable.dmn.engine.impl.el.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,9 +120,9 @@ public class DMNParseUtil {
             return Long.parseLong(value);
         } catch (NumberFormatException nfe1) {
             try {
-                return Double.parseDouble(value);
+                return Float.parseFloat(value);
             } catch (NumberFormatException nfe2) {
-                LOGGER.warn("Could not parse to Long or Double from: "+value);
+                LOGGER.warn("Could not parse to Long or Float from: "+value);
                 return null;
             }
         }
