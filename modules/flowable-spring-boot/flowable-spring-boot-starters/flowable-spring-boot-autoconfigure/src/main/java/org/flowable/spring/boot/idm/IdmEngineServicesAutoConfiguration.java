@@ -12,7 +12,6 @@
  */
 package org.flowable.spring.boot.idm;
 
-import org.flowable.engine.ProcessEngine;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
@@ -51,11 +50,11 @@ public class IdmEngineServicesAutoConfiguration {
      * Therefore extract it from the IdmEngines.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        IdmEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.idm.engine.IdmEngine"
     })
-    @ConditionalOnBean({
-        ProcessEngine.class
+    @ConditionalOnBean(type = {
+        "org.flowable.engine.ProcessEngine"
     })
     static class AlreadyInitializedEngineConfiguration {
 
@@ -72,9 +71,9 @@ public class IdmEngineServicesAutoConfiguration {
      * If there is no process engine configuration, then trigger a creation of the idm engine.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        IdmEngine.class,
-        ProcessEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.idm.engine.IdmEngine",
+        "org.flowable.engine.ProcessEngine"
     })
     static class StandaloneEngineConfiguration {
 

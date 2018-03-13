@@ -20,7 +20,6 @@ import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.spring.DmnEngineFactoryBean;
-import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
@@ -53,11 +52,11 @@ public class DmnEngineServicesAutoConfiguration {
      * Therefore extract it from the DmnEngines.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        DmnEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.dmn.engine.DmnEngine"
     })
-    @ConditionalOnBean({
-        ProcessEngine.class
+    @ConditionalOnBean(type = {
+        "org.flowable.engine.ProcessEngine"
     })
     static class AlreadyInitializedEngineConfiguration {
         @Bean
@@ -73,9 +72,9 @@ public class DmnEngineServicesAutoConfiguration {
      * If there is no process engine configuration, then trigger a creation of the dmn engine.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        DmnEngine.class,
-        ProcessEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.dmn.engine.DmnEngine",
+        "org.flowable.engine.ProcessEngine"
     })
     static class StandaloneEngineConfiguration {
 
