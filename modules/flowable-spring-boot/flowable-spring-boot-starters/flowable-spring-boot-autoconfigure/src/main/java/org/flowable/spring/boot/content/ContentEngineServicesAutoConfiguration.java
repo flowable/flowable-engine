@@ -18,7 +18,6 @@ import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.ContentEngines;
 import org.flowable.content.spring.ContentEngineFactoryBean;
-import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnContentEngine;
@@ -51,11 +50,11 @@ public class ContentEngineServicesAutoConfiguration {
      * Therefore extract it from the ContentEngines.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        ContentEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.content.engine.ContentEngine"
     })
-    @ConditionalOnBean({
-        ProcessEngine.class
+    @ConditionalOnBean(type = {
+        "org.flowable.engine.ProcessEngine"
     })
     static class AlreadyInitializedConfiguration {
 
@@ -72,9 +71,9 @@ public class ContentEngineServicesAutoConfiguration {
      * If there is no process engine configuration, then trigger a creation of the content engine.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        ContentEngine.class,
-        ProcessEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.content.engine.ContentEngine",
+        "org.flowable.engine.ProcessEngine"
     })
     static class StandaloneConfiguration {
 

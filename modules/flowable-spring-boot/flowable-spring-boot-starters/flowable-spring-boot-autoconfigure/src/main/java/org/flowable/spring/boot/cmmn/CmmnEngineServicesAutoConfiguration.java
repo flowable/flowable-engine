@@ -21,7 +21,6 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
-import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
@@ -54,11 +53,11 @@ public class CmmnEngineServicesAutoConfiguration {
      * Therefore extract it from the CmmnEngines.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        CmmnEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.cmmn.engine.CmmnEngine"
     })
-    @ConditionalOnBean({
-        ProcessEngine.class
+    @ConditionalOnBean(type = {
+        "org.flowable.engine.ProcessEngine"
     })
     static class AlreadyInitializedEngineConfiguration {
 
@@ -75,9 +74,9 @@ public class CmmnEngineServicesAutoConfiguration {
      * If there is no process engine configuration, then trigger a creation of the cmmn engine.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        CmmnEngine.class,
-        ProcessEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.cmmn.engine.CmmnEngine",
+        "org.flowable.engine.ProcessEngine"
     })
     static class StandaloneEngineConfiguration {
 

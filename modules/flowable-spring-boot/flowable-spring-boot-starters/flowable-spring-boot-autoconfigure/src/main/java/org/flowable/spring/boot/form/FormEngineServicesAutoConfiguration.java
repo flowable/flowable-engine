@@ -12,7 +12,6 @@
  */
 package org.flowable.spring.boot.form;
 
-import org.flowable.engine.ProcessEngine;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -54,11 +53,11 @@ public class FormEngineServicesAutoConfiguration {
      * Therefore extract it from the FormEngines.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        FormEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.form.engine.FormEngine"
     })
-    @ConditionalOnBean({
-        ProcessEngine.class
+    @ConditionalOnBean(type = {
+        "org.flowable.engine.ProcessEngine"
     })
     static class AlreadyInitializedFormEngineConfiguration {
         @Bean
@@ -73,9 +72,9 @@ public class FormEngineServicesAutoConfiguration {
      * If there is no process engine configuration, then trigger a creation of the form engine.
      */
     @Configuration
-    @ConditionalOnMissingBean({
-        FormEngine.class,
-        ProcessEngine.class
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.form.engine.FormEngine",
+        "org.flowable.engine.ProcessEngine"
     })
     static class StandaloneFormEngineConfiguration {
 
