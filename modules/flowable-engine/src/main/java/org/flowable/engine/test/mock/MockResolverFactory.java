@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.test.mock;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.scripting.Resolver;
-import org.flowable.engine.impl.scripting.ResolverFactory;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.scripting.Resolver;
+import org.flowable.engine.common.impl.scripting.ResolverFactory;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -35,8 +35,8 @@ import org.flowable.variable.api.delegate.VariableScope;
  * &lt;/property&gt;<br>
  * &lt;property name=&quot;resolverFactories&quot;&gt;<br>
  * &lt;list&gt;<br>
- * &lt;bean class=&quot;org.flowable.engine.impl.scripting.VariableScopeResolverFactory &quot; /&gt;<br>
- * &lt;bean class=&quot;org.flowable.engine.impl.scripting.BeansResolverFactory&quot; /&gt;<br>
+ * &lt;bean class=&quot;org.flowable.engine.common.impl.scripting.VariableScopeResolverFactory &quot; /&gt;<br>
+ * &lt;bean class=&quot;org.flowable.engine.common.impl.scripting.BeansResolverFactory&quot; /&gt;<br>
  * &lt;bean class=&quot;com.deenero.activiti.MockResolverFactory&quot; /&gt;<br>
  * &lt;/list&gt;<br>
  * &lt;/property&gt;<br>
@@ -51,7 +51,7 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class MockResolverFactory implements ResolverFactory {
     @Override
-    public Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope) {
         return new Resolver() {
 
             @Override

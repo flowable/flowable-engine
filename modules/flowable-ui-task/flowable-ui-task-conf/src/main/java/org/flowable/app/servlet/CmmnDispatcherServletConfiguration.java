@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
-@ComponentScan({"org.flowable.cmmn.rest.exception", "org.flowable.cmmn.rest.service.api"})
+@ComponentScan({"org.flowable.rest.cmmn.exception", "org.flowable.rest.cmmn.service.api"})
 @EnableAsync
 public class CmmnDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 

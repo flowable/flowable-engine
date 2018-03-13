@@ -14,6 +14,7 @@ package org.flowable.test.spring.boot.dmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,7 +24,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
+import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -50,6 +54,7 @@ public class DmnEngineAutoConfigurationTest {
         assertThat(dmnEngine).as("Dmn engine").isNotNull();
 
         assertAllServicesPresent(context, dmnEngine);
+        assertAutoDeployment(context.getBean(DmnRepositoryService.class));
     }
 
     private void assertAllServicesPresent(AnnotationConfigApplicationContext context, DmnEngine dmnEngine) {
@@ -81,14 +86,24 @@ public class DmnEngineAutoConfigurationTest {
         assertThat(dmnEngine).as("Dmn engine").isNotNull();
 
         assertAllServicesPresent(context, dmnEngine);
+        assertAutoDeployment(context.getBean(DmnRepositoryService.class));
+    }
+
+    protected void assertAutoDeployment(DmnRepositoryService repositoryService) {
+        List<DmnDecisionTable> decisions = repositoryService.createDecisionTableQuery().list();
+        assertThat(decisions)
+            .extracting(DmnDecisionTable::getKey, DmnDecisionTable::getName)
+            .containsExactlyInAnyOrder(
+                tuple("RiskRating", "Risk Rating Decision Table"),
+                tuple("simple", "Full Decision"),
+                tuple("strings1", "Simple decision"),
+                tuple("strings2", "Simple decision")
+            );
     }
 
     private AnnotationConfigApplicationContext context(Class<?>... clazz) {
         AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext();
         annotationConfigApplicationContext.register(clazz);
-        Map<String, Object> values = new HashMap<>();
-        values.put("flowable.dmn.deployResources", false);
-        annotationConfigApplicationContext.getEnvironment().getPropertySources().addFirst(new MapPropertySource("831-override", values));
         annotationConfigApplicationContext.refresh();
         return annotationConfigApplicationContext;
     }

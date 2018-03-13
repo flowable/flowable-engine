@@ -74,7 +74,17 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances with the given case definition version.
      */
     HistoricCaseInstanceQuery caseDefinitionVersion(Integer caseDefinitionVersion);
-    
+
+    /**
+     * Include historic case variables in the historic case query result
+     */
+    HistoricCaseInstanceQuery includeCaseVariables();
+
+    /**
+     * Limit historic case instance variables
+     */
+    HistoricCaseInstanceQuery limitCaseVariables(Integer historicCaseVariablesLimit);
+
     /**
      * Only select historic case instances that are defined by a case definition with the given deployment identifier.
      */

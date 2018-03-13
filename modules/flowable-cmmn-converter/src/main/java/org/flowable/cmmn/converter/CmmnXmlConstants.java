@@ -106,6 +106,8 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
 
+    String ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
+
     String ELEMENT_FIELD = "field";
     String ATTRIBUTE_FIELD_STRING = "stringValue";
     String ATTRIBUTE_FIELD_EXPRESSION = "expression";
@@ -123,6 +125,8 @@ public interface CmmnXmlConstants {
     
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
 
+    String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
+    
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";
     String ELEMENT_DI_SHAPE = "CMMNShape";

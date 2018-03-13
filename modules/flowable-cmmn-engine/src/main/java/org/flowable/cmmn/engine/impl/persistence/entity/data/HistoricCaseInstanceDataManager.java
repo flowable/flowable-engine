@@ -29,7 +29,9 @@ public interface HistoricCaseInstanceDataManager extends DataManager<HistoricCas
     List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQueryImpl query);
     
     long countByCriteria(HistoricCaseInstanceQueryImpl query);
-    
+
+    List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery);
+
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
 }

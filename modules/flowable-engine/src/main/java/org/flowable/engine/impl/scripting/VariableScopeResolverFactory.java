@@ -10,10 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.engine.impl.scripting;
 
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.scripting.Resolver;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.common.impl.scripting.ResolverFactory;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -23,9 +25,9 @@ import org.flowable.variable.api.delegate.VariableScope;
 public class VariableScopeResolverFactory implements ResolverFactory {
 
     @Override
-    public Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope) {
         if (variableScope != null) {
-            return new VariableScopeResolver(processEngineConfiguration, variableScope);
+            return new VariableScopeResolver((ProcessEngineConfigurationImpl) engineConfiguration, variableScope);
         }
         return null;
     }

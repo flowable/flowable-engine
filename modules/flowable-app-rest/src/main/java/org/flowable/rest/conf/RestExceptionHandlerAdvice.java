@@ -12,14 +12,8 @@
  */
 package org.flowable.rest.conf;
 
-import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.rest.exception.BaseExceptionHandlerAdvice;
-import org.flowable.rest.exception.ErrorInfo;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  *
@@ -29,12 +23,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ControllerAdvice
 public class RestExceptionHandlerAdvice extends BaseExceptionHandlerAdvice {
-
-    @ResponseStatus(HttpStatus.CONFLICT) // 409
-    @ExceptionHandler(FlowableTaskAlreadyClaimedException.class)
-    @ResponseBody
-    public ErrorInfo handleTaskAlreadyClaimed(FlowableTaskAlreadyClaimedException e) {
-        return new ErrorInfo("Task was already claimed", e);
-    }
 
 }

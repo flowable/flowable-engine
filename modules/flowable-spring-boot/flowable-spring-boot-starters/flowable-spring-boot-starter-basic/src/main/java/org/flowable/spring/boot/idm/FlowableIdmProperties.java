@@ -12,7 +12,9 @@
  */
 package org.flowable.spring.boot.idm;
 
+import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * Properties for configuring the idm engine.
@@ -27,11 +29,21 @@ public class FlowableIdmProperties {
      */
     private boolean enabled = true;
 
+    /**
+     * The servlet configuration for the IDM Rest API.
+     */
+    @NestedConfigurationProperty
+    private final FlowableServlet servlet = new FlowableServlet("/idm-api", "Flowable IDM Rest API");
+
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public FlowableServlet getServlet() {
+        return servlet;
     }
 }

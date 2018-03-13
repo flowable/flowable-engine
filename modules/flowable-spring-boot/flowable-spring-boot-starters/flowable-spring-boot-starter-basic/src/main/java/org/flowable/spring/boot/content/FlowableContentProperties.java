@@ -12,7 +12,9 @@
  */
 package org.flowable.spring.boot.content;
 
+import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * Properties for configuring the content engine.
@@ -27,11 +29,21 @@ public class FlowableContentProperties {
      */
     private boolean enabled = true;
 
+    /**
+     * The servlet configuration for the Content Rest API.
+     */
+    @NestedConfigurationProperty
+    private final FlowableServlet servlet = new FlowableServlet("/content-api", "Flowable Content Rest API");
+
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public FlowableServlet getServlet() {
+        return servlet;
     }
 }

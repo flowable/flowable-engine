@@ -49,12 +49,6 @@
     </div>
     <div class="header" ng-show="model.task && !noSuchTask">
         <div class=" pull-right">
-            <button ng-if="!model.task.formKey && !model.task.endDate && (model.task.assignee.id == account.id || (model.task.initiatorCanCompleteTask && model.task.processInstanceStartUserId == ('' + account.id)))"
-                    id="toggle-create-subtask"
-                    class="btn dropdown-toggle toggle-create-task"
-                    translate="TASK.ACTION.CREATE-SUB-TASK" ng-click="createSubTask()">&nbsp;
-            </button>
-
             <button class="btn" ng-if="!model.task.formKey && !model.task.endDate && (model.task.assignee.id == account.id || (model.task.initiatorCanCompleteTask && model.task.processInstanceStartUserId == ('' + account.id)))"
                     translate="TASK.ACTION.COMPLETE"
                     ng-disabled="model.completeButtonDisabled || model.uploadInProgress"
@@ -278,7 +272,11 @@
                 </div>
             </div>
             <div class="section pack" ng-if="!$scope.model.subTaskSummary.loading">
-                <h3 class="toggle-content-select">{{'TASK.TITLE.SUBTASK' | translate}}
+                <h3 id="toggle-add-subtask" class="toggle-content-select" ng-click="createSubTask('#toggle-add-subtask')"> 
+                    {{'TASK.TITLE.SUBTASK' | translate}}
+                    <span class="action" ng-if="!model.task.endDate">
+                            <a>+</a>
+                        </span>
                 </h3>
 
                 <div class="form-group">
@@ -374,6 +372,16 @@
                                         ng-disabled="!model.commentSummary.newComment || model.commentSummary.loading || model.commentSummary.newComment.length > 4000"
                                         ng-click="confirmNewComment()"></button>
                             </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="!model.task.endDate">
+                        <div class="help-entry"
+                             id="toggle-create-subtask"
+                             ng-click="createSubTask('#toggle-create-subtask')"
+                             ng-if="model.contentSummary.addContent == null || model.contentSummary.addContent == undefined || model.contentSummary.addContent == false">
+                            <span class="glyphicon glyphicon-check"></span>
+                            <span>{{'TASK.HELP.ADD-SUBTASK' | translate}}</span>
                         </div>
                     </div>
 

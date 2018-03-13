@@ -15,13 +15,18 @@ package org.flowable.spring.common;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Tijs Rademakers
  */
-public interface SpringEngineConfiguration extends ApplicationContextAware {
+public interface SpringEngineConfiguration extends ApplicationContextAware, SmartLifecycle {
+
+    int PHASE = 0;
+
+    int PHASE_DELTA = 10;
 
     PlatformTransactionManager getTransactionManager();
 
@@ -42,4 +47,20 @@ public interface SpringEngineConfiguration extends ApplicationContextAware {
     String getDeploymentMode();
 
     void setDeploymentMode(String deploymentMode);
+
+    @Override
+    default boolean isAutoStartup() {
+        return true;
+    }
+
+    @Override
+    default void stop(Runnable callback) {
+        stop();
+        callback.run();
+    }
+
+    @Override
+    default int getPhase() {
+        return PHASE;
+    }
 }

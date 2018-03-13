@@ -4,11 +4,11 @@
         <div>
             <div class="help-text wide">
                 <div class="description">
-                    {{'PROCESS.MESSAGE.NO-INSTANCES-HELP' | translate}}
+                    {{'CASE.MESSAGE.NO-INSTANCES-HELP' | translate}}
                 </div>
                 <div class="help-entry toggle-create-task" ng-class="{'active': newCaseInstance.inline }" ng-click="createCaseInstance()">
                     <span class="glyphicon glyphicon-plus-sign"></span>
-                    <span translate="PROCESS.MESSAGE.NO-INSTANCES-HELP-START"></span>
+                    <span translate="CASE.MESSAGE.NO-INSTANCES-HELP-START"></span>
                 </div>
             </div>
         </div>
@@ -34,7 +34,7 @@
         <div class="pull-right">
             <button class="btn btn-default" style="margin: 10px 15px 0 0"
                     ng-disabled="newCaseInstance.loading"
-                    ng-click="startCaseInstanceWithoutForm()">{{'FORM.DEFAULT-OUTCOME.START-PROCESS' | translate}}
+                    ng-click="startCaseInstanceWithoutForm()">{{'FORM.DEFAULT-OUTCOME.START-CASE' | translate}}
             </button>
         </div>
     </div>

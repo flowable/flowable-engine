@@ -15,6 +15,7 @@ package org.flowable.test.spring.boot;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
+import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -32,6 +33,9 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.List;
 
 public class FormEngineAutoConfigurationTest {
 
@@ -49,7 +53,8 @@ public class FormEngineAutoConfigurationTest {
         assertThat(context.getBean(FormService.class)).as("Form service")
             .isEqualTo(formEngine.getFormService());
 
-        assertThat(context.getBean(FormRepositoryService.class)).as("Form repository service")
+        FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
+        assertThat(repositoryService).as("Form repository service")
             .isEqualTo(formEngine.getFormRepositoryService());
 
         assertThat(context.getBean(FormManagementService.class)).as("Form management service")
@@ -57,6 +62,8 @@ public class FormEngineAutoConfigurationTest {
 
         assertThat(context.getBean(FormEngineConfiguration.class)).as("Form engine configuration")
             .isEqualTo(formEngine.getFormEngineConfiguration());
+
+        assertAutoDeployment(repositoryService);
     }
 
     @Test
@@ -81,12 +88,22 @@ public class FormEngineAutoConfigurationTest {
         assertThat(context.getBean(FormService.class)).as("Form service")
             .isEqualTo(formEngine.getFormService());
 
-        FormRepositoryService formRepositoryService = context.getBean(FormRepositoryService.class);
-        assertThat(formRepositoryService).as("Form repository service")
+        FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
+        assertThat(repositoryService).as("Form repository service")
             .isEqualTo(formEngine.getFormRepositoryService());
 
         assertThat(context.getBean(FormManagementService.class)).as("Form management service")
             .isEqualTo(formEngine.getFormManagementService());
+        assertAutoDeployment(repositoryService);
+    }
+
+    protected void assertAutoDeployment(FormRepositoryService repositoryService) {
+        List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().list();
+        assertThat(formDefinitions)
+            .extracting(FormDefinition::getKey, FormDefinition::getName)
+            .containsExactlyInAnyOrder(
+                tuple("form1", "My first form")
+            );
     }
 
 

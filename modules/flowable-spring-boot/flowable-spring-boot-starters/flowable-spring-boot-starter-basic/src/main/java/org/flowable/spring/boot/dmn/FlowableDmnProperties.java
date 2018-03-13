@@ -12,10 +12,12 @@
  */
 package org.flowable.spring.boot.dmn;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.flowable.spring.boot.FlowableServlet;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * Properties for configuring the dmn engine.
@@ -51,6 +53,12 @@ public class FlowableDmnProperties {
      * Whether the dmn engine needs to be started.
      */
     private boolean enabled = true;
+
+    /**
+     * The servlet configuration for the DMN Rest API.
+     */
+    @NestedConfigurationProperty
+    private final FlowableServlet servlet = new FlowableServlet("/dmn-api", "Flowable DMN Rest API");
 
     public String getDeploymentName() {
         return deploymentName;
@@ -90,5 +98,9 @@ public class FlowableDmnProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public FlowableServlet getServlet() {
+        return servlet;
     }
 }

@@ -27,4 +27,8 @@ public abstract class AbstractCmmnDataManager<EntityImpl extends Entity> extends
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
+    protected CmmnEngineConfiguration getCmmnEngineConfiguration() {
+        return cmmnEngineConfiguration;
+    }
+
 }

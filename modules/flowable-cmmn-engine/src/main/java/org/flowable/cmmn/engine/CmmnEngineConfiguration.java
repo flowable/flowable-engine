@@ -113,6 +113,7 @@ import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
+import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
@@ -120,6 +121,8 @@ import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.EngineConfigurator;
 import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
+import org.flowable.engine.common.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
@@ -127,6 +130,7 @@ import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
@@ -140,6 +144,10 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.common.impl.scripting.BeansResolverFactory;
+import org.flowable.engine.common.impl.scripting.ResolverFactory;
+import org.flowable.engine.common.impl.scripting.ScriptBindingsFactory;
+import org.flowable.engine.common.impl.scripting.ScriptingEngines;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
@@ -189,7 +197,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi {
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, 
+        HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -252,6 +261,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
 
+    protected ScriptingEngines scriptingEngines;
+    protected List<ResolverFactory> resolverFactories;
+
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
      * information.
@@ -295,6 +307,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected int historicTaskQueryLimit;
 
     protected int caseQueryLimit = 20000;
+    protected int historicCaseQueryLimit = 20000;
 
     // Variable support
     protected VariableTypes variableTypes;
@@ -526,6 +539,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
 
+    /**
+     * generator used to generate task ids
+     */
+    protected IdGenerator taskIdGenerator;
+
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -606,6 +624,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initFailedJobCommandFactory();
         initJobServiceConfiguration();
         initAsyncExecutor();
+        initScriptingEngines();
     }
 
     public void initCaseDiagramGenerator() {
@@ -902,6 +921,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildCaseInstanceStateChangeCallback()));
     }
 
+    protected void initScriptingEngines() {
+        if (resolverFactories == null) {
+            resolverFactories = new ArrayList<>();
+            resolverFactories.add(new CmmnVariableScopeResolverFactory());
+            resolverFactories.add(new BeansResolverFactory());
+        }
+        if (scriptingEngines == null) {
+            
+            scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
+        }
+    }
+
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG;
@@ -1063,6 +1094,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.taskServiceConfiguration.setIdGenerator(taskIdGenerator);
 
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
@@ -1803,6 +1835,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public int getHistoricCaseQueryLimit() {
+        return historicCaseQueryLimit;
+    }
+
+    public void setHistoricCaseQueryLimit(int historicCaseQueryLimit) {
+        this.historicCaseQueryLimit = historicCaseQueryLimit;
+    }
+
     public boolean isSerializableVariableTypeTrackDeserializedObjects() {
         return serializableVariableTypeTrackDeserializedObjects;
     }
@@ -1886,6 +1926,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public List<EngineConfigurator> getConfigurators() {
         return configurators;
+    }
+
+    public CmmnEngineConfiguration addConfigurator(EngineConfigurator configurator) {
+        if (configurators == null) {
+            configurators = new ArrayList<>();
+        }
+        configurators.add(configurator);
+        return this;
     }
 
     public CmmnEngineConfiguration setConfigurators(List<EngineConfigurator> configurators) {
@@ -2224,5 +2272,33 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void setFormFieldHandler(FormFieldHandler formFieldHandler) {
         this.formFieldHandler = formFieldHandler;
+    }
+
+    public void initIdGenerator() {
+        super.initIdGenerator();
+        if (taskIdGenerator == null) {
+            taskIdGenerator = idGenerator;
+        }
+    }
+
+    @Override
+    public IdGenerator getTaskIdGenerator() {
+        return taskIdGenerator;
+    }
+
+    @Override
+    public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
+        this.taskIdGenerator = taskIdGenerator;
+    }
+    
+    @Override
+    public ScriptingEngines getScriptingEngines() {
+        return scriptingEngines;
+    }
+
+    @Override
+    public CmmnEngineConfiguration setScriptingEngines(ScriptingEngines scriptingEngines) {
+        this.scriptingEngines = scriptingEngines;
+        return this;
     }
 }

@@ -28,19 +28,17 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringAsyncExecutor;
-import org.flowable.spring.SpringCallerRunsRejectedJobsHandler;
 import org.flowable.spring.SpringProcessEngineConfiguration;
-import org.flowable.spring.SpringRejectedJobsHandler;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -53,10 +51,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableProcessProperties.class,
     FlowableIdmProperties.class
 })
 @AutoConfigureAfter({
     FlowableTransactionAutoConfiguration.class
+})
+@Import({
+    FlowableJobConfiguration.class
 })
 public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
 
@@ -67,18 +69,6 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableIdmProperties idmProperties) {
         super(flowableProperties);
         this.idmProperties = idmProperties;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SpringAsyncExecutor springAsyncExecutor(TaskExecutor taskExecutor) {
-        return new SpringAsyncExecutor(taskExecutor, springRejectedJobsHandler());
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SpringRejectedJobsHandler springRejectedJobsHandler() {
-        return new SpringCallerRunsRejectedJobsHandler();
     }
 
     @Bean
@@ -172,11 +162,5 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
     @ConditionalOnMissingBean
     public IdentityService identityServiceBean(ProcessEngine processEngine) {
         return processEngine.getIdentityService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public TaskExecutor taskExecutor() {
-        return new SimpleAsyncTaskExecutor();
     }
 }

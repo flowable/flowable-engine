@@ -15,6 +15,7 @@ package org.flowable.cmmn.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -28,9 +29,9 @@ import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrat
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.spring.common.SpringEngineConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -40,7 +41,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author David Syer
  * @author Joram Barrez
  */
-public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration implements ApplicationContextAware {
+public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration implements SpringEngineConfiguration {
 
     protected PlatformTransactionManager transactionManager;
     protected String deploymentName = "SpringAutoDeployment";
@@ -49,6 +50,9 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
     protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected volatile boolean running = false;
+    protected List<String> enginesBuild = new ArrayList<>();
+    protected final Object lifeCycleMonitor = new Object();
 
     public SpringCmmnEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -61,7 +65,7 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     public CmmnEngine buildCmmnEngine() {
         CmmnEngine cmmnEngine = super.buildCmmnEngine();
         CmmnEngines.setInitialized(true);
-        autoDeployResources(cmmnEngine);
+        enginesBuild.add(cmmnEngine.getName());
         return cmmnEngine;
     }
 
@@ -110,30 +114,37 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         }
     }
 
+    @Override
     public PlatformTransactionManager getTransactionManager() {
         return transactionManager;
     }
 
+    @Override
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public String getDeploymentName() {
         return deploymentName;
     }
 
+    @Override
     public void setDeploymentName(String deploymentName) {
         this.deploymentName = deploymentName;
     }
 
+    @Override
     public Resource[] getDeploymentResources() {
         return deploymentResources;
     }
 
+    @Override
     public void setDeploymentResources(Resource[] deploymentResources) {
         this.deploymentResources = deploymentResources;
     }
 
+    @Override
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
@@ -143,10 +154,12 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public String getDeploymentMode() {
         return deploymentMode;
     }
 
+    @Override
     public void setDeploymentMode(String deploymentMode) {
         this.deploymentMode = deploymentMode;
     }
@@ -170,4 +183,25 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         return result;
     }
 
+    @Override
+    public void start() {
+        synchronized (lifeCycleMonitor) {
+            if (!isRunning()) {
+                enginesBuild.forEach(name -> autoDeployResources(CmmnEngines.getCmmnEngine(name)));
+                running = true;
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        synchronized (lifeCycleMonitor) {
+            running = false;
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
 }

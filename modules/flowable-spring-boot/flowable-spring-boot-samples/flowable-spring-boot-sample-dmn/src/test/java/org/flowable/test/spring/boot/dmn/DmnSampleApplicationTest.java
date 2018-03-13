@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.entry;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,17 +35,10 @@ import flowable.DmnSampleApplication;
 public class DmnSampleApplicationTest {
 
     @Autowired
-    private DmnRepositoryService repositoryService;
-
-    @Autowired
     private DmnRuleService ruleService;
 
     @Test
     public void contextLoads() {
-        //TODO Once #832 is resolved use the default folder location
-
-        repositoryService.createDeployment().addClasspathResource("simple.dmn.xml").deploy();
-
         Map<String, Object> variables = new HashMap<>();
         variables.put("inputVariable1", 1);
         variables.put("inputVariable2", "test1");

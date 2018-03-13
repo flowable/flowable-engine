@@ -12,6 +12,11 @@
  */
 package org.flowable.spring.boot.form;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
@@ -30,10 +35,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.sql.DataSource;
-import java.io.IOException;
 
 /**
  * Auto configuration for the form engine.
@@ -70,7 +73,15 @@ public class FormEngineAutoConfiguration extends AbstractEngineAutoConfiguration
     ) throws IOException {
         SpringFormEngineConfiguration configuration = new SpringFormEngineConfiguration();
 
-        //TODO this should use auto deployment discovery. See #832
+        List<Resource> resources = this.discoverDeploymentResources(
+            formProperties.getResourceLocation(),
+            formProperties.getResourceSuffixes(),
+            formProperties.isDeployResources()
+        );
+
+        if (resources != null && !resources.isEmpty()) {
+            configuration.setDeploymentResources(resources.toArray(new Resource[0]));
+        }
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
