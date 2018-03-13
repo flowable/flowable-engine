@@ -68,4 +68,11 @@
 			</build>
 		</profile>
 	</profiles>
+
+	<distributionManagement>
+		<relocation>
+			<artifactId>flowable-spring-boot-starter-process</artifactId>
+			<message>The starter for the Process engine has been moved. If you want to use the starter with all engines use flowable-spring-boot-starter</message>
+		</relocation>
+	</distributionManagement>
 </project>
