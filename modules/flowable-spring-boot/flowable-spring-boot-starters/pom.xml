@@ -22,8 +22,6 @@
         <module>flowable-spring-boot-starter-rest-api</module>
         <module>flowable-spring-boot-starter-integration</module>
         <module>flowable-spring-boot-starter-actuator</module>
-        <module>flowable-spring-boot-starter-security</module>
-        <module>flowable-spring-boot-starter-jpa</module>
         <module>flowable-spring-boot-starter</module>
         <module>flowable-spring-boot-starter-cmmn</module>
         <module>flowable-spring-boot-starter-cmmn-rest</module>
