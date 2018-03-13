@@ -12,30 +12,30 @@
  */
 package org.flowable.spring.boot.dmn;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
-import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
+import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * {@link org.springframework.boot.autoconfigure.EnableAutoConfiguration} for the Dmn engine
@@ -89,7 +89,7 @@ public class DmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
     }
 
     @Configuration
-    @ConditionalOnClass(SpringProcessEngineConfiguration.class)
+    @ConditionalOnProcessEngine
     public static class DmnEngineProcessConfiguration {
 
         @Bean
