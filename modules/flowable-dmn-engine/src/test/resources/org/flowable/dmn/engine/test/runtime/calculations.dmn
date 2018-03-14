@@ -19,6 +19,14 @@
           <text><![CDATA[#{inputFloat1 + inputFloat1 + inputFloat1 + inputFloat1 + inputFloat1 + inputFloat1 + inputFloat1 + inputFloat1 + inputFloat1 + inputFloat1}]]></text>
         </outputEntry>
       </rule>
+      <rule>
+        <inputEntry id="inputEntry2">
+          <text><![CDATA[< 10]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry2_1">
+          <text><![CDATA[#{inputDouble2 * 2000 / 2000}]]></text>
+        </outputEntry>
+      </rule>
     </decisionTable>
   </decision>
 </definitions>

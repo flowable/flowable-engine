@@ -39,10 +39,12 @@ public class CalculationsTest {
 
         Long inputVariable1 = 1L;
         Double inputDouble1 = 0.1D;
+        Double inputDouble2 = 1.0e307;
         Float inputFloat1 = 0.1F;
 
         processVariablesInput.put("inputVariable1", inputVariable1);
         processVariablesInput.put("inputDouble1", inputDouble1);
+        processVariablesInput.put("inputDouble2", inputDouble2);
         processVariablesInput.put("inputFloat1", inputFloat1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
@@ -56,5 +58,26 @@ public class CalculationsTest {
         Assert.assertFalse(result.isFailed());
         Assert.assertEquals(1D, result.getRuleExecutions().get(1).getConclusionResults().get(0).getResult());
         Assert.assertEquals(1D, result.getRuleExecutions().get(1).getConclusionResults().get(1).getResult());
+        Assert.assertEquals(inputDouble2, result.getRuleExecutions().get(2).getConclusionResults().get(0).getResult());
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/calculations_variable_update_1.dmn")
+    public void outcomeVariableReferenceUpdate1() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        processVariablesInput.put("input1", "blablatest");
+        processVariablesInput.put("referenceVar1", 10D);
+
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("decision")
+            .variables(processVariablesInput)
+            .executeWithAuditTrail();
+
+        Assert.assertEquals(10D, result.getRuleExecutions().get(1).getConclusionResults().get(0).getResult());
+        Assert.assertEquals(20D, result.getRuleExecutions().get(2).getConclusionResults().get(0).getResult());
     }
 }
