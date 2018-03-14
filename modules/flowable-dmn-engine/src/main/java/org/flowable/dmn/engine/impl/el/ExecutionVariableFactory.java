@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.engine.impl.el;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -54,6 +56,10 @@ public class ExecutionVariableFactory {
             } else if (StringUtils.equals("number", type)) {
                 if (expressionResult instanceof Double) {
                     executionVariable = expressionResult;
+                } else if (expressionResult instanceof BigDecimal) {
+                    executionVariable = ((BigDecimal) expressionResult).doubleValue();
+                } else if (expressionResult instanceof BigInteger) {
+                    executionVariable = ((BigInteger) expressionResult).doubleValue();
                 } else {
                     executionVariable = Double.valueOf(expressionResult.toString());
                 }
