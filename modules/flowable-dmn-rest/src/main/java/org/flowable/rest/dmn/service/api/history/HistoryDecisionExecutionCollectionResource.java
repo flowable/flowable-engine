@@ -12,14 +12,11 @@
  */
 package org.flowable.rest.dmn.service.api.history;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryProperty;
@@ -31,9 +28,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -65,6 +67,7 @@ public class HistoryDecisionExecutionCollectionResource {
             @ApiImplicitParam(name = "activityId", dataType = "string", value = "Only return historic decision executions with the given activity id.", paramType = "query"),
             @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return historic decision executions with the given execution id.", paramType = "query"),
             @ApiImplicitParam(name = "instanceId", dataType = "string", value = "Only return historic decision executions with the given instance id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return historic decision executions with the given scope type.", paramType = "query"),
             @ApiImplicitParam(name = "failed", dataType = "string", value = "Only return historic decision executions with the failed state.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic decision executions with the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic decision executions like the given tenant id.", paramType = "query"),
@@ -99,6 +102,9 @@ public class HistoryDecisionExecutionCollectionResource {
         }
         if (allRequestParams.containsKey("instanceId")) {
             historicDecisionExecutionQuery.instanceId(allRequestParams.get("instanceId"));
+        }
+        if (allRequestParams.containsKey("scopeType")) {
+            historicDecisionExecutionQuery.scopeType(allRequestParams.get("scopeType"));
         }
         if (allRequestParams.containsKey("failed")) {
             historicDecisionExecutionQuery.failed(new Boolean(allRequestParams.get("failed")));

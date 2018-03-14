@@ -517,14 +517,14 @@ angular.module('flowableApp')
                 $scope.newTask.assignee = user;
             };
 
-            $scope.createSubTask = function () {
+            $scope.createSubTask = function (element) {
                 // Create popover
                 if (!$scope.createTaskPopover) {
                     $scope.newTask = {
                         name: 'New task'
                     };
 
-                    $scope.createTaskPopover = $popover(angular.element('#toggle-create-subtask'), {
+                    $scope.createTaskPopover = $popover(angular.element(element), {
                         template: appResourceRoot + 'views/popover/create-task-popover.html',
                         placement: 'bottom-right',
                         show: true,

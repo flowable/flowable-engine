@@ -277,6 +277,8 @@
         "DELETE-REASON": "Delete reason:",
         "PROCESS-INSTANCE": "Process Instance",
         "PROCESS-DEFINITION": "Process definition",
+        "CASE-INSTANCE": "Case Instance",
+        "CASE-DEFINITION": "Case definition",
         "EXECUTION-ID": "Execution ID:",
         "SUBTASKS-MESSAGE": "This task has {{total}} subtasks, showing {{size}}.",
         "SUBTASKS-MESSAGE-EMPTY": "This task has no subtasks.",
@@ -353,6 +355,7 @@
             "STATUS-ACTIVE": "Active tasks",
             "STATUS-COMPLETE": "Completed tasks",
             "PROCESS-INSTANCE-ID": "Process instance ID",
+            "CASE-INSTANCE-ID": "Case instance ID",
             "TENANT-ID": "Tenant identifier",
             "OWNER": "Owner (case sensitive)",
             "PARENT-TASK-ID": "Parent task ID",
@@ -458,6 +461,8 @@
         "EXECUTION-ID": "Execution ID:",
         "PROCESS-INSTANCE": "Process instance:",
         "PROCESS-DEFINITION": "Process definition:",
+        "CASE-INSTANCE": "Case instance:",
+        "CASE-DEFINITION": "Case definition:",
         "DUEDATE": "Due date:",
         "RETRIES-LEFT": "Retries left:",
         "TENANT-ID": "Tenant:"
@@ -477,6 +482,9 @@
             "PROCESS-DEFINITION": "Process definition",
             "ALL-PROCESS-DEFINITIONS": "All process definitions",
             "PROCESS-INSTANCE-ID": "Process instance ID",
+            "CASE-DEFINITION": "Case definition",
+            "ALL-CASE-DEFINITIONS": "All case definitions",
+            "CASE-INSTANCE-ID": "Case instance ID",
             "TENANT-ID": "Tenant identifier",
             "DUE-BEFORE": "Due before",
             "DUE-AFTER": "Due after",
@@ -486,12 +494,14 @@
         "SORT": {
             "ID": "Job ID",
             "DUE-DATE": "Due date",
-            "PROCESS-INSTANCE-ID": "Process instance ID"
+            "PROCESS-INSTANCE-ID": "Process instance ID",
+            "CASE-INSTANCE-ID": "Case instance ID"
         },
         "HEADER": {
             "ID": "ID",
             "DUE-DATE": "Due date",
             "PROCESS-DEFINITION": "Process definition",
+            "CASE-DEFINITION": "Case definition",
             "RETRIES": "Retries",
             "EXCEPTION": "Exception"
         }
@@ -768,6 +778,256 @@
         	"DELETE-ERROR": "Could not delete app. {{message || ''}}"
         }
     },
+    "CMMN-DEPLOYMENTS": {
+        "TITLE": "Deployments",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching deployments.",
+        "LIST-MESSAGE-EMPTY": "No matching deployments.",
+        "FILTER": {
+            "NAME": "Name (case sensitive)",
+            "TENANTID": "Tenant identifier (case sensitive)"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Name"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "DEPLOY-TIME": "Deploy time",
+            "CATEGORY": "Category",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "UPLOAD": "Upload process or package",
+            "DELETE": "Delete deployment"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Select a .bpmn, .bpmn20.xml process file to deploy or upload a package of processes (with assets) contained in .zip or .bar file.",
+                "DROPZONE": "Or drop a file here",
+                "NO-DROP": "File drop is not supported by your browser",
+                "CANCEL-UPLOAD": "Cancel upload",
+                "ERROR": "Could not upload this file"
+            },
+            "DELETE": {
+                "CONFIRM-MESSAGE": "Delete deployment '{{name}}'?"
+                }
+        }
+    },
+    "CMMN-DEPLOYMENT": {
+        "ID": "ID:",
+        "NAME": "Name:",
+        "TIME": "Deployment time:",
+        "CATEGORY": "Category:",
+        "TENANTID": "Tenant identifier:",
+        "DEFINITIONS-MESSAGE": "This deployment has {{total}} case definitions, showing {{size}}.",
+        "DEFINITIONS-MESSAGE-EMPTY": "This deployment has no case definitions.",
+        "TITLE": {
+            "CASE-DEFINITIONS": "Case Definitions",
+            "RESOURCES": "Resources"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Show all definitions"
+        }
+    },
+    "CASE-DEFINITIONS": {
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching definitions.",
+        "LIST-MESSAGE-EMPTY": "No matching case definitions.",
+        "FILTER": {
+            "NAME": "Name (case sensitive)",
+            "KEY": "Key (case sensitive)",
+            "DEPLOYMENT-ID": "Deployment ID",
+            "TENANT-ID": "Tenant ID",
+            "LATEST": "Latest version",
+            "LATEST-HELP": "Only show latest versions"
+        },
+        "TITLE": {
+            "MAIN": "Case Definitions"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Name",
+            "VERSION": "Version"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "VERSION": "Version",
+            "KEY": "Key",
+            "TENANT": "Tenant"
+        },
+        "ACTIONS": {
+            "UPLOAD-FROM-MODELER": "Upload from Flowable Editor"
+        },
+        "POPUP": {
+            "UPLOAD-FROM-MODELER": {
+                "NAME": "User name",
+                "PASSWORD": "Password",
+                "ERROR": "We couldn't contact the Editor",
+                "UNAUTHORIZED": "Invalid credentials",
+                "UPLOAD-DESCRIPTION": "The process model will now be fetched and deployed to the currently active Flowable cluster. Select an appropriate name for deployment package."
+            }
+        }
+    },
+    "CASE-DEFINITION": {
+        "ID": "ID:",
+        "NAME": "Name:",
+        "VERSION": "Version:",
+        "DESCRIPTION": "Description:",
+        "KEY": "Key:",
+        "CATEGORY": "Category:",
+        "DEPLOYMENT": "Deployment:",
+        "TENANT": "Tenant:",
+        "START-FORM-DEFINED": "Start form defined:",
+        "GRAPHICAL-NOTATION-DEFINED": "Graphical notation defined:",
+        "CASE-INSTANCES-SIZE": "Definition has {{total}} case instances running",
+        "CASE-INSTANCES-SHOWING": ", showing {{size}} most recently started",
+        "CASE-INSTANCES-EMPTY": "Definition has no case instances running",
+        "JOBS-SIZE": "Definition has {{total}} jobs running",
+        "JOBS-EMPTY": "Definition has no jobs running",
+        "DECISION-TABLES-SIZE": "Definition has {{total}} decision tables.",
+        "DECISION-TABLES-EMPTY": "Definition has no decision tables.",
+        "FORM-DEFINITIONS-SIZE": "Definition has {{total}} form definitions.",
+        "FORM-DEFINITIONS-EMPTY": "Definition has no form definitions.",
+        "TITLE": {
+            "CASE-INSTANCES": "Case instances",
+            "JOBS": "Jobs",
+            "DECISION-TABLES": "Decision tables",
+            "FORMS": "Form definitions"
+        },
+        "ACTION": {
+            "EDIT-CATEGORY": "Edit category",
+            "SHOW-ALL-JOBS": "Show all jobs",
+            "SHOW-ALL-CASES": "Show all cases",
+            "SHOW-DIAGRAM": "Show case diagram"
+        },
+        "POPUP": {
+            "EDIT-CATEGORY": {
+                "TITLE": "Edit category for definition",
+                "MESSAGE": "The initial category for the definition is populated from the targetNameSpace attribute in the CMMN 1.1 XML, but can be altered after deployment.",
+                "CATEGORY": "Category",
+                "CATEGORY-PLACEHOLDER": "Enter a category",
+                "CONFIRM": "Update category"
+            },
+            "SHOW-CASE-MODEL": {
+                "TITLE": "Case diagram"
+            }
+        }
+    },
+    "CASE-INSTANCES": {
+        "TITLE": "Case instances",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching case instances.",
+        "LIST-MESSAGE-EMPTY": "No matching case instances.",
+        "FILTER": {
+            "NAME": "Name",
+            "CASE-DEFINITION": "Case definition",
+            "ALL-CASE-DEFINITIONS": "All case definitions",
+            "STATUS": "Status",
+            "STATUS-ANY": "Any status",
+            "STATUS-ACTIVE": "Active instances",
+            "STATUS-COMPLETE": "Completed instances",
+            "BUSINESS-KEY": "Business key",
+            "STARTED-BEFORE": "Started before",
+            "STARTED-AFTER": "Started after",
+            "ENDED-BEFORE": "Ended before",
+            "ENDED-AFTER": "Ended after",
+            "VARIABLE": "Variable",
+            "VARIABLE-NAME": "Variable name",
+            "VARIABLE-VALUE": "Variable value",
+            "VARIABLE-BOOLEAN-VALUE": "Boolean value: {{value}}",
+            "TENANT-ID": "Tenant identifier"
+        },
+        "SORT": {
+            "ID": "ID",
+            "START-TIME": "Time started"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "BUSINESS-KEY": "Business key",
+            "CASE-DEFINITION": "Case definition",
+            "CREATE-TIME": "Created",
+            "END-TIME": "Ended",
+            "STATUS": "Status"
+        }
+    },
+    "CASE-INSTANCE": {
+        "ID": "ID:",
+        "NAME": "Name:",
+        "DESCRIPTION": "Description:",
+        "BUSINESS-KEY": "Business key:",
+        "TENANT-ID": "Tenant:",
+        "STATUS": "Status:",
+        "STATUS-ACTIVE": "Active",
+        "STATUS-COMPLETED": "Completed",
+        "DELETE-REASON": "Delete reason:",
+        "STARTED-BY": "Started by:",
+        "END-TIME": "End time:",
+        "DURATION": "Duration:",
+        "TASKS-SIZE": "This case instance has {{total}} tasks.",
+        "TASKS-EMPTY": "This case instance has no tasks.",
+        "VARIABLES-SIZE": "This case instance has {{total}} variables.",
+        "VARIABLES-EMPTY": "This case instance has no variables.",
+        "JOBS-SIZE": "This case instance has {{total}} jobs.",
+        "JOBS-EMPTY": "This case instance has no jobs.",
+        "DECISION-TABLES-SIZE": "This case instance has {{total}} decision tables.",
+        "DECISION-TABLES-EMPTY": "This case instance has no decision tables.",
+        "FORM-INSTANCES-SIZE": "This case instance has {{total}} form instances.",
+        "FORM-INSTANCES-EMPTY": "This case instance has no form instances.",
+        "TITLE": {
+            "TASKS": "Tasks",
+            "VARIABLES": "Variables",
+            "JOBS": "Jobs",
+            "DECISION-TABLES": "Decision Tables",
+            "FORM-INSTANCES": "Form instances"
+        },
+        "ACTION": {
+            "DELETE": "Delete case instance",
+            "TERMINATE": "Terminate case instance",
+            "SHOW-ALL-TASKS": "Show all tasks",
+            "SHOW-ALL-JOBS": "Show all jobs",
+            "SHOW-DIAGRAM": "Show case diagram",
+            "TITLE-VARIABLES": "Actions on selected variable",
+            "DELETE-VARIABLE": "Delete the variable",
+            "UPDATE-VALUE": "Update variable",
+            "ADD-VARIABLE": "Add variable"
+        },
+        "POPUP": {
+            "DELETE": {
+                "TITLE": "Delete case instance",
+                "MESSAGE-DELETE": "Are you sure you want to delete the case instance",
+                "MESSAGE-TERMINATE": "Are you sure you want to terminate the case instance",
+                "DELETE-REASON": "Delete reason",
+                "DELETE-REASON-HELP": "Enter an optional delete reason",
+                "CONFIRM-DELETE": "Delete case instance",
+                "CONFIRM-TERMINATE": "Terminate case instance"
+            },
+            "SHOW-CASE-MODEL": {
+                "TITLE": "Case diagram"
+            },
+            "CREATE-VARIABLE": {
+                "TITLE": "Create Variable",
+                "NAME": "Variable name",
+                "TYPE": "Flowable variable type",
+                "VALUE": "Variable value",
+                "CREATE": "Create"
+            },
+            "UPDATE-VARIABLE": {
+                "TITLE": "Update variable '{{name}}'",
+                "NAME": "Variable name",
+                "VALUE": "Value",
+                "CHECKED": "true",
+                "UNCHECKED": "false",
+                "DATE-HELP": "ISO-8601 format (example : 2016-01-28T23:00:00Z)",
+                "ACTION-UPDATE": "Update"
+            },
+            "DELETE-VARIABLE": {
+                "TITLE": "Delete variable '{{name}}",
+                "MESSAGE": "Are you sure you want to remove this variable?",
+                "DELETE": "Delete"
+            }
+        }
+    },
     "DECISION-TABLE-DEPLOYMENTS": {
         "TITLE": "Decision Table Deployments",
         "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching deployments.",
@@ -870,6 +1130,7 @@
         "FILTER": {
             "DEFINITION-ID": "Definition ID",
             "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "CASE-INSTANCE-ID": "Case Instance ID",
             "TENANTID": "Tenant identifier"
         },
         "SORT": {
@@ -896,12 +1157,14 @@
         "DEFINITION-NAME": "Decision Name",
         "DEFINITION-VERSION": "Decision Version",
         "PROCESS-INSTANCE-ID": "Process Instance ID",
+        "CASE-INSTANCE-ID": "Case Instance ID",
         "EXECUTION-START-TIME": "Start Time",
         "EXECUTION-END-TIME": "End Time",
         "FAILED": "Failed",
         "FILTER": {
             "DEFINITION-ID": "Definition ID",
             "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "CASE-INSTANCE-ID": "Case Instance ID",
             "TENANTID": "Tenant identifier"
         },
         "SORT": {
@@ -914,6 +1177,7 @@
             "DECISION-DEFINITION-ID": "Definition ID",
             "DECISION-KEY": "Decision Key",
             "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "CASE-INSTANCE-ID": "Case Instance ID",
             "FAILED": "Failed",
             "START-TIME": "Start Time",
             "END-TIME": "End Time",
@@ -1040,6 +1304,7 @@
         "HEADER": {
             "ID": "ID",
             "PROCESS-INSTANCE-ID": "Process Instance ID",
+            "CASE-INSTANCE-ID": "Case Instance ID",
             "TASK-ID": "Task ID",
             "SUBMITTED-ON": "Submitted Date",
             "SUBMITTED-BY": "Submitted By",
@@ -1058,6 +1323,7 @@
             "ID": "ID",
             "TASK-ID": "Task ID",
             "PROCESS-ID": "Process Instance ID",
+            "CASE-INSTANCE-ID": "Case Instance ID",
             "SUBMITTED": "Submitted on",
             "SUBMITTED-BY": "Submitted by",
             "FORM-DEFINITION-ID": "Form Definition ID"

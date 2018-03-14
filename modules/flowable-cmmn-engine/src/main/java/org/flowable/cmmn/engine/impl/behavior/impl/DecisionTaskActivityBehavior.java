@@ -26,6 +26,7 @@ import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -81,6 +82,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
                 instanceId(planItemInstanceEntity.getCaseInstanceId()).
                 executionId(planItemInstanceEntity.getId()).
                 activityId(decisionTask.getId()).
+                scopeType(ScopeTypes.CMMN).
                 variables(planItemInstanceEntity.getVariables()).
                 tenantId(planItemInstanceEntity.getTenantId()).
                 executeWithAuditTrail();

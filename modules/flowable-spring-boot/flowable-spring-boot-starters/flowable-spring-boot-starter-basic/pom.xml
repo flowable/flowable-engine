@@ -14,14 +14,10 @@
 		</properties> -->
 
 	<dependencies>
-		<!-- Support for auto-completion support in Boot 1.2 -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-autoconfigure</artifactId>
 		</dependency>
-
-		<!-- common -->
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine</artifactId>
@@ -29,101 +25,10 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-spring</artifactId>
-
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-form-spring-configurator</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
-		</dependency>
-
-		<!-- rest api -->
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-rest</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-common-rest</artifactId>
-			<optional>true</optional>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- integration -->
-		<dependency>
-			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-java-dsl</artifactId>
-			<version>${spring-integration-java-dsl.version}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy</artifactId>
-			<version>1.7.5</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- actuator -->
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-image-generator</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-bpmn-model</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-bpmn-layout</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-
-		<!-- boot -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-integration</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -163,4 +68,11 @@
 			</build>
 		</profile>
 	</profiles>
+
+	<distributionManagement>
+		<relocation>
+			<artifactId>flowable-spring-boot-starter-process</artifactId>
+			<message>The starter for the Process engine has been moved. If you want to use the starter with all engines use flowable-spring-boot-starter</message>
+		</relocation>
+	</distributionManagement>
 </project>

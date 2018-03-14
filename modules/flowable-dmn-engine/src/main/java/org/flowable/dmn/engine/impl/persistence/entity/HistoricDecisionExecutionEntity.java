@@ -35,6 +35,8 @@ public interface HistoricDecisionExecutionEntity extends DmnHistoricDecisionExec
     void setExecutionId(String executionId);
 
     void setActivityId(String activityId);
+    
+    void setScopeType(String scopeType);
 
     void setFailed(boolean failed);
 

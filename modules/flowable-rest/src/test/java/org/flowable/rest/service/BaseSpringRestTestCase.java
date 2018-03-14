@@ -12,9 +12,9 @@
  */
 package org.flowable.rest.service;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -37,7 +37,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -294,10 +293,8 @@ public class BaseSpringRestTestCase {
             httpResponses.add(response);
             return response;
 
-        } catch (ClientProtocolException e) {
-            Assert.fail(e.getMessage());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage(), e);
         }
         return null;
     }
@@ -307,7 +304,7 @@ public class BaseSpringRestTestCase {
             try {
                 response.close();
             } catch (IOException e) {
-                fail("Could not close http connection");
+                fail("Could not close http connection", e);
             }
         }
     }
@@ -358,7 +355,7 @@ public class BaseSpringRestTestCase {
             if (exception != null) {
                 throw exception;
             } else {
-                Assert.fail(outputMessage.toString());
+                fail(outputMessage.toString());
             }
         } else {
             LOGGER.debug("database was clean");

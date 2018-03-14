@@ -4,7 +4,7 @@
   - Header: #1f3245
   - Subheader: #e8edf1
   - Subheader border: #a4acb9
-  - Highlight buttons/text: #36a7c4
+  - Highlight buttons/text: #2980b9
   - Text color: #1a1a1a
   - Filter color: #373e48
   - Dark highlight: #606b7d
@@ -202,7 +202,7 @@ label {
 
 /** Buttons **/
 button.btn, a.btn {
-    background-color: #36a7c4;
+    background-color: #2980b9;
     color: #ffffff;
     border-color: #ffffff;
     font-size: 15px;
@@ -317,7 +317,7 @@ button.btn.btn-danger {
 }
 
 .dropdown-menu > li > a:hover, .dropdown-menu > ul > li > a:hover {
-    background: #36a7c4;
+    background: #2980b9;
     color: #ffffff;
 }
 
@@ -349,7 +349,7 @@ a.dropdown-toggle {
 }
 
 .open a.dropdown-toggle, a.dropdown-toggle:hover {
-    color: #36a7c4;
+    color: #2980b9;
 }
 
 .btn-group.open .dropdown-toggle {
@@ -586,7 +586,7 @@ a.dropdown-toggle {
 
 
 .navbar-nav > li.active > a {
-    color: #36a7c4;
+    color: #2980b9;
 }
 
 /* Sub header */
@@ -611,7 +611,7 @@ a.dropdown-toggle {
 
 .subheader  .version {
     font-weight: bold;
-    color: #36a7c4;
+    color: #2980b9;
     font-size: 110%;
     padding-left: 5px;
     line-height: 1;
@@ -1280,7 +1280,7 @@ button.selection:active, button.selection:focus {
 }
 
 .list-header .summary .filter-action:hover {
-    color: #36a7c4;
+    color: #2980b9;
 }
 
 .main-list .list-subheader {
@@ -1324,7 +1324,7 @@ button.selection:active, button.selection:focus {
     padding-right: 0;
     border-radius: 3px;
     background-color: #e8edf1;
-    color: #36a7c4;
+    color: #2980b9;
     background-color: transparent;
     font-weight: normal;
 
@@ -1351,7 +1351,7 @@ button.selection:active, button.selection:focus {
 }
 
 .full-list li.active > div {
-    border-left-color: #36a7c4;
+    border-left-color: #2980b9;
 }
 
 .full-list li .title {
@@ -1437,7 +1437,7 @@ button.selection:active, button.selection:focus {
 }
 
 .header .detail a:hover {
-    color: #36a7c4;
+    color: #2980b9;
     text-decoration: underline;
 }
 
@@ -1469,7 +1469,7 @@ button.selection:active, button.selection:focus {
 
 .jumpers li.selected {
     color: white;
-    background-color: #36a7c4;
+    background-color: #2980b9;
 }
 
 
@@ -1554,7 +1554,7 @@ h3+div > .dropzone {
 }
 
 .dropzone.dragover {
-    border: 1px dotted #36a7c4;
+    border: 1px dotted #2980b9;
 }
 
 .dropzone .message {
@@ -1569,7 +1569,7 @@ h3+div > .dropzone {
 }
 
 .dropzone.dragover .message {
-    color: #36a7c4;
+    color: #2980b9;
     font-size: 20px;
     visibility: inherit;
 }
@@ -1812,7 +1812,7 @@ h3+div > .dropzone {
 }
 
 .dropdown-menu.datepicker th .btn:hover, .dropdown-menu.datepicker th .btn:focus {
-    color: #36a7c4;
+    color: #2980b9;
 }
 
 .dropdown-menu.datepicker .calendar-grid .btn:hover, .dropdown-menu.datepicker .calendar-grid .btn:focus {
@@ -1826,7 +1826,7 @@ h3+div > .dropzone {
 }
 
 .dropdown-menu.datepicker .calendar-grid .btn-primary, .dropdown-menu.datepicker .calendar-grid .btn-primary:hover, .dropdown-menu.datepicker .calendar-grid .btn-primary:focus {
-    background-color: #36a7c4;
+    background-color: #2980b9;
     color: #ffffff;
 }
 
@@ -1953,7 +1953,7 @@ h3+div > .dropzone {
 }
 
 .crumb:hover {
-    color: #36a7c4;
+    color: #2980b9;
     text-decoration: underline;
 }
 .crumb:hover i {
@@ -2862,7 +2862,7 @@ ul#strength > li:last-child {
     margin: 0 2px 0 0;
     overflow: hidden;
     color: #ffffff;
-    background: #36a7c4 no-repeat center center;
+    background: #2980b9 no-repeat center center;
     background-size: 32px 32px;
     cursor: pointer;
     border: 1px solid transparent;
@@ -2873,7 +2873,7 @@ ul#strength > li:last-child {
 }
 
 .user-picture.no-picture {
-    border-color: #36a7c4;
+    border-color: #2980b9;
 }
 
 .user-picture span {
@@ -3156,7 +3156,7 @@ ul#strength > li:last-child {
 }
 
 .help-entry:hover > span {
-    color: #36a7c4;
+    color: #2980b9;
 }
 
 .help-entry.active:hover > span {

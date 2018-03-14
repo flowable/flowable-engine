@@ -200,7 +200,8 @@
             "DESCRIPTION-WITH-CLAIM": "This task has no details yet. You can change that by choosing one of the following actions. In addition, to complete this task you need to claim it first by pressing the blue button in the top right of the page.",
             "ADD-PEOPLE": "Involve someone else and start collaborating",
             "ADD-COMMENT": "Enlighten others by adding a comment",
-            "ADD-CONTENT": "Add a document and share the knowledge"
+            "ADD-CONTENT": "Add a document and share the knowledge",
+            "ADD-SUBTASK": "Create a sub task"
         }
     },
     "PROCESS": {
@@ -399,7 +400,7 @@
     "APP-DEFINITION" : {
         "MESSAGE" : {
             "NOT-FOUND": "No app definition found with the given id",
-            "MISSING": "Activiti is running in integration mode, but the required app definition is missing"
+            "MISSING": "Flowable is running in integration mode, but the required app definition is missing"
         }
     }
 }

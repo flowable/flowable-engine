@@ -53,6 +53,9 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
             @ApiImplicitParam(name = "processInstanceIdLike", dataType = "string", value = "Only return form instances with a process instance id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return form instances with the given process definition id.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionIdLike", dataType = "string", value = "Only return form instances with a process definition id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return form instances with the given scope id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return form instances with a scope type like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return form instances with the given scope definition id.", paramType = "query"),
             @ApiImplicitParam(name = "submittedBy", dataType = "string", value = "Only return form instances submitted by the given value.", paramType = "query"),
             @ApiImplicitParam(name = "submittedByLike", dataType = "string", value = "Only return form instances submitted by like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form instances with the given tenantId.", paramType = "query"),
@@ -95,6 +98,15 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         }
         if (allRequestParams.containsKey("processDefinitionIdLike")) {
             queryRequest.setProcessDefinitionIdLike(allRequestParams.get("processDefinitionIdLike"));
+        }
+        if (allRequestParams.containsKey("scopeId")) {
+            queryRequest.setScopeId(allRequestParams.get("scopeId"));
+        }
+        if (allRequestParams.containsKey("scopeType")) {
+            queryRequest.setScopeType(allRequestParams.get("scopeType"));
+        }
+        if (allRequestParams.containsKey("scopeDefinitionId")) {
+            queryRequest.setScopeDefinitionId(allRequestParams.get("scopeDefinitionId"));
         }
         if (allRequestParams.containsKey("submittedBy")) {
             queryRequest.setSubmittedBy(allRequestParams.get("submittedBy"));

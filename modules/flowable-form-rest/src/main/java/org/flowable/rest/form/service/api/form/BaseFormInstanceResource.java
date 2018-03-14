@@ -69,6 +69,15 @@ public class BaseFormInstanceResource {
         if (queryRequest.getProcessDefinitionIdLike() != null) {
             query.processDefinitionIdLike(queryRequest.getProcessDefinitionIdLike());
         }
+        if (queryRequest.getScopeId() != null) {
+            query.scopeId(queryRequest.getScopeId());
+        }
+        if (queryRequest.getScopeType() != null) {
+            query.scopeType(queryRequest.getScopeType());
+        }
+        if (queryRequest.getScopeDefinitionId() != null) {
+            query.scopeDefinitionId(queryRequest.getScopeDefinitionId());
+        }
         if (queryRequest.getSubmittedBy() != null) {
             query.submittedBy(queryRequest.getSubmittedBy());
         }

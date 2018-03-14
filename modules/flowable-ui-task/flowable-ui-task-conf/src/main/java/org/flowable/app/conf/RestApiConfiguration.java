@@ -12,7 +12,7 @@
  */
 package org.flowable.app.conf;
 
-import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
+import org.flowable.rest.cmmn.service.api.CmmnRestResponseFactory;
 import org.flowable.rest.application.ContentTypeResolver;
 import org.flowable.rest.application.DefaultContentTypeResolver;
 import org.flowable.rest.content.ContentRestResponseFactory;

@@ -59,6 +59,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.EngineConfigurator;
 import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.engine.common.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
@@ -84,6 +85,10 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.engine.common.impl.scripting.BeansResolverFactory;
+import org.flowable.engine.common.impl.scripting.ResolverFactory;
+import org.flowable.engine.common.impl.scripting.ScriptBindingsFactory;
+import org.flowable.engine.common.impl.scripting.ScriptingEngines;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -270,10 +275,6 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefin
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.flowable.engine.impl.scripting.BeansResolverFactory;
-import org.flowable.engine.impl.scripting.ResolverFactory;
-import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
-import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.parse.BpmnParseHandler;
@@ -342,7 +343,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration {
+public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration implements ScriptingEngineAwareEngineConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
 
@@ -1306,6 +1307,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.taskServiceConfiguration.setIdGenerator(this.taskIdGenerator);
 
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
@@ -1841,6 +1843,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
             dbIdGenerator.setCommandConfig(getDefaultCommandConfig().transactionRequiresNew());
             idGenerator = dbIdGenerator;
+        }
+        if (taskIdGenerator == null) {
+            taskIdGenerator = idGenerator;
         }
     }
 
@@ -2487,10 +2492,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public ScriptingEngines getScriptingEngines() {
         return scriptingEngines;
     }
-
+    
+    @Override
     public ProcessEngineConfigurationImpl setScriptingEngines(ScriptingEngines scriptingEngines) {
         this.scriptingEngines = scriptingEngines;
         return this;

@@ -91,7 +91,13 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
         List<Task> subTasks = this.taskService.getSubTasks(taskId);
         List<TaskRepresentation> subTasksRepresentations = new ArrayList<>(subTasks.size());
         for (Task subTask : subTasks) {
-            subTasksRepresentations.add(new TaskRepresentation(subTask, parentTask));
+            TaskRepresentation representation = new TaskRepresentation(subTask, parentTask);
+            
+            fillPermissionInformation(representation, subTask, currentUser);
+            populateAssignee(subTask, representation);
+            representation.setInvolvedPeople(getInvolvedUsers(subTask.getId()));
+            
+            subTasksRepresentations.add(representation);
         }
         
         return subTasksRepresentations;
