@@ -280,6 +280,9 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 Object resultValue = ELExpressionExecutor.executeOutputExpression(ruleClauseContainer.getOutputClause(), outputEntryExpression, expressionManager, executionContext);
                 executionVariable = ExecutionVariableFactory.getExecutionVariable(outputVariableType, resultValue);
 
+                // update execution context
+                executionContext.getStackVariables().put(outputVariableId, executionVariable);
+
                 // create result
                 if (getHitPolicyBehavior(hitPolicy) instanceof ComposeRuleResultBehavior) {
                     ((ComposeRuleResultBehavior) getHitPolicyBehavior(hitPolicy)).composeRuleResult(ruleNumber, outputVariableId, executionVariable, executionContext);
