@@ -18,6 +18,7 @@ import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavio
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.UserEventListener;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
@@ -36,7 +37,7 @@ public class UserEventListenerActivityBehaviour extends CoreCmmnTriggerableActiv
 
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
-        //TODO... Confirm its working for states changes other than create - @Dennis Federico
+
     }
 
     @Override

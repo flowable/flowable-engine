@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
              targetNamespace="http://flowable.org/cmmn">
-    <case id="testUserEventListenerTerminateTask" name="testTerminateTaskUserEventListener">
+    <case id="testTerminateTask" name="testTerminateTaskUserEventListener">
         <casePlanModel id="casePlanModel">
 
             <planItem id="planItemStage" name="Stage One" definitionRef="stage1"/>

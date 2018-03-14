@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testUserEventListenerCompleteWithoutFireEvent" name="testCompleteWithoutFireEvent">
+        <casePlanModel id="casePlanModel">
+
+            <planItem id="planItemStage" name="Stage One" definitionRef="stage1">
+                <!--<exitCriterion sentryRef="onUserEventAbortStageSentry"/>-->
+            </planItem>
+            <!--<planItem id="planItemUserEventAbortStage" definitionRef="abortStageUserEvent"/>-->
+
+            <!--<sentry id="onUserEventAbortStageSentry">-->
+                <!--<planItemOnPart sourceRef="planItemUserEventAbortStage">-->
+                    <!--<standardEvent>occur</standardEvent>-->
+                <!--</planItemOnPart>-->
+            <!--</sentry>-->
+
+            <!--<userEventListener id="abortStageUserEvent" name="Abort Stage"/>-->
+
+            <stage id="stage1" name="Stage One">
+                <planItem id="planItemTaskA" name="Task A" definitionRef="taskA">
+                    <exitCriterion sentryRef="onUserEventAbortTaskSentry"/>
+                </planItem>
+                <planItem id="planItemUserEventAbortTask" definitionRef="abortTaskUserEvent"/>
+                <sentry id="onUserEventAbortTaskSentry">
+                    <planItemOnPart sourceRef="planItemUserEventAbortTask">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <task id="taskA" name="Task A"/>
+
+                <userEventListener id="abortTaskUserEvent" name="Abort Task"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+</definitions>
