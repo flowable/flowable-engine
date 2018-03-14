@@ -89,6 +89,7 @@ public class CmmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration
 
         if (resources != null && !resources.isEmpty()) {
             configuration.setDeploymentResources(resources.toArray(new Resource[0]));
+            configuration.setDeploymentName(cmmnProperties.getDeploymentName());
         }
 
         if (asyncExecutor != null) {

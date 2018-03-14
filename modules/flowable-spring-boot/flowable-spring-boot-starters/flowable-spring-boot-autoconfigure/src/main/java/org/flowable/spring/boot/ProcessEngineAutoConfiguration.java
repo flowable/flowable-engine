@@ -90,6 +90,7 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
         if (resources != null && !resources.isEmpty()) {
             conf.setDeploymentResources(resources.toArray(new Resource[0]));
+            conf.setDeploymentName(flowableProperties.getDeploymentName());
         }
 
         if (springAsyncExecutor != null) {

@@ -31,7 +31,7 @@ public class FlowableProperties {
     private boolean checkProcessDefinitions = true;
     private boolean asyncExecutorActivate = true;
     private boolean restApiEnabled;
-    private String deploymentName;
+    private String deploymentName = "SpringBootAutoDeployment";
     private String mailServerHost = "localhost";
     private int mailServerPort = 1025;
     private String mailServerUserName;

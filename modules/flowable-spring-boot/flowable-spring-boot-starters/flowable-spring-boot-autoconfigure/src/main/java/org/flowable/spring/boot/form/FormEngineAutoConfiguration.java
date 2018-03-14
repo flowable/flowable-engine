@@ -80,6 +80,7 @@ public class FormEngineAutoConfiguration extends AbstractEngineAutoConfiguration
 
         if (resources != null && !resources.isEmpty()) {
             configuration.setDeploymentResources(resources.toArray(new Resource[0]));
+            configuration.setDeploymentName(formProperties.getDeploymentName());
         }
 
         configureSpringEngine(configuration, platformTransactionManager);
