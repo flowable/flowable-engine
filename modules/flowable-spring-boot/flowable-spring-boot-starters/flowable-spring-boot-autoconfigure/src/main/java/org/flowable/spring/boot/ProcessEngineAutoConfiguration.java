@@ -66,10 +66,13 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
     @Autowired(required = false)
     private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
+    protected final FlowableProcessProperties processProperties;
     protected final FlowableIdmProperties idmProperties;
 
-    public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableIdmProperties idmProperties) {
+    public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
+        FlowableIdmProperties idmProperties) {
         super(flowableProperties);
+        this.processProperties = processProperties;
         this.idmProperties = idmProperties;
     }
 
@@ -109,6 +112,9 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
         conf.setMailServerDefaultFrom(flowableProperties.getMailServerDefaultFrom());
         conf.setMailServerUseSSL(flowableProperties.isMailServerUseSsl());
         conf.setMailServerUseTLS(flowableProperties.isMailServerUseTls());
+
+        conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());
+        conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
 
