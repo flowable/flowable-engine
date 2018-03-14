@@ -111,7 +111,7 @@ public class DMNParseUtil {
                 return result;
             }
         } else {
-           return getNumberValue(value);
+            return getNumberValue(value);
         }
     }
 
@@ -120,9 +120,9 @@ public class DMNParseUtil {
             return Long.parseLong(value);
         } catch (NumberFormatException nfe1) {
             try {
-                return Float.parseFloat(value);
+                return Double.parseDouble(value);
             } catch (NumberFormatException nfe2) {
-                LOGGER.warn("Could not parse to Long or Float from: "+value);
+                LOGGER.warn("Could not parse to Long or Double from: " + value);
                 return null;
             }
         }
