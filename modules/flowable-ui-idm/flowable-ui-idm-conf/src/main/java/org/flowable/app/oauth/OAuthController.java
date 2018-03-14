@@ -64,7 +64,7 @@ public class OAuthController {
             throw new RuntimeException(e);
         }
         LOG.debug(String.format("Using OAuth Requestor '%1$s'!", selectedRequestor.getClass().getCanonicalName()));
-        String redirectUrl = selectedRequestor.buildAuthorizationURL();
+        String redirectUrl = selectedRequestor.buildAuthorizationURL(request);
         if (redirectUrl != null) {
             return "redirect:" + redirectUrl;
         }

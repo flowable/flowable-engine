@@ -12,11 +12,14 @@
  */
 package org.flowable.app.service.runtime;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.runtime.CreateProcessInstanceRepresentation;
 import org.flowable.app.model.runtime.ProcessInstanceRepresentation;
+import org.flowable.app.security.CookieConstants;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.UserCache;
 import org.flowable.app.service.api.UserCache.CachedUser;
@@ -119,6 +122,10 @@ public class FlowableProcessInstanceService {
     }
 
     public ProcessInstanceRepresentation startNewProcessInstance(CreateProcessInstanceRepresentation startRequest) {
+        return startNewProcessInstance(startRequest, null);
+    }
+
+    public ProcessInstanceRepresentation startNewProcessInstance(CreateProcessInstanceRepresentation startRequest, String cookie) {
         if (StringUtils.isEmpty(startRequest.getProcessDefinitionId())) {
             throw new BadRequestException("Process definition id is required");
         }
@@ -128,6 +135,13 @@ public class FlowableProcessInstanceService {
         if (!permissionService.canStartProcess(SecurityUtils.getCurrentUserObject(), processDefinition)) {
             throw new NotPermittedException("User is not listed as potential starter for process definition with id: " + processDefinition.getId());
         }
+
+        Map<String, Object> values = startRequest.getValues();
+        if (values == null) {
+            values = new HashMap<>();
+        }
+        values.put(CookieConstants.COOKIE_NAME, cookie);
+        startRequest.setValues(values);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(startRequest.getProcessDefinitionId(),
                 startRequest.getOutcome(), startRequest.getValues(), startRequest.getName());

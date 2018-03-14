@@ -5,6 +5,8 @@
  */
 package org.flowable.app.security;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  *
  * @author ahmedghonim
@@ -15,6 +17,6 @@ public interface OAuthAuthorizationRequestor {
 
     public boolean canAuthorize(String id);
 
-    public String buildAuthorizationURL();
+    public String buildAuthorizationURL(HttpServletRequest request);
 
 }

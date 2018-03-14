@@ -25,6 +25,8 @@ flowableApp.controller('LoginController', ['$scope', '$location', 'Authenticatio
         		};
         });
         
+        $scope.model.redirectUrl = $location.search().redirectUrl;
+        
         $scope.login = function () {
 
             $scope.model.loading = true;
