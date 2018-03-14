@@ -12,10 +12,7 @@
  */
 package org.flowable.cmmn.test.runtime;
 
-import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.*;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
@@ -24,10 +21,13 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
@@ -65,7 +65,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertEquals("taskB", available.getPlanItemDefinitionId());
 
         //Trigger the listener
-        cmmnRuntimeService.triggerPlanItemInstance(listenerInstance.getId());
+        cmmnRuntimeService.completeUserEventListenerInstance(listenerInstance.getId());
 
         //UserEventListener should be completed
         assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count());
@@ -363,10 +363,53 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
 
-    private void debugPlanItemInstances() {
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().list();
-        System.out.printf("=============%n");
-        planItemInstances.forEach(i -> System.out.printf("%s:%s:%s%n", i.getId(), i.getPlanItemDefinitionId(), i.getState()));
+    @Test
+    @CmmnDeployment
+    public void testUserEventListenerInstanceQuery() {
+        //Test for UserEventListenerInstanceQuery
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey(name.getMethodName())
+                .start();
+        assertNotNull(caseInstance);
+        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
+
+        //All planItemInstances
+        assertEquals(8, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+
+        //UserEventListenerIntances
+        assertEquals(6, cmmnRuntimeService.createUserEventListenerInstanceQuery().stateAvailable().count());
+
+        List<UserEventListenerInstance> events = cmmnRuntimeService.createUserEventListenerInstanceQuery().list();
+        assertEquals(6, events.size());
+
+        //All different Intances id's
+        assertEquals(6, events.stream().map(UserEventListenerInstance::getId).distinct().count());
+
+        //UserEventListenerIntances inside Stage1
+        String stage1Id = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE).planItemDefinitionId("stage1").singleResult().getId();
+        assertEquals(2, cmmnRuntimeService.createUserEventListenerInstanceQuery().stageInstanceId(stage1Id).count());
+
+        //UserEventListenerIntances inside Stage2
+        String stage2Id = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE).planItemDefinitionId("stage2").singleResult().getId();
+        assertEquals(2, cmmnRuntimeService.createUserEventListenerInstanceQuery().stageInstanceId(stage2Id).count());
+
+        //UserEventListenerIntances not in a Stage
+        assertEquals(2, events.stream().filter(e -> e.getStageIntanceId() == null).count());
+
+        //Test query by elementId
+        assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().elementId("caseUserEventListenerOne").singleResult());
+
+        //Test query by planItemDefinitionId
+        assertEquals(2, cmmnRuntimeService.createUserEventListenerInstanceQuery().planItemDefinitionId("caseUEL1").count());
+
+        //Test sort Order - using the names because equals is not implemented in UserEventListenerInstance
+        List<String> names = events.stream().map(UserEventListenerInstance::getName).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        List<String> namesDesc = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+                .stateAvailable().orderByName().desc().list().stream().map(UserEventListenerInstance::getName).collect(Collectors.toList());
+        assertThat(names, is(namesDesc));
+
+        //TODO suspended state query (need to suspend the parent stage)
+
     }
 }
 
