@@ -88,6 +88,7 @@ public class DmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
 
         configuration.setHistoryEnabled(dmnProperties.isHistoryEnabled());
         configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());
+        configuration.setDatabaseSchemaUpdate(dmnProperties.getDatabaseSchemaUpdate());
 
         return configuration;
     }

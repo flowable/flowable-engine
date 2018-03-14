@@ -67,6 +67,11 @@ public class FlowableDmnProperties {
     private boolean enableSafeXml = true;
 
     /**
+     * The strategy that should be used for the database schema.
+     */
+    private String databaseSchemaUpdate = "true";
+
+    /**
      * The servlet configuration for the DMN Rest API.
      */
     @NestedConfigurationProperty
@@ -126,6 +131,14 @@ public class FlowableDmnProperties {
 
     public void setEnableSafeXml(boolean enableSafeXml) {
         this.enableSafeXml = enableSafeXml;
+    }
+
+    public String getDatabaseSchemaUpdate() {
+        return databaseSchemaUpdate;
+    }
+
+    public void setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
+        this.databaseSchemaUpdate = databaseSchemaUpdate;
     }
 
     public FlowableServlet getServlet() {

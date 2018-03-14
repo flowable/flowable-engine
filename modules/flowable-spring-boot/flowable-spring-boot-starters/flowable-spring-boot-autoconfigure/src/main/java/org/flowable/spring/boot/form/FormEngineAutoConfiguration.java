@@ -85,6 +85,9 @@ public class FormEngineAutoConfiguration extends AbstractEngineAutoConfiguration
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+
+        configuration.setDatabaseSchemaUpdate(formProperties.getDatabaseSchemaUpdate());
+
         return configuration;
     }
 
