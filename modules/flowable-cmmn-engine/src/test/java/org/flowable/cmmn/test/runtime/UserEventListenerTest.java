@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,7 +42,6 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testSimpleEnableTask() {
         //Simple use of the UserEventListener as EntryCriteria of a Task
-        //Case deployed
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
         assertNotNull(caseInstance);
         assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
@@ -233,20 +233,119 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testCompleteWithoutFireEvent() {
-        //Case deployed
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testUserEventListenerCompleteWithoutFireEvent").start();
+    public void testStageWithoutFiringTheEvent() {
+        //Test case where the only "standing" plainItem for a stage is a UserEventListener
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey(name.getMethodName())
+                .start();
         assertNotNull(caseInstance);
         assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
 
-        //4 PlanItems reachable
+        Map<String, List<PlanItemInstance>> planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionType));
+
+        //3 types of planItems
+        assertEquals(3, planItems.size());
+
+        //1 User Event Listener
+        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.USER_EVENT_LISTENER, Collections.emptyList()).size());
+        //1 Stage
+        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.STAGE, Collections.emptyList()).size());
+        PlanItemInstance stage = planItems.get(PlanItemDefinitionType.STAGE).get(0);
+
+        //1 Active Task (inside the stage)
+        assertEquals(1, planItems.getOrDefault("task", Collections.emptyList()).size());
+        PlanItemInstance task = planItems.get("task").get(0);
+        assertEquals(PlanItemInstanceState.ACTIVE, task.getState());
+        assertEquals(stage.getId(), task.getStageInstanceId());
+
+        //Complete the Task
+        cmmnRuntimeService.triggerPlanItemInstance(task.getId());
+
+        //Listener should still be available and Stage active
+        planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionType));
+        assertEquals(2, planItems.size());
+        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.USER_EVENT_LISTENER, Collections.emptyList()).size());
+        PlanItemInstance listener = planItems.get(PlanItemDefinitionType.USER_EVENT_LISTENER).get(0);
+        assertEquals(PlanItemInstanceState.AVAILABLE, listener.getState());
+        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.STAGE, Collections.emptyList()).size());
+        stage = planItems.get(PlanItemDefinitionType.STAGE).get(0);
+        assertEquals(PlanItemInstanceState.ACTIVE, stage.getState());
+
+        //Trigger the listener should end the case
+        cmmnRuntimeService.triggerPlanItemInstance(listener.getId());
+
+        //Stage and case instance should have ended...
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseWithoutFiringTheEvent() {
+        //Test case where the only "standing" plainItem for a Case is a UserEventListener
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey(name.getMethodName())
+                .start();
+        assertNotNull(caseInstance);
+        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
+
+        Map<String, List<PlanItemInstance>> planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionType));
+
+        //3 types of planItems
+        assertEquals(3, planItems.size());
+
+        //1 Stage
+        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.STAGE, Collections.emptyList()).size());
+        PlanItemInstance stage = planItems.get(PlanItemDefinitionType.STAGE).get(0);
+
+        //1 Active Task (inside the stage)
+        assertEquals(1, planItems.getOrDefault("task", Collections.emptyList()).size());
+        PlanItemInstance task = planItems.get("task").get(0);
+        assertEquals(PlanItemInstanceState.ACTIVE, task.getState());
+        assertEquals(stage.getId(), task.getStageInstanceId());
+
+        //1 Available User Event Listener (outside the stage)
+        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.USER_EVENT_LISTENER, Collections.emptyList()).size());
+        PlanItemInstance listener = planItems.get(PlanItemDefinitionType.USER_EVENT_LISTENER).get(0);
+        assertNull(listener.getStageInstanceId());
+
+        //Complete the Task
+        cmmnRuntimeService.triggerPlanItemInstance(task.getId());
+
+        //Listener should still be available but Stage close/terminated
+        planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionType));
+        assertEquals(1, planItems.size());
+        assertEquals(1, planItems.getOrDefault(PlanItemDefinitionType.USER_EVENT_LISTENER, Collections.emptyList()).size());
+        listener = planItems.get(PlanItemDefinitionType.USER_EVENT_LISTENER).get(0);
+
+        //Trigger the listener should end the case
+        cmmnRuntimeService.triggerPlanItemInstance(listener.getId());
+
+        //Stage and case instance should have ended...
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testAutocompleteStageWithoutFiringTheEvent() {
+        //Test case where the only "standing" plainItem for a autocomplete stage is a UserEventListener
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey(name.getMethodName())
+                .start();
+        assertNotNull(caseInstance);
+        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
+
+        //3 PlanItems reachable
         assertEquals(3, cmmnRuntimeService.createPlanItemInstanceQuery().count());
 
         //1 Stage
         PlanItemInstance stage = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE).singleResult();
         assertNotNull(stage);
 
-        //2 User Event Listener
+        //1 User Event Listener
         List<PlanItemInstance> listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
         assertEquals(1, listeners.size());
         listeners.forEach(l -> assertEquals(PlanItemInstanceState.AVAILABLE, l.getState()));
@@ -259,17 +358,9 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
 
         //Complete the Task
         cmmnRuntimeService.triggerPlanItemInstance(task.getId());
-        debugPlanItemInstances();
-
-        PlanItemInstance listener = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
-        cmmnRuntimeService.triggerPlanItemInstance(listener.getId());
-
 
         //Stage and case instance should have ended...
         assertCaseInstanceEnded(caseInstance);
-
-//        cmmnRuntimeService.createPlanItemInstanceQuery().list()
-//                .forEach(i -> System.out.printf("%s:%s:%s%n", i.getPlanItemDefinitionId(), i.getState(), i.getId()));
     }
 
     private void debugPlanItemInstances() {
