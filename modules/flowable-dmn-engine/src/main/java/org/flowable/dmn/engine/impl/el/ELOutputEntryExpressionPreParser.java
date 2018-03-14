@@ -13,18 +13,22 @@
 package org.flowable.dmn.engine.impl.el;
 
 /**
- * @author Tijs Rademakers
+ * @author Yvo Swillens
  */
-public class ELOutputExpressionPreParser {
+public class ELOutputEntryExpressionPreParser {
 
     public static String parse(String expression) {
+
+        if (expression.startsWith("#{") || expression.startsWith("${")) {
+            return expression;
+        }
 
         StringBuilder parsedExpressionBuilder = new StringBuilder();
         parsedExpressionBuilder
             .append("#{")
             .append(expression)
             .append("}");
-        
+
         return parsedExpressionBuilder.toString();
     }
 }

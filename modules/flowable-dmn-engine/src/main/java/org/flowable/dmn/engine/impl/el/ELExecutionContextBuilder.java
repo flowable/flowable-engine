@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.engine.impl.el;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,6 +102,12 @@ public class ELExecutionContextBuilder {
                 if (inputVariable.getValue() instanceof LocalDate) {
                     Date transformedDate = ((LocalDate) inputVariable.getValue()).toDate();
                     inputVariables.put(inputVariable.getKey(), transformedDate);
+                } else if (inputVariable.getValue() instanceof Long) {
+                    BigInteger transformedNumber = BigInteger.valueOf((Long) inputVariable.getValue());
+                    inputVariables.put(inputVariable.getKey(), transformedNumber);
+                } else if (inputVariable.getValue() instanceof Double || inputVariable.getValue() instanceof Float) {
+                    BigDecimal transformedNumber = new BigDecimal(inputVariable.getValue().toString());
+                    inputVariables.put(inputVariable.getKey(), transformedNumber);
                 }
             } catch (Exception ex) {
                 throw new FlowableException("error while transforming variable", ex);
