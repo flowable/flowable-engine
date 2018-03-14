@@ -55,6 +55,13 @@ public class FlowableCmmnProperties {
     private boolean enabled = true;
 
     /**
+     * Enables extra checks on the DMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
+     * Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of
+     * StaxSource during XML parsing.
+     */
+    private boolean enableSafeXml = true;
+
+    /**
      * The servlet configuration for the CMMN Rest API.
      */
     @NestedConfigurationProperty
@@ -98,6 +105,14 @@ public class FlowableCmmnProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isEnableSafeXml() {
+        return enableSafeXml;
+    }
+
+    public void setEnableSafeXml(boolean enableSafeXml) {
+        this.enableSafeXml = enableSafeXml;
     }
 
     public FlowableServlet getServlet() {
