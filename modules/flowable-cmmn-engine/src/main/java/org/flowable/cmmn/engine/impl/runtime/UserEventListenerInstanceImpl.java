@@ -13,7 +13,6 @@
 
 package org.flowable.cmmn.engine.impl.runtime;
 
-import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 
@@ -22,87 +21,69 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
  */
 public class UserEventListenerInstanceImpl implements UserEventListenerInstance {
 
-    private String id;
-    private String name;
-    private String caseInstanceId;
-    private String caseDefinitionId;
-    private String elementId;
-    private String planItemDefinitionId;
-    private String stageIntanceId;
-    private String state;
+    private final PlanItemInstance innerPlanItemInstance;
 
-    private UserEventListenerInstanceImpl() {
-
+    private UserEventListenerInstanceImpl(PlanItemInstance planItemInstance) {
+        this.innerPlanItemInstance = planItemInstance;
     }
 
     protected static UserEventListenerInstance fromPlanItemInstance(PlanItemInstance planItemInstance) {
         if (planItemInstance == null) {
             return null;
         }
-        UserEventListenerInstanceImpl instance = new UserEventListenerInstanceImpl();
-        if (PlanItemDefinitionType.USER_EVENT_LISTENER.equals(planItemInstance.getPlanItemDefinitionType())) {
-            instance.id = planItemInstance.getId();
-            instance.name = planItemInstance.getName();
-            instance.caseInstanceId = planItemInstance.getCaseInstanceId();
-            instance.caseDefinitionId = planItemInstance.getCaseDefinitionId();
-            instance.elementId = planItemInstance.getElementId();
-            instance.planItemDefinitionId = planItemInstance.getPlanItemDefinitionId();
-            instance.stageIntanceId = planItemInstance.getStageInstanceId();
-            instance.state = planItemInstance.getState();
-        }
-        return instance;
+        return new UserEventListenerInstanceImpl(planItemInstance);
     }
 
     @Override
     public String getId() {
-        return id;
+        return innerPlanItemInstance.getId();
     }
 
     @Override
     public String getName() {
-        return name;
+        return innerPlanItemInstance.getName();
     }
 
     @Override
     public String getCaseInstanceId() {
-        return caseInstanceId;
+        return innerPlanItemInstance.getCaseInstanceId();
     }
 
     @Override
     public String getCaseDefinitionId() {
-        return caseDefinitionId;
+        return innerPlanItemInstance.getCaseDefinitionId();
     }
 
     @Override
     public String getElementId() {
-        return elementId;
+        return innerPlanItemInstance.getElementId();
     }
 
     @Override
     public String getPlanItemDefinitionId() {
-        return planItemDefinitionId;
+        return innerPlanItemInstance.getPlanItemDefinitionId();
     }
 
     @Override
     public String getStageIntanceId() {
-        return stageIntanceId;
+        return innerPlanItemInstance.getStageInstanceId();
     }
 
     @Override
     public String getState() {
-        return state;
+        return innerPlanItemInstance.getState();
     }
 
     @Override
     public String toString() {
         return "UserEventListenerInstanceImpl{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", caseInstanceId='" + caseInstanceId + '\'' +
-                ", caseDefinitionId='" + caseDefinitionId + '\'' +
-                ", elementId='" + elementId + '\'' +
-                ", planItemDefinitionId='" + planItemDefinitionId + '\'' +
-                ", stageIntanceId='" + stageIntanceId + '\'' +
+                "id='" + getId() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", caseInstanceId='" + getCaseInstanceId() + '\'' +
+                ", caseDefinitionId='" + getCaseDefinitionId() + '\'' +
+                ", elementId='" + getElementId() + '\'' +
+                ", planItemDefinitionId='" + getPlanItemDefinitionId() + '\'' +
+                ", stageIntanceId='" + getStageIntanceId() + '\'' +
                 '}';
     }
 }
