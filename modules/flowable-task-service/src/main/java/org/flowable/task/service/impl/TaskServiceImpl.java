@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -54,6 +55,11 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     @Override
     public List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType) {
         return getTaskEntityManager().findTasksBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
+
+    @Override
+    public TaskQuery createTaskQuery() {
+        return new TaskQueryImpl();
     }
 
     @Override

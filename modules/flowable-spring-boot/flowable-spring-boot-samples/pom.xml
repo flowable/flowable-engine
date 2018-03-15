@@ -14,7 +14,7 @@
 
     <packaging>pom</packaging>
     <modules>
-        <module>flowable-spring-boot-sample-basic</module>
+        <module>flowable-spring-boot-sample-process</module>
         <module>flowable-spring-boot-sample-jpa</module>
         <module>flowable-spring-boot-sample-security</module>
         <module>flowable-spring-boot-sample-rest-api</module>      

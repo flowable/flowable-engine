@@ -43,7 +43,7 @@ public class CmmnDeploymentClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/admin/cmmn-deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getCmmnDeployment(@PathVariable String deploymentId) throws BadRequestException {
 
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
         try {
             return clientService.getDeployment(serverConfig, deploymentId);
         } catch (FlowableServiceException e) {
@@ -54,6 +54,6 @@ public class CmmnDeploymentClientResource extends AbstractClientResource {
 
     @RequestMapping(value = "/rest/admin/cmmn-deployments/{deploymentId}", method = RequestMethod.DELETE)
     public void deleteCmmnDeployment(@PathVariable String deploymentId, HttpServletResponse httpResponse) {
-        clientService.deleteDeployment(retrieveServerConfig(EndpointType.FORM), httpResponse, deploymentId);
+        clientService.deleteDeployment(retrieveServerConfig(EndpointType.CMMN), httpResponse, deploymentId);
     }
 }
