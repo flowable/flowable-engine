@@ -1,4 +1,7 @@
 
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  org.flowable.spring.boot.environment.FlowableLiquibaseEnvironmentPostProcessor
+
 # Flowable auto-configurations
 
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
