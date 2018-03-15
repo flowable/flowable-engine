@@ -31,7 +31,7 @@ public class FlowableFormProperties {
     /**
      * The name of the deployment for the form resources.
      */
-    private String deploymentName;
+    private String deploymentName = "SpringBootAutoDeployment";
 
     /**
      * The location where the form resources are located.
@@ -54,6 +54,11 @@ public class FlowableFormProperties {
      * Whether the form engine needs to be started.
      */
     private boolean enabled = true;
+
+    /**
+     * The strategy that should be used for the database schema.
+     */
+    private String databaseSchemaUpdate = "true";
 
     /**
      * The servlet configuration for the Form Rest API.
@@ -99,6 +104,14 @@ public class FlowableFormProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getDatabaseSchemaUpdate() {
+        return databaseSchemaUpdate;
+    }
+
+    public void setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
+        this.databaseSchemaUpdate = databaseSchemaUpdate;
     }
 
     public FlowableServlet getServlet() {

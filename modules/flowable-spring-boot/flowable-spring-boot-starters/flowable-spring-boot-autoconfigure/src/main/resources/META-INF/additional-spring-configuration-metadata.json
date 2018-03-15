@@ -102,5 +102,107 @@
       "defaultValue": "/process-api",
       "description": "The context path for the Process rest servlet."
     }
+  ],
+  "hints": [
+    {
+      "name": "flowable.process.database-schema-update",
+      "values": [
+        {
+          "value": "true",
+          "description": "Upon building of the process engine, a check is performed and an update of the schema is performed if it is necessary."
+        },
+        {
+          "value": "drop-create",
+          "description": "The schema is dropped and then created during the process engine startup."
+        },
+        {
+          "value": "create-drop",
+          "description": "The schema is created during the process engine startup and dropped during the close of the engine."
+        },
+        {
+          "value": "create",
+          "description": "The schema is created during the process engine startup."
+        },
+        {
+          "value": "false",
+          "description": "Checks the version of the DB schema against the library when the process engine is being created and throws an exception if the versions don't match."
+        }
+      ]
+    },
+    {
+      "name": "flowable.cmmn.database-schema-update",
+      "values": [
+        {
+          "value": "true",
+          "description": "Upon building of the CMMN engine, a check is performed and an update of the schema is performed if it is necessary."
+        },
+        {
+          "value": "drop-create",
+          "description": "The schema is dropped and then created during the CMMN engine startup."
+        },
+        {
+          "value": "create-drop",
+          "description": "The schema is created during the CMMN engine startup and dropped during the close of the engine."
+        },
+        {
+          "value": "create",
+          "description": "The schema is created during the CMMN engine startup."
+        },
+        {
+          "value": "false",
+          "description": "Checks the version of the DB schema against the library when the CMMN engine is being created and throws an exception if the versions don't match."
+        }
+      ]
+    },
+    {
+      "name": "flowable.dmn.database-schema-update",
+      "values": [
+        {
+          "value": "true",
+          "description": "Upon building of the DMN engine, a check is performed and an update of the schema is performed if it is necessary."
+        },
+        {
+          "value": "drop-create",
+          "description": "The schema is dropped and then created during the DMN engine startup."
+        },
+        {
+          "value": "create-drop",
+          "description": "The schema is created during the DMN engine startup and dropped during the close of the engine."
+        },
+        {
+          "value": "create",
+          "description": "The schema is created during the DMN engine startup."
+        },
+        {
+          "value": "false",
+          "description": "Checks the version of the DB schema against the library when the DMN engine is being created and throws an exception if the versions don't match."
+        }
+      ]
+    },
+    {
+      "name": "flowable.form.database-schema-update",
+      "values": [
+        {
+          "value": "true",
+          "description": "Upon building of the form engine, a check is performed and an update of the schema is performed if it is necessary."
+        },
+        {
+          "value": "drop-create",
+          "description": "The schema is dropped and then created during the form engine startup."
+        },
+        {
+          "value": "create-drop",
+          "description": "The schema is created during the form engine startup and dropped during the close of the engine."
+        },
+        {
+          "value": "create",
+          "description": "The schema is created during the form engine startup."
+        },
+        {
+          "value": "false",
+          "description": "Checks the version of the DB schema against the library when the form engine is being created and throws an exception if the versions don't match."
+        }
+      ]
+    }
   ]
 }

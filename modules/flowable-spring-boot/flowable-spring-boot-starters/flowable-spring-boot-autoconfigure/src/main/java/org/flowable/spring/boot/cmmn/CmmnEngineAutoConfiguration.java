@@ -89,6 +89,7 @@ public class CmmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration
 
         if (resources != null && !resources.isEmpty()) {
             configuration.setDeploymentResources(resources.toArray(new Resource[0]));
+            configuration.setDeploymentName(cmmnProperties.getDeploymentName());
         }
 
         if (asyncExecutor != null) {
@@ -106,6 +107,9 @@ public class CmmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration
 
         //TODO Can it have different then the Process engine?
         configuration.setHistoryLevel(flowableProperties.getHistoryLevel());
+
+        configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
+        configuration.setDatabaseSchemaUpdate(cmmnProperties.getDatabaseSchemaUpdate());
 
         return configuration;
     }

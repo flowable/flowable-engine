@@ -28,7 +28,49 @@ public class FlowableProcessProperties {
     @NestedConfigurationProperty
     private final FlowableServlet servlet = new FlowableServlet("/process-api", "Flowable BPMN Rest API");
 
+    /**
+     * The maximum amount of process definitions available in the process definition cache.
+     * Per default it is 1 (all process definitions)
+     */
+    protected int definitionCacheLimit = -1;
+
+    /**
+     * Enables extra checks on the BPMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
+     * Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of
+     * StaxSource during XML parsing.
+     */
+    private boolean enableSafeXml = true;
+
+    /**
+     * The strategy that should be used for the database schema.
+     */
+    private String databaseSchemaUpdate = "true";
+
     public FlowableServlet getServlet() {
         return servlet;
+    }
+
+    public int getDefinitionCacheLimit() {
+        return definitionCacheLimit;
+    }
+
+    public void setDefinitionCacheLimit(int definitionCacheLimit) {
+        this.definitionCacheLimit = definitionCacheLimit;
+    }
+
+    public boolean isEnableSafeXml() {
+        return enableSafeXml;
+    }
+
+    public void setEnableSafeXml(boolean enableSafeXml) {
+        this.enableSafeXml = enableSafeXml;
+    }
+
+    public String getDatabaseSchemaUpdate() {
+        return databaseSchemaUpdate;
+    }
+
+    public void setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
+        this.databaseSchemaUpdate = databaseSchemaUpdate;
     }
 }

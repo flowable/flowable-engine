@@ -18,8 +18,10 @@ import org.flowable.spring.security.IdentityServiceUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
@@ -34,11 +36,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @author Josh Long
  */
 @Configuration
+@ConditionalOnClass({
+    AuthenticationManager.class,
+    GlobalAuthenticationConfigurerAdapter.class
+})
 @AutoConfigureBefore(org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class)
 public class SecurityAutoConfiguration {
 
     @Configuration
-    @ConditionalOnClass(UserDetailsService.class)
+    @ConditionalOnMissingBean(UserDetailsService.class)
     public static class UserDetailsServiceConfiguration
             extends GlobalAuthenticationConfigurerAdapter {
 
