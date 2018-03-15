@@ -1,7 +1,7 @@
 <div class="container" id="detail-container">
 	<div class="row">
 		<div class="col-md-9">
-			<div class="component" ng-show="formDeployment">
+			<div class="component" ng-show="cmmnDeployment">
 				<div class="title">
 					<div class="pull-right">
 						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
@@ -24,7 +24,7 @@
 							<td>{{cmmnDeployment.category | empty}}</td>
 						</tr>
 						<tr class="property">
-                            <td class="property-name" translate="FORM-DEPLOYMENT.TENANTID"></td>
+                            <td class="property-name" translate="CMMN-DEPLOYMENT.TENANTID"></td>
                             <td>{{cmmnDeployment.tenantId | empty}}</td>
                             <td ng-if="cmmnDeployment.parentDeploymentId" class="property-name" translate="CMMN-DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
                             <td ng-if="cmmnDeployment.parentDeploymentId"><a ng-href="#/deployment/{{cmmnDeployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{cmmnDeployment.parentDeploymentId}}</a></td>
@@ -53,18 +53,18 @@
 			<div class="component">
 				<div class="title">
 					<div class="pull-right">
-						<a ng-click="showAllCmmnDefinitions()" class="action"><i class="glyphicon glyphicon-zoom-in"></i> {{'DEPLOYMENT.ACTION.SHOW-ALL-DEFINITIONS' | translate}}</a>
+						<a ng-click="showAllCaseDefinitions()" class="action"><i class="glyphicon glyphicon-zoom-in"></i> {{'DEPLOYMENT.ACTION.SHOW-ALL-DEFINITIONS' | translate}}</a>
 					</div>
-					<h2 translate="CMMN-DEPLOYMENT.TITLE.CMMN-DEFINITIONS"></h2>
+					<h2 translate="CMMN-DEPLOYMENT.TITLE.CASE-DEFINITIONS"></h2>
 				</div>
-				<div class="grid-wrapper grid-wrapper-compact" ng-if="cmmnDefinitions">
-					<div class="grid-message" ng-if="cmmnDefinitions.size > 0">
-	                       <span>{{'CMMN-DEPLOYMENT.DEFINITIONS-MESSAGE' | translate:formDefinitions}}</span>
+				<div class="grid-wrapper grid-wrapper-compact" ng-if="caseDefinitions">
+					<div class="grid-message" ng-if="caseDefinitions.size > 0">
+	                       <span>{{'CMMN-DEPLOYMENT.DEFINITIONS-MESSAGE' | translate:caseDefinitions}}</span>
 	                   </div>
-	                    <div class="grid-message" ng-if="cmmnDefinitions.size == 0">
+	                    <div class="grid-message" ng-if="caseDefinitions.size == 0">
 	                       <span>{{'CMMN-DEPLOYMENT.DEFINITIONS-MESSAGE-EMPTY' | translate}}</span>
 	                   </div>
-					<div ng-grid="gridCmmnDefinitions" class="gridStyle" ng-if="gridCmmnDefinitions && cmmnDefinitions.data" ng-show="cmmnDefinitions.size > 0"></div>
+					<div ng-grid="gridCaseDefinitions" class="gridStyle" ng-if="gridCaseDefinitions && caseDefinitions.data" ng-show="caseDefinitions.size > 0"></div>
 				</div>
 			</div>
 		</div>

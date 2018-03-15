@@ -228,41 +228,6 @@ public final class CmmnRestUrls {
     public static final String[] URL_TASK_ATTACHMENT_DATA = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_ATTACHMENTS, "{1}", SEGMENT_ATTACHMENT_CONTENT };
 
     /**
-     * URL template for execution collection: <i>runtime/executions/{0:executionId}</i>
-     */
-    public static final String[] URL_EXECUTION_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EXECUTION_RESOURCE };
-
-    /**
-     * URL template for a single execution: <i>runtime/executions/{0:executionId}</i>
-     */
-    public static final String[] URL_EXECUTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EXECUTION_RESOURCE, "{0}" };
-
-    /**
-     * URL template for the variables for an execution: <i>runtime/executions/{0:executionId}/variables</i>
-     */
-    public static final String[] URL_EXECUTION_VARIABLE_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EXECUTION_RESOURCE, "{0}", SEGMENT_VARIABLES };
-
-    /**
-     * URL template for a single variables for an execution: <i>runtime/executions/{0:executionId}/variables/{1:variableName}</i>
-     */
-    public static final String[] URL_EXECUTION_VARIABLE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EXECUTION_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}" };
-
-    /**
-     * URL template for a single variables for an execution: <i>runtime/executions/{0:executionId}/variables/{1:variableName}/data</i>
-     */
-    public static final String[] URL_EXECUTION_VARIABLE_DATA = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EXECUTION_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}", SEGMENT_VARIABLE_DATA };
-
-    /**
-     * URL template for all active activities on an execution: <i>runtime/executions/{0:executionId}/activities</i>
-     */
-    public static final String[] URL_EXECUTION_ACTIVITIES_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EXECUTION_RESOURCE, "{0}", SEGMENT_ACTIVITIES };
-
-    /**
-     * URL template for execution query: <i>query/executions</i>
-     */
-    public static final String[] URL_EXECUTION_QUERY = { SEGMENT_QUERY_RESOURCES, SEGMENT_EXECUTION_RESOURCE };
-
-    /**
      * URL template for process instance collection: <i>runtime/case-instances</i>
      */
     public static final String[] URL_CASE_INSTANCE_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE };
@@ -307,6 +272,66 @@ public final class CmmnRestUrls {
      */
     public static final String[] URL_CASE_INSTANCE_IDENTITYLINK = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS, 
                     SEGMENT_IDENTITYLINKS_FAMILY_USERS, "{1}", "{2}" };
+    
+    /**
+     * URL template for a single job: <i>cmmn-management/jobs/{0:jobId}</i>
+     */
+    public static final String[] URL_JOB = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_JOBS, "{0}" };
+
+    /**
+     * URL template for a single job: <i>cmmn-management/timer-jobs/{0:jobId}</i>
+     */
+    public static final String[] URL_TIMER_JOB = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_TIMER_JOBS, "{0}" };
+
+    /**
+     * URL template for a single job: <i>cmmn-management/suspended-jobs/{0:jobId}</i>
+     */
+    public static final String[] URL_SUSPENDED_JOB = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_SUSPENDED_JOBS, "{0}" };
+
+    /**
+     * URL template for a single job: <i>cmmn-management/deadletter-jobs/{0:jobId}</i>
+     */
+    public static final String[] URL_DEADLETTER_JOB = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_DEADLETTER_JOBS, "{0}" };
+
+    /**
+     * URL template for the stacktrace of a single job: <i>cmmn-management/jobs/{0:jobId}/exception-stacktrace</i>
+     */
+    public static final String[] URL_JOB_EXCEPTION_STRACKTRACE = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_JOBS, "{0}", SEGMENT_JOB_EXCEPTION_STACKTRACE };
+
+    /**
+     * URL template for the stacktrace of a single job: <i>cmmn-management/timer-jobs/{jobId}/exception-stacktrace</i>
+     */
+    public static final String[] URL_TIMER_JOB_EXCEPTION_STRACKTRACE = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_TIMER_JOBS, "{0}", SEGMENT_JOB_EXCEPTION_STACKTRACE };
+
+    /**
+     * URL template for the stacktrace of a single job: <i>cmmn-management/suspended-jobs/{0:jobId}/exception-stacktrace</i>
+     */
+    public static final String[] URL_SUSPENDED_JOB_EXCEPTION_STRACKTRACE = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_SUSPENDED_JOBS, "{0}", SEGMENT_JOB_EXCEPTION_STACKTRACE };
+
+    /**
+     * URL template for the stacktrace of a single job: <i>cmmn-management/deadletter-jobs/{0:jobId}/exception-stacktrace</i>
+     */
+    public static final String[] URL_DEADLETTER_JOB_EXCEPTION_STRACKTRACE = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_DEADLETTER_JOBS, "{0}", SEGMENT_JOB_EXCEPTION_STACKTRACE };
+
+    /**
+     * URL template for the collection of jobs: <i>management/jobs</i>
+     */
+    public static final String[] URL_JOB_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_JOBS };
+
+    /**
+     * URL template for the collection of timer jobs: <i>management/timer-jobs</i>
+     */
+    public static final String[] URL_TIMER_JOB_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_TIMER_JOBS };
+
+    /**
+     * URL template for the collection of timer jobs: <i>management/suspended-jobs</i>
+     */
+    public static final String[] URL_SUSPENDED_JOB_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_SUSPENDED_JOBS };
+
+    /**
+     * URL template for the collection of timer jobs: <i>management/deadletter-jobs</i>
+     */
+    public static final String[] URL_DEADLETTER_JOB_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_DEADLETTER_JOBS };
 
     /**
      * URL template for a single historic case instance: <i>cmmn-history/historic-case-instances/{0:caseInstanceId}</i>
@@ -393,11 +418,6 @@ public final class CmmnRestUrls {
      * URL template for the collection of properties: <i>management/properties</i>
      */
     public static final String[] URL_ENGINE_INFO = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_ENGINE_INFO };
-
-    /**
-     * URL template for a signals <i>runtime/signals</i>
-     */
-    public static final String[] URL_SIGNALS = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_SIGNALS };
 
     /**
      * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by

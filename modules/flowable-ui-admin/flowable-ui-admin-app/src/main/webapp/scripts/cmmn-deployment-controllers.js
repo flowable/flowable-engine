@@ -23,26 +23,26 @@ flowableAdminApp.controller('CmmnDeploymentController', ['$scope', '$rootScope',
 		
 		$scope.openDefinition = function(definition) {
 			if (definition && definition.getProperty('id')) {
-				$location.path("/cmmn-definition/" + definition.getProperty('id'));
+				$location.path("/case-definition/" + definition.getProperty('id'));
 			}
 		};
 		
 		$scope.showAllDefinitions = function() {
 		    // Populate the cmmn-filter with parentId
-		    $rootScope.filters.forced.formDefinitionFilter = {
-		            deploymentId: $scope.formDeployment.id
+		    $rootScope.filters.forced.caseDefinitionFilter = {
+	            deploymentId: $scope.cmmnDeployment.id
 		    };
-		    $location.path("/cmmn-definitions");
+		    $location.path("/case-definitions");
 		};
 		
-		$q.all([$translate('CMMN-DEFINITIONS.HEADER.ID'),
-            $translate('CMMN-DEFINITIONS.HEADER.NAME'),
-            $translate('CMMN-DEFINITIONS.HEADER.VERSION'),
-            $translate('CMMN-DEFINITIONS.HEADER.KEY')])
+		$q.all([$translate('CASE-DEFINITIONS.HEADER.ID'),
+            $translate('CASE-DEFINITIONS.HEADER.NAME'),
+            $translate('CASE-DEFINITIONS.HEADER.VERSION'),
+            $translate('CASE-DEFINITIONS.HEADER.KEY')])
             .then(function(headers) { 
         
-                $scope.gridFormDefinitions = {
-                    data: 'formDefinitions.data',
+                $scope.gridCaseDefinitions = {
+                    data: 'caseDefinitions.data',
                     enableRowReordering: false,
                     multiSelect: false,
                     keepLastSelected : false,
@@ -91,7 +91,7 @@ flowableAdminApp.controller('CmmnDeploymentController', ['$scope', '$rootScope',
         
 		$scope.executeWhenReady(function() {
 		    // Load deployment
-		    $http({method: 'GET', url: '/app/rest/admin/cmmn-deployments/' + $routeParams.cmmnDeploymentId}).
+		    $http({method: 'GET', url: '/app/rest/admin/cmmn-deployments/' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.cmmnDeployment = data;
   	    	    }).
@@ -105,10 +105,10 @@ flowableAdminApp.controller('CmmnDeploymentController', ['$scope', '$rootScope',
                     }
   	    	    });
   		
-		    // Load cmmn definitions
-		    $http({method: 'GET', url: '/app/rest/admin/cmmn-definitions?deploymentId=' + $routeParams.cmmnDeploymentId}).
+		    // Load case definitions
+		    $http({method: 'GET', url: '/app/rest/admin/case-definitions?deploymentId=' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
-  	    	        $scope.cmmnDefinitions = data;
+  	    	        $scope.caseDefinitions = data;
   	    	    });
 		    
   	     });

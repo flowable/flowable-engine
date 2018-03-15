@@ -32,6 +32,7 @@ import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.job.api.Job;
 import org.flowable.rest.application.ContentTypeResolver;
 import org.flowable.rest.cmmn.service.api.engine.RestIdentityLink;
 import org.flowable.rest.cmmn.service.api.engine.variable.QueryVariable;
@@ -41,6 +42,7 @@ import org.flowable.rest.cmmn.service.api.history.HistoricCaseInstanceResponse;
 import org.flowable.rest.cmmn.service.api.history.HistoricIdentityLinkResponse;
 import org.flowable.rest.cmmn.service.api.history.HistoricTaskInstanceResponse;
 import org.flowable.rest.cmmn.service.api.history.HistoricVariableInstanceResponse;
+import org.flowable.rest.cmmn.service.api.management.JobResponse;
 import org.flowable.rest.cmmn.service.api.repository.CaseDefinitionResponse;
 import org.flowable.rest.cmmn.service.api.repository.CmmnDeploymentResponse;
 import org.flowable.rest.cmmn.service.api.repository.DecisionTableResponse;
@@ -48,6 +50,7 @@ import org.flowable.rest.cmmn.service.api.repository.DeploymentResourceResponse;
 import org.flowable.rest.cmmn.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.cmmn.service.api.runtime.caze.CaseInstanceResponse;
 import org.flowable.rest.cmmn.service.api.runtime.task.TaskResponse;
+import org.flowable.rest.util.RestUrlBuilder;
 import org.flowable.rest.variable.BooleanRestVariableConverter;
 import org.flowable.rest.variable.DateRestVariableConverter;
 import org.flowable.rest.variable.DoubleRestVariableConverter;
@@ -638,6 +641,49 @@ public class CmmnRestResponseFactory {
         formDefinitionResponse.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION_FORM_DEFINITIONS_COLLECTION, caseDefinitionId));
 
         return formDefinitionResponse;
+    }
+    
+    public List<JobResponse> createJobResponseList(List<Job> jobs) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<JobResponse> responseList = new ArrayList<>();
+        for (Job instance : jobs) {
+            responseList.add(createJobResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public JobResponse createJobResponse(Job job) {
+        return createJobResponse(job, createUrlBuilder());
+    }
+
+    public JobResponse createJobResponse(Job job, RestUrlBuilder urlBuilder) {
+        JobResponse response = new JobResponse();
+        response.setId(job.getId());
+        response.setDueDate(job.getDuedate());
+        response.setExceptionMessage(job.getExceptionMessage());
+        response.setRetries(job.getRetries());
+        response.setCreateTime(job.getCreateTime());
+        response.setTenantId(job.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_JOB, job.getId()));
+
+        if (ScopeTypes.CMMN.equals(job.getScopeType())) {
+            if (job.getScopeDefinitionId() != null) {
+                response.setCaseDefinitionId(job.getScopeDefinitionId());
+                response.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, job.getScopeDefinitionId()));
+            }
+    
+            if (job.getScopeId() != null) {
+                response.setCaseInstanceId(job.getScopeId());
+                response.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, job.getScopeId()));
+            }
+    
+            if (job.getSubScopeId() != null) {
+                response.setPlanItemInstanceId(job.getSubScopeId());
+            }
+        }
+
+        return response;
     }
 
     /**

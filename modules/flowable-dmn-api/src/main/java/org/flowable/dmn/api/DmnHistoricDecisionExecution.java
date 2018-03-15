@@ -45,6 +45,9 @@ public interface DmnHistoricDecisionExecution {
     /** reference to the activity for which the decision was executed */
     String getActivityId();
     
+    /** reference to the scope type for which the decision was executed */
+    String getScopeType();
+    
     /** identifier if the decision execution failed */
     boolean isFailed();
 

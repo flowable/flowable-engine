@@ -25,6 +25,7 @@ import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     protected static final Map<String, String> TYPE_TO_STENCILSET = new HashMap<>();
     static {
         TYPE_TO_STENCILSET.put(HttpServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
+        TYPE_TO_STENCILSET.put(ScriptServiceTask.SCRIPT_TASK, STENCIL_TASK_SCRIPT);
     }
 
     protected Map<String, CmmnModelInfo> decisionTableKeyMap;
@@ -55,6 +57,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         convertersToJsonMap.put(ServiceTask.class, ServiceTaskJsonConverter.class);
         convertersToJsonMap.put(HttpServiceTask.class, ServiceTaskJsonConverter.class);
+        convertersToJsonMap.put(ScriptServiceTask.class, ServiceTaskJsonConverter.class);
     }
 
     @Override
@@ -99,6 +102,13 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT, "saveResponseParametersTransient", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON, "saveResponseVariableAsJson", serviceTask, propertiesNode);
 
+        } else if (ScriptServiceTask.SCRIPT_TASK.equalsIgnoreCase(serviceTask.getType())) {
+            propertiesNode.put(PROPERTY_SCRIPT_TASK_SCRIPT_FORMAT, ((ScriptServiceTask) serviceTask).getScriptFormat());
+            setPropertyFieldValue(PROPERTY_SCRIPT_TASK_SCRIPT_TEXT, "scripttext", serviceTask, propertiesNode);
+            if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
+                propertiesNode.put(PROPERTY_SERVICETASK_RESULT_VARIABLE, serviceTask.getResultVariableName());
+            }
+            
         } else {
 
             if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {

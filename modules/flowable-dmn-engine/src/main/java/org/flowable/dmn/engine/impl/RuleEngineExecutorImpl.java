@@ -113,6 +113,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 decisionExecutionEntity.setInstanceId(executeDecisionInfo.getInstanceId());
                 decisionExecutionEntity.setExecutionId(executeDecisionInfo.getExecutionId());
                 decisionExecutionEntity.setActivityId(executeDecisionInfo.getActivityId());
+                decisionExecutionEntity.setScopeType(executeDecisionInfo.getScopeType());
                 decisionExecutionEntity.setTenantId(executeDecisionInfo.getTenantId());
 
                 Boolean failed = executionContext.getAuditContainer().isFailed();

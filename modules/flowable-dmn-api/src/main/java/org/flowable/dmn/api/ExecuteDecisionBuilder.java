@@ -51,6 +51,11 @@ public interface ExecuteDecisionBuilder {
      * Set the activity id
      **/
     ExecuteDecisionBuilder activityId(String activityId);
+    
+    /**
+     * Set the scope type
+     **/
+    ExecuteDecisionBuilder scopeType(String scopeType);
 
     /**
      * Set the tenantId

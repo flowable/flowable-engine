@@ -4,7 +4,7 @@
   - Header: #333333
   - Subheader: #e8edf1
   - Subheader border: #a4acb9
-  - Highlight buttons/text: #36a7c4
+  - Highlight buttons/text: #2980b9
   - Text color: #1a1a1a
   - Filter color: #373e48
   - Dark highlight: #606b7d
@@ -140,9 +140,9 @@ ul.filter-list li a {
 }
 
 ul.filter-list li.current a {
-	color: #36a7c4;
+	color: #2980b9;
 	padding-left: 5px;
-	border-left: 4px solid #36a7c4;
+	border-left: 4px solid #2980b9;
 }
 
 ul.filter-list li a:hover, ul.filter-list li a:focus {
@@ -152,7 +152,7 @@ ul.filter-list li a:hover, ul.filter-list li a:focus {
 
 ul.filter-list li.current a:hover, ul.filter-list li.current a:focus {
 	background-color: transparent;
-	color: #36a7c4;
+	color: #2980b9;
 	cursor: default;
 	text-decoration: none;
 }
@@ -474,10 +474,10 @@ table.history a:hover {
 table.history .version {
 	font-size: 30px;
 	display: inline-block;
-	color: #36a7c4;
+	color: #2980b9;
 	padding: 5px 10px;
 	vertical-align:middle;
-	color: #36a7c4;
+	color: #2980b9;
 }
 
 table.history .detail {
@@ -515,7 +515,7 @@ table.history tr.current td {
 }
 
 .comment .author {
-	color: #36a7c4;
+	color: #2980b9;
 	font-size: 18px;
 }
 
@@ -1305,7 +1305,7 @@ ul.list>li:hover .actions {
 }
 
 .sharing-list .sharing-entry .active-permission {
-     color: #36a7c4;
+     color: #2980b9;
     font-weight: bold;
 }
 
@@ -1372,7 +1372,7 @@ ul.list>li:hover .actions {
 }
 
 .simple-content-wrapper p.subtle a:hover {
-	color: #36a7c4;
+	color: #2980b9;
 }
 
 
@@ -1517,7 +1517,7 @@ ul.list>li:hover .actions {
 
 .popover .grid .item.active {
 	background-color: #f3f6f8;
-	color: #36a7c4;
+	color: #2980b9;
 }
 
 .popover .grid .item:hover {
@@ -1543,7 +1543,7 @@ ul.list>li:hover .actions {
 }
 
 .stencil-info-filter-dropdown button:hover {
-    background-color: #36a7c4;
+    background-color: #2980b9;
 }
 
 .stencil-filter-selected {
@@ -1609,7 +1609,7 @@ ul.list>li:hover .actions {
 }
 
 .stencil-info-group-selected, .stencil-info-groupItem-selected {
-    color: #36a7c4;
+    color: #2980b9;
 }
 
 .stencil-info-groupitem {
@@ -1617,7 +1617,7 @@ ul.list>li:hover .actions {
 }
 
 .stencil-info-group:hover, .stencil-info-groupitem:hover, .restoreable-stencil-item:hover {
-    color: #36a7c4;
+    color: #2980b9;
 }
 
 .stencil-item-list-icon {

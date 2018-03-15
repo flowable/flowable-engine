@@ -92,6 +92,46 @@
         </createTable>
         
     </changeSet>
+    
+    <changeSet id="2" author="flowable">
+    
+        <createTable tableName="ACT_DMN_HI_DECISION_EXECUTION">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="DECISION_DEFINITION_ID_" type="varchar(255)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="START_TIME_" type="datetime" />
+            <column name="END_TIME_" type="datetime">
+                <constraints nullable="true" />
+            </column>
+            <column name="INSTANCE_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="EXECUTION_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="ACTIVITY_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="FAILED_" type="boolean" defaultValueBoolean="false" />
+            <column name="TENANT_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="EXECUTION_JSON_" type="longtext">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        
+    </changeSet>
+    
+    <changeSet id="3" author="flowable">
+    
+        <addColumn tableName="ACT_DMN_HI_DECISION_EXECUTION">
+            <column name="SCOPE_TYPE_" type="varchar(255)" />
+        </addColumn>
+    
+    </changeSet>
 
 
 </databaseChangeLog>

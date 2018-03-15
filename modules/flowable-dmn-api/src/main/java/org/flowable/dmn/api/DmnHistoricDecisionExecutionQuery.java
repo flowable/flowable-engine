@@ -48,6 +48,9 @@ public interface DmnHistoricDecisionExecutionQuery extends Query<DmnHistoricDeci
     /** Only select decision executions with the given activity id. */
     DmnHistoricDecisionExecutionQuery activityId(String activityId);
     
+    /** Only select decision executions with the given scope type. */
+    DmnHistoricDecisionExecutionQuery scopeType(String scopeType);
+    
     /** Only select decision executions with the given failed state. */
     DmnHistoricDecisionExecutionQuery failed(Boolean failed);
 

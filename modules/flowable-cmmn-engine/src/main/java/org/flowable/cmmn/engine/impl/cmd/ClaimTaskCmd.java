@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import org.flowable.cmmn.api.exception.FlowableTaskAlreadyClaimedException;
+import org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.interceptor.CommandContext;

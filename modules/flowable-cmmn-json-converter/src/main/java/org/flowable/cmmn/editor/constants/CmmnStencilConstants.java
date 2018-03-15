@@ -29,6 +29,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_HTTP = "HttpTask";
     String STENCIL_TASK_CASE = "CaseTask";
     String STENCIL_TASK_PROCESS = "ProcessTask";
+    String STENCIL_TASK_SCRIPT = "ScriptTask";
     String STENCIL_MILESTONE = "Milestone";
     String STENCIL_TIMER_EVENT_LISTENER ="TimerEventListener";
 
@@ -98,8 +99,8 @@ public interface CmmnStencilConstants {
     String PROPERTY_SERVICETASK_FIELD_STRING = "string";
     String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
 
-    String PROPERTY_SCRIPT_FORMAT = "scriptformat";
-    String PROPERTY_SCRIPT_TEXT = "scripttext";
+    String PROPERTY_SCRIPT_TASK_SCRIPT_FORMAT = "scriptformat";
+    String PROPERTY_SCRIPT_TASK_SCRIPT_TEXT = "scripttext";
 
     String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
     String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
