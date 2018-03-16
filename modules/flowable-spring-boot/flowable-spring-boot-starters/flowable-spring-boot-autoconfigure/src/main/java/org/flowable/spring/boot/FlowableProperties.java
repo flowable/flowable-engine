@@ -39,6 +39,9 @@ public class FlowableProperties {
     private String mailServerDefaultFrom;
     private boolean mailServerUseSsl;
     private boolean mailServerUseTls;
+    /**
+     * The strategy that should be used for the database schema.
+     */
     private String databaseSchemaUpdate = "true";
     private String databaseSchema;
     /**

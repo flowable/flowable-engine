@@ -109,7 +109,6 @@ public class CmmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration
         configuration.setHistoryLevel(flowableProperties.getHistoryLevel());
 
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
-        configuration.setDatabaseSchemaUpdate(cmmnProperties.getDatabaseSchemaUpdate());
 
         return configuration;
     }
