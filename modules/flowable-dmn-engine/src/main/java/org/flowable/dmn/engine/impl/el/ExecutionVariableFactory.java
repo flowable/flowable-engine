@@ -38,7 +38,7 @@ public class ExecutionVariableFactory {
             throw new FlowableException("could not create result variable");
         }
 
-        Object executionVariable = null;
+        Object executionVariable;
 
         try {
             if (StringUtils.equals("boolean", type)) {
@@ -59,7 +59,7 @@ public class ExecutionVariableFactory {
                 } else if (expressionResult instanceof BigDecimal) {
                     executionVariable = ((BigDecimal) expressionResult).doubleValue();
                 } else if (expressionResult instanceof BigInteger) {
-                    executionVariable = ((BigInteger) expressionResult).doubleValue();
+                    executionVariable = ((BigInteger) expressionResult).longValue();
                 } else {
                     executionVariable = Double.valueOf(expressionResult.toString());
                 }

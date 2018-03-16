@@ -59,6 +59,7 @@ public class CalculationsTest {
         Assert.assertEquals(1D, result.getRuleExecutions().get(1).getConclusionResults().get(0).getResult());
         Assert.assertEquals(1D, result.getRuleExecutions().get(1).getConclusionResults().get(1).getResult());
         Assert.assertEquals(inputDouble2, result.getRuleExecutions().get(2).getConclusionResults().get(0).getResult());
+        Assert.assertEquals(10L, result.getRuleExecutions().get(2).getConclusionResults().get(1).getResult());
     }
 
     @Test

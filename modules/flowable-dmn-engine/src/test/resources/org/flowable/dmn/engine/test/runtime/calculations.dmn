@@ -26,6 +26,9 @@
         <outputEntry id="outputEntry2_1">
           <text><![CDATA[#{inputDouble2 * 2000 / 2000}]]></text>
         </outputEntry>
+        <outputEntry id="outputEntry2_2">
+          <text><![CDATA[#{inputVariable1 * 10}]]></text>
+        </outputEntry>
       </rule>
     </decisionTable>
   </decision>
