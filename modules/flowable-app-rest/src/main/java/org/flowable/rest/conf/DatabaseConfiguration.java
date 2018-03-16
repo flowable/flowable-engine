@@ -21,9 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -33,7 +31,6 @@ import com.zaxxer.hikari.HikariDataSource;
  * @author Joram Barrez
  */
 @Configuration
-@EnableTransactionManagement
 public class DatabaseConfiguration {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConfiguration.class);
@@ -146,12 +143,5 @@ public class DatabaseConfiguration {
             return dataSource;
         }
 
-    }
-
-    @Bean(name = "transactionManager")
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
-        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource());
-        return transactionManager;
     }
 }

@@ -13,12 +13,11 @@
 package org.flowable.rest.conf;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.rest.app.properties.RestAppProperties;
 import org.flowable.rest.security.BasicAuthenticationProvider;
 import org.flowable.rest.security.SecurityConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,8 +28,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     
-    @Autowired
-    protected Environment environment;
+    protected final RestAppProperties restAppProperties;
+
+    public SecurityConfiguration(RestAppProperties restAppProperties) {
+        this.restAppProperties = restAppProperties;
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -77,7 +79,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
     
     protected boolean isVerifyRestApiPrivilege() {
-        String authMode = environment.getProperty("rest.authentication.mode");
+        String authMode = restAppProperties.getAuthenticationMode();
         if (StringUtils.isNotEmpty(authMode)) {
             return "verify-privilege".equals(authMode);
         }
@@ -85,7 +87,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
     
     protected boolean isSwaggerDocsEnabled() {
-        return environment.getProperty("rest.docs.swagger.enabled", Boolean.class, true);
+        return restAppProperties.isSwaggerDocsEnabled();
     }
     
 }

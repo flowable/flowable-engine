@@ -26,7 +26,6 @@
             org.flowable.spring.boot
         </flowable.artifact>
 
-        <spring.boot.version>1.5.4.RELEASE</spring.boot.version>
         <!--<spring.framework.version>${spring.framework.version}</spring.framework.version>-->
 
     </properties>
