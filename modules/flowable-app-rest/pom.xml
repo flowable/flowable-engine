@@ -39,7 +39,7 @@
         <configuration>
           <filesets>
             <fileset>
-              <directory>src/main/webapp/docs/specfile</directory>
+              <directory>src/main/resources/static/docs/specfile</directory>.
               <includes>
                 <include>**</include>
               </includes>
@@ -163,7 +163,7 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/process</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/process</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
                 <!-- IDM -->
@@ -201,7 +201,7 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/idm</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/idm</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
                 <!-- DMN -->
@@ -239,7 +239,7 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/dmn</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/dmn</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
                 <!-- FORM -->
@@ -277,7 +277,7 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/form</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/form</swaggerDirectory>
                 </apiSource>
                 <!-- ++++++++++ -->
                 <!-- CONTENT -->
@@ -315,7 +315,7 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/content</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/content</swaggerDirectory>
                 </apiSource>
               </apiSources>
             </configuration>
