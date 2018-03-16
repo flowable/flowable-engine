@@ -41,11 +41,6 @@ public class FlowableProcessProperties {
      */
     private boolean enableSafeXml = true;
 
-    /**
-     * The strategy that should be used for the database schema.
-     */
-    private String databaseSchemaUpdate = "true";
-
     public FlowableServlet getServlet() {
         return servlet;
     }
@@ -66,11 +61,4 @@ public class FlowableProcessProperties {
         this.enableSafeXml = enableSafeXml;
     }
 
-    public String getDatabaseSchemaUpdate() {
-        return databaseSchemaUpdate;
-    }
-
-    public void setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
-        this.databaseSchemaUpdate = databaseSchemaUpdate;
-    }
 }

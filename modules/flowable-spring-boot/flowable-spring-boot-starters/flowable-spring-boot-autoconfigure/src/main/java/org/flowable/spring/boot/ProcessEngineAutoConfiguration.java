@@ -118,7 +118,6 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
-        conf.setDatabaseSchemaUpdate(processProperties.getDatabaseSchemaUpdate());
 
         processEngineConfigurationConfigurers.forEach(configurator -> configurator.configure(conf));
 

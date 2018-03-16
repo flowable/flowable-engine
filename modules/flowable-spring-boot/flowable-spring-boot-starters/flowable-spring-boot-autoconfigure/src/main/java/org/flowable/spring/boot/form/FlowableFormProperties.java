@@ -56,11 +56,6 @@ public class FlowableFormProperties {
     private boolean enabled = true;
 
     /**
-     * The strategy that should be used for the database schema.
-     */
-    private String databaseSchemaUpdate = "true";
-
-    /**
      * The servlet configuration for the Form Rest API.
      */
     @NestedConfigurationProperty
@@ -104,14 +99,6 @@ public class FlowableFormProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public String getDatabaseSchemaUpdate() {
-        return databaseSchemaUpdate;
-    }
-
-    public void setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
-        this.databaseSchemaUpdate = databaseSchemaUpdate;
     }
 
     public FlowableServlet getServlet() {
