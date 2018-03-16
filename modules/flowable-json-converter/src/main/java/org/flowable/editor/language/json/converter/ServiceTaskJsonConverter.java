@@ -26,6 +26,7 @@ import org.flowable.editor.language.json.model.ModelInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * @author Tijs Rademakers
@@ -94,6 +95,8 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
                 } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
                     propertiesNode.set(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS,
                             BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue())));
+                }else if(PROPERTY_DECISIONTABLE_UPDATED_VARIABLE_KEY.equals(fieldExtension.getFieldName())) {
+                    propertiesNode.set(PROPERTY_DECISIONTABLE_UPDATED_VARIABLE, TextNode.valueOf(fieldExtension.getStringValue()));
                 }
             }
 

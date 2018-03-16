@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
+    protected static final String EXPRESSION_DECISION_TABLE_UPDATE_VARIABLE = "decisionTaskUpdatedVariable";
 
     protected Task task;
 
@@ -143,7 +145,9 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (executionResult == null || executionResult.isEmpty()) {
             return;
         }
-
+        FieldExtension fieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_UPDATE_VARIABLE);
+        String updateName = fieldExtension.getStringValue();
+        ArrayList<String> updates = new ArrayList<String>();
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
         if (executionResult.size() > 1) {
@@ -160,6 +164,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             }
 
             execution.setVariable(decisionKey, ruleResultNode);
+            updates.add(decisionKey);
         } else {
             // single rule result
             // put on execution output id (key) and output value (value)
@@ -167,7 +172,9 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
             for (Map.Entry<String, Object> outputResult : ruleResult.entrySet()) {
                 execution.setVariable(outputResult.getKey(), outputResult.getValue());
+                updates.add(outputResult.getKey());
             }
         }
+        execution.setVariable(updateName, updates);
     }
 }

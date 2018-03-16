@@ -274,7 +274,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         String outputVariableType = ruleClauseContainer.getOutputClause().getTypeRef();
 
         LiteralExpression outputEntryExpression = ruleClauseContainer.getOutputEntry();
-
         if (StringUtils.isNotEmpty(outputEntryExpression.getText())) {
             Object executionVariable = null;
             try {
