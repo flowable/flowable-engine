@@ -12,12 +12,12 @@
  */
 package org.flowable.rest.app;
 
+import org.flowable.rest.app.properties.RestAppProperties;
 import org.flowable.rest.conf.BootstrapConfiguration;
-import org.flowable.rest.conf.DatabaseConfiguration;
-import org.flowable.rest.conf.FlowableEngineConfiguration;
 import org.flowable.rest.conf.SecurityConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -36,10 +36,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
     @PropertySource(value = "classpath:engine.properties", ignoreResourceNotFound = true)
 
 })
+@EnableConfigurationProperties({
+    RestAppProperties.class
+})
 @Import({
     BootstrapConfiguration.class,
-    DatabaseConfiguration.class,
-    FlowableEngineConfiguration.class,
     SecurityConfiguration.class
 
 })
