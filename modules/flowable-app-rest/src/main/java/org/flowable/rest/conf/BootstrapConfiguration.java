@@ -100,21 +100,26 @@ public class BootstrapConfiguration {
     }
     
     protected void initializeDefaultPrivileges(String restAdminId) {
+        initializePrivilege(restAdminId, SecurityConstants.PRIVILEGE_ACCESS_REST_API);
+        initializePrivilege(restAdminId, "ROLE_ACTUATOR");
+    }
+
+    protected void initializePrivilege(String restAdminId, String privilegeName) {
         boolean restApiPrivilegeMappingExists = false;
-        Privilege privilege = idmIdentityService.createPrivilegeQuery().privilegeName(SecurityConstants.PRIVILEGE_ACCESS_REST_API).singleResult();
+        Privilege privilege = idmIdentityService.createPrivilegeQuery().privilegeName(privilegeName).singleResult();
         if (privilege != null) {
             restApiPrivilegeMappingExists = restApiPrivilegeMappingExists(restAdminId, privilege);
         } else {
             try {
-                privilege = idmIdentityService.createPrivilege(SecurityConstants.PRIVILEGE_ACCESS_REST_API);
+                privilege = idmIdentityService.createPrivilege(privilegeName);
             } catch (Exception e) {
                 // Could be created by another server, retrying fetch
-                privilege = idmIdentityService.createPrivilegeQuery().privilegeName(SecurityConstants.PRIVILEGE_ACCESS_REST_API).singleResult();
+                privilege = idmIdentityService.createPrivilegeQuery().privilegeName(privilegeName).singleResult();
             }
         }
         
         if (privilege == null) {
-            throw new FlowableException("Could not find or create " + SecurityConstants.PRIVILEGE_ACCESS_REST_API + " privilege");
+            throw new FlowableException("Could not find or create " + privilegeName + " privilege");
         }
         
         if (!restApiPrivilegeMappingExists) {
