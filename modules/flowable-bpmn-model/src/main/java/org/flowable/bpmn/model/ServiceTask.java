@@ -25,6 +25,8 @@ public class ServiceTask extends TaskWithFieldExtensions {
     public static final String HTTP_TASK = "http";
     public static final String SHELL_TASK = "shell";
 
+    public static final String TRIGGER_SYNCHRONOUSLY = "sync";
+
     protected String implementation;
     protected String implementationType;
     protected String resultVariableName;
@@ -34,6 +36,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
     protected List<CustomProperty> customProperties = new ArrayList<>();
     protected String skipExpression;
     protected boolean useLocalScopeForResultVariable;
+    protected String triggerable;
 
     public String getImplementation() {
         return implementation;
@@ -111,6 +114,18 @@ public class ServiceTask extends TaskWithFieldExtensions {
         this.useLocalScopeForResultVariable = useLocalScopeForResultVariable;
     }
 
+    public String getTriggerable() {
+        return triggerable;
+    }
+
+    public void setTriggerable(String triggerable) {
+        this.triggerable = triggerable;
+    }
+
+    public boolean isTriggerable() {
+        return Boolean.TRUE.toString().equalsIgnoreCase(triggerable) || TRIGGER_SYNCHRONOUSLY.equalsIgnoreCase(triggerable);
+    }
+
     @Override
     public ServiceTask clone() {
         ServiceTask clone = new ServiceTask();
@@ -128,6 +143,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
         setExtensionId(otherElement.getExtensionId());
         setSkipExpression(otherElement.getSkipExpression());
         setUseLocalScopeForResultVariable(otherElement.isUseLocalScopeForResultVariable());
+        setTriggerable(otherElement.getTriggerable());
 
         fieldExtensions = new ArrayList<>();
         if (otherElement.getFieldExtensions() != null && !otherElement.getFieldExtensions().isEmpty()) {

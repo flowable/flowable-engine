@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import java.util.Map;
+
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -35,7 +37,25 @@ public class AsyncContinuationJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) variableScope;
-        CommandContextUtil.getAgenda(commandContext).planContinueProcessSynchronousOperation(executionEntity);
+
+        Map<String,Object> configurationMap = AsyncContinuationEventHandler.readConfiguration(configuration);
+        Map<String,Object> processVariables = (Map<String, Object>) configurationMap.get(AsyncContinuationEventHandler.PROPERTY_NAME_PROCESS_VARIABLES);
+        Map<String,Object> transientVariables = (Map<String, Object>) configurationMap.get(AsyncContinuationEventHandler.PROPERTY_NAME_TRANSIENT_VARIABLES);
+
+        if (processVariables != null) {
+            executionEntity.setVariables(processVariables);
+        }
+
+        if (transientVariables != null) {
+            executionEntity.setTransientVariables(transientVariables);
+        }
+
+        if (configuration == null) {
+            CommandContextUtil.getAgenda(commandContext).planContinueProcessSynchronousOperation(executionEntity);
+        }
+        else {
+            CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
+        }
     }
 
 }

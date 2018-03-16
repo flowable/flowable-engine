@@ -54,22 +54,25 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
     protected Expression skipExpression;
     protected List<FieldDeclaration> fieldDeclarations;
     protected List<MapExceptionEntry> mapExceptions;
+    protected boolean triggerable;
 
     public ServiceTaskDelegateExpressionActivityBehavior(String serviceTaskId, Expression expression, Expression skipExpression,
-            List<FieldDeclaration> fieldDeclarations, List<MapExceptionEntry> mapExceptions) {
+            List<FieldDeclaration> fieldDeclarations, List<MapExceptionEntry> mapExceptions, boolean triggerable) {
         this.serviceTaskId = serviceTaskId;
         this.expression = expression;
         this.skipExpression = skipExpression;
         this.fieldDeclarations = fieldDeclarations;
         this.mapExceptions = mapExceptions;
+        this.triggerable = triggerable;
     }
 
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
-        if (delegate instanceof TriggerableActivityBehavior) {
+        if (triggerable && delegate instanceof TriggerableActivityBehavior) {
             ((TriggerableActivityBehavior) delegate).trigger(execution, signalName, signalData);
         }
+        leave(execution);
     }
 
     @Override
@@ -100,8 +103,10 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
 
                 } else if (delegate instanceof JavaDelegate) {
                     CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
-                    leave(execution);
 
+                    if (!triggerable) {
+                        leave(execution);
+                    }
                 } else {
                     throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of " + ActivityBehavior.class + " nor " + JavaDelegate.class);
                 }
@@ -134,5 +139,4 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
 
         }
     }
-
 }

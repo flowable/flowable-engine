@@ -12,6 +12,8 @@
  */
 package org.flowable.engine;
 
+import java.util.Map;
+
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
@@ -34,6 +36,8 @@ public interface FlowableEngineAgenda extends Agenda {
     void planEndExecutionOperation(ExecutionEntity execution);
 
     void planTriggerExecutionOperation(ExecutionEntity execution);
+
+    void planAsyncTriggerExecutionOperation(ExecutionEntity execution, Map<String, Object> processVariables, Map<String, Object> transientVariables);
 
     void planDestroyScopeOperation(ExecutionEntity execution);
 

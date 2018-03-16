@@ -109,6 +109,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_ACTIVITY_ASYNCHRONOUS = "async";
     public static final String ATTRIBUTE_ACTIVITY_EXCLUSIVE = "exclusive";
     public static final String ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION = "isForCompensation";
+    public static final String ATTRIBUTE_ACTIVITY_TRIGGERABLE = "triggerable";
 
     public static final String ELEMENT_IMPORT = "import";
     public static final String ATTRIBUTE_IMPORT_TYPE = "importType";
