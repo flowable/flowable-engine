@@ -5,6 +5,7 @@ org.springframework.boot.env.EnvironmentPostProcessor=\
 # Flowable auto-configurations
 
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    org.flowable.spring.boot.actuate.info.FlowableInfoAutoConfiguration,\
     org.flowable.spring.boot.EndpointAutoConfiguration,\
     org.flowable.spring.boot.RestApiAutoConfiguration,\
     org.flowable.spring.boot.ProcessEngineAutoConfiguration,\

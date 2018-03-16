@@ -12,7 +12,12 @@
  */
 package org.flowable.test.spring.boot;
 
-import flowable.Application;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
+import java.util.Map;
+
+import org.flowable.engine.common.impl.FlowableVersions;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,14 +27,13 @@ import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebCl
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import flowable.Application;
 
 /**
  * @author Filip Hrisafov
@@ -70,5 +74,19 @@ public class ActuatorApplicationTest {
             Number invokedValue = (Number) invokedResults.get(criticalKey);
             assertThat(criticalValue.longValue()).isEqualTo(invokedValue.longValue());
         }
+    }
+
+    @Test
+    public void infoEndpoint() {
+        ResponseEntity<Map<String, Object>> response = restTemplate
+            .exchange("http://localhost:" + serverPort + "/info/", HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
+
+            });
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsKeys("flowable");
+        Map<String, Object> flowableInfo = (Map<String, Object>) response.getBody().get("flowable");
+        assertThat(flowableInfo)
+            .containsExactly(entry("version", FlowableVersions.CURRENT_VERSION));
     }
 }
