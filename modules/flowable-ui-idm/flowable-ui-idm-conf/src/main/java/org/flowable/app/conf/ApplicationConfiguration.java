@@ -13,7 +13,10 @@
 package org.flowable.app.conf;
 
 import org.flowable.app.service.idm.RemoteIdmServiceImpl;
+import org.flowable.app.servlet.ApiDispatcherServletConfiguration;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -21,14 +24,11 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
 @PropertySources({
-    
-    @PropertySource(value = "classpath:/META-INF/flowable-app/flowable-app.properties"),
-    @PropertySource(value = "classpath:flowable-app.properties", ignoreResourceNotFound = true),
-    @PropertySource(value = "file:flowable-app.properties", ignoreResourceNotFound = true),
-
     // For backwards compatibility (pre 6.3.0)
     @PropertySource(value = "classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties", ignoreResourceNotFound = true),
     @PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
@@ -42,20 +42,17 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         "org.flowable.app.service" }, excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RemoteIdmServiceImpl.class) })
 public class ApplicationConfiguration {
 
-    /**
-     * This is needed to make property resolving work on annotations ... (see http://stackoverflow.com/questions/11925952/custom-spring-property-source-does-not-resolve-placeholders-in-value)
-     * 
-     * @Scheduled(cron="${someProperty}")
-     */
     @Bean
-    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
+    public ServletRegistrationBean apiServlet(ApplicationContext applicationContext) {
+        AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
+        dispatcherServletConfiguration.setParent(applicationContext);
+        dispatcherServletConfiguration.register(ApiDispatcherServletConfiguration.class);
+        DispatcherServlet servlet = new DispatcherServlet(dispatcherServletConfiguration);
+        ServletRegistrationBean registrationBean = new ServletRegistrationBean(servlet, "/api/*");
+        registrationBean.setName("Flowable IDM App API Servlet");
+        registrationBean.setLoadOnStartup(1);
+        registrationBean.setAsyncSupported(true);
+        return registrationBean;
     }
 
-    @Bean
-    public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
-        PropertyPlaceholderConfigurer placeholderConfigurer = new PropertyPlaceholderConfigurer();
-        placeholderConfigurer.setSystemPropertiesMode(PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE);
-        return placeholderConfigurer;
-    }
 }

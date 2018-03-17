@@ -45,7 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping(value = "/rest/admin")
+@RequestMapping(value = "/app/rest/admin")
 public class IdmProfileResource {
 
     @Autowired

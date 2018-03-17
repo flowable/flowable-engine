@@ -142,6 +142,9 @@ public class SecurityConfiguration {
         @Autowired
         private Http401UnauthorizedEntryPoint authenticationEntryPoint;
 
+        @Autowired
+        private RememberMeServices rememberMeServices;
+
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
@@ -152,7 +155,7 @@ public class SecurityConfiguration {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .rememberMe()
-                    .rememberMeServices(rememberMeServices())
+                    .rememberMeServices(rememberMeServices)
                     .key(env.getProperty("security.rememberme.key"))
                     .and()
                     .logout()
@@ -185,15 +188,16 @@ public class SecurityConfiguration {
             http.apply(loginConfig);
         }
 
-        @Bean
-        public RememberMeServices rememberMeServices() {
-            return new CustomPersistentRememberMeServices(env, userDetailsService());
-        }
+    }
 
-        @Bean
-        public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
-            return new RememberMeAuthenticationProvider(env.getProperty("security.rememberme.key"));
-        }
+    @Bean
+    public CustomPersistentRememberMeServices rememberMeServices() {
+        return new CustomPersistentRememberMeServices(env, userDetailsService());
+    }
+
+    @Bean
+    public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
+        return new RememberMeAuthenticationProvider(env.getProperty("security.rememberme.key"));
     }
 
     //
