@@ -132,6 +132,11 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
         if (!privilegeMappingExists(adminId, restApiAccessPrivilege)) {
             identityService.addUserPrivilegeMapping(restApiAccessPrivilege.getId(), adminId);
         }
+
+        Privilege actuatorAccessPrivilege = findOrCreatePrivilege("ROLE_ACTUATOR", privilegeMap);
+        if (!privilegeMappingExists(adminId, actuatorAccessPrivilege)) {
+            identityService.addUserPrivilegeMapping(actuatorAccessPrivilege.getId(), adminId);
+        }
     }
     
     protected Privilege findOrCreatePrivilege(String privilegeName, Map<String, Privilege> privilegeMap) {
