@@ -39,7 +39,7 @@ public class CollectionUtil {
         }
 
         if (DMNParseUtil.isDMNCollection(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
+            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value, (Collection) collection);
             return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return ((Collection) collection).containsAll((Collection) value);
@@ -47,7 +47,8 @@ public class CollectionUtil {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
             return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
         } else {
-            return ((Collection) collection).contains(value);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), (Collection) collection);
+            return ((Collection) collection).contains(formattedValue);
         }
     }
 
@@ -63,8 +64,12 @@ public class CollectionUtil {
 
         DMNParseUtil.isCollection(collection);
 
+        if (DMNParseUtil.isArrayNode(collection)) {
+            collection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
+        }
+
         if (DMNParseUtil.isDMNCollection(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
+            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value, (Collection) collection);
             return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return !((Collection) collection).containsAll((Collection) value);
@@ -72,7 +77,8 @@ public class CollectionUtil {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
             return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
         } else {
-            return !((Collection) collection).contains(value);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), (Collection) collection);
+            return !((Collection) collection).contains(formattedValue);
         }
     }
 
@@ -88,8 +94,12 @@ public class CollectionUtil {
 
         DMNParseUtil.isCollection(collection);
 
+        if (DMNParseUtil.isArrayNode(collection)) {
+            collection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
+        }
+
         if (DMNParseUtil.isDMNCollection(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
+            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value, (Collection) collection);
             return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return CollectionUtils.containsAny((Collection) collection, (Collection) value);
@@ -97,7 +107,8 @@ public class CollectionUtil {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
             return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else {
-            return ((Collection) collection).contains(value);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), (Collection) collection);
+            return ((Collection) collection).contains(formattedValue);
         }
     }
 
@@ -113,8 +124,12 @@ public class CollectionUtil {
 
         DMNParseUtil.isCollection(collection);
 
+        if (DMNParseUtil.isArrayNode(collection)) {
+            collection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
+        }
+
         if (DMNParseUtil.isDMNCollection(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value);
+            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value, (Collection) collection);
             return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return !CollectionUtils.containsAny((Collection) collection, (Collection) value);
@@ -122,7 +137,8 @@ public class CollectionUtil {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
             return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
         } else {
-            return !((Collection) collection).contains(value);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), (Collection) collection);
+            return !((Collection) collection).contains(formattedValue);
         }
     }
 

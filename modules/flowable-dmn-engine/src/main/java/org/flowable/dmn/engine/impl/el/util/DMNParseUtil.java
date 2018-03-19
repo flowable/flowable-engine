@@ -14,11 +14,14 @@ package org.flowable.dmn.engine.impl.el.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,7 +38,6 @@ public class DMNParseUtil {
             throw new IllegalArgumentException("collection must be of type java.util.Collection or com.fasterxml.jackson.databind.node.ArrayNode");
         }
     }
-
 
     public static boolean isJavaCollection(Object collection) {
         return Collection.class.isAssignableFrom(collection.getClass());
@@ -54,9 +56,10 @@ public class DMNParseUtil {
         return stringValue.contains(",");
     }
 
-    public static Collection getCollectionFromDMNCollection(Object value) {
+    public static Collection getCollectionFromDMNCollection(Object value, Collection inputCollection) {
         String stringValue = String.valueOf(value);
-        List<Object> items = split(stringValue);
+        Class<?> collectionType = getCollectionType(inputCollection);
+        List<Object> items = split(stringValue, collectionType);
         return items;
     }
 
@@ -89,30 +92,65 @@ public class DMNParseUtil {
         }
     }
 
-    protected static List<Object> split(String str) {
+    protected static List<Object> split(String str, Class<?> collectionType) {
         return Stream.of(str.split(","))
-            .map(elem -> formatElementValue(elem.trim()))
+            .map(elem -> formatElementValue(elem.trim(), collectionType))
             .collect(Collectors.toList());
     }
 
+    protected static Object getFormattedValue(String value, Collection inputCollection) {
+        Class<?> collectionType = getCollectionType(inputCollection);
+        return formatElementValue(value, collectionType);
+    }
 
-    //TODO: DATES
-    protected static Object formatElementValue(String value) {
+    protected static Object formatElementValue(String value, Class<?> collectionType) {
         if (value.isEmpty()) {
             return null;
         }
+
+        value = removedSurroundingQuotes(value);
+
+        // format element based on collection type
+        if (Date.class.equals(collectionType)) {
+            return DateUtil.toDate(value);
+        } else if (LocalDate.class.equals(collectionType)) {
+            return new DateTime(DateUtil.toDate(value)).toLocalDate();
+        } else if (Integer.class.equals(collectionType) || Long.class.equals(collectionType) || Float.class.equals(collectionType) || Double.class.equals(collectionType)) {
+            return getNumberValue(value, collectionType);
+        } else if (Boolean.class.equals(collectionType)) {
+            return Boolean.valueOf(value);
+        } else if (String.class.equals(collectionType)) {
+            return value;
+        }
+        return value;
+    }
+
+    protected static String removedSurroundingQuotes(String value) {
         if (value.startsWith("\"") && value.endsWith("\"")) {
             String result = value.substring(1, value.length() - 1);
-
-            // Boolean
-            if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
-                return Boolean.valueOf(value);
-            } else {
-                return result;
-            }
+            return result;
         } else {
-            return getNumberValue(value);
+            return value;
         }
+    }
+
+    protected static Object getNumberValue(String value, Class<?> targetType) {
+        Object returnValue = null;
+        try {
+            if (Integer.class.equals(targetType)) {
+                returnValue = Integer.valueOf(value);
+            } else if (Long.class.equals(targetType)) {
+                returnValue = Long.valueOf(value);
+            } else if (Float.class.equals(targetType)) {
+                returnValue = Float.valueOf(value);
+            } else if (Double.class.equals(targetType)) {
+                returnValue = Double.valueOf(value);
+            }
+        } catch (NumberFormatException nfe) {
+            LOGGER.warn("Could not parse to Integer, Long, Float or Double from: " + value);
+        }
+
+        return returnValue;
     }
 
     protected static Object getNumberValue(String value) {
@@ -127,4 +165,12 @@ public class DMNParseUtil {
             }
         }
     }
+
+    protected static Class<?> getCollectionType(Collection collection) {
+        if (collection.isEmpty()) {
+            return null;
+        }
+        return collection.iterator().next().getClass();
+    }
+
 }
