@@ -62,7 +62,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Import({
     FlowableJobConfiguration.class
 })
-public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
+public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     @Autowired(required = false)
     private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
