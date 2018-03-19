@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RequestMapping("/app")
 public class TasksResource {
 
     @Autowired

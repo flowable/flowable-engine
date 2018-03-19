@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequestMapping("/app")
 public class TaskResource {
 
     @Autowired
