@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.Task;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DmnResponseHandler;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
@@ -32,6 +34,7 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,8 +47,12 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
+    protected static final String EXPRESSION_DECISION_TABLE_UPDATE_VARIABLE = "decisionTaskUpdatedVariable";
 
     protected Task task;
+    
+    @Autowired(required = false)
+    DmnResponseHandler responseHandler;
 
     public DmnActivityBehavior(Task task) {
         this.task = task;
@@ -133,9 +140,9 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                 }
             }
         }
-
+        
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
-
+        handleResponse(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution);
         leave(execution);
     }
 
@@ -143,7 +150,9 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (executionResult == null || executionResult.isEmpty()) {
             return;
         }
-
+        FieldExtension fieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_UPDATE_VARIABLE);
+        String updateName = fieldExtension.getStringValue();
+        ArrayList<String> updates = new ArrayList<String>();
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
         if (executionResult.size() > 1) {
@@ -160,6 +169,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             }
 
             execution.setVariable(decisionKey, ruleResultNode);
+            updates.add(decisionKey);
         } else {
             // single rule result
             // put on execution output id (key) and output value (value)
@@ -167,7 +177,16 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
             for (Map.Entry<String, Object> outputResult : ruleResult.entrySet()) {
                 execution.setVariable(outputResult.getKey(), outputResult.getValue());
+                updates.add(outputResult.getKey());
             }
+        }
+        execution.setVariable(updateName, updates);
+    }
+    
+    private void handleResponse(List<Map<String, Object>> decisionResult, String finaldecisionTableKeyValue, DelegateExecution execution) {
+        Map<String, Object> variablesToSetOnExecution = responseHandler.handleResponse(decisionResult, finaldecisionTableKeyValue);
+        for(String key: variablesToSetOnExecution.keySet()) {
+        		execution.setVariable(key, variablesToSetOnExecution.get(key));
         }
     }
 }
