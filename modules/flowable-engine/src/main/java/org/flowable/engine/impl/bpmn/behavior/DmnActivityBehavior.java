@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.Task;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnResponseHandler;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
@@ -142,7 +141,9 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         }
         
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
-        handleResponse(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution);
+        if(responseHandler != null) {
+        		responseHandler.handleResponse(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution);
+        }
         leave(execution);
     }
 
@@ -181,12 +182,5 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             }
         }
         execution.setVariable(updateName, updates);
-    }
-    
-    private void handleResponse(List<Map<String, Object>> decisionResult, String finaldecisionTableKeyValue, DelegateExecution execution) {
-        Map<String, Object> variablesToSetOnExecution = responseHandler.handleResponse(decisionResult, finaldecisionTableKeyValue, execution.getVariables());
-        for(String key: variablesToSetOnExecution.keySet()) {
-        		execution.setVariable(key, variablesToSetOnExecution.get(key));
-        }
     }
 }
