@@ -12,7 +12,11 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-	
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-modeler-logic</artifactId>

@@ -32,9 +32,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -44,7 +41,6 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 @Configuration
-@EnableTransactionManagement
 public class DatabaseConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConfiguration.class);
@@ -102,13 +98,6 @@ public class DatabaseConfiguration {
     @Bean
     public DataSource dataSource() {
         return FlowableAppDatasourceUtil.createDataSource(env);
-    }
-
-    @Bean
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
-        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-        dataSourceTransactionManager.setDataSource(dataSource());
-        return dataSourceTransactionManager;
     }
 
     @Bean

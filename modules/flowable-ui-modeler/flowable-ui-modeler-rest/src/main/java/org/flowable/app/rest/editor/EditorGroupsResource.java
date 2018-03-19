@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Rest resource for managing groups, used in the editor app.
  */
 @RestController
+@RequestMapping("/app")
 public class EditorGroupsResource {
 
     @Autowired

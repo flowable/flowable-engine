@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping("/rest/form-models")
+@RequestMapping("/app/rest/form-models")
 public class FormsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormsResource.class);

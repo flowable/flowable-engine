@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Created by Pardo David on 16/02/2017.
  */
 @RestController
+@RequestMapping("/app")
 public class ModelValidationRestResource {
 
     @RequestMapping(value = "/rest/model/validate",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
