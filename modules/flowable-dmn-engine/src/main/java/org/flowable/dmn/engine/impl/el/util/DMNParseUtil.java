@@ -119,10 +119,9 @@ public class DMNParseUtil {
             return getNumberValue(value, collectionType);
         } else if (Boolean.class.equals(collectionType)) {
             return Boolean.valueOf(value);
-        } else if (String.class.equals(collectionType)) {
+        } else { // Default case String
             return value;
         }
-        return value;
     }
 
     protected static String removedSurroundingQuotes(String value) {
@@ -143,7 +142,7 @@ public class DMNParseUtil {
                 returnValue = Long.valueOf(value);
             } else if (Float.class.equals(targetType)) {
                 returnValue = Float.valueOf(value);
-            } else if (Double.class.equals(targetType)) {
+            } else { // Default case Double
                 returnValue = Double.valueOf(value);
             }
         } catch (NumberFormatException nfe) {
