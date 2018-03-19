@@ -184,7 +184,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     }
     
     private void handleResponse(List<Map<String, Object>> decisionResult, String finaldecisionTableKeyValue, DelegateExecution execution) {
-        Map<String, Object> variablesToSetOnExecution = responseHandler.handleResponse(decisionResult, finaldecisionTableKeyValue);
+        Map<String, Object> variablesToSetOnExecution = responseHandler.handleResponse(decisionResult, finaldecisionTableKeyValue, execution.getVariables());
         for(String key: variablesToSetOnExecution.keySet()) {
         		execution.setVariable(key, variablesToSetOnExecution.get(key));
         }
