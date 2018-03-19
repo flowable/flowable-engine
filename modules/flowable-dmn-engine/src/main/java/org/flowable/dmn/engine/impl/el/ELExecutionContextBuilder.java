@@ -102,8 +102,8 @@ public class ELExecutionContextBuilder {
                 if (inputVariable.getValue() instanceof LocalDate) {
                     Date transformedDate = ((LocalDate) inputVariable.getValue()).toDate();
                     inputVariables.put(inputVariable.getKey(), transformedDate);
-                } else if (inputVariable.getValue() instanceof Long) {
-                    BigInteger transformedNumber = BigInteger.valueOf((Long) inputVariable.getValue());
+                } else if (inputVariable.getValue() instanceof Long || inputVariable.getValue() instanceof Integer) {
+                    BigInteger transformedNumber = new BigInteger(inputVariable.getValue().toString());
                     inputVariables.put(inputVariable.getKey(), transformedNumber);
                 } else if (inputVariable.getValue() instanceof Double || inputVariable.getValue() instanceof Float) {
                     BigDecimal transformedNumber = new BigDecimal(inputVariable.getValue().toString());
