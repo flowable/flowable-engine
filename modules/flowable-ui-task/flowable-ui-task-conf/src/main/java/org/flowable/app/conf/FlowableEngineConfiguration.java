@@ -68,7 +68,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
+//@Configuration
 @ComponentScan(basePackages = {
         "org.flowable.app.extension.conf", // For custom configuration classes
         "org.flowable.app.extension.bean" // For custom beans (delegates etc.)

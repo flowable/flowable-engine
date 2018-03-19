@@ -18,12 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@EnableTransactionManagement
 public class DatabaseConfiguration {
 
     @Autowired
@@ -33,12 +29,4 @@ public class DatabaseConfiguration {
     public DataSource dataSource() {
         return FlowableAppDatasourceUtil.createDataSource(env);
     }
-
-    @Bean
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
-        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-        dataSourceTransactionManager.setDataSource(dataSource());
-        return dataSourceTransactionManager;
-    }
-
 }

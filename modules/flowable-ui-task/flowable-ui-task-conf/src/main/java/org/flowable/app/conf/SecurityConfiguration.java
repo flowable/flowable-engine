@@ -31,7 +31,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -44,7 +43,6 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * @author Tijs Rademakers
  */
 @Configuration
-@EnableWebSecurity
 public class SecurityConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfiguration.class);
@@ -115,7 +113,7 @@ public class SecurityConfiguration {
                     .addHeaderWriter(new XXssProtectionHeaderWriter())
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
+                .antMatchers("/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
         }
     }
 

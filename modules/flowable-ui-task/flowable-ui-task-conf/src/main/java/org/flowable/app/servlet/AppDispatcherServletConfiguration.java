@@ -12,36 +12,27 @@
  */
 package org.flowable.app.servlet;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Configuration
 @ComponentScan(value = { "org.flowable.app.rest" })
 @EnableAsync
-public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
+public class AppDispatcherServletConfiguration extends WebMvcRegistrationsAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDispatcherServletConfiguration.class);
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private Environment environment;
@@ -66,8 +57,8 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
         return multipartResolver;
     }
 
-    @Bean
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+    @Override
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
@@ -75,17 +66,5 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
         Object[] interceptors = { localeChangeInterceptor() };
         requestMappingHandlerMapping.setInterceptors(interceptors);
         return requestMappingHandlerMapping;
-    }
-
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        addDefaultHttpMessageConverters(converters);
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-                jackson2HttpMessageConverter.setObjectMapper(objectMapper);
-                break;
-            }
-        }
     }
 }
