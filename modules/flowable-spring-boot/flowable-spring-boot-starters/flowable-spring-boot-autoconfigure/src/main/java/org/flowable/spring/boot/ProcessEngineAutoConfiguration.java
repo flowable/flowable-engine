@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -157,8 +158,14 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
     @Bean
     @ConditionalOnMissingBean
-    public ManagementService managementServiceBeanBean(ProcessEngine processEngine) {
+    public ManagementService managementServiceBean(ProcessEngine processEngine) {
         return processEngine.getManagementService();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public DynamicBpmnService dynamicBpmnServiceBean(ProcessEngine processEngine) {
+        return processEngine.getDynamicBpmnService();
     }
 
     @Bean
