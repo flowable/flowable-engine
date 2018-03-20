@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RequestMapping("/app")
 public class CmmnJobClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnJobClientResource.class);

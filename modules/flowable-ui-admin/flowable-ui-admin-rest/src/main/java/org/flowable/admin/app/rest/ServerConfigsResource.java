@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@RequestMapping("/app")
 public class ServerConfigsResource {
 
     @Autowired

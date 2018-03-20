@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Bassam Al-Sarori
  */
 @RestController
+@RequestMapping("/app")
 public class DecisionTablesClientResource extends AbstractClientResource {
 
     @Autowired

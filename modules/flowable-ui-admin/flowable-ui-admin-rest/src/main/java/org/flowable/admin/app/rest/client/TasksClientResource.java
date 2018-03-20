@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for managing the current user's account.
  */
 @RestController
+@RequestMapping("/app")
 public class TasksClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksClientResource.class);

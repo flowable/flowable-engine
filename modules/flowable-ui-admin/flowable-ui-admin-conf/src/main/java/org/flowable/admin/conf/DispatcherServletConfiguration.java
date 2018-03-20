@@ -19,6 +19,7 @@ import org.apache.commons.lang3.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,8 +30,6 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -43,8 +42,7 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 @ComponentScan(basePackages = {
     "org.flowable.admin.app.rest",
     "org.flowable.app.rest"})
-@EnableWebMvc
-public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
+public class DispatcherServletConfiguration extends WebMvcRegistrationsAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
 
@@ -107,8 +105,8 @@ public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
         return multipartResolver;
     }
 
-    @Bean
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+    @Override
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);

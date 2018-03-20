@@ -42,7 +42,6 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 @Configuration
-@EnableTransactionManagement
 public class DatabaseConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConfiguration.class);
@@ -58,13 +57,6 @@ public class DatabaseConfiguration {
     @Bean
     public DataSource dataSource() {
         return FlowableAppDatasourceUtil.createDataSource(env);
-    }
-
-    @Bean
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
-        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-        dataSourceTransactionManager.setDataSource(dataSource());
-        return dataSourceTransactionManager;
     }
 
     @Bean
