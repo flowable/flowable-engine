@@ -38,7 +38,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 /**
  * @author Tijs Rademakers
  */
-public class DynamicSubProcessParallelInjectUtil extends AbstractDynamicSubProcessInjectUtil {
+public class DynamicSubProcessParallelInjectUtil extends BaseDynamicSubProcessInjectUtil {
     
     public static void injectParallelSubProcess(Process process, BpmnModel bpmnModel, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder,
                     ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
@@ -76,6 +76,8 @@ public class DynamicSubProcessParallelInjectUtil extends AbstractDynamicSubProce
         for (FlowElement flowElement : bpmnModelSubProcess.getMainProcess().getFlowElements()) {
             subProcess.addFlowElement(flowElement);
         }
+        
+        processFlowElements(commandContext, process, bpmnModel, originalProcessDefinitionEntity, newDeploymentEntity);
         
         Map<String, FlowElement> generatedIds = new HashMap<>();
         processSubProcessFlowElements(commandContext, subProcess.getId(), process, bpmnModel, subProcess, bpmnModelSubProcess, 
