@@ -139,16 +139,18 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
                 if(FormFieldTypes.HYPERLINK.equals(field.getType())) {
                     Object variableValue = variables.get(field.getId());
                     // process expression if there is no value, otherwise keep it
-                    if(variableValue != null) {
+                    if (variableValue != null) {
                         field.setValue(variableValue);
                     } else {
                         // No value set, process as expression
-                        String hyperlinkUrl = field.getParam("hyperlinkUrl").toString();
-                        Expression formExpression = formEngineConfiguration.getExpressionManager().createExpression(hyperlinkUrl);
-                        try {
-                            field.setValue(formExpression.getValue(new VariableContainerWrapper(variables)));
-                        } catch (Exception e) {
-                            LOGGER.error("Error getting value for hyperlink expression {} {}", hyperlinkUrl, e.getMessage(), e);
+                        if (field.getParam("hyperlinkUrl") != null) {
+                            String hyperlinkUrl = field.getParam("hyperlinkUrl").toString();
+                            Expression formExpression = formEngineConfiguration.getExpressionManager().createExpression(hyperlinkUrl);
+                            try {
+                                field.setValue(formExpression.getValue(new VariableContainerWrapper(variables)));
+                            } catch (Exception e) {
+                                LOGGER.error("Error getting value for hyperlink expression {} {}", hyperlinkUrl, e.getMessage(), e);
+                            }
                         }
                     }
                 } else if (field instanceof ExpressionFormField) {
