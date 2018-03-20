@@ -1222,9 +1222,9 @@
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
 				<module>modules/flowable-idm-spring</module>
+                <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
-				<module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-cxf</module>
@@ -1257,9 +1257,10 @@
 				<module>modules/flowable-content-spring</module>
 				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-content-rest</module>
+                <module>modules/flowable-http</module>
+                <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-ui-common</module>
-				<module>modules/flowable-http</module>
 			</modules>
 		</profile>
 		<profile>
