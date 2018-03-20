@@ -17,14 +17,17 @@ import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.filter.FlowableCookieFilter;
 import org.flowable.app.filter.FlowableCookieFilterCallback;
+import org.flowable.app.filter.FlowableCookieFilterRegistrationBean;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.app.security.EngineAuthenticationCookieFilterCallback;
 import org.flowable.app.security.RemoteIdmAuthenticationProvider;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -54,10 +57,11 @@ public class SecurityConfiguration {
     protected Environment env;
 
     @Bean
-    public FlowableCookieFilter flowableCookieFilter() {
-        FlowableCookieFilter filter = new FlowableCookieFilter();
-        filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
-        return filter;
+    public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistration(RemoteIdmService remoteIdmService) {
+        FlowableCookieFilterRegistrationBean registrationBean = new FlowableCookieFilterRegistrationBean(remoteIdmService);
+        registrationBean.addUrlPatterns("/app/*");
+        registrationBean.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
+        return registrationBean;
     }
 
     @Bean
@@ -88,7 +92,7 @@ public class SecurityConfiguration {
         protected Environment env;
 
         @Autowired
-        protected FlowableCookieFilter flowableCookieFilter;
+        protected FilterRegistrationBean flowableCookieFilterRegistration;
 
         @Autowired
         protected AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
@@ -99,7 +103,7 @@ public class SecurityConfiguration {
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
-                    .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(flowableCookieFilterRegistration.getFilter(), UsernamePasswordAuthenticationFilter.class)
                     .logout()
                     .logoutUrl("/app/logout")
                     .logoutSuccessHandler(ajaxLogoutSuccessHandler)

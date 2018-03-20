@@ -53,13 +53,10 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
     protected static final String DELIMITER = ":";
 
-    @Autowired
-    protected Environment env;
+    protected final Environment env;
 
-    @Autowired
-    protected RemoteIdmService remoteIdmService;
+    protected final RemoteIdmService remoteIdmService;
 
-    @Autowired(required = false)
     protected FlowableCookieFilterCallback filterCallback;
 
     protected String idmAppUrl;
@@ -72,6 +69,11 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     protected LoadingCache<String, RemoteToken> tokenCache;
 
     protected LoadingCache<String, FlowableAppUser> userCache;
+
+    public FlowableCookieFilter(Environment env, RemoteIdmService remoteIdmService) {
+        this.env = env;
+        this.remoteIdmService = remoteIdmService;
+    }
 
     @PostConstruct
     protected void initCaches() {
@@ -320,4 +322,8 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         this.requiredPrivileges = requiredPrivileges;
     }
 
+    @Autowired(required = false)
+    public void setFilterCallback(FlowableCookieFilterCallback filterCallback) {
+        this.filterCallback = filterCallback;
+    }
 }
