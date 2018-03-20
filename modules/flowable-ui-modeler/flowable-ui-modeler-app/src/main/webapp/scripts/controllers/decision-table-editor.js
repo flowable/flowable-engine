@@ -28,10 +28,10 @@ angular.module('flowableModeler')
 
             var hotDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
-            var stringOperators = ['==', '!='];
-            var numberOperators = ['==', '!=', '<', '>', '>=', '<='];
+            var stringOperators = ['==', '!=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
+            var numberOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
             var booleanOperators = ['==', '!='];
-            var dateOperators = ['==', '!=', '<', '>', '>=', '<='];
+            var dateOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
             var collectionOperators = ['IN', 'NOT IN', 'ANY', 'NOT ANY', '==', '!='];
             var allOperators = ['==', '!=', '<', '>', '>=', '<='];
             var collectOperators = {
@@ -286,7 +286,9 @@ angular.module('flowableModeler')
             };
 
             $scope.doAfterValidate = function (isValid, value, row, prop, source) {
-                if (isCustomExpression(value) || isDashValue(value)) {
+                if (isCorrespondingCollectionOperator(row, prop)) {
+                    return true;
+                } else if (isCustomExpression(value) || isDashValue(value)) {
                     disableCorrespondingOperatorCell(row, prop);
                     return true;
                 } else {
@@ -308,15 +310,25 @@ angular.module('flowableModeler')
                 return !!(val != null && "-" === val);
             };
 
-            var disableCorrespondingOperatorCell = function (row, prop) {
-                var currentCol = hotDecisionTableEditorInstance.propToCol(prop);
-                if (currentCol < 1) {
-                    return;
-                }
-                var operatorCol = currentCol - 1;
+            var isCorrespondingCollectionOperator = function (row, prop) {
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
                 var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
 
-                if (operatorCellMeta == null || operatorCellMeta.prop.endsWith("_operator") === false) {
+                var isCollectionOperator = false;
+                if (isOperatorCell(operatorCellMeta)) {
+                    var operatorValue = hotDecisionTableEditorInstance.getDataAtCell(row, operatorCol);
+                    if (operatorValue === "IN" || operatorValue === "NOT IN" || operatorValue === "ANY" || operatorValue === "NOT ANY") {
+                        isCollectionOperator = true;
+                    }
+                }
+                return isCollectionOperator;
+            };
+
+            var disableCorrespondingOperatorCell = function (row, prop) {
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
+                var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                if (!isOperatorCell(operatorCellMeta)) {
                     return;
                 }
 
@@ -333,14 +345,10 @@ angular.module('flowableModeler')
             };
 
             var enableCorrespondingOperatorCell = function (row, prop) {
-                var currentCol = hotDecisionTableEditorInstance.propToCol(prop);
-                if (currentCol < 1) {
-                    return;
-                }
-                var operatorCol = currentCol - 1;
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
                 var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
 
-                if (operatorCellMeta == null || operatorCellMeta.prop.endsWith("_operator") === false) {
+                if (!isOperatorCell(operatorCellMeta)) {
                     return;
                 }
 
@@ -352,6 +360,19 @@ angular.module('flowableModeler')
                 hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className);
                 hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', operatorCellMeta.originalEditor);
                 hotDecisionTableEditorInstance.setDataAtCell(row, operatorCol, '==');
+            };
+
+            var getCorrespondingOperatorCell = function (row, prop) {
+                var currentCol = hotDecisionTableEditorInstance.propToCol(prop);
+                if (currentCol < 1) {
+                    return;
+                }
+                var operatorCol = currentCol - 1;
+                return operatorCol;
+            };
+
+            var isOperatorCell = function (cellMeta) {
+                return !(cellMeta == null || cellMeta.prop == null || cellMeta.prop.endsWith("_operator") === false);
             };
 
             var createNewInputExpression = function (inputExpression) {

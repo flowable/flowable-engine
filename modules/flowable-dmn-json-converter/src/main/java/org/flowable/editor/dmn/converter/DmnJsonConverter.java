@@ -380,6 +380,24 @@ public class DmnJsonConverter {
                     // if expression is dash value or custom expression skip composition
                     if ("-".equals(expressionValue) || expressionValue.startsWith("${") || expressionValue.startsWith("#{")) {
                         inputEntry.setText(expressionValue);
+                    } else if (DmnJsonConverterUtil.isCollectionOperator(operatorValue) && StringUtils.isNotEmpty(expressionValue)) {
+
+                        String inputExpressionVariable = ruleInputClauseContainer.getInputClause().getInputExpression().getText();
+
+                        String formattedCollectionExpression;
+                        if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
+                            formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
+                        } else {
+                            formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, expressionValue, inputExpressionVariable);
+                        }
+
+                        inputEntry.setText(formattedCollectionExpression);
+
+                        // extensions
+                        addExtensionElement("operator", operatorValue, inputEntry);
+                        addExtensionElement("expression", expressionValue, inputEntry);
+
+
                     } else if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
                         && StringUtils.isNotEmpty(expressionValue)) {
 

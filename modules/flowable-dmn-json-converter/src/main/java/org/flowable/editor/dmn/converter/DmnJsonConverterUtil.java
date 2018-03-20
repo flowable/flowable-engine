@@ -207,7 +207,7 @@ public class DmnJsonConverterUtil {
             stringBuilder.append("${");
             stringBuilder.append(containsPrefixAndMethod);
             stringBuilder.append("(");
-            stringBuilder.append(inputVariable);
+            stringBuilder.append(formatCollectionExpressionValue(inputVariable));
             stringBuilder.append(", ");
 
             String formattedExpressionValue = formatCollectionExpressionValue(expressionValue);
@@ -221,7 +221,10 @@ public class DmnJsonConverterUtil {
         }
 
        return stringBuilder.toString();
+    }
 
+    public static boolean isCollectionOperator(String operator) {
+        return "IN".equals(operator) || "NOT IN".equals(operator) || "ANY".equals(operator) || "NOT ANY".equals(operator);
     }
 
     protected static String getDMNContainsExpressionMethod(String containsOperator) {

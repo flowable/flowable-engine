@@ -68,7 +68,8 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_15 = "org/flowable/editor/dmn/converter/decisiontable_aggregation.json";
     private static final String JSON_RESOURCE_16 = "org/flowable/editor/dmn/converter/decisiontable_special_characters.json";
     private static final String JSON_RESOURCE_17 = "org/flowable/editor/dmn/converter/decisiontable_custom_input_expression.json";
-    private static final String JSON_RESOURCE_18 = "org/flowable/editor/dmn/converter/decisiontable_collections.json";
+    private static final String JSON_RESOURCE_18 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_input.json";
+    private static final String JSON_RESOURCE_19 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_compare.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -514,7 +515,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmnCollections() {
+    public void testConvertJsonToDmnCollectionsCollectionInput() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_18);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
@@ -533,6 +534,38 @@ public class DmnJsonConverterTest {
         assertEquals("== \"testValue\"",  decisionTable.getRules().get(11).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("== testCollection",  decisionTable.getRules().get(12).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("!= \"testValue\"",  decisionTable.getRules().get(13).getInputEntries().get(0).getInputEntry().getText());
+
+        // extension elements
+        assertEquals("NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("\"testValue\"",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
+        assertEquals("NOT IN", modelerJson.get("rules").get(0).get("inputExpression_1_operator").asText());
+        assertEquals("\"testValue\"", modelerJson.get("rules").get(0).get("inputExpression_1_expression").asText());
+        assertEquals("IN", modelerJson.get("rules").get(1).get("inputExpression_1_operator").asText());
+        assertEquals("\"testValue\"", modelerJson.get("rules").get(1).get("inputExpression_1_expression").asText());
+        assertEquals("IN", modelerJson.get("rules").get(2).get("inputExpression_1_operator").asText());
+        assertEquals("testVar1, testVar2", modelerJson.get("rules").get(2).get("inputExpression_1_expression").asText());
+    }
+
+    @Test
+    public void testConvertJsonToDmnCollectionsCollectionCompare() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_19);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertEquals("${collection:notContains(\"testValue\", input1)}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains(\"testValue\", input1)}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains('testVar1,testVar2', input1)}",  decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains('\"testValue1\",\"testValue2\"', input1)}",  decisionTable.getRules().get(3).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains('10,20', input1)}",  decisionTable.getRules().get(4).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains(10, input1)}",  decisionTable.getRules().get(5).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("-",  decisionTable.getRules().get(6).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:notContains(\"testValue\", input1)}",  decisionTable.getRules().get(7).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("-",  decisionTable.getRules().get(8).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:containsAny(\"testValue\", input1)}",  decisionTable.getRules().get(9).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("-",  decisionTable.getRules().get(10).getInputEntries().get(0).getInputEntry().getText());
 
         // extension elements
         assertEquals("NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
