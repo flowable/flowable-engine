@@ -12,8 +12,6 @@
  */
 package org.flowable.app.service.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -71,8 +71,11 @@ public class FlowableAppDefinitionService {
             if (deployment.getKey() != null) {
                 if (!deploymentMap.containsKey(deployment.getKey())) {
                     deploymentMap.put(deployment.getKey(), deployment);
-                } else if (deploymentMap.get(deployment.getKey()).getDeploymentTime().before(deployment.getDeploymentTime())) {
-                    deploymentMap.put(deployment.getKey(), deployment);
+                } else {
+                    Deployment compareDeployment = deploymentMap.get(deployment.getKey());
+                    if (deployment.getDerivedFrom() == null && compareDeployment.getDeploymentTime().before(deployment.getDeploymentTime())) {
+                        deploymentMap.put(deployment.getKey(), deployment);
+                    }
                 }
             }
         }

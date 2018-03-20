@@ -46,8 +46,7 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
         ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml")
                 .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP).buildProcessEngine();
 
-        // then update the version to something that is different to the library
-        // version
+        // then update the version to something that is different to the library version
         DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) processEngine.getProcessEngineConfiguration().getSessionFactories().get(DbSqlSession.class);
         SqlSessionFactory sqlSessionFactory = dbSqlSessionFactory.getSqlSessionFactory();
         SqlSession sqlSession = sqlSessionFactory.openSession();

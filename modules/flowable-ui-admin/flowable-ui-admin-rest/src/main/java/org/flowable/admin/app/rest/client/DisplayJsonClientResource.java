@@ -12,11 +12,6 @@
  */
 package org.flowable.admin.app.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,6 +52,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 public class DisplayJsonClientResource extends AbstractClientResource {
@@ -253,6 +253,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
         ArrayNode elementArray = objectMapper.createArrayNode();
         ArrayNode flowArray = objectMapper.createArrayNode();
+        ArrayNode collapsedArray = objectMapper.createArrayNode();
 
         if (CollectionUtils.isNotEmpty(pojoModel.getPools())) {
             ArrayNode poolArray = objectMapper.createArrayNode();
@@ -304,16 +305,18 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         }
 
         for (org.flowable.bpmn.model.Process process : pojoModel.getProcesses()) {
-            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, diagramInfo, completedElements, currentElements);
+            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, 
+                            collapsedArray, diagramInfo, completedElements, currentElements, null);
         }
 
         displayNode.set("elements", elementArray);
         displayNode.set("flows", flowArray);
+        displayNode.set("collapsed", collapsedArray);
     }
 
     protected void processElements(Collection<FlowElement> elementList,
-                                   BpmnModel model, ArrayNode elementArray, ArrayNode flowArray,
-                                   GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements) {
+                                   BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, ArrayNode collapsedArray,
+                                   GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements, ObjectNode collapsedNode) {
 
         for (FlowElement element : elementList) {
 
@@ -342,7 +345,11 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                     fillDiagramInfo(graphicInfo, diagramInfo);
                 }
                 elementNode.set("waypoints", waypointArray);
-                flowArray.add(elementNode);
+                if (collapsedNode != null) {
+                    ((ArrayNode) collapsedNode.get("flows")).add(elementNode);
+                } else {
+                    flowArray.add(elementNode);
+                }
 
             } else {
 
@@ -379,11 +386,28 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                     elementNode.set("properties", propertyMappers.get(className).map(element));
                 }
 
-                elementArray.add(elementNode);
+                if (collapsedNode != null) {
+                    ((ArrayNode) collapsedNode.get("elements")).add(elementNode);
+                } else {
+                    elementArray.add(elementNode);
+                }
 
                 if (element instanceof SubProcess) {
                     SubProcess subProcess = (SubProcess) element;
-                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, diagramInfo, currentElements, currentElements);
+                    
+                    ObjectNode newCollapsedNode = collapsedNode;
+                    // skip collapsed sub processes
+                    if (graphicInfo != null && graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
+                        elementNode.put("collapsed", "true");
+                        newCollapsedNode = objectMapper.createObjectNode();
+                        newCollapsedNode.put("id", subProcess.getId());
+                        newCollapsedNode.putArray("elements");
+                        newCollapsedNode.putArray("flows");
+                        collapsedArray.add(newCollapsedNode);
+                    }
+                    
+                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray, 
+                                    diagramInfo, currentElements, currentElements, newCollapsedNode);
                 }
             }
         }
