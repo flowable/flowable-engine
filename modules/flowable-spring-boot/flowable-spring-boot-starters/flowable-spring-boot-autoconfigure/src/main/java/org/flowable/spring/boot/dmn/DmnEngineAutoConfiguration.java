@@ -21,7 +21,7 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
-import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -54,7 +54,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @AutoConfigureBefore({
     ProcessEngineAutoConfiguration.class
 })
-public class DmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
+public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableDmnProperties dmnProperties;
 
@@ -85,6 +85,10 @@ public class DmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+
+        configuration.setHistoryEnabled(dmnProperties.isHistoryEnabled());
+        configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());
+
         return configuration;
     }
 

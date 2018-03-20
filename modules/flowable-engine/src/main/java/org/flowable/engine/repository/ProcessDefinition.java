@@ -19,10 +19,11 @@ import org.flowable.engine.runtime.ProcessInstance;
 /**
  * An object structure representing an executable process composed of activities and transitions.
  * 
- * Business processes are often created with graphical editors that store the process definition in certain file format. These files can be added to a {@link Deployment} artifact, such as for example
- * a Business Archive (.bar) file.
+ * Business processes are often created with graphical editors that store the process definition in certain file format. 
+ * These files can be added to a {@link Deployment} artifact, such as for example a Business Archive (.bar) file.
  * 
- * At deploy time, the engine will then parse the process definition files to an executable instance of this class, that can be used to start a {@link ProcessInstance}.
+ * At deploy time, the engine will then parse the process definition files to an executable instance of this class, 
+ * that can be used to start a {@link ProcessInstance}.
  * 
  * @author Tom Baeyens
  * @author Joram Barez
@@ -76,6 +77,15 @@ public interface ProcessDefinition {
 
     /** The tenant identifier of this process definition */
     String getTenantId();
+    
+    /** The derived from process definition value when this is a dynamic process definition */
+    String getDerivedFrom();
+
+    /** The root derived from process definition value when this is a dynamic process definition */
+    String getDerivedFromRoot();
+
+    /** The derived version of the process definition */
+    int getDerivedVersion();
 
     /** The engine version for this process definition (5 or 6) */
     String getEngineVersion();

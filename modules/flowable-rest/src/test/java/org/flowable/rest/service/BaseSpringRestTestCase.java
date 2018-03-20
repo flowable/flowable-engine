@@ -48,6 +48,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.server.Server;
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -120,6 +121,7 @@ public class BaseSpringRestTestCase {
     protected HistoryService historyService;
     protected IdentityService identityService;
     protected ManagementService managementService;
+    protected DynamicBpmnService dynamicBpmnService;
 
     protected static CloseableHttpClient client;
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
@@ -165,6 +167,7 @@ public class BaseSpringRestTestCase {
         historyService = appContext.getBean(HistoryService.class);
         identityService = appContext.getBean(IdentityService.class);
         managementService = appContext.getBean(ManagementService.class);
+        dynamicBpmnService = appContext.getBean(DynamicBpmnService.class);
         
         if (server == null) {
             TestServer testServer = TestServerUtil.createAndStartServer(appContext);

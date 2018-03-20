@@ -25,6 +25,7 @@
 		<camel.version>2.20.2</camel.version>
 		<cxf.version>3.2.2</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
+		<spring.boot.version>1.5.4.RELEASE</spring.boot.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -1024,6 +1025,14 @@
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.0.2</version>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.5</version>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+					</configuration>
+				</plugin>
 				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
@@ -1059,6 +1068,23 @@
 						<useReleaseProfile>false</useReleaseProfile>
 						<arguments>${arguments} -Psonatype-oss-release</arguments>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring.boot.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>build-info</goal>
+								<goal>repackage</goal>
+							</goals>
+							<configuration>
+								<mainClass>${start-class}</mainClass>
+								<executable>true</executable>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>

@@ -7,7 +7,7 @@
   <!-- PROCESSDEFINITION INSERT -->
 
   <insert id="insertProcessDefinition" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl">
-    insert into ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, TENANT_ID_, ENGINE_VERSION_)
+    insert into ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_)
     values (#{id, jdbcType=VARCHAR},
     		1,
             #{category, jdbcType=VARCHAR},
@@ -21,12 +21,15 @@
             #{hasStartFormKey, jdbcType=BOOLEAN},
             #{isGraphicalNotationDefined, jdbcType=BOOLEAN},
             #{suspensionState, jdbcType=INTEGER},
+            #{derivedFrom, jdbcType=VARCHAR},
+            #{derivedFromRoot, jdbcType=VARCHAR},
+            #{derivedVersion, jdbcType=INTEGER},
             #{tenantId, jdbcType=VARCHAR},
             #{engineVersion, jdbcType=VARCHAR})
   </insert>
 
   <insert id="bulkInsertProcessDefinition" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, TENANT_ID_, ENGINE_VERSION_)
+    INSERT INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_)
     VALUES 
       <foreach collection="list" item="processDefinition" index="index" separator=","> 
         (#{processDefinition.id, jdbcType=VARCHAR},
@@ -42,6 +45,9 @@
          #{processDefinition.hasStartFormKey, jdbcType=BOOLEAN},
          #{processDefinition.isGraphicalNotationDefined, jdbcType=BOOLEAN},
          #{processDefinition.suspensionState, jdbcType=INTEGER},
+         #{processDefinition.derivedFrom, jdbcType=VARCHAR},
+         #{processDefinition.derivedFromRoot, jdbcType=VARCHAR},
+         #{processDefinition.derivedVersion, jdbcType=INTEGER},
          #{processDefinition.tenantId, jdbcType=VARCHAR},
          #{processDefinition.engineVersion, jdbcType=VARCHAR})
     </foreach>
@@ -51,7 +57,7 @@
     INSERT ALL 
     <foreach collection="list" item="processDefinition" index="index"> 
       INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
-      DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, TENANT_ID_, ENGINE_VERSION_) VALUES 
+      DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_) VALUES 
         (#{processDefinition.id, jdbcType=VARCHAR},
          1,
          #{processDefinition.category, jdbcType=VARCHAR},
@@ -65,6 +71,9 @@
          #{processDefinition.hasStartFormKey, jdbcType=BOOLEAN},
          #{processDefinition.isGraphicalNotationDefined, jdbcType=BOOLEAN},
          #{processDefinition.suspensionState, jdbcType=INTEGER},
+         #{processDefinition.derivedFrom, jdbcType=VARCHAR},
+         #{processDefinition.derivedFromRoot, jdbcType=VARCHAR},
+         #{processDefinition.derivedVersion, jdbcType=INTEGER},
          #{processDefinition.tenantId, jdbcType=VARCHAR},
          #{processDefinition.engineVersion, jdbcType=VARCHAR})
     </foreach>
@@ -118,6 +127,9 @@
     <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
     <result property="isGraphicalNotationDefined" column="HAS_GRAPHICAL_NOTATION_" jdbcType="BOOLEAN" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
+    <result property="derivedFrom" column="DERIVED_FROM_" jdbcType="VARCHAR" />
+    <result property="derivedFromRoot" column="DERIVED_FROM_ROOT_" jdbcType="VARCHAR" />
+    <result property="derivedVersion" column="DERIVED_VERSION_" jdbcType="INTEGER" />
     <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="VARCHAR" />
   </resultMap>
 
@@ -302,6 +314,22 @@
     where KEY_ = #{processDefinitionKey} and
           TENANT_ID_ = #{tenantId} and
           VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
+  </select>
+  
+  <select id="selectLatestDerivedProcessDefinitionByKey" parameterType="string" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF 
+    where KEY_ = #{key} and
+    (TENANT_ID_ = ''  or TENANT_ID_ is null) and
+    DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
+  </select>
+
+  <select id="selectLatestDerivedProcessDefinitionByKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF 
+    where KEY_ = #{processDefinitionKey} and
+    TENANT_ID_ = #{tenantId} and
+    DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
   
   <!-- mysql specific sql -->

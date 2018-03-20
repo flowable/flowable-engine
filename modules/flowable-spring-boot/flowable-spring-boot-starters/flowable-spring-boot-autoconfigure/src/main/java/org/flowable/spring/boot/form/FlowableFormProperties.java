@@ -31,7 +31,7 @@ public class FlowableFormProperties {
     /**
      * The name of the deployment for the form resources.
      */
-    private String deploymentName;
+    private String deploymentName = "SpringBootAutoDeployment";
 
     /**
      * The location where the form resources are located.

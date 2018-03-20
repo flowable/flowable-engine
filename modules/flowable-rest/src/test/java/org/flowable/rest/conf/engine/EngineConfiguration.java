@@ -14,6 +14,7 @@ package org.flowable.rest.conf.engine;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -128,5 +129,10 @@ public class EngineConfiguration {
     @Bean
     public ManagementService managementService() {
         return processEngine().getManagementService();
+    }
+    
+    @Bean
+    public DynamicBpmnService dynamicBpmnService() {
+        return processEngine().getDynamicBpmnService();
     }
 }

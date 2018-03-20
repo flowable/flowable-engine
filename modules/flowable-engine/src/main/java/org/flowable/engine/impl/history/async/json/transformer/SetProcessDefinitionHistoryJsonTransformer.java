@@ -20,19 +20,13 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class SetProcessDefinitionHistoryJsonTransformer extends AbstractNeedsHistoricActivityHistoryJsonTransformer {
+public class SetProcessDefinitionHistoryJsonTransformer extends AbstractNeedsProcessInstanceHistoryJsonTransformer {
 
     @Override
     public String getType() {
         return HistoryJsonConstants.TYPE_SET_PROCESS_DEFINITION;
     }
     
-    @Override
-    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-        String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
-        return CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricProcessInstanceEntityManager().findById(processInstanceId) != null;
-    }
-
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String processInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);

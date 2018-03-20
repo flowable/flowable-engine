@@ -16,9 +16,14 @@ package org.flowable.rest.service.api.runtime.process;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
+import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.exception.FlowableConflictException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +47,9 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceResource extends BaseProcessInstanceResource {
+    
+    @Autowired
+    protected DynamicBpmnService dynamicBpmnService;
 
     @ApiOperation(value = "Get a process instance", tags = { "Process Instances" }, nickname = "getProcessInstance")
     @ApiResponses(value = {
@@ -112,6 +120,48 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
                 .changeState();
         }
         
+    }
+    
+    @ApiOperation(value = "Inject activity in a process instance", tags = { "Process Instances" },
+            notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was updated and the activity injection was executed."),
+            @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/inject", produces = "application/json")
+    public void injectActivityInProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
+            @RequestBody InjectActivityRequest injectActivityRequest, HttpServletRequest request) {
+
+        if ("task".equalsIgnoreCase(injectActivityRequest.getInjectionType())) {
+            DynamicUserTaskBuilder taskBuilder = new DynamicUserTaskBuilder();
+            taskBuilder.id(injectActivityRequest.getId())
+                .name(injectActivityRequest.getName())
+                .assignee(injectActivityRequest.getAssignee());
+            
+            if (injectActivityRequest.getTaskId() != null) {
+                dynamicBpmnService.injectParallelUserTask(injectActivityRequest.getTaskId(), taskBuilder);
+            } else {
+                dynamicBpmnService.injectUserTaskInProcessInstance(processInstanceId, taskBuilder);
+            }
+        
+        } else if ("subprocess".equalsIgnoreCase(injectActivityRequest.getInjectionType())) {
+            if (StringUtils.isEmpty(injectActivityRequest.getProcessDefinitionId())) {
+                throw new FlowableIllegalArgumentException("processDefinitionId is required");
+            }
+            DynamicEmbeddedSubProcessBuilder subProcessBuilder = new DynamicEmbeddedSubProcessBuilder();
+            subProcessBuilder.id(injectActivityRequest.getId())
+                .processDefinitionId(injectActivityRequest.getProcessDefinitionId());
+            
+            if (injectActivityRequest.getTaskId() != null) {
+                dynamicBpmnService.injectParallelEmbeddedSubProcess(injectActivityRequest.getTaskId(), subProcessBuilder);
+            } else {
+                dynamicBpmnService.injectEmbeddedSubProcessInProcessInstance(processInstanceId, subProcessBuilder);
+            }
+        
+        } else {
+            throw new FlowableIllegalArgumentException("injection type is not supported " + injectActivityRequest.getInjectionType());
+        }
     }
 
     protected ProcessInstanceResponse activateProcessInstance(ProcessInstance processInstance) {

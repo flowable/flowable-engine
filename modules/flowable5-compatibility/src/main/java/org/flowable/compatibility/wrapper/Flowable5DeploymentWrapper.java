@@ -70,6 +70,16 @@ public class Flowable5DeploymentWrapper implements Deployment {
     public Map<String, EngineResource> getResources() {
         return null;
     }
+    
+    @Override
+    public String getDerivedFrom() {
+        return null;
+    }
+
+    @Override
+    public String getDerivedFromRoot() {
+        return null;
+    }
 
     @Override
     public String getEngineVersion() {

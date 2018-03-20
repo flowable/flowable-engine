@@ -113,6 +113,26 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
