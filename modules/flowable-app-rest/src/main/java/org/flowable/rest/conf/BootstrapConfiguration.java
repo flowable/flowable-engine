@@ -15,8 +15,6 @@ package org.flowable.rest.conf;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.FlowableException;
@@ -24,47 +22,58 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
+import org.flowable.rest.app.properties.RestAppProperties;
 import org.flowable.rest.security.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 @Configuration
 public class BootstrapConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BootstrapConfiguration.class);
 
-    @Autowired
-    protected Environment environment;
-    
-    @Autowired
-    protected RepositoryService repositoryService;
-    
-    @Autowired
-    protected IdmIdentityService idmIdentityService;
-    
-    @PostConstruct
-    public void init() {
+    protected final RepositoryService repositoryService;
 
-        // Rest admin user
-        String restAdminUserId = environment.getProperty("rest-admin.userid");
-        if (StringUtils.isNotEmpty(restAdminUserId)) {
-            createDefaultAdminUserAndPrivileges(restAdminUserId);
-        }
-        
-        // Demo process definitions
-        if (environment.getProperty("create.demo.definitions", Boolean.class, false)) {
-            LOGGER.info("Initializing demo process definitions");
-            initDemoProcessDefinitions();
-        }
-        
+    protected final IdmIdentityService idmIdentityService;
+
+    protected final RestAppProperties restAppProperties;
+
+    public BootstrapConfiguration(RepositoryService repositoryService, IdmIdentityService idmIdentityService, RestAppProperties restAppProperties) {
+        this.repositoryService = repositoryService;
+        this.idmIdentityService = idmIdentityService;
+        this.restAppProperties = restAppProperties;
     }
-    
+
+    /**
+     * Initialize the rest admin user
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "flowable.rest.app.admin", name = "userId")
+    public CommandLineRunner initDefaultAdminUserAndPrivilegesRunner() {
+        return args -> {
+            if (StringUtils.isNotEmpty(restAppProperties.getAdmin().getUserId())) {
+                createDefaultAdminUserAndPrivileges(restAppProperties.getAdmin().getUserId());
+            }
+        };
+    }
+
+    /**
+     * Initialize the demo process definitions
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "flowable.rest.app", name = "create-demo-definitions", havingValue = "true")
+    public CommandLineRunner initDemoProcessDefinitionsRunner() {
+        return args -> initDemoProcessDefinitions();
+    }
+
     protected void createDefaultAdminUserAndPrivileges(String restAdminUserId) {
         User restAdminUser = idmIdentityService.createUserQuery().userId(restAdminUserId).singleResult();
         if (restAdminUser == null) {
@@ -75,10 +84,11 @@ public class BootstrapConfiguration {
     }
     
     protected User initRestAdmin() {
-        String adminUserId = environment.getRequiredProperty("rest-admin.userid");
-        String adminPassword = environment.getRequiredProperty("rest-admin.password");
-        String adminFirstname = environment.getRequiredProperty("rest-admin.firstname");
-        String adminLastname = environment.getRequiredProperty("rest-admin.lastname");
+        RestAppProperties.Admin admin = restAppProperties.getAdmin();
+        String adminUserId = admin.getUserId();
+        String adminPassword = admin.getPassword();
+        String adminFirstname = admin.getFirstName();
+        String adminLastname = admin.getLastName();
 
         User restAdminUser = idmIdentityService.newUser(adminUserId);
         restAdminUser.setFirstName(adminFirstname);
@@ -90,21 +100,26 @@ public class BootstrapConfiguration {
     }
     
     protected void initializeDefaultPrivileges(String restAdminId) {
+        initializePrivilege(restAdminId, SecurityConstants.PRIVILEGE_ACCESS_REST_API);
+        initializePrivilege(restAdminId, "ROLE_ACTUATOR");
+    }
+
+    protected void initializePrivilege(String restAdminId, String privilegeName) {
         boolean restApiPrivilegeMappingExists = false;
-        Privilege privilege = idmIdentityService.createPrivilegeQuery().privilegeName(SecurityConstants.PRIVILEGE_ACCESS_REST_API).singleResult();
+        Privilege privilege = idmIdentityService.createPrivilegeQuery().privilegeName(privilegeName).singleResult();
         if (privilege != null) {
             restApiPrivilegeMappingExists = restApiPrivilegeMappingExists(restAdminId, privilege);
         } else {
             try {
-                privilege = idmIdentityService.createPrivilege(SecurityConstants.PRIVILEGE_ACCESS_REST_API);
+                privilege = idmIdentityService.createPrivilege(privilegeName);
             } catch (Exception e) {
                 // Could be created by another server, retrying fetch
-                privilege = idmIdentityService.createPrivilegeQuery().privilegeName(SecurityConstants.PRIVILEGE_ACCESS_REST_API).singleResult();
+                privilege = idmIdentityService.createPrivilegeQuery().privilegeName(privilegeName).singleResult();
             }
         }
         
         if (privilege == null) {
-            throw new FlowableException("Could not find or create " + SecurityConstants.PRIVILEGE_ACCESS_REST_API + " privilege");
+            throw new FlowableException("Could not find or create " + privilegeName + " privilege");
         }
         
         if (!restApiPrivilegeMappingExists) {
