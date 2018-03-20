@@ -82,6 +82,11 @@
       "1_operator": "ANY",
       "1_expression": "-",
       "2": "result 2"
+    },
+    {
+      "1_operator": "IN",
+      "1_expression": "\"test,Value1\", \"test,Value2\"",
+      "2": "result 4"
     }
   ]
 }

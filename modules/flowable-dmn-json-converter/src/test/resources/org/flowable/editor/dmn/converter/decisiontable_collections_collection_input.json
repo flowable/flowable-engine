@@ -97,6 +97,11 @@
       "1_operator": "!=",
       "1_expression": "\"testValue\"",
       "2": "result 4"
+    },
+    {
+      "1_operator": "IN",
+      "1_expression": "\"test,Value1\", \"test,Value2\"",
+      "2": "result 4"
     }
   ]
 }

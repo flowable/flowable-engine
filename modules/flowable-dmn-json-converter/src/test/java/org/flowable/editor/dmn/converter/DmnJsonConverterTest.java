@@ -534,6 +534,7 @@ public class DmnJsonConverterTest {
         assertEquals("== \"testValue\"",  decisionTable.getRules().get(11).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("== testCollection",  decisionTable.getRules().get(12).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("!= \"testValue\"",  decisionTable.getRules().get(13).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains(collection1, '\"test,Value1\",\"test,Value2\"')}",  decisionTable.getRules().get(14).getInputEntries().get(0).getInputEntry().getText());
 
         // extension elements
         assertEquals("NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
@@ -566,6 +567,7 @@ public class DmnJsonConverterTest {
         assertEquals("-",  decisionTable.getRules().get(8).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("${collection:containsAny(\"testValue\", input1)}",  decisionTable.getRules().get(9).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(10).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains('\"test,Value1\",\"test,Value2\"', input1)}",  decisionTable.getRules().get(11).getInputEntries().get(0).getInputEntry().getText());
 
         // extension elements
         assertEquals("NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());

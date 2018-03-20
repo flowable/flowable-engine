@@ -281,7 +281,14 @@ public class DmnJsonConverterUtil {
     }
 
     protected static List<String> split(String str) {
-        return Stream.of(str.split(","))
+        String regex;
+        if (str.contains("\"")) {
+            // only split on comma between matching quotes
+            regex  =",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+        } else {
+            regex = ",";
+        }
+        return Stream.of(str.split(regex))
             .map(elem -> elem.trim())
             .collect(Collectors.toList());
     }
