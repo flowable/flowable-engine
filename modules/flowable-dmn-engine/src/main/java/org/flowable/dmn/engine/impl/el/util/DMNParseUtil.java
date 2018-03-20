@@ -94,7 +94,15 @@ public class DMNParseUtil {
     }
 
     protected static List<Object> split(String str, Class<?> collectionType) {
-        return Stream.of(str.split(","))
+        String regex;
+        if (str.contains("\"")) {
+            // only split on comma between matching quotes
+            regex  =",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+        } else {
+            regex = ",";
+        }
+
+        return Stream.of(str.split(regex))
             .map(elem -> formatElementValue(elem.trim(), collectionType))
             .collect(Collectors.toList());
     }

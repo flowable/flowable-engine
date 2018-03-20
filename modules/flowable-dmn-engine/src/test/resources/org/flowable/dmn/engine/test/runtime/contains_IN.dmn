@@ -151,6 +151,14 @@
             <text><![CDATA["test1 and test2 in property1 of nestedArrayNode1"]]></text>
           </outputEntry>
         </rule>
+        <rule>
+          <inputEntry id="inputEntry_1_19">
+            <text><![CDATA[${collection:contains(collection6, '"tes,t6", "te,st5"')}]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_2_19">
+            <text><![CDATA['"tes,t6" and "te,st5" in collection6']]></text>
+          </outputEntry>
+        </rule>
     </decisionTable>
   </decision>
 </definitions>
