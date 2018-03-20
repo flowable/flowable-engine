@@ -49,7 +49,7 @@ import org.flowable.form.api.FormRepositoryService;
  */
 public class BaseDynamicSubProcessInjectUtil {
     
-    public static void processFlowElements(CommandContext commandContext, Process process, BpmnModel bpmnModel, 
+    public static void processFlowElements(CommandContext commandContext, FlowElementsContainer process, BpmnModel bpmnModel, 
                     ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity) {
         
         for (FlowElement flowElement : process.getFlowElements()) {
@@ -58,7 +58,7 @@ public class BaseDynamicSubProcessInjectUtil {
             processDecisionTask(flowElement, originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
                 
             if (flowElement instanceof SubProcess) {
-                processFlowElements(commandContext, process, bpmnModel, originalProcessDefinitionEntity, newDeploymentEntity);
+                processFlowElements(commandContext, ((SubProcess) flowElement), bpmnModel, originalProcessDefinitionEntity, newDeploymentEntity);
             }
         }
     }
