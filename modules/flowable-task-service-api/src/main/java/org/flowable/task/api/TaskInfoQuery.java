@@ -311,6 +311,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T processDefinitionKeyIn(List<String> processDefinitionKeys);
 
     /**
+     * Only select tasks which created from the given task definition referenced by id.
+     */
+    T taskDefinitionId(String taskDefinitionId);
+
+    /**
      * Only select tasks which are part of a process instance which has the given process definition id.
      */
     T processDefinitionId(String processDefinitionId);

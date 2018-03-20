@@ -2,6 +2,7 @@ create table ACT_HI_TASKINST (
     ID_ varchar(64) not null,
     REV_ integer default 1,
     PROC_DEF_ID_ varchar(64),
+    TASK_DEF_ID_ varchar(64),
     TASK_DEF_KEY_ varchar(255),
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
