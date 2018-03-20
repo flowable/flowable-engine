@@ -23,7 +23,13 @@ import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.GetBpmnModelCmd;
 import org.flowable.engine.impl.cmd.GetProcessDefinitionInfoCmd;
+import org.flowable.engine.impl.cmd.InjectEmbeddedSubProcessInProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.InjectParallelEmbeddedSubProcessCmd;
+import org.flowable.engine.impl.cmd.InjectParallelUserTaskCmd;
+import org.flowable.engine.impl.cmd.InjectUserTaskInProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.SaveProcessDefinitionInfoCmd;
+import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
+import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +43,22 @@ public class DynamicBpmnServiceImpl extends ServiceImpl implements DynamicBpmnSe
 
     public DynamicBpmnServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
+    }
+    
+    public void injectUserTaskInProcessInstance(String processInstanceId, DynamicUserTaskBuilder dynamicUserTaskBuilder) {
+        commandExecutor.execute(new InjectUserTaskInProcessInstanceCmd(processInstanceId, dynamicUserTaskBuilder));
+    }
+
+    public void injectParallelUserTask(String taskId, DynamicUserTaskBuilder dynamicUserTaskBuilder) {
+        commandExecutor.execute(new InjectParallelUserTaskCmd(taskId, dynamicUserTaskBuilder));
+    }
+    
+    public void injectEmbeddedSubProcessInProcessInstance(String processInstanceId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder) {
+        commandExecutor.execute(new InjectEmbeddedSubProcessInProcessInstanceCmd(processInstanceId, dynamicEmbeddedSubProcessBuilder));
+    }
+
+    public void injectParallelEmbeddedSubProcess(String taskId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder) {
+        commandExecutor.execute(new InjectParallelEmbeddedSubProcessCmd(taskId, dynamicEmbeddedSubProcessBuilder));
     }
 
     @Override

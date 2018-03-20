@@ -88,6 +88,24 @@ function _drawSubProcess(element)
 		"stroke": strokeColor,
 		"fill": "white"
  	});
+ 	
+ 	if (element.collapsed) {
+        if (element.name) {
+            this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11,
+            _bpmnGetColor(element, TEXT_COLOR));
+        }
+        
+        var topRect = paper.rect(element.x, element.y, element.width, element.height, 4);
+        topRect.attr({
+            "opacity": 0,
+            "stroke" : "none",
+            "fill" : "white"
+        });
+
+        topRect.click(function() {
+            _expandCollapsedElement(element);
+        });
+    }
 }
 
 function _drawTransaction(element)

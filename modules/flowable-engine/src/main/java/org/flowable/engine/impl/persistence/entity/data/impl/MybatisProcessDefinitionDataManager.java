@@ -56,6 +56,19 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         params.put("tenantId", tenantId);
         return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectLatestProcessDefinitionByKeyAndTenantId", params);
     }
+    
+    @Override
+    public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKey(String processDefinitionKey) {
+        return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectLatestDerivedProcessDefinitionByKey", processDefinitionKey);
+    }
+
+    @Override
+    public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+        Map<String, Object> params = new HashMap<String, Object>(2);
+        params.put("processDefinitionKey", processDefinitionKey);
+        params.put("tenantId", tenantId);
+        return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectLatestDerivedProcessDefinitionByKeyAndTenantId", params);
+    }
 
     @Override
     public void deleteProcessDefinitionsByDeploymentId(String deploymentId) {
