@@ -274,6 +274,9 @@
 			<fileset dir="../modules/flowable-ui-common/target">
 				<include name="flowable-ui-common-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-ui-edge/target">
+				<include name="flowable-ui-edge-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-conf/target">
                 <include name="flowable-ui-admin-conf-*.jar" />
             </fileset>
