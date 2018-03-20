@@ -15,6 +15,7 @@ package org.flowable.dmn.engine.impl.el.util;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -32,23 +33,21 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        DMNParseUtil.isCollection(collection);
+        // collection to check against
+        Collection targetCollection = getTargetCollection(collection, value);
 
-        if (DMNParseUtil.isArrayNode(collection)) {
-            collection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
-        }
-
-        if (DMNParseUtil.isDMNCollection(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value, (Collection) collection);
-            return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
+        // elements to check
+        if (DMNParseUtil.isParseableCollection(value)) {
+            Collection valueCollection = DMNParseUtil.parseCollection(value, targetCollection);
+            return valueCollection != null && targetCollection.containsAll(valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
-            return ((Collection) collection).containsAll((Collection) value);
+            return targetCollection.containsAll((Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
-            return valueCollection != null && ((Collection) collection).containsAll(valueCollection);
+            return valueCollection != null && targetCollection.containsAll(valueCollection);
         } else {
-            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), (Collection) collection);
-            return ((Collection) collection).contains(formattedValue);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), targetCollection);
+            return targetCollection.contains(formattedValue);
         }
     }
 
@@ -62,23 +61,21 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        DMNParseUtil.isCollection(collection);
+        // collection to check against
+        Collection targetCollection = getTargetCollection(collection, value);
 
-        if (DMNParseUtil.isArrayNode(collection)) {
-            collection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
-        }
-
-        if (DMNParseUtil.isDMNCollection(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value, (Collection) collection);
-            return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
+        // elements to check
+        if (DMNParseUtil.isParseableCollection(value)) {
+            Collection valueCollection = DMNParseUtil.parseCollection(value, targetCollection);
+            return valueCollection == null || !targetCollection.containsAll(valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
-            return !((Collection) collection).containsAll((Collection) value);
+            return !targetCollection.containsAll((Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
-            return valueCollection == null || !((Collection) collection).containsAll(valueCollection);
+            return valueCollection == null || !targetCollection.containsAll(valueCollection);
         } else {
-            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), (Collection) collection);
-            return !((Collection) collection).contains(formattedValue);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), targetCollection);
+            return !targetCollection.contains(formattedValue);
         }
     }
 
@@ -92,23 +89,21 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        DMNParseUtil.isCollection(collection);
+        // collection to check against
+        Collection targetCollection = getTargetCollection(collection, value);
 
-        if (DMNParseUtil.isArrayNode(collection)) {
-            collection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
-        }
-
-        if (DMNParseUtil.isDMNCollection(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value, (Collection) collection);
-            return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
+        // elements to check
+        if (DMNParseUtil.isParseableCollection(value)) {
+            Collection valueCollection = DMNParseUtil.parseCollection(value, targetCollection);
+            return valueCollection != null && CollectionUtils.containsAny(targetCollection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
-            return CollectionUtils.containsAny((Collection) collection, (Collection) value);
+            return CollectionUtils.containsAny(targetCollection, (Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
-            return valueCollection != null && CollectionUtils.containsAny((Collection) collection, valueCollection);
+            return valueCollection != null && CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
-            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), (Collection) collection);
-            return ((Collection) collection).contains(formattedValue);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(),targetCollection);
+            return targetCollection.contains(formattedValue);
         }
     }
 
@@ -122,24 +117,39 @@ public class CollectionUtil {
             throw new IllegalArgumentException("value cannot be null");
         }
 
-        DMNParseUtil.isCollection(collection);
+        // collection to check against
+        Collection targetCollection = getTargetCollection(collection, value);
 
-        if (DMNParseUtil.isArrayNode(collection)) {
-            collection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
-        }
-
-        if (DMNParseUtil.isDMNCollection(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromDMNCollection(value, (Collection) collection);
-            return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
+        // elements to check
+        if (DMNParseUtil.isParseableCollection(value)) {
+            Collection valueCollection = DMNParseUtil.parseCollection(value, targetCollection);
+            return valueCollection == null || !CollectionUtils.containsAny(targetCollection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
-            return !CollectionUtils.containsAny((Collection) collection, (Collection) value);
+            return !CollectionUtils.containsAny(targetCollection, (Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
-            return valueCollection == null || !CollectionUtils.containsAny((Collection) collection, valueCollection);
+            return valueCollection == null || !CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
-            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), (Collection) collection);
-            return !((Collection) collection).contains(formattedValue);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), targetCollection);
+            return !targetCollection.contains(formattedValue);
         }
+    }
+
+    protected static Collection getTargetCollection(Object collection, Object value) {
+        Collection targetCollection;
+        if (!DMNParseUtil.isCollection(collection)) {
+            if (DMNParseUtil.isParseableCollection(collection)) {
+                targetCollection = DMNParseUtil.parseCollection(collection, value);
+            } else {
+                targetCollection = Arrays.asList(collection);
+            }
+        } else if (DMNParseUtil.isArrayNode(collection)) {
+            targetCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
+        } else {
+            targetCollection = (Collection) collection;
+        }
+
+        return targetCollection;
     }
 
 }

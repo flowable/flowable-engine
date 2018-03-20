@@ -14,6 +14,7 @@ package org.flowable.dmn.engine.test.runtime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
@@ -58,6 +59,7 @@ public class CollectionsContainsTest {
         ArrayNode arrayNode3 = objectMapper.createArrayNode().add(5.5D).add(10.5D).add(20.5D).add(50.5D);
         ArrayNode arrayNode4 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F).add(20.5555F).add(50.5555F);
         ArrayNode arrayNode5 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F);
+        ObjectNode nestedArrayNode1 = objectMapper.createObjectNode().putPOJO("property1", arrayNode1);
 
         processVariablesInput.put("collection1", inputVariable1);
         processVariablesInput.put("collection2", inputVariable2);
@@ -69,6 +71,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("arrayNode3", arrayNode3);
         processVariablesInput.put("arrayNode4", arrayNode4);
         processVariablesInput.put("arrayNode5", arrayNode5);
+        processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -91,6 +94,7 @@ public class CollectionsContainsTest {
         Assert.assertTrue(result.getRuleExecutions().get(15).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(16).isValid());
         Assert.assertTrue(result.getRuleExecutions().get(17).isValid());
+        Assert.assertTrue(result.getRuleExecutions().get(18).isValid());
     }
 
     @Test
@@ -109,6 +113,7 @@ public class CollectionsContainsTest {
         ArrayNode arrayNode3 = objectMapper.createArrayNode().add(5.5D).add(10.5D).add(20.5D).add(50.5D);
         ArrayNode arrayNode4 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F).add(20.5555F).add(50.5555F);
         ArrayNode arrayNode5 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F);
+        ObjectNode nestedArrayNode1 = objectMapper.createObjectNode().putPOJO("property1", arrayNode1);
 
         processVariablesInput.put("collection1", inputVariable1);
         processVariablesInput.put("collection2", inputVariable2);
@@ -120,6 +125,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("arrayNode3", arrayNode3);
         processVariablesInput.put("arrayNode4", arrayNode4);
         processVariablesInput.put("arrayNode5", arrayNode5);
+        processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -135,24 +141,6 @@ public class CollectionsContainsTest {
         Assert.assertFalse(result.getRuleExecutions().get(9).isValid());
         Assert.assertFalse(result.getRuleExecutions().get(10).isValid());
         Assert.assertFalse(result.getRuleExecutions().get(12).isValid());
-    }
-
-    @Test
-    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/contains_IN.dmn")
-    public void testContainsNotACollection() {
-        Map<String, Object> processVariablesInput = new HashMap<>();
-
-        processVariablesInput.put("collection1", "not a collection");
-
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
-
-        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
-
-        Assert.assertTrue(result.isFailed());
     }
 
     @Test

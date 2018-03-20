@@ -33,10 +33,8 @@ public class DMNParseUtil {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DMNParseUtil.class);
 
-    public static void isCollection(Object collection) {
-        if (!isJavaCollection(collection) && !isArrayNode(collection)) {
-            throw new IllegalArgumentException("collection must be of type java.util.Collection or com.fasterxml.jackson.databind.node.ArrayNode");
-        }
+    public static boolean isCollection(Object collection) {
+        return isJavaCollection(collection) || isArrayNode(collection);
     }
 
     public static boolean isJavaCollection(Object collection) {
@@ -47,18 +45,21 @@ public class DMNParseUtil {
         return ArrayNode.class.isAssignableFrom(collection.getClass());
     }
 
-    public static boolean isDMNCollection(Object value) {
+    public static boolean isParseableCollection(Object value) {
         if (value instanceof String == false || value.equals("")) {
             return false;
         }
-
         String stringValue = String.valueOf(value);
         return stringValue.contains(",");
     }
 
-    public static Collection getCollectionFromDMNCollection(Object value, Collection inputCollection) {
+    public static Collection parseCollection(Object value, Object targetType) {
         String stringValue = String.valueOf(value);
-        Class<?> collectionType = getCollectionType(inputCollection);
+        Class<?> collectionType = getTargetType(targetType);
+
+        if (stringValue.startsWith("[") && stringValue.endsWith("]")) {
+            stringValue = stringValue.substring(1, stringValue.length() - 1);
+        }
         List<Object> items = split(stringValue, collectionType);
         return items;
     }
@@ -98,8 +99,8 @@ public class DMNParseUtil {
             .collect(Collectors.toList());
     }
 
-    protected static Object getFormattedValue(String value, Collection inputCollection) {
-        Class<?> collectionType = getCollectionType(inputCollection);
+    protected static Object getFormattedValue(String value, Object inputCollection) {
+        Class<?> collectionType = getTargetType(inputCollection);
         return formatElementValue(value, collectionType);
     }
 
@@ -126,8 +127,7 @@ public class DMNParseUtil {
 
     protected static String removedSurroundingQuotes(String value) {
         if (value.startsWith("\"") && value.endsWith("\"")) {
-            String result = value.substring(1, value.length() - 1);
-            return result;
+            return value.substring(1, value.length() - 1);
         } else {
             return value;
         }
@@ -165,11 +165,19 @@ public class DMNParseUtil {
         }
     }
 
-    protected static Class<?> getCollectionType(Collection collection) {
-        if (collection.isEmpty()) {
+    protected static Class<?> getTargetType(Object targetTypeObject) {
+        if (targetTypeObject == null) {
             return null;
         }
-        return collection.iterator().next().getClass();
+
+        if (isJavaCollection(targetTypeObject)) {
+            if (((Collection) targetTypeObject).isEmpty()) {
+                return null;
+            }
+            return ((Collection) targetTypeObject).iterator().next().getClass();
+        } else {
+            return targetTypeObject.getClass();
+        }
     }
 
 }
