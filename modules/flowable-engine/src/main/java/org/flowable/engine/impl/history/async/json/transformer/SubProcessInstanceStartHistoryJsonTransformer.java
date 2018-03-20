@@ -25,7 +25,7 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class SubProcessInstanceHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
+public class SubProcessInstanceStartHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
     @Override
     public String getType() {

@@ -102,5 +102,32 @@
       "defaultValue": "/process-api",
       "description": "The context path for the Process rest servlet."
     }
+  ],
+  "hints": [
+    {
+      "name": "flowable.database-schema-update",
+      "values": [
+        {
+          "value": "true",
+          "description": "Upon building of the engine(s), a check is performed and an update of the schema is performed if it is necessary."
+        },
+        {
+          "value": "drop-create",
+          "description": "The schema is dropped and then created during the engine(s) startup."
+        },
+        {
+          "value": "create-drop",
+          "description": "The schema is created during the engine(s) startup and dropped during the close of the engine(s)."
+        },
+        {
+          "value": "create",
+          "description": "The schema is created during the engine(s) startup."
+        },
+        {
+          "value": "false",
+          "description": "Checks the version of the DB schema against the library when the engine(s) is(are) being created and throws an exception if the versions don't match."
+        }
+      ]
+    }
   ]
 }

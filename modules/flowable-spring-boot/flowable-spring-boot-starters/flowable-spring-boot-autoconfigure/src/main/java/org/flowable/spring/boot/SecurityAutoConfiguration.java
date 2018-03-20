@@ -13,19 +13,20 @@
 package org.flowable.spring.boot;
 
 import org.flowable.engine.IdentityService;
-import org.flowable.rest.security.BasicAuthenticationProvider;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.spring.security.IdentityServiceUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -34,11 +35,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @author Josh Long
  */
 @Configuration
+@ConditionalOnClass({
+    AuthenticationManager.class,
+    GlobalAuthenticationConfigurerAdapter.class
+})
 @AutoConfigureBefore(org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class)
 public class SecurityAutoConfiguration {
 
     @Configuration
-    @ConditionalOnClass(UserDetailsService.class)
+    @ConditionalOnMissingBean(UserDetailsService.class)
     public static class UserDetailsServiceConfiguration
             extends GlobalAuthenticationConfigurerAdapter {
 
@@ -56,25 +61,36 @@ public class SecurityAutoConfiguration {
         private IdentityService identityService;
     }
 
+    @ConditionalOnBean(type = "org.flowable.engine.IdentityService")
+    @ConditionalOnMissingBean(type = "org.flowable.idm.api.IdmIdentityService")
     @Configuration
-    @ConditionalOnClass(name = { "org.flowable.rest.service.api.RestUrls", "org.springframework.web.servlet.DispatcherServlet" })
-    @EnableWebSecurity
-    public static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+    protected static class IdentitySecurityConfiguration implements ApplicationListener<AuthenticationSuccessEvent> {
 
-        @Bean
-        public AuthenticationProvider authenticationProvider() {
-            return new BasicAuthenticationProvider();
+        protected final IdentityService identityService;
+
+        public IdentitySecurityConfiguration(IdentityService identityService) {
+            this.identityService = identityService;
         }
 
         @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http
-                    .authenticationProvider(authenticationProvider())
-                    .csrf().disable()
-                    .authorizeRequests()
-                    .anyRequest().authenticated()
-                    .and()
-                    .httpBasic();
+        public void onApplicationEvent(AuthenticationSuccessEvent event) {
+            identityService.setAuthenticatedUserId(event.getAuthentication().getName());
+        }
+    }
+
+    @ConditionalOnBean(type = "org.flowable.idm.api.IdmIdentityService")
+    @Configuration
+    protected static class IdmIdentitySecurityConfiguration implements ApplicationListener<AuthenticationSuccessEvent> {
+
+        protected final IdmIdentityService identityService;
+
+        public IdmIdentitySecurityConfiguration(IdmIdentityService identityService) {
+            this.identityService = identityService;
+        }
+
+        @Override
+        public void onApplicationEvent(AuthenticationSuccessEvent event) {
+            identityService.setAuthenticatedUserId(event.getAuthentication().getName());
         }
     }
 }

@@ -19,10 +19,11 @@ import org.flowable.engine.runtime.ProcessInstance;
 /**
  * An object structure representing an executable process composed of activities and transitions.
  * 
- * Business processes are often created with graphical editors that store the process definition in certain file format. These files can be added to a {@link Deployment} artifact, such as for example
- * a Business Archive (.bar) file.
+ * Business processes are often created with graphical editors that store the process definition in certain file format. 
+ * These files can be added to a {@link Deployment} artifact, such as for example a Business Archive (.bar) file.
  * 
- * At deploy time, the engine will then parse the process definition files to an executable instance of this class, that can be used to start a {@link ProcessInstance}.
+ * At deploy time, the engine will then parse the process definition files to an executable instance of this class, 
+ * that can be used to start a {@link ProcessInstance}.
  * 
  * @author Tom Baeyens
  * @author Joram Barez

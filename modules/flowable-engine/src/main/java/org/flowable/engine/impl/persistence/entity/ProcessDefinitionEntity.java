@@ -63,6 +63,7 @@ public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasR
 
     void setSuspensionState(int suspensionState);
 
+<<<<<<< HEAD
     @Override
     String getEngineVersion();
     
@@ -72,6 +73,8 @@ public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasR
 
     void setDerivedVersion(int derivedVersion);
 
+=======
+>>>>>>> 447f3bb3c8bddc42f32bd3e8ce38fa8cee72c68b
     void setEngineVersion(String engineVersion);
 
 }

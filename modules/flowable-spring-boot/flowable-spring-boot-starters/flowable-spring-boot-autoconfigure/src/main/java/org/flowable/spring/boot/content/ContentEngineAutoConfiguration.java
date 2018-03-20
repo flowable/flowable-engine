@@ -52,8 +52,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 })
 public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
 
-    public ContentEngineAutoConfiguration(FlowableProperties flowableProperties) {
+    protected final FlowableContentProperties contentProperties;
+
+    public ContentEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableContentProperties contentProperties) {
         super(flowableProperties);
+        this.contentProperties = contentProperties;
     }
 
     @Bean
@@ -63,6 +66,10 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
         configuration.setTransactionManager(platformTransactionManager);
         configureEngine(configuration, dataSource);
+
+        FlowableContentProperties.Storage storage = contentProperties.getStorage();
+        configuration.setContentRootFolder(storage.getRootFolder());
+        configuration.setCreateContentRootFolder(storage.getCreateRoot());
 
         return configuration;
     }

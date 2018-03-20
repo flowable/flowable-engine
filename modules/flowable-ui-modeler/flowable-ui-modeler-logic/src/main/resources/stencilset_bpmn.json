@@ -104,6 +104,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "process_iseagerexecutionfetchpackage",
+    "properties" : [ {
+      "id" : "iseagerexecutionfetch",
+      "type" : "Boolean",
+      "title" : "Eager execution fetching",
+      "value" : "false",
+      "description" : "Enable eager execution fetching for this process definition?",
+      "popular" : true
+    } ]
+  }, {
     "name" : "asynchronousdefinitionpackage",
     "properties" : [ {
       "id" : "asynchronousdefinition",
@@ -1158,7 +1168,7 @@
     "groups" : [ "Diagram" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "isexecutablepackage", "datapropertiespackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
+    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "isexecutablepackage", "datapropertiespackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage", "process_iseagerexecutionfetchpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {
