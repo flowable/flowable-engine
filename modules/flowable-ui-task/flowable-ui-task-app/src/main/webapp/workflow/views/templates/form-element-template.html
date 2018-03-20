@@ -139,7 +139,7 @@
     <div ng-switch-when="hyperlink" class="form-group {{field.className}}" ng-show="field.isVisible">
         <label class="control-label">{{field.name}}</label>
         <div>
-             <a id="{{activitiFieldIdPrefix + field.id}}" ng-href="{{field.params.hyperlinkUrl}}" target="_blank">{{field.params.hyperlinkUrl}}</a>
+             <a id="{{activitiFieldIdPrefix + field.id}}" ng-href="{{field.value}}" target="_blank">{{field.value}}</a>
         </div>
     </div>
 
