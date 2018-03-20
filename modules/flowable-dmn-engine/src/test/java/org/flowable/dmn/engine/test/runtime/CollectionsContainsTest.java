@@ -110,6 +110,7 @@ public class CollectionsContainsTest {
         List inputVariable3 = Arrays.asList("test1", "test2");
         List inputVariable4 = Arrays.asList(5L, 10L, 20L, 50L);
         List inputVariable5 = Arrays.asList("test3", "test5");
+        List inputVariable6 = Arrays.asList("tes,t6", "te,st5");
 
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
         ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
@@ -123,6 +124,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collection3", inputVariable3);
         processVariablesInput.put("collection4", inputVariable4);
         processVariablesInput.put("collection5", inputVariable5);
+        processVariablesInput.put("collection6", inputVariable6);
         processVariablesInput.put("arrayNode1", arrayNode1);
         processVariablesInput.put("arrayNode2", arrayNode2);
         processVariablesInput.put("arrayNode3", arrayNode3);
