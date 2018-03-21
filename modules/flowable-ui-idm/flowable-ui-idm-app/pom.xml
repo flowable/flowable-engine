@@ -203,7 +203,7 @@
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
                                 <datasource.driver>org.postgresql.Driver</datasource.driver>
-                                <datasource.url>jdbc:postgresql://localhost:5432/flowable_orig</datasource.url>
+                                <datasource.url>jdbc:postgresql://localhost:5432/flowable</datasource.url>
                                 <datasource.username>flowable</datasource.username>
                                 <datasource.password>flowable</datasource.password>
                                 <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
