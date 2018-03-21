@@ -258,7 +258,9 @@ angular.module('flowableModeler')
             };
 
             $scope.doAfterValidate = function (isValid, value, row, prop, source) {
-                if (isCustomExpression(value)) {
+                if (isCorrespondingCollectionOperator(row, prop)) {
+                    return true;
+                } else if (isCustomExpression(value) || isDashValue(value)) {
                     disableCorrespondingOperatorCell(row, prop);
                     return true;
                 } else {
@@ -271,15 +273,33 @@ angular.module('flowableModeler')
                     && (String(val).startsWith('${') || String(val).startsWith('#{')));
             };
 
-            var disableCorrespondingOperatorCell = function (row, prop) {
-                var currentCol = hotReadOnlyDecisionTableEditorInstance.propToCol(prop);
-                if (currentCol < 1) {
-                    return;
-                }
-                var operatorCol = currentCol - 1;
+            var isDashValue = function (val) {
+                return !!(val != null && "-" === val);
+            };
+
+            var isCorrespondingCollectionOperator = function (row, prop) {
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
                 var operatorCellMeta = hotReadOnlyDecisionTableEditorInstance.getCellMeta(row, operatorCol);
 
-                if (operatorCellMeta.className.indexOf('custom-expression-operator') !== -1) {
+                var isCollectionOperator = false;
+                if (isOperatorCell(operatorCellMeta)) {
+                    var operatorValue = hotReadOnlyDecisionTableEditorInstance.getDataAtCell(row, operatorCol);
+                    if (operatorValue === "IN" || operatorValue === "NOT IN" || operatorValue === "ANY" || operatorValue === "NOT ANY") {
+                        isCollectionOperator = true;
+                    }
+                }
+                return isCollectionOperator;
+            };
+
+            var disableCorrespondingOperatorCell = function (row, prop) {
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
+                var operatorCellMeta = hotReadOnlyDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                if (!isOperatorCell(operatorCellMeta)) {
+                    return;
+                }
+
+                if (operatorCellMeta.className != null && operatorCellMeta.className.indexOf('custom-expression-operator') !== -1) {
                     return;
                 }
 
@@ -288,23 +308,38 @@ angular.module('flowableModeler')
                 hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className + ' custom-expression-operator');
                 hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'originalEditor', currentEditor);
                 hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', false);
+                hotReadOnlyDecisionTableEditorInstance.setDataAtCell(row, operatorCol, null);
             };
 
             var enableCorrespondingOperatorCell = function (row, prop) {
-                var currentCol = hotReadOnlyDecisionTableEditorInstance.propToCol(prop);
-                if (currentCol < 1) {
-                    return;
-                }
-                var operatorCol = currentCol - 1;
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
                 var operatorCellMeta = hotReadOnlyDecisionTableEditorInstance.getCellMeta(row, operatorCol);
 
-                if (operatorCellMeta.className.indexOf('custom-expression-operator') == -1) {
+                if (!isOperatorCell(operatorCellMeta)) {
+                    return;
+                }
+
+                if (operatorCellMeta == null || operatorCellMeta.className == null || operatorCellMeta.className.indexOf('custom-expression-operator') == -1) {
                     return;
                 }
 
                 operatorCellMeta.className = operatorCellMeta.className.replace('custom-expression-operator', '');
                 hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className);
                 hotReadOnlyDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', operatorCellMeta.originalEditor);
+                hotReadOnlyDecisionTableEditorInstance.setDataAtCell(row, operatorCol, '==');
+            };
+
+            var getCorrespondingOperatorCell = function (row, prop) {
+                var currentCol = hotReadOnlyDecisionTableEditorInstance.propToCol(prop);
+                if (currentCol < 1) {
+                    return;
+                }
+                var operatorCol = currentCol - 1;
+                return operatorCol;
+            };
+
+            var isOperatorCell = function (cellMeta) {
+                return !(cellMeta == null || cellMeta.prop == null || cellMeta.prop.endsWith("_operator") === false);
             };
 
             var createNewInputExpression = function (inputExpression) {
