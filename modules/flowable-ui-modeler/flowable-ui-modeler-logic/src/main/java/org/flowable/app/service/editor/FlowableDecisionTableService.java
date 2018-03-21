@@ -187,6 +187,9 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
                 // remove id to avoid InvalidFormatException when deserializing
                 editorJsonNode.remove("id");
 
+                // set to latest model version
+                editorJsonNode.put("modelVersion", 2);
+
                 ModelRepresentation modelRepresentation = new ModelRepresentation();
                 modelRepresentation.setKey(dmnDefinition.getDecisions().get(0).getId());
                 modelRepresentation.setName(dmnDefinition.getName());

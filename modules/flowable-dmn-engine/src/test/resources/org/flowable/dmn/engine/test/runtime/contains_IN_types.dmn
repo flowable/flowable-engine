@@ -1,0 +1,106 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_3fa3bde4-1645-11e8-b1df-be031b97f836" name="asdasd" namespace="http://www.flowable.org/dmn">
+  <decision id="decision" name="collection decision">
+    <decisionTable id="decisionTable_3fa3bde4-1645-11e8-b1df-be031b97f836" hitPolicy="RULE ORDER">
+      <input>
+        <inputExpression id="inputExpression_1" typeRef="collection">
+          <text>collectionString</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputExpression_2" typeRef="collection">
+          <text>collectionBoolean</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputExpression_3" typeRef="collection">
+          <text>collectionDate</text>
+        </inputExpression>
+      </input>
+       <input>
+        <inputExpression id="inputExpression_4" typeRef="collection">
+          <text>collectionInteger</text>
+        </inputExpression>
+      </input>
+       <input>
+        <inputExpression id="inputExpression_5" typeRef="collection">
+          <text>collectionLong</text>
+        </inputExpression>
+      </input>
+       <input>
+        <inputExpression id="inputExpression_6" typeRef="collection">
+          <text>collectionFloat</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputExpression_7" typeRef="collection">
+          <text>collectionDouble</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputExpression_8" typeRef="collection">
+          <text>collectionLocalDate</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" name="output1" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[${collection:contains(collectionString, '"test2"')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[${collection:contains(collectionBoolean, "true")}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[${collection:contains(collectionDate, "2017-12-25")}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1_4">
+          <text><![CDATA[${collection:contains(collectionInteger, 10)}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1_5">
+          <text><![CDATA[${collection:contains(collectionLong, 10)}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1_6">
+          <text><![CDATA[${collection:contains(collectionFloat, 10)}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1_7">
+          <text><![CDATA[${collection:contains(collectionDouble, 10)}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1_8">
+          <text><![CDATA[${collection:contains(collectionLocalDate, "2017-12-25")}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA["test1 in collection"]]></text>
+        </outputEntry>
+      </rule>
+
+      <rule>
+        <inputEntry id="inputEntry_2_1">
+          <text><![CDATA[${collection:contains(collectionString, '"test1", "test2"')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2_2">
+          <text><![CDATA[${collection:contains(collectionBoolean, '"true", "false"')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2_3">
+          <text><![CDATA[${collection:contains(collectionDate, '"2017-12-25", "2018-12-25"')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2_4">
+          <text><![CDATA[${collection:contains(collectionInteger, '10, 20')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2_5">
+          <text><![CDATA[${collection:contains(collectionLong, '10, 20')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2_6">
+          <text><![CDATA[${collection:contains(collectionFloat, '10, 20')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2_7">
+          <text><![CDATA[${collection:contains(collectionDouble, '10, 20')}]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2_8">
+          <text><![CDATA[${collection:contains(collectionLocalDate, '"2017-12-25", "2018-12-25"')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA["test1 in collection"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

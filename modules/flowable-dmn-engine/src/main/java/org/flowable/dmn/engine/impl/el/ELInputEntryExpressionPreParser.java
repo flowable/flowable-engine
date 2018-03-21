@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author Yvo Swillens
  */
-public class ELConditionExpressionPreParser {
+public class ELInputEntryExpressionPreParser {
 
     protected static String[] OPERATORS = new String[]{"==", "!=", "<", ">", ">=", "<="};
 
