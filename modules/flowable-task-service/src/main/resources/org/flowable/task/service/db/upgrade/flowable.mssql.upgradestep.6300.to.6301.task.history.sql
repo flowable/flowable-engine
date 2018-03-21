@@ -1,1 +1,1 @@
-alter table ACT_HI_TASKINST add TAS_DEF_ID_ nvarchar(64);
+alter table ACT_HI_TASKINST add TASK_DEF_ID_ nvarchar(64);
