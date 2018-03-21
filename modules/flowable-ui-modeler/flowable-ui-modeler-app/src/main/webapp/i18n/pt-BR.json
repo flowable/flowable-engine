@@ -441,7 +441,7 @@
     "MESSAGE":{
       "EMPTY-EXPRESSION":"(Nenhuma expressão)",
       "EXPRESSION-HELP":"Você também pode exibir valores anteriormente apresentados sob qualquer formulário, como parte do texto, referenciando-os usando uma notação como segue ${myFieldId}.",
-      "OPTIONS-EXPRESSION-HELP": "Você pode usar uma expressão para preencher dinamicamente opções suspensas, por exemplo, fazendo referência a uma variável como esta $ {optionsVariable}. A expressão precisa resultar em um objeto java (java.util.List com objetos Option) ou sua representação json."
+      "OPTIONS-EXPRESSION-HELP": "Você pode usar uma expressão para preencher dinamicamente opções, por exemplo, fazendo referência a uma variável como esta ${optionsVariable}. A expressão precisa resultar em um objeto java (java.util.List com objetos Option) ou sua representação json."
     },
     "LABEL":{
       "FUNCTIONAL-GROUP":"Selecione o grupo..",

@@ -577,7 +577,7 @@
         "MESSAGE": {
             "EMPTY-EXPRESSION": "(No expression value)",
             "EXPRESSION-HELP": "You can also display values previously submitted in any form, as part of the text, by referencing them using a notation as follows ${myFieldId}.",
-            "OPTIONS-EXPRESSION-HELP": "You can use an expression to dynamically populate drop down options for example by referencing a variable like this ${optionsVariable}. The expression needs to result in either a java object (java.util.List with Option objects) or its json representation."
+            "OPTIONS-EXPRESSION-HELP": "You can use an expression to dynamically populate options for example by referencing a variable like this ${optionsVariable}. The expression needs to result in either a java object (java.util.List with Option objects) or its json representation."
         },
         "LABEL" : {
             "FUNCTIONAL-GROUP": "Select group..",

@@ -39,10 +39,17 @@
               <input type="radio" name="optionsRadios" id="optionsRadios{{$index}}" value="option{{$index}}" ng-checked="formElement.value == option.name" disabled>{{option.name}}</input>
           </label>
       </div>
-      <div ng-show="!formElement.options && formElement.options.length === 0" class="radio">
+      <div ng-show="!formElement.options && formElement.options.length === 0 && !formElement.optionsExpression" class="radio">
           <label>
               <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" disabled>
               Option 1
+          </label>
+      </div>
+      <div ng-show="formElement.optionsExpression" ng-style="{'font-size': '1em'}">
+          <label>
+              <input type="radio" name="optionsRadios" id="optionsRadios1" value="none" disabled>
+                {{formElement.optionsExpression}}
+              </input>
           </label>
       </div>
       <div class="clearfix"></div>

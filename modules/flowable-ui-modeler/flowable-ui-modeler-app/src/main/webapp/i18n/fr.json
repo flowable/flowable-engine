@@ -570,7 +570,7 @@
         "MESSAGE": {
             "EMPTY-EXPRESSION": "(Aucune valeur de l'expression)",
             "EXPRESSION-HELP": "Vous pouvez également afficher les valeurs préalablement soumises dans tout formulaire, dans le cadre du texte, en utilisant une notation de référence comme ${myFieldId}.",
-            "OPTIONS-EXPRESSION-HELP": "Vous pouvez utiliser une expression pour remplir dynamiquement des options déroulantes, par exemple en référençant une variable telle que $ {optionsVariable}. L'expression doit aboutir à un objet java (java.util.List avec des objets Option) ou à sa représentation json."
+            "OPTIONS-EXPRESSION-HELP": "Vous pouvez utiliser une expression pour remplir dynamiquement des options, par exemple en référençant une variable telle que ${optionsVariable}. L'expression doit aboutir à un objet java (java.util.List avec des objets Option) ou à sa représentation json."
         },
         "LABEL" : {
             "FUNCTIONAL-GROUP": "Sélectionner un groupe..",
