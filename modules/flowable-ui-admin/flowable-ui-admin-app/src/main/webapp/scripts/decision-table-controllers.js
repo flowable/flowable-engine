@@ -28,6 +28,10 @@ flowableAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
             $location.path("/process-definitions");
         };
 
+        $scope.showAllExecutions = function () {
+            $location.path("/decision-table-executions");
+        };
+
         $scope.showDecisionTable = function () {
             $modal.open({
                 templateUrl: 'views/decision-table-popup.html',
@@ -41,33 +45,33 @@ flowableAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
             });
         };
 
-        $scope.showDecisionAudit = function (decisionAudit) {
-            if (decisionAudit && decisionAudit.getProperty('id')) {
-                $location.path("/decision-audit/"+decisionAudit.getProperty('id'));
+        $scope.showDecisionExecution = function (decisionExecution) {
+            if (decisionExecution && decisionExecution.getProperty('id')) {
+                $location.path("/decision-table-execution/"+decisionExecution.getProperty('id'));
             }
         };
 
-        $q.all([$translate('DECISION-AUDIT.HEADER.ID'),
-                $translate('DECISION-AUDIT.HEADER.PROCESS-DEFINITION-ID'),
-                $translate('DECISION-AUDIT.HEADER.PROCESS-INSTANCE-ID'),
-                $translate('DECISION-AUDIT.HEADER.CREATED'),
-                $translate('DECISION-AUDIT.HEADER.FAILED')])
+        $q.all([$translate('DECISION-TABLE-EXECUTION.HEADER.ID'),
+                $translate('DECISION-TABLE-EXECUTION.HEADER.PROCESS-INSTANCE-ID'),
+                $translate('DECISION-TABLE-EXECUTION.HEADER.START-TIME'),
+                $translate('DECISION-TABLE-EXECUTION.HEADER.END-TIME'),
+                $translate('DECISION-TABLE-EXECUTION.HEADER.FAILED')])
             .then(function (headers) {
 
-                $scope.gridDecisionAudits = {
-                    data: 'decisionAudits.data',
+                $scope.gridDecisionExecutions = {
+                    data: 'decisionExecutions.data',
                     enableRowReordering: false,
                     multiSelect: false,
                     keepLastSelected: false,
-                    enableSorting: false,
+                    enableSorting: true,
                     rowHeight: 36,
-                    afterSelectionChange: $scope.showDecisionAudit,
+                    afterSelectionChange: $scope.showDecisionExecution,
                     columnDefs: [
                         {field: 'id', displayName: headers[0]},
-                        {field: 'processDefinitionId', displayName: headers[1]},
-                        {field: 'processInstanceId', displayName: headers[2]},
-                        {field: 'created', displayName: headers[3], cellTemplate: gridConstants.dateTemplate},
-                        {field: 'decisionExecutionFailed', displayName: headers[4]}
+                        {field: 'instanceId', displayName: headers[1]},
+                        {field: 'startTime', displayName: headers[2], cellTemplate: gridConstants.dateTemplate},
+                        {field: 'endTime', displayName: headers[3], cellTemplate: gridConstants.dateTemplate},
+                        {field: 'failed', displayName: headers[4]}
                     ]
                 };
             });
@@ -78,14 +82,14 @@ flowableAdminApp.controller('DecisionTableController', ['$scope', '$rootScope', 
             success(function (data, status, headers, config) {
                 $scope.decisionTable = data;
 
-                // Load decision audits
-                // $http({
-                //     method: 'GET',
-                //     url: '/app/rest/admin/decision-audits?decisionKey=' + data.key + '&dmnDeploymentId=' + data.deploymentId
-                // }).
-                // success(function (auditsData, status, headers, config) {
-                //     $scope.decisionAudits = auditsData;
-                // });
+                // Load decision executions
+                $http({
+                    method: 'GET',
+                    url: '/app/rest/admin/decision-tables/history?decisionKey=' + data.key + '&deploymentId=' + data.deploymentId
+                }).
+                success(function (executionsData, status, headers, config) {
+                    $scope.decisionExecutions = executionsData;
+                });
             }).
             error(function (data, status, headers, config) {
                 if (data && data.message) {

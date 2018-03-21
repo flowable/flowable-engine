@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -109,7 +109,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         }
         return new ArrayList<>();
     }
-    
+
     @Override
     public List<RemoteUser> findUsersByGroup(String groupId) {
         JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId) + "/users", adminUser, adminPassword);
@@ -118,7 +118,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         }
         return new ArrayList<>();
     }
-    
+
     @Override
     public RemoteGroup getGroup(String groupId) {
         JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId), adminUser, adminPassword);
@@ -140,7 +140,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     protected JsonNode callRemoteIdmService(String url, String username, String password) {
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
-                Base64.encodeBase64((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
+                Base64.getEncoder().encode((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
 
         HttpClientBuilder clientBuilder = HttpClientBuilder.create();
         SSLConnectionSocketFactory sslsf = null;
@@ -192,6 +192,9 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         user.setLastName(json.get("lastName").asText());
         user.setEmail(json.get("email").asText());
         user.setFullName(json.get("fullName").asText());
+        if (json.has("tenantId") && !json.get("tenantId").isNull()) {
+            user.setTenantId(json.get("tenantId").asText());
+        }
 
         if (json.has("groups")) {
             for (JsonNode groupNode : ((ArrayNode) json.get("groups"))) {

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,9 +37,9 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  * @author Joram Barrez
  */
 public class DbSqlSessionFactory implements SessionFactory {
-    
+
     protected Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<>();
-    
+
     protected String databaseType;
     protected String databaseTablePrefix = "";
     protected boolean tablePrefixIsSchema;
@@ -47,29 +47,30 @@ public class DbSqlSessionFactory implements SessionFactory {
     protected String databaseCatalog;
     protected String databaseSchema;
     protected SqlSessionFactory sqlSessionFactory;
-    protected IdGenerator idGenerator;
     protected Map<String, String> statementMappings;
 
     protected Map<Class<?>, String> insertStatements = new ConcurrentHashMap<>();
     protected Map<Class<?>, String> updateStatements = new ConcurrentHashMap<>();
     protected Map<Class<?>, String> deleteStatements = new ConcurrentHashMap<>();
     protected Map<Class<?>, String> selectStatements = new ConcurrentHashMap<>();
-    
+
     protected List<Class<? extends Entity>> insertionOrder = new ArrayList<>();
     protected List<Class<? extends Entity>> deletionOrder = new ArrayList<>();
 
     protected boolean isDbHistoryUsed = true;
-    
+
     protected Set<Class<? extends Entity>> bulkInserteableEntityClasses = new HashSet<>();
     protected Map<Class<?>, String> bulkInsertStatements = new ConcurrentHashMap<>();
-    
+
     protected int maxNrOfStatementsInBulkInsert = 100;
+    
+    protected Map<String, Class<?>> logicalNameToClassMapping = new ConcurrentHashMap<>();
 
     @Override
     public Class<?> getSessionType() {
         return DbSqlSession.class;
     }
-    
+
     @Override
     public Session openSession(CommandContext commandContext) {
         DbSqlSession dbSqlSession = createDbSqlSession();
@@ -92,11 +93,11 @@ public class DbSqlSessionFactory implements SessionFactory {
         }
         return dbSqlSession;
     }
-    
+
     protected DbSqlSession createDbSqlSession() {
         return new DbSqlSession(this, Context.getCommandContext().getSession(EntityCache.class));
     }
-    
+
     // insert, update and delete statements
     // /////////////////////////////////////
 
@@ -162,7 +163,7 @@ public class DbSqlSessionFactory implements SessionFactory {
         this.databaseType = databaseType;
         this.statementMappings = databaseSpecificStatements.get(databaseType);
     }
-    
+
     public boolean isMysql() {
         return getDatabaseType().equals("mysql");
     }
@@ -179,7 +180,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     public String getBulkInsertStatement(Class clazz) {
         return getStatement(clazz, bulkInsertStatements, "bulkInsert");
     }
-    
+
     public Set<Class<? extends Entity>> getBulkInserteableEntityClasses() {
         return bulkInserteableEntityClasses;
     }
@@ -187,7 +188,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     public void setBulkInserteableEntityClasses(Set<Class<? extends Entity>> bulkInserteableEntityClasses) {
         this.bulkInserteableEntityClasses = bulkInserteableEntityClasses;
     }
-    
+
     public int getMaxNrOfStatementsInBulkInsert() {
         return maxNrOfStatementsInBulkInsert;
     }
@@ -195,7 +196,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     public void setMaxNrOfStatementsInBulkInsert(int maxNrOfStatementsInBulkInsert) {
         this.maxNrOfStatementsInBulkInsert = maxNrOfStatementsInBulkInsert;
     }
-    
+
     public Map<Class<?>, String> getBulkInsertStatements() {
         return bulkInsertStatements;
     }
@@ -203,7 +204,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     public void setBulkInsertStatements(Map<Class<?>, String> bulkInsertStatements) {
         this.bulkInsertStatements = bulkInsertStatements;
     }
-    
+
     // getters and setters //////////////////////////////////////////////////////
 
     public SqlSessionFactory getSqlSessionFactory() {
@@ -212,14 +213,6 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
-    }
-
-    public IdGenerator getIdGenerator() {
-        return idGenerator;
-    }
-
-    public void setIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
     }
 
     public String getDatabaseType() {
@@ -313,7 +306,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     public boolean isTablePrefixIsSchema() {
         return tablePrefixIsSchema;
     }
-    
+
     public List<Class<? extends Entity>> getInsertionOrder() {
         return insertionOrder;
     }
@@ -329,5 +322,17 @@ public class DbSqlSessionFactory implements SessionFactory {
     public void setDeletionOrder(List<Class<? extends Entity>> deletionOrder) {
         this.deletionOrder = deletionOrder;
     }
+    public void addLogicalEntityClassMapping(String logicalName, Class<?> entityClass) {
+        logicalNameToClassMapping.put(logicalName, entityClass);
+    }
+
+    public Map<String, Class<?>> getLogicalNameToClassMapping() {
+        return logicalNameToClassMapping;
+    }
+
+    public void setLogicalNameToClassMapping(Map<String, Class<?>> logicalNameToClassMapping) {
+        this.logicalNameToClassMapping = logicalNameToClassMapping;
+    }
     
+
 }

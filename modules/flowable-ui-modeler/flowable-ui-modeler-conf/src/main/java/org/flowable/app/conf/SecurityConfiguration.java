@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -109,6 +110,9 @@ public class SecurityConfiguration {
     @Configuration
     @Order(1)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+        
+        @Autowired
+        protected Environment env;
 
         protected void configure(HttpSecurity http) throws Exception {
 
@@ -117,10 +121,27 @@ public class SecurityConfiguration {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .csrf()
-                    .disable()
-                    .antMatcher("/api/**").authorizeRequests()
-                    .antMatchers("/api/**").authenticated()
-                .and().httpBasic();
+                    .disable();
+            
+            if (isEnableRestApi()) {
+                
+                if (RestApiUtil.isVerifyRestApiPrivilege(env)) {
+                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                } else {
+                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").authenticated().and().httpBasic();
+                    
+                }
+                
+            } else {
+                http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").denyAll();
+                
+            }
+            
         }
+        
+        protected boolean isEnableRestApi() {
+            return env.getProperty("rest.modeler-app.enabled", Boolean.class, true);
+        }
+        
     }
 }

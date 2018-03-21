@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.scripting.secure.behavior.SecureJavascriptTaskParseHandler;

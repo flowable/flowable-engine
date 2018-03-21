@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -105,7 +105,7 @@
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
             </if>
-        </set>    
+        </set>
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>
 
@@ -131,6 +131,30 @@
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
 
+    <resultMap id="historicCaseInstanceResultMapWithVariables"
+               type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl"
+               extends="historicCaseInstanceResultMap">
+        <collection property="queryVariables" column="SCOPE_ID_" javaType="ArrayList"
+                    ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
+            <id property="id" column="VAR_ID_"/>
+            <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR"/>
+            <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType"
+                    jdbcType="VARCHAR"/>
+            <result property="revision" column="VAR_REV_" jdbcType="INTEGER"/>
+            <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR"/>
+            <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR"/>
+            <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR"/>
+            <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
+            <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+            <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="VARCHAR"/>
+            <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
+            <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE"/>
+            <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR"/>
+            <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR"/>
+            <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT"/>
+        </collection>
+    </resultMap>
+
     <select id="selectHistoricCaseInstance" parameterType="string" resultMap="historicCaseInstanceResultMap">
         select * from ${prefix}ACT_CMMN_HI_CASE_INST where ID_ = #{id, jdbcType=VARCHAR}
     </select>
@@ -148,14 +172,122 @@
         <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
     </select>
 
+    <select id="selectHistoricCaseInstancesWithVariablesByQueryCriteria"
+            parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl"
+            resultMap="historicCaseInstanceResultMapWithVariables">
+        <include refid="selectHistoricCaseInstancesWithVariablesByQueryCriteriaColumns"/>
+        <include refid="selectHistoricCaseInstancesWithVariablesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
+    <sql id="selectHistoricCaseInstancesWithVariablesByQueryCriteriaColumns">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        <if test="_databaseId != 'db2' and _databaseId != 'mssql'">
+            select distinct RES.*,
+            VAR.ID_ as VAR_ID_,
+            VAR.NAME_ as VAR_NAME_,
+            VAR.VAR_TYPE_ as VAR_TYPE_,
+            VAR.REV_ as VAR_REV_,
+            VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_,
+            VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_,
+            VAR.TASK_ID_ as VAR_TASK_ID_,
+            VAR.SCOPE_ID_ as VAR_SCOPE_ID_,
+            VAR.SUB_SCOPE_ID_ as VAR_SUB_SCOPE_ID_,
+            VAR.SCOPE_TYPE_ as VAR_SCOPE_TYPE_,
+            VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_,
+            VAR.DOUBLE_ as VAR_DOUBLE_,
+            VAR.TEXT_ as VAR_TEXT_,
+            VAR.TEXT2_ as VAR_TEXT2_,
+            VAR.LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_,
+            VAR.LONG_ as VAR_LONG_
+            <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        </if>
+        <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
+            select distinct
+            TEMPRES_ID_ as ID_,
+            TEMPRES_REV_ as REV_,
+            TEMPRES_PARENT_ID_ as PARENT_ID_,
+            TEMPRES_CASE_DEF_ID_ as CASE_DEF_ID_,
+            TEMPRES_BUSINESS_KEY_ as BUSINESS_KEY_,
+            TEMPRES_NAME_ as NAME_,
+            TEMPRES_STATE_ as STATE_,
+            TEMPRES_START_TIME_ as START_TIME_,
+            TEMPRES_END_TIME_ as END_TIME_,
+            TEMPRES_START_USER_ID_ as START_USER_ID_,
+            TEMPRES_CALLBACK_ID_ as CALLBACK_ID_,
+            TEMPRES_CALLBACK_TYPE_ as CALLBACK_TYPE_,
+            TEMPRES_TENANT_ID_ as TENANT_ID_,
+            TEMPVAR_ID_ as VAR_ID_,
+            TEMPVAR_NAME_ as VAR_NAME_,
+            TEMPVAR_TYPE_ as VAR_TYPE_,
+            TEMPVAR_REV_ as VAR_REV_,
+            TEMPVAR_PROC_INST_ID_ as VAR_PROC_INST_ID_,
+            TEMPVAR_EXECUTION_ID_ as VAR_EXECUTION_ID_,
+            TEMPVAR_TASK_ID_ as VAR_TASK_ID_,
+            TEMPVAR_SCOPE_ID_ as VAR_SCOPE_ID_,
+            TEMPVAR_SUB_SCOPE_ID_ as VAR_SUB_SCOPE_ID_,
+            TEMPVAR_SCOPE_TYPE_ as VAR_SCOPE_TYPE_,
+            TEMPVAR_BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_,
+            TEMPVAR_DOUBLE_ as VAR_DOUBLE_,
+            TEMPVAR_TEXT_ as VAR_TEXT_,
+            TEMPVAR_TEXT2_ as VAR_TEXT2_,
+            TEMPVAR_LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_,
+            TEMPVAR_LONG_ as VAR_LONG_
+            <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
+            RES.ID_ as TEMPRES_ID_,
+            RES.REV_ as TEMPRES_REV_,
+            RES.PARENT_ID_ as TEMPRES_PARENT_ID_,
+            RES.CASE_DEF_ID_ as TEMPRES_CASE_DEF_ID_,
+            RES.BUSINESS_KEY_ as TEMPRES_BUSINESS_KEY_,
+            RES.NAME_ as TEMPRES_NAME_,
+            RES.STATE_ as TEMPRES_STATE_,
+            RES.START_TIME_ as TEMPRES_START_TIME_,
+            RES.END_TIME_ as TEMPRES_END_TIME_,
+            RES.START_USER_ID_ as TEMPRES_START_USER_ID_,
+            RES.CALLBACK_ID_ as TEMPRES_CALLBACK_ID_,
+            RES.CALLBACK_TYPE_ as TEMPRES_CALLBACK_TYPE_,
+            RES.TENANT_ID_ as TEMPRES_TENANT_ID_,
+            VAR.ID_ as TEMPVAR_ID_,
+            VAR.NAME_ as TEMPVAR_NAME_,
+            VAR.VAR_TYPE_ as TEMPVAR_TYPE_,
+            VAR.REV_ as TEMPVAR_REV_,
+            VAR.PROC_INST_ID_ as TEMPVAR_PROC_INST_ID_,
+            VAR.EXECUTION_ID_ as TEMPVAR_EXECUTION_ID_,
+            VAR.TASK_ID_ as TEMPVAR_TASK_ID_,
+            VAR.SCOPE_ID_ as TEMPVAR_SCOPE_ID_,
+            VAR.SUB_SCOPE_ID_ as TEMPVAR_SUB_SCOPE_ID_,
+            VAR.SCOPE_TYPE_ as TEMPVAR_SCOPE_TYPE_,
+            VAR.BYTEARRAY_ID_ as TEMPVAR_BYTEARRAY_ID_,
+            VAR.DOUBLE_ as TEMPVAR_DOUBLE_,
+            VAR.TEXT_ as TEMPVAR_TEXT_,
+            VAR.TEXT2_ as TEMPVAR_TEXT2_,
+            VAR.LAST_UPDATED_TIME_ as TEMPVAR_LAST_UPDATED_TIME_,
+            VAR.LONG_ as TEMPVAR_LONG_
+        </if>
+    </sql>
+
+    <sql id="selectHistoricCaseInstancesWithVariablesByQueryCriteriaSql">
+        from ${prefix}ACT_CMMN_HI_CASE_INST RES
+        <if test="includeCaseVariables">
+            left outer join ${prefix}ACT_HI_VARINST VAR ON VAR.PROC_INST_ID_ is null and VAR.TASK_ID_ is null and
+            RES.ID_ = VAR.SCOPE_ID_ and VAR.SCOPE_TYPE_ = 'cmmn' and VAR.SUB_SCOPE_ID_ is null
+        </if>
+        <include refid="commonSelectHistoricCaseInstancesByQueryCriteriaSql"/>
+    </sql>
+
     <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
         <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null or deploymentId != null or deploymentIds != null">
             inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         </if>
+        <include refid="commonSelectHistoricCaseInstancesByQueryCriteriaSql"/>
+    </sql>
+
+    <sql id="commonSelectHistoricCaseInstancesByQueryCriteriaSql">
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
             <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
-                inner join ${prefix}ACT_HI_VARINST A${index} on RES.ID_ = A${index}.SCOPE_ID_ and SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn' 
+                inner join ${prefix}ACT_HI_VARINST A${index} on RES.ID_ = A${index}.SCOPE_ID_ and A${index}.SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
             </if>
         </foreach>
         <where>
@@ -164,7 +296,7 @@
             </if>
             <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() &gt; 0">
                 and RES.ID_ IN
-                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" 
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds"
                          open="(" separator="," close=")">
                   #{caseInstanceId}
                 </foreach>
@@ -173,7 +305,7 @@
                 and RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
             <if test="caseDefinitionKey != null">
-                and CASE_DEF.KEY_ = #{caseDefinitionId}
+                and CASE_DEF.KEY_ = #{caseDefinitionKey}
             </if>
             <if test="caseDefinitionKeys != null">
                 and CASE_DEF.KEY_ IN
@@ -195,7 +327,7 @@
             </if>
             <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
                 and CASE_DEF.DEPLOYMENT_ID_ IN
-                <foreach item="deploymentId" index="index" collection="deploymentIds" 
+                <foreach item="deploymentId" index="index" collection="deploymentIds"
                          open="(" separator="," close=")">
                   #{deploymentId}
                 </foreach>
@@ -308,11 +440,11 @@
             </foreach>
         </where>
     </sql>
-    
+
     <select id="selectHistoricCaseInstancesByCaseDefinitionId" resultMap="historicCaseInstanceResultMap">
         select * from ${prefix}ACT_CMMN_HI_CASE_INST where CASE_DEF_ID_ = #{parameter}
     </select>
-    
+
     <sql id="variableOperator">
         <choose>
           <when test="queryVariableValue.operator.equals('EQUALS')">=</when>

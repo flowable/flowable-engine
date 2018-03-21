@@ -3,18 +3,31 @@
 
 ==== Installation and Authentication
 
-Flowable includes a REST API to the Flowable engine that can be installed by deploying the flowable-rest.war file to a servlet container like Apache Tomcat. However, it can also be used in another web-application by including the servlet and its mapping in your application and add all flowable-rest dependencies to the classpath.
+Flowable includes a REST API to the Flowable engine that can be installed by deploying the flowable-rest.war file to a servlet container like Apache Tomcat. However, it can also be used in another web-application by including the servlet (and/or its mappings) in your application and add all flowable-rest dependencies to the classpath.
 
-By default the Flowable engine will connect to an in-memory H2 database. You can change the database settings in the db.properties file in the WEB-INF/classes folder. The REST API uses JSON format (http://www.json.org) and is built upon the Spring MVC (http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html).
+By default the Flowable engine will connect to an in-memory H2 database. You can change the database settings in the flowable-app.properties file in the _WEB-INF/META-INF/flowable-app_ folder. The REST API uses JSON format (http://www.json.org) and is built upon the Spring MVC (http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html).
 
-All REST-resources require a valid Flowable-user to be authenticated by default. Basic HTTP access authentication is used, so you should always include a _Authorization: Basic ...==_ HTTP-header when performing requests or include the username and password in the request-url (for example, _http://username:password@localhost:8080/xyz_).
+All REST-resources require a valid user with the _rest-access-api_ privilege to be authenticated by default. If any valid user should be able to call the REST API, the _rest.authentication.mode_ can be set to _any-user_ (this was the default in older versions of Flowable).
+
+A default user that can access the REST API can be configured by settings the following properties:
+
+----
+rest-admin.userid=rest-admin
+rest-admin.password=test
+rest-admin.firstname=Rest
+rest-admin.lastname=Admin
+----
+
+When the REST app boots up, the user is created if it doesn't exist or fetched otherwise. This user will be given the _access-rest-api_ privilege which is needed by default to access the REST API. *Do not forget to change the password of this user afterwards*. If the _rest-admin.userid_ is not set, no users or privileges will be created. So, after the initial setup, removing this property will not remove the user nor the privilege that has been configured before.
+
+Basic HTTP access authentication is used, so you should always include a _Authorization: Basic ...==_ HTTP-header when performing requests or include the username and password in the request-url (for example, _http://username:password@localhost:8080/xyz_).
 
 *We recommend that you use Basic Authentication in combination with HTTPS.*
 
 ==== Configuration
 
 The Flowable REST web application uses Spring Java Configuration for starting the Flowable Form engine, defining the basic authentication security using Spring security, and to define the variable converters for specific variable handling.
-A small number of properties can be defined by changing the engine.properties file you can find in the WEB-INF/classes folder.
+A small number of properties can be defined by changing the flowable-app.properties file you can find in the WEB-INF/META-INF/flowable-app/flowable-app.properties folder.
 If you need more advanced configuration options there's the possibility to override the default Spring beans in XML in the flowable-custom-context.xml file you can also find in the WEB-INF/classes folder.
 An example configuration is already in comments in this file. This is also the place to override the default RestResponseFactory by defining a new Spring bean with the name restResponsefactory and use your custom implementation class for it.
 

@@ -34,9 +34,13 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     protected String instanceId;
     protected String executionId;
     protected String activityId;
+    protected String scopeType;
     protected boolean failed;
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
     protected String executionJson;
+    protected String decisionKey;
+    protected String decisionName;
+    protected String decisionVersion;
 
     @Override
     public Object getPersistentState() {
@@ -46,6 +50,7 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
         persistentState.put("instanceId", this.instanceId);
         persistentState.put("executionId", this.executionId);
         persistentState.put("activityId", this.activityId);
+        persistentState.put("scopeType", this.scopeType);
         persistentState.put("tenantId", this.tenantId);
         return persistentState;
     }
@@ -124,6 +129,16 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     }
 
     @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
     public boolean isFailed() {
         return failed;
     }
@@ -152,7 +167,34 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     public void setExecutionJson(String executionJson) {
         this.executionJson = executionJson;
     }
-    
+
+    @Override
+    public String getDecisionKey() {
+        return decisionKey;
+    }
+
+    public void setDecisionKey(String decisionKey) {
+        this.decisionKey = decisionKey;
+    }
+
+    @Override
+    public String getDecisionName() {
+        return decisionName;
+    }
+
+    public void setDecisionName(String decisionName) {
+        this.decisionName = decisionName;
+    }
+
+    @Override
+    public String getDecisionVersion() {
+        return decisionVersion;
+    }
+
+    public void setDecisionVersion(String decisionVersion) {
+        this.decisionVersion = decisionVersion;
+    }
+
     @Override
     public String toString() {
         return "HistoricDecisionExecutionEntity[" + id + "]";

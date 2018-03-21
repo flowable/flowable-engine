@@ -31,9 +31,9 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
-import org.flowable.form.model.FormModel;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,8 +98,8 @@ public class FlowableProcessInstanceService {
         ProcessInstanceRepresentation processInstanceResult = new ProcessInstanceRepresentation(processInstance, processDefinition, processDefinition.isGraphicalNotationDefined(), userRep);
 
         if (processDefinition.hasStartFormKey()) {
-            FormModel formModel = runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
-            if (formModel != null) {
+            FormInfo formInfo = runtimeService.getStartFormModel(processInstance.getProcessDefinitionId(), processInstance.getId());
+            if (formInfo != null) {
                 processInstanceResult.setStartFormDefined(true);
             }
         }
@@ -107,7 +107,7 @@ public class FlowableProcessInstanceService {
         return processInstanceResult;
     }
 
-    public FormModel getProcessInstanceStartForm(String processInstanceId, HttpServletResponse response) {
+    public FormInfo getProcessInstanceStartForm(String processInstanceId, HttpServletResponse response) {
 
         HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 

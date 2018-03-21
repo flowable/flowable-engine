@@ -30,8 +30,8 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
-import org.flowable.form.model.FormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class FlowableProcessDefinitionService {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    public FormModel getProcessDefinitionStartForm(String processDefinitionId) {
+    public FormInfo getProcessDefinitionStartForm(String processDefinitionId) {
 
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
 
@@ -107,25 +107,25 @@ public class FlowableProcessDefinitionService {
         return result;
     }
 
-    protected FormModel getStartForm(ProcessDefinition processDefinition) {
-        FormModel formModel = null;
+    protected FormInfo getStartForm(ProcessDefinition processDefinition) {
+        FormInfo formInfo = null;
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
         Process process = bpmnModel.getProcessById(processDefinition.getKey());
         FlowElement startElement = process.getInitialFlowElement();
         if (startElement instanceof StartEvent) {
             StartEvent startEvent = (StartEvent) startElement;
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-                formModel = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
                         processDefinition.getDeploymentId(), processDefinition.getTenantId());
             }
         }
 
-        if (formModel == null) {
+        if (formInfo == null) {
             // Definition found, but no form attached
             throw new NotFoundException("Process definition does not have a form defined: " + processDefinition.getId());
         }
 
-        return formModel;
+        return formInfo;
     }
 
     protected List<ProcessDefinitionRepresentation> convertDefinitionList(List<ProcessDefinition> definitions) {

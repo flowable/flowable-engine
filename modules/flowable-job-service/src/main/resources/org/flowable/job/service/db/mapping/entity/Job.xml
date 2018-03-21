@@ -175,11 +175,8 @@
         delete from ${prefix}ACT_RU_JOB where ID_ = #{id} and REV_ = #{revision}
     </delete>
 
-    <delete id="bulkDeleteJob" parameterType="java.util.Collection">
-        delete from ${prefix}ACT_RU_JOB where
-        <foreach item="job" collection="list" index="index" separator=" or ">
-            ID_ = #{job.id, jdbcType=VARCHAR}
-        </foreach>
+    <delete id="deleteJobsByExecutionId" parameterType="string">
+        delete from ${prefix}ACT_RU_JOB where PROCESS_INSTANCE_ID_ = #{id}
     </delete>
 
     <!-- JOB UPDATE STATEMENTS -->

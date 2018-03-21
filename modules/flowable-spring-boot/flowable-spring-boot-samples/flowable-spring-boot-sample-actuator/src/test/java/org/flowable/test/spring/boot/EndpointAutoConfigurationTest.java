@@ -3,8 +3,9 @@ package org.flowable.test.spring.boot;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngine;
-import org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.EndpointAutoConfiguration;
+import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +50,8 @@ public class EndpointAutoConfigurationTest {
             MetricFilterAutoConfiguration.class, EndpointWebMvcAutoConfiguration.class,
             ManagementServerPropertiesAutoConfiguration.class,
             MetricRepositoryAutoConfiguration.class,
-            DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class,
             EndpointAutoConfiguration.class })
     @PropertySource("test-actuator-endpoint.properties")
     public static class EndpointConfiguration {

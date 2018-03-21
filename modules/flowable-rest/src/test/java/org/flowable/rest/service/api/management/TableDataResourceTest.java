@@ -9,9 +9,12 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Table columns.
@@ -23,6 +26,7 @@ public class TableDataResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single table's row data. GET management/tables/{tableName}/data
      */
+    @Test
     public void testGetTableColumns() throws Exception {
         try {
 
@@ -111,10 +115,12 @@ public class TableDataResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetDataForUnexistingTable() throws Exception {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, "unexisting")), HttpStatus.SC_NOT_FOUND));
     }
 
+    @Test
     public void testGetDataSortByIllegalColumn() throws Exception {
         // We use variable-table as a reference
         String tableName = managementService.getTableName(VariableInstanceEntity.class);

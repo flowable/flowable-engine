@@ -15,9 +15,11 @@ package org.flowable.task.service;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.AbstractServiceConfiguration;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.impl.AbstractServiceConfiguration;
+import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;
@@ -65,15 +67,24 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     
     protected int taskQueryLimit;
     protected int historicTaskQueryLimit;
+    
+    protected IdGenerator idGenerator;
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        checkIdGenerator();
         initDataManagers();
         initEntityManagers();
     }
-    
+
+    protected void checkIdGenerator() {
+        if (this.idGenerator == null) {
+            throw new FlowableException("Id generator for task configuration must be initialized");
+        }
+    }
+
     // Data managers
     ///////////////////////////////////////////////////////////
 
@@ -243,5 +254,14 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     public TaskServiceConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
         this.typedEventListeners = typedEventListeners;
         return this;
+    }
+
+    public TaskServiceConfiguration setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+        return this;
+    }
+
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
     }
 }

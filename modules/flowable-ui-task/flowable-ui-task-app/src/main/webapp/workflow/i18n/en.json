@@ -119,6 +119,7 @@
             "ASSIGN": "Assign",
             "REASSIGN": "Reassign",
             "CREATE": "+ Create Task",
+            "CREATE-SUB-TASK": "Create sub task",
             "CREATE-CONFIRM": "Create",
             "INVOLVE": "+ Involve people",
             "ADD-COMMENT": "+ Add comment",
@@ -134,6 +135,7 @@
             "ASSIGN": "Select assignee",
             "ASSIGNEE": "Assignee",
             "CONTENT": "Related content",
+            "SUBTASK": "Sub tasks",
             "CREATE-NEW": "New Task",
             "FORM": "Form",
             "DETAILS": "Details",
@@ -145,6 +147,9 @@
             "NO-COMMENTS": "No comments",
             "COMMENT-COUNT": "comment",
             "COMMENTS-COUNT": "comments",
+            "NO-SUBTASKS": "No sub tasks",
+            "SUBTASK-COUNT": "sub task ",
+            "SUBTASKS-COUNT": "sub tasks",
             "SHOW-DETAILS": "Show details",
             "SHOW-FORM": "Show form"
         },
@@ -152,9 +157,11 @@
             "NAME": "Name",
             "DESCRIPTION": "Description",
             "ASSIGNEE": "Assignee",
+
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",
             "CASE-INSTANCE": "Part of case",
+            "PARENT-TASK": "Part of task",
             "ENDED": "Ended",
             "DURATION": "Duration"
         },
@@ -193,7 +200,8 @@
             "DESCRIPTION-WITH-CLAIM": "This task has no details yet. You can change that by choosing one of the following actions. In addition, to complete this task you need to claim it first by pressing the blue button in the top right of the page.",
             "ADD-PEOPLE": "Involve someone else and start collaborating",
             "ADD-COMMENT": "Enlighten others by adding a comment",
-            "ADD-CONTENT": "Add a document and share the knowledge"
+            "ADD-CONTENT": "Add a document and share the knowledge",
+            "ADD-SUBTASK": "Create a sub task"
         }
     },
     "PROCESS": {
@@ -388,7 +396,7 @@
     "APP-DEFINITION" : {
         "MESSAGE" : {
             "NOT-FOUND": "No app definition found with the given id",
-            "MISSING": "Activiti is running in integration mode, but the required app definition is missing"
+            "MISSING": "Flowable is running in integration mode, but the required app definition is missing"
         }
     }
 }

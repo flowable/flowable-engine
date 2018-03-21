@@ -7,7 +7,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
@@ -550,8 +550,49 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
         assertEquals(idx, mylistener.getEventsReceived().size());
     }
+    
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
+    public void testDeleteParentProcessWithCallActivity() throws Exception {
+        CallActivityEventListener mylistener = new CallActivityEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(mylistener);
 
-    class CallActivityEventListener implements FlowableEventListener {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
+        assertNotNull(processInstance);
+
+        // no task should be active in parent process
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(task);
+
+        // only active task should be the one defined in the external subprocess
+        task = taskService.createTaskQuery().active().singleResult();
+        assertNotNull(task);
+        assertEquals("User Task2 in External", task.getName());
+
+        ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
+                .rootProcessInstanceId(processInstance.getId())
+                .onlySubProcessExecutions()
+                .singleResult();
+        assertNotNull(subprocessInstance);
+        
+        runtimeService.deleteProcessInstance(processInstance.getId(), null);
+        
+        List<FlowableEvent> entityEvents = mylistener.getEventsReceived();
+        int lastIndex = entityEvents.size() - 1;
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, entityEvents.get(lastIndex - 3).getType());
+        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, entityEvents.get(lastIndex - 2).getType());
+        FlowableCancelledEvent subProcessCancelledEvent = (FlowableCancelledEvent) entityEvents.get(lastIndex - 2);
+        assertEquals(subprocessInstance.getId(), subProcessCancelledEvent.getProcessInstanceId());
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, entityEvents.get(lastIndex - 1).getType());
+        assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, entityEvents.get(lastIndex).getType());
+        FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) entityEvents.get(lastIndex);
+        assertEquals(processInstance.getId(), processCancelledEvent.getProcessInstanceId());
+        
+        System.out.println("the end");
+    }
+
+    class CallActivityEventListener extends AbstractFlowableEngineEventListener {
 
         private List<FlowableEvent> eventsReceived;
 

@@ -12,9 +12,13 @@
  */
 package org.flowable.cmmn.api;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 
 /**
@@ -31,4 +35,22 @@ public interface CmmnHistoryService {
     HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
 
     void deleteHistoricCaseInstance(String caseInstanceId);
+    
+    /**
+     * Deletes historic task instance. This might be useful for tasks that are {@link CmmnTaskService#newTask() dynamically created} and then {@link CmmnTaskService#complete(String) completed}. If the
+     * historic task instance doesn't exist, no exception is thrown and the method returns normal.
+     */
+    void deleteHistoricTaskInstance(String taskId);
+    
+    /**
+     * Retrieves the {@link HistoricIdentityLink}s associated with the given task. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a certain task
+     * (eg. as candidate, assignee, etc.), even if the task is completed as opposed to {@link IdentityLink}s which only exist for active tasks.
+     */
+    List<HistoricIdentityLink> getHistoricIdentityLinksForTask(String taskId);
+
+    /**
+     * Retrieves the {@link HistoricIdentityLink}s associated with the given case instance. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a
+     * certain case instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
+     */
+    List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String processInstanceId);
 }

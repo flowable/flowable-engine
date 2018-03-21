@@ -1,0 +1,134 @@
+{
+    "modelId": "cd128bc9-2384-11e8-bba4-acde48001122",
+    "bounds": {
+        "lowerRight": {
+            "x": 1200,
+            "y": 1050
+        },
+        "upperLeft": {
+            "x": 0,
+            "y": 0
+        }
+    },
+    "properties": {
+        "case_id": "testScriptTask",
+        "name": "testScriptTask",
+        "documentation": "",
+        "case_initiatorvariablename": "",
+        "case_author": "",
+        "case_version": "",
+        "case_namespace": "http://www.flowable.org/casedef"
+    },
+    "childShapes": [
+        {
+            "resourceId": "casePlanModel",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "formkeydefinition": "",
+                "formreference": "",
+                "autocompleteenabled": "",
+                "autocompletecondition": ""
+            },
+            "stencil": {
+                "id": "CasePlanModel"
+            },
+            "childShapes": [
+                {
+                    "resourceId": "sid-C2C2C837-C020-416A-9372-932838CD028C",
+                    "properties": {
+                        "overrideid": "scriptTaskA",
+                        "name": "A",
+                        "documentation": "",
+                        "servicetaskclass": "",
+                        "isasync": "",
+                        "isexclusive": "",
+                        "requiredenabled": "",
+                        "requiredrulecondition": "",
+                        "repetitionenabled": "",
+                        "repetitionrulecondition": "",
+                        "repetitioncountervariablename": "",
+                        "manualactivationenabled": "",
+                        "manualactivationrulecondition": "",
+                        "scriptformat": "",
+                        "scripttext": "",
+                        "servicetaskresultvariable": ""
+                    },
+                    "stencil": {
+                        "id": "ScriptTask"
+                    },
+                    "childShapes": [],
+                    "outgoing": [],
+                    "bounds": {
+                        "lowerRight": {
+                            "x": 298,
+                            "y": 234
+                        },
+                        "upperLeft": {
+                            "x": 198,
+                            "y": 154
+                        }
+                    },
+                    "dockers": []
+                },
+                {
+                    "resourceId": "sid-ED01DE96-9A6C-46AA-8BC5-5854C09F1ED0",
+                    "properties": {
+                        "overrideid": "scriptTaskB",
+                        "name": "B",
+                        "documentation": "",
+                        "servicetaskclass": "",
+                        "isasync": true,
+                        "isexclusive": true,
+                        "requiredenabled": true,
+                        "requiredrulecondition": "",
+                        "repetitionenabled": true,
+                        "repetitionrulecondition": "",
+                        "repetitioncountervariablename": "",
+                        "manualactivationenabled": true,
+                        "manualactivationrulecondition": "",
+                        "scriptformat": "",
+                        "scripttext": "",
+                        "servicetaskresultvariable": "result"
+                    },
+                    "stencil": {
+                        "id": "ScriptTask"
+                    },
+                    "childShapes": [],
+                    "outgoing": [],
+                    "bounds": {
+                        "lowerRight": {
+                            "x": 475,
+                            "y": 215
+                        },
+                        "upperLeft": {
+                            "x": 375,
+                            "y": 135
+                        }
+                    },
+                    "dockers": []
+                }
+            ],
+            "outgoing": [],
+            "bounds": {
+                "lowerRight": {
+                    "x": 763,
+                    "y": 744
+                },
+                "upperLeft": {
+                    "x": 45,
+                    "y": 30
+                }
+            },
+            "dockers": []
+        }
+    ],
+    "stencil": {
+        "id": "CMMNDiagram"
+    },
+    "stencilset": {
+        "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+        "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+    }
+}

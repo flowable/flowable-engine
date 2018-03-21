@@ -5,6 +5,8 @@ create table ACT_RE_DEPLOYMENT (
     KEY_ nvarchar(255),
     TENANT_ID_ nvarchar(255) default '',
     DEPLOY_TIME_ datetime,
+    DERIVED_FROM_ nvarchar(64),
+    DERIVED_FROM_ROOT_ nvarchar(64),
     ENGINE_VERSION_ nvarchar(255),
     primary key (ID_)
 );
@@ -78,6 +80,9 @@ create table ACT_RE_PROCDEF (
     HAS_GRAPHICAL_NOTATION_ tinyint,
     SUSPENSION_STATE_ tinyint,
     TENANT_ID_ nvarchar(255) default '',
+    DERIVED_FROM_ nvarchar(64),
+    DERIVED_FROM_ROOT_ nvarchar(64),
+    DERIVED_VERSION_ int not null default 0,
     ENGINE_VERSION_ nvarchar(255),
     primary key (ID_)
 );
@@ -160,7 +165,7 @@ alter table ACT_GE_BYTEARRAY
 
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
-    unique (KEY_,VERSION_, TENANT_ID_);
+    unique (KEY_,VERSION_, DERIVED_VERSION_, TENANT_ID_);
     
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PARENT 
@@ -312,7 +317,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
     
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.3.0.0', 1);  
+values ('schema.version', '6.3.0.1', 1);  
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.3.0.0)', 1);   
+values ('schema.history', 'create(6.3.0.1)', 1);   

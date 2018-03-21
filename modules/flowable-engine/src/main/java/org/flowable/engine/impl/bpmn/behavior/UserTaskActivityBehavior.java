@@ -117,7 +117,10 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         if (StringUtils.isNotEmpty(activeTaskName)) {
             String name = null;
             try {
-                name = (String) expressionManager.createExpression(activeTaskName).getValue(execution);
+                Object nameValue = expressionManager.createExpression(activeTaskName).getValue(execution);
+                if (nameValue != null) {
+                    name = nameValue.toString();
+                }
             } catch (FlowableException e) {
                 name = activeTaskName;
                 LOGGER.warn("property not found in task name expression {}", e.getMessage());
@@ -128,7 +131,10 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         if (StringUtils.isNotEmpty(activeTaskDescription)) {
             String description = null;
             try {
-                description = (String) expressionManager.createExpression(activeTaskDescription).getValue(execution);
+                Object descriptionValue = expressionManager.createExpression(activeTaskDescription).getValue(execution);
+                if (descriptionValue != null) {
+                    description = descriptionValue.toString();
+                }
             } catch (FlowableException e) {
                 description = activeTaskDescription;
                 LOGGER.warn("property not found in task description expression {}", e.getMessage());
@@ -177,25 +183,31 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         }
 
         if (StringUtils.isNotEmpty(activeTaskCategory)) {
-            final Object category = expressionManager.createExpression(activeTaskCategory).getValue(execution);
-            if (category != null) {
-                if (category instanceof String) {
-                    task.setCategory((String) category);
-                } else {
-                    throw new FlowableIllegalArgumentException("Category expression does not resolve to a string: " + activeTaskCategory);
+            String category = null;
+            try {
+                Object categoryValue = expressionManager.createExpression(activeTaskCategory).getValue(execution);
+                if (categoryValue != null) {
+                    category = categoryValue.toString();
                 }
+            }  catch (FlowableException e) {
+                category = activeTaskCategory;
+                LOGGER.warn("property not found in task category expression {}", e.getMessage());
             }
+            task.setCategory(category.toString());
         }
 
         if (StringUtils.isNotEmpty(activeTaskFormKey)) {
-            final Object formKey = expressionManager.createExpression(activeTaskFormKey).getValue(execution);
-            if (formKey != null) {
-                if (formKey instanceof String) {
-                    task.setFormKey((String) formKey);
-                } else {
-                    throw new FlowableIllegalArgumentException("FormKey expression does not resolve to a string: " + activeTaskFormKey);
+            String formKey = null;
+            try {
+                Object formKeyValue = expressionManager.createExpression(activeTaskFormKey).getValue(execution);
+                if (formKeyValue != null) {
+                    formKey = formKeyValue.toString();
                 }
+            } catch (FlowableException e) {
+                formKey = activeTaskFormKey;
+                LOGGER.warn("property not found in task formKey expression {}", e.getMessage());
             }
+            task.setFormKey(formKey.toString());
         }
 
         boolean skipUserTask = false;
@@ -221,7 +233,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
             
         } else {
-            TaskHelper.deleteTask(task, null, false, false);
+            TaskHelper.deleteTask(task, null, false, false, false); // false: no events fired for skipped user task
             leave(execution);
         }
     }
@@ -271,20 +283,18 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
                 Object value = groupIdExpr.getValue(execution);
                 if (value != null) {
-                    if (value instanceof String) {
-                        String strValue = (String) value;
+                    if (value instanceof Collection) {
+                        List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
+                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
+                        
+                    } else if (value != null) {
+                        String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {
                             List<String> candidates = extractCandidates(strValue);
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
                             IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         }
                         
-                    } else if (value instanceof Collection) {
-                        List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
-                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
-                        
-                    } else {
-                        throw new FlowableIllegalArgumentException("Expression did not resolve to a string or collection of strings");
                     }
                 }
             }
@@ -295,20 +305,18 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 Expression userIdExpr = expressionManager.createExpression(candidateUser);
                 Object value = userIdExpr.getValue(execution);
                 if (value != null) {
-                    if (value instanceof String) {
-                        String strValue = (String) value;
+                    if (value instanceof Collection) {
+                        List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
+                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
+                        
+                    } else {
+                        String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {
                             List<String> candidates = extractCandidates(strValue);
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
                             IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         }
                         
-                    } else if (value instanceof Collection) {
-                        List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
-                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
-                        
-                    } else {
-                        throw new FlowableException("Expression did not resolve to a string or collection of strings");
                     }
                 }
             }
@@ -320,21 +328,21 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 for (String userIdentityLink : userTask.getCustomUserIdentityLinks().get(customUserIdentityLinkType)) {
                     Expression idExpression = expressionManager.createExpression(userIdentityLink);
                     Object value = idExpression.getValue(execution);
-                    if (value instanceof String) {
-                        List<String> userIds = extractCandidates((String) value);
+                    if (value instanceof Collection) {
+                        Iterator userIdSet = ((Collection) value).iterator();
+                        while (userIdSet.hasNext()) {
+                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
+                                            task.getId(), userIdSet.next().toString(), null, customUserIdentityLinkType);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+                        }
+                        
+                    } else {
+                        List<String> userIds = extractCandidates(value.toString());
                         for (String userId : userIds) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
                             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
-                    } else if (value instanceof Collection) {
-                        Iterator userIdSet = ((Collection) value).iterator();
-                        while (userIdSet.hasNext()) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
-                                            task.getId(), (String) userIdSet.next(), null, customUserIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                        }
-                    } else {
-                        throw new FlowableException("Expression did not resolve to a string or collection of strings");
+                        
                     }
 
                 }
@@ -349,22 +357,22 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
                     Expression idExpression = expressionManager.createExpression(groupIdentityLink);
                     Object value = idExpression.getValue(execution);
-                    if (value instanceof String) {
-                        List<String> groupIds = extractCandidates((String) value);
+                    if (value instanceof Collection) {
+                        Iterator groupIdSet = ((Collection) value).iterator();
+                        while (groupIdSet.hasNext()) {
+                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
+                                            task.getId(), null, groupIdSet.next().toString(), customGroupIdentityLinkType);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+                        }
+                        
+                    } else {
+                        List<String> groupIds = extractCandidates(value.toString());
                         for (String groupId : groupIds) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
                                             task.getId(), null, groupId, customGroupIdentityLinkType);
                             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
-                    } else if (value instanceof Collection) {
-                        Iterator groupIdSet = ((Collection) value).iterator();
-                        while (groupIdSet.hasNext()) {
-                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
-                                            task.getId(), null, (String) groupIdSet.next(), customGroupIdentityLinkType);
-                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-                        }
-                    } else {
-                        throw new FlowableException("Expression did not resolve to a string or collection of strings");
+                        
                     }
 
                 }

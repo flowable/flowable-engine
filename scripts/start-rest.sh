@@ -1,5 +1,5 @@
 #!/bin/bash
-export MAVEN_OPTS="-Xms521M -Xmx1024M -XX:MaxPermSize=256M -noverify -Xdebug -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8005,server=y,suspend=n"
+export MAVEN_OPTS="-Xms1024m -Xmx2048m -noverify -Xdebug -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8005,server=y,suspend=n"
 cd ..
 mvn -T 1C -PbuildRestappDependencies clean install
 STATUS=$?

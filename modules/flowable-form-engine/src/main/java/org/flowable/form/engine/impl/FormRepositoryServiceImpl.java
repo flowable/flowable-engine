@@ -22,6 +22,7 @@ import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormDeploymentQuery;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.NativeFormDefinitionQuery;
 import org.flowable.form.api.NativeFormDeploymentQuery;
@@ -36,7 +37,6 @@ import org.flowable.form.engine.impl.cmd.SetDeploymentCategoryCmd;
 import org.flowable.form.engine.impl.cmd.SetDeploymentTenantIdCmd;
 import org.flowable.form.engine.impl.cmd.SetFormDefinitionCategoryCmd;
 import org.flowable.form.engine.impl.repository.FormDeploymentBuilderImpl;
-import org.flowable.form.model.FormModel;
 
 /**
  * @author Tijs Rademakers
@@ -108,27 +108,27 @@ public class FormRepositoryServiceImpl extends ServiceImpl implements FormReposi
     }
 
     @Override
-    public FormModel getFormModelById(String formId) {
+    public FormInfo getFormModelById(String formId) {
         return commandExecutor.execute(new GetFormModelCmd(null, formId));
     }
 
     @Override
-    public FormModel getFormModelByKey(String formDefinitionKey) {
+    public FormInfo getFormModelByKey(String formDefinitionKey) {
         return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null));
     }
 
     @Override
-    public FormModel getFormModelByKey(String formDefinitionKey, String tenantId) {
+    public FormInfo getFormModelByKey(String formDefinitionKey, String tenantId) {
         return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId));
     }
 
     @Override
-    public FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
+    public FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
         return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, null, parentDeploymentId));
     }
 
     @Override
-    public FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
+    public FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
         return commandExecutor.execute(new GetFormModelCmd(formDefinitionKey, null, tenantId, parentDeploymentId));
     }
 

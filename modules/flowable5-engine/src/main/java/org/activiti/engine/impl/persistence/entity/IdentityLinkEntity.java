@@ -223,6 +223,21 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, BulkDelet
     public String getProcessDefinitionId() {
         return this.processDefId;
     }
+    
+    @Override
+    public String getScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeType() {
+        return null;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return null;
+    }
 
     @Override
     public String toString() {

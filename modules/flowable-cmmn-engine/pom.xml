@@ -53,11 +53,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-form-model</artifactId>
+            <artifactId>flowable-form-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-form-api</artifactId>
+            <artifactId>flowable-form-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -120,6 +120,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.13</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-api</artifactId>
         </dependency>
@@ -138,7 +144,6 @@
             com.sun*;resolution:=optional,
             javax.activation*;resolution:=optional,
             javax.persistence*;resolution:=optional,
-            org.apache.commons.codec*;resolution:=optional,
             org.apache.commons.mail*;resolution:=optional,
             org.apache.xerces*;resolution:=optional,
             org.springframework*;resolution:=optional,

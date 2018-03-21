@@ -41,7 +41,7 @@ For more detailed information on the service operations and the DMN engine API, 
 
 === Exception strategy
 
-The base exception in Flowable is the +org.flowable.engine.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the link:$$http://flowable.org/javadocs/index.html$$[ the javadocs]. For example, an extract from ++DmnRuleService++:
+The base exception in Flowable is the +org.flowable.engine.FlowableException+, an unchecked exception. This exception can be thrown at all times by the API, but 'expected' exceptions that happen in specific methods are documented in the link:$$http://www.flowable.org/javadocs/index.html$$[ the javadocs]. For example, an extract from ++DmnRuleService++:
 
 [source,java,linenums]
 ----

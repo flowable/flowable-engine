@@ -31,17 +31,18 @@ public class CountingTaskUtil {
                 countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() - 1);
             }
         }
-        
+
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getTaskServiceConfiguration().getEventDispatcher();
-        if (fireDeleteEvent && eventDispatcher.isEnabled()) {
+        if (fireDeleteEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
-    
+
             eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_DELETED,
-                            variableInstance.getName(), null, variableInstance.getType(), variableInstance.getTaskId(), 
-                            variableInstance.getExecutionId(), variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId()));
+                            variableInstance.getName(), null, variableInstance.getType(), variableInstance.getTaskId(),
+                            variableInstance.getExecutionId(), variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
+                            variableInstance.getScopeId(), variableInstance.getScopeType()));
         }
     }
-    
+
     public static void handleInsertVariableInstanceEntityCount(VariableInstanceEntity variableInstance) {
         if (variableInstance.getTaskId() != null && isTaskRelatedEntityCountEnabledGlobally()) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) CommandContextUtil.getTaskEntityManager().findById(variableInstance.getTaskId());
@@ -50,7 +51,7 @@ public class CountingTaskUtil {
             }
         }
     }
-    
+
     /**
      * Check if the Task Relationship Count performance improvement is enabled.
      */

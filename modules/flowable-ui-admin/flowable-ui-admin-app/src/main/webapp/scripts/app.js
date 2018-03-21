@@ -19,7 +19,7 @@
 
 var flowableAdminApp = angular.module('flowableAdminApp', ['ngResource', 'ngRoute', 'ngCookies', 'ngSanitize',
     'pascalprecht.translate', 'ngGrid', 'ui.select2', 'ui.bootstrap', 'ngFileUpload', 'ui.keypress',
-    'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav']);
+    'ui.grid', 'ui.grid.edit', 'ui.grid.selection', 'ui.grid.autoResize', 'ui.grid.moveColumns', 'ui.grid.cellNav', 'jsonFormatter']);
 
 flowableAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider', '$provide',
@@ -32,6 +32,11 @@ flowableAdminApp
                 .when('/process-engine', {
                     templateUrl: 'views/deployments.html',
                     controller: 'DeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/cmmn-engine', {
+                    templateUrl: 'views/cmmn-deployments.html',
+                    controller: 'CmmnDeploymentsController',
                     reloadOnSearch: true
                 })
                 .when('/form-engine', {
@@ -130,6 +135,56 @@ flowableAdminApp
               	.when('/process-definitions-refresh', {
               		redirectTo: '/process-definitions'
               	})
+              	.when('/cmmn-deployments', {
+                    templateUrl: 'views/cmmn-deployments.html',
+                    controller: 'CmmnDeploymentsController',
+                    reloadOnSearch: true
+                })
+              	.when('/cmmn-deployment/:deploymentId', {
+                    templateUrl: 'views/cmmn-deployment.html',
+                    controller: 'CmmnDeploymentController',
+                    reloadOnSearch: true
+                })
+                .when('/case-definitions', {
+                    templateUrl: 'views/case-definitions.html',
+                    controller: 'CaseDefinitionsController',
+                    reloadOnSearch: true
+                })
+                .when('/case-definition/:definitionId', {
+                    templateUrl: 'views/case-definition.html',
+                    controller: 'CaseDefinitionController',
+                    reloadOnSearch: true
+                })
+                .when('/case-instances', {
+                    templateUrl: 'views/case-instances.html',
+                    controller: 'CaseInstancesController',
+                    reloadOnSearch: true
+                })
+                .when('/case-instance/:caseInstanceId', {
+                    templateUrl: 'views/case-instance.html',
+                    controller: 'CaseInstanceController',
+                    reloadOnSearch: true
+                })
+                .when('/cmmn-tasks', {
+                    templateUrl: 'views/cmmn-tasks.html',
+                    controller: 'CmmnTasksController',
+                    reloadOnSearch: true
+                })
+                .when('/cmmn-task/:taskId', {
+                    templateUrl: 'views/cmmn-task.html',
+                    controller: 'CmmnTaskController',
+                    reloadOnSearch: true
+                })
+                .when('/cmmn-jobs', {
+                    templateUrl: 'views/cmmn-jobs.html',
+                    controller: 'CmmnJobsController',
+                    reloadOnSearch: true
+                })
+                .when('/cmmn-job/:jobId', {
+                    templateUrl: 'views/cmmn-job.html',
+                    controller: 'CmmnJobController',
+                    reloadOnSearch: true
+                })
                 .when('/decision-table-deployments', {
                     templateUrl: 'views/decision-table-deployments.html',
                     controller: 'DecisionTableDeploymentsController',
@@ -148,6 +203,16 @@ flowableAdminApp
                 .when('/decision-table/:decisionTableId', {
                     templateUrl: 'views/decision-table.html',
                     controller: 'DecisionTableController',
+                    reloadOnSearch: true
+                })
+                .when('/decision-table-executions', {
+                    templateUrl: 'views/decision-table-executions.html',
+                    controller: 'DecisionTableExecutionsController',
+                    reloadOnSearch: true
+                })
+                .when('/decision-table-execution/:executionId', {
+                    templateUrl: 'views/decision-table-execution.html',
+                    controller: 'DecisionTableExecutionController',
                     reloadOnSearch: true
                 })
                 .when('/form-deployments', {
@@ -253,6 +318,11 @@ flowableAdminApp
         $httpProvider.interceptors.push('NotPermittedInterceptor');
     }])
 
+    .config(function (JSONFormatterConfigProvider) {
+
+        JSONFormatterConfigProvider.hoverPreviewEnabled = true;
+    })
+
     /* Filters */
 
     .filter('dateformat', function() {
@@ -343,6 +413,8 @@ flowableAdminApp
                                     $rootScope.activeServers['form'] = data[i];
                                 } else if (data[i].endpointType === 4) {
                                     $rootScope.activeServers['content'] = data[i];
+                                } else if (data[i].endpointType === 5) {
+                                    $rootScope.activeServers['cmmn'] = data[i];
                                 } else {
                                     console.log('Warning! Invalid endpoint type received: '+data[i].endpointType);
                                 }
@@ -378,6 +450,19 @@ flowableAdminApp
 
                     return promise;
 	            };
+	            
+	            $rootScope.loadCaseDefinitionsCache = function() {
+                    var promise = $http({
+                        method: 'GET',
+                        url: '/app/rest/admin/case-definitions?size=100000000'
+                    }).success(function (data, status, headers, config) {
+                        return data;
+                    }).error(function (data, status, headers, config) {
+                        return {'status': false};
+                    });
+
+                    return promise;
+                };
 
 	            $rootScope.getProcessDefinitionFromCache = function(processDefId) {
 	            	for (var i = 0; i < $rootScope.processDefinitionsCache.data.length; i++) {
@@ -387,6 +472,15 @@ flowableAdminApp
             		}
 	            	return null;
 	            };
+	            
+	            $rootScope.getCaseDefinitionFromCache = function(caseDefId) {
+                    for (var i = 0; i < $rootScope.caseDefinitionsCache.data.length; i++) {
+                        if ($rootScope.caseDefinitionsCache.data[i].id === caseDefId) {
+                            return $rootScope.caseDefinitionsCache.data[i];
+                        }
+                    }
+                    return null;
+                };
 
 	            // Reference the fixed configuration values on the root scope
 	            $rootScope.config = FlowableAdmin.Config;

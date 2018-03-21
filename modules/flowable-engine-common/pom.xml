@@ -16,10 +16,9 @@
 
     <properties>
         <flowable.artifact>
-            org.flowable.engine.common
+            org.flowable.engine.common.impl
         </flowable.artifact>
         <flowable.osgi.export.additional>
-            org.flowable.engine.common,
             org.flowable.engine.common.impl,
             org.flowable.engine.common.impl.cfg,
             org.flowable.engine.common.impl.cmd,
@@ -33,7 +32,7 @@
             org.flowable.engine.common.impl.transaction,
             org.flowable.engine.common.impl.util,
             org.flowable.engine.common.impl.util.io,
-            org.flowable.engine.common.runtime,
+            org.flowable.engine.common.impl.runtime,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             org.springframework*;resolution:=optional,
@@ -136,6 +135,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine-common-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-variable-service-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>

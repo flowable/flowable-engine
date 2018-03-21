@@ -47,7 +47,7 @@
         "ACTIVATE": {
           "TITLE": "Activar cuenta",
           "ACTIVATING-MESSAGE": "Por favor espera {{userFullName}} estamos activando tu cuenta...",
-          "SUCCESS-MESSAGE": "Tu cuenta ha sido activada. Por favor inicia sesion para comenzar a diseñar y correr procesos",
+          "SUCCESS-MESSAGE": "Tu cuenta ha sido activada. Por favor inicia sesion para comenzar a diseÃ±ar y correr procesos",
           "FAILURE-MESSAGE": "Tu cuenta no puede ser activada, esto puede ser por que ya se ha activado o el link de activacion ha expirado"
         },
 
@@ -158,7 +158,7 @@
              "CREATE-FIRSTNAME": "Nombre",
              "CREATE-LASTNAME": "Apellidos",
              "CREATE-TENANT": "Tenant",
-             "CREATE-COMPANY": "Compañia",
+             "CREATE-COMPANY": "CompaÃ±ia",
              "CREATE-STATUS": "Estatus",
              "CREATE-TYPE": "Tipo",
              "BULK-UPDATE-TITLE": "Actualizacion masiva de usuarios",
@@ -217,6 +217,7 @@
           "access-admin": "Acceso a la App de administrador",
           "access-modeler": "Acceso a la App de modelador",
           "access-task": "Acceso a la App de workflow",
+          "access-rest-api": "Acceso a la REST API",
           "NO-SELECTION": "No se seleccionaron privilegios",
           "USERS": "Usuarios",
           "GROUPS": "Grupos",

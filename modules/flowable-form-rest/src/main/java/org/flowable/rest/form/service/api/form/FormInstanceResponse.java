@@ -12,10 +12,11 @@
  */
 package org.flowable.rest.form.service.api.form;
 
-import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+
 import org.flowable.form.api.FormInstance;
 
-import java.util.Date;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Yvo Swillens
@@ -27,6 +28,9 @@ public class FormInstanceResponse {
     private String taskId;
     private String processInstanceId;
     private String processDefinitionId;
+    private String scopeId;
+    private String scopeType;
+    private String scopeDefinitionId;
     private Date submittedDate;
     private String submittedBy;
     private String formValuesId;
@@ -39,6 +43,9 @@ public class FormInstanceResponse {
         this.taskId = formInstance.getTaskId();
         this.processInstanceId = formInstance.getProcessInstanceId();
         this.processDefinitionId = formInstance.getProcessDefinitionId();
+        this.scopeId = formInstance.getScopeId();
+        this.scopeType = formInstance.getScopeType();
+        this.scopeDefinitionId = formInstance.getScopeDefinitionId();
         this.submittedDate = formInstance.getSubmittedDate();
         this.submittedBy = formInstance.getSubmittedBy();
         this.formValuesId = formInstance.getFormValuesId();
@@ -88,6 +95,33 @@ public class FormInstanceResponse {
 
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+
+    @ApiModelProperty(example = "243")
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @ApiModelProperty(example = "cmmn")
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @ApiModelProperty(example = "caseDef:1:244")
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")

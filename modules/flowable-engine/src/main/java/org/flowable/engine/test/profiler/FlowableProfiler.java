@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.EngineConfigurator;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.EngineConfigurator;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 
 /**

@@ -48,6 +48,11 @@ public class HistoricIdentityLinkServiceImpl extends ServiceImpl implements Hist
     }
     
     @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
     public HistoricIdentityLinkEntity createHistoricIdentityLink() {
         return getHistoricIdentityLinkEntityManager().create();
     }
@@ -75,5 +80,10 @@ public class HistoricIdentityLinkServiceImpl extends ServiceImpl implements Hist
     @Override
     public void deleteHistoricIdentityLinksByTaskId(String taskId) {
         getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByTaskId(taskId);
+    }
+    
+    @Override
+    public void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
 }

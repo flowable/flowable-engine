@@ -15,6 +15,7 @@ package org.flowable.form.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -29,9 +30,9 @@ import org.flowable.form.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.spring.common.SpringEngineConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -41,7 +42,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author David Syer
  * @author Joram Barrez
  */
-public class SpringFormEngineConfiguration extends FormEngineConfiguration implements ApplicationContextAware {
+public class SpringFormEngineConfiguration extends FormEngineConfiguration implements SpringEngineConfiguration {
 
     protected PlatformTransactionManager transactionManager;
     protected String deploymentName = "SpringAutoDeployment";
@@ -50,6 +51,9 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
     private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected volatile boolean running = false;
+    protected List<String> enginesBuild = new ArrayList<>();
+    protected final Object lifeCycleMonitor = new Object();
 
     public SpringFormEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -62,7 +66,7 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
     public FormEngine buildFormEngine() {
         FormEngine formEngine = super.buildFormEngine();
         FormEngines.setInitialized(true);
-        autoDeployResources(formEngine);
+        enginesBuild.add(formEngine.getName());
         return formEngine;
     }
 
@@ -171,4 +175,30 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
         return result;
     }
 
+    @Override
+    public void start() {
+        synchronized (lifeCycleMonitor) {
+            if (!isRunning()) {
+                enginesBuild.forEach(name -> autoDeployResources(FormEngines.getFormEngine(name)));
+                running = true;
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        synchronized (lifeCycleMonitor) {
+            running = false;
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        return SpringEngineConfiguration.super.getPhase() - SpringEngineConfiguration.PHASE_DELTA * 2;
+    }
 }

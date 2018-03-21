@@ -50,7 +50,7 @@ public interface ChangeActivityStateBuilder {
     ChangeActivityStateBuilder moveSingleExecutionToActivityIds(String executionId, List<String> activityId);
 
     /**
-     * Set the activity that should be cancelled.
+     * Moves the execution with the current activity id to the provided new activity id
      */
     ChangeActivityStateBuilder moveActivityIdTo(String currentActivityId, String newActivityId);
     
@@ -65,6 +65,17 @@ public interface ChangeActivityStateBuilder {
      * This can be used for parallel execution like parallel/inclusive gateways, multiinstance, event sub processes etc.
      */
     ChangeActivityStateBuilder moveSingleActivityIdToActivityIds(String currentActivityId, List<String> newActivityIds);
+    
+    /**
+     * Moves the execution with the current activity id to an activity id in the parent process instance.
+     * The sub process instance will be terminated, so all sub process instance executions need to be moved.
+     */
+    ChangeActivityStateBuilder moveActivityIdToParentActivityId(String currentActivityId, String newActivityId);
+    
+    /**
+     * Moves the execution with the current activity id to an activity id in a new sub process instance for the provided call activity id.
+     */
+    ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId);
     
     /**
      * Sets a process scope variable 

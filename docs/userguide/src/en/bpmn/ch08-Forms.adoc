@@ -10,7 +10,7 @@ For the external form rendering strategy form properties can be used (that was s
 
 === Form definition
 
-Full information about the form definitions and Flowable form engine can be found in the link:$$http://flowable.org/docs/userguide-form/$$[Form Engine user guide].
+Full information about the form definitions and Flowable form engine can be found in the link:$$http://www.flowable.org/docs/userguide-form/$$[Form Engine user guide].
 Form definitions can be created with the Flowable Form Designer that's part of the Flowable Modeler web application, or created by hand with a JSON editor.
 The Form Engine user guide describes the structure of the form definition JSON in full length. The following form field types are supported:
 
@@ -63,7 +63,7 @@ void TaskService.completeTaskWithForm(String taskId, String formDefinitionId,
     String outcome, Map<String, Object> variables)
 ----
 
-Again, for more information about form definitions have a look at the link:$$http://flowable.org/docs/userguide-form$$[Form Engine user guide].
+Again, for more information about form definitions have a look at the link:$$http://www.flowable.org/docs/userguide-form$$[Form Engine user guide].
 
 
 [[formProperties]]

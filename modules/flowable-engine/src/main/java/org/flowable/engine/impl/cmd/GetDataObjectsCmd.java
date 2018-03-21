@@ -126,7 +126,7 @@ public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Seri
                         }
                     }
                 } else {
-                    SubProcess subProcess = (SubProcess) bpmnModel.getFlowElement(execution.getActivityId());
+                    SubProcess subProcess = (SubProcess) bpmnModel.getFlowElement(executionEntity.getActivityId());
                     for (ValuedDataObject dataObject : subProcess.getDataObjects()) {
                         if (dataObject.getName().equals(variableEntity.getName())) {
                             foundDataObject = dataObject;

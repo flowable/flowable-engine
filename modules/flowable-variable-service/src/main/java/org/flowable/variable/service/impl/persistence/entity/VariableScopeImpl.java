@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -76,7 +76,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             }
         }
     }
-    
+
     /**
      * Only to be used when creating a new entity, to avoid an extra call to the database.
      */
@@ -257,10 +257,10 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     /**
      * The same operation as {@link VariableScopeImpl#getVariable(String)}, but with an extra parameter to indicate whether or not all variables need to be fetched.
-     * 
+     *
      * Note that the default way (because of backwards compatibility) is to fetch all the variables when doing a get/set of variables. So this means 'true' is the default value for this method, and in
      * fact it will simply delegate to {@link #getVariable(String)}. This can also be the most performant, if you're doing a lot of variable gets in the same transaction (eg in service tasks).
-     * 
+     *
      * In case 'false' is used, only the specific variable will be fetched.
      */
     @Override
@@ -658,9 +658,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     /**
      * The default {@link #setVariable(String, Object)} fetches all variables (for historical and backwards compatible reasons) while setting the variables.
-     * 
+     *
      * Setting the fetchAllVariables parameter to true is the default behaviour (ie fetching all variables) Setting the fetchAllVariables parameter to false does not do that.
-     * 
+     *
      */
     @Override
     public void setVariable(String variableName, Object value, boolean fetchAllVariables) {
@@ -733,9 +733,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     /**
      * The default {@link #setVariableLocal(String, Object)} fetches all variables (for historical and backwards compatible reasons) while setting the variables.
-     * 
+     *
      * Setting the fetchAllVariables parameter to true is the default behaviour (ie fetching all variables) Setting the fetchAllVariables parameter to false does not do that.
-     * 
+     *
      */
     @Override
     public Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables) {
@@ -823,9 +823,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance) {
         CommandContextUtil.getVariableInstanceEntityManager().delete(variableInstance);
         variableInstance.setValue(null);
-        
+
         initializeVariableInstanceBackPointer(variableInstance);
-        
+
         if (isPropagateToHistoricVariable()) {
             VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
@@ -852,22 +852,23 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         } else {
             variableInstance.setValue(value);
         }
-        
+
         initializeVariableInstanceBackPointer(variableInstance);
-        
+
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
                 variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstance);
             }
         }
-        
+
         // Dispatch event, if needed
         if (variableServiceConfiguration.getEventDispatcher() != null && variableServiceConfiguration.getEventDispatcher().isEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
-                            FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, 
-                                            variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(), 
-                                            variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId()));
+                            FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value,
+                                            variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
+                                            variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
+                                            variableInstance.getScopeId(), variableInstance.getScopeType()));
         }
     }
 
@@ -880,23 +881,24 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableInstanceEntity variableInstance = variableInstanceEntityManager.create(variableName, type, value);
         initializeVariableInstanceBackPointer(variableInstance);
         variableInstanceEntityManager.insert(variableInstance);
-        
+
         if (variableInstances != null) {
             variableInstances.put(variableName, variableInstance);
         }
-        
+
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
                 variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableCreate(variableInstance);
             }
         }
-        
+
         if (variableServiceConfiguration.getEventDispatcher() != null && variableServiceConfiguration.getEventDispatcher().isEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
-                            FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value, 
-                                            variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(), 
-                                            variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId()));
+                            FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value,
+                                            variableInstance.getType(), variableInstance.getTaskId(), variableInstance.getExecutionId(),
+                                            variableInstance.getProcessInstanceId(), variableInstance.getProcessDefinitionId(),
+                                            variableInstance.getScopeId(), variableInstance.getScopeType()));
         }
 
         return variableInstance;
@@ -1029,7 +1031,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     }
 
     /**
-     * Return whether changes to the variables are progagated to the history storage. 
+     * Return whether changes to the variables are progagated to the history storage.
      */
     protected abstract boolean isPropagateToHistoricVariable();
 

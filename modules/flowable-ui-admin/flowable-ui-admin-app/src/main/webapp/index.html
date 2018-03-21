@@ -22,6 +22,7 @@
         <link href="additional_components/angular-ui-select2/select2.css" rel="stylesheet" >
         <link href="additional_components/ng-grid/ng-grid-2.0.14.min.css" rel="stylesheet" >
         <link href="additional_components/ui-grid/ui-grid.min.css" rel="stylesheet" >
+        <link href="bower_components/json-formatter/json-formatter.min.css" rel="stylesheet" >
         <link href="styles/style.css" rel="stylesheet" >
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -51,12 +52,13 @@
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav" ng-show="authenticated">
                         <li ng-class="{'active-process': navigation.main == 'process-engine'}"><a href="#process-engine" translate="GENERAL.MENU.PROCESS-ENGINE"></a></li>
+                        <li ng-class="{'active-cmmn': navigation.main == 'cmmn-engine'}"><a href="#cmmn-engine" translate="GENERAL.MENU.CMMN-ENGINE"></a></li>
                         <li ng-class="{'active-form': navigation.main == 'form-engine'}"><a href="#form-engine" translate="GENERAL.MENU.FORM-ENGINE"></a></li>
                         <li ng-class="{'active-dmn': navigation.main == 'dmn-engine'}"><a href="#dmn-engine" translate="GENERAL.MENU.DMN-ENGINE"></a></li>
                         <li ng-class="{'active-content': navigation.main == 'content-engine'}"><a href="#content-engine" translate="GENERAL.MENU.CONTENT-ENGINE"></a></li>
                     </ul>
                 </div>
-                <div class="sub-navbar" ng-class="{'active-process': navigation.main == 'process-engine', 'active-form': navigation.main == 'form-engine', 'active-dmn': navigation.main == 'dmn-engine', 'active-content': navigation.main == 'content-engine'}">
+                <div class="sub-navbar" ng-class="{'active-process': navigation.main == 'process-engine', 'active-cmmn': navigation.main == 'cmmn-engine', 'active-form': navigation.main == 'form-engine', 'active-dmn': navigation.main == 'dmn-engine', 'active-content': navigation.main == 'content-engine'}">
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav" ng-if="navigation.main == 'process-engine'">
                             <li ng-class="{'active': navigation.sub == 'deployments'}"><a href="#deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
@@ -66,6 +68,13 @@
                             <li ng-class="{'active': navigation.sub == 'jobs'}"><a href="#jobs" translate="GENERAL.MENU.JOBS"></a></li>
                             <li ng-class="{'active': navigation.sub == 'event-subscriptions'}"><a href="#event-subscriptions" translate="GENERAL.MENU.EVENT-SUBSCRIPTIONS"></a></li>
                         </ul>
+                        <ul class="nav navbar-nav" ng-if="navigation.main == 'cmmn-engine'">
+                            <li ng-class="{'active': navigation.sub == 'deployments'}"><a href="#cmmn-deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'definitions'}"><a href="#case-definitions" translate="GENERAL.MENU.DEFINITIONS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'instances'}"><a href="#case-instances" translate="GENERAL.MENU.INSTANCES"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'tasks'}"><a href="#cmmn-tasks" translate="GENERAL.MENU.TASKS"></a></li>
+                            <li ng-class="{'active': navigation.sub == 'jobs'}"><a href="#cmmn-jobs" translate="GENERAL.MENU.JOBS"></a></li>
+                        </ul>
                         <ul class="nav navbar-nav" ng-if="navigation.main == 'form-engine'">
                             <li ng-class="{active: navigation.sub == 'deployments'}"><a href="#form-deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
                             <li ng-class="{active: navigation.sub == 'definitions'}"><a href="#form-definitions" translate="GENERAL.MENU.DEFINITIONS"></a></li>
@@ -74,7 +83,7 @@
                         <ul class="nav navbar-nav" ng-if="navigation.main == 'dmn-engine'">
                             <li ng-class="{active: navigation.sub == 'deployments'}"><a href="#decision-table-deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
                             <li ng-class="{active: navigation.sub == 'decision-tables'}"><a href="#decision-tables" translate="GENERAL.MENU.DECISION-TABLES"></a></li>
-                            <!--TODO: <li ng-class="{active: navigation.sub == 'instances'}"><a href="#process-instances" translate="GENERAL.MENU.INSTANCES"></a></li>-->
+                            <li ng-class="{active: navigation.sub == 'executions'}"><a href="#decision-table-executions" translate="GENERAL.MENU.DECISION-TABLE-EXECUTIONS"></a></li>
                         </ul>
                         <ul class="nav navbar-nav" ng-if="navigation.main == 'content-engine'">
                             <li ng-class="{active: navigation.sub == 'content-items'}"><a href="#content-items" translate="GENERAL.MENU.CONTENT-ITEMS"></a></li>
@@ -133,6 +142,8 @@
         <script src="bower_components/sass-bootstrap/js/scrollspy.js"></script>
         <script src="bower_components/sass-bootstrap/js/collapse.js"></script>
         <script src="bower_components/sass-bootstrap/js/tab.js"></script>
+        <script src="bower_components/json-formatter/json-formatter.min.js"></script>
+
 
         <script src="scripts/config.js"></script>
         <script src="scripts/utils.js"></script>
@@ -156,10 +167,22 @@
         <script src="scripts/services.js"></script>
         <script src="scripts/directives.js"></script>
         <script src="scripts/constants.js"></script>
+        <script src="scripts/cmmn-deployments-controllers.js"></script>
+        <script src="scripts/cmmn-deployment-controllers.js"></script>
+        <script src="scripts/case-definitions-controllers.js"></script>
+        <script src="scripts/case-definition-controllers.js"></script>
+        <script src="scripts/case-instances-controllers.js"></script>
+        <script src="scripts/case-instance-controllers.js"></script>
+        <script src="scripts/cmmn-tasks-controllers.js"></script>
+        <script src="scripts/cmmn-task-controllers.js"></script>
+        <script src="scripts/cmmn-jobs-controllers.js"></script>
+        <script src="scripts/cmmn-job-controllers.js"></script>
         <script src="scripts/decision-table-deployments-controllers.js"></script>
         <script src="scripts/decision-table-deployment-controllers.js"></script>
         <script src="scripts/decision-tables-controllers.js"></script>
         <script src="scripts/decision-table-controllers.js"></script>
+        <script src="scripts/decision-table-executions-controllers.js"></script>
+        <script src="scripts/decision-table-execution-controllers.js"></script>
         <script src="scripts/form-deployments-controllers.js"></script>
         <script src="scripts/form-deployment-controllers.js"></script>
         <script src="scripts/form-definitions-controllers.js"></script>

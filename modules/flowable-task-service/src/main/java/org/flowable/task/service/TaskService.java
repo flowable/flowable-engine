@@ -14,7 +14,9 @@ package org.flowable.task.service;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -35,6 +37,8 @@ public interface TaskService {
     
     List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType);
     
+    TaskQuery createTaskQuery();
+    
     void changeTaskAssignee(TaskEntity taskEntity, String userId);
     
     void changeTaskOwner(TaskEntity taskEntity, String ownerId);
@@ -50,4 +54,6 @@ public interface TaskService {
     void insertTask(TaskEntity taskEntity, boolean fireCreateEvent);
     
     void deleteTask(TaskEntity task, boolean fireEvents);
+    
+    void deleteTasksByExecutionId(String executionId);
 }

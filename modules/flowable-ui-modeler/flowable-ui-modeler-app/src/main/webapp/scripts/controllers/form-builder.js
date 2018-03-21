@@ -202,6 +202,7 @@ angular.module('flowableModeler')
 
             $scope.palletteElements = [
                 {'type': 'text', 'title': $translate.instant('FORM-BUILDER.PALLETTE.TEXT'), 'icon': 'images/form-builder/textfield-icon.png', 'width': 1},
+                {'type': 'password', 'title': $translate.instant('FORM-BUILDER.PALLETTE.PASSWORD'), 'icon': 'images/form-builder/password-icon.png', 'width': 1},
                 {'type': 'multi-line-text', 'title': $translate.instant('FORM-BUILDER.PALLETTE.MULTILINE-TEXT'), 'icon': 'images/form-builder/multi-line-textfield-icon.png', 'width': 1},
                 {'type': 'integer', 'title': $translate.instant('FORM-BUILDER.PALLETTE.NUMBER'), 'icon': 'images/form-builder/numberfield-icon.png', 'width': 1},
                 {'type': 'decimal', 'title': $translate.instant('FORM-BUILDER.PALLETTE.DECIMAL'), 'icon': 'images/form-builder/decimalfield-icon.png', 'width': 1},

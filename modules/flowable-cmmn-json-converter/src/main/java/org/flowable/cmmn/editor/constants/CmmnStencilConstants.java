@@ -29,6 +29,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_HTTP = "HttpTask";
     String STENCIL_TASK_CASE = "CaseTask";
     String STENCIL_TASK_PROCESS = "ProcessTask";
+    String STENCIL_TASK_SCRIPT = "ScriptTask";
     String STENCIL_MILESTONE = "Milestone";
     String STENCIL_TIMER_EVENT_LISTENER ="TimerEventListener";
 
@@ -98,8 +99,8 @@ public interface CmmnStencilConstants {
     String PROPERTY_SERVICETASK_FIELD_STRING = "string";
     String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
 
-    String PROPERTY_SCRIPT_FORMAT = "scriptformat";
-    String PROPERTY_SCRIPT_TEXT = "scripttext";
+    String PROPERTY_SCRIPT_TASK_SCRIPT_FORMAT = "scriptformat";
+    String PROPERTY_SCRIPT_TASK_SCRIPT_TEXT = "scripttext";
 
     String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
     String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
@@ -129,6 +130,8 @@ public interface CmmnStencilConstants {
     String PROPERTY_HTTPTASK_SAVE_REQUEST_VARIABLES = "httptasksaverequestvariables";
     String PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS = "httptasksaveresponseparameters";
     String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
+    String PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT = "httptasksaveresponseparameterstransient";
+    String PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON = "httptasksaveresponseasjson";
 
     String PROPERTY_TIMER_EXPRESSION = "timerexpression";
     String PROPERTY_TIMER_START_TRIGGER_SOURCE_REF = "timerstarttriggersourceref";

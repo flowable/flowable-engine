@@ -18,13 +18,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.impl.util.CommandContextUtil;
-import org.flowable.variable.api.type.VariableScopeType;
 
 /**
  * @author Joram Barrez
@@ -135,7 +135,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
             throw new FlowableIllegalArgumentException("Provided case instance id is null");
         }
         scopeId(caseInstanceId);
-        scopeType(VariableScopeType.CMMN);
+        scopeType(ScopeTypes.CMMN);
         return this;
     }
     
@@ -145,7 +145,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
             throw new FlowableIllegalArgumentException("Provided case definition id is null");
         }
         scopeDefinitionId(caseDefinitionId);
-        scopeType(VariableScopeType.CMMN);
+        scopeType(ScopeTypes.CMMN);
         return this;
     }
     
@@ -155,7 +155,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
             throw new FlowableIllegalArgumentException("Provided plan item instance id is null");
         }
         subScopeId(planItemInstanceId);
-        scopeType(VariableScopeType.CMMN);
+        scopeType(ScopeTypes.CMMN);
         return this;
     }
 

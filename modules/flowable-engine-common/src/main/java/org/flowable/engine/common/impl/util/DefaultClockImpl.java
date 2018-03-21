@@ -20,7 +20,7 @@ import java.util.TimeZone;
 /**
  * @author Joram Barrez
  */
-public class DefaultClockImpl implements org.flowable.engine.common.runtime.Clock {
+public class DefaultClockImpl implements org.flowable.engine.common.impl.runtime.Clock {
     private TimeZone timeZone;
     protected static volatile Calendar CURRENT_TIME;
 

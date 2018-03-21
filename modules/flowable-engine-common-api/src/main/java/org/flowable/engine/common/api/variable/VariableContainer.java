@@ -22,5 +22,7 @@ public interface VariableContainer {
     Object getVariable(String variableName);
     
     void setVariable(String variableName, Object variableValue);
+    
+    void setTransientVariable(String variableName, Object variableValue);
 
 }

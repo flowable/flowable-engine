@@ -434,6 +434,7 @@
     "FORM-BUILDER": {
         "PALLETTE": {
             "TEXT": "Texto",
+            "PASSWORD": "Contraseña",
             "MULTILINE-TEXT": "Texto en varias lineas",
             "NUMBER": "Numero",
             "CHECKBOX": "Checkbox",
@@ -465,7 +466,7 @@
         "MESSAGE": {
             "EMPTY-EXPRESSION": "(No expression value)",
             "EXPRESSION-HELP": "Tambien puedes mostrar valores enviados anteriormente en cualquier formulario, como parte del texto, referenciandolo utilizando una notacion como la siguiente ${myFieldId}.",
-            "DROPDOWN-EXPRESSION-HELP": "Puede usar una expresión para rellenar dinámicamente las opciones desplegables, por ejemplo, haciendo referencia a una variable como esta $ {optionsVariable}. La expresión debe dar como resultado un objeto java (java.util.List con objetos Option) o su representación json."
+            "OPTIONS-EXPRESSION-HELP": "Puede usar una expresión para rellenar dinámicamente las opciones desplegables, por ejemplo, haciendo referencia a una variable como esta $ {optionsVariable}. La expresión debe dar como resultado un objeto java (java.util.List con objetos Option) o su representación json."
         },
         "LABEL" : {
             "FUNCTIONAL-GROUP": "Selecciona el grupo..",
@@ -480,13 +481,15 @@
             "RADIO-BUTTON-DEFAULT": "Opcion 1",
             "DROPDOWN-DEFAULT-EMPTY-SELECTION": "Por favor elige uno...",
             "DROPDOWN-EMPTY-VALUE-HELP": "Este es la opcion 'valor vacio'. Seleccionar esto en tiempo de ejecucion es igual a 'no valor' o 'vacio'.  Esto esta permitido para campos opcionales, pero no para campos requeridos.",
-            "DROPDOWN-EXPRESSION": "Expresión de opciones:",
+            "OPTIONS-EXPRESSION": "Expresión de opciones:",
+            "OPTIONS-EXPRESSION-ENABLED": "Habilitar expresión de opciones",
             "REQUIRED": "Requerido",
             "EXPRESSION": "Expresion",
             "ADD-OPTION": "+ Agregar nueva opcion",
             "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos",
 	          "MAX-LENGTH":"Longitud máxima:",
             "MIN-LENGTH":"Longitud mínima:",
+            "PASSWORD-UNMASK-OPTION": "Opción de enmascaramiento/desenmascaramiento de contraseña",
 	          "HYPERLINK-URL": "URL hiperlink",
 	          "REGEX-PATTERN":"Estándar  Regex",
             "MASK":{

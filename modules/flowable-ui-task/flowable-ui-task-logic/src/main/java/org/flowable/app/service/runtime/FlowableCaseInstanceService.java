@@ -12,8 +12,6 @@
  */
 package org.flowable.app.service.runtime;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.runtime.CaseInstanceRepresentation;
 import org.flowable.app.model.runtime.CreateCaseInstanceRepresentation;
@@ -29,10 +27,10 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.content.api.ContentService;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.idm.api.User;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +73,7 @@ public class FlowableCaseInstanceService {
     @Autowired
     protected UserCache userCache;
 
-    public CaseInstanceRepresentation getCaseInstance(String caseInstanceId, HttpServletResponse response) {
+    public CaseInstanceRepresentation getCaseInstance(String caseInstanceId) {
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
@@ -138,7 +136,7 @@ public class FlowableCaseInstanceService {
             }*/
 
             // Delete all content related to the case instance
-            contentService.deleteContentItemsByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
+            contentService.deleteContentItemsByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
 
             // Finally, delete all history for this instance in the engine
             cmmnHistoryService.deleteHistoricCaseInstance(caseInstanceId);

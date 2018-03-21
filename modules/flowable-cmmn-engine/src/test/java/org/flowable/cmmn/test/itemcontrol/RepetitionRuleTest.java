@@ -297,5 +297,26 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         // Ignoring second occur event
         assertEquals(1L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
     }
-    
+
+    @Test
+    @CmmnDeployment
+    public void testRepetitionRuleWithExitCriteria() {
+        //Completion of taskB will transition taskA to "exit", skipping the evaluation of the repetition rule (Table 8.8 of CMM 1.1 Spec)
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testRepetitionRuleWithExitCriteria")
+                .variable("whileTrue", "true")
+                .start();
+
+        assertNotNull(caseInstance);
+
+        for (int i = 0; i < 3; i++) {
+            Task taskA = cmmnTaskService.createTaskQuery().active().taskDefinitionKey("taskA").singleResult();
+            cmmnTaskService.complete(taskA.getId());
+            assertCaseInstanceNotEnded(caseInstance);
+        }
+
+        Task taskB = cmmnTaskService.createTaskQuery().active().taskDefinitionKey("taskB").singleResult();
+        cmmnTaskService.complete(taskB.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
 }

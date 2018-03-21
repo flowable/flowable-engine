@@ -1,11 +1,15 @@
 package org.flowable.test.spring.boot;
 
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration;
+import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
+import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.RestApiAutoConfiguration;
 import org.flowable.spring.boot.SecurityAutoConfiguration;
+import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
+import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -18,10 +22,10 @@ import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebAppl
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -34,7 +38,10 @@ public class RestApiAutoConfigurationTest {
             MultipartAutoConfiguration.class,
             ServerPropertiesAutoConfiguration.class,
             DataSourceAutoConfiguration.class,
-            DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            IdmEngineAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class,
+            IdmEngineServicesAutoConfiguration.class,
             SecurityAutoConfiguration.class,
             RestApiAutoConfiguration.class,
             JacksonAutoConfiguration.class
@@ -82,24 +89,16 @@ public class RestApiAutoConfigurationTest {
         RestTemplate restTemplate = this.context.getBean(RestTemplate.class);
 
         String authenticationChallenge = "http://localhost:" + this.context.getEmbeddedServletContainer().getPort() +
-                "/repository/process-definitions";
+            "/process-api/repository/process-definitions";
 
-        final AtomicBoolean received401 = new AtomicBoolean();
-        received401.set(false);
-        restTemplate.setErrorHandler(new ResponseErrorHandler() {
-            @Override
-            public boolean hasError(ClientHttpResponse clientHttpResponse) throws IOException {
-                return true;
-            }
-
-            @Override
-            public void handleError(ClientHttpResponse clientHttpResponse) throws IOException {
-                if (clientHttpResponse.getStatusCode() == HttpStatus.UNAUTHORIZED)
-                    received401.set(true);
-            }
-        });
-
-        ResponseEntity<String> response = restTemplate.getForEntity(authenticationChallenge, String.class);
-        org.junit.Assert.assertTrue(received401.get());
+        ResponseEntity<DataResponse<ProcessDefinitionResponse>> response = restTemplate
+            .exchange(authenticationChallenge, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<ProcessDefinitionResponse>>() {});
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        DataResponse<ProcessDefinitionResponse> definitionResponse = response.getBody();
+        assertThat(definitionResponse.getData())
+            .extracting(ProcessDefinitionResponse::getName)
+            .as("Process definitions names")
+            .containsExactly("DogeProcess");
+        assertThat(definitionResponse.getTotal()).isEqualTo(1);
     }
 }

@@ -13,9 +13,7 @@
 
 package org.flowable.task.service.impl.persistence.entity;
 
-import java.util.List;
-import java.util.Map;
-
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -23,6 +21,9 @@ import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tom Baeyens
@@ -138,6 +139,19 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     @Override
     public void updateAllTaskRelatedEntityCountFlags(boolean configProperty) {
         taskDataManager.updateAllTaskRelatedEntityCountFlags(configProperty);
+    }
+    
+    @Override
+    public void deleteTasksByExecutionId(String executionId) {
+        taskDataManager.deleteTasksByExecutionId(executionId);
+    }
+
+    @Override
+    public void insert(TaskEntity taskEntity, boolean fireCreateEvent) {
+        if (StringUtils.isEmpty(taskEntity.getId())) {
+            taskEntity.setId(this.taskServiceConfiguration.getIdGenerator().getNextId());
+        }
+        super.insert(taskEntity, fireCreateEvent);
     }
 
     public TaskDataManager getTaskDataManager() {

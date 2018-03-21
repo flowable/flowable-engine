@@ -20,6 +20,7 @@ import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.InternalJobCompatibilityManager;
@@ -155,6 +156,11 @@ public class ExecuteAsyncRunnable implements Runnable {
     }
 
     protected void unlockJobIfNeeded() {
+        if (this.job instanceof HistoryJob) {
+            return;
+            // no unlocking needed for history job
+        }
+        
         Job job = (Job) this.job; // This method is only called for a regular Job
         try {
             if (job.isExclusive()) {

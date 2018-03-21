@@ -88,6 +88,17 @@ function _drawSubProcess(element)
 		"stroke": strokeColor,
 		"fill": "white"
  	});
+ 	
+ 	if (element.collapsed) {
+        if (element.name) {
+            this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11,
+            _bpmnGetColor(element, TEXT_COLOR));
+        }
+
+        rect.click(function() {
+            _expandCollapsedElement(element);
+        });
+    }
 }
 
 function _drawEventSubProcess(element)
@@ -252,7 +263,7 @@ function _drawTask(element)
 
 
 	var strokeColor = _bpmnGetColor(element, ACTIVITY_STROKE_COLOR);
-  var strokeWidth = element.current ? CURRENT_ACTIVITY_STROKE : TASK_STROKE;
+    var strokeWidth = element.current ? CURRENT_ACTIVITY_STROKE : TASK_STROKE;
 	rect.attr({"stroke-width": strokeWidth,
 		"stroke": strokeColor,
 		"fill": ACTIVITY_FILL_COLOR

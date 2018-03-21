@@ -15,6 +15,10 @@ package org.flowable.spring;
 import org.flowable.job.service.impl.asyncexecutor.UnacquireAsyncHistoryJobExceptionHandler;
 import org.springframework.core.task.TaskExecutor;
 
+/**
+ * @deprecated use {@Link org.flowable.spring.job.service.SpringAsyncHistoryExecutor}
+ */
+@Deprecated
 public class SpringAsyncHistoryExecutor extends SpringAsyncExecutor {
 
     public SpringAsyncHistoryExecutor() {

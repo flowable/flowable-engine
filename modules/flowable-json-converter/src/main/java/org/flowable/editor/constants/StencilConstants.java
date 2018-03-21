@@ -93,6 +93,7 @@ public interface StencilConstants {
     final String PROPERTY_PROCESS_NAMESPACE = "process_namespace";
 
     final String PROPERTY_IS_EXECUTABLE = "isexecutable";
+    final String PROPERTY_IS_EAGER_EXECUTION_FETCHING = "iseagerexecutionfetch";
 
     final String PROPERTY_PROCESS_POTENTIALSTARTERUSER = "process_potentialstarteruser";
     final String PROPERTY_PROCESS_POTENTIALSTARTERGROUP = "process_potentialstartergroup";
@@ -175,6 +176,7 @@ public interface StencilConstants {
     final String PROPERTY_SERVICETASK_FIELD_STRING_VALUE = "stringValue";
     final String PROPERTY_SERVICETASK_FIELD_STRING = "string";
     final String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
+    final String PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "servicetaskUseLocalScopeForResultVariable";
 
     final String PROPERTY_FORM_PROPERTIES = "formproperties";
     final String PROPERTY_FORM_ID = "id";
@@ -270,6 +272,8 @@ public interface StencilConstants {
     final String PROPERTY_HTTPTASK_SAVE_REQUEST_VARIABLES = "httptasksaverequestvariables";
     final String PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS = "httptasksaveresponseparameters";
     final String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
+    final String PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT = "httptasksaveresponseparameterstransient";
+    final String PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON = "httptasksaveresponseasjson";
 
     final String PROPERTY_SKIP_EXPRESSION = "skipexpression";
 

@@ -38,7 +38,7 @@ flowableModule.service('RelatedContentService', ['$http', '$q', '$rootScope', '$
             return promise;
         };
 
-        this.addRelatedContent = function(taskId, processInstanceId, file, isIE) {
+        this.addRelatedContent = function(taskId, processInstanceId, caseInstanceId, file, isIE) {
             var deferred = $q.defer();
             var uploadPromise;
             var url;
@@ -54,12 +54,23 @@ flowableModule.service('RelatedContentService', ['$http', '$q', '$rootScope', '$
                     method: 'POST',
                     file: file
                 });
-                
+
             } else if (processInstanceId) {
                 if (isIE) {
                     url = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + processInstanceId + '/raw-content/text';
                 } else {
                     url = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + processInstanceId + '/raw-content';
+                }
+                uploadPromise = Upload.upload({
+                    url: url,
+                    method: 'POST',
+                    file: file
+                });
+            } else if (caseInstanceId) {
+                if (isIE) {
+                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/raw-content/text';
+                } else {
+                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/raw-content';
                 }
                 uploadPromise = Upload.upload({
                     url: url,

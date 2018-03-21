@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -112,10 +113,11 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 decisionExecutionEntity.setInstanceId(executeDecisionInfo.getInstanceId());
                 decisionExecutionEntity.setExecutionId(executeDecisionInfo.getExecutionId());
                 decisionExecutionEntity.setActivityId(executeDecisionInfo.getActivityId());
+                decisionExecutionEntity.setScopeType(executeDecisionInfo.getScopeType());
                 decisionExecutionEntity.setTenantId(executeDecisionInfo.getTenantId());
 
                 Boolean failed = executionContext.getAuditContainer().isFailed();
-                if (failed != null) {
+                if (BooleanUtils.isTrue(failed)) {
                     decisionExecutionEntity.setFailed(failed.booleanValue());
                 }
 
@@ -134,7 +136,6 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
     protected void evaluateDecisionTable(DecisionTable decisionTable, ELExecutionContext executionContext) {
         LOGGER.debug("Start table evaluation: {}", decisionTable.getId());
-
 
         if (decisionTable == null || decisionTable.getRules().isEmpty()) {
             throw new IllegalArgumentException("no rules present in table");

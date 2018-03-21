@@ -33,6 +33,12 @@ public class Application {
                 joram.setPassword("password");
                 identityService.saveUser(joram);
 
+                User filip = identityService.newUser("filiphr");
+                filip.setFirstName("Filip");
+                filip.setLastName("Hrisafov");
+                filip.setPassword("password");
+                identityService.saveUser(filip);
+
                 User josh = identityService.newUser("jlong");
                 josh.setFirstName("Josh");
                 josh.setLastName("Long");
@@ -40,6 +46,7 @@ public class Application {
                 identityService.saveUser(josh);
 
                 identityService.createMembership("jbarrez", "user");
+                identityService.createMembership("filiphr", "user");
                 identityService.createMembership("jlong", "user");
             }
         };

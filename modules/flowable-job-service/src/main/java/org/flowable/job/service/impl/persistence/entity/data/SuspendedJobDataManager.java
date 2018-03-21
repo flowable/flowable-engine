@@ -33,4 +33,5 @@ public interface SuspendedJobDataManager extends DataManager<SuspendedJobEntity>
     long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+    
 }

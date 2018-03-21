@@ -63,4 +63,5 @@ public interface FlowableEventDispatcher {
      * @return true, if event dispatcher is enabled.
      */
     boolean isEnabled();
+
 }

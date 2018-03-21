@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import org.flowable.engine.common.runtime.ClockReader;
+import org.flowable.engine.common.impl.runtime.ClockReader;
 
 /**
  * Provides a parser and evaluator for unix-like cron expressions. Cron

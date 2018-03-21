@@ -125,5 +125,9 @@ FLOWABLE.PROPERTY_CONFIG =
     "flowable-planitem-dropdown" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-read-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-write-template.html"
+    },
+    "flowable-http-request-method" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/http-request-method-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/http-request-method-property-write-template.html"
     }
 };

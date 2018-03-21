@@ -38,6 +38,7 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     protected String instanceId;
     protected String executionId;
     protected String activityId;
+    protected String scopeType;
     protected Boolean failed;
     protected String tenantId;
     protected String tenantIdLike;
@@ -117,6 +118,15 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
             throw new FlowableIllegalArgumentException("activityId is null");
         }
         this.activityId = activityId;
+        return this;
+    }
+    
+    @Override
+    public DmnHistoricDecisionExecutionQuery scopeType(String scopeType) {
+        if (scopeType == null) {
+            throw new FlowableIllegalArgumentException("scopeType is null");
+        }
+        this.scopeType = scopeType;
         return this;
     }
     
@@ -221,6 +231,10 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
 
     public String getActivityId() {
         return activityId;
+    }
+    
+    public String getScopeType() {
+        return scopeType;
     }
     
     public Boolean getFailed() {

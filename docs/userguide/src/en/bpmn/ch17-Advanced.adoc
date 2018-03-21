@@ -761,7 +761,7 @@ To avoid the attacks described in the link above, a property _enableSafeBpmnXml_
 <property name="enableSafeBpmnXml" value="true"/>
 ----
 
-*By default this feature is disabled!* The reason for this is that it relies on  the availability of the link:$$http://download.java.net/jdk7/archive/b123/docs/api/javax/xml/transform/stax/StAXSource.html$$[StaxSource] class. Unfortunately, on some platforms (e.g. JDK 6, JBoss, etc.) this class is unavailable (due to older xml parser implementation) and thus the safe BPMN 2.0 xml feature cannot be enabled.
+*By default this feature is disabled!* The reason for this is that it relies on  the availability of the StaxSource class of the JDK. Unfortunately, on some platforms this class is unavailable (due to older xml parser implementation) and thus the safe BPMN 2.0 xml feature cannot be enabled.
 
 If the platform on which Flowable runs does support it, do enable this feature.
 
@@ -827,7 +827,7 @@ To solve this problem, the _secure scripting_ feature can be enabled. Currently,
 
 Adding this dependency will transitively bring in the Rhino dependency (see link:$https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino$$[https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino]). Rhino is a javascript engine for the JDK. It used to be included in JDK version 6 and 7 and was superseded by the Nashorn engine. However, the Rhino project continued development after it was included in the JDK. Many features (including the ones Flowable uses to implement the secure scripting) were added afterwards. At the time of writing, the Nashorn engine *does not* have the features that are needed to implement the secure scripting feature.
 
-This does mean that there could be (typically small) differences between scripts (for example, _importPackage_ works on Rhino, but _load()_ has to be used on Nashorn). The changes would be similar to switching from JDK 7 to 8 scripts.
+This does mean that there could be (typically small) differences between scripts (for example, _importPackage_ works on Rhino, but _load()_ has to be used on Nashorn).
 
 Configuring the secure scripting is done through a dedicated _Configurator_ object that is passed to the process engine configuration before the process engine is instantiated:
 

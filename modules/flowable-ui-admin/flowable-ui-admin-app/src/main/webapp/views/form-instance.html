@@ -20,9 +20,12 @@
                             <td ng-if="!formInstance.taskId">{{formInstance.taskId | empty}}</td>
                         </tr>
                         <tr class="property">
-                        	<td class="property-name" translate="FORM-INSTANCE.HEADER.PROCESS-ID"></td>
-                            <td ng-if="formInstance.processInstanceId"><a ng-href="#/process-instance/{{formInstance.processInstanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.processInstanceId}}</a></td>
-                            <td ng-if="!formInstance.processInstanceId">{{formInstance.processInstanceId | empty}}</td>
+                        	<td class="property-name" ng-if="!formInstance.scopeType || formInstance.scopeType != 'cmmn'" translate="FORM-INSTANCE.HEADER.PROCESS-ID"></td>
+                            <td ng-if="(!formInstance.scopeType || formInstance.scopeType != 'cmmn') && formInstance.processInstanceId"><a ng-href="#/process-instance/{{formInstance.processInstanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.processInstanceId}}</a></td>
+                            <td ng-if="(!formInstance.scopeType || formInstance.scopeType != 'cmmn') && !formInstance.processInstanceId">{{formInstance.processInstanceId | empty}}</td>
+                            <td class="property-name" ng-if="formInstance.scopeType && formInstance.scopeType == 'cmmn'" translate="FORM-INSTANCE.HEADER.CASE-INSTANCE-ID"></td>
+                            <td ng-if="formInstance.scopeType && formInstance.scopeType == 'cmmn' && formInstance.scopeId"><a ng-href="#/case-instance/{{formInstance.scopeId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.scopeId}}</a></td>
+                            <td ng-if="formInstance.scopeType && formInstance.scopeType == 'cmmn' && !formInstance.scopeId">{{formInstance.scopeId | empty}}</td>
                             <td class="property-name" translate="FORM-INSTANCE.HEADER.SUBMITTED"></td>
                             <td>{{formInstance.submittedDate | date}}</td>
                         </tr>

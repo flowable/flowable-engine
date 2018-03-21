@@ -28,10 +28,14 @@ public class HistoricDecisionExecutionResponse {
     protected String activityId;
     protected String executionId;
     protected String instanceId;
+    protected String scopeType;
     protected boolean failed;
     protected Date startTime;
     protected Date endTime;
     protected String tenantId;
+    protected String decisionKey;
+    protected String decisionName;
+    protected String decisionVersion;
 
     public HistoricDecisionExecutionResponse(DmnHistoricDecisionExecution historicDecisionExecution) {
         setId(historicDecisionExecution.getId());
@@ -40,10 +44,14 @@ public class HistoricDecisionExecutionResponse {
         setActivityId(historicDecisionExecution.getActivityId());
         setExecutionId(historicDecisionExecution.getExecutionId());
         setInstanceId(historicDecisionExecution.getInstanceId());
+        setScopeType(historicDecisionExecution.getScopeType());
         setFailed(historicDecisionExecution.isFailed());
         setStartTime(historicDecisionExecution.getStartTime());
         setEndTime(historicDecisionExecution.getEndTime());
         setTenantId(historicDecisionExecution.getTenantId());
+        setDecisionKey(historicDecisionExecution.getDecisionKey());
+        setDecisionName(historicDecisionExecution.getDecisionName());
+        setDecisionVersion(historicDecisionExecution.getDecisionVersion());
     }
 
     public String getId() {
@@ -102,6 +110,14 @@ public class HistoricDecisionExecutionResponse {
         this.instanceId = instanceId;
     }
 
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
     public Boolean getFailed() {
         return failed;
     }
@@ -132,5 +148,29 @@ public class HistoricDecisionExecutionResponse {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public String getDecisionKey() {
+        return decisionKey;
+    }
+
+    public void setDecisionKey(String decisionKey) {
+        this.decisionKey = decisionKey;
+    }
+
+    public String getDecisionName() {
+        return decisionName;
+    }
+
+    public void setDecisionName(String decisionName) {
+        this.decisionName = decisionName;
+    }
+
+    public String getDecisionVersion() {
+        return decisionVersion;
+    }
+
+    public void setDecisionVersion(String decisionVersion) {
+        this.decisionVersion = decisionVersion;
     }
 }

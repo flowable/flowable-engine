@@ -537,6 +537,7 @@
     "FORM-BUILDER": {
         "PALLETTE": {
             "TEXT": "Texte",
+            "PASSWORD": "Mot de passe",
             "MULTILINE-TEXT": "Texte Multiligne",
             "NUMBER": "Nombre",
             "CHECKBOX": "Case à cocher",
@@ -569,7 +570,7 @@
         "MESSAGE": {
             "EMPTY-EXPRESSION": "(Aucune valeur de l'expression)",
             "EXPRESSION-HELP": "Vous pouvez également afficher les valeurs préalablement soumises dans tout formulaire, dans le cadre du texte, en utilisant une notation de référence comme ${myFieldId}.",
-            "DROPDOWN-EXPRESSION-HELP": "Vous pouvez utiliser une expression pour remplir dynamiquement des options déroulantes, par exemple en référençant une variable telle que $ {optionsVariable}. L'expression doit aboutir à un objet java (java.util.List avec des objets Option) ou à sa représentation json."
+            "OPTIONS-EXPRESSION-HELP": "Vous pouvez utiliser une expression pour remplir dynamiquement des options déroulantes, par exemple en référençant une variable telle que $ {optionsVariable}. L'expression doit aboutir à un objet java (java.util.List avec des objets Option) ou à sa représentation json."
         },
         "LABEL" : {
             "FUNCTIONAL-GROUP": "Sélectionner un groupe..",
@@ -584,7 +585,8 @@
             "RADIO-BUTTON-DEFAULT": "Option 1",
             "DROPDOWN-DEFAULT-EMPTY-SELECTION": "Veuillez en choisir un...",
             "DROPDOWN-EMPTY-VALUE-HELP": "Ceci est l'option pour la 'valeur à vide'. Le sélectionner lors de l'utilisation signifie 'aucune valeur' ou 'vide'.  Ceci est autorisé pour les champs optionnels mais pas pour les champs obligatoires.",
-            "DROPDOWN-EXPRESSION": "Expression des options:",
+            "OPTIONS-EXPRESSION": "Expression des options:",
+            "OPTIONS-EXPRESSION-ENABLED": "Activer l'expression des options",
             "REQUIRED": "Requis",
 	          "READONLY": "Lecture seul",
             "EXPRESSION": "Expression",
@@ -593,6 +595,7 @@
             "SIZE": "Taille",
 	          "MAX-LENGTH":"Longueur maximale:",
             "MIN-LENGTH":"Longueur minimum:",
+            "PASSWORD-UNMASK-OPTION": "Option de masquage / démasquage de mot de passe",
 	          "HYPERLINK-URL": "URL line hypertexte",
 	          "REGEX-PATTERN":"Regex standard",
             "MASK":{

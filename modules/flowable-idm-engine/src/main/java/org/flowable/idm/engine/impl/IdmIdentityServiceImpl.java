@@ -14,6 +14,7 @@ package org.flowable.idm.engine.impl;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.IdmIdentityService;
@@ -128,6 +129,11 @@ public class IdmIdentityServiceImpl extends ServiceImpl implements IdmIdentitySe
     @Override
     public boolean checkPassword(String userId, String password) {
         return commandExecutor.execute(new CheckPassword(userId, password));
+    }
+    
+    @Override
+    public void setAuthenticatedUserId(String authenticatedUserId) {
+        Authentication.setAuthenticatedUserId(authenticatedUserId);
     }
 
     @Override

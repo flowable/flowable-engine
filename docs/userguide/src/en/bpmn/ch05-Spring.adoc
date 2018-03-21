@@ -339,10 +339,6 @@ For more information on Spring Boot, see link:$$http://projects.spring.io/spring
 
 The Spring Boot - Flowable integration has been developed together with Spring committers. 
 
-==== Compatibility
-
-Spring Boot requires a JDK 7 runtime. Please check the Spring Boot documentation.
-
 ==== Getting started
 
 Spring Boot is all about convention over configuration. To get started, simply add the _spring-boot-starters-basic_ dependency to your project. For example for Maven:
@@ -407,7 +403,7 @@ o.flowable.engine.impl.db.DbSqlSession   : performing create on engine with reso
 o.flowable.engine.impl.db.DbSqlSession   : performing create on history with resource org/flowable/db/create/flowable.h2.create.history.sql
 o.flowable.engine.impl.db.DbSqlSession   : performing create on identity with resource org/flowable/db/create/flowable.h2.create.identity.sql
 o.a.engine.impl.ProcessEngineImpl        : ProcessEngine default created
-o.a.e.i.a.DefaultAsyncJobExecutor        : Starting up the default async job executor [org.flowable.spring.SpringAsyncExecutor].
+o.a.e.i.a.DefaultAsyncJobExecutor        : Starting up the default async job executor [org.flowable.spring.job.service.SpringAsyncExecutor].
 o.a.e.i.a.AcquireTimerJobsRunnable       : {} starting to acquire async jobs due
 o.a.e.i.a.AcquireAsyncJobsDueRunnable    : {} starting to acquire async jobs due
 o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
@@ -641,8 +637,13 @@ To add JPA support for Flowable in Spring Boot, add following dependency:
 ----
 <dependency>
     <groupId>org.flowable</groupId>
-    <artifactId>flowable-spring-boot-starter-jpa</artifactId>
+    <artifactId>flowable-spring-boot-starter</artifactId>
     <version>${flowable.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+    <version>${spring-boot.version</version>
 </dependency>
 ----
 

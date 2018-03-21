@@ -418,6 +418,12 @@
             "OUTPUT ORDER": "Output Order",
             "COLLECT": "Collect"
         },
+        "COLLECT-OPERATORS": {
+            "SUM": "Sum",
+            "MIN": "Min",
+            "MAX": "Max",
+            "COUNT": "Count"
+        },
         "POPUP": {
             "CREATE-TITLE": "Create a new decision table",
             "CREATE-DESCRIPTION": "You need to give a name for the new decision table and you may want to add a description at the same time.",
@@ -539,6 +545,7 @@
         "PALLETTE": {
             "TEXT": "Text",
             "MULTILINE-TEXT": "Multiline text",
+            "PASSWORD": "Password",
             "NUMBER": "Number",
             "CHECKBOX": "Checkbox",
             "DATE": "Date",
@@ -570,7 +577,7 @@
         "MESSAGE": {
             "EMPTY-EXPRESSION": "(No expression value)",
             "EXPRESSION-HELP": "You can also display values previously submitted in any form, as part of the text, by referencing them using a notation as follows ${myFieldId}.",
-            "DROPDOWN-EXPRESSION-HELP": "You can use an expression to dynamically populate drop down options for example by referencing a variable like this ${optionsVariable}. The expression needs to result in either a java object (java.util.List with Option objects) or its json representation."
+            "OPTIONS-EXPRESSION-HELP": "You can use an expression to dynamically populate drop down options for example by referencing a variable like this ${optionsVariable}. The expression needs to result in either a java object (java.util.List with Option objects) or its json representation."
         },
         "LABEL" : {
             "FUNCTIONAL-GROUP": "Select group..",
@@ -585,7 +592,8 @@
             "RADIO-BUTTON-DEFAULT": "Option 1",
             "DROPDOWN-DEFAULT-EMPTY-SELECTION": "Please choose one...",
             "DROPDOWN-EMPTY-VALUE-HELP": "This is the 'empty value' option. Selecting this at runtime is the taken to mean 'no value' or 'empty'.  This is allowed for optional fields, but not allowed for required fields.",
-            "DROPDOWN-EXPRESSION": "Options expression:",
+            "OPTIONS-EXPRESSION": "Options expression:",
+            "OPTIONS-EXPRESSION-ENABLED": "Enable options expression",
             "REQUIRED": "Required",
 	          "READONLY": "Read-only",
             "EXPRESSION": "Expression",
@@ -594,6 +602,7 @@
             "SIZE": "Size",
 	          "MAX-LENGTH":"Maximum length:",
             "MIN-LENGTH":"Minimum length:",
+            "PASSWORD-UNMASK-OPTION": "password masking/unmasking option",
 	          "HYPERLINK-URL": "Hyperlink URL",
 	          "REGEX-PATTERN":"Regex standard",
             "MASK":{

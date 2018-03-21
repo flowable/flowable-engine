@@ -26,6 +26,7 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -60,15 +61,20 @@ public class SecurityConfiguration {
     // GLOBAL CONFIG
     //
 
+    @Qualifier("defaultIdmIdentityService")
     @Autowired
     protected IdmIdentityService identityService;
-
+    
     @Autowired
     protected PasswordEncoder passwordEncoder;
 
+    @Qualifier("customAuthenticationProvider")
+    @Autowired(required = false)
+    protected AuthenticationProvider customAuthenticationProvider;
+    
     @Autowired
     protected Environment env;
-
+    
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) {
 
@@ -79,7 +85,8 @@ public class SecurityConfiguration {
             } catch (Exception e) {
                 LOGGER.error("Could not configure ldap authentication mechanism:", e);
             }
-
+        } else if (customAuthenticationProvider != null) {
+            auth.authenticationProvider(customAuthenticationProvider);
         } else {
             // Default auth (database backed)
             try {
@@ -196,6 +203,9 @@ public class SecurityConfiguration {
     @Configuration
     @Order(1)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+        
+        @Autowired
+        protected Environment env;
 
         protected void configure(HttpSecurity http) throws Exception {
 
@@ -204,12 +214,28 @@ public class SecurityConfiguration {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .csrf()
-                    .disable()
-                    .antMatcher("/api" + "/**")
-                    .authorizeRequests()
-                    .antMatchers("/api" + "/**").authenticated()
-                    .and().httpBasic();
+                    .disable();
+
+            if (isEnableRestApi()) {
+                
+                if (RestApiUtil.isVerifyRestApiPrivilege(env)) {
+                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                } else {
+                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").authenticated().and().httpBasic();
+                    
+                }
+                
+            } else {
+                http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").denyAll();
+                
+            }
+            
         }
+        
+        protected boolean isEnableRestApi() {
+            return env.getProperty("rest.idm-app.enabled", Boolean.class, true);
+        }
+        
     }
 
 }

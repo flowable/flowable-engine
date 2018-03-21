@@ -2,10 +2,12 @@ package org.flowable.rest.exception;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * 
  * @author Tijs Rademakers
  */
+@ControllerAdvice
 public class BaseExceptionHandlerAdvice {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseExceptionHandlerAdvice.class);
@@ -59,6 +62,13 @@ public class BaseExceptionHandlerAdvice {
     @ResponseBody
     public ErrorInfo handleBadMessageConversion(HttpMessageConversionException e) {
         return new ErrorInfo("Bad request", e);
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
+    @ExceptionHandler(FlowableTaskAlreadyClaimedException.class)
+    @ResponseBody
+    public ErrorInfo handleTaskAlreadyClaimed(FlowableTaskAlreadyClaimedException e) {
+        return new ErrorInfo("Task was already claimed", e);
     }
 
     // Fall back

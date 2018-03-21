@@ -91,14 +91,14 @@ body {
 }
 
 .navbar {
-	background-color: #384042;
+	background-color: #1f3245;
 	border: none;
 	min-height: 40px;
 	margin-bottom: 5px;
 }
 
 .nav.navbar-nav {
-	background-color: #384042;
+	background-color: #1f3245;
 	color: #eef1f1;
 	border: none;
 }
@@ -124,6 +124,11 @@ body {
 .navbar-inverse .navbar-nav > .active-process > a, .navbar-inverse .navbar-nav > .active-process > a:hover, .navbar-inverse .navbar-nav > .active-process > a:focus {
 	background: rgb(162,204,70);
 	color: #ffffff;
+}
+
+.navbar-inverse .navbar-nav > .active-cmmn > a, .navbar-inverse .navbar-nav > .active-cmmn > a:hover, .navbar-inverse .navbar-nav > .active-cmmn > a:focus {
+    background: rgb(253,229,65);
+    color: #ffffff;
 }
 
 .navbar-inverse .navbar-nav > .active-form > a, .navbar-inverse .navbar-nav > .active-form > a:hover, .navbar-inverse .navbar-nav > .active-form > a:focus {
@@ -174,6 +179,11 @@ body {
 .sub-navbar.active-process {
 	background: rgb(162,204,70);
     background: linear-gradient(to right, rgba(162,204,70,1.0), rgba(162,204,70,1.0), rgba(162,204,70,1.0), rgba(162,204,70,0), rgba(162,204,70,0));
+}
+
+.sub-navbar.active-cmmn {
+    background: rgb(253,229,65);
+    background: linear-gradient(to right, rgba(253,229,65,1.0), rgba(253,229,65,1.0), rgba(253,229,65,1.0), rgba(253,229,65,0), rgba(253,229,65,0));
 }
 
 .sub-navbar.active-form {
@@ -422,6 +432,10 @@ body {
 
 .component .title.process {
 	color: rgb(162,204,70)
+}
+
+.component .title.cmmn {
+    color: rgb(253,229,65)
 }
 
 .component .title.dmn {
@@ -1579,7 +1593,7 @@ only screen and (min-resolution: 192dpi) {
 	overflow: visible;
 }
 .activiti-table .decision-table-display-cell-match {
-	border: 1px solid #36a7c4;
+	border: 1px solid #2980b9;
 }
 
 .activiti-table .decision-table-display-cell-nomatch,

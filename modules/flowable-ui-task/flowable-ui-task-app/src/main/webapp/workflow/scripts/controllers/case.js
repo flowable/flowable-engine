@@ -37,8 +37,8 @@ angular.module('flowableApp')
 }]);
 
 angular.module('flowableApp')
-    .controller('CaseDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CommentService', 'RelatedContentService',
-        function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CommentService, RelatedContentService) {
+    .controller('CaseDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CaseService', 'CommentService', 'RelatedContentService',
+        function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CaseService, CommentService, RelatedContentService) {
 
     $rootScope.root.showStartForm = false;
 
@@ -48,7 +48,12 @@ angular.module('flowableApp')
         caseInstance: $scope.selectedCaseInstance
     };
 
-    $scope.$watch('selectedCaseInstance', function(newValue) {
+
+    $scope.model.contentSummary = {
+        loading: false
+    };
+
+    $scope.$watch('selectedCaseInstance', function (newValue) {
         if (newValue && newValue.id) {
             $scope.model.caseUpdating = true;
             $scope.model.caseInstance = newValue;
@@ -62,6 +67,7 @@ angular.module('flowableApp')
             success(function(response, status, headers, config) {
                 $scope.model.caseInstance = response;
                 $scope.loadCaseTasks();
+                $scope.loadRelatedContent();
             }).
             error(function(response, status, headers, config) {
                 console.log('Something went wrong: ' + response);
@@ -92,7 +98,59 @@ angular.module('flowableApp')
         });
     };
 
-    $scope.cancelCase = function(final) {
+            $scope.toggleCreateContent = function () {
+                $scope.model.contentSummary.addContent = !$scope.model.contentSummary.addContent;
+            };
+
+            $scope.onContentUploaded = function (content) {
+                if ($scope.model.content && $scope.model.content.data) {
+                    $scope.model.content.data.push(content);
+                    RelatedContentService.addUrlToContent(content);
+                    $scope.model.selectedContent = content;
+                }
+                $rootScope.addAlertPromise($translate('TASK.ALERT.RELATED-CONTENT-ADDED', content), 'info');
+                $scope.toggleCreateContent();
+            };
+
+            $scope.onContentDeleted = function (content) {
+                if ($scope.model.content && $scope.model.content.data) {
+                    $scope.model.content.data.forEach(function (value, i, arr) {
+                        if (content === value) {
+                            arr.splice(i, 1);
+                        }
+                    })
+                }
+            };
+
+            $scope.selectContent = function (content) {
+                if ($scope.model.selectedContent == content) {
+                    $scope.model.selectedContent = undefined;
+                } else {
+                    $scope.model.selectedContent = content;
+                }
+            };
+
+            $scope.loadRelatedContent = function () {
+                $scope.model.content = undefined;
+                CaseService.getRelatedContent($scope.model.caseInstance.id).then(function (data) {
+                    $scope.model.content = data;
+                });
+            };
+
+            $scope.$watch("model.content", function (newValue) {
+                if (newValue && newValue.data && newValue.data.length > 0) {
+                    var needsRefresh = false;
+                    for (var i = 0; i < newValue.data.length; i++) {
+                        var entry = newValue.data[i];
+                        if (!entry.contentAvailable) {
+                            needsRefresh = true;
+                            break;
+                        }
+                    }
+                }
+            }, true);
+
+            $scope.cancelCase = function(final) {
         if ($scope.model.caseInstance) {
             var modalInstance = _internalCreateModal({
                 template: appResourceRoot + 'views/modal/case-cancel.html',

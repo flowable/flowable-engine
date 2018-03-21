@@ -61,7 +61,7 @@
                         </div>
                     </div>
 
-                    <div ng-show="formElement.type === 'functional-group' || formElement.type === 'people' || formElement.type === 'dropdown' || formElement.type === 'date' || formElement.type === 'text' || formElement.type === 'multi-line-text' || formElement.type === 'integer' || formElement.type === 'decimal'">
+                    <div ng-show="formElement.type === 'functional-group' || formElement.type === 'people' || formElement.type === 'dropdown' || formElement.type === 'date' || formElement.type === 'text' || formElement.type === 'password' || formElement.type === 'multi-line-text' || formElement.type === 'integer' || formElement.type === 'decimal'">
                         <label translate="FORM-BUILDER.COMPONENT.PLACEHOLDER"></label>
                         <input type="text" class="form-control" ng-model="formElement.placeholder">
                     </div>
@@ -75,31 +75,40 @@
                         <div>
                             <div ng-repeat="option in formElement.options" style="margin-bottom: 5px" class="input-group">
                                 <div class="input-group-addon">
-                                    <input type="radio" ng-model="formElement.value" ng-value="option.name">
+                                    <input type="radio" ng-disabled="optionsExpressionEnabled" ng-model="formElement.value" ng-value="option.name">
                                 </div>
 
-                                <input id="firstDropdownOption" type="text" class="form-control" ng-if="$index == 0" ng-model="option.name" style="background-color: #E6E6E6;">
-                                <input type="text" class="form-control" ng-if="$index > 0" ng-model="option.name">
+                                <input id="firstDropdownOption" type="text" class="form-control" ng-disabled="optionsExpressionEnabled" ng-if="$index == 0" ng-model="option.name" style="background-color: #E6E6E6;">
+                                <input type="text" class="form-control" ng-disabled="optionsExpressionEnabled" ng-if="$index > 0" ng-model="option.name">
 
                                 <a class="input-group-addon" ng-if="$index == 0"
                                    data-placement="left" data-type="info" data-animation="am-fade-and-scale" bs-tooltip="'FORM-BUILDER.COMPONENT.DROPDOWN-EMPTY-VALUE-HELP'|translate">
                                     <i class="glyphicon glyphicon-question-sign"></i>
                                 </a>
 
-                                <a class="input-group-addon" ng-click="removeOption($index)" ng-if="$index > 1"><i class="icon icon-remove"></i></a>
+                                <a class="input-group-addon" ng-disabled="optionsExpressionEnabled" ng-click="removeOption($index)" ng-if="$index > 1"><i class="icon icon-remove"></i></a>
                             </div>
 
                             <div>
                                 <input type="text" class="form-control" placeholder="{{'FORM-BUILDER.COMPONENT.ADD-OPTION' | translate}}" ng-model="newOption.name"
-                                       ng-blur="confirmNewOption($event)" ng-keydown="optionKeyDown($event)">
+                                       ng-disabled="optionsExpressionEnabled" ng-blur="confirmNewOption($event)" ng-keydown="optionKeyDown($event)">
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-init="optionsExpressionEnabled = formElement.optionsExpression != null && formElement.optionsExpression != ''" ng-model="optionsExpressionEnabled">
+                                {{'FORM-BUILDER.COMPONENT.OPTIONS-EXPRESSION-ENABLED' | translate}}
+                            </label>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label translate="FORM-BUILDER.COMPONENT.DROPDOWN-EXPRESSION"></label>
-                        <textarea rows="3" ng-model="formElement.optionsExpression" class="form-control" id="readonly-text-value"></textarea>
-                        <div class="subtle" translate="FORM-BUILDER.MESSAGE.DROPDOWN-EXPRESSION-HELP" style="padding: 5px 0 5px 1px;"></div>
+                        <label translate="FORM-BUILDER.COMPONENT.OPTIONS-EXPRESSION"></label>
+                        <textarea rows="3" ng-disabled="!optionsExpressionEnabled" ng-model="formElement.optionsExpression" class="form-control" id="readonly-text-value"></textarea>
+                        <div class="subtle" translate="FORM-BUILDER.MESSAGE.OPTIONS-EXPRESSION-HELP" style="padding: 5px 0 5px 1px;"></div>
                     </div>
                     
                 </div>
@@ -114,7 +123,28 @@
                         </div>
                     </div>
                 </div>
-
+                <div ng-if="activeTab.id == 'advanced' && (formElement.type === 'password')">
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.MIN-LENGTH"></label> <input
+				 type="text" number-input-check maxlength="5" class="form-control"
+				 ng-model="formElement.params.minLength">
+		     </div>
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.MAX-LENGTH"></label> <input
+			         type="text" number-input-check maxlength="5" class="form-control"
+			         ng-model="formElement.params.maxLength">
+              </div>
+                        <div class="row">
+                           <div class="form-group col-md-12">
+                               <div class="checkbox">
+                                   <label>
+                                       <input type="checkbox" ng-model="formElement.params.passwordunmask">
+                                       {{'FORM-BUILDER.COMPONENT.PASSWORD-UNMASK-OPTION' | translate}}?
+                                   </label>
+                               </div>
+                            </div>
+                        </div>
+              </div>
                 <div ng-if="activeTab.id == 'advanced' && (formElement.type === 'text' || formElement.type === 'multi-line-text' || formElement.type === 'decimal' || formElement.type === 'integer')">
 		     <div class="form-group">
 			  <label translate="FORM-BUILDER.COMPONENT.MIN-LENGTH"></label> <input

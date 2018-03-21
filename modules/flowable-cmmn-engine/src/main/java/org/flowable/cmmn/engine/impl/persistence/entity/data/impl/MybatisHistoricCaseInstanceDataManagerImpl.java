@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -59,7 +60,44 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     public long countByCriteria(HistoricCaseInstanceQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectHistoricCaseInstanceCountByQueryCriteria", query);
     }
-    
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
+        // paging doesn't work for combining process instances and variables
+        // due to an outer join, so doing it in-memory
+
+        int firstResult = historicCaseInstanceQuery.getFirstResult();
+        int maxResults = historicCaseInstanceQuery.getMaxResults();
+
+        // setting max results, limit to 20000 results for performance reasons
+        if (historicCaseInstanceQuery.getCaseVariablesLimit() != null) {
+            historicCaseInstanceQuery.setMaxResults(historicCaseInstanceQuery.getCaseVariablesLimit());
+        } else {
+            historicCaseInstanceQuery.setMaxResults(getCmmnEngineConfiguration().getHistoricCaseQueryLimit());
+        }
+        historicCaseInstanceQuery.setFirstResult(0);
+
+        List<HistoricCaseInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectHistoricCaseInstancesWithVariablesByQueryCriteria", historicCaseInstanceQuery);
+
+        if (instanceList != null && !instanceList.isEmpty()) {
+            if (firstResult > 0) {
+                if (firstResult <= instanceList.size()) {
+                    int toIndex = firstResult + Math.min(maxResults, instanceList.size() - firstResult);
+                    return instanceList.subList(firstResult, toIndex);
+                } else {
+                    return Collections.EMPTY_LIST;
+                }
+            } else {
+                int toIndex = maxResults > 0 ? Math.min(maxResults, instanceList.size()) : instanceList.size();
+                return instanceList.subList(0, toIndex);
+            }
+        }
+
+        return instanceList;
+    }
+
+
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         getDbSqlSession().delete("deleteHistoricCaseInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());

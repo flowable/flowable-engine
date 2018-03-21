@@ -31,6 +31,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     protected String instanceId;
     protected String executionId;
     protected String activityId;
+    protected String scopeType;
     protected String tenantId;
     protected Map<String, Object> variables;
 
@@ -65,6 +66,12 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     @Override
     public ExecuteDecisionBuilder activityId(String activityId) {
         this.activityId = activityId;
+        return this;
+    }
+    
+    @Override
+    public ExecuteDecisionBuilder scopeType(String scopeType) {
+        this.scopeType = scopeType;
         return this;
     }
 
@@ -129,6 +136,10 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
 
     public String getActivityId() {
         return activityId;
+    }
+    
+    public String getScopeType() {
+        return scopeType;
     }
 
     public String getTenantId() {

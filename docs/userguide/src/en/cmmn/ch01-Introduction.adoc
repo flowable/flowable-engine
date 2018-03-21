@@ -11,7 +11,7 @@ Flowable is distributed under link:$$http://www.apache.org/licenses/LICENSE-2.0.
 
 === Download
 
-link:$$http://flowable.org/downloads.html$$[http://flowable.org/downloads.html]
+link:$$http://www.flowable.org/downloads.html$$[http://www.flowable.org/downloads.html]
 
 [[sources]]
 
@@ -33,7 +33,7 @@ In the next releases, we will enhance and expand on the CMMN 1.1 support and con
 
 === Required software
 
-Flowable runs on a JDK higher than or equal to version 7.  Go to link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[Oracle Java SE downloads] and click on button "Download JDK".  There are installation instructions on that page as well. To verify that your installation was successful, run +java -version+ on the command line.  That should print the installed version of your JDK.
+Flowable runs on a JDK higher than or equal to version 8. Go to link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[Oracle Java SE downloads] and click on button "Download JDK".  There are installation instructions on that page as well. To verify that your installation was successful, run +java -version+ on the command line.  That should print the installed version of your JDK.
 
 
 [[reporting.problems]]

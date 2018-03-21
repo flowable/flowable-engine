@@ -408,6 +408,7 @@
   "FORM-BUILDER":{
     "PALLETTE":{
       "TEXT":"Texto",
+      "PASSWORD": "Senha",
       "MULTILINE-TEXT":"Texto de multilinhas",
       "NUMBER":"Número",
       "CHECKBOX":"Caixa de seleção",
@@ -440,7 +441,7 @@
     "MESSAGE":{
       "EMPTY-EXPRESSION":"(Nenhuma expressão)",
       "EXPRESSION-HELP":"Você também pode exibir valores anteriormente apresentados sob qualquer formulário, como parte do texto, referenciando-os usando uma notação como segue ${myFieldId}.",
-      "DROPDOWN-EXPRESSION-HELP": "Você pode usar uma expressão para preencher dinamicamente opções suspensas, por exemplo, fazendo referência a uma variável como esta $ {optionsVariable}. A expressão precisa resultar em um objeto java (java.util.List com objetos Option) ou sua representação json."
+      "OPTIONS-EXPRESSION-HELP": "Você pode usar uma expressão para preencher dinamicamente opções suspensas, por exemplo, fazendo referência a uma variável como esta $ {optionsVariable}. A expressão precisa resultar em um objeto java (java.util.List com objetos Option) ou sua representação json."
     },
     "LABEL":{
       "FUNCTIONAL-GROUP":"Selecione o grupo..",
@@ -455,7 +456,8 @@
       "RADIO-BUTTON-DEFAULT":"Opção 1",
       "DROPDOWN-DEFAULT-EMPTY-SELECTION":"Por favor, escolha uma...",
       "DROPDOWN-EMPTY-VALUE-HELP":"Esta é a opção 'valor vazio'. Selecionar isto em tempo de execução significa dizer 'sem valor' ou 'vazio'.  Isto é permitido para campos opcionais, mas não permitido para campos obrigatórios.",
-      "DROPDOWN-EXPRESSION": "Expressão de opções:",
+      "OPTIONS-EXPRESSION": "Expressão de opções:",
+      "OPTIONS-EXPRESSION-ENABLED": "Ativar expressão de opções",
       "REQUIRED":"Obrigatório",
       "READONLY":"Somente leitura",
       "EXPRESSION":"Expressão",
@@ -463,6 +465,7 @@
       "UPLOAD-ALLOW-MULTIPLE":"Permitir o upload de vários arquivos",
       "MAX-LENGTH":"Comprimento máximo:",
       "MIN-LENGTH":"Comprimento mínimo:",
+      "PASSWORD-UNMASK-OPTION": "opção de mascaramento/desmascarar senha",
       "HYPERLINK-URL": "URL de hiperlink",
       "REGEX-PATTERN":"Padrão Regex",
       "MASK":{

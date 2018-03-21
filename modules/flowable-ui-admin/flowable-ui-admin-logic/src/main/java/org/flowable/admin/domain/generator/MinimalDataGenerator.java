@@ -12,6 +12,9 @@
  */
 package org.flowable.admin.domain.generator;
 
+import java.util.List;
+
+import org.flowable.admin.dto.ServerConfigRepresentation;
 import org.flowable.admin.service.engine.ServerConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +43,13 @@ public class MinimalDataGenerator implements ApplicationListener<ContextRefreshe
         if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
             LOGGER.info("Verifying if minimal data is present");
 
-            if (serverConfigService.findAll().size() == 0) {
+            List<ServerConfigRepresentation> serverConfigs = serverConfigService.findAll();
+            if (serverConfigs.size() == 0) {
                 LOGGER.info("No server configurations found, creating default server configurations");
                 serverConfigService.createDefaultServerConfigs();
+            
+            } else if (serverConfigs.size() == 4) {
+                serverConfigService.createCmmnDefaultServerConfig();
             }
         }
     }

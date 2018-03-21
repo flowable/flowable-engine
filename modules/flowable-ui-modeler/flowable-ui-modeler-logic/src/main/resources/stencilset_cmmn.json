@@ -659,6 +659,28 @@
       ]
     },
     {
+      "name" : "httptasksaveresponseparameterstransientpackage",
+      "properties" : [ {
+        "id" : "httptasksaveresponseparameterstransient",
+        "type" : "String",
+        "title" : "Save response as a transient variable",
+        "value" : "",
+        "description" : "Flag indicating to store the response variable(s) transient",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "httptasksaveresponseasjsonpackage",
+      "properties" : [ {
+        "id" : "httptasksaveresponseasjson",
+        "type" : "String",
+        "title" : "Save response as JSON",
+        "value" : "",
+        "description" : "Flag indicating to store the response variable as a JSON variable instead of a String",
+        "popular" : true
+      } ]
+    },
+    {
     "name" : "casetaskcasereferencepackage",
     "properties" : [ {
       "id" : "casetaskcasereference",
@@ -808,6 +830,27 @@
       "description" : "An expression that is resolved to determine if the stage or task needs to be manually activated.",
       "popular" : true
     }]
+  }, {
+    "name": "scriptformatpackage",
+    "properties" : [ {
+        "id": "scriptformat",
+        "type": "String",
+        "title": "Script format",
+        "value": "",
+        "description": "Script format of the script task (JavaScript, groovy, etc).",
+        "popular": true
+  } ]
+  }, {
+    "name": "scripttextpackage",
+    "properties" : [ {
+        "id": "scripttext",
+        "type": "Text",
+        "title": "Script",
+        "value": "",
+        "description": "Script text of the script task.",
+        "popular": true
+      }
+    ]
   }, {
     "name" : "transitioneventpackage",
     "properties" : [ {
@@ -981,6 +1024,11 @@
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
+        "servicetaskclasspackage",
+        "asyncpackage",
+        "requiredrulepackage",
+        "repetitionrulepackage",
+        "manualactivationrulepackage",
         "httptaskrequestmethodpackage",
         "httptaskrequesturlpackage",
         "httptaskrequestheaderspackage",
@@ -994,11 +1042,8 @@
         "httptasksaverequestvariablespackage",
         "httptasksaveresponseparameterspackage",
         "httptaskresultvariableprefixpackage",
-        "servicetaskclasspackage",
-        "asyncpackage",
-        "requiredrulepackage",
-        "repetitionrulepackage",
-        "manualactivationrulepackage"
+        "httptasksaveresponseparameterstransientpackage",
+        "httptasksaveresponseasjsonpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -1008,6 +1053,29 @@
         "ActivitiesMorph",
         "all"
       ]
+    }, {
+      "type" : "node",
+      "id" : "ScriptTask",
+      "title" : "Script task",
+      "description" : "An automatic task with script logic",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"scriptTask\" transform=\"translate(2,2)\">\n\t\t<path oryx:anchors=\"top left\"\n\t\t\td=\"m 5,2 0,0.094 c 0.23706,0.064 0.53189,0.1645 0.8125,0.375 0.5582,0.4186 1.05109,1.228 1.15625,2.5312 l 8.03125,0 1,0 1,0 c 0,-3 -2,-3 -2,-3 l -10,0 z M 4,3 4,13 2,13 c 0,3 2,3 2,3 l 9,0 c 0,0 2,0 2,-3 L 15,6 6,6 6,5.5 C 6,4.1111 5.5595,3.529 5.1875,3.25 4.8155,2.971 4.5,3 4.5,3 L 4,3 z\"\n     \t\tstyle=\"fill:#72a7d0;stroke:none\"\n\t\t/>\n\t</g><g id=\"required\" display=\"inherit\" stroke=\"#000000\"><g oryx:anchors=\"bottom\"><path fill=\"none\" oryx:anchors=\"bottom\" d=\"M49 67 L49 74 M49 76 L49 78\" transform=\"translate(-11,0)\"></path></g></g><g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/></g><g id=\"manualActivation\" display=\"inherit\" stroke=\"#000000\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" d=\"M45.5 68 L54 73 L45.5 77 L45.5 69z\" transform=\"translate(-2,0)\"></path></g></g></svg>",
+      "icon" : "activity/scripttask.png",
+      "groups" : [ "Activities" ],
+      "propertyPackages" : [  
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "servicetaskclasspackage",
+        "asyncpackage",
+        "requiredrulepackage",
+        "repetitionrulepackage",
+        "manualactivationrulepackage",
+        "scriptformatpackage", 
+        "scripttextpackage",
+        "servicetaskresultvariablepackage"
+      ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
     "type" : "node",
     "id" : "Milestone",

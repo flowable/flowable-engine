@@ -24,15 +24,19 @@ import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeployCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCmmnModelCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetDecisionTablesForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDiagramCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetFormDefinitionsForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseDefinitionCategoryCmd;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormDefinition;
 
 /**
  * @author Joram Barrez
@@ -97,5 +101,15 @@ public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnReposi
     @Override
     public void setCaseDefinitionCategory(String caseDefinitionId, String category) {
         commandExecutor.execute(new SetCaseDefinitionCategoryCmd(caseDefinitionId, category));
+    }
+    
+    @Override
+    public List<DmnDecisionTable> getDecisionTablesForCaseDefinition(String caseDefinitionId) {
+        return commandExecutor.execute(new GetDecisionTablesForCaseDefinitionCmd(caseDefinitionId));
+    }
+    
+    @Override
+    public List<FormDefinition> getFormDefinitionsForCaseDefinition(String caseDefinitionId) {
+        return commandExecutor.execute(new GetFormDefinitionsForCaseDefinitionCmd(caseDefinitionId));
     }
 }

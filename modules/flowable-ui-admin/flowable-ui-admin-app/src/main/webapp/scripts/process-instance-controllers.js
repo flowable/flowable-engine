@@ -95,7 +95,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
 
         $scope.openDecisionTable = function (decisionTable) {
             if (decisionTable && decisionTable.getProperty('id')) {
-                $location.path("/decision-audit/" + decisionTable.getProperty('id'));
+                $location.path("/decision-table-execution/" + decisionTable.getProperty('id'));
             }
         };
 
@@ -135,6 +135,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 $scope.loadVariables();
                 $scope.loadSubProcesses();
                 $scope.loadJobs();
+                $scope.loadDecisionTables()
 
                 $scope.tabData.tabs.push({id: 'decisionTables', name: 'PROCESS-INSTANCE.TITLE.DECISION-TABLES'});
                 $scope.tabData.tabs.push({id: 'forms', name: 'PROCESS-INSTANCE.TITLE.FORM-INSTANCES'});
@@ -255,11 +256,11 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                 };
             });
 
-        $q.all([$translate('DECISION-AUDIT.HEADER.ID'),
-            $translate('DECISION-AUDIT.HEADER.PROCESS-DEFINITION-ID'),
-            $translate('DECISION-AUDIT.HEADER.PROCESS-INSTANCE-ID'),
-            $translate('DECISION-AUDIT.HEADER.CREATED'),
-            $translate('DECISION-AUDIT.HEADER.FAILED')])
+        $q.all([$translate('DECISION-TABLE-EXECUTION.HEADER.ID'),
+            $translate('DECISION-TABLE-EXECUTION.HEADER.DECISION-KEY'),
+            $translate('DECISION-TABLE-EXECUTION.HEADER.DECISION-DEFINITION-ID'),
+            $translate('DECISION-TABLE-EXECUTION.HEADER.END-TIME'),
+            $translate('DECISION-TABLE-EXECUTION.HEADER.FAILED')])
             .then(function (headers) {
 
                 $scope.gridDecisionTables = {
@@ -272,10 +273,10 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
                     afterSelectionChange: $scope.openDecisionTable,
                     columnDefs: [
                         {field: 'id', displayName: headers[0]},
-                        {field: 'processDefinitionId', displayName: headers[1]},
-                        {field: 'processInstanceId', displayName: headers[2]},
+                        {field: 'decisionKey', displayName: headers[1]},
+                        {field: 'decisionDefinitionId', displayName: headers[2]},
                         {
-                            field: 'decisionExecutionEnded',
+                            field: 'endTime',
                             displayName: headers[3],
                             cellTemplate: gridConstants.dateTemplate
                         },
@@ -376,7 +377,7 @@ flowableAdminApp.controller('ProcessInstanceController', ['$scope', '$rootScope'
             // Load decision tables
             $http({
                 method: 'GET',
-                url: '/app/rest/admin/process-instances/' + $scope.process.id + '/decision-tasks'
+                url: '/app/rest/admin/process-instances/' + $scope.process.id + '/decision-executions'
             }).success(function (data, status, headers, config) {
                 $scope.decisionTables = data;
                 $scope.tabData.tabs[4].info = data.total;

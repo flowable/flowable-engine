@@ -12,15 +12,6 @@
 		<os family="windows" />
 	</condition>
 
-	<condition property="usingJdk8OrHigher" value=",java8" else="">
-		<not>
-			<or>
-				<!-- Flowable supports java 7 as minimum -->
-				<equals arg1="${ant.java.version}" arg2="1.7" />
-			</or>
-		</not>
-	</condition>
-
 	<target name="clean">
 		<delete dir="target" />
 	</target>
@@ -44,24 +35,24 @@
 			<equals arg1="${nodocs}" arg2="true" />
 		</condition>
 		<exec executable="${mvn.executable}" dir=".." failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${nodocs.profile}${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-idm" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-modeler" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-task" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-admin" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m -XX:MaxPermSize=256M" />
-			<arg line="-Pdistro${usingJdk8OrHigher} -DskipTests clean install" />
+			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 	</target>
 
@@ -75,7 +66,7 @@
 
 		<!-- MOVE ALL LIBS TO libs -->
 		<mkdir dir="${target.distro.root}/libs" />
-		<copy todir="${target.distro.root}/libs">
+		<copy todir="${target.distro.root}/libs" flatten="true">
 			<fileset dir="../modules/flowable-engine/target">
 				<include name="flowable-engine-*.jar" />
 			</fileset>
@@ -114,6 +105,9 @@
             </fileset>
 			<fileset dir="../modules/flowable-job-service/target">
                 <include name="flowable-job-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-job-spring-service/target">
+                <include name="flowable-job-spring-service-*.jar" />
             </fileset>
 			<fileset dir="../modules/flowable-task-service-api/target">
                 <include name="flowable-task-service-api-*.jar" />
@@ -154,6 +148,9 @@
 			<fileset dir="../modules/flowable-cmmn-spring-configurator/target">
                 <include name="flowable-cmmn-spring-configurator-*.jar" />
             </fileset>
+			<fileset dir="../modules/flowable-cmmn-rest/target">
+			    <include name="flowable-cmmn-rest-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-dmn-model/target">
 				<include name="flowable-dmn-model-*.jar" />
 			</fileset>
@@ -271,23 +268,8 @@
 			<fileset dir="../modules/flowable-http/target">
 				<include name="flowable-http-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-actuator/target">
-				<include name="flowable-spring-boot-starter-actuator-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-basic/target">
-				<include name="flowable-spring-boot-starter-basic-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-integration/target">
-				<include name="flowable-spring-boot-starter-integration-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-jpa/target">
-				<include name="flowable-spring-boot-starter-jpa-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-rest-api/target">
-				<include name="flowable-spring-boot-starter-rest-api-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-security/target">
-				<include name="flowable-spring-boot-starter-security-*.jar" />
+			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/">
+				<include name="**/flowable-spring-boot-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-ui-common/target">
 				<include name="flowable-ui-common-*.jar" />

@@ -1,0 +1,355 @@
+{
+  "properties": [
+    {
+      "name": "contentstorage.fs.rootFolder",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.content.storage.root-folder"
+      }
+    },
+    {
+      "name": "contentstorage.fs.createRoot",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.content.storage.create-root"
+      }
+    },
+    {
+      "name": "datasource.jndi.name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.jndi-name"
+      }
+    },
+    {
+      "name": "datasource.jndi.resourceRef",
+      "deprecation": {
+        "level": "error",
+        "reason": "Spring Boot does not support using JNDI resourceRef."
+      }
+    },
+    {
+      "name": "datasource.url",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.url"
+      }
+    },
+    {
+      "name": "datasource.driver",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.driver-class-name"
+      }
+    },
+    {
+      "name": "datasource.username",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.username"
+      }
+    },
+    {
+      "name": "datasource.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.password"
+      }
+    },
+    {
+      "name": "datasource.connection.timeout",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.connection-timeout"
+      }
+    },
+    {
+      "name": "datasource.connection.minidle",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.minimum-idle"
+      }
+    },
+    {
+      "name": "datasource.connection.maxpoolsize",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.maximum-pool-size"
+      }
+    },
+    {
+      "name": "datasource.connection.idletimeout",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.idle-timeout"
+      }
+    },
+    {
+      "name": "datasource.connection.maxlifetime",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.max-lifetime"
+      }
+    },
+    {
+      "name": "datasource.preferred-test-query",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.connection-test-query"
+      }
+    },
+    {
+      "name": "engine.process.schema.update",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.database-schema-update"
+      }
+    },
+    {
+      "name": "engine.process.asyncexecutor.activate",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.async-executor-activate"
+      }
+    },
+    {
+      "name": "engine.process.history.level",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.history-level"
+      }
+    },
+    {
+      "name": "email.host",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-host"
+      }
+    },
+    {
+      "name": "email.port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-port"
+      }
+    },
+    {
+      "name": "email.useCredentials",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot. In case you don't want to use credentials, set the password and user to empty."
+      }
+    },
+    {
+      "name": "email.username",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-user-name"
+      }
+    },
+    {
+      "name": "email.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-password"
+      }
+    },
+    {
+      "name": "email.useSSL",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-use-ssl"
+      }
+    },
+    {
+      "name": "email.useTLS",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-use-tls"
+      }
+    },
+    {
+      "name": "flowable.process-definitions.cache.max",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.process.definition-cache-limit"
+      }
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.cmmn.servlet.load-on-startup",
+      "description": "Load on startup of the CMMN dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.cmmn.servlet.name",
+      "defaultValue": "Flowable CMMN Rest API",
+      "description": "The name of the CMMN servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.cmmn.servlet.path",
+      "defaultValue": "/cmmn-api",
+      "description": "The context path for the CMMN rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.content.servlet.load-on-startup",
+      "description": "Load on startup of the Content dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.content.servlet.name",
+      "defaultValue": "Flowable Content Rest API",
+      "description": "The name of the Content servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.content.servlet.path",
+      "defaultValue": "/content-api",
+      "description": "The context path for the Content rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.dmn.servlet.load-on-startup",
+      "description": "Load on startup of the DMN dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.dmn.servlet.name",
+      "defaultValue": "Flowable DMN Rest API",
+      "description": "The name of the DMN servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.dmn.servlet.path",
+      "defaultValue": "/dmn-api",
+      "description": "The context path for the DMN rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.form.servlet.load-on-startup",
+      "description": "Load on startup of the Form dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.form.servlet.name",
+      "defaultValue": "Flowable Form Rest API",
+      "description": "The name of the Form servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.form.servlet.path",
+      "defaultValue": "/form-api",
+      "description": "The context path for the Form rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.idm.servlet.load-on-startup",
+      "description": "Load on startup of the IDM dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.idm.servlet.name",
+      "defaultValue": "Flowable IDM Rest API",
+      "description": "The name of the IDM servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.idm.servlet.path",
+      "defaultValue": "/idm-api",
+      "description": "The context path for the IDM rest servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.process.servlet.load-on-startup",
+      "description": "Load on startup of the Process dispatcher servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.process.servlet.name",
+      "defaultValue": "Flowable BPMN Rest API",
+      "description": "The name of the Process servlet."
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.FlowableServlet",
+      "name": "flowable.process.servlet.path",
+      "defaultValue": "/process-api",
+      "description": "The context path for the Process rest servlet."
+    }
+  ],
+  "hints": [
+    {
+      "name": "flowable.database-schema-update",
+      "values": [
+        {
+          "value": "true",
+          "description": "Upon building of the engine(s), a check is performed and an update of the schema is performed if it is necessary."
+        },
+        {
+          "value": "drop-create",
+          "description": "The schema is dropped and then created during the engine(s) startup."
+        },
+        {
+          "value": "create-drop",
+          "description": "The schema is created during the engine(s) startup and dropped during the close of the engine(s)."
+        },
+        {
+          "value": "create",
+          "description": "The schema is created during the engine(s) startup."
+        },
+        {
+          "value": "false",
+          "description": "Checks the version of the DB schema against the library when the engine(s) is(are) being created and throws an exception if the versions don't match."
+        }
+      ]
+    }
+  ]
+}

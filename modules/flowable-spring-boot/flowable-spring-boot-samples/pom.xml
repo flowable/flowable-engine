@@ -14,7 +14,7 @@
 
     <packaging>pom</packaging>
     <modules>
-        <module>flowable-spring-boot-sample-basic</module>
+        <module>flowable-spring-boot-sample-process</module>
         <module>flowable-spring-boot-sample-jpa</module>
         <module>flowable-spring-boot-sample-security</module>
         <module>flowable-spring-boot-sample-rest-api</module>      
@@ -22,16 +22,23 @@
         <module>flowable-spring-boot-sample-actuator</module>
         <module>flowable-spring-boot-sample-integration</module>
         <module>flowable-spring-boot-sample-custom-mybatis-mapper</module>
+        <module>flowable-spring-boot-sample-dmn</module>
+        <module>flowable-spring-boot-sample-form</module>
+        <module>flowable-spring-boot-sample-content</module>
+        <module>flowable-spring-boot-sample-cmmn</module>
     </modules>
     <dependencies>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <version>1.7.5</version>
+            <artifactId>groovy-all</artifactId>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
     </dependencies>
     
