@@ -50,10 +50,10 @@
                     <text><![CDATA[10]]></text>
                 </inputEntry>
                 <inputEntry id="inputEntry4">
-                    <text><![CDATA[${collection:notContains(input1, '"20", "13"')}]]></text>
+                    <text><![CDATA[${collection:notContains(input1, '20, 13')}]]></text>
                      <extensionElements>
                         <flowable:operator xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[NOT IN]]></flowable:operator>
-                        <flowable:expression xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[\"20\", \"13\"]]></flowable:expression>
+                        <flowable:expression xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[20, 13]]></flowable:expression>
                      </extensionElements>
                 </inputEntry>
                 <outputEntry id="outputEntry1">
@@ -74,7 +74,7 @@
                     <text><![CDATA[${collection:containsAny(input1, '"20", "13"')}]]></text>
                      <extensionElements>
                         <flowable:operator xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[ANY]]></flowable:operator>
-                        <flowable:expression xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[\"20\", \"13\"]]></flowable:expression>
+                        <flowable:expression xmlns:flowable="http://www.flowable.org/dmn"><![CDATA["20", "13"]]></flowable:expression>
                      </extensionElements>
                 </inputEntry>
                 <outputEntry id="outputEntry2">
