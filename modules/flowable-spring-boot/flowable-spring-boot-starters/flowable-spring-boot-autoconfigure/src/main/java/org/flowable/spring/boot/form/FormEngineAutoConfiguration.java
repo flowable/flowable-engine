@@ -21,7 +21,7 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
-import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -55,7 +55,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @AutoConfigureBefore({
     ProcessEngineAutoConfiguration.class
 })
-public class FormEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
+public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableFormProperties formProperties;
 
@@ -80,10 +80,12 @@ public class FormEngineAutoConfiguration extends AbstractEngineAutoConfiguration
 
         if (resources != null && !resources.isEmpty()) {
             configuration.setDeploymentResources(resources.toArray(new Resource[0]));
+            configuration.setDeploymentName(formProperties.getDeploymentName());
         }
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+
         return configuration;
     }
 

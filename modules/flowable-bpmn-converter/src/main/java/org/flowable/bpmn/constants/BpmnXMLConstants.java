@@ -60,6 +60,7 @@ public interface BpmnXMLConstants {
 
     public static final String ELEMENT_PROCESS = "process";
     public static final String ATTRIBUTE_PROCESS_EXECUTABLE = "isExecutable";
+    public static final String ATTRIBUTE_PROCESS_EAGER_EXECUTION_FETCHING = "isEagerExecutionFetching";
     public static final String ELEMENT_POTENTIAL_STARTER = "potentialStarter";
     public static final String ATTRIBUTE_PROCESS_CANDIDATE_USERS = "candidateStarterUsers";
     public static final String ATTRIBUTE_PROCESS_CANDIDATE_GROUPS = "candidateStarterGroups";

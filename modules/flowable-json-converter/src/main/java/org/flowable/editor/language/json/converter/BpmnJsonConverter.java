@@ -264,6 +264,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         if (CollectionUtils.isNotEmpty(mainProcess.getCandidateStarterUsers())) {
             propertiesNode.put(PROPERTY_PROCESS_POTENTIALSTARTERUSER, StringUtils.join(mainProcess.getCandidateStarterUsers(), ","));
         }
+        propertiesNode.put(PROPERTY_IS_EAGER_EXECUTION_FETCHING, Boolean.valueOf(mainProcess.isEnableEagerExecutionTreeFetching()));
 
         BpmnJsonConverterUtil.convertMessagesToJson(model.getMessages(), propertiesNode);
 
@@ -484,6 +485,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 process.setId(pool.getProcessRef());
                 process.setName(pool.getName());
                 process.setExecutable(pool.isExecutable());
+                process.setEnableEagerExecutionTreeFetching(JsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_EAGER_EXECUTION_FETCHING, shapeNode, false));
                 bpmnModel.addProcess(process);
 
                 ArrayNode laneArrayNode = (ArrayNode) shapeNode.get(EDITOR_CHILD_SHAPES);
@@ -586,6 +588,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
                 process.setCandidateStarterGroups(groupStarters);
             }
+            
+            process.setEnableEagerExecutionTreeFetching(JsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_EAGER_EXECUTION_FETCHING, modelNode, false));
 
             processJsonElements(shapesArrayNode, modelNode, process, shapeMap, formKeyMap, decisionTableKeyMap, bpmnModel);
 

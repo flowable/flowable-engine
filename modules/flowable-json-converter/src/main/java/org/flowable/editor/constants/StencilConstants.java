@@ -93,6 +93,7 @@ public interface StencilConstants {
     final String PROPERTY_PROCESS_NAMESPACE = "process_namespace";
 
     final String PROPERTY_IS_EXECUTABLE = "isexecutable";
+    final String PROPERTY_IS_EAGER_EXECUTION_FETCHING = "iseagerexecutionfetch";
 
     final String PROPERTY_PROCESS_POTENTIALSTARTERUSER = "process_potentialstarteruser";
     final String PROPERTY_PROCESS_POTENTIALSTARTERGROUP = "process_potentialstartergroup";

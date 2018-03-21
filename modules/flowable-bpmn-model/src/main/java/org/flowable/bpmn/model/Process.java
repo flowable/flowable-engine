@@ -42,6 +42,9 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
 
     // Added during process definition parsing
     protected FlowElement initialFlowElement;
+    
+    // Performance settings
+    protected boolean enableEagerExecutionTreeFetching;
 
     public Process() {
 
@@ -386,6 +389,8 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
         if (otherElement.getCandidateStarterGroups() != null && !otherElement.getCandidateStarterGroups().isEmpty()) {
             candidateStarterGroups.addAll(otherElement.getCandidateStarterGroups());
         }
+        
+        enableEagerExecutionTreeFetching = otherElement.enableEagerExecutionTreeFetching;
 
         eventListeners = new ArrayList<>();
         if (otherElement.getEventListeners() != null && !otherElement.getEventListeners().isEmpty()) {
@@ -440,6 +445,14 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
 
     public void setInitialFlowElement(FlowElement initialFlowElement) {
         this.initialFlowElement = initialFlowElement;
+    }
+
+    public boolean isEnableEagerExecutionTreeFetching() {
+        return enableEagerExecutionTreeFetching;
+    }
+
+    public void setEnableEagerExecutionTreeFetching(boolean enableEagerExecutionTreeFetching) {
+        this.enableEagerExecutionTreeFetching = enableEagerExecutionTreeFetching;
     }
 
 }

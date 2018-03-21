@@ -18,17 +18,25 @@ package org.flowable.engine.impl.cfg;
 public class PerformanceSettings {
 
     /**
-     * Experimental setting: if true, whenever an execution is fetched from the data store, the whole execution tree is fetched in the same roundtrip.
+     * If true, whenever an execution is fetched from the data store, the whole execution tree is fetched in the same roundtrip.
      * 
-     * Less roundtrips to the database outweighs doing many, smaller fetches and often multiple executions from the same tree are needed anyway when executing process instances.
+     * Less roundtrips to the database outweighs doing many, smaller fetches and often multiple executions from the same tree are 
+     * needed anyway when executing process instances.
+     * 
+     * This enables the setting globally. However, it must also be enabled on a process definition itself.
+     * If false, the setting on the process definition is ignored.
      */
-    protected boolean enableEagerExecutionTreeFetching = true;
+    protected boolean enableEagerExecutionTreeFetching = false;
 
     /**
-     * Experimental setting: keeps a count on each execution that holds how many variables, jobs, tasks, event subscriptions, etc. the execution has.
+     * Keeps a count on each execution that holds how many variables, jobs, tasks, event subscriptions, etc. the execution has.
      * 
-     * This makes the delete more performant as a query is not needed anymore to check if there is related data. However, maintaining the count does mean more updates to the execution and potentially
-     * more optimistic locking opportunities. Typically keeping the counts lead to better performance as deletes are a large part of the execution tree maintenance.
+     * This makes the delete more performant as a query is not needed anymore to check if there is related data. 
+     * However, maintaining the count does mean more updates to the execution and potentially
+     * more optimistic locking opportunities. 
+     * Typically keeping the counts lead to better performance as deletes are a large part of the execution tree maintenance.
+     *
+     * This property can only be enabled or disabled globally currently.
      */
     protected boolean enableExecutionRelationshipCounts = true;
 

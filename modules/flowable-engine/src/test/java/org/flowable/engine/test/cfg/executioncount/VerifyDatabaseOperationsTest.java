@@ -315,6 +315,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "selectById org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L,
                     "selectById org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl", 1L,
                     "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 1L,
+                    "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 1L,
                     "selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId", 1L,
                     "selectExecutionsWithSameRootProcessInstanceId", 1L,
                     "selectTasksByExecutionId", 2L,
@@ -446,11 +447,18 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "AddIdentityLinkCmd", "DeleteIdentityLinkCmd",
                     "CompleteTaskCmd");
 
-            // Check "AddIdentityLinkCmd"
+            // Check "AddIdentityLinkCmd" (2 invocations)
             assertNoDeletes("AddIdentityLinkCmd");
-            assertDatabaseInserts("AddIdentityLinkCmd", "CommentEntityImpl", 2L, "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, "IdentityLinkEntityImpl-bulk-with-2", 2l);
-            assertDatabaseSelects("AddIdentityLinkCmd", "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L, "selectIdentityLinksByTaskId", 2L,
-                    "selectExecutionsWithSameRootProcessInstanceId", 2L, "selectIdentityLinksByProcessInstance", 2L);
+            assertDatabaseInserts("AddIdentityLinkCmd", 
+                    "CommentEntityImpl", 2L, 
+                    "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, 
+                    "IdentityLinkEntityImpl-bulk-with-2", 2l);
+            assertDatabaseSelects("AddIdentityLinkCmd", 
+                    "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L, 
+                    "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
+                    "selectIdentityLinksByTaskId", 2L,
+                    "selectExecutionsWithSameRootProcessInstanceId", 2L, 
+                    "selectIdentityLinksByProcessInstance", 2L);
             assertDatabaseUpdates("AddIdentityLinkCmd", 
                     "org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L);
 
@@ -458,9 +466,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             // not sure if the HistoricIdentityLinkEntityImpl should be deleted
             assertDatabaseDeletes("DeleteIdentityLinkCmd", "IdentityLinkEntityImpl", 2L, "HistoricIdentityLinkEntityImpl", 2L);
             assertDatabaseInserts("DeleteIdentityLinkCmd", "CommentEntityImpl", 5L);
-            // TODO: some selects can be removed. No need to query the DB if the "identityLinkCount" is zero
             assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 5L,
-                    "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
+                    "selectIdentityLinkByTaskUserGroupAndType", 5L, 
+                    "selectById org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
                     "selectIdentityLinksByTaskId", 5L);
             assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L);
         }
@@ -501,9 +509,10 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             // not sure if the HistoricIdentityLinkEntityImpl should be deleted
             assertDatabaseDeletes("DeleteIdentityLinkCmd", "IdentityLinkEntityImpl", 2L, "HistoricIdentityLinkEntityImpl", 2L);
             assertDatabaseInserts("DeleteIdentityLinkCmd", "CommentEntityImpl", 5L);
-            // TODO: some selects can be removed. No need to query the DB if the "identityLinkCount" is zero
-            assertDatabaseSelects("DeleteIdentityLinkCmd", "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 5L,
-                    "selectIdentityLinkByTaskUserGroupAndType", 5L, "selectById org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
+            assertDatabaseSelects("DeleteIdentityLinkCmd", 
+                    "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 5L,
+                    "selectIdentityLinkByTaskUserGroupAndType", 5L, 
+                    "selectById org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl", 2L,
                     "selectIdentityLinksByTaskId", 5L);
             assertDatabaseUpdates("DeleteIdentityLinkCmd", "org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L);
         }

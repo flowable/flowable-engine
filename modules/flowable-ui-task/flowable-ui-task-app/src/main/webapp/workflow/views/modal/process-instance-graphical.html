@@ -6,7 +6,9 @@
                 <div class="pull-right">
                     <button type="button" class="close" ng-click="$hide()">&times;</button>
                 </div>
-                <h3 class="modal-title">{{'PROCESS.TITLE.DIAGRAM' | translate}}</h3>
+                <h3 class="modal-title">{{'PROCESS.TITLE.DIAGRAM' | translate}}
+                    <span id="navigationTree">| <a href="javascript:_navigateTo('FLOWABLE_ROOT_PROCESS')">Root</a></span>
+                </h3>
             </div>
             <div class="modal-body">
                 <div class="popup-wrapper clearfix">

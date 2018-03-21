@@ -35,6 +35,11 @@ public class FlowableContentProperties {
     @NestedConfigurationProperty
     private final FlowableServlet servlet = new FlowableServlet("/content-api", "Flowable Content Rest API");
 
+    /**
+     * The storage properties for the content configuration.
+     */
+    private final Storage storage = new Storage();
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -45,5 +50,41 @@ public class FlowableContentProperties {
 
     public FlowableServlet getServlet() {
         return servlet;
+    }
+
+    public Storage getStorage() {
+        return storage;
+    }
+
+    /**
+     * The storage configuration for the content engine.
+     */
+    public static class Storage {
+
+        /**
+         * Root folder location where content files will be stored, for example, task attachments or form file uploads.
+         */
+        private String rootFolder;
+
+        /**
+         * If the root folder doesn't exist, should it be created?
+         */
+        private boolean createRoot = true;
+
+        public String getRootFolder() {
+            return rootFolder;
+        }
+
+        public void setRootFolder(String rootFolder) {
+            this.rootFolder = rootFolder;
+        }
+
+        public boolean getCreateRoot() {
+            return createRoot;
+        }
+
+        public void setCreateRoot(Boolean createRoot) {
+            this.createRoot = createRoot;
+        }
     }
 }
