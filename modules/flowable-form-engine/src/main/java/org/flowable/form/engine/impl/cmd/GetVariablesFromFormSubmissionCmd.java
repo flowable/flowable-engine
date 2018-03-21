@@ -133,7 +133,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
                 result = null;
             }
 
-        } else if (formField.getType().equals(FormFieldTypes.DROPDOWN)) {
+        } else if (formField.getType().equals(FormFieldTypes.DROPDOWN) || formField.getType().equals(FormFieldTypes.RADIO_BUTTONS)) {
             if (formFieldValue instanceof Map<?, ?>) {
                 result = ((Map<?, ?>) formFieldValue).get("id");
                 if (result == null) {

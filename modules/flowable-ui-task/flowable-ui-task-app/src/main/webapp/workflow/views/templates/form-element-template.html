@@ -68,7 +68,7 @@
             <div ng-repeat="option in field.options" class="radio">
                 <label class="control-label">
                     <input id="{{activitiFieldIdPrefix + field.id}}_{{$index}}" type="radio"
-                           value="{{option.name}}"
+                           value="{{option.id ? option.id : option.name}}"
                            name="{{field.id}}"
                            ng-required="field.required"
                            ng-model="field.value"
