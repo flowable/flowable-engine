@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.form;
 
+import org.flowable.engine.ProcessEngine;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -61,7 +62,8 @@ public class FormEngineServicesAutoConfiguration {
     })
     static class AlreadyInitializedFormEngineConfiguration {
         @Bean
-        public FormEngine formEngine() {
+        public FormEngine formEngine(@SuppressWarnings("unused") ProcessEngine processEngine) {
+            // The process engine needs to be injected, as otherwise it won't be initialized, which means that the FormEngine is not initialized yet
             if (!FormEngines.isInitialized()) {
                 throw new IllegalStateException("Form engine has not been initialized");
             }
