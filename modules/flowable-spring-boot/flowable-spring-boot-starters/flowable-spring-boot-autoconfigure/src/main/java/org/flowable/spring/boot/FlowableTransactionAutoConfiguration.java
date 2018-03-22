@@ -13,6 +13,7 @@
 package org.flowable.spring.boot;
 
 import org.flowable.engine.ProcessEngine;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -68,7 +69,7 @@ public class FlowableTransactionAutoConfiguration {
         @ConditionalOnClass(ProcessEngine.class)
         @ConditionalOnMissingBean(name = "jpaProcessEngineConfigurer")
         @Bean
-        public ProcessEngineConfigurationConfigurer jpaProcessEngineConfigurer(EntityManagerFactory emf) {
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> jpaProcessEngineConfigurer(EntityManagerFactory emf) {
             return processEngineConfiguration -> {
                 processEngineConfiguration.setJpaEntityManagerFactory(emf);
                 processEngineConfiguration.setJpaHandleTransaction(false);

@@ -21,11 +21,12 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -95,7 +96,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         @Bean
         @ConditionalOnMissingBean(name = "formProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer formProcessEngineConfigurationConfigurer(
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> formProcessEngineConfigurationConfigurer(
             FormEngineConfigurator formEngineConfigurator
         ) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(formEngineConfigurator);

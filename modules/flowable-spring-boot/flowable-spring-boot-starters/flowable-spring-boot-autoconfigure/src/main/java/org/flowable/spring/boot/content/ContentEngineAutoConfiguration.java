@@ -18,11 +18,12 @@ import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.configurator.ContentEngineConfigurator;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnContentEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -80,7 +81,8 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
         @Bean
         @ConditionalOnMissingBean(name = "contentProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer contentProcessEngineConfigurationConfigurer(ContentEngineConfigurator contentEngineConfigurator) {
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> contentProcessEngineConfigurationConfigurer(
+            ContentEngineConfigurator contentEngineConfigurator) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(contentEngineConfigurator);
         }
 

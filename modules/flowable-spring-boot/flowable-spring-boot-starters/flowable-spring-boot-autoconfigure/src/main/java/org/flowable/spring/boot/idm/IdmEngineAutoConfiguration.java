@@ -17,11 +17,12 @@ import javax.sql.DataSource;
 import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.configurator.SpringIdmEngineConfigurator;
@@ -76,7 +77,7 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
 
         @Bean
         @ConditionalOnMissingBean(name = "idmProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer idmProcessEngineConfigurationConfigurer(
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> idmProcessEngineConfigurationConfigurer(
             IdmEngineConfigurator idmEngineConfigurator
         ) {
             return processEngineConfiguration -> processEngineConfiguration.setIdmEngineConfigurator(idmEngineConfigurator);

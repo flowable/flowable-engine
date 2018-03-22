@@ -66,7 +66,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     @Autowired(required = false)
-    private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
+    private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> processEngineConfigurationConfigurers = new ArrayList<>();
     protected final FlowableProcessProperties processProperties;
     protected final FlowableIdmProperties idmProperties;
 
