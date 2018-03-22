@@ -191,6 +191,13 @@ function _drawTimerEventListener(element)
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
+function _drawUserEventListener(element)
+{
+    _drawEventListener(element);
+    _drawUserEventListenerIcon(paper, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
 function _drawEventListener(element)
 {
     var x = element.x + (element.width / 2);

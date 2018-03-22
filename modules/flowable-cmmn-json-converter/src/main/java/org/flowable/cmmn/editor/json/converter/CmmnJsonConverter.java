@@ -72,6 +72,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         TimerEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
+        UserEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         TaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ScriptTaskJsonConverter.fillTypes(convertersToCmmnMap);
 
@@ -91,6 +92,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
 
     static {
         DI_CIRCLES.add(STENCIL_TIMER_EVENT_LISTENER);
+        DI_CIRCLES.add(STENCIL_USER_EVENT_LISTENER);
 
         DI_RECTANGLES.add(STENCIL_TASK);
         DI_RECTANGLES.add(STENCIL_TASK_HUMAN);
@@ -277,7 +279,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CmmnModel cmmnModel = new CmmnModel();
         CmmnModelIdHelper cmmnModelIdHelper = new CmmnModelIdHelper();
 
-        
+
         cmmnModel.setTargetNamespace("http://flowable.org/cmmn"); // will be overriden later with actual value
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
@@ -316,7 +318,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         planModelStage.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, planModelShape));
         planModelStage.setDocumentation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, planModelShape));
         planModelStage.setAutoComplete(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_AUTOCOMPLETE, planModelShape));
-        
+
         String autocompleteCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_AUTOCOMPLETE_CONDITION, planModelShape);
         if (StringUtils.isNotEmpty(autocompleteCondition)) {
             planModelStage.setAutoCompleteCondition(autocompleteCondition);
@@ -466,10 +468,6 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                     PlanItemDefinition referencedPlanItemDefinition = parentStage.findPlanItemDefinition(startTriggerSourceRef);
                     timerEventListener.setTimerStartTriggerSourceRef(referencedPlanItemDefinition.getPlanItemRef());
                 }
-
-            }else if (planItemDefinition instanceof UserEventListener) {
-                //TODO... implement @Dennis Federico
-                throw new UnsupportedOperationException("Not implemented yet!!!");
             }
 
              if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {
