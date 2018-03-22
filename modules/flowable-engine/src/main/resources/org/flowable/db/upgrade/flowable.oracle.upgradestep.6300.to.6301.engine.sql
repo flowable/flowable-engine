@@ -5,6 +5,8 @@ alter table ACT_RE_PROCDEF add DERIVED_FROM_ROOT_ NVARCHAR2(64);
 
 alter table ACT_RE_PROCDEF add DERIVED_VERSION_ INTEGER DEFAULT 0 NOT NULL;
 
+alter table ACT_RE_PROCDEF drop constraint ACT_UNIQ_PROCDEF;
+
 begin
   execute immediate 'drop index ACT_UNIQ_PROCDEF';
 exception
