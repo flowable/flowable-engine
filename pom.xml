@@ -23,7 +23,7 @@
 		<jackson.version>2.8.11</jackson.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.20.2</camel.version>
-		<cxf.version>3.2.2</cxf.version>
+		<cxf.version>3.2.3</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<spring.boot.version>1.5.4.RELEASE</spring.boot.version>
 
