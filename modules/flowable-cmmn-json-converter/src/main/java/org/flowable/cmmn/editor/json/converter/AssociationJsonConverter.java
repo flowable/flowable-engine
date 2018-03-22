@@ -73,11 +73,14 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
         }
 
         PlanItem planItem = model.findPlanItem(association.getTargetRef());
-        Criterion criterion = model.getCriterion(association.getTargetRef());
-        if (planItem == null && criterion == null) {
-            // Invalid reference, ignoring
-            return;
+        if (planItem == null) {
+            Criterion criterion = model.getCriterion(association.getTargetRef());
+            if (criterion == null) {
+                // Invalid reference, ignoring
+                return;
+            }
         }
+
         GraphicInfo targetGraphicInfo = model.getGraphicInfo(association.getTargetRef());
         GraphicInfo flowGraphicInfo = graphicInfoList.get(graphicInfoList.size() - 1);
 
