@@ -96,14 +96,8 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public DataSource dataSource() {
-        return FlowableAppDatasourceUtil.createDataSource(env);
-    }
-
-    @Bean
-    public SqlSessionFactory sqlSessionFactory() {
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        DataSource dataSource = dataSource();
         sqlSessionFactoryBean.setDataSource(dataSource);
         String databaseType = initDatabaseType(dataSource);
         if (databaseType == null) {
@@ -130,16 +124,16 @@ public class DatabaseConfiguration {
     }
 
     @Bean(destroyMethod = "clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
-    public SqlSessionTemplate SqlSessionTemplate() {
-        return new SqlSessionTemplate(sqlSessionFactory());
+    public SqlSessionTemplate SqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean
-    public Liquibase liquibase() {
+    public Liquibase liquibase(DataSource dataSource) {
         LOGGER.info("Configuring Liquibase");
 
         try {
-            DatabaseConnection connection = new JdbcConnection(dataSource().getConnection());
+            DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
             database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());

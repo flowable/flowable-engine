@@ -18,7 +18,6 @@ import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.flowable.admin.domain.generator.MinimalDataGenerator;
-import org.flowable.app.conf.FlowableAppDatasourceUtil;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -30,9 +29,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -55,14 +51,9 @@ public class DatabaseConfiguration {
     private ResourceLoader resourceLoader;
 
     @Bean
-    public DataSource dataSource() {
-        return FlowableAppDatasourceUtil.createDataSource(env);
-    }
-
-    @Bean
-    public SqlSessionFactory sqlSessionFactory() {
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(dataSource());
+        sqlSessionFactoryBean.setDataSource(dataSource);
 
         try {
             Properties properties = new Properties();
@@ -79,17 +70,17 @@ public class DatabaseConfiguration {
     }
 
     @Bean(destroyMethod = "clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
-    public SqlSessionTemplate SqlSessionTemplate() {
-        return new SqlSessionTemplate(sqlSessionFactory());
+    public SqlSessionTemplate SqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean(name = "liquibase")
-    public Liquibase liquibase() {
+    public Liquibase liquibase(DataSource dataSource) {
         LOGGER.debug("Configuring Liquibase");
 
         try {
 
-            DatabaseConnection connection = new JdbcConnection(dataSource().getConnection());
+            DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
             database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
