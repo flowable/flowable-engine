@@ -12,6 +12,9 @@
  */
 package org.flowable.spring.boot.idm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
@@ -26,6 +29,7 @@ import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.configurator.SpringIdmEngineConfigurator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -54,6 +58,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
 
     protected final FlowableIdmProperties idmProperties;
+    protected List<EngineConfigurationConfigurer<SpringIdmEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public IdmEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableIdmProperties idmProperties) {
         super(flowableProperties);
@@ -67,6 +72,8 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
 
         configuration.setTransactionManager(platformTransactionManager);
         configureEngine(configuration, dataSource);
+
+        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
 
         return configuration;
     }
@@ -90,6 +97,11 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
             idmEngineConfigurator.setIdmEngineConfiguration(configuration);
             return idmEngineConfigurator;
         }
+    }
+
+    @Autowired(required = false)
+    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringIdmEngineConfiguration>> engineConfigurers) {
+        this.engineConfigurers = engineConfigurers;
     }
 }
 
