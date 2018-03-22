@@ -14,6 +14,7 @@ package org.flowable.spring.boot;
 
 import org.flowable.engine.IdentityService;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.spring.security.FlowableAuthenticationProvider;
 import org.flowable.spring.security.FlowableUserDetailsService;
@@ -39,6 +40,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @author Josh Long
  */
 @Configuration
+@ConditionalOnIdmEngine
 @ConditionalOnClass({
     AuthenticationManager.class,
     GlobalAuthenticationConfigurerAdapter.class
