@@ -767,6 +767,14 @@ A timer event listener is visualized as circle with a clock icon inside:
 
 image::images/cmmn.timereventlistener.png[align="center"]
 
+===== User Event Listener
+
+A user event listener can be when needed to capture a user interaction that influences the proceeding of a Case directly,
+instead of indirectly via impacting variables or information in the case. When the event is captured an Occur transition is triggered on the event listener.
+Like timer event listeners, it has a much simpler lifecycle that a _task_.
+
+image::images/cmmn.usereventlistener.png[align="center"]
+
 ==== Item control: Repetition Rule
 
 Plan items on the case model can have a _repetition rule_, an expression that can be used to indicate a certain plan item needs to be repeated.
