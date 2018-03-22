@@ -14,12 +14,14 @@ package org.flowable.spring.boot.idm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.sql.DataSource;
 
 import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.idm.spring.authentication.SpringEncoder;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
@@ -29,13 +31,19 @@ import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.configurator.SpringIdmEngineConfigurator;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -66,12 +74,34 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
     }
 
     @Bean
+    @ConditionalOnMissingClass("org.flowable.ldap.LDAPConfiguration")
+    @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "false", matchIfMissing = true)
     @ConditionalOnMissingBean
-    public SpringIdmEngineConfiguration idmEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager) {
+    public PasswordEncoder passwordEncoder() {
+        PasswordEncoder encoder;
+        String encoderType = idmProperties.getPasswordEncoder();
+        if (Objects.equals("spring_bcrypt", encoderType)) {
+            encoder = new BCryptPasswordEncoder();
+        } else {
+            encoder = NoOpPasswordEncoder.getInstance();
+        }
+
+        return encoder;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SpringIdmEngineConfiguration idmEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<PasswordEncoder> passwordEncoderProvider) {
         SpringIdmEngineConfiguration configuration = new SpringIdmEngineConfiguration();
 
         configuration.setTransactionManager(platformTransactionManager);
         configureEngine(configuration, dataSource);
+
+        PasswordEncoder passwordEncoder = passwordEncoderProvider.getIfAvailable();
+        if (passwordEncoder != null) {
+            configuration.setPasswordEncoder(new SpringEncoder(passwordEncoder));
+        }
 
         engineConfigurers.forEach(configurer -> configurer.configure(configuration));
 

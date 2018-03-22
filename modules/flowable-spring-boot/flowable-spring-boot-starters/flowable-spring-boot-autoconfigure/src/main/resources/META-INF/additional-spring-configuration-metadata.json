@@ -172,6 +172,15 @@
       }
     },
     {
+      "name": "security.passwordencoder",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable IDM auto-configuration instead.",
+        "replacement": "flowable.idm.password-encoder"
+      }
+    },
+    {
       "name": "contentstorage.fs.rootFolder",
       "type": "java.lang.String",
       "deprecation": {
