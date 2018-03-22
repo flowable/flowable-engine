@@ -15,9 +15,9 @@ package org.flowable.app.conf;
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.app.filter.FlowableCookieFilter;
 import org.flowable.app.filter.FlowableCookieFilterCallback;
 import org.flowable.app.filter.FlowableCookieFilterRegistrationBean;
+import org.flowable.app.properties.FlowableRemoteIdmProperties;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.DefaultPrivileges;
@@ -57,8 +57,8 @@ public class SecurityConfiguration {
     protected Environment env;
 
     @Bean
-    public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistration(RemoteIdmService remoteIdmService) {
-        FlowableCookieFilterRegistrationBean registrationBean = new FlowableCookieFilterRegistrationBean(remoteIdmService);
+    public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistration(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
+        FlowableCookieFilterRegistrationBean registrationBean = new FlowableCookieFilterRegistrationBean(remoteIdmService, properties);
         registrationBean.addUrlPatterns("/app/*");
         registrationBean.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
         return registrationBean;

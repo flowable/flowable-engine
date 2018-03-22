@@ -36,6 +36,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
+import org.flowable.app.properties.FlowableRemoteIdmProperties;
 import org.flowable.app.service.api.AppDefinitionService;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.idm.api.User;
@@ -59,6 +60,12 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
     @Autowired
     protected Environment environment;
+
+    protected final FlowableRemoteIdmProperties properties;
+
+    public AppDefinitionPublishService(FlowableRemoteIdmProperties properties) {
+        this.properties = properties;
+    }
 
     public void publishAppDefinition(String comment, Model appDefinitionModel, User user) {
 
@@ -86,8 +93,8 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
     protected void deployZipArtifact(String artifactName, byte[] zipArtifact, String deploymentKey, String deploymentName) {
         String deployApiUrl = environment.getRequiredProperty("deployment.api.url");
-        String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
-        String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
+        String basicAuthUser = properties.getAdmin().getUser();
+        String basicAuthPassword = properties.getAdmin().getPassword();
 
         if (!deployApiUrl.endsWith("/")) {
             deployApiUrl = deployApiUrl.concat("/");

@@ -34,11 +34,12 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
+import org.flowable.app.properties.FlowableRemoteIdmProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,13 +50,6 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteIdmServiceImpl.class);
 
-    private static final String PROPERTY_URL = "idm.app.url";
-    private static final String PROPERTY_ADMIN_USER = "idm.admin.user";
-    private static final String PROPERTY_ADMIN_PASSWORD = "idm.admin.password";
-
-    @Autowired
-    protected Environment environment;
-
     @Autowired
     protected ObjectMapper objectMapper;
 
@@ -63,11 +57,12 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     protected String adminUser;
     protected String adminPassword;
 
-    @PostConstruct
-    protected void init() {
-        url = environment.getRequiredProperty(PROPERTY_URL);
-        adminUser = environment.getRequiredProperty(PROPERTY_ADMIN_USER);
-        adminPassword = environment.getRequiredProperty(PROPERTY_ADMIN_PASSWORD);
+    public RemoteIdmServiceImpl(FlowableRemoteIdmProperties properties) {
+        url = properties.determineIdmAppUrl();
+        adminUser = properties.getAdmin().getUser();
+        Assert.hasText(adminUser, "Admin user must not be empty");
+        adminPassword = properties.getAdmin().getPassword();
+        Assert.hasText(adminUser, "Admin user password should not be empty");
     }
 
     @Override

@@ -12,10 +12,9 @@ services:
               - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
               - datasource.username=flowable
               - datasource.password=flowable
-              - idm.app.url=http://flowable-idm-app:8080/flowable-idm
-              - idm.app.redirect.url=http://localhost:8080/flowable-idm
-              - idm.admin.user=admin
-              - idm.admin.password=test
+              - flowable.app.idm.url=http://flowable-idm-app:8080/flowable-idm
+              - flowable.app.idm.admin.user=admin
+              - flowable.app.idm.admin.password=test
               - deployment.api.url=http://flowable-task-app:9999/flowable-task/process-api
           ports:
               - 8888:8888
@@ -31,10 +30,9 @@ services:
             - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
             - datasource.username=flowable
             - datasource.password=flowable
-            - idm.app.url=http://flowable-idm-app:8080/flowable-idm
-            - idm.app.redirect.url=http://localhost:8080/flowable-idm
-            - idm.admin.user=admin
-            - idm.admin.password=test
+            - flowable.app.idm.url=http://flowable-idm-app:8080/flowable-idm
+            - flowable.app.idm.admin.user=admin
+            - flowable.app.idm.admin.password=test
         ports:
             - 9999:9999
         entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-task.jar", "-httpPort=9999", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
@@ -63,10 +61,9 @@ services:
             - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
             - datasource.username=flowable
             - datasource.password=flowable
-            - idm.app.url=http://flowable-idm-app:8080/flowable-idm
-            - idm.app.redirect.url=http://localhost:8080/flowable-idm
-            - idm.admin.user=admin
-            - idm.admin.password=test
+            - flowable.app.idm.url=http://flowable-idm-app:8080/flowable-idm
+            - flowable.app.idm.admin.user=admin
+            - flowable.app.idm.admin.password=test
             - rest.process.app.host=http://flowable-task-app
             - rest.process.app.port=9999
             - rest.process.app.contextroot=flowable-task

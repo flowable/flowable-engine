@@ -90,9 +90,9 @@ The additional configuration options are described in the table below:
 |file.upload.max.size|Maximum size of file uploads, such as attachments and model files
 |contentstorage.fs.rootFolder|Root folder location where content files will be stored, for example, task attachments or form file uploads
 |contentstorage.fs.createRoot|If the root folder doesn't exist, should the Flowable Task application create it?
-|idm.app.url|The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
-|idm.admin.user|The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin.
-|idm.admin.password|The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.
+|flowable.app.idm.url|The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
+|flowable.app.idm.admin.user|The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin.
+|flowable.app.idm.admin.password|The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.
 |deployment.api.url|The root URI to th REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine. Default url for the Flowable Task application is http://localhost:8080/flowable-task/process-api
 |rest.task-app|idm-app|modeler-app.enabled|Enables the REST API (this is not the REST api used by the UI, but an api that's availble over basic auth authentication). Default is true.
 |rest.authentication.mode|Sets the mode of verifying the user when accessing the REST API. By default this is 'verify-privilege', which means that the user passing the credentials with basic authentication needs to have the 'access-rest-api' privilege. Can be set to 'any-users', which means that any valid user/password pair passed as basic auth credentials can access the rest api (as it was in earlier versions of Flowable).

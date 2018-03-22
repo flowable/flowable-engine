@@ -16,41 +16,37 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
+import org.flowable.app.properties.FlowableRemoteIdmProperties;
 import org.flowable.app.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
 
 /**
  * @author Filip Hrisafov
  */
-public class FlowableCookieFilterRegistrationBean extends FilterRegistrationBean implements EnvironmentAware {
+public class FlowableCookieFilterRegistrationBean extends FilterRegistrationBean {
 
     protected final RemoteIdmService remoteIdmService;
 
-    protected Environment env;
+    protected final FlowableRemoteIdmProperties properties;
+
     protected FlowableCookieFilterCallback filterCallback;
     protected Collection<String> requiredPrivileges;
 
-    public FlowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService) {
+    public FlowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
         this.remoteIdmService = remoteIdmService;
+        this.properties = properties;
     }
 
     @PostConstruct
     protected void initializeFilter() {
         if (getFilter() == null) {
-            FlowableCookieFilter flowableCookieFilter = new FlowableCookieFilter(env, remoteIdmService);
+            FlowableCookieFilter flowableCookieFilter = new FlowableCookieFilter(remoteIdmService, properties);
             flowableCookieFilter.setFilterCallback(filterCallback);
             flowableCookieFilter.setRequiredPrivileges(requiredPrivileges);
             flowableCookieFilter.initCaches();
             setFilter(flowableCookieFilter);
         }
-    }
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.env = environment;
     }
 
     @Autowired(required = false)

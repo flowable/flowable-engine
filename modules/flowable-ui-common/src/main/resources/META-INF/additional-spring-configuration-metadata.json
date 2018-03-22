@@ -1,0 +1,85 @@
+{
+  "properties": [
+    {
+      "name": "idm.admin.user",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.admin.user"
+      }
+    },
+    {
+      "name": "idm.admin.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.admin.password"
+      }
+    },
+    {
+      "name": "idm.app.redirect.url",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.url"
+      }
+    },
+    {
+      "name": "idm.app.url",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.url"
+      }
+    },
+    {
+      "name": "app.redirect.url.on.authsuccess",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.redirect-on-auth-success"
+      }
+    },
+    {
+      "name": "cache.login-tokens.max.size",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.cache-login-tokens.max-size"
+      }
+    },
+    {
+      "name": "cache.login-tokens.max.age",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.cache-login-tokens.max-age"
+      }
+    },
+    {
+      "name": "cache.login-users.max.size",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.cache-login-users.max-size"
+      }
+    },
+    {
+      "name": "cache.login-users.max.age",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Flowable IDM App auto-configuration instead.",
+        "replacement": "flowable.app.idm.cache-login-users.max-age"
+      }
+    }
+  ]
+}
