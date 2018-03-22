@@ -62,10 +62,16 @@ public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasR
     int getSuspensionState();
 
     void setSuspensionState(int suspensionState);
+    
+    void setDerivedFrom(String derivedFrom);
+    
+    void setDerivedFromRoot(String derivedFromRoot);
 
+    void setDerivedVersion(int derivedVersion);
+    
     @Override
     String getEngineVersion();
 
     void setEngineVersion(String engineVersion);
-
+    
 }

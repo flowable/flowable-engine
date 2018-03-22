@@ -33,6 +33,10 @@ public interface EngineDeployment {
     String getCategory();
 
     String getKey();
+    
+    String getDerivedFrom();
+
+    String getDerivedFromRoot();
 
     String getTenantId();
     

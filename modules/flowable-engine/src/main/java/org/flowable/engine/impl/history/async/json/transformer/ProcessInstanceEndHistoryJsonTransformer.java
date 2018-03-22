@@ -25,18 +25,13 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class ProcessInstanceEndHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
+public class ProcessInstanceEndHistoryJsonTransformer extends AbstractNeedsProcessInstanceHistoryJsonTransformer {
 
     @Override
     public String getType() {
         return HistoryJsonConstants.TYPE_PROCESS_INSTANCE_END;
     }
     
-    @Override
-    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-        return true;
-    }
-
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext);
@@ -97,5 +92,5 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractHistoryJso
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
         }
     }
-
+    
 }

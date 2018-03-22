@@ -39,6 +39,8 @@ public interface HistoricTaskService {
     
     HistoricTaskInstanceEntity createHistoricTask(TaskEntity taskEntity);
     
+    void updateHistoricTask(HistoricTaskInstanceEntity historicTaskInstanceEntity, boolean fireUpdateEvent);
+    
     void insertHistoricTask(HistoricTaskInstanceEntity historicTaskInstanceEntity, boolean fireCreateEvent);
     
     void deleteHistoricTask(HistoricTaskInstanceEntity HistoricTaskInstance);

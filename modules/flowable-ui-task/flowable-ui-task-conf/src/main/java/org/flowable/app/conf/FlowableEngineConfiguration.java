@@ -34,6 +34,7 @@ import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
@@ -263,6 +264,11 @@ public class FlowableEngineConfiguration {
     @Bean
     public ManagementService managementService() {
         return processEngine().getManagementService();
+    }
+    
+    @Bean
+    public DynamicBpmnService dynamicBpmnService() {
+        return processEngine().getDynamicBpmnService();
     }
 
     @Bean

@@ -22,13 +22,11 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.spring.common.SpringEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
 
 /**
@@ -51,10 +49,6 @@ public abstract class AbstractEngineAutoConfiguration {
     @Autowired
     public void setResourcePatternResolver(ResourcePatternResolver resourcePatternResolver) {
         this.resourcePatternResolver = resourcePatternResolver;
-    }
-
-    protected void configureSpringEngine(SpringEngineConfiguration engineConfiguration, PlatformTransactionManager transactionManager) {
-        engineConfiguration.setTransactionManager(transactionManager);
     }
 
     protected void configureEngine(AbstractEngineConfiguration engineConfiguration, DataSource dataSource) {

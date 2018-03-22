@@ -165,6 +165,16 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
         this.isNew = isNew;
     }
     
+    @Override
+    public String getDerivedFrom() {
+        return null;
+    }
+
+    @Override
+    public String getDerivedFromRoot() {
+        return null;
+    }
+
     public String getEngineVersion() {
         return null;
     }

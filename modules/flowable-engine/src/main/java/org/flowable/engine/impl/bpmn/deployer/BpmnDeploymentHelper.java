@@ -114,6 +114,26 @@ public class BpmnDeploymentHelper {
 
         return existingDefinition;
     }
+    
+    /**
+     * Gets the most recent persisted derived process definition that matches this one for tenant and key. If none is found, returns null. This method assumes that the tenant and key are properly set on the
+     * process definition entity.
+     */
+    public ProcessDefinitionEntity getMostRecentDerivedVersionOfProcessDefinition(ProcessDefinitionEntity processDefinition) {
+        String key = processDefinition.getKey();
+        String tenantId = processDefinition.getTenantId();
+        ProcessDefinitionEntityManager processDefinitionManager = CommandContextUtil.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+
+        ProcessDefinitionEntity existingDefinition = null;
+
+        if (tenantId != null && !tenantId.equals(ProcessEngineConfiguration.NO_TENANT_ID)) {
+            existingDefinition = processDefinitionManager.findLatestDerivedProcessDefinitionByKeyAndTenantId(key, tenantId);
+        } else {
+            existingDefinition = processDefinitionManager.findLatestDerivedProcessDefinitionByKey(key);
+        }
+
+        return existingDefinition;
+    }
 
     /**
      * Gets the persisted version of the already-deployed process definition. Note that this is different from {@link #getMostRecentVersionOfProcessDefinition} as it looks specifically for a process
