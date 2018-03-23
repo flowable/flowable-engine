@@ -12,24 +12,15 @@
  */
 package org.flowable.admin.conf;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
-import org.springframework.web.servlet.view.JstlView;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 @Configuration
 @ComponentScan(basePackages = {
@@ -38,27 +29,6 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 public class DispatcherServletConfiguration extends WebMvcRegistrationsAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
-
-    @Bean
-    public ViewResolver contentNegotiatingViewResolver() {
-        LOGGER.debug("Configuring the ContentNegotiatingViewResolver");
-        ContentNegotiatingViewResolver viewResolver = new ContentNegotiatingViewResolver();
-        List<ViewResolver> viewResolvers = new ArrayList<>();
-
-        UrlBasedViewResolver urlBasedViewResolver = new UrlBasedViewResolver();
-        urlBasedViewResolver.setViewClass(JstlView.class);
-        urlBasedViewResolver.setPrefix("/WEB-INF/pages/");
-        urlBasedViewResolver.setSuffix(".jsp");
-        viewResolvers.add(urlBasedViewResolver);
-
-        viewResolver.setViewResolvers(viewResolvers);
-
-        List<View> defaultViews = new ArrayList<>();
-        defaultViews.add(new MappingJackson2JsonView());
-        viewResolver.setDefaultViews(defaultViews);
-
-        return viewResolver;
-    }
 
     @Bean
     public SessionLocaleResolver localeResolver() {
