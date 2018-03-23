@@ -87,7 +87,7 @@ The additional configuration options are described in the table below:
 |admin.firstname|Firstname of the default administrator user for the Flowable IDM application. Default is Test.
 |admin.lastname|Lastname of the default administrator user for the Flowable IDM application. Default is Administrator.
 |admin.email|Email of the default administrator user for the Flowable IDM application. Default is admin@flowable.org.
-|file.upload.max.size|Maximum size of file uploads, such as attachments and model files
+|spring.http.multipart.max-file-size|Maximum size of file uploads, such as attachments and model files
 |contentstorage.fs.rootFolder|Root folder location where content files will be stored, for example, task attachments or form file uploads
 |contentstorage.fs.createRoot|If the root folder doesn't exist, should the Flowable Task application create it?
 |flowable.app.idm.url|The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.

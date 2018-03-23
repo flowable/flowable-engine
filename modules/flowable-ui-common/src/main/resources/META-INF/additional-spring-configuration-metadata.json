@@ -1,6 +1,15 @@
 {
   "properties": [
     {
+      "name": "file.upload.max.size",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot MultiPartAutoConfiguration instead.",
+        "replacement": "spring.http.multipart.max-file-size"
+      }
+    },
+    {
       "name": "idm.admin.user",
       "type": "java.lang.String",
       "deprecation": {
