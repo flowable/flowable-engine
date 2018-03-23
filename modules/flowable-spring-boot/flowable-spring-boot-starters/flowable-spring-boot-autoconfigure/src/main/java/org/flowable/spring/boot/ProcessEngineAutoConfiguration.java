@@ -27,12 +27,13 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
-import org.flowable.spring.job.service.SpringAsyncExecutor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -79,7 +80,8 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
     @Bean
     @ConditionalOnMissingBean
-    public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager, SpringAsyncExecutor springAsyncExecutor) throws IOException {
+    public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<AsyncExecutor> asyncExecutorProvider) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
@@ -94,6 +96,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             conf.setDeploymentName(flowableProperties.getDeploymentName());
         }
 
+        AsyncExecutor springAsyncExecutor = asyncExecutorProvider.getIfUnique();
         if (springAsyncExecutor != null) {
             conf.setAsyncExecutor(springAsyncExecutor);
         }
