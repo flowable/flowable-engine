@@ -132,6 +132,11 @@
             <artifactId>flowable-content-rest</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
 		<!-- LOGGING -->
         <dependency>
             <groupId>org.slf4j</groupId>
