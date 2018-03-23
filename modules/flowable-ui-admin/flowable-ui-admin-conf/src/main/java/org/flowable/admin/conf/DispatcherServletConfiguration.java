@@ -15,16 +15,13 @@ package org.flowable.admin.conf;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -84,18 +81,6 @@ public class DispatcherServletConfiguration extends WebMvcRegistrationsAdapter {
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("language");
         return localeChangeInterceptor;
-    }
-
-    @Bean
-    public MessageSource messageSource() {
-        LOGGER.debug("Loading MessageSources");
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("/WEB-INF/messages/messages");
-        messageSource.setDefaultEncoding(CharEncoding.UTF_8);
-        if ("true".equals(env.getProperty("message.reloading.enabled"))) {
-            messageSource.setCacheSeconds(1);
-        }
-        return messageSource;
     }
 
     @Bean
