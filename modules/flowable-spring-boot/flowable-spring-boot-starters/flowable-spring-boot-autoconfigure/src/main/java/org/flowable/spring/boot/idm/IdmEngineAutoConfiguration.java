@@ -31,10 +31,11 @@ import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.configurator.SpringIdmEngineConfigurator;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -73,35 +74,42 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
         this.idmProperties = idmProperties;
     }
 
-    @Bean
+    @ConditionalOnClass(PasswordEncoder.class)
+    @Configuration
     @ConditionalOnMissingClass("org.flowable.ldap.LDAPConfiguration")
     @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "false", matchIfMissing = true)
-    @ConditionalOnMissingBean
-    public PasswordEncoder passwordEncoder() {
-        PasswordEncoder encoder;
-        String encoderType = idmProperties.getPasswordEncoder();
-        if (Objects.equals("spring_bcrypt", encoderType)) {
-            encoder = new BCryptPasswordEncoder();
-        } else {
-            encoder = NoOpPasswordEncoder.getInstance();
+    public static class PasswordEncoderConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public PasswordEncoder passwordEncoder(FlowableIdmProperties idmProperties) {
+            PasswordEncoder encoder;
+            String encoderType = idmProperties.getPasswordEncoder();
+            if (Objects.equals("spring_bcrypt", encoderType)) {
+                encoder = new BCryptPasswordEncoder();
+            } else {
+                encoder = NoOpPasswordEncoder.getInstance();
+            }
+
+            return encoder;
         }
 
-        return encoder;
+        @Bean
+        @ConditionalOnBean(PasswordEncoder.class)
+        @ConditionalOnMissingBean(name = "passwordEncoderIdmEngineConfigurationConfigurer")
+        public EngineConfigurationConfigurer<SpringIdmEngineConfiguration> passwordEncoderIdmEngineConfigurationConfigurer(PasswordEncoder passwordEncoder) {
+            return idmEngineConfiguration -> idmEngineConfiguration.setPasswordEncoder(new SpringEncoder(passwordEncoder));
+        }
+
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public SpringIdmEngineConfiguration idmEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-        ObjectProvider<PasswordEncoder> passwordEncoderProvider) {
+    public SpringIdmEngineConfiguration idmEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager) {
         SpringIdmEngineConfiguration configuration = new SpringIdmEngineConfiguration();
 
         configuration.setTransactionManager(platformTransactionManager);
         configureEngine(configuration, dataSource);
-
-        PasswordEncoder passwordEncoder = passwordEncoderProvider.getIfAvailable();
-        if (passwordEncoder != null) {
-            configuration.setPasswordEncoder(new SpringEncoder(passwordEncoder));
-        }
 
         engineConfigurers.forEach(configurer -> configurer.configure(configuration));
 
