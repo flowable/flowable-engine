@@ -17,12 +17,10 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
@@ -40,12 +38,6 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 public class DispatcherServletConfiguration extends WebMvcRegistrationsAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
-
-    // 10 Mb max file size
-    private static final int MAX_UPLOAD_SIZE = 10 * 1000 * 1000;
-
-    @Autowired
-    private Environment env;
 
     @Bean
     public ViewResolver contentNegotiatingViewResolver() {

@@ -22,7 +22,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -48,9 +47,6 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private Environment environment;
 
     @Bean
     public SessionLocaleResolver localeResolver() {
