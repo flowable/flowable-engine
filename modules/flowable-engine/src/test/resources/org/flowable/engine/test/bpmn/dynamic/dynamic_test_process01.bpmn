@@ -5,21 +5,21 @@
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="parallelgateway1"></sequenceFlow>
     <parallelGateway id="parallelgateway1" name="Exclusive Gateway"></parallelGateway>
     <subProcess id="subprocess1" name="Sub Process">
-      <userTask id="taskB" name="Task B"></userTask>
+      <userTask id="taskB" name="task B"></userTask>
       <startEvent id="startevent2" name="Start"></startEvent>
-      <userTask id="taskA" name="Task A"></userTask>
+      <userTask id="taskA" name="task A"></userTask>
       <sequenceFlow id="flow4" sourceRef="startevent2" targetRef="parallelgateway2"></sequenceFlow>
       <parallelGateway id="parallelgateway2" name="Exclusive Gateway"></parallelGateway>
       <sequenceFlow id="flow5" sourceRef="parallelgateway2" targetRef="taskA"></sequenceFlow>
       <sequenceFlow id="flow6" sourceRef="parallelgateway2" targetRef="taskB"></sequenceFlow>
-      <userTask id="taskC" name="Task C"></userTask>
+      <userTask id="taskC" name="task C"></userTask>
       <sequenceFlow id="flow7" sourceRef="parallelgateway2" targetRef="taskC"></sequenceFlow>
       <sequenceFlow id="flow8" sourceRef="taskA" targetRef="parallelgateway3"></sequenceFlow>
       <parallelGateway id="parallelgateway3" name="Exclusive Gateway"></parallelGateway>
       <sequenceFlow id="flow10" sourceRef="taskC" targetRef="parallelgateway3"></sequenceFlow>
       <endEvent id="endevent1" name="End"></endEvent>
       <sequenceFlow id="flow11" sourceRef="parallelgateway3" targetRef="endevent1"></sequenceFlow>
-      <userTask id="afterB" name="After B"></userTask>
+      <userTask id="afterB" name="after B"></userTask>
       <sequenceFlow id="flow19" sourceRef="taskB" targetRef="afterB"></sequenceFlow>
       <sequenceFlow id="flow20" sourceRef="afterB" targetRef="parallelgateway3"></sequenceFlow>
     </subProcess>
@@ -33,11 +33,11 @@
     <sequenceFlow id="flow12" sourceRef="boundarytimer1" targetRef="escalation"></sequenceFlow>
     <endEvent id="endevent2" name="End"></endEvent>
     <sequenceFlow id="flow13" sourceRef="escalation" targetRef="endevent2"></sequenceFlow>
-    <userTask id="afterSubProcess" name="After sub process"></userTask>
+    <userTask id="afterSubProcess" name="after sub process"></userTask>
     <sequenceFlow id="flow14" sourceRef="subprocess1" targetRef="afterSubProcess"></sequenceFlow>
     <endEvent id="endevent3" name="End"></endEvent>
     <sequenceFlow id="flow15" sourceRef="afterSubProcess" targetRef="endevent3"></sequenceFlow>
-    <userTask id="taskD" name="Task D"></userTask>
+    <userTask id="taskD" name="task D"></userTask>
     <sequenceFlow id="flow17" sourceRef="parallelgateway1" targetRef="taskD"></sequenceFlow>
     <endEvent id="endevent4" name="End"></endEvent>
     <sequenceFlow id="flow18" sourceRef="taskD" targetRef="endevent4"></sequenceFlow>

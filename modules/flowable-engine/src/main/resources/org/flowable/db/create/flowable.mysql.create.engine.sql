@@ -83,7 +83,7 @@ create table ACT_RE_PROCDEF (
     ENGINE_VERSION_ varchar(255),
     DERIVED_FROM_ varchar(64),
     DERIVED_FROM_ROOT_ varchar(64),
-    DERIVED_VERSION_ integer default 0,
+    DERIVED_VERSION_ integer not null default 0,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

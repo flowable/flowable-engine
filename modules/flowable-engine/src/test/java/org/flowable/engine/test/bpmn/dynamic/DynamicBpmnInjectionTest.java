@@ -23,9 +23,11 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
+import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -63,6 +65,13 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             .name("My injected task")
             .assignee("kermit");
         dynamicBpmnService.injectParallelUserTask(task.getId(), taskBuilder);
+        
+        Task injectedTask = taskService.createTaskQuery().taskName("My injected task").singleResult();
+        assertNotNull(injectedTask);
+        if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(injectedTask.getExecutionId()).singleResult();
+            assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
+        }
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasks.size());
@@ -156,6 +165,13 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             .name("My injected task")
             .assignee("kermit");
         dynamicBpmnService.injectParallelUserTask(task.getId(), taskBuilder);
+        
+        Task injectedTask = taskService.createTaskQuery().taskName("My injected task").singleResult();
+        assertNotNull(injectedTask);
+        if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(injectedTask.getExecutionId()).singleResult();
+            assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
+        }
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
@@ -188,6 +204,11 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
                 .processDefinitionId(processDefinition.getId());
         dynamicBpmnService.injectParallelEmbeddedSubProcess(task.getId(), subProcessBuilder);
         
+        if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
+            Execution execution = runtimeService.createExecutionQuery().activityId("usertaskV2").singleResult();
+            assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
+        }
+        
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasks.size());
         for (Task t : tasks) {
@@ -210,10 +231,10 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess01");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(4, tasks.size());
-        assertEquals("Task A", tasks.get(0).getName());
-        assertEquals("Task B", tasks.get(1).getName());
-        assertEquals("Task C", tasks.get(2).getName());
-        assertEquals("Task D", tasks.get(3).getName());
+        assertEquals("task A", tasks.get(0).getName());
+        assertEquals("task B", tasks.get(1).getName());
+        assertEquals("task C", tasks.get(2).getName());
+        assertEquals("task D", tasks.get(3).getName());
 
         Task taskB = tasks.get(1);
         ProcessDefinition subProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("testProcess02").singleResult();
@@ -223,15 +244,16 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(9, tasks.size());
-        List<String> expectedTaskNames = Arrays.asList("Task A", "Task B", "Task C", "Task D", "five", "four", "one", "three", "two");
+        List<String> expectedTaskNames = Arrays.asList("five", "four", "one", "task A", "task B", "task C", "task D", "three", "two");
         for (int i=0; i<expectedTaskNames.size(); i++) {
             assertEquals(expectedTaskNames.get(i), tasks.get(i).getName());
         }
         
         // first complete the tasks from the original process definition and check that it won't continue to the next task (After B and After sub process).
-        for (int i = 0; i < 4; i++) {
-            taskService.complete(tasks.get(i).getId());
-        }
+        taskService.complete(taskService.createTaskQuery().taskName("task A").singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().taskName("task B").singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().taskName("task C").singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().taskName("task D").singleResult().getId());
         
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         expectedTaskNames = Arrays.asList("five", "four", "one", "three", "two");
@@ -245,11 +267,11 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
        
         // now task After B should be available
         Task afterBTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("After B", afterBTask.getName());
+        assertEquals("after B", afterBTask.getName());
         taskService.complete(afterBTask.getId());
 
         Task afterSubProcessTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("After sub process", afterSubProcessTask.getName());
+        assertEquals("after sub process", afterSubProcessTask.getName());
         taskService.complete(afterSubProcessTask.getId());
         assertProcessEnded(processInstance.getId());
 
@@ -325,7 +347,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(9, tasks.size());
-        List<String> expectedTaskNames = Arrays.asList("Task A", "Task B", "Task C", "Task D", "five", "four", "one", "three", "two");
+        List<String> expectedTaskNames = Arrays.asList("five", "four", "one", "task A", "task B", "task C", "task D", "three", "two");
         for (int i = 0; i < expectedTaskNames.size(); i++) {
             assertEquals(expectedTaskNames.get(i), tasks.get(i).getName());
         }
@@ -336,19 +358,18 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         taskService.complete(afterBTask.getId());
         
         // first complete the tasks from the original process definition and check that it continues to the next task (After sub process).
-        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        for (int i = 0; i < 3; i++) {
-            taskService.complete(tasks.get(i).getId());
-        }
+        taskService.complete(taskService.createTaskQuery().taskName("task A").singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().taskName("task C").singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().taskName("task D").singleResult().getId());
         
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        expectedTaskNames = Arrays.asList("After sub process", "five", "four", "one", "three", "two");
+        expectedTaskNames = Arrays.asList("after sub process", "five", "four", "one", "three", "two");
         for (int i = 0; i < expectedTaskNames.size(); i++) {
             assertEquals(expectedTaskNames.get(i), tasks.get(i).getName());
         }
         
         Task afterSubProcessTask = tasks.get(0);
-        assertEquals("After sub process", afterSubProcessTask.getName());
+        assertEquals("after sub process", afterSubProcessTask.getName());
         taskService.complete(afterSubProcessTask.getId());
         
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();

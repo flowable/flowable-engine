@@ -21,11 +21,12 @@ import java.util.Map;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.engine.common.impl.EngineDeployer;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.io.BytesStreamSource;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
-import org.flowable.engine.impl.bpmn.deployer.BpmnDeployer;
+import org.flowable.engine.impl.dynamic.BaseDynamicSubProcessInjectUtil;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -35,7 +36,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -88,21 +88,10 @@ public abstract class AbstractDynamicInjectionCmd {
         return newDeploymentEntity;
     }
 
-    protected ResourceEntity storeBpmnModelAsByteArray(CommandContext commandContext, BpmnModel bpmnModel, DeploymentEntity deploymentEntity, String resourceName) {
+    protected void storeBpmnModelAsByteArray(CommandContext commandContext, BpmnModel bpmnModel, DeploymentEntity deploymentEntity, String resourceName) {
         BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
         byte[] bytes = bpmnXMLConverter.convertToXML(bpmnModel);
-        return addResource(commandContext, deploymentEntity, resourceName, bytes);
-    }
-
-    protected ResourceEntity addResource(CommandContext commandContext, DeploymentEntity deploymentEntity, String resourceName, byte[] bytes) {
-        ResourceEntityManager resourceEntityManager = CommandContextUtil.getResourceEntityManager(commandContext);
-        ResourceEntity resourceEntity = resourceEntityManager.create();
-        resourceEntity.setDeploymentId(deploymentEntity.getId());
-        resourceEntity.setName(resourceName);
-        resourceEntity.setBytes(bytes);
-        resourceEntityManager.insert(resourceEntity);
-        deploymentEntity.addResource(resourceEntity);
-        return resourceEntity;
+        BaseDynamicSubProcessInjectUtil.addResource(commandContext, deploymentEntity, resourceName, bytes);
     }
 
     protected ProcessDefinitionEntity deployDerivedDeploymentEntity(CommandContext commandContext, 
@@ -117,9 +106,11 @@ public abstract class AbstractDynamicInjectionCmd {
             deploymentSettings.put(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ROOT_ID, originalProcessDefinitionEntity.getId());
         }
 
-        BpmnDeployer bpmnDeployer = CommandContextUtil.getProcessEngineConfiguration(commandContext).getBpmnDeployer();
         deploymentEntity.setNew(true);
-        bpmnDeployer.deploy(deploymentEntity, deploymentSettings);
+        List<EngineDeployer> deployers = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager().getDeployers();
+        for (EngineDeployer engineDeployer : deployers) {
+            engineDeployer.deploy(deploymentEntity, deploymentSettings);
+        }
 
         return deploymentEntity.getDeployedArtifacts(ProcessDefinitionEntity.class).get(0);
     }

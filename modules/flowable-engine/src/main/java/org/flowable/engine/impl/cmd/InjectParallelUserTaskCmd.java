@@ -30,6 +30,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.dynamic.BaseDynamicSubProcessInjectUtil;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -187,6 +188,8 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
             
             bpmnModel.addFlowGraphicInfoList(endFlow.getId(), createWayPoints(389.621, 150.378, 435, 150.089));
         }
+        
+        BaseDynamicSubProcessInjectUtil.processFlowElements(commandContext, process, bpmnModel, originalProcessDefinitionEntity, newDeploymentEntity);
     }
 
     @Override

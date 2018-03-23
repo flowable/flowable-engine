@@ -3,7 +3,7 @@ alter table ACT_RE_DEPLOYMENT add column DERIVED_FROM_ROOT_ varchar(64);
 alter table ACT_RE_PROCDEF add column DERIVED_FROM_ varchar(64);
 alter table ACT_RE_PROCDEF add column DERIVED_FROM_ROOT_ varchar(64);
 
-alter table ACT_RE_PROCDEF add column DERIVED_VERSION_ integer default 0;
+alter table ACT_RE_PROCDEF add column DERIVED_VERSION_ integer not null default 0;
 
 alter table ACT_RE_PROCDEF
     drop constraint ACT_UNIQ_PROCDEF;

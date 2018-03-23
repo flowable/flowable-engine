@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelp
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
 
@@ -73,10 +74,14 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
 
         PlanItem planItem = model.findPlanItem(association.getTargetRef());
         if (planItem == null) {
-            // Invalid reference, ignoring
-            return;
+            Criterion criterion = model.getCriterion(association.getTargetRef());
+            if (criterion == null) {
+                // Invalid reference, ignoring
+                return;
+            }
         }
-        GraphicInfo targetGraphicInfo = model.getGraphicInfo(planItem.getId());
+
+        GraphicInfo targetGraphicInfo = model.getGraphicInfo(association.getTargetRef());
         GraphicInfo flowGraphicInfo = graphicInfoList.get(graphicInfoList.size() - 1);
 
         double diffTopY = Math.abs(flowGraphicInfo.getY() - targetGraphicInfo.getY());
@@ -109,6 +114,7 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
 
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         propertiesNode.put(PROPERTY_OVERRIDE_ID, association.getId());
+        propertiesNode.put(PROPERTY_TRANSITION_EVENT, association.getTransitionEvent());
 
         flowNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
 
@@ -121,9 +127,9 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
     }
 
     @Override
-    protected Association convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
+    protected Association convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
-        
+
         Association association = new Association();
 
         association.setId(CmmnJsonConverterUtil.getElementId(elementNode));

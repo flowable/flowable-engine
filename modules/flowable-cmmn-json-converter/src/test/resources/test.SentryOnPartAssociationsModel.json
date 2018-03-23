@@ -1,0 +1,710 @@
+{
+  "modelId": "ca3e5f6a-2ce8-11e8-abb8-00155d018402",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "case_id": "ST",
+    "name": "SentryTest",
+    "documentation": "Test for Sentries",
+    "case_initiatorvariablename": "",
+    "case_author": "",
+    "case_version": "",
+    "case_namespace": "http://www.flowable.org/casedef"
+  },
+  "childShapes": [
+    {
+      "resourceId": "casePlanModel",
+      "properties": {
+        "overrideid": "SentryEventsTest",
+        "name": "Sentry events",
+        "documentation": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "autocompleteenabled": "",
+        "autocompletecondition": ""
+      },
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "childShapes": [
+        {
+          "resourceId": "sid-977BC73B-233B-4C70-9F5B-2286C9BBDE68",
+          "properties": {
+            "overrideid": "stage1",
+            "name": "Stage1",
+            "documentation": "",
+            "autocompleteenabled": "",
+            "autocompletecondition": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": ""
+          },
+          "stencil": {
+            "id": "Stage"
+          },
+          "childShapes": [
+            {
+              "resourceId": "sid-9C13EBD0-57FF-4C98-93E1-598697283A3D",
+              "properties": {
+                "overrideid": "taskA",
+                "name": "Task A",
+                "documentation": "",
+                "isblocking": true,
+                "isblockingexpression": "",
+                "usertaskassignment": "",
+                "formkeydefinition": "",
+                "formreference": "",
+                "duedatedefinition": "",
+                "prioritydefinition": "",
+                "isasync": "",
+                "isexclusive": "",
+                "requiredenabled": "",
+                "requiredrulecondition": "",
+                "repetitionenabled": "",
+                "repetitionrulecondition": "",
+                "repetitioncountervariablename": "",
+                "manualactivationenabled": "",
+                "manualactivationrulecondition": "",
+                "type": "http://b3mn.org/stencilset/cmmn1.1#Task"
+              },
+              "stencil": {
+                "id": "HumanTask"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "sid-F8E5EBC5-DCBB-4C01-B7EA-3267631B2625"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 151.0,
+                  "y": 119.0
+                },
+                "upperLeft": {
+                  "x": 51.0,
+                  "y": 39.0
+                }
+              },
+              "dockers": []
+            },
+            {
+              "resourceId": "sid-F53EF351-E177-4CD7-888E-A8A6319B1B29",
+              "properties": {
+                "overrideid": "taskC",
+                "name": "Task C",
+                "documentation": "",
+                "isblocking": true,
+                "isblockingexpression": "",
+                "isasync": "",
+                "isexclusive": "",
+                "requiredenabled": "",
+                "requiredrulecondition": "",
+                "repetitionenabled": "",
+                "repetitionrulecondition": "",
+                "repetitioncountervariablename": "",
+                "manualactivationenabled": "",
+                "manualactivationrulecondition": ""
+              },
+              "stencil": {
+                "id": "Task"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "sid-BBA866F1-32FF-48B0-A7C8-DD1794720B23"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 316.0,
+                  "y": 170.0
+                },
+                "upperLeft": {
+                  "x": 216.0,
+                  "y": 90.0
+                }
+              },
+              "dockers": []
+            },
+            {
+              "resourceId": "sid-BBA866F1-32FF-48B0-A7C8-DD1794720B23",
+              "properties": {
+                "overrideid": "taskCEntrySentry",
+                "name": "",
+                "documentation": "",
+                "ifpartcondition": ""
+              },
+              "stencil": {
+                "id": "EntryCriterion"
+              },
+              "childShapes": [],
+              "outgoing": [],
+              "bounds": {
+                "lowerRight": {
+                  "x": 223.0,
+                  "y": 137.0
+                },
+                "upperLeft": {
+                  "x": 209.0,
+                  "y": 115.0
+                }
+              },
+              "dockers": [
+                {
+                  "x": 5,
+                  "y": 37
+                }
+              ]
+            },
+            {
+              "resourceId": "sid-C16B67FC-68F8-4A06-9D73-E669AFCB52CF",
+              "properties": {
+                "overrideid": "taskB",
+                "name": "TaskB",
+                "documentation": "",
+                "isblocking": true,
+                "isblockingexpression": "",
+                "usertaskassignment": "",
+                "formkeydefinition": "",
+                "formreference": "",
+                "duedatedefinition": "",
+                "prioritydefinition": "",
+                "isasync": "",
+                "isexclusive": "",
+                "requiredenabled": "",
+                "requiredrulecondition": "",
+                "repetitionenabled": "",
+                "repetitionrulecondition": "",
+                "repetitioncountervariablename": "",
+                "manualactivationenabled": "",
+                "manualactivationrulecondition": ""
+              },
+              "stencil": {
+                "id": "HumanTask"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "sid-58D9F7C0-8B7E-456F-B064-6EA70197A5F5"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 151.0,
+                  "y": 215.0
+                },
+                "upperLeft": {
+                  "x": 51.0,
+                  "y": 135.0
+                }
+              },
+              "dockers": []
+            }
+          ],
+          "outgoing": [
+            {
+              "resourceId": "sid-B1C298F3-BF26-42EF-B7D6-B1067FEE0303"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 463.0,
+              "y": 259.0
+            },
+            "upperLeft": {
+              "x": 95.0,
+              "y": 30.0
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "sid-8493247F-1794-420F-9193-598DFB7593FE",
+          "properties": {
+            "overrideid": "stage2",
+            "name": "Stage2",
+            "documentation": "",
+            "autocompleteenabled": "",
+            "autocompletecondition": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": ""
+          },
+          "stencil": {
+            "id": "Stage"
+          },
+          "childShapes": [
+            {
+              "resourceId": "sid-1DB7D0FB-3209-432A-B1A3-301681C6E90B",
+              "properties": {
+                "overrideid": "expireTimer",
+                "name": "Expire Timer",
+                "documentation": "",
+                "timerexpression": "",
+                "timerstarttriggersourceref": {
+                  "id": "sid-8493247F-1794-420F-9193-598DFB7593FE",
+                  "name": "Stage2"
+                },
+                "transitionevent": "start"
+              },
+              "stencil": {
+                "id": "TimerEventListener"
+              },
+              "childShapes": [],
+              "outgoing": [],
+              "bounds": {
+                "lowerRight": {
+                  "x": 96.0,
+                  "y": 96.0
+                },
+                "upperLeft": {
+                  "x": 65.0,
+                  "y": 65.0
+                }
+              },
+              "dockers": []
+            },
+            {
+              "resourceId": "sid-DEC843BC-5987-42CD-B329-9C903C92D215",
+              "properties": {
+                "overrideid": "timedTask",
+                "name": "Timed Task",
+                "documentation": "",
+                "isblocking": true,
+                "isblockingexpression": "",
+                "isasync": "",
+                "isexclusive": "",
+                "requiredenabled": "",
+                "requiredrulecondition": "",
+                "repetitionenabled": "",
+                "repetitionrulecondition": "",
+                "repetitioncountervariablename": "",
+                "manualactivationenabled": "",
+                "manualactivationrulecondition": ""
+              },
+              "stencil": {
+                "id": "Task"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "sid-325B2A4B-3711-4286-BEA8-5E1CB1C94EA0"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 306.0,
+                  "y": 121.0
+                },
+                "upperLeft": {
+                  "x": 206.0,
+                  "y": 41.0
+                }
+              },
+              "dockers": []
+            },
+            {
+              "resourceId": "sid-325B2A4B-3711-4286-BEA8-5E1CB1C94EA0",
+              "properties": {
+                "overrideid": "timedTaskExitSentry",
+                "name": "",
+                "documentation": "",
+                "ifpartcondition": ""
+              },
+              "stencil": {
+                "id": "ExitCriterion"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "sid-163496E6-4B3B-4674-B1D9-8578B5015134"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 212.0,
+                  "y": 93.0
+                },
+                "upperLeft": {
+                  "x": 198.0,
+                  "y": 71.0
+                }
+              },
+              "dockers": [
+                {
+                  "x": 7.0,
+                  "y": 41.0
+                }
+              ]
+            }
+          ],
+          "outgoing": [
+            {
+              "resourceId": "sid-94B8054B-2608-46A2-90F8-D38F826E4D98"
+            },
+            {
+              "resourceId": "sid-BF44CEB3-9BDA-40D0-BA8D-352A1B7675A0"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 465.0,
+              "y": 470.0
+            },
+            "upperLeft": {
+              "x": 95.0,
+              "y": 300.0
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "sid-036C9D43-0B65-42ED-95D2-832825C1EC7E",
+          "properties": {
+            "overrideid": "abortStageTask",
+            "name": "Abort Stage Task",
+            "documentation": "",
+            "isblocking": true,
+            "isblockingexpression": "",
+            "usertaskassignment": "",
+            "formkeydefinition": "",
+            "formreference": "",
+            "duedatedefinition": "",
+            "prioritydefinition": "",
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": ""
+          },
+          "stencil": {
+            "id": "HumanTask"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 330.0,
+              "y": 590.0
+            },
+            "upperLeft": {
+              "x": 230.0,
+              "y": 510.0
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "sid-94B8054B-2608-46A2-90F8-D38F826E4D98",
+          "properties": {
+            "overrideid": "stage1EntrySentry",
+            "name": "",
+            "documentation": "",
+            "ifpartcondition": ""
+          },
+          "stencil": {
+            "id": "EntryCriterion"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 283.0,
+              "y": 310.0
+            },
+            "upperLeft": {
+              "x": 269.0,
+              "y": 288.0
+            }
+          },
+          "dockers": [
+            {
+              "x": 180.0,
+              "y": 7.0
+            }
+          ]
+        },
+        {
+          "resourceId": "sid-BF44CEB3-9BDA-40D0-BA8D-352A1B7675A0",
+          "properties": {
+            "overrideid": "stage2ExitSentry",
+            "name": "",
+            "documentation": "",
+            "ifpartcondition": ""
+          },
+          "stencil": {
+            "id": "ExitCriterion"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "sid-0DE18D34-1A64-404D-86DB-2856E6772A12"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 289.0,
+              "y": 481.0
+            },
+            "upperLeft": {
+              "x": 275.0,
+              "y": 459.0
+            }
+          },
+          "dockers": [
+            {
+              "x": 186.0,
+              "y": 167.0
+            }
+          ]
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 620.0,
+          "y": 671.0
+        },
+        "upperLeft": {
+          "x": 40.0,
+          "y": 45.0
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "sid-F8E5EBC5-DCBB-4C01-B7EA-3267631B2625",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "transitionevent": "complete"
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-BBA866F1-32FF-48B0-A7C8-DD1794720B23"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 345.0,
+          "y": 199.0
+        },
+        "upperLeft": {
+          "x": 286.0,
+          "y": 175.0
+        }
+      },
+      "dockers": [
+        {
+          "x": 50.0,
+          "y": 40
+        },
+        {
+          "x": 7.0,
+          "y": 11.0
+        }
+      ],
+      "target": {
+        "resourceId": "sid-BBA866F1-32FF-48B0-A7C8-DD1794720B23"
+      }
+    },
+    {
+      "resourceId": "sid-B1C298F3-BF26-42EF-B7D6-B1067FEE0303",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "transitionevent": "terminate"
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-94B8054B-2608-46A2-90F8-D38F826E4D98"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 316.0,
+          "y": 333.0
+        },
+        "upperLeft": {
+          "x": 316.0,
+          "y": 304.0
+        }
+      },
+      "dockers": [
+        {
+          "x": 184.0,
+          "y": 114.0
+        },
+        {
+          "x": 7.0,
+          "y": 11.0
+        }
+      ],
+      "target": {
+        "resourceId": "sid-94B8054B-2608-46A2-90F8-D38F826E4D98"
+      }
+    },
+    {
+      "resourceId": "sid-163496E6-4B3B-4674-B1D9-8578B5015134",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "transitionevent": "occur"
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-1DB7D0FB-3209-432A-B1A3-301681C6E90B"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 333.0,
+          "y": 426.0
+        },
+        "upperLeft": {
+          "x": 240.0,
+          "y": 426.0
+        }
+      },
+      "dockers": [
+        {
+          "x": 8.0,
+          "y": 10.0
+        },
+        {
+          "x": 15.0,
+          "y": 15.0
+        }
+      ],
+      "target": {
+        "resourceId": "sid-1DB7D0FB-3209-432A-B1A3-301681C6E90B"
+      }
+    },
+    {
+      "resourceId": "sid-0DE18D34-1A64-404D-86DB-2856E6772A12",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "transitionevent": "complete"
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-036C9D43-0B65-42ED-95D2-832825C1EC7E"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 323.0,
+          "y": 554.0
+        },
+        "upperLeft": {
+          "x": 322.0,
+          "y": 526.0
+        }
+      },
+      "dockers": [
+        {
+          "x": 8.0,
+          "y": 10.0
+        },
+        {
+          "x": 50.0,
+          "y": 40.0
+        }
+      ],
+      "target": {
+        "resourceId": "sid-036C9D43-0B65-42ED-95D2-832825C1EC7E"
+      }
+    },
+    {
+      "resourceId": "sid-58D9F7C0-8B7E-456F-B064-6EA70197A5F5",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "transitionevent": "complete"
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-BBA866F1-32FF-48B0-A7C8-DD1794720B23"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 345.0,
+          "y": 228.0
+        },
+        "upperLeft": {
+          "x": 286.0,
+          "y": 204.0
+        }
+      },
+      "dockers": [
+        {
+          "x": 50.0,
+          "y": 40.0
+        },
+        {
+          "x": 7.0,
+          "y": 11.0
+        }
+      ],
+      "target": {
+        "resourceId": "sid-BBA866F1-32FF-48B0-A7C8-DD1794720B23"
+      }
+    }
+  ],
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  },
+  "modelType": "model"
+}

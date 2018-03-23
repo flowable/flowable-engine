@@ -47,7 +47,21 @@ import org.flowable.form.api.FormRepositoryService;
 /**
  * @author Tijs Rademakers
  */
-public class AbstractDynamicSubProcessInjectUtil {
+public class BaseDynamicSubProcessInjectUtil {
+    
+    public static void processFlowElements(CommandContext commandContext, FlowElementsContainer process, BpmnModel bpmnModel, 
+                    ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity) {
+        
+        for (FlowElement flowElement : process.getFlowElements()) {
+
+            processUserTask(flowElement, originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
+            processDecisionTask(flowElement, originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
+                
+            if (flowElement instanceof SubProcess) {
+                processFlowElements(commandContext, ((SubProcess) flowElement), bpmnModel, originalProcessDefinitionEntity, newDeploymentEntity);
+            }
+        }
+    }
     
     protected static void processSubProcessFlowElements(CommandContext commandContext, String prefix, Process process, BpmnModel bpmnModel, 
                     SubProcess subProcess, BpmnModel subProcessBpmnModel, ProcessDefinitionEntity originalProcessDefinitionEntity, 
@@ -74,49 +88,11 @@ public class AbstractDynamicSubProcessInjectUtil {
                     }
                 }
             }
+            
+            processUserTask(flowElement, originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
+            processDecisionTask(flowElement, originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
 
-            FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
-            DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
-            if (flowElement instanceof UserTask && formRepositoryService != null) {
-                UserTask userTask = (UserTask) flowElement;
-                if (StringUtils.isNotEmpty(userTask.getFormKey())) {
-                    FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery()
-                            .formDefinitionKey(userTask.getFormKey()).parentDeploymentId(originalProcessDefinitionEntity.getDeploymentId()).latestVersion().singleResult();
-                    if (formDefinition != null) {
-                        String name = formDefinition.getResourceName();
-                        InputStream inputStream = formRepositoryService.getResourceAsStream(formDefinition.getId(), name);
-                        addResource(commandContext, newDeploymentEntity, name, IoUtil.readInputStream(inputStream, name));
-                        IoUtil.closeSilently(inputStream);
-                    }
-                }
-                
-            } else if (flowElement instanceof ServiceTask 
-                    && ServiceTask.DMN_TASK.equals(((ServiceTask) flowElement).getType()) 
-                    && dmnRepositoryService != null) {
-                
-                ServiceTask serviceTask = (ServiceTask) flowElement;
-                if (serviceTask.getFieldExtensions() != null && serviceTask.getFieldExtensions().size() > 0) {
-                    String decisionTableReferenceKey = null;
-                    for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-                        if ("decisionTableReferenceKey".equals(fieldExtension.getFieldName())) {
-                            decisionTableReferenceKey = fieldExtension.getStringValue();
-                            break;
-                        }
-                    }
-
-                    if (decisionTableReferenceKey != null) {
-                        DmnDecisionTable dmnDecisionTable = dmnRepositoryService.createDecisionTableQuery()
-                                .decisionTableKey(decisionTableReferenceKey).parentDeploymentId(originalProcessDefinitionEntity.getDeploymentId()).latestVersion().singleResult();
-                        if (dmnDecisionTable != null) {
-                            String name = dmnDecisionTable.getResourceName();
-                            InputStream inputStream = dmnRepositoryService.getDmnResource(dmnDecisionTable.getId());
-                            addResource(commandContext, newDeploymentEntity, name, IoUtil.readInputStream(inputStream, name));
-                            IoUtil.closeSilently(inputStream);
-                        }
-                    }
-                }
-                
-            } else if (flowElement instanceof SubProcess) {
+            if (flowElement instanceof SubProcess) {
                 processSubProcessFlowElements(commandContext, prefix, process, bpmnModel, (SubProcess) flowElement, 
                         subProcessBpmnModel, originalProcessDefinitionEntity, newDeploymentEntity, generatedIds, includeDiInfo);
             }
@@ -192,15 +168,69 @@ public class AbstractDynamicSubProcessInjectUtil {
         }
     }
     
-    protected static ResourceEntity addResource(CommandContext commandContext, DeploymentEntity deploymentEntity, String resourceName, byte[] bytes) {
-        ResourceEntityManager resourceEntityManager = CommandContextUtil.getResourceEntityManager(commandContext);
-        ResourceEntity resourceEntity = resourceEntityManager.create();
-        resourceEntity.setDeploymentId(deploymentEntity.getId());
-        resourceEntity.setName(resourceName);
-        resourceEntity.setBytes(bytes);
-        resourceEntityManager.insert(resourceEntity);
-        deploymentEntity.addResource(resourceEntity);
-        return resourceEntity;
+    protected static void processUserTask(FlowElement flowElement, ProcessDefinitionEntity originalProcessDefinitionEntity, 
+                    DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
+        
+        if (flowElement instanceof UserTask) {
+            FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
+            if (formRepositoryService != null) {
+                UserTask userTask = (UserTask) flowElement;
+                if (StringUtils.isNotEmpty(userTask.getFormKey())) {
+                    FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery()
+                            .formDefinitionKey(userTask.getFormKey()).parentDeploymentId(originalProcessDefinitionEntity.getDeploymentId()).latestVersion().singleResult();
+                    if (formDefinition != null) {
+                        String name = formDefinition.getResourceName();
+                        InputStream inputStream = formRepositoryService.getFormDefinitionResource(formDefinition.getId());
+                        addResource(commandContext, newDeploymentEntity, name, IoUtil.readInputStream(inputStream, name));
+                        IoUtil.closeSilently(inputStream);
+                    }
+                }
+            }
+        }
+    }
+    
+    protected static void processDecisionTask(FlowElement flowElement, ProcessDefinitionEntity originalProcessDefinitionEntity, 
+                    DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
+        
+        if (flowElement instanceof ServiceTask && ServiceTask.DMN_TASK.equals(((ServiceTask) flowElement).getType())) {
+                    
+            DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
+            if (dmnRepositoryService != null) {
+                ServiceTask serviceTask = (ServiceTask) flowElement;
+                if (serviceTask.getFieldExtensions() != null && serviceTask.getFieldExtensions().size() > 0) {
+                    String decisionTableReferenceKey = null;
+                    for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
+                        if ("decisionTableReferenceKey".equals(fieldExtension.getFieldName())) {
+                            decisionTableReferenceKey = fieldExtension.getStringValue();
+                            break;
+                        }
+                    }
+    
+                    if (decisionTableReferenceKey != null) {
+                        DmnDecisionTable dmnDecisionTable = dmnRepositoryService.createDecisionTableQuery()
+                                .decisionTableKey(decisionTableReferenceKey).parentDeploymentId(originalProcessDefinitionEntity.getDeploymentId()).latestVersion().singleResult();
+                        if (dmnDecisionTable != null) {
+                            String name = dmnDecisionTable.getResourceName();
+                            InputStream inputStream = dmnRepositoryService.getDmnResource(dmnDecisionTable.getId());
+                            addResource(commandContext, newDeploymentEntity, name, IoUtil.readInputStream(inputStream, name));
+                            IoUtil.closeSilently(inputStream);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public static void addResource(CommandContext commandContext, DeploymentEntity deploymentEntity, String resourceName, byte[] bytes) {
+        if (!deploymentEntity.getResources().containsKey(resourceName)) { 
+            ResourceEntityManager resourceEntityManager = CommandContextUtil.getResourceEntityManager(commandContext);
+            ResourceEntity resourceEntity = resourceEntityManager.create();
+            resourceEntity.setDeploymentId(deploymentEntity.getId());
+            resourceEntity.setName(resourceName);
+            resourceEntity.setBytes(bytes);
+            resourceEntityManager.insert(resourceEntity);
+            deploymentEntity.addResource(resourceEntity);
+        }
     }
     
     protected static List<GraphicInfo> createWayPoints(double x1, double y1, double x2, double y2) {

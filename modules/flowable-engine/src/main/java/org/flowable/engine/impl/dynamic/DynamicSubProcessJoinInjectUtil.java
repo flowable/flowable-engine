@@ -43,7 +43,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 /**
  * @author Tijs Rademakers
  */
-public class DynamicSubProcessJoinInjectUtil extends AbstractDynamicSubProcessInjectUtil {
+public class DynamicSubProcessJoinInjectUtil extends BaseDynamicSubProcessInjectUtil {
     
     public static void injectSubProcessWithJoin(String taskId, Process process, BpmnModel bpmnModel, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder,
                     ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
@@ -107,6 +107,8 @@ public class DynamicSubProcessJoinInjectUtil extends AbstractDynamicSubProcessIn
         for (FlowElement flowElement : bpmnModelSubProcess.getMainProcess().getFlowElements()) {
             subProcess.addFlowElement(flowElement);
         }
+        
+        processFlowElements(commandContext, process, bpmnModel, originalProcessDefinitionEntity, newDeploymentEntity);
         
         Map<String, FlowElement> generatedIds = new HashMap<>();
         processSubProcessFlowElements(commandContext, subProcess.getId(), process, bpmnModel, subProcess, bpmnModelSubProcess, 

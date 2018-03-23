@@ -82,7 +82,7 @@ create table ACT_RE_PROCDEF (
     TENANT_ID_ nvarchar(255) default '',
     DERIVED_FROM_ nvarchar(64),
     DERIVED_FROM_ROOT_ nvarchar(64),
-    DERIVED_VERSION_ int default 0,
+    DERIVED_VERSION_ int not null default 0,
     ENGINE_VERSION_ nvarchar(255),
     primary key (ID_)
 );

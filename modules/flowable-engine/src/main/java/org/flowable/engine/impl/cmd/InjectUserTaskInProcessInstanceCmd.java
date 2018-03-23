@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.dynamic.BaseDynamicSubProcessInjectUtil;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -152,6 +153,8 @@ public class InjectUserTaskInProcessInstanceCmd extends AbstractDynamicInjection
             bpmnModel.addFlowGraphicInfoList(flowFromUserTask.getId(), createWayPoints(elementGraphicInfo.getX() + 285, elementGraphicInfo.getY() - 123, 
                             elementGraphicInfo.getX() + 335, elementGraphicInfo.getY() - 123));
         }
+        
+        BaseDynamicSubProcessInjectUtil.processFlowElements(commandContext, process, bpmnModel, originalProcessDefinitionEntity, newDeploymentEntity);
     }
 
     @Override
