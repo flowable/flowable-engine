@@ -67,6 +67,13 @@ public class FlowableDmnProperties {
     private boolean enableSafeXml = true;
 
     /**
+     * Set this to false if you want to ignore the decision table hit policy validity checks to result in an failed decision table state.
+     * <p>
+     * A result is that intermediate results created up to the point the validation error occurs are returned.
+     */
+    private boolean strictMode = true;
+
+    /**
      * The servlet configuration for the DMN Rest API.
      */
     @NestedConfigurationProperty
@@ -126,6 +133,14 @@ public class FlowableDmnProperties {
 
     public void setEnableSafeXml(boolean enableSafeXml) {
         this.enableSafeXml = enableSafeXml;
+    }
+
+    public boolean isStrictMode() {
+        return strictMode;
+    }
+
+    public void setStrictMode(boolean strictMode) {
+        this.strictMode = strictMode;
     }
 
     public FlowableServlet getServlet() {
