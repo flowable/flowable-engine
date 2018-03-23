@@ -14,13 +14,10 @@ package org.flowable.app.task;
 
 import org.flowable.app.conf.ApplicationConfiguration;
 import org.flowable.app.servlet.AppDispatcherServletConfiguration;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.runtime.Clock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -51,10 +48,4 @@ public class FlowableTaskApplication extends SpringBootServletInitializer {
             }
         };
     }
-
-    @Bean(name = "clock")
-    public Clock getClock(ProcessEngineConfiguration engineConfiguration) {
-        return engineConfiguration.getClock();
-    }
-
 }
