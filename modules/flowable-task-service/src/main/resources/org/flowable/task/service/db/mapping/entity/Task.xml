@@ -23,7 +23,7 @@
   
   <insert id="insertTask" parameterType="org.flowable.task.service.impl.persistence.entity.TaskEntityImpl">
     insert into ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_, 
-                      EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
+                      EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
                       TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, 
                       IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_)
     values (#{id, jdbcType=VARCHAR},
@@ -39,6 +39,7 @@
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
+            #{taskDefinitionId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
             #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
@@ -59,7 +60,7 @@
 
   <insert id="bulkInsertTask" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_, 
-        EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, 
+        EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, 
         TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, 
         IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_)
     VALUES 
@@ -77,6 +78,7 @@
          #{task.executionId, jdbcType=VARCHAR},
          #{task.processInstanceId, jdbcType=VARCHAR},
          #{task.processDefinitionId, jdbcType=VARCHAR},
+         #{task.taskDefinitionId, jdbcType=VARCHAR},
          #{task.scopeId, jdbcType=VARCHAR},
          #{task.subScopeId, jdbcType=VARCHAR},
          #{task.scopeType, jdbcType=VARCHAR},
@@ -100,7 +102,7 @@
     INSERT ALL 
       <foreach collection="list" item="task" index="index">
         INTO ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_, 
-              EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, TASK_DEF_KEY_, 
+              EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, TASK_DEF_KEY_, 
               DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, 
               IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_) VALUES
         (#{task.id, jdbcType=VARCHAR},
@@ -116,6 +118,7 @@
          #{task.executionId, jdbcType=VARCHAR},
          #{task.processInstanceId, jdbcType=VARCHAR},
          #{task.processDefinitionId, jdbcType=VARCHAR},
+         #{task.taskDefinitionId, jdbcType=VARCHAR},
          #{task.scopeId, jdbcType=VARCHAR},
          #{task.subScopeId, jdbcType=VARCHAR},
          #{task.scopeType, jdbcType=VARCHAR},
@@ -168,6 +171,9 @@
       </if>
       <if test="originalPersistentState.processDefinitionId != processDefinitionId">
           PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.taskDefinitionId != taskDefinitionId">
+          TASK_DEF_ID_ = #{taskDefinitionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.scopeId != scopeId">
           SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
@@ -287,6 +293,7 @@
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="taskDefinitionId" column="TASK_DEF_ID_" jdbcType="VARCHAR"/>
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
@@ -318,6 +325,7 @@
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="taskDefinitionId" column="TASK_DEF_ID_" jdbcType="VARCHAR"/>
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
@@ -444,7 +452,8 @@
       TEMPRES_PRIORITY_ as PRIORITY_, TEMPRES_CREATE_TIME_ as CREATE_TIME_,
       TEMPRES_OWNER_ as OWNER_, TEMPRES_ASSIGNEE_ as ASSIGNEE_, TEMPRES_DELEGATION_ as DELEGATION_,
       TEMPRES_FORM_KEY_ as FORM_KEY_, TEMPRES_CLAIM_TIME_ as CLAIM_TIME_, TEMPRES_EXECUTION_ID_ as EXECUTION_ID_,
-      TEMPRES_PROC_INST_ID_ as PROC_INST_ID_, TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_, TEMPRES_TASK_DEF_KEY_ as TASK_DEF_KEY_,
+      TEMPRES_PROC_INST_ID_ as PROC_INST_ID_, TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_,
+      TEMPRES_TASK_DEF_ID_ as TASK_DEF_ID_, TEMPRES_TASK_DEF_KEY_ as TASK_DEF_KEY_,
       TEMPRES_DUE_DATE_ as DUE_DATE_, TEMPRES_SUSPENSION_STATE_ as SUSPENSION_STATE_, TEMPRES_CATEGORY_ as CATEGORY_,
       TEMPRES_IS_COUNT_ENABLED_ as IS_COUNT_ENABLED_,	TEMPRES_VAR_COUNT_ as VAR_COUNT_, TEMPRES_ID_LINK_COUNT_ as ID_LINK_COUNT_, TEMPRES_ID_SUB_TASK_COUNT_ as SUB_TASK_COUNT_
       <if test="includeTaskLocalVariables or includeProcessVariables">
@@ -466,7 +475,8 @@
       RES.PRIORITY_ as TEMPRES_PRIORITY_, RES.CREATE_TIME_ as TEMPRES_CREATE_TIME_,
       RES.OWNER_ as TEMPRES_OWNER_, RES.ASSIGNEE_ as TEMPRES_ASSIGNEE_, RES.DELEGATION_ as TEMPRES_DELEGATION_,
       RES.FORM_KEY_ as TEMPRES_FORM_KEY_, RES.CLAIM_TIME_ as TEMPRES_CLAIM_TIME_, RES.EXECUTION_ID_ as TEMPRES_EXECUTION_ID_,
-      RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_, RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_, RES.TASK_DEF_KEY_ as TEMPRES_TASK_DEF_KEY_,
+      RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_, RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_,
+      RES.TASK_DEF_ID_ as TEMPRES_TASK_DEF_ID_, RES.TASK_DEF_KEY_ as TEMPRES_TASK_DEF_KEY_,
       RES.DUE_DATE_ as TEMPRES_DUE_DATE_, RES.SUSPENSION_STATE_ as TEMPRES_SUSPENSION_STATE_, RES.CATEGORY_ as TEMPRES_CATEGORY_,
       RES.IS_COUNT_ENABLED_ as TEMPRES_IS_COUNT_ENABLED_, RES.VAR_COUNT_ as TEMPRES_VAR_COUNT_, RES.ID_LINK_COUNT_ as TEMPRES_ID_LINK_COUNT_, RES.SUB_TASK_COUNT_ as TEMPRES_ID_SUB_TASK_COUNT_
       <if test="includeTaskLocalVariables or includeProcessVariables">
@@ -703,6 +713,9 @@
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="taskDefinitionId != null">
+        and RES.TASK_DEF_ID_ = #{taskDefinitionId}
       </if>
       <if test="processDefinitionKey != null">
         and D.KEY_ = #{processDefinitionKey}
@@ -1101,6 +1114,9 @@
             </if>
             <if test="orQueryObject.processDefinitionId != null">
               or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}
+            </if>
+            <if test="orQueryObject.processDefinitionId != null">
+              or RES.TASK_DEF_ID_ = #{orQueryObject.taskDefinitionId}
             </if>
             <if test="orQueryObject.processDefinitionKey != null">
               or D_OR${orIndex}.KEY_ = #{orQueryObject.processDefinitionKey}

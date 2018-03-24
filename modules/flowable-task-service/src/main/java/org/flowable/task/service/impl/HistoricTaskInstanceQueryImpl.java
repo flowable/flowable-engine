@@ -39,6 +39,7 @@ import org.flowable.variable.service.impl.QueryVariableValue;
 public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricTaskInstanceQuery, HistoricTaskInstance> implements HistoricTaskInstanceQuery {
 
     private static final long serialVersionUID = 1L;
+    protected String taskDefinitionId;
     protected String processDefinitionId;
     protected String processDefinitionKey;
     protected String processDefinitionKeyLike;
@@ -303,6 +304,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
         } else {
             this.scopeDefinitionId = scopeDefinitionId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQueryImpl taskDefinitionId(String taskDefinitionId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.taskDefinitionId = taskDefinitionId;
+        } else {
+            this.taskDefinitionId = taskDefinitionId;
         }
         return this;
     }
@@ -1568,6 +1579,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getTaskDefinitionId() {
+        return taskDefinitionId;
     }
 
     public String getProcessDefinitionId() {

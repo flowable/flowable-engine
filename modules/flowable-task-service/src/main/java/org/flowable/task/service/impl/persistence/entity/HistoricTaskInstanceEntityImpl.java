@@ -39,6 +39,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
     protected String executionId;
     protected String processInstanceId;
     protected String processDefinitionId;
+    protected String taskDefinitionId;
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
@@ -73,6 +74,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
 
     public HistoricTaskInstanceEntityImpl(TaskEntity task) {
         this.id = task.getId();
+        this.taskDefinitionId = task.getTaskDefinitionId();
         this.processDefinitionId = task.getProcessDefinitionId();
         this.processInstanceId = task.getProcessInstanceId();
         this.executionId = task.getExecutionId();
@@ -117,6 +119,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         persistentState.put("category", category);
         persistentState.put("executionId", executionId);
         persistentState.put("processDefinitionId", processDefinitionId);
+        persistentState.put("taskDefinitionId", taskDefinitionId);
         persistentState.put("scopeId", scopeId);
         persistentState.put("subScopeId", subScopeId);
         persistentState.put("scopeType", scopeType);
@@ -160,7 +163,12 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
-    
+
+    @Override
+    public String getTaskDefinitionId() {
+        return taskDefinitionId;
+    }
+
     @Override
     public String getScopeId() {
         return scopeId;
@@ -224,6 +232,11 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
     @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
+    public void setTaskDefinitionId(String taskDefinitionId) {
+        this.taskDefinitionId = taskDefinitionId;
     }
 
     @Override

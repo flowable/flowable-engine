@@ -4,6 +4,7 @@ create table ACT_RU_TASK (
     EXECUTION_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    TASK_DEF_ID_ varchar(64),
     SCOPE_ID_ varchar(255),
     SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),

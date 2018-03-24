@@ -12,12 +12,11 @@
  */
 package org.flowable.task.service;
 
-import java.util.List;
-
-import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+
+import java.util.List;
 
 /**
  * Service which provides access to {@link Task} and form related operations.
