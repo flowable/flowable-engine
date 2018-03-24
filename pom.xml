@@ -1258,7 +1258,7 @@
 				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-content-rest</module>
                 <module>modules/flowable-http</module>
-                <module>modules/flowable-spring-boot</module>
+                <!-- <module>modules/flowable-spring-boot</module> -->
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-ui-common</module>
 			</modules>
