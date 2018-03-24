@@ -26,6 +26,7 @@
         <module>flowable-spring-boot-sample-form</module>
         <module>flowable-spring-boot-sample-content</module>
         <module>flowable-spring-boot-sample-cmmn</module>
+        <module>flowable-spring-boot-sample-ldap</module>
     </modules>
     <dependencies>
         <dependency>

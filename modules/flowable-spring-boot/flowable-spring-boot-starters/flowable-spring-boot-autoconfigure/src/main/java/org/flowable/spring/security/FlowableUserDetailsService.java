@@ -13,26 +13,33 @@
 package org.flowable.spring.security;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.flowable.engine.IdentityService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.Group;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
+ * {@link UserDetails} provider that uses the {@link IdmIdentityService} to load users.
+ *
  * @author Josh Long
+ * @author Filip Hrisafov
  */
-public class IdentityServiceUserDetailsService
+public class FlowableUserDetailsService
         implements UserDetailsService {
 
-    private final IdentityService identityService;
+    protected final IdmIdentityService identityService;
 
-    public IdentityServiceUserDetailsService(IdentityService identityService) {
+    public FlowableUserDetailsService(IdmIdentityService identityService) {
         this.identityService = identityService;
     }
 
@@ -53,42 +60,31 @@ public class IdentityServiceUserDetailsService
                     String.format("user (%s) could not be found", userId));
         }
 
-        // if the results not null then its active...
-        boolean active = true;
-
-        // get the granted authorities
-        List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
-        List<Group> groupsForUser = identityService
-                .createGroupQuery()
-                .groupMember(user.getId())
-                .list();
-
-        for (Group g : groupsForUser) {
-            grantedAuthorityList.add(new GroupGrantedAuthority(g));
-        }
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getId(),
-                user.getPassword(),
-                active, active, active, active,
-                grantedAuthorityList);
+        return createFlowableUser(user);
     }
 
-    public static class GroupGrantedAuthority implements GrantedAuthority {
-        private final Group group;
+    protected FlowableUser createFlowableUser(User user) {
 
-        public GroupGrantedAuthority(Group group) {
-            this.group = group;
+        String userId = user.getId();
+        List<Privilege> userPrivileges = identityService.createPrivilegeQuery().userId(userId).list();
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        for (Privilege userPrivilege : userPrivileges) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(userPrivilege.getName()));
         }
 
-        public Group getGroup() {
-            return group;
+        List<Group> groups = identityService.createGroupQuery().groupMember(userId).list();
+        if (!groups.isEmpty()) {
+            List<String> groupIds = new ArrayList<>(groups.size());
+            for (Group group : groups) {
+                groupIds.add(group.getId());
+            }
+
+            List<Privilege> groupPrivileges = identityService.createPrivilegeQuery().groupIds(groupIds).list();
+            for (Privilege groupPrivilege : groupPrivileges) {
+                grantedAuthorities.add(new SimpleGrantedAuthority(groupPrivilege.getName()));
+            }
         }
 
-        @Override
-        public String getAuthority() {
-            return group.getName();
-        }
+        return new FlowableUser(user, true, groups, userPrivileges, grantedAuthorities);
     }
-
 }

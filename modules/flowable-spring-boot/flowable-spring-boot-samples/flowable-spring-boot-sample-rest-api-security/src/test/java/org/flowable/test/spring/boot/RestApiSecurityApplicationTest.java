@@ -82,7 +82,7 @@ public class RestApiSecurityApplicationTest {
                     .as("jlong authorities")
                     .hasSize(1)
                     .extracting(GrantedAuthority::getAuthority)
-                    .containsExactlyInAnyOrder("users");
+                    .containsExactlyInAnyOrder("user-privilege");
             });
 
         assertThat(userDetailsService.loadUserByUsername("jbarrez"))
@@ -93,7 +93,7 @@ public class RestApiSecurityApplicationTest {
                     .as("jbarrez authorities")
                     .hasSize(2)
                     .extracting(GrantedAuthority::getAuthority)
-                    .containsExactlyInAnyOrder("users", "admin");
+                    .containsExactlyInAnyOrder("user-privilege", "admin-privilege");
             });
     }
 

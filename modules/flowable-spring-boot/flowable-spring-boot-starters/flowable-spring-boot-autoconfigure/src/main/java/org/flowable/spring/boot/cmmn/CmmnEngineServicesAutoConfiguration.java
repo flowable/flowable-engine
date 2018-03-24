@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
+import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
@@ -62,7 +63,8 @@ public class CmmnEngineServicesAutoConfiguration {
     static class AlreadyInitializedEngineConfiguration {
 
         @Bean
-        public CmmnEngine cmmnEngine() {
+        public CmmnEngine cmmnEngine(@SuppressWarnings("unused") ProcessEngine processEngine) {
+            // The process engine needs to be injected, as otherwise it won't be initialized, which means that the CmmnEngine is not initialized yet
             if (!CmmnEngines.isInitialized()) {
                 throw new IllegalStateException("CMMN engine has not been initialized");
             }
