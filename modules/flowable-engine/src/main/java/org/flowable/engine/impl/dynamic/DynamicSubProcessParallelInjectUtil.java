@@ -81,7 +81,7 @@ public class DynamicSubProcessParallelInjectUtil extends BaseDynamicSubProcessIn
         
         Map<String, FlowElement> generatedIds = new HashMap<>();
         processSubProcessFlowElements(commandContext, subProcess.getId(), process, bpmnModel, subProcess, bpmnModelSubProcess, 
-                        originalProcessDefinitionEntity, newDeploymentEntity, generatedIds, (elementGraphicInfo != null));
+                        subProcessDefinition, newDeploymentEntity, generatedIds, (elementGraphicInfo != null));
         
         for (String originalFlowElementId : generatedIds.keySet()) {
             FlowElement duplicateFlowElement = generatedIds.get(originalFlowElementId);

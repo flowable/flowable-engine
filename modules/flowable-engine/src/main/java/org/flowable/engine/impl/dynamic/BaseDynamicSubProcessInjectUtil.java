@@ -41,6 +41,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormRepositoryService;
 
@@ -64,7 +65,7 @@ public class BaseDynamicSubProcessInjectUtil {
     }
     
     protected static void processSubProcessFlowElements(CommandContext commandContext, String prefix, Process process, BpmnModel bpmnModel, 
-                    SubProcess subProcess, BpmnModel subProcessBpmnModel, ProcessDefinitionEntity originalProcessDefinitionEntity, 
+                    SubProcess subProcess, BpmnModel subProcessBpmnModel, ProcessDefinition originalProcessDefinition, 
                     DeploymentEntity newDeploymentEntity, Map<String, FlowElement> generatedIds, boolean includeDiInfo) {
         
         Collection<FlowElement> flowElementsOfSubProcess = subProcess.getFlowElementMap().values(); 
@@ -89,12 +90,12 @@ public class BaseDynamicSubProcessInjectUtil {
                 }
             }
             
-            processUserTask(flowElement, originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
-            processDecisionTask(flowElement, originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
+            processUserTask(flowElement, originalProcessDefinition, newDeploymentEntity, commandContext);
+            processDecisionTask(flowElement, originalProcessDefinition, newDeploymentEntity, commandContext);
 
             if (flowElement instanceof SubProcess) {
                 processSubProcessFlowElements(commandContext, prefix, process, bpmnModel, (SubProcess) flowElement, 
-                        subProcessBpmnModel, originalProcessDefinitionEntity, newDeploymentEntity, generatedIds, includeDiInfo);
+                        subProcessBpmnModel, originalProcessDefinition, newDeploymentEntity, generatedIds, includeDiInfo);
             }
         }
     }
@@ -168,7 +169,7 @@ public class BaseDynamicSubProcessInjectUtil {
         }
     }
     
-    protected static void processUserTask(FlowElement flowElement, ProcessDefinitionEntity originalProcessDefinitionEntity, 
+    protected static void processUserTask(FlowElement flowElement, ProcessDefinition originalProcessDefinitionEntity, 
                     DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
         
         if (flowElement instanceof UserTask) {
@@ -189,7 +190,7 @@ public class BaseDynamicSubProcessInjectUtil {
         }
     }
     
-    protected static void processDecisionTask(FlowElement flowElement, ProcessDefinitionEntity originalProcessDefinitionEntity, 
+    protected static void processDecisionTask(FlowElement flowElement, ProcessDefinition originalProcessDefinitionEntity, 
                     DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
         
         if (flowElement instanceof ServiceTask && ServiceTask.DMN_TASK.equals(((ServiceTask) flowElement).getType())) {

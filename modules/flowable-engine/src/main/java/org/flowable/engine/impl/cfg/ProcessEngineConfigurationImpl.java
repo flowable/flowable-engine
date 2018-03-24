@@ -299,6 +299,7 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -673,6 +674,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
+    protected InternalTaskAssignmentManager internalTaskAssignmentManager;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
     protected InternalJobManager internalJobManager;
     protected InternalJobCompatibilityManager internalJobCompatibilityManager;
@@ -1319,6 +1321,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(this.internalTaskVariableScopeResolver);
         } else {
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultTaskVariableScopeResolver(this));
+        }
+        
+        if (this.internalTaskAssignmentManager != null) {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
+        } else {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
         }
 
         if (this.internalTaskLocalizationManager != null) {
@@ -2536,6 +2544,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setInternalHistoryTaskManager(InternalHistoryTaskManager internalHistoryTaskManager) {
         this.internalHistoryTaskManager = internalHistoryTaskManager;
+        return this;
+    }
+    
+    public InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return internalTaskAssignmentManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalTaskAssignmentManager(InternalTaskAssignmentManager internalTaskAssignmentManager) {
+        this.internalTaskAssignmentManager = internalTaskAssignmentManager;
         return this;
     }
 
