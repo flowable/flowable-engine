@@ -14,10 +14,10 @@ package org.flowable.test.spring.boot;
 
 import flowable.Application;
 
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.cmmn.service.api.repository.CaseDefinitionResponse;
-import org.flowable.rest.content.service.api.content.ContentItemResponse;
-import org.flowable.rest.dmn.service.api.repository.DmnDeploymentResponse;
+import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.content.rest.service.api.content.ContentItemResponse;
+import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;

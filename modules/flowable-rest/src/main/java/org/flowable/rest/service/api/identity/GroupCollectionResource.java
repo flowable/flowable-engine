@@ -21,14 +21,15 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.GroupQueryProperty;
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

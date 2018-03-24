@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Flowable - REST - Common</name>
+    <name>Flowable - Common - REST</name>
     <artifactId>flowable-common-rest</artifactId>
     <packaging>jar</packaging>
 
@@ -17,7 +17,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <flowable.artifact>
-            org.flowable.rest.common
+            org.flowable.common.rest
         </flowable.artifact>
     </properties>
 

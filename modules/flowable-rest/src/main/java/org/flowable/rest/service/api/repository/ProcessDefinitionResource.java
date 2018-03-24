@@ -19,9 +19,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.rest.exception.FlowableConflictException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;

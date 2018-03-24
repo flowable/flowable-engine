@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot.cmmn;
 
-import org.flowable.rest.cmmn.service.api.CmmnRestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

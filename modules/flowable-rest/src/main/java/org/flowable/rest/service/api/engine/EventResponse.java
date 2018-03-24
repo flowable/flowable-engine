@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.engine;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.rest.util.DateToStringSerializer;
+import org.flowable.common.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

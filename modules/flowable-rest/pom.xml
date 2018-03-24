@@ -16,7 +16,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <flowable.artifact>
-      org.flowable.rest.service
+      org.flowable.rest
     </flowable.artifact>
   </properties>
 

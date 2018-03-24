@@ -18,12 +18,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryProperty;
-import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;

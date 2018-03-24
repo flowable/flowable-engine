@@ -15,9 +15,10 @@ package org.flowable.rest.service.api.repository;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
-import org.flowable.rest.util.DateToStringSerializer;
 
 import java.util.Date;
+
+import org.flowable.common.rest.util.DateToStringSerializer;
 
 /**
  * @author Frederik Heremans

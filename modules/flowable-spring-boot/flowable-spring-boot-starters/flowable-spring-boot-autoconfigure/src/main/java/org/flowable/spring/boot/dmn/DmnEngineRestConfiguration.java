@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot.dmn;
 
-import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
+import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

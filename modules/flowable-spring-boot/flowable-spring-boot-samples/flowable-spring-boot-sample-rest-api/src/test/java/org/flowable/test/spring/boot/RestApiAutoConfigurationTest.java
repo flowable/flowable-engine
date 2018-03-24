@@ -2,7 +2,7 @@ package org.flowable.test.spring.boot;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.rest.api.DataResponse;
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;

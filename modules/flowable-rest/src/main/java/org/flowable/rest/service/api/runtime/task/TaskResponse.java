@@ -15,8 +15,9 @@ package org.flowable.rest.service.api.runtime.task;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
+
+import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.rest.util.DateToStringSerializer;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 

@@ -12,9 +12,9 @@
  */
 package org.flowable.app.conf;
 
+import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
+import org.flowable.common.rest.exception.ErrorInfo;
 import org.flowable.engine.FlowableTaskAlreadyClaimedException;
-import org.flowable.rest.exception.BaseExceptionHandlerAdvice;
-import org.flowable.rest.exception.ErrorInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

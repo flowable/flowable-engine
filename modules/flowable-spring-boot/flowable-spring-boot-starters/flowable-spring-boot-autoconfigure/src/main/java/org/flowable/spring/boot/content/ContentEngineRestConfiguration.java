@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot.content;
 
-import org.flowable.rest.content.ContentRestResponseFactory;
+import org.flowable.content.rest.ContentRestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

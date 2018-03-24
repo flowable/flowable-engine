@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.history;
 
 import java.util.List;
 
-import org.flowable.rest.api.AbstractPaginateList;
+import org.flowable.common.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 

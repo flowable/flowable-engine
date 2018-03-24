@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<name>Flowable - Content REST</name>
+	<name>Flowable - Content - REST</name>
 	<artifactId>flowable-content-rest</artifactId>
 	<packaging>jar</packaging>
 
@@ -18,7 +18,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<flowable.artifact>
-			org.flowable.rest.content.service
+			org.flowable.content.rest
 		</flowable.artifact>
 	</properties>
 
