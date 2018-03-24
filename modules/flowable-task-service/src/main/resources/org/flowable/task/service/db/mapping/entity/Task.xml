@@ -1115,7 +1115,7 @@
             <if test="orQueryObject.processDefinitionId != null">
               or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}
             </if>
-            <if test="orQueryObject.processDefinitionId != null">
+            <if test="orQueryObject.taskDefinitionId != null">
               or RES.TASK_DEF_ID_ = #{orQueryObject.taskDefinitionId}
             </if>
             <if test="orQueryObject.processDefinitionKey != null">
