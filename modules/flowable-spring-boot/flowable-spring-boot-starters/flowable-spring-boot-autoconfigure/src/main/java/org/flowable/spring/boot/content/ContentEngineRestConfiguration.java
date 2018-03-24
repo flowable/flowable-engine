@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
  * @author Filip Hrisafov
  */
 @Import(DispatcherServletConfiguration.class)
-@ComponentScan("org.flowable.rest.content.service.api")
+@ComponentScan("org.flowable.content.rest.service.api")
 public class ContentEngineRestConfiguration {
 
     @Bean

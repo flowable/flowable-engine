@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
  * @author Filip Hrisafov
  */
 @Import(DispatcherServletConfiguration.class)
-@ComponentScan("org.flowable.rest.idm.service.api")
+@ComponentScan("org.flowable.idm.rest.service.api")
 public class IdmEngineRestConfiguration {
 
     @Bean
