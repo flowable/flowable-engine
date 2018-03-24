@@ -1,7 +1,8 @@
 package flowable;
 
-import org.flowable.engine.IdentityService;
 import org.flowable.idm.api.Group;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
 import org.flowable.rest.security.BasicAuthenticationProvider;
 import org.springframework.boot.CommandLineRunner;
@@ -36,7 +37,7 @@ public class Application {
     }
 
     @Bean
-    CommandLineRunner seedUsersAndGroups(final IdentityService identityService) {
+    CommandLineRunner seedUsersAndGroups(final IdmIdentityService identityService) {
         return new CommandLineRunner() {
             @Override
             public void run(String... strings) throws Exception {
@@ -52,11 +53,17 @@ public class Application {
                 group.setType("security-role");
                 identityService.saveGroup(group);
 
+                Privilege userPrivilege = identityService.createPrivilege("user-privilege");
+                identityService.addGroupPrivilegeMapping(userPrivilege.getId(), group.getId());
+
+                Privilege adminPrivilege = identityService.createPrivilege("admin-privilege");
+
                 User joram = identityService.newUser("jbarrez");
                 joram.setFirstName("Joram");
                 joram.setLastName("Barrez");
                 joram.setPassword("password");
                 identityService.saveUser(joram);
+                identityService.addUserPrivilegeMapping(adminPrivilege.getId(), joram.getId());
 
                 User filip = identityService.newUser("filiphr");
                 filip.setFirstName("Filip");

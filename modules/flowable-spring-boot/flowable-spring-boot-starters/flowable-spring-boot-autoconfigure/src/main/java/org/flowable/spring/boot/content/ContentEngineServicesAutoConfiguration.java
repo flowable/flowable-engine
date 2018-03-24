@@ -18,6 +18,7 @@ import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.ContentEngines;
 import org.flowable.content.spring.ContentEngineFactoryBean;
+import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnContentEngine;
@@ -59,7 +60,8 @@ public class ContentEngineServicesAutoConfiguration {
     static class AlreadyInitializedConfiguration {
 
         @Bean
-        public ContentEngine contentEngine() {
+        public ContentEngine contentEngine(@SuppressWarnings("unused") ProcessEngine processEngine) {
+            // The process engine needs to be injected, as otherwise it won't be initialized, which means that the ContentEngine is not initialized yet
             if (!ContentEngines.isInitialized()) {
                 throw new IllegalStateException("Content engine has not been initialized");
             }

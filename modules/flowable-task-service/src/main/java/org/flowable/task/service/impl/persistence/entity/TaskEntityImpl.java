@@ -79,6 +79,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected String executionId;
     protected String processInstanceId;
     protected String processDefinitionId;
+    protected String taskDefinitionId;
     
     protected String scopeId;
     protected String subScopeId;
@@ -129,6 +130,9 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         }
         if (processDefinitionId != null) {
             persistentState.put("processDefinitionId", this.processDefinitionId);
+        }
+        if (taskDefinitionId != null) {
+            persistentState.put("taskDefinitionId", this.taskDefinitionId);
         }
         if (scopeId != null) {
             persistentState.put("scopeId", this.scopeId);
@@ -473,7 +477,17 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
-    
+
+    @Override
+    public String getTaskDefinitionId() {
+        return taskDefinitionId;
+    }
+
+    @Override
+    public void setTaskDefinitionId(String taskDefinitionId) {
+        this.taskDefinitionId = taskDefinitionId;
+    }
+
     @Override
     public String getScopeId() {
         return scopeId;

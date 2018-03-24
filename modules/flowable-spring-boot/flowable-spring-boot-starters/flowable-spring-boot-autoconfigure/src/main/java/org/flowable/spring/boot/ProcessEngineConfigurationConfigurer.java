@@ -19,9 +19,10 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  * is created and the default values have been set.
  * 
  * @author Joram Barrez
+ *
+ * @deprecated use <code>{@link EngineConfigurationConfigurer}<{@link SpringProcessEngineConfiguration}></code> instead
  */
-public interface ProcessEngineConfigurationConfigurer {
-
-    void configure(SpringProcessEngineConfiguration processEngineConfiguration);
+@Deprecated
+public interface ProcessEngineConfigurationConfigurer extends EngineConfigurationConfigurer<SpringProcessEngineConfiguration> {
 
 }

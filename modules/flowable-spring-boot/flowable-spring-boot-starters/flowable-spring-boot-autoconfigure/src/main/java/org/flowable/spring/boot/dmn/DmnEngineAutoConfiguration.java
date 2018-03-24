@@ -21,11 +21,12 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -98,7 +99,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
         @Bean
         @ConditionalOnMissingBean(name = "dmnProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer dmnProcessEngineConfigurationConfigurer(
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> dmnProcessEngineConfigurationConfigurer(
             DmnEngineConfigurator dmnEngineConfigurator
         ) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(dmnEngineConfigurator);
