@@ -38,6 +38,7 @@ import org.flowable.engine.impl.history.async.json.transformer.TaskCreatedHistor
 import org.flowable.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskOwnerChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.UpdateProcessDefinitionCascadeHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
@@ -69,6 +70,7 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
         addHistoryJsonTransformer(new ProcessInstancePropertyChangedHistoryJsonTransformer());
         addHistoryJsonTransformer(new SubProcessInstanceStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new SetProcessDefinitionHistoryJsonTransformer());
+        addHistoryJsonTransformer(new UpdateProcessDefinitionCascadeHistoryJsonTransformer());
 
         addHistoryJsonTransformer(new ActivityStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new ActivityEndHistoryJsonTransformer());

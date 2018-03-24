@@ -388,6 +388,9 @@
             <if test="originalPersistentState.retries != retries">
                 RETRIES_ = #{retries, jdbcType=INTEGER},
             </if>
+            <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.createTime != createTime">
                 CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP}
             </if>

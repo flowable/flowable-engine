@@ -77,6 +77,11 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     }
     
     @Override
+    public List<DeadLetterJobEntity> findDeadLetterJobsByProcessInstanceId(String processInstanceId) {
+        return getDeadLetterJobEntityManager().findJobsByProcessInstanceId(processInstanceId);
+    }
+    
+    @Override
     public void updateAllJobTypesTenantIdForDeployment(String deploymentId, String newTenantId) {
         getJobEntityManager().updateJobTenantIdForDeployment(deploymentId, newTenantId);
         getTimerJobEntityManager().updateJobTenantIdForDeployment(deploymentId, newTenantId);

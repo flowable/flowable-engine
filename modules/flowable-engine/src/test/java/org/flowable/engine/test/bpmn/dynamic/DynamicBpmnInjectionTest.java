@@ -19,11 +19,13 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.SubProcess;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -34,7 +36,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 
 public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
 
-    public void testInjectuserTaskInProcessInstance() {
+    public void testInjectUserTaskInProcessInstance() {
         deployOneTaskTestProcess();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -46,12 +48,14 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasks.size());
+        
+        deploymentIdsForAutoCleanup.add(repositoryService.getProcessDefinition(tasks.get(0).getProcessDefinitionId()).getDeploymentId()); // For auto-cleanup
+        
         for (Task t : tasks) {
             taskService.complete(t.getId());
         }
 
         assertProcessEnded(processInstance.getId());
-        removeDerivedDeployments();
     }
 
     public void testInjectParallelTask() {
@@ -68,6 +72,9 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         
         Task injectedTask = taskService.createTaskQuery().taskName("My injected task").singleResult();
         assertNotNull(injectedTask);
+        
+        deploymentIdsForAutoCleanup.add(repositoryService.getProcessDefinition(injectedTask.getProcessDefinitionId()).getDeploymentId()); // For auto-cleanup
+        
         if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
             Execution execution = runtimeService.createExecutionQuery().executionId(injectedTask.getExecutionId()).singleResult();
             assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
@@ -79,8 +86,6 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             taskService.complete(t.getId());
         }
         assertProcessEnded(processInstance.getId());
-
-        removeDerivedDeployments();
     }
     
     @org.flowable.engine.test.Deployment
@@ -94,38 +99,39 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             .assignee("kermit");
         dynamicBpmnService.injectParallelUserTask(task.getId(), taskBuilder);
         
-        try {
-            List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").list();
-            assertEquals(2, processDefinitions.size());
-            
-            ProcessDefinition rootDefinition = null;
-            ProcessDefinition derivedFromDefinition = null;
-            for (ProcessDefinition definitionItem : processDefinitions) {
-                if (definitionItem.getDerivedFrom() != null && definitionItem.getDerivedFromRoot() != null) {
-                    derivedFromDefinition = definitionItem;
-                } else {
-                    rootDefinition = definitionItem;
-                }
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").list();
+        assertEquals(2, processDefinitions.size());
+        
+        ProcessDefinition rootDefinition = null;
+        ProcessDefinition derivedFromDefinition = null;
+        for (ProcessDefinition definitionItem : processDefinitions) {
+            if (definitionItem.getDerivedFrom() != null && definitionItem.getDerivedFromRoot() != null) {
+                derivedFromDefinition = definitionItem;
+            } else {
+                rootDefinition = definitionItem;
             }
-            
-            assertNotNull(derivedFromDefinition);
-            
-            BpmnModel bpmnModel = repositoryService.getBpmnModel(derivedFromDefinition.getId());
-            FlowElement taskElement = bpmnModel.getFlowElement("theTask");
-            SubProcess subProcessElement = (SubProcess) taskElement.getParentContainer();
-            assertNotNull(subProcessElement);
-            GraphicInfo subProcessGraphicInfo = bpmnModel.getGraphicInfo(subProcessElement.getId());
-            assertNotNull(subProcessGraphicInfo);
-            assertFalse(subProcessGraphicInfo.getExpanded());
-            
-            BpmnModel rootBpmnModel = repositoryService.getBpmnModel(rootDefinition.getId());
-            GraphicInfo taskGraphicInfo = rootBpmnModel.getGraphicInfo("theTask");
-            
-            assertEquals(taskGraphicInfo.getX(), subProcessGraphicInfo.getX());
-            assertEquals(taskGraphicInfo.getY(), subProcessGraphicInfo.getY());
-            assertEquals(taskGraphicInfo.getWidth(), subProcessGraphicInfo.getWidth());
-            assertEquals(taskGraphicInfo.getHeight(), subProcessGraphicInfo.getHeight());
-            
+        }
+        
+        assertNotNull(derivedFromDefinition);
+        deploymentIdsForAutoCleanup.add(derivedFromDefinition.getDeploymentId()); // For auto-cleanup
+        
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(derivedFromDefinition.getId());
+        FlowElement taskElement = bpmnModel.getFlowElement("theTask");
+        SubProcess subProcessElement = (SubProcess) taskElement.getParentContainer();
+        assertNotNull(subProcessElement);
+        GraphicInfo subProcessGraphicInfo = bpmnModel.getGraphicInfo(subProcessElement.getId());
+        assertNotNull(subProcessGraphicInfo);
+        assertFalse(subProcessGraphicInfo.getExpanded());
+        
+        BpmnModel rootBpmnModel = repositoryService.getBpmnModel(rootDefinition.getId());
+        GraphicInfo taskGraphicInfo = rootBpmnModel.getGraphicInfo("theTask");
+        
+        assertEquals(taskGraphicInfo.getX(), subProcessGraphicInfo.getX());
+        assertEquals(taskGraphicInfo.getY(), subProcessGraphicInfo.getY());
+        assertEquals(taskGraphicInfo.getWidth(), subProcessGraphicInfo.getWidth());
+        assertEquals(taskGraphicInfo.getHeight(), subProcessGraphicInfo.getHeight());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
             assertEquals(derivedFromDefinition.getId(), historicProcessInstance.getProcessDefinitionId());
             assertEquals(Integer.valueOf(derivedFromDefinition.getVersion()), historicProcessInstance.getProcessDefinitionVersion());
@@ -141,17 +147,14 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 assertEquals(derivedFromDefinition.getId(), historicActivityInstance.getProcessDefinitionId());
             }
-            
-            List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-            assertEquals(2, tasks.size());
-            for (Task t : tasks) {
-                taskService.complete(t.getId());
-            }
-            assertProcessEnded(processInstance.getId());
-            
-        } finally {
-            removeDerivedDeployments();
         }
+        
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+        for (Task t : tasks) {
+            taskService.complete(t.getId());
+        }
+        assertProcessEnded(processInstance.getId());  
     }
 
     public void testInjectParallelTaskNoJoin() {
@@ -168,6 +171,9 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         
         Task injectedTask = taskService.createTaskQuery().taskName("My injected task").singleResult();
         assertNotNull(injectedTask);
+        
+        deploymentIdsForAutoCleanup.add(repositoryService.getProcessDefinition(injectedTask.getProcessDefinitionId()).getDeploymentId()); // For auto-cleanup
+        
         if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
             Execution execution = runtimeService.createExecutionQuery().executionId(injectedTask.getExecutionId()).singleResult();
             assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
@@ -183,7 +189,6 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
-        removeDerivedDeployments();
     }
 
     public void testInjectParallelSubProcessSimple() {
@@ -191,6 +196,8 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         Deployment deployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/bpmn/dynamic/dynamic_onetask.bpmn20.xml")
                 .deploy();
+        
+        deploymentIdsForAutoCleanup.add(deployment.getId());
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().singleResult();
@@ -204,6 +211,9 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
                 .processDefinitionId(processDefinition.getId());
         dynamicBpmnService.injectParallelEmbeddedSubProcess(task.getId(), subProcessBuilder);
         
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        deploymentIdsForAutoCleanup.add(repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId()).getDeploymentId()); // For auto-cleanup
+        
         if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
             Execution execution = runtimeService.createExecutionQuery().activityId("usertaskV2").singleResult();
             assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
@@ -216,10 +226,6 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         }
         
         assertProcessEnded(processInstance.getId());
-
-        repositoryService.deleteDeployment(deployment.getId(), true);
-
-        removeDerivedDeployments();
     }
 
     public void testInjectParallelSubProcessComplex() {
@@ -227,6 +233,8 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
                 .addClasspathResource("org/flowable/engine/test/bpmn/dynamic/dynamic_test_process01.bpmn")
                 .addClasspathResource("org/flowable/engine/test/bpmn/dynamic/dynamic_test_process02.bpmn")
                 .deploy();
+        
+        deploymentIdsForAutoCleanup.add(deployment.getId());
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess01");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
@@ -241,6 +249,9 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         dynamicBpmnService.injectParallelEmbeddedSubProcess(taskB.getId(), new DynamicEmbeddedSubProcessBuilder()
                 .id("injectedSubProcess")
                 .processDefinitionId(subProcessDefinition.getId()));
+        
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        deploymentIdsForAutoCleanup.add(repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId()).getDeploymentId()); // For auto-cleanup
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(9, tasks.size());
@@ -274,9 +285,6 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         assertEquals("after sub process", afterSubProcessTask.getName());
         taskService.complete(afterSubProcessTask.getId());
         assertProcessEnded(processInstance.getId());
-
-        removeDerivedDeployments();
-        repositoryService.deleteDeployment(deployment.getId(), true);
     }
     
     public void testInjectParallelTask2Times() {
@@ -293,6 +301,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
+        deploymentIdsForAutoCleanup.add(processDefinition.getDeploymentId()); // For auto-cleanup
         assertNotNull(processDefinition.getDerivedFrom());
         assertNotNull(processDefinition.getDerivedFromRoot());
         assertEquals(1, processDefinition.getDerivedVersion());
@@ -315,6 +324,7 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
+        deploymentIdsForAutoCleanup.add(processDefinition.getDeploymentId()); // For auto-cleanup
         assertNotNull(processDefinition.getDerivedFrom());
         assertNotNull(processDefinition.getDerivedFromRoot());
         assertEquals(2, processDefinition.getDerivedVersion());
@@ -325,8 +335,6 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             taskService.complete(t.getId());
         }
         assertProcessEnded(processInstance.getId());
-
-        removeDerivedDeployments();
     }
 
     public void testInjectParallelSubProcessComplexNoJoin() {
@@ -334,6 +342,8 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
                 .addClasspathResource("org/flowable/engine/test/bpmn/dynamic/dynamic_test_process01.bpmn")
                 .addClasspathResource("org/flowable/engine/test/bpmn/dynamic/dynamic_test_process02.bpmn")
                 .deploy();
+        
+        deploymentIdsForAutoCleanup.add(deployment.getId()); // For auto-cleanup
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess01");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
@@ -344,6 +354,9 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         dynamicBpmnService.injectEmbeddedSubProcessInProcessInstance(processInstance.getId(), new DynamicEmbeddedSubProcessBuilder()
                 .id("injectedSubProcess")
                 .processDefinitionId(subProcessDefinition.getId()));
+        
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        deploymentIdsForAutoCleanup.add(repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId()).getDeploymentId()); // For auto-cleanup
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(9, tasks.size());
@@ -383,17 +396,6 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
         }
 
         assertProcessEnded(processInstance.getId());
-
-        removeDerivedDeployments();
-        repositoryService.deleteDeployment(deployment.getId(), true);
-    }
-
-    protected void removeDerivedDeployments() {
-        for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            if (deployment.getDerivedFrom() != null) {
-                repositoryService.deleteDeployment(deployment.getId(), true);
-            }
-        }
     }
 
 }

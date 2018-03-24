@@ -24,24 +24,19 @@ import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.engine.common.impl.EngineDeployer;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.io.BytesStreamSource;
-import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.flowable.engine.impl.dynamic.BaseDynamicSubProcessInjectUtil;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.task.service.HistoricTaskService;
-import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
-import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 public abstract class AbstractDynamicInjectionCmd {
@@ -129,38 +124,41 @@ public abstract class AbstractDynamicInjectionCmd {
             BpmnModel bpmnModel, ProcessDefinitionEntity originalProcessDefinitionEntity, DeploymentEntity newDeploymentEntity);
 
     protected void updateExecutions(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance, BpmnModel bpmnModel) {
+        String previousProcessDefinitionId = processInstance.getProcessDefinitionId();
         processInstance.setProcessDefinitionId(processDefinitionEntity.getId());
         processInstance.setProcessDefinitionVersion(processDefinitionEntity.getVersion());
         
-        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext);
-        HistoricProcessInstanceEntity historicProcessInstance = (HistoricProcessInstanceEntity) historicProcessInstanceEntityManager.findById(processInstance.getId());
-        historicProcessInstance.setProcessDefinitionId(processDefinitionEntity.getId());
-        historicProcessInstance.setProcessDefinitionVersion(processDefinitionEntity.getVersion());
-        historicProcessInstanceEntityManager.update(historicProcessInstance);
-
-        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-        HistoricTaskInstanceQueryImpl taskQuery = new HistoricTaskInstanceQueryImpl();
-        taskQuery.processInstanceId(processInstance.getId());
-        List<HistoricTaskInstance> historicTasks = historicTaskService.findHistoricTaskInstancesByQueryCriteria(taskQuery);
-        if (historicTasks != null) {
-            for (HistoricTaskInstance historicTaskInstance : historicTasks) {
-                HistoricTaskInstanceEntity taskEntity = (HistoricTaskInstanceEntity) historicTaskInstance;
-                taskEntity.setProcessDefinitionId(processDefinitionEntity.getId());
-                historicTaskService.updateHistoricTask(taskEntity, true);
-            }
+        List<TaskEntity> currentTasks = CommandContextUtil.getTaskService(commandContext).findTasksByProcessInstanceId(processInstance.getId());
+        for (TaskEntity currentTask : currentTasks) {
+            currentTask.setProcessDefinitionId(processDefinitionEntity.getId());
         }
         
-        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
-        HistoricActivityInstanceQueryImpl activityQuery = new HistoricActivityInstanceQueryImpl();
-        activityQuery.processInstanceId(processInstance.getId());
-        List<HistoricActivityInstance> historicActivities = historicActivityInstanceEntityManager.findHistoricActivityInstancesByQueryCriteria(activityQuery);
-        if (historicActivities != null) {
-            for (HistoricActivityInstance historicActivityInstance : historicActivities) {
-                HistoricActivityInstanceEntity activityEntity = (HistoricActivityInstanceEntity) historicActivityInstance;
-                activityEntity.setProcessDefinitionId(processDefinitionEntity.getId());
-                historicActivityInstanceEntityManager.update(activityEntity);
-            }
+        List<JobEntity> currentJobs = CommandContextUtil.getJobService(commandContext).findJobsByProcessInstanceId(processInstance.getId());
+        for (JobEntity currentJob : currentJobs) {
+            currentJob.setProcessDefinitionId(processDefinitionEntity.getId());
         }
+        
+        List<TimerJobEntity> currentTimerJobs = CommandContextUtil.getTimerJobService(commandContext).findTimerJobsByProcessInstanceId(processInstance.getId());
+        for (TimerJobEntity currentTimerJob : currentTimerJobs) {
+            currentTimerJob.setProcessDefinitionId(processDefinitionEntity.getId());
+        }
+        
+        List<SuspendedJobEntity> currentSuspendedJobs = CommandContextUtil.getJobService(commandContext).findSuspendedJobsByProcessInstanceId(processInstance.getId());
+        for (SuspendedJobEntity currentSuspendedJob : currentSuspendedJobs) {
+            currentSuspendedJob.setProcessDefinitionId(processDefinitionEntity.getId());
+        }
+        
+        List<DeadLetterJobEntity> currentDeadLetterJobs = CommandContextUtil.getJobService(commandContext).findDeadLetterJobsByProcessInstanceId(processInstance.getId());
+        for (DeadLetterJobEntity currentDeadLetterJob : currentDeadLetterJobs) {
+            currentDeadLetterJob.setProcessDefinitionId(processDefinitionEntity.getId());
+        }
+        
+        List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService().findIdentityLinksByProcessDefinitionId(previousProcessDefinitionId);
+        for (IdentityLinkEntity identityLinkEntity : identityLinks) {
+            identityLinkEntity.setProcessDefId(processDefinitionEntity.getId());
+        }
+        
+        CommandContextUtil.getHistoryManager().updateProcessDefinitionIdInHistory(processDefinitionEntity, processInstance);
         
         List<ExecutionEntity> childExecutions = CommandContextUtil.getExecutionEntityManager(commandContext).findChildExecutionsByProcessInstanceId(processInstance.getId());
         for (ExecutionEntity childExecution : childExecutions) {

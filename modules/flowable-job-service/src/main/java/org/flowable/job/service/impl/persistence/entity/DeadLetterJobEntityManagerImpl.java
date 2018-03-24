@@ -38,6 +38,11 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
     public List<DeadLetterJobEntity> findJobsByExecutionId(String id) {
         return jobDataManager.findJobsByExecutionId(id);
     }
+    
+    @Override
+    public List<DeadLetterJobEntity> findJobsByProcessInstanceId(String id) {
+        return jobDataManager.findJobsByProcessInstanceId(id);
+    }
 
     @Override
     public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {

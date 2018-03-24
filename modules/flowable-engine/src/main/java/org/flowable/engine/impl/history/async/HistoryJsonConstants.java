@@ -20,6 +20,7 @@ public interface HistoryJsonConstants {
     String TYPE_SUBPROCESS_INSTANCE_START = "subprocess-instance-start";
     String TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED = "process-instance-property-changed";
     String TYPE_SET_PROCESS_DEFINITION = "set-process-definition";
+    String TYPE_UPDATE_PROCESS_DEFINITION_CASCADE = "update-process-definition-cascade";
     String TYPE_ACTIVITY_START = "activity-start";
     String TYPE_ACTIVITY_END = "activity-end";
     String TYPE_ACTIVITY_FULL = "activity-full";

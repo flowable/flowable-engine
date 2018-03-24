@@ -305,6 +305,7 @@
     from ${prefix}ACT_RE_PROCDEF 
     where KEY_ = #{key} and
           (TENANT_ID_ = ''  or TENANT_ID_ is null) and
+          DERIVED_FROM_ is null and
           VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
   </select>
   
@@ -313,6 +314,7 @@
     from ${prefix}ACT_RE_PROCDEF 
     where KEY_ = #{processDefinitionKey} and
           TENANT_ID_ = #{tenantId} and
+          DERIVED_FROM_ is null and
           VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
   
