@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Base64;
 
-import org.flowable.rest.api.DataResponse;
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;

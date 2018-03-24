@@ -91,7 +91,7 @@ public class FlowableLdapAutoConfiguration {
         if (ldapConfiguration.getGroupCacheSize() > 0) {
             // We need to use a supplier for the clock as the clock would be created later
             ldapGroupCache = new LDAPGroupCache(ldapConfiguration.getGroupCacheSize(),
-                ldapConfiguration.getGroupCacheExpirationTime(), engineConfiguration::getClock);
+                ldapConfiguration.getGroupCacheExpirationTime(), engineConfiguration.getClock());
 
             if (ldapConfiguration.getGroupCacheListener() != null) {
                 ldapGroupCache.setLdapCacheListener(ldapConfiguration.getGroupCacheListener());
