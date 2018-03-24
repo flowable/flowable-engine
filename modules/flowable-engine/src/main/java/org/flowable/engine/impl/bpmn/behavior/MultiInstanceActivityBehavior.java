@@ -331,10 +331,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             if (obj instanceof Collection) {
                 return (Collection) obj;
                 
+            } else if (obj instanceof Iterable) {
+                return iterableToCollection((Iterable) obj);
+                
             } else if (obj instanceof String) {
                 Object collectionVariable = execution.getVariable((String) obj);
                 if (collectionVariable instanceof Collection) {
                     return (Collection) collectionVariable;
+                } else if (collectionVariable instanceof Iterable) {
+                    return iterableToCollection((Iterable) collectionVariable);
                 } else if (collectionVariable == null) {
                     throw new FlowableIllegalArgumentException("Variable '" + obj + "' is not found");
                 } else {
@@ -346,6 +351,13 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 
             }
         }
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected Collection iterableToCollection(Iterable iterable) {
+        List result = new ArrayList();
+        iterable.forEach(element -> result.add(element));
+        return result;
     }
 
     protected Object resolveCollection(DelegateExecution execution) {

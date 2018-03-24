@@ -23,9 +23,11 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
+import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -63,6 +65,13 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             .name("My injected task")
             .assignee("kermit");
         dynamicBpmnService.injectParallelUserTask(task.getId(), taskBuilder);
+        
+        Task injectedTask = taskService.createTaskQuery().taskName("My injected task").singleResult();
+        assertNotNull(injectedTask);
+        if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(injectedTask.getExecutionId()).singleResult();
+            assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
+        }
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasks.size());
@@ -156,6 +165,13 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
             .name("My injected task")
             .assignee("kermit");
         dynamicBpmnService.injectParallelUserTask(task.getId(), taskBuilder);
+        
+        Task injectedTask = taskService.createTaskQuery().taskName("My injected task").singleResult();
+        assertNotNull(injectedTask);
+        if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(injectedTask.getExecutionId()).singleResult();
+            assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
+        }
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
@@ -187,6 +203,11 @@ public class DynamicBpmnInjectionTest extends PluggableFlowableTestCase {
                 .id("customSubprocess")
                 .processDefinitionId(processDefinition.getId());
         dynamicBpmnService.injectParallelEmbeddedSubProcess(task.getId(), subProcessBuilder);
+        
+        if (processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts()) {
+            Execution execution = runtimeService.createExecutionQuery().activityId("usertaskV2").singleResult();
+            assertEquals(1, ((CountingExecutionEntity) execution).getTaskCount());
+        }
         
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasks.size());
