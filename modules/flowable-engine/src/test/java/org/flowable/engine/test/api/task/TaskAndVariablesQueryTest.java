@@ -12,13 +12,18 @@
  */
 package org.flowable.engine.test.api.task;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -27,9 +32,6 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Tijs Rademakers
@@ -340,12 +342,16 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
             assertThat(updatedTask.getName(), is("taskWithDefinitionId"));
             assertThat(updatedTask.getTaskDefinitionId(), is("testTaskDefinitionId"));
 
-            HistoricTaskInstance updatedHistoricTask = historyService.createHistoricTaskInstanceQuery().taskDefinitionId("testTaskDefinitionId").singleResult();
-            assertThat(updatedHistoricTask.getName(), is("taskWithDefinitionId"));
-            assertThat(updatedHistoricTask.getTaskDefinitionId(), is("testTaskDefinitionId"));
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                HistoricTaskInstance updatedHistoricTask = historyService.createHistoricTaskInstanceQuery().taskDefinitionId("testTaskDefinitionId").singleResult();
+                assertThat(updatedHistoricTask.getName(), is("taskWithDefinitionId"));
+                assertThat(updatedHistoricTask.getTaskDefinitionId(), is("testTaskDefinitionId"));
+            }
         } finally {
             this.taskService.deleteTask("testTaskId");
-            this.historyService.deleteHistoricTaskInstance("testTaskId");
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                this.historyService.deleteHistoricTaskInstance("testTaskId");
+            }
         }
     }
     
@@ -359,13 +365,17 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
             List<Task> updatedTasks = taskService.createTaskQuery().taskDefinitionId("testTaskDefinitionId").list();
             assertThat(updatedTasks.size(), is(2));
             
-            List<HistoricTaskInstance> updatedHistoricTasks = historyService.createHistoricTaskInstanceQuery().taskDefinitionId("testTaskDefinitionId").list();
-            assertThat(updatedHistoricTasks.size(), is(2));
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                List<HistoricTaskInstance> updatedHistoricTasks = historyService.createHistoricTaskInstanceQuery().taskDefinitionId("testTaskDefinitionId").list();
+                assertThat(updatedHistoricTasks.size(), is(2));
+            }
         } finally {
             this.taskService.deleteTask("testTaskId1");
-            this.historyService.deleteHistoricTaskInstance("testTaskId1");
             this.taskService.deleteTask("testTaskId2");
-            this.historyService.deleteHistoricTaskInstance("testTaskId2");
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                this.historyService.deleteHistoricTaskInstance("testTaskId1");
+                this.historyService.deleteHistoricTaskInstance("testTaskId2");
+            }
         }
     }
 

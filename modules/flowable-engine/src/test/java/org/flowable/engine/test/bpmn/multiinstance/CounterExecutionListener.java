@@ -18,7 +18,6 @@ import java.util.List;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.slf4j.Logger;
@@ -40,22 +39,28 @@ public class CounterExecutionListener implements ExecutionListener {
         
         if (nrOfCompletedInstances != null && nrOfInstances.equals(nrOfCompletedInstances)) {
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-            List<HistoricVariableInstance> vars = processEngineConfiguration.getHistoryService().createHistoricVariableInstanceQuery()
-                    .processInstanceId(execution.getProcessInstanceId())
-                    .variableName("csApproveResult")
-                    .list();
-            Integer passCount = 0;
-            Integer notPassCount = 0;
-            for (HistoricVariableInstance value : vars) {
-                if ("pass".equals(value.getValue().toString())) {
-                    passCount++;
+            
+            if (processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
+                List<HistoricVariableInstance> vars = processEngineConfiguration.getHistoryService().createHistoricVariableInstanceQuery()
+                        .processInstanceId(execution.getProcessInstanceId())
+                        .variableName("csApproveResult")
+                        .list();
+                Integer passCount = 0;
+                Integer notPassCount = 0;
+                for (HistoricVariableInstance value : vars) {
+                    if ("pass".equals(value.getValue().toString())) {
+                        passCount++;
+                    }
+                    if ("notpass".equals(value.getValue().toString())) {
+                        notPassCount++;
+                    }
                 }
-                if ("notpass".equals(value.getValue().toString())) {
-                    notPassCount++;
-                }
+                LOGGER.info("Countersign result: pass" + passCount + " not pass:" + notPassCount);
+                execution.setVariable("approveResult", passCount > notPassCount ? "pass" : "notpass");
+                
+            } else {
+                execution.setVariable("approveResult", "pass");
             }
-            LOGGER.info("Countersign result: pass" + passCount + " not pass:" + notPassCount);
-            execution.setVariable("approveResult", passCount > notPassCount ? "pass" : "notpass");
         }
     }
 }
