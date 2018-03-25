@@ -37,6 +37,7 @@ public class ModelRepresentation extends AbstractRepresentation {
     protected int version;
     protected String comment;
     protected Integer modelType;
+    protected String tenantId;
 
     public ModelRepresentation(AbstractModel model) {
         initialize(model);
@@ -57,6 +58,7 @@ public class ModelRepresentation extends AbstractRepresentation {
         this.lastUpdatedBy = model.getLastUpdatedBy();
         this.comment = model.getComment();
         this.modelType = model.getModelType();
+        this.tenantId = model.getTenantId();
 
         // When based on a ProcessModel and not history, this is always the latest version
         if (model instanceof Model) {
@@ -152,6 +154,14 @@ public class ModelRepresentation extends AbstractRepresentation {
 
     public void setModelType(Integer modelType) {
         this.modelType = modelType;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     public Model toModel() {

@@ -38,6 +38,7 @@ import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.service.api.AppDefinitionService;
 import org.flowable.app.service.exception.InternalServerErrorException;
+import org.flowable.app.tenant.TenantProvider;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionPublishService.class);
+
+    @Autowired
+    protected TenantProvider tenantProvider;
 
     @Autowired
     protected Environment environment;
@@ -89,11 +93,18 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
         String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
         String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
 
+        String tenantId = tenantProvider.getTenantId();
         if (!deployApiUrl.endsWith("/")) {
             deployApiUrl = deployApiUrl.concat("/");
         }
         deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s",
                 encode(deploymentKey), encode(deploymentName)));
+
+        if(tenantId != null) {
+            StringBuilder sb = new StringBuilder(deployApiUrl);
+            sb.insert(sb.indexOf("//") + 2, tenantId + ".").append("&tenantId=").append(encode(tenantId));
+            deployApiUrl = sb.toString();
+        }
 
         HttpPost httpPost = new HttpPost(deployApiUrl);
         httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(

@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.app.domain.editor.ModelHistory;
 import org.flowable.app.repository.UuidIdGenerator;
+import org.flowable.app.tenant.TenantProvider;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,9 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
 
     @Autowired
     protected UuidIdGenerator idGenerator;
+    
+    @Autowired
+    protected TenantProvider tenantProvider;
 
     @Override
     public ModelHistory get(String id) {
@@ -42,6 +46,7 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
         Map<String, Object> params = new HashMap<>();
         params.put("modelType", modelType);
         params.put("createdBy", createdBy);
+        params.put("tenantId", tenantProvider.getTenantId());
         return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByTypeAndCreatedBy", params);
     }
 
@@ -51,6 +56,7 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
 
     @Override
     public void save(ModelHistory modelHistory) {
+        modelHistory.setTenantId(tenantProvider.getTenantId());
         if (modelHistory.getId() == null) {
             modelHistory.setId(idGenerator.generateId());
             sqlSessionTemplate.insert(NAMESPACE + "insertModelHistory", modelHistory);
