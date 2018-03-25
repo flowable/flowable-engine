@@ -273,6 +273,10 @@ public class BaseSpringRestTestCase {
      * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
      */
     public CloseableHttpResponse executeBinaryRequest(HttpUriRequest request, int expectedStatusCode) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
         return internalExecuteRequest(request, expectedStatusCode, false);
     }
 
