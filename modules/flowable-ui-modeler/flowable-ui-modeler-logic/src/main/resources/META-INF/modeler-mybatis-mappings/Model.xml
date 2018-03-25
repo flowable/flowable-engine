@@ -120,6 +120,9 @@
     <select id="countByModelTypeAndCreatedBy" parameterType="map">
        select count(m.id) from ${prefix}ACT_DE_MODEL m 
        where m.created_by = #{createdBy, jdbcType=VARCHAR} and m.model_type = #{modelType, jdbcType=INTEGER}
+      <if test="tenantId != null">
+         and tenant_id = #{tenantId, jdbcType=VARCHAR}
+      </if>
     </select>
 
     <delete id="deleteModel" parameterType="org.flowable.app.domain.editor.Model">

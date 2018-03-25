@@ -87,7 +87,7 @@
        where created_by = #{createdBy, jdbcType=VARCHAR}
        and model_type = #{modelType, jdbcType=INTEGER}
        and removal_date is null
-      <if test="modelType != null">
+      <if test="tenantId != null">
        and tenant_id = #{tenantId, jdbcType=VARCHAR}
       </if>
     </select>
