@@ -109,6 +109,8 @@ public interface HistoryJsonConstants {
     String IDENTITY_LINK_TYPE = "identityLinkType";
 
     String TASK_DEFINITION_KEY = "taskDefinitionKey";
+    
+    String TASK_DEFINITION_ID = "taskDefinitionId";
 
     String FORM_KEY = "formKey";
 

@@ -250,6 +250,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, task.getAssignee());
             putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
+            putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_ID, task.getTaskDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.PRIORITY, task.getPriority());
             if (task.getDueDate() != null) {
                 putIfNotNull(data, HistoryJsonConstants.DUE_DATE, task.getDueDate());
@@ -281,6 +282,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, task.getAssignee());
             putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
+            putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_ID, task.getTaskDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.PRIORITY, task.getPriority());
             putIfNotNull(data, HistoryJsonConstants.DUE_DATE, task.getDueDate());
             putIfNotNull(data, HistoryJsonConstants.FORM_KEY, task.getFormKey());
@@ -319,6 +321,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.FORM_KEY, taskEntity.getFormKey());
             putIfNotNull(data, HistoryJsonConstants.PARENT_TASK_ID, taskEntity.getParentTaskId());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, taskEntity.getTaskDefinitionKey());
+            putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_ID, taskEntity.getTaskDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, taskEntity.getProcessDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.CLAIM_TIME, taskEntity.getClaimTime());
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED, data);
