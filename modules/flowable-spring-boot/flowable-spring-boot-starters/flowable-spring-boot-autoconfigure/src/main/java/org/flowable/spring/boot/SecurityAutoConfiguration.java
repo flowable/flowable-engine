@@ -18,6 +18,8 @@ import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.spring.security.FlowableAuthenticationProvider;
 import org.flowable.spring.security.FlowableUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -52,6 +54,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 })
 public class SecurityAutoConfiguration {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityAutoConfiguration.class);
+
     @Configuration
     public static class UserDetailsServiceConfiguration
             extends GlobalAuthenticationConfigurerAdapter {
@@ -72,6 +76,9 @@ public class SecurityAutoConfiguration {
                 AuthenticationProvider authenticationProvider = authenticationProviderProvider.getIfUnique();
                 if (authenticationProvider != null) {
                     auth.authenticationProvider(authenticationProvider);
+                } else {
+                    LOGGER.warn("There is no authentication provider configured. However, there is no single one in the context."
+                        + " Please configure the global authentication provider by yourself.");
                 }
             }
 
@@ -79,6 +86,9 @@ public class SecurityAutoConfiguration {
                 UserDetailsService userDetailsService = userDetailsServiceProvider.getIfUnique();
                 if (userDetailsService != null) {
                     auth.userDetailsService(userDetailsService);
+                } else {
+                    LOGGER.warn("There is no default UserDetailsService configured, but there is no single one in the context."
+                        + " Please configure it by yourself");
                 }
             }
         }
