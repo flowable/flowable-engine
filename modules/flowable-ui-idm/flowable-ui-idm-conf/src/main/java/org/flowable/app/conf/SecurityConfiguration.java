@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -56,8 +58,6 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfiguration.class);
-
     //
     // GLOBAL CONFIG
     //
@@ -66,40 +66,8 @@ public class SecurityConfiguration {
     protected IdmIdentityService identityService;
     
     @Autowired
-    protected PasswordEncoder passwordEncoder;
-
-    @Qualifier("customAuthenticationProvider")
-    @Autowired(required = false)
-    protected AuthenticationProvider customAuthenticationProvider;
-
-    @Autowired(required = false)
-    protected FlowableLdapProperties ldapProperties;
-
-    @Autowired
     protected FlowableIdmAppProperties idmAppProperties;
     
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) {
-
-        if (ldapProperties != null && ldapProperties.isEnabled()) {
-            // LDAP auth
-            try {
-                auth.authenticationProvider(ldapAuthenticationProvider());
-            } catch (Exception e) {
-                LOGGER.error("Could not configure ldap authentication mechanism:", e);
-            }
-        } else if (customAuthenticationProvider != null) {
-            auth.authenticationProvider(customAuthenticationProvider);
-        } else {
-            // Default auth (database backed)
-            try {
-                auth.authenticationProvider(dbAuthenticationProvider());
-            } catch (Exception e) {
-                LOGGER.error("Could not configure authentication mechanism:", e);
-            }
-        }
-    }
-
     @Bean
     public UserDetailsService userDetailsService() {
         org.flowable.app.security.UserDetailsService userDetailsService = new org.flowable.app.security.UserDetailsService();
@@ -108,7 +76,9 @@ public class SecurityConfiguration {
     }
 
     @Bean(name = "dbAuthenticationProvider")
-    public AuthenticationProvider dbAuthenticationProvider() {
+    @ConditionalOnMissingBean(AuthenticationProvider.class)
+    @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "false", matchIfMissing = true)
+    public AuthenticationProvider dbAuthenticationProvider(PasswordEncoder passwordEncoder) {
         CustomDaoAuthenticationProvider daoAuthenticationProvider = new CustomDaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService());
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
@@ -116,6 +86,7 @@ public class SecurityConfiguration {
     }
 
     @Bean(name = "ldapAuthenticationProvider")
+    @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "true")
     public AuthenticationProvider ldapAuthenticationProvider() {
         CustomLdapAuthenticationProvider ldapAuthenticationProvider = new CustomLdapAuthenticationProvider(
                 userDetailsService(), identityService);
