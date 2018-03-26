@@ -13,6 +13,7 @@
 package org.flowable.app.idm.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * Properties for the IDM UI App.
@@ -35,11 +36,13 @@ public class FlowableIdmAppProperties {
     /**
      * The information for the admin user for bootstrapping the application.
      */
+    @NestedConfigurationProperty
     private final Admin admin = new Admin();
 
     /**
      * The security configuration for the IDM UI App.
      */
+    @NestedConfigurationProperty
     private final Security security = new Security();
 
     public boolean isRestEnabled() {
@@ -147,6 +150,7 @@ public class FlowableIdmAppProperties {
         /**
          * The configuration for the security cookie.
          */
+        @NestedConfigurationProperty
         private final Cookie cookie = new Cookie();
 
         /**

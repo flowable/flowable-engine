@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.ldap.LDAPConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * @author Filip Hrisafov
@@ -94,16 +95,19 @@ public class FlowableLdapProperties {
     /**
      * Configuration for the queries performed by the IDM Service.
      */
+    @NestedConfigurationProperty
     private final Query query = new Query();
 
     /**
      * Configuration for the attributes for the queries.
      */
+    @NestedConfigurationProperty
     private final Attribute attribute = new Attribute();
 
     /**
      * Configuration for the LDAP caching.
      */
+    @NestedConfigurationProperty
     private final Cache cache = new Cache();
 
     public boolean isEnabled() {
