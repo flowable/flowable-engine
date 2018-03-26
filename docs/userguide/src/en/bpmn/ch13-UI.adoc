@@ -36,20 +36,20 @@ Usually, you will want to change the default H2 in-memory database configuration
 
 [source,linenums]
 ----
-datasource.driver=com.mysql.jdbc.Driver
-datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8
-datasource.username=flowable
-datasource.password=flowable
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8
+spring.datasource.username=flowable
+spring.datasource.password=flowable
 ----
 
 This configuration will expect a flowable database to be present in the MySQL server and the UI apps will automatically generate the necessary database tables. For Postgres the following changes are necessary:
 
 [source,linenums]
 ----
-datasource.driver=org.postgresql.Driver
-datasource.url=jdbc:postgresql://localhost:5432/flowable
-datasource.username=flowable
-datasource.password=flowable
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.url=jdbc:postgresql://localhost:5432/flowable
+spring.datasource.username=flowable
+spring.datasource.password=flowable
 ----
 
 In addition to changing the configuration, make sure the database driver is available on the classpath. Again, you could do this for every web application separately by adding the driver JAR file to the WEB-INF/lib folder, but you can also copy the JAR file once to the Tomcat lib folder. For MySQL and Postgres the database drivers can be downloaded from:
@@ -62,40 +62,39 @@ The additional configuration options are described in the table below:
 [options="header"]
 |===============
 |Property name|Description
-|security.rememberme.key|The hash key that is used by Spring Security to hash the password values in the applications. Make sure that you change the value of this property.
-|security.passwordencoder|Define a password encoder for the IDM users. Use a value of spring_bcrypt to use the Spring password encoder. By default, the passwords will be saved in plain text.
-|datasource.jndi.name|JNDI name of the data source, to be used when the datasource is configured in the servlet container instead of defining the datasource url and driver in this configuration file
+|flowable.idm.app.security.remember-me-key|The hash key that is used by Spring Security to hash the password values in the applications. Make sure that you change the value of this property.
+|flowable.idm.password-encoder|Define a password encoder for the IDM users. Use a value of spring_bcrypt to use the Spring password encoder. By default, the passwords will be saved in plain text.
+|spring.datasource.jndi-name=|JNDI name of the data source, to be used when the datasource is configured in the servlet container instead of defining the datasource url and driver in this configuration file
 |datasource.jndi.resourceRef|Set whether the lookup occurs in a J2EE container, i.e. if the prefix "java:comp/env/" needs to be added if the JNDI name doesn't already contain it. Default is "true".
-|datasource.driver|The JDBC driver class name
-|datasource.url|The JDBC driver url
-|datasource.username|The username to be used for the JDBC connection
-|datasource.password|The password to be used for the JDBC connection
-|datasource.min-pool-size|The minimum datasource pool size
-|datasource.max-pool-size|The maximum datasource pool size
-|datasource.connection-timeout|The timeout, in milliseconds, that the connection pool will wait to acquire a connection
-|datasource.test-query|Defines the query that will be executed for all connection tests
-|datasource.max-idle-time|Seconds (not *not* milliseconds) a connection can remain pooled but unused before being discarded. Zero means idle connections never expire
-|datasource.connection.max-lifetime|The time, in milliseconds, a connection will be kept in the connection pool (if set)
-|email.host|Hostname of the email server for the Flowable Task application email service task
-|email.port|Port of the email server
-|email.useCredentials|Does the email server require authentication
-|email.username|Username for the email server connection
-|email.password|Password for the email server connection
+|spring.datasource.driver-class-name|The JDBC driver class name
+|spring.datasource.url|The JDBC driver url
+|spring.datasource.username|The username to be used for the JDBC connection
+|spring.datasource.password|The password to be used for the JDBC connection
+|spring.datasource.hikari.minimum-idle|The minimum datasource pool size
+|spring.datasource.hikari.maximum-pool-size|The maximum datasource pool size
+|spring.datasource.hikari.connection-timeout|The timeout, in milliseconds, that the connection pool will wait to acquire a connection
+|spring.datasource.hikari.connection-test-query|Defines the query that will be executed for all connection tests
+|spring.datasource.hikari.idle-timeout|Seconds (not *not* milliseconds) a connection can remain pooled but unused before being discarded. Zero means idle connections never expire
+|spring.datasource.hikari.max-lifetime|The time, in milliseconds, a connection will be kept in the connection pool (if set)
+|flowable.mail-server-host|Hostname of the email server for the Flowable Task application email service task
+|flowable.mail-server-port|Port of the email server
+|flowable.mail-server-user-name|Username for the email server connection
+|flowable.mail-server-password|Password for the email server connection
 |flowable.process-definitions.cache.max|Defines the maximum amount of process definitions available in the process definition cache
-|admin.userid|Username of the default administrator user for the Flowable IDM application. Default is admin.
-|admin.password|Password of the default administrator user for the Flowable IDM application. Default is test.
-|admin.firstname|Firstname of the default administrator user for the Flowable IDM application. Default is Test.
-|admin.lastname|Lastname of the default administrator user for the Flowable IDM application. Default is Administrator.
-|admin.email|Email of the default administrator user for the Flowable IDM application. Default is admin@flowable.org.
+|flowable.idm.app.admin.user-id|Username of the default administrator user for the Flowable IDM application. Default is admin.
+|flowable.idm.app.admin.password|Password of the default administrator user for the Flowable IDM application. Default is test.
+|flowable.idm.app.admin.first-name|Firstname of the default administrator user for the Flowable IDM application. Default is Test.
+|flowable.idm.app.admin.last-name|Lastname of the default administrator user for the Flowable IDM application. Default is Administrator.
+|flowable.idm.app.admin.email|Email of the default administrator user for the Flowable IDM application. Default is admin@flowable.org.
 |spring.http.multipart.max-file-size|Maximum size of file uploads, such as attachments and model files
-|contentstorage.fs.rootFolder|Root folder location where content files will be stored, for example, task attachments or form file uploads
-|contentstorage.fs.createRoot|If the root folder doesn't exist, should the Flowable Task application create it?
+|flowable.content.storage.root-folder|Root folder location where content files will be stored, for example, task attachments or form file uploads
+|flowable.content.storage.create-root|If the root folder doesn't exist, should the Flowable Task application create it?
 |flowable.app.idm.url|The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
 |flowable.app.idm.admin.user|The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin.
 |flowable.app.idm.admin.password|The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.
-|deployment.api.url|The root URI to th REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine. Default url for the Flowable Task application is http://localhost:8080/flowable-task/process-api
-|rest.task-app|idm-app|modeler-app.enabled|Enables the REST API (this is not the REST api used by the UI, but an api that's availble over basic auth authentication). Default is true.
-|rest.authentication.mode|Sets the mode of verifying the user when accessing the REST API. By default this is 'verify-privilege', which means that the user passing the credentials with basic authentication needs to have the 'access-rest-api' privilege. Can be set to 'any-users', which means that any valid user/password pair passed as basic auth credentials can access the rest api (as it was in earlier versions of Flowable).
+|flowable.modeler.app.deployment-api-url|The root URI to th REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine. Default url for the Flowable Task application is http://localhost:8080/flowable-task/process-api
+|flowable.(task|idm|modeler).app.rest-enabled|Enables the REST API (this is not the REST api used by the UI, but an api that's availble over basic auth authentication). Default is true.
+|flowable.rest.app.authentication-mode|Sets the mode of verifying the user when accessing the REST API. By default this is 'verify-privilege', which means that the user passing the credentials with basic authentication needs to have the 'access-rest-api' privilege. Can be set to 'any-users', which means that any valid user/password pair passed as basic auth credentials can access the rest api (as it was in earlier versions of Flowable).
 |===============
 
 In addition to these properties that are used by multiple Flowable web applications, the Flowable admin application has a few more properties. The full
@@ -103,14 +102,14 @@ content of the properties file can be viewed on link:$$https://github.com/flowab
 
 [source,linenums]
 ----
-rest.process.app.name=Flowable Process app
-rest.process.app.description=Flowable Process REST config
-rest.process.app.host=http://localhost
-rest.process.app.port=8080
-rest.process.app.contextroot=flowable-task
-rest.process.app.restroot=process-api
-rest.process.app.user=admin
-rest.process.app.password=test
+flowable.admin.app.server-config.process.app.name=Flowable Process app
+flowable.admin.app.server-config.description=Flowable Process REST config
+flowable.admin.app.server-config.process.server-address=http://localhost
+flowable.admin.app.server-config.process.app.port=8080
+flowable.admin.app.server-config.process.context-root=flowable-task
+flowable.admin.app.server-config.process.rest-root=process-api
+flowable.admin.app.server-config.process.app.user=admin
+flowable.admin.app.server-config.process.app.password=test
 ----
 
 These values can be used when the Flowable Task app (with all the Flowable engines included) is managed by the Flowable Admin application.
@@ -129,7 +128,7 @@ When the Flowable IDM application is deployed and started, it will check if ther
 * access-admin: allows the user to login to the Flowable Admin application and manage the Flowable engines
 * access-modeler: enables access to the Flowable Modeler application
 * access-task: provides the privilege to login to the Flowable Task application
-* access-rest-api: allows the user to do call the REST API. Otherwise a 403 (forbidden) http status will be returned. Note that _rest.authentication.mode_ nees to be set to _verify-privilege_, which is the default.
+* access-rest-api: allows the user to do call the REST API. Otherwise a 403 (forbidden) http status will be returned. Note that _flowable.rest.app.authentication-mode_ nees to be set to _verify-privilege_, which is the default.
 
 When logging in to link:$$http://localhost:8080/flowable-idm$$[http://localhost:8080/flowable-idm] with admin/test for the first time the following user overview screen is shown:
 
@@ -148,27 +147,27 @@ In addition to the default identity tables, the IDM application can also be conf
 #
 # LDAP
 #
-ldap.enabled=true
-ldap.server=ldap://localhost
-ldap.port=10389
-ldap.user=uid=admin, ou=system
-ldap.password=secret
-ldap.basedn=o=flowable
-ldap.query.userbyid=(&(objectClass=inetOrgPerson)(uid={0}))
-ldap.query.userbyname=(&(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))
-ldap.query.userall=(objectClass=inetOrgPerson)
-ldap.query.groupsforuser=(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))
-ldap.query.groupall=(objectClass=groupOfUniqueNames)
-ldap.attribute.userid=uid
-ldap.attribute.firstname=cn
-ldap.attribute.lastname=sn
-ldap.attribute.groupid=cn
-ldap.attribute.groupname=cn
-ldap.cache.groupsize=10000
-ldap.cache.groupexpiration=180000
+flowable.idm.ldap.enabled=true
+flowable.idm.ldap.server=ldap://localhost
+flowable.idm.ldap.port=10389
+flowable.idm.ldap.user=uid=admin, ou=system
+flowable.idm.ldap.password=secret
+flowable.idm.ldap.base-dn=o=flowable
+flowable.idm.ldap.query.user-by-id=(&(objectClass=inetOrgPerson)(uid={0}))
+flowable.idm.ldap.query.user-by-full-name-like=(&(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))
+flowable.idm.ldap.query.all-users=(objectClass=inetOrgPerson)
+flowable.idm.ldap.query.groups-for-user=(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))
+flowable.idm.ldap.query.all-groups=(objectClass=groupOfUniqueNames)
+flowable.idm.ldap.attribute.user-id=uid
+flowable.idm.ldap.attribute.first-name=cn
+flowable.idm.ldap.attribute.last-name=sn
+flowable.idm.ldap.attribute.group-id=cn
+flowable.idm.ldap.attribute.group-name=cn
+flowable.idm.ldap.cache.group-size=10000
+flowable.idm.ldap.cache.group-expiration=180000
 ----
 
-When the ldap.enabled property is set to true, the IDM app will expect the other LDAP properties to have been filled-in. In this example configuration the server configuration + LDAP queries for the Apache Directory Server are provided. For other LDAP servers, like Active Directory, other configuration values are needed.
+When the flowable.idm.ldap.enabled property is set to true, the IDM app will expect the other LDAP properties to have been filled-in. In this example configuration the server configuration + LDAP queries for the Apache Directory Server are provided. For other LDAP servers, like Active Directory, other configuration values are needed.
 
 When LDAP is configured, authentication and group retrieval for a user will be done through the LDAP server. Only privileges will still be retrieved from the Flowable identity tables. So make sure each LDAP user has the correct privileges defined in the IDM application.
 
@@ -261,7 +260,7 @@ image::images/flowable_modeler_appdetails_screen.png[align="center"]
 From this view, you can download the app definition in two different formats. The first download button (with the arrow pointing downwards) can be used to
 download the app definition with the JSON model files for each included model. This makes it easy to share app definitions between different Flowable Modeler applications. The second download button (with the arrow point to upper right) will provide a BAR file of the app definition models, which can be deployed on the Flowable engine. In the BAR file, only the deployable artifacts are included, such as the BPMN 2.0 XML file and the DMN XML file, and not the JSON model files. All files in a BAR file deployed on a Flowable engine are stored in the database, so therefore only the deployable files are included.
 
-From the app definition details view, you can also _Publish_ the app definition directly to the Flowable engine. The Flowable Modeler uses the URL defined in the flowable-ui-app.properties file with the _deployment.api.url_ property key. By default, the deployment URL is configured so the app definition will be deployed on the Flowable Task application when it's running. However, this can be changed to use the Flowable REST application, for example. Make sure the Flowable Task application is running and click on the _Publish_ button. The app definition is now deployed as a BAR file to the Flowable Task application.
+From the app definition details view, you can also _Publish_ the app definition directly to the Flowable engine. The Flowable Modeler uses the URL defined in the flowable-ui-app.properties file with the _flowable.modeler.app.deployment-api-url_ property key. By default, the deployment URL is configured so the app definition will be deployed on the Flowable Task application when it's running. However, this can be changed to use the Flowable REST application, for example. Make sure the Flowable Task application is running and click on the _Publish_ button. The app definition is now deployed as a BAR file to the Flowable Task application.
 
 
 [[flowableTaskApp]]

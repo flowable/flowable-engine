@@ -253,10 +253,10 @@
                             <port>8080</port>
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
-                                <datasource.driver>org.postgresql.Driver</datasource.driver>
-                                <datasource.url>jdbc:postgresql://localhost:5432/flowable</datasource.url>
-                                <datasource.username>flowable</datasource.username>
-                                <datasource.password>flowable</datasource.password>
+                                <spring.datasource.driver-class-name>org.postgresql.Driver</spring.datasource.driver-class-name>
+                                <spring.datasource.url>jdbc:postgresql://localhost:5432/flowable</spring.datasource.url>
+                                <spring.datasource.username>flowable</spring.datasource.username>
+                                <spring.datasource.password>flowable</spring.datasource.password>
                                 <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
                             </systemProperties>
                         </configuration>
@@ -283,10 +283,10 @@
                             <port>8080</port>
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
-                                <datasource.driver>com.mysql.jdbc.Driver</datasource.driver>
-                                <datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</datasource.url>
-                                <datasource.username>flowable</datasource.username>
-                                <datasource.password>flowable</datasource.password>
+                                <spring.datasource.driver-class-name>com.mysql.jdbc.Driver</spring.datasource.driver-class-name>
+                                <spring.datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</spring.datasource.url>
+                                <spring.datasource.username>flowable</spring.datasource.username>
+                                <spring.datasource.password>flowable</spring.datasource.password>
                                 <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
                             </systemProperties>
                         </configuration>
