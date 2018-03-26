@@ -234,7 +234,7 @@ button.btn.btn-danger {
 
 .btn:hover, .btn.active, .btn:focus,
 .btn[disabled]:hover, .btn[disabled].active, .btn[disabled]:focus {
-    background-color: #2a8198;
+    background-color: #3990c9;
     border-color: #ffffff;
     color: #ffffff;
 }
