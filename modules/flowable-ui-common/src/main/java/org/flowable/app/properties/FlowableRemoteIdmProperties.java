@@ -44,6 +44,11 @@ public class FlowableRemoteIdmProperties {
     private final Cache cacheLoginUsers = new Cache();
 
     /**
+     * The cache configuration for the users.
+     */
+    private final Cache cacheUsers = new Cache();
+
+    /**
      * The information for the IDM Admin user.
      */
     private final Admin admin = new Admin();
@@ -70,6 +75,10 @@ public class FlowableRemoteIdmProperties {
 
     public Cache getCacheLoginUsers() {
         return cacheLoginUsers;
+    }
+
+    public Cache getCacheUsers() {
+        return cacheUsers;
     }
 
     public Admin getAdmin() {

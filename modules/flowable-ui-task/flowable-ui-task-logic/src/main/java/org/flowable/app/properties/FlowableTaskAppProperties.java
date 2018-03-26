@@ -12,17 +12,26 @@
  */
 package org.flowable.app.properties;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * Properties for the Task UI App.
+ *
  * @author Filip Hrisafov
  */
-@EnableConfigurationProperties({
-    FlowableRemoteIdmProperties.class,
-    FlowableRestAppProperties.class
-})
-@Configuration
-public class FlowableRemoteIdmAutoConfiguration {
+@ConfigurationProperties(prefix = "flowable.task.app")
+public class FlowableTaskAppProperties {
 
+    /**
+     * Enables the REST API (this is not the REST api used by the UI, but an api that's available over basic auth authentication).
+     */
+    private boolean restEnabled = true;
+
+    public boolean isRestEnabled() {
+        return restEnabled;
+    }
+
+    public void setRestEnabled(boolean restEnabled) {
+        this.restEnabled = restEnabled;
+    }
 }

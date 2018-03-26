@@ -14,10 +14,11 @@ package org.flowable.app.conf;
 
 import java.util.Collections;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.filter.FlowableCookieFilterCallback;
 import org.flowable.app.filter.FlowableCookieFilterRegistrationBean;
 import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableRestAppProperties;
+import org.flowable.app.properties.FlowableTaskAppProperties;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.DefaultPrivileges;
@@ -31,7 +32,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -44,6 +44,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * 
  * @author Joram Barrez
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 @Configuration
 public class SecurityConfiguration {
@@ -53,8 +54,6 @@ public class SecurityConfiguration {
     @Autowired
     protected RemoteIdmAuthenticationProvider authenticationProvider;
 
-    @Autowired
-    protected Environment env;
 
     @Bean
     public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistration(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
@@ -87,9 +86,6 @@ public class SecurityConfiguration {
     @Configuration
     @Order(10) // API config first (has Order(1))
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
-
-        @Autowired
-        protected Environment env;
 
         @Autowired
         protected FilterRegistrationBean flowableCookieFilterRegistration;
@@ -128,19 +124,25 @@ public class SecurityConfiguration {
     @Configuration
     @Order(1)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-        
-        @Autowired
-        protected Environment env;
+
+        protected final FlowableRestAppProperties restAppProperties;
+        protected final FlowableTaskAppProperties taskAppProperties;
+
+        public ApiWebSecurityConfigurationAdapter(FlowableRestAppProperties restAppProperties,
+            FlowableTaskAppProperties taskAppProperties) {
+            this.restAppProperties = restAppProperties;
+            this.taskAppProperties = taskAppProperties;
+        }
 
         protected void configure(HttpSecurity http) throws Exception {
 
             http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().csrf().disable();
-            
-            if (isEnableRestApi()) {
-                
-                if (isVerifyRestApiPrivilege()) {
+
+            if (taskAppProperties.isRestEnabled()) {
+
+                if (restAppProperties.isVerifyRestApiPrivilege()) {
                     http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
                 } else {
                     http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").authenticated().and().httpBasic();
@@ -153,19 +155,6 @@ public class SecurityConfiguration {
             }
                    
         }
-        
-        protected boolean isVerifyRestApiPrivilege() {
-            String authMode = env.getProperty("rest.authentication.mode");
-            if (StringUtils.isNotEmpty(authMode)) {
-                return "verify-privilege".equals(authMode);
-            }
-            return true; // checking privilege is the default
-        }
-        
-        protected boolean isEnableRestApi() {
-            return env.getProperty("rest.task-app.enabled", Boolean.class, true);
-        }
-        
     }
     
 }

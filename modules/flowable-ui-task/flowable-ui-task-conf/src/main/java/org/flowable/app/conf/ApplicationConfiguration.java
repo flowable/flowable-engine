@@ -12,6 +12,8 @@
  */
 package org.flowable.app.conf;
 
+import org.flowable.app.properties.FlowableTaskAppProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -26,6 +28,7 @@ import org.springframework.context.annotation.PropertySources;
     @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
 
 })
+@EnableConfigurationProperties(FlowableTaskAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.app.conf",
         "org.flowable.app.repository",

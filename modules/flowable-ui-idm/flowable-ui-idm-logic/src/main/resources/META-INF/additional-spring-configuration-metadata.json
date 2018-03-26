@@ -1,0 +1,112 @@
+{
+  "properties": [
+    {
+      "name": "rest.idm-app.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.rest-enabled"
+      }
+    },
+    {
+      "name": "idm.bootstrap.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.bootstrap"
+      }
+    },
+    {
+      "name": "admin.userid",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.admin.user-id"
+      }
+    },
+    {
+      "name": "admin.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.admin.password"
+      }
+    },
+    {
+      "name": "admin.firstname",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.admin.first-name"
+      }
+    },
+    {
+      "name": "admin.lastname",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.admin.last-name"
+      }
+    },
+    {
+      "name": "admin.email",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.admin.email"
+      }
+    },
+    {
+      "name": "cache.users.recheck.period",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.security.user-validity-period"
+      }
+    },
+    {
+      "name": "security.rememberme.key",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.security.remember-me-key"
+      }
+    },
+    {
+      "name": "security.cookie.max-age",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.security.cookie.max-age"
+      }
+    },
+    {
+      "name": "security.cookie.refresh-age",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.security.cookie.refresh-age"
+      }
+    },
+    {
+      "name": "security.cookie.domain",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using IDM App Auto configuration.",
+        "replacement": "flowable.idm.app.security.cookie.domain"
+      }
+    }
+  ]
+}

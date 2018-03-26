@@ -12,7 +12,9 @@
  */
 package org.flowable.app.conf;
 
+import org.flowable.app.properties.FlowableModelerAppProperties;
 import org.flowable.app.servlet.ApiDispatcherServletConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +34,7 @@ import org.springframework.web.servlet.DispatcherServlet;
     @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
 
 })
+@EnableConfigurationProperties(FlowableModelerAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.app.conf",
         "org.flowable.app.repository",

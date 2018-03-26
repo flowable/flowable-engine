@@ -12,9 +12,11 @@
  */
 package org.flowable.app.conf;
 
+import org.flowable.app.idm.properties.FlowableIdmAppProperties;
 import org.flowable.app.service.idm.RemoteIdmServiceImpl;
 import org.flowable.app.servlet.ApiDispatcherServletConfiguration;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +37,7 @@ import org.springframework.web.servlet.DispatcherServlet;
     @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
 
 })
+@EnableConfigurationProperties(FlowableIdmAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.app.conf",
         "org.flowable.app.security",

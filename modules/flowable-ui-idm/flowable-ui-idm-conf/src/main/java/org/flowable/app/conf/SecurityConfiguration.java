@@ -12,6 +12,8 @@
  */
 package org.flowable.app.conf;
 
+import org.flowable.app.idm.properties.FlowableIdmAppProperties;
+import org.flowable.app.properties.FlowableRestAppProperties;
 import org.flowable.app.security.AjaxAuthenticationFailureHandler;
 import org.flowable.app.security.AjaxAuthenticationSuccessHandler;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
@@ -23,6 +25,7 @@ import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.app.security.Http401UnauthorizedEntryPoint;
 import org.flowable.app.web.CustomFormLoginConfig;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.spring.boot.ldap.FlowableLdapProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +33,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -48,6 +50,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  *
  * @author Joram Barrez
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
@@ -69,14 +72,17 @@ public class SecurityConfiguration {
     @Qualifier("customAuthenticationProvider")
     @Autowired(required = false)
     protected AuthenticationProvider customAuthenticationProvider;
-    
+
+    @Autowired(required = false)
+    protected FlowableLdapProperties ldapProperties;
+
     @Autowired
-    protected Environment env;
+    protected FlowableIdmAppProperties idmAppProperties;
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) {
 
-        if (env.getProperty("ldap.enabled", Boolean.class, false)) {
+        if (ldapProperties != null && ldapProperties.isEnabled()) {
             // LDAP auth
             try {
                 auth.authenticationProvider(ldapAuthenticationProvider());
@@ -98,7 +104,7 @@ public class SecurityConfiguration {
     @Bean
     public UserDetailsService userDetailsService() {
         org.flowable.app.security.UserDetailsService userDetailsService = new org.flowable.app.security.UserDetailsService();
-        userDetailsService.setUserValidityPeriod(env.getProperty("cache.users.recheck.period", Long.class, 30000L));
+        userDetailsService.setUserValidityPeriod(idmAppProperties.getSecurity().getUserValidityPeriod());
         return userDetailsService;
     }
 
@@ -126,7 +132,7 @@ public class SecurityConfiguration {
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
         @Autowired
-        private Environment env;
+        private FlowableIdmAppProperties idmAppProperties;
 
         @Autowired
         private AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler;
@@ -154,7 +160,7 @@ public class SecurityConfiguration {
                     .and()
                     .rememberMe()
                     .rememberMeServices(rememberMeServices)
-                    .key(env.getProperty("security.rememberme.key"))
+                    .key(idmAppProperties.getSecurity().getRememberMeKey())
                     .and()
                     .logout()
                     .logoutUrl("/app/logout")
@@ -190,12 +196,12 @@ public class SecurityConfiguration {
 
     @Bean
     public CustomPersistentRememberMeServices rememberMeServices() {
-        return new CustomPersistentRememberMeServices(env, userDetailsService());
+        return new CustomPersistentRememberMeServices(idmAppProperties, userDetailsService());
     }
 
     @Bean
     public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
-        return new RememberMeAuthenticationProvider(env.getProperty("security.rememberme.key"));
+        return new RememberMeAuthenticationProvider(idmAppProperties.getSecurity().getRememberMeKey());
     }
 
     //
@@ -205,9 +211,15 @@ public class SecurityConfiguration {
     @Configuration
     @Order(1)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-        
-        @Autowired
-        protected Environment env;
+
+        protected final FlowableRestAppProperties restAppProperties;
+        protected final FlowableIdmAppProperties idmAppProperties;
+
+        public ApiWebSecurityConfigurationAdapter(FlowableRestAppProperties restAppProperties,
+            FlowableIdmAppProperties idmAppProperties) {
+            this.restAppProperties = restAppProperties;
+            this.idmAppProperties = idmAppProperties;
+        }
 
         protected void configure(HttpSecurity http) throws Exception {
 
@@ -218,9 +230,9 @@ public class SecurityConfiguration {
                     .csrf()
                     .disable();
 
-            if (isEnableRestApi()) {
-                
-                if (RestApiUtil.isVerifyRestApiPrivilege(env)) {
+            if (idmAppProperties.isRestEnabled()) {
+
+                if (restAppProperties.isVerifyRestApiPrivilege()) {
                     http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
                 } else {
                     http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").authenticated().and().httpBasic();
@@ -233,11 +245,6 @@ public class SecurityConfiguration {
             }
             
         }
-        
-        protected boolean isEnableRestApi() {
-            return env.getProperty("rest.idm-app.enabled", Boolean.class, true);
-        }
-        
     }
 
 }

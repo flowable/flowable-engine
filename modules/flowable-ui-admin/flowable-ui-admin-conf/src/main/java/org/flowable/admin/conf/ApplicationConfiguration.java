@@ -12,6 +12,8 @@
  */
 package org.flowable.admin.conf;
 
+import org.flowable.admin.properties.FlowableAdminAppProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -41,6 +43,7 @@ import org.springframework.context.annotation.PropertySources;
         SecurityConfiguration.class,
     DatabaseConfiguration.class
 })
+@EnableConfigurationProperties(FlowableAdminAppProperties.class)
 public class ApplicationConfiguration {
 
 }

@@ -20,6 +20,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.flowable.app.properties.FlowableModelerAppProperties;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.engine.common.api.FlowableException;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -29,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
 
@@ -48,7 +48,7 @@ public class DatabaseConfiguration {
     protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DE_";
 
     @Autowired
-    protected Environment env;
+    protected FlowableModelerAppProperties modelerAppProperties;
 
     @Autowired
     protected ResourceLoader resourceLoader;
@@ -106,7 +106,7 @@ public class DatabaseConfiguration {
 
         try {
             Properties properties = new Properties();
-            properties.put("prefix", env.getProperty("datasource.prefix", ""));
+            properties.put("prefix", modelerAppProperties.getDataSourcePrefix());
             properties.put("blobType", "BLOB");
             properties.put("boolValue", "TRUE");
 

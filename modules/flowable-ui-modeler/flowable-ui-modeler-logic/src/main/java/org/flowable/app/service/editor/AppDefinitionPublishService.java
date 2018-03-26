@@ -36,16 +36,16 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
+import org.flowable.app.properties.FlowableModelerAppProperties;
 import org.flowable.app.properties.FlowableRemoteIdmProperties;
 import org.flowable.app.service.api.AppDefinitionService;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Can't merge this with {@link AppDefinitionService}, as it doesn't have visibility of domain models needed to do the publication.
@@ -58,13 +58,12 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionPublishService.class);
 
-    @Autowired
-    protected Environment environment;
-
     protected final FlowableRemoteIdmProperties properties;
+    protected final FlowableModelerAppProperties modelerAppProperties;
 
-    public AppDefinitionPublishService(FlowableRemoteIdmProperties properties) {
+    public AppDefinitionPublishService(FlowableRemoteIdmProperties properties, FlowableModelerAppProperties modelerAppProperties) {
         this.properties = properties;
+        this.modelerAppProperties = modelerAppProperties;
     }
 
     public void publishAppDefinition(String comment, Model appDefinitionModel, User user) {
@@ -92,7 +91,8 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
     }
 
     protected void deployZipArtifact(String artifactName, byte[] zipArtifact, String deploymentKey, String deploymentName) {
-        String deployApiUrl = environment.getRequiredProperty("deployment.api.url");
+        String deployApiUrl = modelerAppProperties.getDeploymentApiUrl();
+        Assert.hasText(deployApiUrl, "flowable.modeler.app.deployment-api-url must be set");
         String basicAuthUser = properties.getAdmin().getUser();
         String basicAuthPassword = properties.getAdmin().getPassword();
 
