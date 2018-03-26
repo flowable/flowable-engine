@@ -14,8 +14,10 @@ package org.flowable.app.rest.runtime;
 
 import org.flowable.app.model.runtime.CreateProcessInstanceRepresentation;
 import org.flowable.app.model.runtime.ProcessInstanceRepresentation;
+import org.flowable.app.security.CookieConstants;
 import org.flowable.app.service.runtime.FlowableProcessInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +30,7 @@ public class ProcessInstancesResource {
     protected FlowableProcessInstanceService processInstanceService;
 
     @RequestMapping(value = "/rest/process-instances", method = RequestMethod.POST)
-    public ProcessInstanceRepresentation startNewProcessInstance(@RequestBody CreateProcessInstanceRepresentation startRequest) {
-        return processInstanceService.startNewProcessInstance(startRequest);
+    public ProcessInstanceRepresentation startNewProcessInstance(@RequestBody CreateProcessInstanceRepresentation startRequest, @CookieValue(name = CookieConstants.COOKIE_NAME, required = false) String flowable) {
+        return processInstanceService.startNewProcessInstance(startRequest, flowable);
     }
 }

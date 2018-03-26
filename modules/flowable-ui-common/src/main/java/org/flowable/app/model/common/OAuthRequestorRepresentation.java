@@ -10,14 +10,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.security;
+package org.flowable.app.model.common;
 
-import org.flowable.idm.api.Token;
-import org.flowable.idm.api.User;
+import org.flowable.app.security.OAuthAuthorizationRequestor;
 
-public interface CustomRememberMeService {
+/**
+ * @author Ahmed Ghonim
+ */
+public class OAuthRequestorRepresentation extends AbstractRepresentation {
 
-    Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent);
-    
-    Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent, String data);
+    protected String name;
+
+    public OAuthRequestorRepresentation() {
+
+    }
+
+    public OAuthRequestorRepresentation(OAuthAuthorizationRequestor requestor) {
+        this.name = requestor.getName();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

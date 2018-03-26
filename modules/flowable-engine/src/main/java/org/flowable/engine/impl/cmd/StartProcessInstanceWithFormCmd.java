@@ -88,7 +88,10 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
                 }
             }
         }
-
+        if (formVariables == null) {
+            formVariables = new HashMap<>();
+        }
+        formVariables.put("FLOWABLE_REMEMBER_ME", variables.get("FLOWABLE_REMEMBER_ME"));
         ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, processInstanceName,
                 formVariables, commandContext);
 

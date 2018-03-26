@@ -17,6 +17,7 @@ public class RemoteToken {
     protected String id;
     protected String value;
     protected String userId;
+    protected String data;
 
     public String getId() {
         return id;
@@ -40,6 +41,14 @@ public class RemoteToken {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
 }

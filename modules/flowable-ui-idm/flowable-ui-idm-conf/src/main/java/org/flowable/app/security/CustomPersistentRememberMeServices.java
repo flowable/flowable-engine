@@ -121,7 +121,16 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
         LOGGER.debug("Creating new persistent login for user {}", userEmail);
         FlowableAppUser appUser = (FlowableAppUser) successfulAuthentication.getPrincipal();
 
-        Token token = createAndInsertPersistentToken(appUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
+        Token token;
+        
+        if (successfulAuthentication instanceof OAuthAuthentication) {
+            OAuthAuthentication auth = (OAuthAuthentication) successfulAuthentication;
+            String data = auth.getTokenData();
+            token = createAndInsertPersistentToken(appUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"), data);
+        } else {
+            token = createAndInsertPersistentToken(appUser.getUserObject(), request.getRemoteAddr(), request.getHeader("User-Agent"));
+        }
+        
         addCookie(token, request, response);
     }
 
@@ -245,5 +254,10 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     @Override
     public Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent) {
         return persistentTokenService.createToken(user, remoteAddress, userAgent);
+    }
+    
+    @Override
+    public Token createAndInsertPersistentToken(User user, String remoteAddress, String userAgent, String data) {
+        return persistentTokenService.createToken(user, remoteAddress, userAgent, data);
     }
 }

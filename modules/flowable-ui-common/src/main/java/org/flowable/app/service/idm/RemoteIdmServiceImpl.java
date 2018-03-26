@@ -78,7 +78,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         }
         return null;
     }
-
+    
     @Override
     public RemoteToken getToken(String tokenValue) {
         JsonNode json = callRemoteIdmService(url + "/api/idm/tokens/" + encode(tokenValue), adminUser, adminPassword);
@@ -87,6 +87,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
             token.setId(json.get("id").asText());
             token.setValue(json.get("value").asText());
             token.setUserId(json.get("userId").asText());
+            token.setData(json.get("data").asText());
             return token;
         }
         return null;

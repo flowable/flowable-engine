@@ -16,6 +16,17 @@ flowableApp.controller('LoginController', ['$scope', '$location', 'Authenticatio
         $scope.model = {
             loading: false
         };
+        
+        AuthenticationSharedService.getOAuthProviders().then(function(data){
+        		
+        		$scope.model.oAuthProviders = { 
+        				data: data.data, 
+        				baseURL: FLOWABLE.CONFIG.contextRoot 
+        		};
+        });
+        
+        $scope.model.redirectUrl = $location.search().redirectUrl;
+        
         $scope.login = function () {
 
             $scope.model.loading = true;

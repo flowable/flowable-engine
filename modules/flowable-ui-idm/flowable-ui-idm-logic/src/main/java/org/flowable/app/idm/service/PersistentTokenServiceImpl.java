@@ -144,10 +144,16 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
 
     @Override
     public Token createToken(User user, String remoteAddress, String userAgent) {
+        return createToken(user, remoteAddress, userAgent, null);
+    }
+
+    @Override
+    public Token createToken(User user, String remoteAddress, String userAgent, String data) {
 
         Token token = idmIdentityService.newToken(generateSeriesData());
         token.setTokenValue(generateTokenData());
         token.setTokenDate(new Date());
+        token.setTokenData(data);
         token.setIpAddress(remoteAddress);
         token.setUserAgent(userAgent);
         token.setUserId(user.getId());

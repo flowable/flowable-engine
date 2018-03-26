@@ -220,6 +220,14 @@ flowableApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'auth
                     $rootScope.authenticated = false;
                     authService.loginCancelled({isFromLogout: true});
                 });
+        },
+        getOAuthProviders: function (){
+        		var deferred = $q.defer();
+        		$http.get(FLOWABLE.CONFIG.contextRoot + '/oauth/rest/requestor')
+        			.success(function(data, status,headers,config){
+        				deferred.resolve(data);
+        			});
+            return deferred.promise;
         }
 
       };
