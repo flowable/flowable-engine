@@ -86,7 +86,9 @@ public class ListenerNotificationHelper {
         }
     }
 
-    protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, TransactionDependentExecutionListener executionListener, FlowableListener listener) {
+    protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, 
+                    TransactionDependentExecutionListener executionListener, FlowableListener listener) {
+        
         Map<String, Object> executionVariablesToUse = execution.getVariables();
         CustomPropertiesResolver customPropertiesResolver = createCustomPropertiesResolver(listener);
         Map<String, Object> customPropertiesMapToUse = invokeCustomPropertiesResolver(execution, customPropertiesResolver);
@@ -94,7 +96,8 @@ public class ListenerNotificationHelper {
         TransactionDependentExecutionListenerExecutionScope scope = new TransactionDependentExecutionListenerExecutionScope(
                 execution.getProcessInstanceId(), execution.getId(), execution.getCurrentFlowElement(), executionVariablesToUse, customPropertiesMapToUse);
 
-        addTransactionListener(listener, new ExecuteExecutionListenerTransactionListener(executionListener, scope));
+        addTransactionListener(listener, new ExecuteExecutionListenerTransactionListener(executionListener, scope, 
+                        CommandContextUtil.getProcessEngineConfiguration().getCommandExecutor()));
     }
 
     public void executeTaskListeners(TaskEntity taskEntity, String eventType) {
@@ -160,7 +163,8 @@ public class ListenerNotificationHelper {
 
         TransactionDependentTaskListenerExecutionScope scope = new TransactionDependentTaskListenerExecutionScope(
                 execution.getProcessInstanceId(), execution.getId(), (Task) execution.getCurrentFlowElement(), executionVariablesToUse, customPropertiesMapToUse);
-        addTransactionListener(listener, new ExecuteTaskListenerTransactionListener(taskListener, scope));
+        addTransactionListener(listener, new ExecuteTaskListenerTransactionListener(taskListener, scope,
+                        CommandContextUtil.getProcessEngineConfiguration().getCommandExecutor()));
     }
 
     protected CustomPropertiesResolver createCustomPropertiesResolver(FlowableListener listener) {

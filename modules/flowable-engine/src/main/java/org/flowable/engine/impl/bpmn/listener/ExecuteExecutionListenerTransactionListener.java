@@ -20,7 +20,6 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * A {@link TransactionListener} that invokes an {@link ExecutionListener}.
@@ -31,16 +30,17 @@ public class ExecuteExecutionListenerTransactionListener implements TransactionL
 
     protected TransactionDependentExecutionListener listener;
     protected TransactionDependentExecutionListenerExecutionScope scope;
+    protected CommandExecutor commandExecutor;
 
     public ExecuteExecutionListenerTransactionListener(TransactionDependentExecutionListener listener,
-            TransactionDependentExecutionListenerExecutionScope scope) {
+            TransactionDependentExecutionListenerExecutionScope scope, CommandExecutor commandExecutor) {
         this.listener = listener;
         this.scope = scope;
+        this.commandExecutor = commandExecutor;
     }
 
     @Override
     public void execute(CommandContext commandContext) {
-        CommandExecutor commandExecutor = CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor();
         CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         commandExecutor.execute(commandConfig, new Command<Void>() {
             @Override
