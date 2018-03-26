@@ -14,7 +14,7 @@ package org.flowable.app.servlet;
 
 import java.util.List;
 
-import org.flowable.rest.service.api.PutAwareCommonsMultipartResolver;
+import org.flowable.common.rest.multipart.PutAwareCommonsMultipartResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

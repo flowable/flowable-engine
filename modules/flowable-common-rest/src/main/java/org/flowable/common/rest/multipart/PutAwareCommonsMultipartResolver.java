@@ -1,8 +1,7 @@
-package org.flowable.rest.service.api;
+package org.flowable.common.rest.multipart;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 public class PutAwareCommonsMultipartResolver extends CommonsMultipartResolver {
@@ -22,7 +21,7 @@ public class PutAwareCommonsMultipartResolver extends CommonsMultipartResolver {
      * 
      * @return <code>true</code> if the request is multipart; {@code false} otherwise.
      * 
-     * @see ServletFileUpload#isMultipartContent(HttpServletRequest)
+     * @see org.apache.commons.fileupload.servlet.ServletFileUpload#isMultipartContent(HttpServletRequest)
      */
     public static final boolean isMultipartContent(HttpServletRequest request) {
         final String method = request.getMethod().toLowerCase();
