@@ -17,6 +17,7 @@ import java.util.Map;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -175,5 +176,10 @@ public interface HistoryManager {
     void recordIdentityLinkDeleted(String identityLinkId);
 
     void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
+    
+    /**
+     * Record the update of a process definition for historic process instance, task, and activity instance, if history is enabled.
+     */
+    void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance);
 
 }

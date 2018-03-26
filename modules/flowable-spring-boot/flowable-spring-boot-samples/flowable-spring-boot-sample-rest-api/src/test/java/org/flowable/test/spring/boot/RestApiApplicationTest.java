@@ -15,15 +15,10 @@ package org.flowable.test.spring.boot;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.io.IOException;
-import java.util.Base64;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.cmmn.service.api.repository.CaseDefinitionResponse;
-import org.flowable.rest.content.service.api.content.ContentItemResponse;
-import org.flowable.rest.dmn.service.api.repository.DmnDeploymentResponse;
+import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.content.rest.service.api.content.ContentItemResponse;
+import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
@@ -35,15 +30,11 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.DefaultResponseErrorHandler;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import flowable.Application;
@@ -66,40 +57,13 @@ public class RestApiApplicationTest {
     public void tearDown() {
         restTemplate.setErrorHandler(new DefaultResponseErrorHandler());
     }
-    @Test
-    public void testRestApiIntegration() throws InterruptedException {
-        String authenticationChallenge = "http://localhost:" + serverPort + "/repository/process-definitions";
-
-        CountDownLatch latch401 = new CountDownLatch(1);
-        restTemplate.setErrorHandler(new ResponseErrorHandler() {
-
-            @Override
-            public boolean hasError(ClientHttpResponse clientHttpResponse) throws IOException {
-                return true;
-            }
-
-            @Override
-            public void handleError(ClientHttpResponse clientHttpResponse) throws IOException {
-                if (clientHttpResponse.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                    latch401.countDown();
-                }
-            }
-        });
-
-        ResponseEntity<String> response = restTemplate.getForEntity(authenticationChallenge, String.class);
-        latch401.await(500, TimeUnit.MILLISECONDS);
-        assertThat(latch401.getCount())
-            .as("401 Latch")
-            .isEqualTo(0);
-    }
 
     @Test
-    public void testRestApiIntegrationWithAuthentication() {
+    public void testRestApiIntegration() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/process-api/repository/process-definitions";
 
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("jbarrez", "password"));
         ResponseEntity<DataResponse<ProcessDefinitionResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<ProcessDefinitionResponse>>() {
+            .exchange(processDefinitionsUrl, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<ProcessDefinitionResponse>>() {
 
             });
 
@@ -118,12 +82,11 @@ public class RestApiApplicationTest {
     }
 
     @Test
-    public void testCmmnRestApiIntegrationWithAuthentication() {
+    public void testCmmnRestApiIntegration() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/cmmn-api/cmmn-repository/case-definitions";
 
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
         ResponseEntity<DataResponse<CaseDefinitionResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<CaseDefinitionResponse>>() {
+            .exchange(processDefinitionsUrl, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<CaseDefinitionResponse>>() {
             });
 
         assertThat(response.getStatusCode())
@@ -140,12 +103,11 @@ public class RestApiApplicationTest {
     }
 
     @Test
-    public void testContentRestApiIntegrationWithAuthentication() {
+    public void testContentRestApiIntegration() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/content-api/content-service/content-items";
 
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
         ResponseEntity<DataResponse<ContentItemResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<ContentItemResponse>>() {
+            .exchange(processDefinitionsUrl, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<ContentItemResponse>>() {
             });
 
         assertThat(response.getStatusCode())
@@ -158,12 +120,11 @@ public class RestApiApplicationTest {
         assertThat(contentItems.getTotal()).isEqualTo(0);
     }
     @Test
-    public void testDmnRestApiIntegrationWithAuthentication() {
+    public void testDmnRestApiIntegration() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/dmn-api/dmn-repository/deployments";
 
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
         ResponseEntity<DataResponse<DmnDeploymentResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<DmnDeploymentResponse>>() {
+            .exchange(processDefinitionsUrl, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<DmnDeploymentResponse>>() {
             });
 
         assertThat(response.getStatusCode())
@@ -176,12 +137,11 @@ public class RestApiApplicationTest {
         assertThat(deployments.getTotal()).isEqualTo(0);
     }
     @Test
-    public void testFormRestApiIntegrationWithAuthentication() {
+    public void testFormRestApiIntegration() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/form-api/form-repository/form-definitions";
 
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
         ResponseEntity<DataResponse<FormDefinitionResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<FormDefinitionResponse>>() {
+            .exchange(processDefinitionsUrl, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<FormDefinitionResponse>>() {
             });
 
         assertThat(response.getStatusCode())
@@ -194,12 +154,11 @@ public class RestApiApplicationTest {
         assertThat(formDefinitions.getTotal()).isEqualTo(0);
     }
     @Test
-    public void testIdmRestApiIntegrationWithAuthentication() {
+    public void testIdmRestApiIntegration() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/idm-api/groups";
 
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
         ResponseEntity<DataResponse<GroupResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<GroupResponse>>() {
+            .exchange(processDefinitionsUrl, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<GroupResponse>>() {
             });
 
         assertThat(response.getStatusCode())
@@ -213,17 +172,5 @@ public class RestApiApplicationTest {
                 tuple("user", "security-role", "users", null)
             );
         assertThat(groups.getTotal()).isEqualTo(1);
-    }
-
-    protected static HttpHeaders createHeaders(String username, String password) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, base64Auhentication(username, password));
-        return headers;
-    }
-
-    protected static String base64Auhentication(String username, String password) {
-        String auth = username + ":" + password;
-        return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
-
     }
 }

@@ -47,7 +47,7 @@ public class ELExpressionExecutor {
         executionContext.checkExecutionContext(inputExpression);
         
         // pre parse expression
-        String parsedExpression = ELConditionExpressionPreParser.parse(inputEntry.getText(), inputExpression, inputClause.getInputExpression().getTypeRef());
+        String parsedExpression = ELInputEntryExpressionPreParser.parse(inputEntry.getText(), inputExpression, inputClause.getInputExpression().getTypeRef());
 
         Expression expression = expressionManager.createExpression(parsedExpression);
         RuleExpressionCondition condition = new RuleExpressionCondition(expression);
@@ -71,7 +71,7 @@ public class ELExpressionExecutor {
             throw new IllegalArgumentException("execution context is required");
         }
         
-        String parsedExpression = ELOutputExpressionPreParser.parse(outputEntry.getText());
+        String parsedExpression = ELOutputEntryExpressionPreParser.parse(outputEntry.getText());
         
         Expression expression = expressionManager.createExpression(parsedExpression);
         RuleExpressionOutput outputExpression = new RuleExpressionOutput(expression);

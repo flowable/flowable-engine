@@ -22,25 +22,16 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
+public class TaskEndedHistoryJsonTransformer extends AbstractNeedsTaskHistoryJsonTransformer {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskEndedHistoryJsonTransformer.class);
-
     @Override
     public String getType() {
         return HistoryJsonConstants.TYPE_TASK_ENDED;
     }
     
-    @Override
-    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-        return true;
-    }
-
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
@@ -59,6 +50,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
                 historicTaskInstance.setAssignee(getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE));
                 historicTaskInstance.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
                 historicTaskInstance.setTaskDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_KEY));
+                historicTaskInstance.setTaskDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_ID));
                 historicTaskInstance.setPriority(getIntegerFromJson(historicalData, HistoryJsonConstants.PRIORITY));
                 historicTaskInstance.setDueDate(getDateFromJson(historicalData, HistoryJsonConstants.DUE_DATE));
                 historicTaskInstance.setCategory(getStringFromJson(historicalData, HistoryJsonConstants.CATEGORY));
@@ -92,6 +84,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
             historicTaskInstance.setAssignee(getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE));
             historicTaskInstance.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
             historicTaskInstance.setTaskDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_KEY));
+            historicTaskInstance.setTaskDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.TASK_DEFINITION_ID));
             historicTaskInstance.setPriority(getIntegerFromJson(historicalData, HistoryJsonConstants.PRIORITY));
             historicTaskInstance.setDueDate(getDateFromJson(historicalData, HistoryJsonConstants.DUE_DATE));
             historicTaskInstance.setCategory(getStringFromJson(historicalData, HistoryJsonConstants.CATEGORY));

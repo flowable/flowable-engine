@@ -1,6 +1,408 @@
 {
   "properties": [
     {
+      "name": "ldap.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.enabled"
+      }
+    },
+    {
+      "name": "ldap.server",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.server"
+      }
+    },
+    {
+      "name": "ldap.port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.port"
+      }
+    },
+    {
+      "name": "ldap.user",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.user"
+      }
+    },
+    {
+      "name": "ldap.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.password"
+      }
+    },
+    {
+      "name": "ldap.basedn",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.base-dn"
+      }
+    },
+    {
+      "name": "ldap.query.userbyid",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.query.user-by-id"
+      }
+    },
+    {
+      "name": "ldap.query.userbyname",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.query.user-by-full-name-like"
+      }
+    },
+    {
+      "name": "ldap.query.userall",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.query.all-users"
+      }
+    },
+    {
+      "name": "ldap.query.groupsforuser",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.query.groups-for-user"
+      }
+    },
+    {
+      "name": "ldap.query.groupall",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.query.all-groups"
+      }
+    },
+    {
+      "name": "ldap.attribute.userid",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.attribute.user-id"
+      }
+    },
+    {
+      "name": "ldap.attribute.firstname",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.attribute.first-name"
+      }
+    },
+    {
+      "name": "ldap.attribute.lastname",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.attribute.last-name"
+      }
+    },
+    {
+      "name": "ldap.attribute.email",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.attribute.email"
+      }
+    },
+    {
+      "name": "ldap.attribute.groupid",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.attribute.group-id"
+      }
+    },
+    {
+      "name": "ldap.attribute.groupname",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.attribute.group-name"
+      }
+    },
+    {
+      "name": "ldap.cache.groupsize",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.cache.group-size"
+      }
+    },
+    {
+      "name": "ldap.cache.groupexpiration",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable LDAP auto-configuration instead.",
+        "replacement": "flowable.idm.ldap.cache.group-expiration"
+      }
+    },
+    {
+      "name": "security.passwordencoder",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using general Flowable IDM auto-configuration instead.",
+        "replacement": "flowable.idm.password-encoder"
+      }
+    },
+    {
+      "name": "contentstorage.fs.rootFolder",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.content.storage.root-folder"
+      }
+    },
+    {
+      "name": "contentstorage.fs.createRoot",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.content.storage.create-root"
+      }
+    },
+    {
+      "name": "datasource.jndi.name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.jndi-name"
+      }
+    },
+    {
+      "name": "datasource.jndi.resourceRef",
+      "deprecation": {
+        "level": "error",
+        "reason": "Spring Boot does not support using JNDI resourceRef."
+      }
+    },
+    {
+      "name": "datasource.url",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.url"
+      }
+    },
+    {
+      "name": "datasource.driver",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.driver-class-name"
+      }
+    },
+    {
+      "name": "datasource.username",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.username"
+      }
+    },
+    {
+      "name": "datasource.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.password"
+      }
+    },
+    {
+      "name": "datasource.connection.timeout",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.connection-timeout"
+      }
+    },
+    {
+      "name": "datasource.connection.minidle",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.minimum-idle"
+      }
+    },
+    {
+      "name": "datasource.connection.maxpoolsize",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.maximum-pool-size"
+      }
+    },
+    {
+      "name": "datasource.connection.idletimeout",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.idle-timeout"
+      }
+    },
+    {
+      "name": "datasource.connection.maxlifetime",
+      "type": "java.lang.Long",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.max-lifetime"
+      }
+    },
+    {
+      "name": "datasource.preferred-test-query",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot DataSource configuration instead.",
+        "replacement": "spring.datasource.hikari.connection-test-query"
+      }
+    },
+    {
+      "name": "engine.process.schema.update",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.database-schema-update"
+      }
+    },
+    {
+      "name": "engine.process.asyncexecutor.activate",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.async-executor-activate"
+      }
+    },
+    {
+      "name": "engine.process.history.level",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.history-level"
+      }
+    },
+    {
+      "name": "email.host",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-host"
+      }
+    },
+    {
+      "name": "email.port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-port"
+      }
+    },
+    {
+      "name": "email.useCredentials",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot. In case you don't want to use credentials, set the password and user to empty."
+      }
+    },
+    {
+      "name": "email.username",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-user-name"
+      }
+    },
+    {
+      "name": "email.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-password"
+      }
+    },
+    {
+      "name": "email.useSSL",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-use-ssl"
+      }
+    },
+    {
+      "name": "email.useTLS",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail-server-use-tls"
+      }
+    },
+    {
+      "name": "flowable.process-definitions.cache.max",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.process.definition-cache-limit"
+      }
+    },
+    {
       "sourceType": "org.flowable.spring.boot.FlowableServlet",
       "name": "flowable.cmmn.servlet.load-on-startup",
       "description": "Load on startup of the CMMN dispatcher servlet."
@@ -101,6 +503,33 @@
       "name": "flowable.process.servlet.path",
       "defaultValue": "/process-api",
       "description": "The context path for the Process rest servlet."
+    }
+  ],
+  "hints": [
+    {
+      "name": "flowable.database-schema-update",
+      "values": [
+        {
+          "value": "true",
+          "description": "Upon building of the engine(s), a check is performed and an update of the schema is performed if it is necessary."
+        },
+        {
+          "value": "drop-create",
+          "description": "The schema is dropped and then created during the engine(s) startup."
+        },
+        {
+          "value": "create-drop",
+          "description": "The schema is created during the engine(s) startup and dropped during the close of the engine(s)."
+        },
+        {
+          "value": "create",
+          "description": "The schema is created during the engine(s) startup."
+        },
+        {
+          "value": "false",
+          "description": "Checks the version of the DB schema against the library when the engine(s) is(are) being created and throws an exception if the versions don't match."
+        }
+      ]
     }
   ]
 }

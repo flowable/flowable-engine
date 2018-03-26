@@ -3,6 +3,7 @@ package org.flowable.rest.conf.jpa;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -109,5 +110,10 @@ public class JPAFlowableEngineConfiguration {
     @Bean
     public ManagementService managementService() {
         return processEngine().getManagementService();
+    }
+    
+    @Bean
+    public DynamicBpmnService dynamicBpmnService() {
+        return processEngine().getDynamicBpmnService();
     }
 }

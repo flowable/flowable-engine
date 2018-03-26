@@ -12,7 +12,7 @@
  */
 package org.flowable.rest.conf.common;
 
-import org.flowable.rest.exception.BaseExceptionHandlerAdvice;
+import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 /**

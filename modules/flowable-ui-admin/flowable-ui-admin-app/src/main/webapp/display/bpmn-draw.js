@@ -88,6 +88,17 @@ function _drawSubProcess(element)
 		"stroke": strokeColor,
 		"fill": "white"
  	});
+ 	
+ 	if (element.collapsed) {
+        if (element.name) {
+            this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11,
+            _bpmnGetColor(element, TEXT_COLOR));
+        }
+
+        rect.click(function() {
+            _expandCollapsedElement(element);
+        });
+    }
 }
 
 function _drawEventSubProcess(element)

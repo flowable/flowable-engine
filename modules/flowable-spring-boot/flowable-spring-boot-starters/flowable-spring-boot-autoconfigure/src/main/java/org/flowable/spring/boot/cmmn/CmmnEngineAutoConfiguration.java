@@ -22,12 +22,12 @@ import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
-import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableJobConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
@@ -63,7 +63,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Import({
     FlowableJobConfiguration.class
 })
-public class CmmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
+public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
@@ -89,6 +89,7 @@ public class CmmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration
 
         if (resources != null && !resources.isEmpty()) {
             configuration.setDeploymentResources(resources.toArray(new Resource[0]));
+            configuration.setDeploymentName(cmmnProperties.getDeploymentName());
         }
 
         if (asyncExecutor != null) {
@@ -107,6 +108,8 @@ public class CmmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration
         //TODO Can it have different then the Process engine?
         configuration.setHistoryLevel(flowableProperties.getHistoryLevel());
 
+        configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
+
         return configuration;
     }
 
@@ -116,7 +119,8 @@ public class CmmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration
 
         @Bean
         @ConditionalOnMissingBean(name = "cmmnProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer cmmnProcessEngineConfigurationConfigurer(CmmnEngineConfigurator cmmnEngineConfigurator) {
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> cmmnProcessEngineConfigurationConfigurer(
+            CmmnEngineConfigurator cmmnEngineConfigurator) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(cmmnEngineConfigurator);
         }
 

@@ -22,9 +22,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;

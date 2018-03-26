@@ -12,17 +12,26 @@
  */
 package org.flowable.engine.test.api.task;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tijs Rademakers
@@ -322,6 +331,63 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = query1.singleResult();
         assertEquals(2, task.getProcessVariables().size());
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
+    }
+
+    public void testQueryTaskDefinitionId() {
+        Task taskWithDefinitionId = createTaskWithDefinitionId("testTaskId");
+        try {
+            this.taskService.saveTask(taskWithDefinitionId);
+
+            Task updatedTask = taskService.createTaskQuery().taskDefinitionId("testTaskDefinitionId").singleResult();
+            assertThat(updatedTask.getName(), is("taskWithDefinitionId"));
+            assertThat(updatedTask.getTaskDefinitionId(), is("testTaskDefinitionId"));
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                HistoricTaskInstance updatedHistoricTask = historyService.createHistoricTaskInstanceQuery().taskDefinitionId("testTaskDefinitionId").singleResult();
+                assertThat(updatedHistoricTask.getName(), is("taskWithDefinitionId"));
+                assertThat(updatedHistoricTask.getTaskDefinitionId(), is("testTaskDefinitionId"));
+            }
+        } finally {
+            this.taskService.deleteTask("testTaskId");
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                this.historyService.deleteHistoricTaskInstance("testTaskId");
+            }
+        }
+    }
+    
+    public void testQueryTaskDefinitionId_multipleResults() {
+        Task taskWithDefinitionId1 = createTaskWithDefinitionId("testTaskId1");
+        Task taskWithDefinitionId2 = createTaskWithDefinitionId("testTaskId2");
+        try {
+            this.taskService.saveTask(taskWithDefinitionId1);
+            this.taskService.saveTask(taskWithDefinitionId2);
+
+            List<Task> updatedTasks = taskService.createTaskQuery().taskDefinitionId("testTaskDefinitionId").list();
+            assertThat(updatedTasks.size(), is(2));
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                List<HistoricTaskInstance> updatedHistoricTasks = historyService.createHistoricTaskInstanceQuery().taskDefinitionId("testTaskDefinitionId").list();
+                assertThat(updatedHistoricTasks.size(), is(2));
+            }
+        } finally {
+            this.taskService.deleteTask("testTaskId1");
+            this.taskService.deleteTask("testTaskId2");
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                this.historyService.deleteHistoricTaskInstance("testTaskId1");
+                this.historyService.deleteHistoricTaskInstance("testTaskId2");
+            }
+        }
+    }
+
+    public Task createTaskWithDefinitionId(String taskId) {
+        return this.processEngineConfiguration.getCommandExecutor().execute((Command<Task>) commandContext -> {
+                TaskEntity task = CommandContextUtil.getTaskService().createTask();
+                task.setId(taskId);
+                task.setRevision(0);
+                task.setTaskDefinitionId("testTaskDefinitionId");
+                task.setName("taskWithDefinitionId");
+                return task;
+            });
     }
 
     /**

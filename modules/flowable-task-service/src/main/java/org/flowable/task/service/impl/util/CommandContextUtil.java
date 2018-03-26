@@ -34,7 +34,8 @@ public class CommandContextUtil {
     
     public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
         if (commandContext != null) {
-            return (TaskServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+            return (TaskServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                            .get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
         }
         return null;
     }
@@ -45,7 +46,8 @@ public class CommandContextUtil {
     
     public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
         if (commandContext != null) {
-            return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+            return (VariableServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                            .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
         }
         return null;
     }
@@ -56,7 +58,8 @@ public class CommandContextUtil {
     
     public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
         if (commandContext != null) {
-            return (IdentityLinkServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+            return (IdentityLinkServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                            .get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
         }
         return null;
     }

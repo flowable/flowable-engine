@@ -21,18 +21,23 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -375,6 +380,38 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 if (historicProcessInstance != null) {
                     historicProcessInstance.setBusinessKey(processInstance.getProcessInstanceBusinessKey());
                     getHistoricProcessInstanceEntityManager().update(historicProcessInstance, false);
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
+        if (isHistoryEnabled()) {
+            HistoricProcessInstanceEntity historicProcessInstance = (HistoricProcessInstanceEntity) getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
+            historicProcessInstance.setProcessDefinitionId(processDefinitionEntity.getId());
+            getHistoricProcessInstanceEntityManager().update(historicProcessInstance);
+    
+            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+            HistoricTaskInstanceQueryImpl taskQuery = new HistoricTaskInstanceQueryImpl();
+            taskQuery.processInstanceId(processInstance.getId());
+            List<HistoricTaskInstance> historicTasks = historicTaskService.findHistoricTaskInstancesByQueryCriteria(taskQuery);
+            if (historicTasks != null) {
+                for (HistoricTaskInstance historicTaskInstance : historicTasks) {
+                    HistoricTaskInstanceEntity taskEntity = (HistoricTaskInstanceEntity) historicTaskInstance;
+                    taskEntity.setProcessDefinitionId(processDefinitionEntity.getId());
+                    historicTaskService.updateHistoricTask(taskEntity, true);
+                }
+            }
+            
+            HistoricActivityInstanceQueryImpl activityQuery = new HistoricActivityInstanceQueryImpl();
+            activityQuery.processInstanceId(processInstance.getId());
+            List<HistoricActivityInstance> historicActivities = getHistoricActivityInstanceEntityManager().findHistoricActivityInstancesByQueryCriteria(activityQuery);
+            if (historicActivities != null) {
+                for (HistoricActivityInstance historicActivityInstance : historicActivities) {
+                    HistoricActivityInstanceEntity activityEntity = (HistoricActivityInstanceEntity) historicActivityInstance;
+                    activityEntity.setProcessDefinitionId(processDefinitionEntity.getId());
+                    getHistoricActivityInstanceEntityManager().update(activityEntity);
                 }
             }
         }

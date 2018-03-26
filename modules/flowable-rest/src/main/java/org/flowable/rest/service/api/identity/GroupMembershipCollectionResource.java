@@ -16,9 +16,9 @@ package org.flowable.rest.service.api.identity;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
-import org.flowable.rest.exception.FlowableConflictException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

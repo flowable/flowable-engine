@@ -12,12 +12,12 @@
  */
 package org.flowable.app.conf;
 
-import org.flowable.rest.cmmn.service.api.CmmnRestResponseFactory;
-import org.flowable.rest.application.ContentTypeResolver;
-import org.flowable.rest.application.DefaultContentTypeResolver;
-import org.flowable.rest.content.ContentRestResponseFactory;
-import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
-import org.flowable.rest.form.FormRestResponseFactory;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
+import org.flowable.common.rest.resolver.ContentTypeResolver;
+import org.flowable.common.rest.resolver.DefaultContentTypeResolver;
+import org.flowable.content.rest.ContentRestResponseFactory;
+import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
+import org.flowable.form.rest.FormRestResponseFactory;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

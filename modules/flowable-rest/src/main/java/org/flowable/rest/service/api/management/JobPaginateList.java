@@ -15,8 +15,8 @@ package org.flowable.rest.service.api.management;
 
 import java.util.List;
 
+import org.flowable.common.rest.api.AbstractPaginateList;
 import org.flowable.job.api.Job;
-import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
 
 /**

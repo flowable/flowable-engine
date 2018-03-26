@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.runtime.task;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.rest.api.PaginateRequest;
+import org.flowable.common.rest.api.PaginateRequest;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

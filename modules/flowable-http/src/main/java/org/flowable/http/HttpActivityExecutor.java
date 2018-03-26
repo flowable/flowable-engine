@@ -299,9 +299,9 @@ public class HttpActivityExecutor {
     protected void setConfig(final HttpRequestBase base, final HttpRequest requestInfo, int socketTimeout, int connectTimeout, int connectionRequestTimeout) {
         base.setConfig(RequestConfig.custom()
                 .setRedirectsEnabled(!requestInfo.isNoRedirects())
-                .setSocketTimeout(socketTimeout)
+                .setSocketTimeout(requestInfo.getTimeout() == 0 ? socketTimeout : requestInfo.getTimeout())
                 .setConnectTimeout(connectTimeout)
-                .setConnectionRequestTimeout(requestInfo.getTimeout() == 0 ? connectionRequestTimeout : requestInfo.getTimeout())
+                .setConnectionRequestTimeout(connectionRequestTimeout)
                 .build());
     }
 

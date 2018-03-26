@@ -27,6 +27,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -249,6 +250,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, task.getAssignee());
             putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
+            putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_ID, task.getTaskDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.PRIORITY, task.getPriority());
             if (task.getDueDate() != null) {
                 putIfNotNull(data, HistoryJsonConstants.DUE_DATE, task.getDueDate());
@@ -280,6 +282,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, task.getAssignee());
             putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
+            putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_ID, task.getTaskDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.PRIORITY, task.getPriority());
             putIfNotNull(data, HistoryJsonConstants.DUE_DATE, task.getDueDate());
             putIfNotNull(data, HistoryJsonConstants.FORM_KEY, task.getFormKey());
@@ -318,6 +321,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.FORM_KEY, taskEntity.getFormKey());
             putIfNotNull(data, HistoryJsonConstants.PARENT_TASK_ID, taskEntity.getParentTaskId());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, taskEntity.getTaskDefinitionKey());
+            putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_ID, taskEntity.getTaskDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, taskEntity.getProcessDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.CLAIM_TIME, taskEntity.getClaimTime());
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED, data);
@@ -535,9 +539,20 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED, data);
         }
     }
+    
+    @Override
+    public void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
+        if (isHistoryEnabled()) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, processDefinitionEntity.getId());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, processInstance.getId());
+            getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_UPDATE_PROCESS_DEFINITION_CASCADE, data);
+        }
+    }
+    
 
     /* Helper methods */
-    
+
     protected Map<String, String> getActivityStart(String executionId, String activityId, boolean removeFromAsyncHistorySession) {
         Map<String, List<Map<String, String>>> jobData = getAsyncHistorySession().getJobData();
         if (jobData != null && jobData.containsKey(HistoryJsonConstants.TYPE_ACTIVITY_START)) {

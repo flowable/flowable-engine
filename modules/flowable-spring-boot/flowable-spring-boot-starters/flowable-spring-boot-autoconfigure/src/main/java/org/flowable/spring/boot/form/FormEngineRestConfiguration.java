@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot.form;
 
-import org.flowable.rest.form.FormRestResponseFactory;
+import org.flowable.form.rest.FormRestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
  * @author Filip Hrisafov
  */
 @Import(DispatcherServletConfiguration.class)
-@ComponentScan("org.flowable.rest.form.service.api")
+@ComponentScan("org.flowable.form.rest.service.api")
 public class FormEngineRestConfiguration {
 
     @Bean

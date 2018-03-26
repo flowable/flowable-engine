@@ -69,6 +69,11 @@ public class HistoricTaskServiceImpl extends ServiceImpl implements HistoricTask
     public HistoricTaskInstanceEntity createHistoricTask(TaskEntity taskEntity) {
         return getHistoricTaskInstanceEntityManager().create(taskEntity);
     }
+    
+    @Override
+    public void updateHistoricTask(HistoricTaskInstanceEntity historicTaskInstanceEntity, boolean fireUpdateEvent) {
+        getHistoricTaskInstanceEntityManager().update(historicTaskInstanceEntity, fireUpdateEvent);
+    }
 
     @Override
     public void insertHistoricTask(HistoricTaskInstanceEntity historicTaskInstanceEntity, boolean fireCreateEvent) {

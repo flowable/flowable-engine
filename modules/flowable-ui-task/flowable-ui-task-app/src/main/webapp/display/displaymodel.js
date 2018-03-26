@@ -74,6 +74,9 @@ var elementsAdded = new Array();
 var elementsRemoved = new Array();
 var selectedElement = undefined;
 
+var collapsedItemNavigation = new Array();
+var bpmnData;
+
 function _showTip(htmlNode, element)
 {
 
@@ -142,6 +145,119 @@ function _showTip(htmlNode, element)
             classes: 'ui-tooltip-kisbpm-bpmn'
         }
     });
+}
+
+function _expandCollapsedElement(element) {
+    if (bpmnData.collapsed) {
+        for (var i = 0; i < bpmnData.collapsed.length; i++) {
+            var collapsedItem = bpmnData.collapsed[i];
+            if (element.id == collapsedItem.id) {
+                paper.clear();
+                
+                var modelElements = collapsedItem.elements;
+                for (var i = 0; i < modelElements.length; i++) {
+                    var subElement = modelElements[i];
+                    var drawFunction = eval("_draw" + subElement.type);
+                    drawFunction(subElement);
+                }
+                
+                if (collapsedItem.flows) {
+                    for (var i = 0; i < collapsedItem.flows.length; i++) {
+                        var subFlow = collapsedItem.flows[i];
+                        _drawFlow(subFlow);
+                    }
+                }
+                
+                var collapsedName;
+                if (element.name) {
+                    collapsedName = element.name;
+                } else {
+                    collapsedName = 'sub process ' + element.id;
+                }
+                
+                collapsedItemNavigation.push({
+                    "id": element.id,
+                    "name": collapsedName
+                });
+                
+                _buildNavigationTree();
+                
+                break;
+            }
+        }
+    }
+}
+
+function _navigateTo(elementId) {
+    var modelElements = undefined;
+    var modelFlows = undefined;
+    newCollapsedItemNavigation = new Array();
+    
+    if (elementId == 'FLOWABLE_ROOT_PROCESS') {
+        modelElements = bpmnData.elements;
+        modelFlows = bpmnData.flows;
+        
+    } else {
+    
+        for (var i = 0; i < bpmnData.collapsed.length; i++) {
+            var collapsedItem = bpmnData.collapsed[i];
+            
+            var collapsedName = undefined;
+            for (var j = 0; j < collapsedItemNavigation.length; j++) {
+                if (elementId == collapsedItemNavigation[j].id) {
+                    collapsedName = collapsedItemNavigation[j].name;
+                    break;
+                }
+            }
+        
+            if (!collapsedName) {
+                continue;
+            }
+            
+            newCollapsedItemNavigation.push({
+                "id": collapsedItem.id,
+                "name": collapsedName
+            });
+            
+            if (elementId == collapsedItem.id) {
+                modelElements = collapsedItem.elements;
+                modelFlows = collapsedItem.flows;
+                break;
+            }
+        }
+    }
+    
+    if (modelElements) {
+        paper.clear();
+                    
+        for (var i = 0; i < modelElements.length; i++) {
+            var subElement = modelElements[i];
+            var drawFunction = eval("_draw" + subElement.type);
+            drawFunction(subElement);
+        }
+        
+        if (modelFlows) {
+            for (var i = 0; i < modelFlows.length; i++) {
+                var subFlow = modelFlows[i];
+                _drawFlow(subFlow);
+            }
+        }
+        
+        collapsedItemNavigation = newCollapsedItemNavigation;
+        
+        _buildNavigationTree();
+    }
+}
+
+function _buildNavigationTree() {
+    var navigationUrl = '| <a href="javascript:_navigateTo(\'FLOWABLE_ROOT_PROCESS\')">Root</a>';
+                
+    for (var i = 0; i < collapsedItemNavigation.length; i++) {
+        navigationUrl += ' > <a href="javascript:_navigateTo(\'' + collapsedItemNavigation[i].id + '\')">' + 
+            collapsedItemNavigation[i].name + '</a>';
+    }
+    
+    $('#navigationTree').html(navigationUrl);
 }
 
 function _addHoverLogic(element, type, defaultColor)
@@ -487,6 +603,8 @@ function _showProcessDiagram() {
                 }
             }
         }
+        
+        bpmnData = data;
     });
 
     request.error(function (jqXHR, textStatus, errorThrown) {

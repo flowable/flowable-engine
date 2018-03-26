@@ -30,6 +30,11 @@ public class FlowableIdmProperties {
     private boolean enabled = true;
 
     /**
+     * The type of the password encoder that needs to be used.
+     */
+    private String passwordEncoder;
+
+    /**
      * The servlet configuration for the IDM Rest API.
      */
     @NestedConfigurationProperty
@@ -41,6 +46,14 @@ public class FlowableIdmProperties {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getPasswordEncoder() {
+        return passwordEncoder;
+    }
+
+    public void setPasswordEncoder(String passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
     public FlowableServlet getServlet() {

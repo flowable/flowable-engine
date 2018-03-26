@@ -34,9 +34,9 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Tom Baeyens
@@ -246,6 +246,19 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
     public void setResourceName(String resourceName) {
         this.resourceName = resourceName;
+    }
+    
+    // only valid in Flowable 6
+    public String getDerivedFrom() {
+        return null;
+    }
+
+    public String getDerivedFromRoot() {
+        return null;
+    }
+
+    public int getDerivedVersion() {
+        return 0;
     }
 
     @Override

@@ -13,7 +13,7 @@
 	
 	<properties>
 		<flowable.artifact>
-			org.flowable.dmn.json.converter
+			org.flowable.editor.dmn.converter
 		</flowable.artifact>
 	</properties>
 

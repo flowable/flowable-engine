@@ -25,4 +25,4 @@ alter table ACT_RU_VARIABLE
     foreign key (BYTEARRAY_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.3.0.0', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.3.0.1', 1);

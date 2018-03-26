@@ -3,7 +3,9 @@
 		<div class="pull-right">
             <a class="action" ng-click="cancel()">&times; {{'GENERAL.ACTION.CANCEL-AND-CLOSE' | translate}}</a>
         </div>
-		<h2>{{'PROCESS-INSTANCE.POPUP.SHOW-PROCESS-MODEL.TITLE' | translate}} '{{model.name &amp;&amp; model.name || model.id}}'</h2>	
+        <h2>{{'PROCESS-INSTANCE.POPUP.SHOW-PROCESS-MODEL.TITLE' | translate}} '{{model.name &amp;&amp; model.name || model.id}}' 
+            <span id="navigationTree">| <a href="javascript:_navigateTo('FLOWABLE_ROOT_PROCESS')">Root</a></span>
+        </h2>
 	</div>
 </div>
 <div class="modal-body modal-body-medium">

@@ -1,0 +1,33 @@
+{
+	"name": "Hyperlink",
+	"key": "hyperlink",
+	"fields": [
+		{
+			"id": "plainLink",
+			"name": "Plain Link",
+			"type": "hyperlink",
+			"required": false,
+			"params": {
+				"hyperlinkUrl": "http://www.flowable.org"
+			}
+		},
+        {
+            "id": "expressionLink",
+            "name": "Expression Link",
+            "type": "hyperlink",
+            "required": false,
+            "params": {
+                "hyperlinkUrl": "http://www.flowable.org/${page}"
+            }
+        },
+        {
+            "id": "anotherPlainLink",
+            "name": "Another Plain Link",
+            "type": "hyperlink",
+            "required": false,
+            "params": {
+                "hyperlinkUrl": "http://blog.flowable.org"
+            }
+        }
+    ]
+}

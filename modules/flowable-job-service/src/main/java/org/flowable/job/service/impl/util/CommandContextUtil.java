@@ -34,7 +34,8 @@ public class CommandContextUtil {
     
     public static JobServiceConfiguration getJobServiceConfiguration(CommandContext commandContext) {
         if (commandContext != null) {
-            return (JobServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+            return (JobServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                            .get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
         }
         return null;
     }

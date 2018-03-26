@@ -28,7 +28,12 @@ angular.module('flowableModeler')
 
             var hotDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
-            var operators = ['==', '!=', '<', '>', '>=', '<='];
+            var stringOperators = ['==', '!=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
+            var numberOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
+            var booleanOperators = ['==', '!='];
+            var dateOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
+            var collectionOperators = ['IN', 'NOT IN', 'ANY', 'NOT ANY', '==', '!='];
+            var allOperators = ['==', '!=', '<', '>', '>=', '<='];
             var collectOperators = {
                 'SUM': '+',
                 'MIN': '<',
@@ -51,7 +56,7 @@ angular.module('flowableModeler')
                 columnVariableIdMap: {},
                 startOutputExpression: 0,
                 selectedRow: undefined,
-                availableVariableTypes: ['string', 'number', 'boolean', 'date']
+                availableVariableTypes: ['string', 'number', 'boolean', 'date', 'collection']
             };
 
             // Hot Model init
@@ -280,6 +285,96 @@ angular.module('flowableModeler')
                 console.log($scope.model.columnDefs);
             };
 
+            $scope.doAfterValidate = function (isValid, value, row, prop, source) {
+                if (isCorrespondingCollectionOperator(row, prop)) {
+                    return true;
+                } else if (isCustomExpression(value) || isDashValue(value)) {
+                    disableCorrespondingOperatorCell(row, prop);
+                    return true;
+                } else {
+                    enableCorrespondingOperatorCell(row, prop);
+                }
+            };
+
+            // dummy validator for text fields in order to trigger the post validation hook
+            var textValidator = function(value, callback) {
+                callback(true);
+            };
+
+            var isCustomExpression = function (val) {
+                return !!(val != null
+                    && (String(val).startsWith('${') || String(val).startsWith('#{')));
+            };
+
+            var isDashValue = function (val) {
+                return !!(val != null && "-" === val);
+            };
+
+            var isCorrespondingCollectionOperator = function (row, prop) {
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
+                var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                var isCollectionOperator = false;
+                if (isOperatorCell(operatorCellMeta)) {
+                    var operatorValue = hotDecisionTableEditorInstance.getDataAtCell(row, operatorCol);
+                    if (operatorValue === "IN" || operatorValue === "NOT IN" || operatorValue === "ANY" || operatorValue === "NOT ANY") {
+                        isCollectionOperator = true;
+                    }
+                }
+                return isCollectionOperator;
+            };
+
+            var disableCorrespondingOperatorCell = function (row, prop) {
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
+                var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                if (!isOperatorCell(operatorCellMeta)) {
+                    return;
+                }
+
+                if (operatorCellMeta.className != null && operatorCellMeta.className.indexOf('custom-expression-operator') !== -1) {
+                    return;
+                }
+
+                var currentEditor = hotDecisionTableEditorInstance.getCellEditor(row, operatorCol);
+
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className + ' custom-expression-operator');
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'originalEditor', currentEditor);
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', false);
+                hotDecisionTableEditorInstance.setDataAtCell(row, operatorCol, null);
+            };
+
+            var enableCorrespondingOperatorCell = function (row, prop) {
+                var operatorCol = getCorrespondingOperatorCell(row, prop);
+                var operatorCellMeta = hotDecisionTableEditorInstance.getCellMeta(row, operatorCol);
+
+                if (!isOperatorCell(operatorCellMeta)) {
+                    return;
+                }
+
+                if (operatorCellMeta == null || operatorCellMeta.className == null || operatorCellMeta.className.indexOf('custom-expression-operator') == -1) {
+                    return;
+                }
+
+                operatorCellMeta.className = operatorCellMeta.className.replace('custom-expression-operator', '');
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'className', operatorCellMeta.className);
+                hotDecisionTableEditorInstance.setCellMeta(row, operatorCol, 'editor', operatorCellMeta.originalEditor);
+                hotDecisionTableEditorInstance.setDataAtCell(row, operatorCol, '==');
+            };
+
+            var getCorrespondingOperatorCell = function (row, prop) {
+                var currentCol = hotDecisionTableEditorInstance.propToCol(prop);
+                if (currentCol < 1) {
+                    return;
+                }
+                var operatorCol = currentCol - 1;
+                return operatorCol;
+            };
+
+            var isOperatorCell = function (cellMeta) {
+                return !(cellMeta == null || cellMeta.prop == null || cellMeta.prop.endsWith("_operator") === false);
+            };
+
             var createNewInputExpression = function (inputExpression) {
                 var newInputExpression;
                 if (inputExpression) {
@@ -489,10 +584,10 @@ angular.module('flowableModeler')
                     data: inputExpression.id + '_operator',
                     expressionType: 'input-operator',
                     expression: inputExpression,
-                    width: '60',
+                    width: '70',
                     className: 'input-operator-cell',
                     type: 'dropdown',
-                    source: operators
+                    source: getOperatorsForColumnType(inputExpression.type)
                 };
 
                 if ($scope.currentDecisionTable.inputExpressions.length !== 1) {
@@ -502,6 +597,23 @@ angular.module('flowableModeler')
                 }
 
                 return columnDefinition;
+            };
+
+            var getOperatorsForColumnType = function (type) {
+                switch (type) {
+                    case 'number':
+                        return numberOperators;
+                    case 'date':
+                        return dateOperators;
+                    case 'boolean':
+                        return booleanOperators;
+                    case 'string':
+                        return stringOperators;
+                    case 'collection':
+                        return collectionOperators;
+                    default:
+                        return allOperators;
+                }
             };
 
             var composeInputExpressionColumnDefinition = function (inputExpression) {
@@ -541,7 +653,7 @@ angular.module('flowableModeler')
 
                 if (inputExpression.entries && inputExpression.entries.length > 0) {
                     var entriesOptionValues = inputExpression.entries.slice(0, inputExpression.entries.length);
-                    entriesOptionValues.push('-', '', ' ');
+                    entriesOptionValues.push('-');
 
                     columnDefinition.type = 'dropdown';
                     columnDefinition.strict = true;
@@ -556,6 +668,8 @@ angular.module('flowableModeler')
                         '<div class="header-add-new-expression">' +
                         '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
                         '</div>';
+                } else if (type === 'text') {
+                    columnDefinition.validator = textValidator;
                 }
 
                 if (type === 'date') {
@@ -572,7 +686,7 @@ angular.module('flowableModeler')
                     columnDefinition.source = ['true', 'false', '-'];
                 }
 
-                if (type !== 'string') {
+                if (type !== 'text') {
                     columnDefinition.allowEmpty = false;
                 }
 

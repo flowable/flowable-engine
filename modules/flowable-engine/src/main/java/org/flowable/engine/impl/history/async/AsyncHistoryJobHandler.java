@@ -32,12 +32,13 @@ import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceEn
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceStartHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.SetProcessDefinitionHistoryJsonTransformer;
-import org.flowable.engine.impl.history.async.json.transformer.SubProcessInstanceHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.SubProcessInstanceStartHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskOwnerChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.UpdateProcessDefinitionCascadeHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
@@ -67,8 +68,9 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
         addHistoryJsonTransformer(new ProcessInstanceDeleteHistoryJsonTransformer());
         addHistoryJsonTransformer(new ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer());
         addHistoryJsonTransformer(new ProcessInstancePropertyChangedHistoryJsonTransformer());
-        addHistoryJsonTransformer(new SubProcessInstanceHistoryJsonTransformer());
+        addHistoryJsonTransformer(new SubProcessInstanceStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new SetProcessDefinitionHistoryJsonTransformer());
+        addHistoryJsonTransformer(new UpdateProcessDefinitionCascadeHistoryJsonTransformer());
 
         addHistoryJsonTransformer(new ActivityStartHistoryJsonTransformer());
         addHistoryJsonTransformer(new ActivityEndHistoryJsonTransformer());

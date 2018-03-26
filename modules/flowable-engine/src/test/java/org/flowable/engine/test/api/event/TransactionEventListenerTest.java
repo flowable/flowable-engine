@@ -24,6 +24,7 @@ import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 
@@ -61,6 +62,9 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         int expectedCreatedEvents = 10;
+        if (!processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
+            expectedCreatedEvents = 7;
+        }
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
             waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
         }

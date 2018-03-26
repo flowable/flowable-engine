@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -62,14 +63,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Import({
     FlowableJobConfiguration.class
 })
-public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
+public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     @Autowired(required = false)
-    private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
+    private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> processEngineConfigurationConfigurers = new ArrayList<>();
+    protected final FlowableProcessProperties processProperties;
     protected final FlowableIdmProperties idmProperties;
 
-    public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableIdmProperties idmProperties) {
+    public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
+        FlowableIdmProperties idmProperties) {
         super(flowableProperties);
+        this.processProperties = processProperties;
         this.idmProperties = idmProperties;
     }
 
@@ -87,6 +91,7 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
         if (resources != null && !resources.isEmpty()) {
             conf.setDeploymentResources(resources.toArray(new Resource[0]));
+            conf.setDeploymentName(flowableProperties.getDeploymentName());
         }
 
         if (springAsyncExecutor != null) {
@@ -109,6 +114,9 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
         conf.setMailServerDefaultFrom(flowableProperties.getMailServerDefaultFrom());
         conf.setMailServerUseSSL(flowableProperties.isMailServerUseSsl());
         conf.setMailServerUseTLS(flowableProperties.isMailServerUseTls());
+
+        conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());
+        conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
 
@@ -150,8 +158,14 @@ public class ProcessEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
     @Bean
     @ConditionalOnMissingBean
-    public ManagementService managementServiceBeanBean(ProcessEngine processEngine) {
+    public ManagementService managementServiceBean(ProcessEngine processEngine) {
         return processEngine.getManagementService();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public DynamicBpmnService dynamicBpmnServiceBean(ProcessEngine processEngine) {
+        return processEngine.getDynamicBpmnService();
     }
 
     @Bean

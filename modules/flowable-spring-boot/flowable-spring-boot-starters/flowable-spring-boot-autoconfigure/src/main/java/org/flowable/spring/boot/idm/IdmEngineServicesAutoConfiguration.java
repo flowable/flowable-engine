@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.idm;
 
+import org.flowable.engine.ProcessEngine;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
@@ -59,7 +60,8 @@ public class IdmEngineServicesAutoConfiguration {
     static class AlreadyInitializedEngineConfiguration {
 
         @Bean
-        public IdmEngine idmEngine() {
+        public IdmEngine idmEngine(@SuppressWarnings("unused") ProcessEngine processEngine) {
+            // The process engine needs to be injected, as otherwise it won't be initialized, which means that the IdmEngine is not initialized yet
             if (!IdmEngines.isInitialized()) {
                 throw new IllegalStateException("Idm engine has not been initialized");
             }

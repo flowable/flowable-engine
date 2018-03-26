@@ -84,6 +84,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected Date createTimeBefore;
     protected Date createTimeAfter;
     protected String category;
+    protected String taskDefinitionId;
     protected String key;
     protected String keyLike;
     protected String processDefinitionKey;
@@ -799,6 +800,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.category = category;
         } else {
             this.category = category;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskDefinitionId(String taskDefinitionId) {
+        if (orActive) {
+            currentOrQueryObject.taskDefinitionId = taskDefinitionId;
+        } else {
+            this.taskDefinitionId = taskDefinitionId;
         }
         return this;
     }
@@ -1666,6 +1677,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public Date getCreateTimeAfter() {
         return createTimeAfter;
+    }
+
+    public String getTaskDefinitionId() {
+        return taskDefinitionId;
     }
 
     public String getKey() {

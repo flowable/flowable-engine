@@ -21,11 +21,12 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
-import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -54,7 +55,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @AutoConfigureBefore({
     ProcessEngineAutoConfiguration.class
 })
-public class DmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
+public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableDmnProperties dmnProperties;
 
@@ -85,6 +86,10 @@ public class DmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+
+        configuration.setHistoryEnabled(dmnProperties.isHistoryEnabled());
+        configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());
+
         return configuration;
     }
 
@@ -94,7 +99,7 @@ public class DmnEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
 
         @Bean
         @ConditionalOnMissingBean(name = "dmnProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer dmnProcessEngineConfigurationConfigurer(
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> dmnProcessEngineConfigurationConfigurer(
             DmnEngineConfigurator dmnEngineConfigurator
         ) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(dmnEngineConfigurator);

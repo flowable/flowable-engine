@@ -25,6 +25,8 @@ import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 public interface DeadLetterJobDataManager extends DataManager<DeadLetterJobEntity> {
 
     List<DeadLetterJobEntity> findJobsByExecutionId(String executionId);
+    
+    List<DeadLetterJobEntity> findJobsByProcessInstanceId(String processInstanceId);
 
     List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
