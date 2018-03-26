@@ -62,7 +62,6 @@ public class SecurityConfiguration {
     // GLOBAL CONFIG
     //
 
-    @Qualifier("defaultIdmIdentityService")
     @Autowired
     protected IdmIdentityService identityService;
     

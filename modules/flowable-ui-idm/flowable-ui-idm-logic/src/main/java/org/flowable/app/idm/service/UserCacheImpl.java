@@ -31,7 +31,6 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.spring.boot.ldap.FlowableLdapProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -55,7 +54,6 @@ public class UserCacheImpl implements UserCache {
 
     protected FlowableLdapProperties ldapProperties;
 
-    @Qualifier("defaultIdmIdentityService")
     @Autowired
     protected IdmIdentityService identityService;
 
