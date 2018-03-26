@@ -25,19 +25,13 @@ import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.app.security.Http401UnauthorizedEntryPoint;
 import org.flowable.app.web.CustomFormLoginConfig;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.spring.boot.ldap.FlowableLdapProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.RememberMeAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -167,11 +161,6 @@ public class SecurityConfiguration {
     @Bean
     public CustomPersistentRememberMeServices rememberMeServices() {
         return new CustomPersistentRememberMeServices(idmAppProperties, userDetailsService());
-    }
-
-    @Bean
-    public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
-        return new RememberMeAuthenticationProvider(idmAppProperties.getSecurity().getRememberMeKey());
     }
 
     //
