@@ -17,7 +17,10 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineMvcEndpoint;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,18 +30,23 @@ import org.springframework.context.annotation.Configuration;
  * @author Josh Long
  */
 @Configuration
-@ConditionalOnClass(name = "org.springframework.boot.actuate.endpoint.AbstractEndpoint")
+@ConditionalOnClass(Endpoint.class)
 @ConditionalOnProcessEngine
 public class EndpointAutoConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledEndpoint
     public ProcessEngineEndpoint processEngineEndpoint(ProcessEngine engine) {
         return new ProcessEngineEndpoint(engine);
     }
 
-    @Bean
+//FIXME Bring back support for the process engine MVC Endpoint for displaying images
+//    @Bean
+//    @ConditionalOnMissingBean
+//    @ConditionalOnEnabledEndpoint
     public ProcessEngineMvcEndpoint processEngineMvcEndpoint(
-            ProcessEngineEndpoint engineEndpoint, RepositoryService repositoryService) {
-        return new ProcessEngineMvcEndpoint(engineEndpoint, repositoryService);
+        RepositoryService repositoryService) {
+        return new ProcessEngineMvcEndpoint(repositoryService);
     }
 }

@@ -33,7 +33,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -47,7 +47,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
     AuthenticationManager.class,
     GlobalAuthenticationConfigurerAdapter.class
 })
-@AutoConfigureBefore(org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class)
+@AutoConfigureBefore(org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class)
 @AutoConfigureAfter({
     IdmEngineServicesAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class

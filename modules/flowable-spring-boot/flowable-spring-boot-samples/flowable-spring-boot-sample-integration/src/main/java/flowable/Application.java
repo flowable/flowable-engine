@@ -15,7 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.support.GenericHandler;
+import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.support.MessageBuilder;
 
 @SpringBootApplication
