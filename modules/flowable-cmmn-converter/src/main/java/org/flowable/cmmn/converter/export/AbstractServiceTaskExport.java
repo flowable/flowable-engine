@@ -20,12 +20,7 @@ import org.flowable.cmmn.model.ServiceTask;
 
 import javax.xml.stream.XMLStreamWriter;
 
-public class ServiceTaskExport extends AbstractPlanItemDefinitionExport<ServiceTask> {
-
-    @Override
-    public Class<ServiceTask> getExportablePlanItemDefinitionClass() {
-        return ServiceTask.class;
-    }
+public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends AbstractPlanItemDefinitionExport<ServiceTask> {
 
     @Override
     public String getPlanItemDefinitionXmlElementValue(ServiceTask serviceTask) {
@@ -77,5 +72,26 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport<ServiceT
         }
 
         TaskExport.writeTaskFieldExtensions(serviceTask, xtw);
+    }
+
+    public static class ServiceTaskExport extends AbstractServiceTaskExport<ServiceTask> {
+        @Override
+        protected Class<? extends ServiceTask> getExportablePlanItemDefinitionClass() {
+            return ServiceTask.class;
+        }
+    }
+
+    public static class HttpServiceTaskExport extends AbstractServiceTaskExport<HttpServiceTask> {
+        @Override
+        protected Class<? extends ServiceTask> getExportablePlanItemDefinitionClass() {
+            return HttpServiceTask.class;
+        }
+    }
+
+    public static class ScriptServiceTaskExport extends AbstractServiceTaskExport<ScriptServiceTask> {
+        @Override
+        protected Class<? extends ServiceTask> getExportablePlanItemDefinitionClass() {
+            return ScriptServiceTask.class;
+        }
     }
 }

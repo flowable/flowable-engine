@@ -24,7 +24,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * The class for which exporter subclasess works for
      * @return a Class that extends PlanItemDefinition
      */
-    protected abstract Class<T> getExportablePlanItemDefinitionClass();
+    protected abstract Class<? extends T> getExportablePlanItemDefinitionClass();
 
     /**
      * The steps followed to write a planItemDefinition

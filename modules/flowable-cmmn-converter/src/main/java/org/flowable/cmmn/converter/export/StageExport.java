@@ -23,6 +23,15 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
 
+    private static final StageExport instance = new StageExport();
+
+    public static StageExport getInstance() {
+        return instance;
+    }
+
+    private StageExport() {
+    }
+
     @Override
     protected Class<Stage> getExportablePlanItemDefinitionClass() {
         return Stage.class;
@@ -85,10 +94,5 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
                 xtw.writeEndElement();
             }
         }
-    }
-
-    //TODO Singleton? Static? @Dennis Federico
-    public static void writePlanModel(Stage stage, XMLStreamWriter xtw) throws Exception {
-        new StageExport().writePlanItemDefinition(stage, xtw);
     }
 }

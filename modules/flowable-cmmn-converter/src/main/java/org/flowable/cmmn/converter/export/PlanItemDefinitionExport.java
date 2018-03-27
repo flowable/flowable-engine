@@ -13,16 +13,7 @@
 package org.flowable.cmmn.converter.export;
 
 import org.flowable.cmmn.converter.CmmnXmlConstants;
-import org.flowable.cmmn.model.CaseTask;
-import org.flowable.cmmn.model.DecisionTask;
-import org.flowable.cmmn.model.HumanTask;
-import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.ProcessTask;
-import org.flowable.cmmn.model.ServiceTask;
-import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.Task;
-import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.api.FlowableException;
 
 import javax.xml.stream.XMLStreamWriter;
@@ -33,13 +24,15 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
     protected static Map<String, AbstractPlanItemDefinitionExport> planItemDefinitionExporters = new HashMap<>();
 
     static {
-        addPlanItemDefinitionExport(new StageExport());
+        addPlanItemDefinitionExport(StageExport.getInstance());
         addPlanItemDefinitionExport(new TaskExport());
         addPlanItemDefinitionExport(new HumanTaskExport());
         addPlanItemDefinitionExport(new CaseTaskExport());
         addPlanItemDefinitionExport(new DecisionTaskExport());
         addPlanItemDefinitionExport(new ProcessTaskExport());
-        addPlanItemDefinitionExport(new ServiceTaskExport());
+        addPlanItemDefinitionExport(new AbstractServiceTaskExport.ServiceTaskExport());
+        addPlanItemDefinitionExport(new AbstractServiceTaskExport.HttpServiceTaskExport());
+        addPlanItemDefinitionExport(new AbstractServiceTaskExport.ScriptServiceTaskExport());
         addPlanItemDefinitionExport(new MilestoneExport());
         addPlanItemDefinitionExport(new TimerEventListenerExport());
     }
@@ -48,61 +41,13 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
         planItemDefinitionExporters.put(exporter.getExportablePlanItemDefinitionClass().getCanonicalName(), exporter);
     }
 
-
     public static void writePlanItemDefinition(PlanItemDefinition planItemDefinition, XMLStreamWriter xtw) throws Exception {
 
         String exporterType = planItemDefinition.getClass().getCanonicalName();
         AbstractPlanItemDefinitionExport exporter = planItemDefinitionExporters.get(exporterType);
         if (exporter == null) {
-            throw new FlowableException("Cannot find a PlanItemDefinitionExporter for '"+exporterType+"'");
+            throw new FlowableException("Cannot find a PlanItemDefinitionExporter for '" + exporterType + "'");
         }
         exporter.writePlanItemDefinition(planItemDefinition, xtw);
-/*
-        if (planItemDefinition instanceof Stage) {
-            exporterType = Stage.class.getCanonicalName();
-//            StageExport.writeStage((Stage) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof HumanTask) {
-            exporterType = HumanTask.class.getCanonicalName();
-//            HumanTaskExport.writeHumanTask((HumanTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof ProcessTask) {
-            exporterType = ProcessTask.class.getCanonicalName();
-//            ProcessTaskExport.writeProcessTask((ProcessTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof DecisionTask) {
-            exporterType = DecisionTask.class.getCanonicalName();
-//            DecisionTaskExport.writeDecisionTask((DecisionTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof CaseTask) {
-            exporterType = CaseTask.class.getCanonicalName();
-//            CaseTaskExport.writeCaseTask((CaseTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof ServiceTask) {
-            exporterType = ServiceTask.class.getCanonicalName();
-//            ServiceTaskExport.writeTask((ServiceTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof Task) {
-            exporterType = Task.class.getCanonicalName();
-//            TaskExport.writeTask((Task) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof Milestone) {
-            exporterType = Milestone.class.getCanonicalName();
-//            MilestoneExport.writeMilestone((Milestone) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof TimerEventListener) {
-            exporterType = TimerEventListener.class.getCanonicalName();
-//            TimerEventListenerExport.writeTimerEventListener((TimerEventListener) planItemDefinition, xtw);
-
-        }
-        */
-/*
-        if (exporterType != null) {
-            AbstractPlanItemDefinitionExport abstractPlanItemDefinitionExport = planItemDefinitionExporters.get(exporterType);
-            abstractPlanItemDefinitionExport.writePlanItemDefinition(planItemDefinition, xtw);
-        } else {
-            throw new FlowableException("Cannot find a PlanItemDefinitionExporter for '"+planItemDefinition.getClass()+"'");
-        }
-*/
     }
 }
