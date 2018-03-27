@@ -12,90 +12,70 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
-import org.flowable.cmmn.model.TaskWithFieldExtensions;
 
-public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
+import javax.xml.stream.XMLStreamWriter;
 
-    public static void writeTask(ServiceTask task, XMLStreamWriter xtw) throws Exception {
-        // start task element
-        xtw.writeStartElement(ELEMENT_TASK);
-        writeCommonTaskAttributes(xtw, task);
+public class ServiceTaskExport extends AbstractPlanItemDefinitionExport<ServiceTask> {
 
-        if (StringUtils.isNotEmpty(task.getType())) {
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE, task.getType());
+    @Override
+    public Class<ServiceTask> getExportablePlanItemDefinitionClass() {
+        return ServiceTask.class;
+    }
+
+    @Override
+    public String getPlanItemDefinitionXmlElementValue(ServiceTask serviceTask) {
+        return ELEMENT_TASK;
+    }
+
+    @Override
+    public void writePlanItemDefinitionSpecificAttributes(ServiceTask serviceTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(serviceTask, xtw);
+
+        TaskExport.writeCommonTaskAttributes(serviceTask, xtw);
+
+        if (StringUtils.isNotEmpty(serviceTask.getType())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE, serviceTask.getType());
         }
-
-        switch (task.getType()) {
+        switch (serviceTask.getType()) {
             case ServiceTask.JAVA_TASK:
-                if (StringUtils.isNotEmpty(task.getImplementation())) {
-                    if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(task.getImplementationType())) {
-                        xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementation());
+                if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
+                    if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
+                        xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, serviceTask.getImplementation());
 
-                    } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(task.getImplementationType())) {
-                        xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_EXPRESSION, task.getImplementation());
+                    } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(serviceTask.getImplementationType())) {
+                        xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_EXPRESSION, serviceTask.getImplementation());
 
-                    } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(task.getImplementationType())) {
-                        xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DELEGATE_EXPRESSION, task.getImplementation());
+                    } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
+                        xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DELEGATE_EXPRESSION, serviceTask.getImplementation());
                     }
                 }
 
-                if (StringUtils.isNotEmpty(task.getResultVariableName())) {
-                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, task.getResultVariableName());
+                if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, serviceTask.getResultVariableName());
                 }
                 break;
 
             case HttpServiceTask.HTTP_TASK:
-                if (StringUtils.isNotEmpty(task.getImplementation())) {
-                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementation());
+                if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, serviceTask.getImplementation());
                 }
                 break;
 
             case ScriptServiceTask.SCRIPT_TASK:
-                if (StringUtils.isNotBlank(task.getImplementationType())) {
-                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SCRIPT_FORMAT, task.getImplementationType());
+                if (StringUtils.isNotBlank(serviceTask.getImplementationType())) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SCRIPT_FORMAT, serviceTask.getImplementationType());
                 }
-                if (StringUtils.isNotEmpty(task.getResultVariableName())) {
-                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, task.getResultVariableName());
+                if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_RESULT_VARIABLE_NAME, serviceTask.getResultVariableName());
                 }
                 break;
         }
 
-        writeExtensions(task, xtw);
-
-        // end task element
-        xtw.writeEndElement();
+        TaskExport.writeTaskFieldExtensions(serviceTask, xtw);
     }
-
-    public static void writeExtensions(TaskWithFieldExtensions task, XMLStreamWriter xtw) throws XMLStreamException {
-        if (task.getFieldExtensions().size() > 0) {
-            xtw.writeStartElement(ELEMENT_EXTENSIONS);
-
-            for (FieldExtension fieldExtension : task.getFieldExtensions()) {
-                xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD, FLOWABLE_EXTENSIONS_NAMESPACE);
-                xtw.writeAttribute(ATTRIBUTE_NAME, fieldExtension.getFieldName());
-
-                if (StringUtils.isNotEmpty(fieldExtension.getStringValue())) {
-                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_FIELD_STRING, FLOWABLE_EXTENSIONS_NAMESPACE);
-                    xtw.writeCData(fieldExtension.getStringValue());
-                } else {
-                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_FIELD_EXPRESSION, FLOWABLE_EXTENSIONS_NAMESPACE);
-                    xtw.writeCData(fieldExtension.getExpression());
-                }
-                xtw.writeEndElement();
-                xtw.writeEndElement();
-            }
-
-            xtw.writeEndElement();
-        }
-    }
-
 }

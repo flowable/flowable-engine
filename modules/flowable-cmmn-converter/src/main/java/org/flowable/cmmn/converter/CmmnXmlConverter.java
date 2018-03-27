@@ -95,6 +95,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new RequiredRuleXmlConverter());
         addElementConverter(new RepetitionRuleXmlConverter());
         addElementConverter(new ManualActivationRuleXmlConverter());
+        addElementConverter(new CompletionNeutralRuleXmlConverter());
         addElementConverter(new SentryXmlConverter());
         addElementConverter(new EntryCriterionXmlConverter());
         addElementConverter(new ExitCriterionXmlConverter());
@@ -290,7 +291,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 CaseExport.writeCase(caseModel, xtw);
 
                 Stage planModel = caseModel.getPlanModel();
-                StageExport.writeStage(planModel, xtw);
+                StageExport.writePlanModel(planModel, xtw);
 
                 // end case element
                 xtw.writeEndElement();

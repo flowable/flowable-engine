@@ -65,6 +65,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_REQUIRED_RULE = "requiredRule";
     String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
     String ELEMENT_REPETITION_RULE = "repetitionRule";
+    String ELEMENT_COMPLETION_NEUTRAL_RULE = "completionNeutralRule";
 
     String ELEMENT_PROCESS = "process";
     String ELEMENT_DECISION = "decision";

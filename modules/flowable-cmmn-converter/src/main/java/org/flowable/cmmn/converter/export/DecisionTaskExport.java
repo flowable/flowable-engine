@@ -17,28 +17,36 @@ import org.flowable.cmmn.model.DecisionTask;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import static org.flowable.cmmn.converter.export.ServiceTaskExport.writeExtensions;
+public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<DecisionTask> {
 
-public class DecisionTaskExport extends AbstractPlanItemDefinitionExport {
+    @Override
+    protected Class<DecisionTask> getExportablePlanItemDefinitionClass() {
+        return DecisionTask.class;
+    }
 
-    public static void writeDecisionTask(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
-        // start decision task element
-        xtw.writeStartElement(ELEMENT_DECISION_TASK);
-        writeCommonTaskAttributes(xtw, decisionTask);
+    @Override
+    protected String getPlanItemDefinitionXmlElementValue(DecisionTask decisionTask) {
+        return ELEMENT_DECISION_TASK;
+    }
 
-        writeExtensions(decisionTask, xtw);
+    @Override
+    protected void writePlanItemDefinitionSpecificAttributes(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(decisionTask, xtw);
+        TaskExport.writeCommonTaskAttributes(decisionTask, xtw);
+        TaskExport.writeTaskFieldExtensions(decisionTask, xtw);
+    }
 
+    @Override
+    protected void writePlanItemDefinitionBody(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionBody(decisionTask, xtw);
         if (StringUtils.isNotEmpty(decisionTask.getDecisionRef()) || StringUtils.isNotEmpty(decisionTask.getDecisionRefExpression())) {
             xtw.writeStartElement(ELEMENT_DECISION_REF_EXPRESSION);
-                xtw.writeCData(
-                        StringUtils.isNotEmpty(decisionTask.getDecisionRef()) ?
-                            decisionTask.getDecisionRef():
+            xtw.writeCData(
+                    StringUtils.isNotEmpty(decisionTask.getDecisionRef()) ?
+                            decisionTask.getDecisionRef() :
                             decisionTask.getDecisionRefExpression()
-                );
+            );
             xtw.writeEndElement();
         }
-
-        // end decision task element
-        xtw.writeEndElement();
     }
 }
