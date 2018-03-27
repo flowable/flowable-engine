@@ -398,7 +398,8 @@ public class DefaultJobManager implements JobManager {
         }
         
         if (Context.getTransactionContext() != null) {
-            JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, getAsyncExecutor());
+            JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, getAsyncExecutor(),
+                            CommandContextUtil.getJobServiceConfiguration().getCommandExecutor());
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
         } else {
             AsyncJobAddedNotification jobAddedNotification = new AsyncJobAddedNotification(job, getAsyncExecutor());
