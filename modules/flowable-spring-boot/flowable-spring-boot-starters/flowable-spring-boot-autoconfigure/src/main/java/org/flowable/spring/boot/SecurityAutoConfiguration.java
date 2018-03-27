@@ -81,16 +81,6 @@ public class SecurityAutoConfiguration {
                         + " Please configure the global authentication provider by yourself.");
                 }
             }
-
-            if (auth.getDefaultUserDetailsService() == null) {
-                UserDetailsService userDetailsService = userDetailsServiceProvider.getIfUnique();
-                if (userDetailsService != null) {
-                    auth.userDetailsService(userDetailsService);
-                } else {
-                    LOGGER.warn("There is no default UserDetailsService configured, but there is no single one in the context."
-                        + " Please configure it by yourself");
-                }
-            }
         }
     }
 
