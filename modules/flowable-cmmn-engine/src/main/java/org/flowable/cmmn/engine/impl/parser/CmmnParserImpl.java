@@ -24,23 +24,7 @@ import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.model.Case;
-import org.flowable.cmmn.model.CaseTask;
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.DecisionTask;
-import org.flowable.cmmn.model.HttpServiceTask;
-import org.flowable.cmmn.model.HumanTask;
-import org.flowable.cmmn.model.ImplementationType;
-import org.flowable.cmmn.model.Milestone;
-import org.flowable.cmmn.model.PlanFragment;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.ProcessTask;
-import org.flowable.cmmn.model.ScriptServiceTask;
-import org.flowable.cmmn.model.ServiceTask;
-import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.Task;
-import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.*;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.el.ExpressionManager;
@@ -149,9 +133,14 @@ public class CmmnParserImpl implements CmmnParser {
                 TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createTimerEventListenerActivityBehavior(planItem, timerEventListener));
 
+            } else if (planItemDefinition instanceof UserEventListener) {
+                UserEventListener userEventListener = (UserEventListener) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createUserEventListenerActivityBehavior(planItem, userEventListener));
+
             } else if (planItemDefinition instanceof ScriptServiceTask) {
                 //ScriptServiceTask Is-A ServiceTask thus should be check before
                 planItem.setBehavior(activityBehaviorFactory.createScriptTaskActivityBehavior(planItem, (ScriptServiceTask) planItemDefinition));
+
             } else if (planItemDefinition instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
 
