@@ -17,6 +17,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -305,6 +308,18 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             newTokens[0] = tokens[0] + ":" + tokens[1];
             System.arraycopy(tokens, 2, newTokens, 1, newTokens.length - 1);
             tokens = newTokens;
+        }
+
+        for (int i = 0; i < tokens.length; i++)
+        {
+            try
+            {
+                tokens[i] = URLDecoder.decode(tokens[i], StandardCharsets.UTF_8.toString());
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                logger.error(e.getMessage(), e);
+            }
         }
 
         return tokens;
