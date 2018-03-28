@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @EnableConfigurationProperties({
     FlowableRemoteIdmProperties.class,
+    FlowableCommonAppProperties.class,
     FlowableRestAppProperties.class
 })
 @Configuration
