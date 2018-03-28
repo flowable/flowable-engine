@@ -231,6 +231,27 @@ angular.module('flowableModeler').directive('formBuilderElement', ['$rootScope',
                 }
             };
 
+            $scope.optionsExpressionChanged = function ($event) {
+            	if(event.target.checked) {
+            		$scope.formElement.options = [];
+                    $scope.formElement.value = '';
+                    $scope.formElement.optionsExpression = '${}';
+            	} else {
+            		$scope.formElement.optionsExpression = null;
+                    if ($scope.formElement.type === 'radio-buttons') {
+                    	$scope.formElement.options = [{ 
+                        	name: $translate.instant('FORM-BUILDER.COMPONENT.RADIO-BUTTON-DEFAULT')
+                        }];
+                    } else if($scope.formElement.type === 'dropdown') {
+                    	$scope.formElement.options = [
+                            {name: $translate.instant('FORM-BUILDER.COMPONENT.DROPDOWN-DEFAULT-EMPTY-SELECTION')}
+                        ];
+	                    $scope.formElement.value = field.options[0];
+	                    $scope.formElement.hasEmptyValue = true;
+            	    }
+            	}
+            };
+
             $scope.doneEditing = function () {
 
                 if ($scope.fieldEditPopup) {

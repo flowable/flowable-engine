@@ -319,7 +319,7 @@
                         <artifactId>tomcat7-maven-plugin</artifactId>
                         <configuration>
                             <path>/flowable-task</path>
-                            <port>8080</port>
+                            <port>9999</port>
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
                                 <datasource.driver>org.postgresql.Driver</datasource.driver>

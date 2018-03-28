@@ -107,6 +107,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new DecisionXmlConverter());
         addElementConverter(new DecisionTaskXmlConverter());
         addElementConverter(new TimerEventListenerXmlConverter());
+        addElementConverter(new UserEventListenerXmlConverter());
         addElementConverter(new PlanItemStartTriggerXmlConverter());
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
@@ -478,7 +479,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     planItem.addEntryCriterion(criterion);
                 }
             }
-
         }
 
     }
