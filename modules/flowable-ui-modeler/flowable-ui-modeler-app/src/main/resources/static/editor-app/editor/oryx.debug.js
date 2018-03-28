@@ -2079,6 +2079,7 @@ ORYX.CONFIG.TYPE_EXPRESSION = 			"expression";
 ORYX.CONFIG.TYPE_DATASOURCE = 			"datasource";
 ORYX.CONFIG.TYPE_DATASOURCE_MINIMAL =	"datasource-minimal";
 ORYX.CONFIG.TYPE_VALIDATORS =			"validators";
+ORYX.CONFIG.TYPE_FLOWABLE_HTTP_REQUEST_METHOD =        "flowable-http-request-method";
 
 	
 	/* Vertical line distance of multiline labels */
@@ -4397,7 +4398,7 @@ ORYX.Core.SVG.Label = Clazz.extend({
 		
 		
 		this.node.setAttributeNS(null, 'stroke-width', '0pt');
-		this.node.setAttributeNS(null, 'letter-spacing', '-0.01px');
+		this.node.setAttributeNS(null, 'letter-spacing', '0px');
 		
 		this.shapeId = options.shapeId;
 		
