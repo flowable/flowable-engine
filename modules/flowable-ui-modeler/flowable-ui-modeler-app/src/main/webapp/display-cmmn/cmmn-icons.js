@@ -146,3 +146,35 @@ function _drawTimerEventListenerIcon(paper, element)
 	path.transform("T" + (element.x + 5) + "," + (element.y + 5));
 	return path;
 }
+
+function _drawUserEventListenerIcon(paper, element) {
+    var userTaskIcon = paper.set();
+    var path1 = paper.path("M0.585,24.167h24.083v-7.833c0,0-2.333-3.917-7.083-5.167h-9.25 c-4.417,1.333-7.833,5.75-7.833,5.75L0.585,24.167z");
+    path1.attr({"opacity": 1, "stroke": "none", "fill": "#F4F6F7"});
+    userTaskIcon.push(path1);
+
+    var path2 = paper.path("M6,20L6,24");
+    path2.attr({"opacity": 1, "stroke": "white", "fill": "none"});
+    userTaskIcon.push(path2);
+
+    var path3 = paper.path("M20,20L20,24");
+    path3.attr({"opacity": 1, "stroke": "white", "fill": "none"});
+    userTaskIcon.push(path3);
+
+    var circle = paper.circle(13.002, 5.916, 5.417);
+    circle.attr({"stroke-width": 1, "stroke": "black", "fill": "#000000"});
+    userTaskIcon.push(circle);
+
+    var path4 = paper.path("M8.043,7.083c0,0,2.814-2.426,5.376-1.807s4.624-0.693,4.624-0.693 c0.25,1.688,0.042,3.75-1.458,5.584c0,0,1.083,0.75,1.083,1.5s0.125,1.875-1,3s-5.5,1.25-6.75,0S8.668,12.834,8.668,12 s0.583-1.25,1.25-1.917C8.835,9.5,7.419,7.708,8.043,7.083z");
+    path4.attr({"opacity": 1, "stroke": "none", "fill": "#F0EFF0"});
+    userTaskIcon.push(path4);
+
+    var x = (element.width / 2) - 2;
+    var y = (element.height / 2) - 2;
+    var circle2 = paper.circle(x, y, 17);
+    circle2.attr({"stroke-width": 1, "stroke": "#F0EFF0", "fill": "none"});
+    userTaskIcon.push(circle2);
+
+    userTaskIcon.transform("S0.7,0.7" + "T" + (element.x + 2) + "," + (element.y + 2));
+    return userTaskIcon;
+}

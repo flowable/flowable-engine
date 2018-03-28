@@ -32,6 +32,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_SCRIPT = "ScriptTask";
     String STENCIL_MILESTONE = "Milestone";
     String STENCIL_TIMER_EVENT_LISTENER ="TimerEventListener";
+    String STENCIL_USER_EVENT_LISTENER ="UserEventListener";
 
     String STENCIL_ENTRY_CRITERION = "EntryCriterion";
     String STENCIL_EXIT_CRITERION = "ExitCriterion";

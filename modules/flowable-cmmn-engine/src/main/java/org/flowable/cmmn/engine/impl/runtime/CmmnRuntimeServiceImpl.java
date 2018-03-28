@@ -22,6 +22,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
@@ -109,6 +110,11 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     }
 
     @Override
+    public void completeUserEventListenerInstance(String userEventListenerInstanceId) {
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(userEventListenerInstanceId));
+    }
+
+    @Override
     public Map<String, Object> getVariables(String caseInstanceId) {
         return commandExecutor.execute(new GetVariablesCmd(caseInstanceId));
     }
@@ -187,7 +193,12 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public MilestoneInstanceQuery createMilestoneInstanceQuery() {
         return cmmnEngineConfiguration.getMilestoneInstanceEntityManager().createMilestoneInstanceQuery();
     }
-    
+
+    @Override
+    public UserEventListenerInstanceQuery createUserEventListenerInstanceQuery() {
+        return new UserEventListenerInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+    }
+
     @Override
     public void addUserIdentityLink(String caseInstanceId, String userId, String identityLinkType) {
         commandExecutor.execute(new AddIdentityLinkForCaseInstanceCmd(caseInstanceId, userId, null, identityLinkType));
