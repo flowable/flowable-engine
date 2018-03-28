@@ -41,7 +41,7 @@ public class FlowableFormProperties {
 
     /**
      * The suffixes for the resources that need to be scanned.
-     * Default is {@code **.json}
+     * Default is {@code **.form}
      */
     private List<String> resourceSuffixes = Collections.singletonList("**.form");
 

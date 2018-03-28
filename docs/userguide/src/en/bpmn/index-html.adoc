@@ -10,6 +10,9 @@
 :compat-mode:
 :pdf-page-size: A4
 :nofooter:
-
+:github-tag: master
+:github-code: https://github.com/flowable/flowable-engine/tree/{github-tag}
+:sc-flowable-starter: {github-code}/modules/flowable-spring-boot/flowable-spring-boot-starters
+:sc-flowable-boot: {sc-flowable-starter}/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot
 
 include::index-common.adoc[]

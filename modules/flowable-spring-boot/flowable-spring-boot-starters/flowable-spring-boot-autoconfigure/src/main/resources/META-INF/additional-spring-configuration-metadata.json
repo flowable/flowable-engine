@@ -466,6 +466,21 @@
       }
     },
     {
+      "sourceType": "org.flowable.spring.boot.dmn.FlowableDmnProperties",
+      "name": "flowable.process-definition-location-suffixes",
+      "defaultValue": "**.bpmn20.xml,**.bpmn"
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.cmmn.FlowableCmmnProperties",
+      "name": "flowable.cmmn.resource-suffixes",
+      "defaultValue": "**.cmmn,**.cmmn11,**.cmmn.xml,**.cmmn11.xml"
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.dmn.FlowableDmnProperties",
+      "name": "flowable.dmn.resource-suffixes",
+      "defaultValue": "**.dmn,**.dmn.xml,**.dmn11,**.dmn11.xml"
+    },
+    {
       "sourceType": "org.flowable.spring.boot.FlowableServlet",
       "name": "flowable.cmmn.servlet.load-on-startup",
       "description": "Load on startup of the CMMN dispatcher servlet."
