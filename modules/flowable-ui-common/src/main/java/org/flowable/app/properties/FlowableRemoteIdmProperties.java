@@ -13,6 +13,7 @@
 package org.flowable.app.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.util.Assert;
 
 /**
@@ -36,21 +37,25 @@ public class FlowableRemoteIdmProperties {
     /**
      * The cache configuration for the login tokens.
      */
+    @NestedConfigurationProperty
     private final Cache cacheLoginTokens = new Cache();
 
     /**
      * The cache configuration for the login users.
      */
+    @NestedConfigurationProperty
     private final Cache cacheLoginUsers = new Cache();
 
     /**
      * The cache configuration for the users.
      */
+    @NestedConfigurationProperty
     private final Cache cacheUsers = new Cache();
 
     /**
      * The information for the IDM Admin user.
      */
+    @NestedConfigurationProperty
     private final Admin admin = new Admin();
 
     public String getUrl() {

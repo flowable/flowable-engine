@@ -18,7 +18,6 @@ import java.util.List;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * @author Josh Long
@@ -28,26 +27,66 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 @ConfigurationProperties(prefix = "flowable")
 public class FlowableProperties {
 
+    /**
+     * Whether process definitions need to be auto deployed.
+     */
     private boolean checkProcessDefinitions = true;
+
+    /**
+     * Whether the async executor should be activated.
+     */
     private boolean asyncExecutorActivate = true;
     private boolean restApiEnabled;
+
+    /**
+     * The name of the auto deployment.
+     */
     private String deploymentName = "SpringBootAutoDeployment";
+
     /**
      * The strategy that should be used for the database schema.
      */
     private String databaseSchemaUpdate = "true";
+
+    /**
+     * In some situations you want to set the schema to use for table checks / generation if the database metadata doesn't return that correctly.
+     */
     private String databaseSchema;
     /**
      * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#enabled}
      */
     @Deprecated
     private boolean isDbIdentityUsed = true;
+
+    /**
+     * Whether db history should be used.
+     */
     private boolean isDbHistoryUsed = true;
+
+    /**
+     * The history level that needs to be used.
+     */
     private HistoryLevel historyLevel = HistoryLevel.AUDIT;
+
+    /**
+     * The folder in which processes need to be searched for auto deployment.
+     */
     private String processDefinitionLocationPrefix = "classpath*:/processes/";
+
+    /**
+     * The suffixes (extensions) of the files that needs to be deployed from the 'processDefinitionLocationPrefix' location.
+     */
     private List<String> processDefinitionLocationSuffixes = Arrays.asList("**.bpmn20.xml", "**.bpmn");
     private boolean jpaEnabled = true; // true by default
+
+    /**
+     * The FQN of custom Mybatis mappers that need to be added to the engine.
+     */
     private List<String> customMybatisMappers;
+
+    /**
+     * The location of the custom Mybatis XML Mappers that need to be added to the engine.
+     */
     private List<String> customMybatisXMLMappers;
 
     public boolean isAsyncExecutorActivate() {
