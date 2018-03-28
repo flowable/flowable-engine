@@ -32,13 +32,6 @@ public class FlowableProperties {
     private boolean asyncExecutorActivate = true;
     private boolean restApiEnabled;
     private String deploymentName = "SpringBootAutoDeployment";
-    private String mailServerHost = "localhost";
-    private int mailServerPort = 1025;
-    private String mailServerUserName;
-    private String mailServerPassword;
-    private String mailServerDefaultFrom;
-    private boolean mailServerUseSsl;
-    private boolean mailServerUseTls;
     /**
      * The strategy that should be used for the database schema.
      */
@@ -198,61 +191,6 @@ public class FlowableProperties {
         this.processDefinitionLocationSuffixes = processDefinitionLocationSuffixes;
     }
 
-    public String getMailServerHost() {
-        return mailServerHost;
-    }
-
-    public void setMailServerHost(String mailServerHost) {
-        this.mailServerHost = mailServerHost;
-    }
-
-    public int getMailServerPort() {
-        return mailServerPort;
-    }
-
-    public void setMailServerPort(int mailServerPort) {
-        this.mailServerPort = mailServerPort;
-    }
-
-    public String getMailServerUserName() {
-        return mailServerUserName;
-    }
-
-    public void setMailServerUserName(String mailServerUserName) {
-        this.mailServerUserName = mailServerUserName;
-    }
-
-    public String getMailServerPassword() {
-        return mailServerPassword;
-    }
-
-    public void setMailServerPassword(String mailServerPassword) {
-        this.mailServerPassword = mailServerPassword;
-    }
-
-    public String getMailServerDefaultFrom() {
-        return mailServerDefaultFrom;
-    }
-
-    public void setMailServerDefaultFrom(String mailServerDefaultFrom) {
-        this.mailServerDefaultFrom = mailServerDefaultFrom;
-    }
-
-    public boolean isMailServerUseSsl() {
-        return mailServerUseSsl;
-    }
-
-    public void setMailServerUseSsl(boolean mailServerUseSsl) {
-        this.mailServerUseSsl = mailServerUseSsl;
-    }
-
-    public boolean isMailServerUseTls() {
-        return mailServerUseTls;
-    }
-
-    public void setMailServerUseTls(boolean mailServerUseTls) {
-        this.mailServerUseTls = mailServerUseTls;
-    }
 
     public List<String> getCustomMybatisMappers() {
         return customMybatisMappers;

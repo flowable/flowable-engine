@@ -55,6 +55,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ConditionalOnProcessEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableMailProperties.class,
     FlowableProcessProperties.class,
     FlowableIdmProperties.class
 })
@@ -70,12 +71,14 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> processEngineConfigurationConfigurers = new ArrayList<>();
     protected final FlowableProcessProperties processProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableMailProperties mailProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
-        FlowableIdmProperties idmProperties) {
+        FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties) {
         super(flowableProperties);
         this.processProperties = processProperties;
         this.idmProperties = idmProperties;
+        this.mailProperties = mailProperties;
     }
 
     @Bean
@@ -110,13 +113,13 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
 
-        conf.setMailServerHost(flowableProperties.getMailServerHost());
-        conf.setMailServerPort(flowableProperties.getMailServerPort());
-        conf.setMailServerUsername(flowableProperties.getMailServerUserName());
-        conf.setMailServerPassword(flowableProperties.getMailServerPassword());
-        conf.setMailServerDefaultFrom(flowableProperties.getMailServerDefaultFrom());
-        conf.setMailServerUseSSL(flowableProperties.isMailServerUseSsl());
-        conf.setMailServerUseTLS(flowableProperties.isMailServerUseTls());
+        conf.setMailServerHost(mailProperties.getHost());
+        conf.setMailServerPort(mailProperties.getPort());
+        conf.setMailServerUsername(mailProperties.getUsername());
+        conf.setMailServerPassword(mailProperties.getPassword());
+        conf.setMailServerDefaultFrom(mailProperties.getDefaultFrom());
+        conf.setMailServerUseSSL(mailProperties.isUseSsl());
+        conf.setMailServerUseTLS(mailProperties.isUseTls());
 
         conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());

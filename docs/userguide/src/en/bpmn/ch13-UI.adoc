@@ -76,10 +76,10 @@ The additional configuration options are described in the table below:
 |spring.datasource.hikari.connection-test-query|Defines the query that will be executed for all connection tests
 |spring.datasource.hikari.idle-timeout|Seconds (not *not* milliseconds) a connection can remain pooled but unused before being discarded. Zero means idle connections never expire
 |spring.datasource.hikari.max-lifetime|The time, in milliseconds, a connection will be kept in the connection pool (if set)
-|flowable.mail-server-host|Hostname of the email server for the Flowable Task application email service task
-|flowable.mail-server-port|Port of the email server
-|flowable.mail-server-user-name|Username for the email server connection
-|flowable.mail-server-password|Password for the email server connection
+|flowable.mail.server.host|Hostname of the email server for the Flowable Task application email service task
+|flowable.mail.server.port|Port of the email server
+|flowable.mail.server.user-name|Username for the email server connection
+|flowable.mail.server.password|Password for the email server connection
 |flowable.process-definitions.cache.max|Defines the maximum amount of process definitions available in the process definition cache
 |flowable.idm.app.admin.user-id|Username of the default administrator user for the Flowable IDM application. Default is admin.
 |flowable.idm.app.admin.password|Password of the default administrator user for the Flowable IDM application. Default is test.
