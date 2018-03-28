@@ -14,7 +14,7 @@ package org.flowable.admin.conf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @ComponentScan(basePackages = {
     "org.flowable.admin.app.rest",
     "org.flowable.app.rest"})
-public class DispatcherServletConfiguration extends WebMvcRegistrationsAdapter {
+public class DispatcherServletConfiguration implements WebMvcRegistrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
 
