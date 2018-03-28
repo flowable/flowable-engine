@@ -293,6 +293,16 @@
                 <includes>
                     <include>**/*</include>
                 </includes>
+                <excludes>
+                    <exclude>static/fonts/**</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/fonts/**</include>
+                </includes>
             </resource>
         </resources>
 
@@ -341,15 +351,12 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>9999</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <com.sun.management.jmxremote.port>4001</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--com.sun.management.jmxremote.port=4001</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -367,19 +374,16 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>9999</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <spring.datasource.driver-class-name>org.postgresql.Driver</spring.datasource.driver-class-name>
-                                <spring.datasource.url>jdbc:postgresql://localhost:5432/flowable</spring.datasource.url>
-                                <spring.datasource.username>flowable</spring.datasource.username>
-                                <spring.datasource.password>flowable</spring.datasource.password>
-                                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--spring.datasource.driver-class-name=org.postgresql.Driver</argument>
+                                <argument>--spring.datasource.url=jdbc:postgresql://localhost:5432/flowable</argument>
+                                <argument>--spring.datasource.username=flowable</argument>
+                                <argument>--spring.datasource.password=flowable</argument>
+                                <argument>--com.sun.management.jmxremote.port=4000</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -397,19 +401,16 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>9999</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <spring.datasource.driver-class-name>com.mysql.jdbc.Driver</spring.datasource.driver-class-name>
-                                <spring.datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</spring.datasource.url>
-                                <spring.datasource.username>flowable</spring.datasource.username>
-                                <spring.datasource.password>flowable</spring.datasource.password>
-                                <com.sun.management.jmxremote.port>4001</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--spring.datasource.driver-class-name=com.mysql.jdbc.Driver</argument>
+                                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
+                                <argument>--spring.datasource.username=flowable</argument>
+                                <argument>--spring.datasource.password=flowable</argument>
+                                <argument>--com.sun.management.jmxremote.port=4001</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>

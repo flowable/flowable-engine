@@ -12,7 +12,10 @@
  */
 package org.flowable.spring.boot.rest;
 
+import javax.servlet.MultipartConfigElement;
+
 import org.flowable.spring.boot.FlowableServlet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -27,6 +30,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 public class BaseRestApiConfiguration implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
+
+    protected MultipartConfigElement multipartConfigElement;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -44,6 +49,14 @@ public class BaseRestApiConfiguration implements ApplicationContextAware {
         registrationBean.setName(servletProperties.getName());
         registrationBean.setLoadOnStartup(servletProperties.getLoadOnStartup());
         registrationBean.setAsyncSupported(true);
+        if (multipartConfigElement != null) {
+            registrationBean.setMultipartConfig(multipartConfigElement);
+        }
         return registrationBean;
+    }
+
+    @Autowired(required = false)
+    public void setMultipartConfigElement(MultipartConfigElement multipartConfigElement) {
+        this.multipartConfigElement = multipartConfigElement;
     }
 }

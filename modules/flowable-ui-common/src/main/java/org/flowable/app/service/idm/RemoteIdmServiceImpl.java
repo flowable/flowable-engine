@@ -67,7 +67,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     @Override
     public RemoteUser authenticateUser(String username, String password) {
-        JsonNode json = callRemoteIdmService(url + "/api/idm/users/" + encode(username), username, password);
+        JsonNode json = callRemoteIdmService(url + "api/idm/users/" + encode(username), username, password);
         if (json != null) {
             return parseUserInfo(json);
         }
@@ -76,7 +76,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     @Override
     public RemoteToken getToken(String tokenValue) {
-        JsonNode json = callRemoteIdmService(url + "/api/idm/tokens/" + encode(tokenValue), adminUser, adminPassword);
+        JsonNode json = callRemoteIdmService(url + "api/idm/tokens/" + encode(tokenValue), adminUser, adminPassword);
         if (json != null) {
             RemoteToken token = new RemoteToken();
             token.setId(json.get("id").asText());
@@ -89,7 +89,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     @Override
     public RemoteUser getUser(String userId) {
-        JsonNode json = callRemoteIdmService(url + "/api/idm/users/" + encode(userId), adminUser, adminPassword);
+        JsonNode json = callRemoteIdmService(url + "api/idm/users/" + encode(userId), adminUser, adminPassword);
         if (json != null) {
             return parseUserInfo(json);
         }
@@ -98,7 +98,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     @Override
     public List<RemoteUser> findUsersByNameFilter(String filter) {
-        JsonNode json = callRemoteIdmService(url + "/api/idm/users?filter=" + encode(filter), adminUser, adminPassword);
+        JsonNode json = callRemoteIdmService(url + "api/idm/users?filter=" + encode(filter), adminUser, adminPassword);
         if (json != null) {
             return parseUsersInfo(json);
         }
@@ -107,7 +107,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     @Override
     public List<RemoteUser> findUsersByGroup(String groupId) {
-        JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId) + "/users", adminUser, adminPassword);
+        JsonNode json = callRemoteIdmService(url + "api/idm/groups/" + encode(groupId) + "/users", adminUser, adminPassword);
         if (json != null) {
             return parseUsersInfo(json);
         }
@@ -116,7 +116,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     @Override
     public RemoteGroup getGroup(String groupId) {
-        JsonNode json = callRemoteIdmService(url + "/api/idm/groups/" + encode(groupId), adminUser, adminPassword);
+        JsonNode json = callRemoteIdmService(url + "api/idm/groups/" + encode(groupId), adminUser, adminPassword);
         if (json != null) {
             return parseGroupInfo(json);
         }
@@ -125,7 +125,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
 
     @Override
     public List<RemoteGroup> findGroupsByNameFilter(String filter) {
-        JsonNode json = callRemoteIdmService(url + "/api/idm/groups?filter=" + encode(filter), adminUser, adminPassword);
+        JsonNode json = callRemoteIdmService(url + "api/idm/groups?filter=" + encode(filter), adminUser, adminPassword);
         if (json != null) {
             return parseGroupsInfo(json);
         }

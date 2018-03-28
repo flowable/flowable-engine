@@ -218,6 +218,7 @@
           "access-modeler": "Access modeler application",
 		  "access-task": "Access the workflow application",
 		  "access-rest-api": "Access the REST API",
+		  "ROLE_ACTUATOR": "Spring Boot Actuator access",
           "NO-SELECTION": "No privilege selected",
           "USERS": "Users",
           "GROUPS": "Groups",

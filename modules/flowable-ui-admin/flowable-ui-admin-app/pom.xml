@@ -40,15 +40,12 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-admin</path>
-                            <port>9988</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--com.sun.management.jmxremote.port=4002</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -67,19 +64,16 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-admin</path>
-                            <port>9988</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <spring.datasource.driver-class-name>org.postgresql.Driver</spring.datasource.driver-class-name>
-                                <spring.datasource.url>jdbc:postgresql://localhost:5432/flowable</spring.datasource.url>
-                                <spring.datasource.username>flowable</spring.datasource.username>
-                                <spring.datasource.password>flowable</spring.datasource.password>
-                                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--spring.datasource.driver-class-name=org.postgresql.Driver</argument>
+                                <argument>--spring.datasource.url=jdbc:postgresql://localhost:5432/flowable</argument>
+                                <argument>--spring.datasource.username=flowable</argument>
+                                <argument>--spring.datasource.password=flowable</argument>
+                                <argument>--com.sun.management.jmxremote.port=4000</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -98,32 +92,31 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-admin</path>
-                            <port>9988</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <spring.datasource.driver-class-name>com.mysql.jdbc.Driver</spring.datasource.driver-class-name>
-                                <spring.datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</spring.datasource.url>
-                                <spring.datasource.username>flowable</spring.datasource.username>
-                                <spring.datasource.password>flowable</spring.datasource.password>
-                                <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
-                                <!-- endpoint config for development -->
-                                <flowable.admin.app.server-config.process.port>9999</flowable.admin.app.server-config.process.port>
-                                <flowable.admin.app.server-config.process.context-root>flowable-task</flowable.admin.app.server-config.process.context-root>
-                                <flowable.admin.app.server-config.process.rest-root>process-api</flowable.admin.app.server-config.process.rest-root>
-                                <flowable.admin.app.server-config.dmn.app.port>9999</flowable.admin.app.server-config.dmn.app.port>
-                                <flowable.admin.app.server-config.dmn.app.context-root>flowable-task</flowable.admin.app.server-config.dmn.app.context-root>
-                                <flowable.admin.app.server-config.dmn.app.rest-root>dmn-api</flowable.admin.app.server-config.dmn.app.rest-root>
-                                <flowable.admin.app.server-config.form.app.port>9999</flowable.admin.app.server-config.form.app.port>
-                                <flowable.admin.app.server-config.form.app.context-root>flowable-task</flowable.admin.app.server-config.form.app.context-root>
-                                <flowable.admin.app.server-config.form.app.rest-root>form-api</flowable.admin.app.server-config.form.app.rest-root>
-                                <flowable.admin.app.server-config.content.app.port>9999</flowable.admin.app.server-config.content.app.port>
-                                <flowable.admin.app.server-config.content.app.context-root>flowable-task</flowable.admin.app.server-config.content.app.context-root>
-                                <flowable.admin.app.server-config.content.app.rest-root>content-api</flowable.admin.app.server-config.content.app.rest-root>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--spring.datasource.driver-class-name=com.mysql.jdbc.Driver</argument>
+                                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
+                                <argument>--spring.datasource.username=flowable</argument>
+                                <argument>--spring.datasource.password=flowable</argument>
+                                <argument>--com.sun.management.jmxremote.port=4002</argument>
+                                <argument>--flowable.admin.app.server-config.process.port=9999</argument>
+                                <argument>--flowable.admin.app.server-config.process.context-root=flowable-task</argument>
+                                <argument>--flowable.admin.app.server-config.process.rest-root=process-api</argument>
+                                <argument>--flowable.admin.app.server-config.dmn.app.port=9999</argument>
+                                <argument>--flowable.admin.app.server-config.dmn.app.context-root=flowable-task</argument>
+                                <argument>--flowable.admin.app.server-config.dmn.app.rest-root=dmn-api</argument>
+                                <argument>--flowable.admin.app.server-config.form.app.port=9999</argument>
+                                <argument>--flowable.admin.app.server-config.form.app.context-root=flowable-task</argument>
+                                <argument>--flowable.admin.app.server-config.form.app.rest-root=form-api</argument>
+                                <argument>--flowable.admin.app.server-config.content.app.port=9999</argument>
+                                <argument>--flowable.admin.app.server-config.content.app.context-root=flowable-task</argument>
+                                <argument>--flowable.admin.app.server-config.content.app.rest-root=content-api</argument>
+                                <argument>--flowable.admin.app.server-config.cmmn.app.port=9999</argument>
+                                <argument>--flowable.admin.app.server-config.cmmn.app.context-root=flowable-task</argument>
+                                <argument>--flowable.admin.app.server-config.cmmn.app.rest-root=cmmn-api</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -649,8 +642,7 @@
 						<configuration>
 							<rules>
 								<requireMavenVersion>
-									<message>You are running an older version of Maven. JHipster
-										requires at least Maven 3.0</message>
+									<message>You are running an older version of Maven. JHipster requires at least Maven 3.0</message>
 									<version>[3.0.0,)</version>
 								</requireMavenVersion>
 								<requireJavaVersion>
@@ -677,23 +669,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.4</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<path>/flowable-admin</path>
-					<port>9988</port>
-					<protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-				</configuration>
-			    <dependencies>
-			        <dependency>
-			            <groupId>mysql</groupId>
-			            <artifactId>mysql-connector-java</artifactId>
-			            <version>5.1.14</version>
-			        </dependency>
-			    </dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
