@@ -769,11 +769,15 @@ image::images/cmmn.timereventlistener.png[align="center"]
 
 ===== User Event Listener
 
-A user event listener can be when needed to capture a user interaction that influences the proceeding of a Case directly,
+A user event listener can be used when neededing to capture a user interaction that influences the proceeding of a case directly,
 instead of indirectly via impacting variables or information in the case. When the event is captured an Occur transition is triggered on the event listener.
 Like timer event listeners, it has a much simpler lifecycle that a _task_.
 
 image::images/cmmn.usereventlistener.png[align="center"]
+
+User event listeners can be queried using the _org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery_. Such a query can be created by calling the _cmmnRuntimeService.createUserEventListenerInstanceQuery()_ method. Note that a user event listener is a plan item instance under the hood, which means it can also be queried through the _org.flowable.cmmn.api.runtime.PlanItemInstanceQuery_ API.
+
+A user event listener can be completed by calling the _cmmnRuntimeService.completeUserEventListenerInstance(id)_ method.
 
 ==== Item control: Repetition Rule
 

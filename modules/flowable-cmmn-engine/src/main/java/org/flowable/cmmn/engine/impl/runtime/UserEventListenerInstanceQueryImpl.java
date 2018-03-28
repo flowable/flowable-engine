@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 public class UserEventListenerInstanceQueryImpl implements UserEventListenerInstanceQuery {
 
-    private PlanItemInstanceQuery innerQuery;
+    protected PlanItemInstanceQuery innerQuery;
 
     UserEventListenerInstanceQueryImpl(CommandExecutor commandExecutor) {
         innerQuery = new PlanItemInstanceQueryImpl(commandExecutor).planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER);
@@ -135,7 +135,7 @@ public class UserEventListenerInstanceQueryImpl implements UserEventListenerInst
         return convertPlanItemInstances(innerQuery.listPage(firstResult, maxResults));
     }
 
-    private List<UserEventListenerInstance> convertPlanItemInstances(List<PlanItemInstance> instances) {
+    protected List<UserEventListenerInstance> convertPlanItemInstances(List<PlanItemInstance> instances) {
         if (instances == null) {
             return null;
         }

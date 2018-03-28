@@ -21,13 +21,13 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
  */
 public class UserEventListenerInstanceImpl implements UserEventListenerInstance {
 
-    private final PlanItemInstance innerPlanItemInstance;
+    protected PlanItemInstance innerPlanItemInstance;
 
-    private UserEventListenerInstanceImpl(PlanItemInstance planItemInstance) {
+    public UserEventListenerInstanceImpl(PlanItemInstance planItemInstance) {
         this.innerPlanItemInstance = planItemInstance;
     }
 
-    protected static UserEventListenerInstance fromPlanItemInstance(PlanItemInstance planItemInstance) {
+    public static UserEventListenerInstance fromPlanItemInstance(PlanItemInstance planItemInstance) {
         if (planItemInstance == null) {
             return null;
         }

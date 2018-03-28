@@ -53,6 +53,24 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertNotNull(listenerInstance);
         assertEquals("userEventListener", listenerInstance.getPlanItemDefinitionId());
         assertEquals(PlanItemInstanceState.AVAILABLE, listenerInstance.getState());
+        
+        // Verify same result is returned from query
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(userEventListenerInstance);
+        assertEquals(userEventListenerInstance.getId(), listenerInstance.getId());
+        assertEquals(userEventListenerInstance.getCaseDefinitionId(), listenerInstance.getCaseDefinitionId());
+        assertEquals(userEventListenerInstance.getCaseInstanceId(), listenerInstance.getCaseInstanceId());
+        assertEquals(userEventListenerInstance.getElementId(), listenerInstance.getElementId());
+        assertEquals(userEventListenerInstance.getName(), listenerInstance.getName());
+        assertEquals(userEventListenerInstance.getPlanItemDefinitionId(), listenerInstance.getPlanItemDefinitionId());
+        assertEquals(userEventListenerInstance.getStageIntanceId(), listenerInstance.getStageInstanceId());
+        assertEquals(userEventListenerInstance.getState(), listenerInstance.getState());
+        
+        assertEquals(1, cmmnRuntimeService.createUserEventListenerInstanceQuery().count());
+        assertEquals(1, cmmnRuntimeService.createUserEventListenerInstanceQuery().list().size());
+        
+        assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseDefinitionId(listenerInstance.getCaseDefinitionId()).singleResult());
+        assertNotNull(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseDefinitionId(listenerInstance.getCaseDefinitionId()).singleResult());
 
         //2 HumanTasks ... one active and other waiting (available)
         assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).count());
