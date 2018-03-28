@@ -35,8 +35,9 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      */
     public void writePlanItemDefinition(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         writePlanItemDefinitionStartElement(planItemDefinition, xtw);
-        writePlanItemDefinitionSpecificAttributes(planItemDefinition, xtw);
         writePlanItemDefinitionCommonAttributes(planItemDefinition, xtw);
+        writePlanItemDefinitionSpecificAttributes(planItemDefinition, xtw);
+        writePlanItemDefinitionCommonElements(planItemDefinition, xtw);
         writePlanItemDefinitionDefaultItemControl(planItemDefinition, xtw);
         writePlanItemDefinitionBody(planItemDefinition, xtw);
         writePlanItemDefinitionEndElement(xtw);
@@ -60,13 +61,6 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
         if (StringUtils.isNotEmpty(planItemDefinition.getName())) {
             xtw.writeAttribute(ATTRIBUTE_NAME, planItemDefinition.getName());
         }
-
-        if (StringUtils.isNotEmpty(planItemDefinition.getDocumentation())) {
-
-            xtw.writeStartElement(ELEMENT_DOCUMENTATION);
-            xtw.writeCharacters(planItemDefinition.getDocumentation());
-            xtw.writeEndElement();
-        }
     }
 
     /**
@@ -78,6 +72,23 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      */
     protected void writePlanItemDefinitionSpecificAttributes(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
 
+    }
+
+    /**
+     * Writes common elements like planItem documentation.
+     * Subclasses should call super.writePlanItemDefinitionCommonElements(), it is recommended to override
+     * writePlanItemDefinitionBody instead
+     *
+     * @param planItemDefinition the plan item definition to write
+     * @param xtw                the XML to write the definition to
+     * @throws Exception in case of write exception
+     */
+    protected void writePlanItemDefinitionCommonElements(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+        if (StringUtils.isNotEmpty(planItemDefinition.getDocumentation())) {
+            xtw.writeStartElement(ELEMENT_DOCUMENTATION);
+            xtw.writeCharacters(planItemDefinition.getDocumentation());
+            xtw.writeEndElement();
+        }
     }
 
     protected void writePlanItemDefinitionDefaultItemControl(T planItemDefinition, XMLStreamWriter xtw) throws Exception {

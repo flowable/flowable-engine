@@ -33,7 +33,6 @@ public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<Decisio
     protected void writePlanItemDefinitionSpecificAttributes(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(decisionTask, xtw);
         TaskExport.writeCommonTaskAttributes(decisionTask, xtw);
-        TaskExport.writeTaskFieldExtensions(decisionTask, xtw);
     }
 
     @Override
@@ -48,5 +47,6 @@ public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<Decisio
             );
             xtw.writeEndElement();
         }
+        TaskExport.writeTaskFieldExtensions(decisionTask, xtw);
     }
 }
