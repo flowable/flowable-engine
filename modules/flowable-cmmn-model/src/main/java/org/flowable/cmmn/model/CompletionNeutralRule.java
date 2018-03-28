@@ -13,11 +13,11 @@
 package org.flowable.cmmn.model;
 
 /**
- * @author Joram Barrez
+ * @author Dennis Federico
  */
-public class RequiredRule extends PlanItemRule {
+public class CompletionNeutralRule extends PlanItemRule {
     @Override
     public String toString() {
-        return "RequiredRule{} " + super.toString();
+        return "CompletionNeutralRule{} " + super.toString();
     }
 }
