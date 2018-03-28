@@ -401,6 +401,10 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, convertToBase64(variable));
             }
             
+            if (variable.getExecutionId() != null) {
+                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, variable.getProcessDefinitionId());
+            }
+            
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_VARIABLE_CREATED, data);
         }
     }
@@ -442,6 +446,10 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 }
             }
             
+            if (variable.getExecutionId() != null) {
+                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, variable.getProcessDefinitionId());
+            }
+            
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_HISTORIC_DETAIL_VARIABLE_UPDATE, data);
         }
     }
@@ -464,6 +472,10 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
                 putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, convertToBase64(variable));
             }
             
+            if (variable.getExecutionId() != null) {
+                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, variable.getProcessDefinitionId());
+            }
+            
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_VARIABLE_UPDATED, data);
         }
     }
@@ -482,6 +494,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
     public void recordFormPropertiesSubmitted(ExecutionEntity execution, Map<String, String> properties, String taskId) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, execution.getProcessDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, execution.getProcessInstanceId());
             putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, execution.getId());
             putIfNotNull(data, HistoryJsonConstants.TASK_ID, taskId);
@@ -512,6 +525,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             Map<String, String> data = new HashMap<>();
             putIfNotNull(data, HistoryJsonConstants.ID, identityLink.getId());
             putIfNotNull(data, HistoryJsonConstants.GROUP_ID, identityLink.getGroupId());
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, identityLink.getProcessDefinitionId());
             putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, identityLink.getProcessInstanceId());
             putIfNotNull(data, HistoryJsonConstants.TASK_ID, identityLink.getTaskId());
             putIfNotNull(data, HistoryJsonConstants.IDENTITY_LINK_TYPE, identityLink.getType());
