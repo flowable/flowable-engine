@@ -141,6 +141,7 @@ We support the following form property types:
 
 * +string+ (org.flowable.engine.impl.form.StringFormType
 * +long+ (org.flowable.engine.impl.form.LongFormType)
+* +double+ (org.flowable.engine.impl.form.DoubleFormType)
 * +enum+ (org.flowable.engine.impl.form.EnumFormType)
 * +date+ (org.flowable.engine.impl.form.DateFormType)
 * +boolean+ (org.flowable.engine.impl.form.BooleanFormType)

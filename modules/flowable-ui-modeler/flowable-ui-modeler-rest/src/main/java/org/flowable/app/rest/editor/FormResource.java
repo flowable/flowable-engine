@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping("/rest/form-models")
+@RequestMapping("/app/rest/form-models")
 public class FormResource {
 
     @Autowired

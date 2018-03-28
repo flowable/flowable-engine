@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for managing an event subscription.
  */
 @RestController
+@RequestMapping("/app")
 public class EventSubscriptionClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventSubscriptionClientResource.class);

@@ -1,0 +1,31 @@
+{
+  "properties": [
+    {
+      "name": "rest.modeler-app.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Modeler App Auto configuration.",
+        "replacement": "flowable.modeler.app.rest-enabled"
+      }
+    },
+    {
+    "name": "deployment.api.url",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Modeler App Auto configuration.",
+        "replacement": "flowable.modeler.app.deployment-api-url"
+      }
+    },
+    {
+      "name": "datasource.prefix",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Modeler App Auto Configuration properties.",
+        "replacement": "flowable.modeler.app.data-source-prefix"
+      }
+    }
+  ]
+}

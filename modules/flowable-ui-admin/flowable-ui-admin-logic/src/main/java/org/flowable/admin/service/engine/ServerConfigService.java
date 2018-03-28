@@ -18,34 +18,32 @@ import java.util.List;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.dto.ServerConfigRepresentation;
+import org.flowable.admin.properties.FlowableAdminAppProperties;
 import org.flowable.admin.repository.ServerConfigRepository;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author jbarrez
  * @author Yvo Swillens
+ * @author Filip Hrisafov
  */
 @Service
 public class ServerConfigService extends AbstractEncryptingService {
 
-    private static final String APP_NAME = "app.name";
-    private static final String APP_DESCRIPTION = "app.description";
-    private static final String APP_HOST = "app.host";
-    private static final String APP_PORT = "app.port";
-    private static final String APP_CONTEXT_ROOT = "app.contextroot";
-    private static final String APP_REST_ROOT = "app.restroot";
-    private static final String APP_USER = "app.user";
-    private static final String APP_PASSWORD = "app.password";
-
-    @Autowired
-    protected Environment environment;
+    protected final FlowableAdminAppProperties properties;
 
     @Autowired
     protected ServerConfigRepository serverConfigRepository;
+
+    public ServerConfigService(FlowableAdminAppProperties properties) {
+        super(properties);
+        this.properties = properties;
+    }
 
     @Transactional
     public void createDefaultServerConfigs() {
@@ -122,44 +120,38 @@ public class ServerConfigService extends AbstractEncryptingService {
 
     public ServerConfig getDefaultServerConfig(EndpointType endpointType) {
 
-        ServerConfig serverConfig = new ServerConfig();
-        String endpointTypeString = null;
-
-        switch (endpointType) {
-
-            case PROCESS:
-                endpointTypeString = "process";
-                break;
-                
-            case CMMN:
-                endpointTypeString = "cmmn";
-                break;
-
-            case DMN:
-                endpointTypeString = "dmn";
-                break;
-
-            case FORM:
-                endpointTypeString = "form";
-                break;
-
-            case CONTENT:
-                endpointTypeString = "content";
-                break;
+        ServerConfig config = properties.getServerConfig().get(endpointType);
+        if (config == null) {
+            throw new FlowableIllegalArgumentException("Configuration for '" + endpointType + "' is missing.");
         }
-        
-        String propertyPrefix = "rest." + endpointTypeString + ".";
-        serverConfig.setName(environment.getRequiredProperty(propertyPrefix + APP_NAME));
-        serverConfig.setDescription(environment.getRequiredProperty(propertyPrefix + APP_DESCRIPTION));
-        serverConfig.setServerAddress(environment.getRequiredProperty(propertyPrefix + APP_HOST));
-        serverConfig.setPort(environment.getRequiredProperty(propertyPrefix + APP_PORT, Integer.class));
-        serverConfig.setContextRoot(environment.getRequiredProperty(propertyPrefix + APP_CONTEXT_ROOT));
-        serverConfig.setRestRoot(environment.getRequiredProperty(propertyPrefix + APP_REST_ROOT));
-        serverConfig.setUserName(environment.getRequiredProperty(propertyPrefix + APP_USER));
-        serverConfig.setPassword(environment.getRequiredProperty(propertyPrefix + APP_PASSWORD));
+
+        validateServerConfig(endpointType, config);
+
+        ServerConfig serverConfig = new ServerConfig();
+        serverConfig.setName(config.getName());
+        serverConfig.setDescription(config.getDescription());
+        serverConfig.setServerAddress(config.getServerAddress());
+        serverConfig.setPort(config.getPort());
+        serverConfig.setContextRoot(config.getContextRoot());
+        serverConfig.setRestRoot(config.getRestRoot());
+        serverConfig.setUserName(config.getUserName());
+        serverConfig.setPassword(config.getPassword());
         serverConfig.setEndpointType(endpointType.getEndpointCode());
 
         return serverConfig;
+    }
+
+    protected void validateServerConfig(EndpointType type, ServerConfig config) {
+        String endpointPrefixVariable = "flowable.admin.app.server-config." + type.name().toLowerCase();
+        Assert.hasText(config.getName(), endpointPrefixVariable + ".name must be set");
+        Assert.hasText(config.getDescription(), endpointPrefixVariable + ".description must be set");
+        //TODO needs to be host
+        Assert.hasText(config.getServerAddress(), endpointPrefixVariable + ".server-address must be set");
+        Assert.notNull(config.getPort(), endpointPrefixVariable + ".port must be set");
+        Assert.hasText(config.getContextRoot(), endpointPrefixVariable + ".context-root must be set");
+        Assert.hasText(config.getRestRoot(), endpointPrefixVariable + ".rest-root must be set");
+        Assert.hasText(config.getUserName(), endpointPrefixVariable + ".user-name must be set");
+        Assert.hasText(config.getPassword(), endpointPrefixVariable + ".password must be set");
     }
 
     public List<ServerConfig> getDefaultServerConfigs() {

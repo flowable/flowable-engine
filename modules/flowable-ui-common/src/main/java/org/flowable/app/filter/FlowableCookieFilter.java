@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
+import org.flowable.app.properties.FlowableRemoteIdmProperties;
 import org.flowable.app.security.CookieConstants;
 import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.service.idm.RemoteIdmService;
@@ -38,7 +39,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -53,13 +53,10 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
     protected static final String DELIMITER = ":";
 
-    @Autowired
-    protected Environment env;
+    protected final RemoteIdmService remoteIdmService;
 
-    @Autowired
-    protected RemoteIdmService remoteIdmService;
+    protected final FlowableRemoteIdmProperties properties;
 
-    @Autowired(required = false)
     protected FlowableCookieFilterCallback filterCallback;
 
     protected String idmAppUrl;
@@ -73,6 +70,11 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
     protected LoadingCache<String, FlowableAppUser> userCache;
 
+    public FlowableCookieFilter(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
+        this.remoteIdmService = remoteIdmService;
+        this.properties = properties;
+    }
+
     @PostConstruct
     protected void initCaches() {
         initIdmAppRedirectUrl();
@@ -81,20 +83,15 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected void initIdmAppRedirectUrl() {
-        idmAppUrl = env.getProperty("idm.app.redirect.url");
-        if (idmAppUrl == null || idmAppUrl.isEmpty()) {
-            idmAppUrl = env.getRequiredProperty("idm.app.url");
-        }
-        if (!idmAppUrl.endsWith("/")) {
-            idmAppUrl += "/";
-        }
-        
-        redirectUrlOnAuthSuccess = env.getProperty("app.redirect.url.on.authsuccess");
+        idmAppUrl = properties.determineIdmAppUrl();
+
+        redirectUrlOnAuthSuccess = properties.getRedirectOnAuthSuccess();
     }
 
     protected void initTokenCache() {
-        Long maxSize = env.getProperty("cache.login-tokens.max.size", Long.class, 2048l);
-        Long maxAge = env.getProperty("cache.login-tokens.max.age", Long.class, 30l);
+        FlowableRemoteIdmProperties.Cache cache = properties.getCacheLoginTokens();
+        Long maxSize = cache.getMaxSize();
+        Long maxAge = cache.getMaxAge();
         tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(maxAge, TimeUnit.SECONDS).recordStats()
                 .build(new CacheLoader<String, RemoteToken>() {
 
@@ -112,8 +109,9 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected void initUserCache() {
-        Long userMaxSize = env.getProperty("cache.login-users.max.size", Long.class, 2048l);
-        Long userMaxAge = env.getProperty("cache.login-users.max.age", Long.class, 30l);
+        FlowableRemoteIdmProperties.Cache cache = properties.getCacheLoginUsers();
+        Long userMaxSize = cache.getMaxSize();
+        Long userMaxAge = cache.getMaxAge();
         userCache = CacheBuilder.newBuilder().maximumSize(userMaxSize).expireAfterWrite(userMaxAge, TimeUnit.SECONDS).recordStats()
                 .build(new CacheLoader<String, FlowableAppUser>() {
 
@@ -320,4 +318,8 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         this.requiredPrivileges = requiredPrivileges;
     }
 
+    @Autowired(required = false)
+    public void setFilterCallback(FlowableCookieFilterCallback filterCallback) {
+        this.filterCallback = filterCallback;
+    }
 }

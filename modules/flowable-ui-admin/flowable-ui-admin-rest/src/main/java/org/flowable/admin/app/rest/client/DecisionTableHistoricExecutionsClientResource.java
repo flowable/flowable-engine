@@ -34,6 +34,7 @@ import java.util.Map;
  * @author Yvo Swillens
  */
 @RestController
+@RequestMapping("/app")
 public class DecisionTableHistoricExecutionsClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableHistoricExecutionsClientResource.class);

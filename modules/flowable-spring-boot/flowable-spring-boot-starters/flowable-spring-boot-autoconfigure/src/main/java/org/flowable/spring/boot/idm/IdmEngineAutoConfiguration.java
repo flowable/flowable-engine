@@ -76,7 +76,6 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
 
     @ConditionalOnClass(PasswordEncoder.class)
     @Configuration
-    @ConditionalOnMissingClass("org.flowable.ldap.LDAPConfiguration")
     @ConditionalOnProperty(prefix = "flowable.idm.ldap", name = "enabled", havingValue = "false", matchIfMissing = true)
     public static class PasswordEncoderConfiguration {
 

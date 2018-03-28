@@ -22,6 +22,7 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.UserEventListener;
 
 /**
  * @author Joram Barrez
@@ -35,6 +36,8 @@ public interface PlanItemDefinitionType {
     String MILESTONE = Milestone.class.getSimpleName().toLowerCase();
 
     String TIMER_EVENT_LISTENER = TimerEventListener.class.getSimpleName().toLowerCase();
+
+    String USER_EVENT_LISTENER = UserEventListener.class.getSimpleName().toLowerCase();
     
     String HUMAN_TASK = HumanTask.class.getSimpleName().toLowerCase();
     

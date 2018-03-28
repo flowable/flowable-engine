@@ -38,6 +38,7 @@ public class FlowableContentProperties {
     /**
      * The storage properties for the content configuration.
      */
+    @NestedConfigurationProperty
     private final Storage storage = new Storage();
 
     public boolean isEnabled() {

@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
@@ -31,7 +32,7 @@ import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
-import org.flowable.spring.job.service.SpringAsyncExecutor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -77,7 +78,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @Bean
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-        SpringAsyncExecutor asyncExecutor)
+        ObjectProvider<AsyncExecutor> asyncExecutorProvider)
         throws IOException {
         SpringCmmnEngineConfiguration configuration = new SpringCmmnEngineConfiguration();
 
@@ -92,6 +93,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             configuration.setDeploymentName(cmmnProperties.getDeploymentName());
         }
 
+        AsyncExecutor asyncExecutor = asyncExecutorProvider.getIfUnique();
         if (asyncExecutor != null) {
             configuration.setAsyncExecutor(asyncExecutor);
         }

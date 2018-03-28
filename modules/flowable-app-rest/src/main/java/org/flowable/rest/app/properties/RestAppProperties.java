@@ -13,6 +13,7 @@
 package org.flowable.rest.app.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
  * Properties for the rest app.
@@ -40,6 +41,7 @@ public class RestAppProperties {
      */
     private boolean swaggerDocsEnabled = true;
 
+    @NestedConfigurationProperty
     private final Admin admin = new Admin();
 
     public String getAuthenticationMode() {

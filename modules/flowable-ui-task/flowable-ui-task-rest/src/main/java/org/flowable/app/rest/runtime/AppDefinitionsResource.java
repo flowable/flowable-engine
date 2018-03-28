@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for managing the app definitions.
  */
 @RestController
+@RequestMapping("/app")
 public class AppDefinitionsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionsResource.class);

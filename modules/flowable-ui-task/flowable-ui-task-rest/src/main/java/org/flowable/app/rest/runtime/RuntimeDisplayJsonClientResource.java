@@ -76,6 +76,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
+@RequestMapping("/app")
 public class RuntimeDisplayJsonClientResource {
 
     @Autowired

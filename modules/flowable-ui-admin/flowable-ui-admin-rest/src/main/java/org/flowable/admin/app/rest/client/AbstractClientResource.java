@@ -23,7 +23,6 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.repository.ServerConfigRepository;
 import org.flowable.app.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 
 public abstract class AbstractClientResource {
 
@@ -31,9 +30,6 @@ public abstract class AbstractClientResource {
 
     @Autowired
     protected ServerConfigRepository configRepository;
-
-    @Autowired
-    protected Environment env;
 
     protected ServerConfig retrieveServerConfig(EndpointType endpointType) {
         List<ServerConfig> serverConfigs = configRepository.getByEndpointType(endpointType);

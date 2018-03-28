@@ -12,7 +12,6 @@
  */
 package org.flowable.spring.boot.ldap;
 
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.ldap.LDAPConfiguration;
 import org.flowable.ldap.LDAPGroupCache;
@@ -90,9 +89,9 @@ public class FlowableLdapAutoConfiguration {
     protected LDAPGroupCache createCache(SpringIdmEngineConfiguration engineConfiguration, LDAPConfiguration ldapConfiguration) {
         LDAPGroupCache ldapGroupCache = null;
         if (ldapConfiguration.getGroupCacheSize() > 0) {
-            // Passing a default clock like is done in the FlowableIdmEngineConfguration class
+            // We need to use a supplier for the clock as the clock would be created later
             ldapGroupCache = new LDAPGroupCache(ldapConfiguration.getGroupCacheSize(),
-                ldapConfiguration.getGroupCacheExpirationTime(), new DefaultClockImpl());
+                ldapConfiguration.getGroupCacheExpirationTime(), engineConfiguration::getClock);
 
             if (ldapConfiguration.getGroupCacheListener() != null) {
                 ldapGroupCache.setLdapCacheListener(ldapConfiguration.getGroupCacheListener());

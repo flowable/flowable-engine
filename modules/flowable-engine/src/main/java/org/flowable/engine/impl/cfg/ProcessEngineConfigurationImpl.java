@@ -2735,6 +2735,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public ProcessEngineConfigurationImpl addCustomJobHandler(JobHandler customJobHandler) {
+        if (this.customJobHandlers == null) {
+            this.customJobHandlers = new ArrayList<>();
+        }
+        this.customJobHandlers.add(customJobHandler);
+        return this;
+    }
+
     public List<HistoryJobHandler> getCustomHistoryJobHandlers() {
         return customHistoryJobHandlers;
     }

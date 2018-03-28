@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for managing the Engine case definitions.
  */
 @RestController
+@RequestMapping("/app")
 public class CaseDefinitionsResource {
 
     @Autowired

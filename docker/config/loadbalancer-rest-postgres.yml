@@ -5,15 +5,15 @@ services:
     depends_on:
       - flowable-db
     environment:
-      - datasource.driver=org.postgresql.Driver
-      - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
-      - datasource.username=flowable
-      - datasource.password=flowable
+      - spring.datasource.driver-class-name=org.postgresql.Driver
+      - spring.datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+      - spring.datasource.username=flowable
+      - spring.datasource.password=flowable
       - rest.docs.swagger.enabled=false
-      - rest-admin.userid=rest-admin
-      - rest-admin.password=test
-      - rest-admin.firstname=Rest
-      - rest-admin.lastname=Admin
+      - flowable.rest.app.admin.user-id=rest-admin
+      - flowable.rest.app.admin.password=test
+      - flowable.rest.app.admin.first-name=Rest
+      - flowable.rest.app.admin.last-name=Admin
     expose:
       - "9977"
     entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]

@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
-@RequestMapping("/rest/admin/decision-table-deployments")
+@RequestMapping("/app/rest/admin/decision-table-deployments")
 public class DecisionTableDeploymentsClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableDeploymentsClientResource.class);

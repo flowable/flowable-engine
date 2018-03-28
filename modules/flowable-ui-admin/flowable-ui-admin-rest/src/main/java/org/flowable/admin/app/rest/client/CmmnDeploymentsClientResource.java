@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping("/rest/admin/cmmn-deployments")
+@RequestMapping("/app/rest/admin/cmmn-deployments")
 public class CmmnDeploymentsClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDeploymentsClientResource.class);

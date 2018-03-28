@@ -1,0 +1,12 @@
+{
+  "properties": [
+    {
+      "name": "message.reloading.enabled",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot MessageSourceAutoConfiguration."
+      }
+    }
+  ]
+}

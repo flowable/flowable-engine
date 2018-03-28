@@ -103,6 +103,7 @@ public class DefaultCaseDiagramCanvas {
     // icons
     protected static int ICON_PADDING = 5;
     protected static BufferedImage TIMER_IMAGE;
+    protected static BufferedImage USERLISTENER_IMAGE;
     protected static BufferedImage USERTASK_IMAGE;
     protected static BufferedImage SERVICETASK_IMAGE;
     protected static BufferedImage CASETASK_IMAGE;
@@ -195,6 +196,7 @@ public class DefaultCaseDiagramCanvas {
 
         try {
             TIMER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/timer.png", customClassLoader));
+            USERLISTENER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/user.png", customClassLoader));
             USERTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/userTask.png", customClassLoader));
             SERVICETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/serviceTask.png", customClassLoader));
             CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
@@ -321,9 +323,13 @@ public class DefaultCaseDiagramCanvas {
         g.fill(arrowHead);
         g.setTransform(originalTransformation);
     }
-    
+
     public void drawTimerEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, TIMER_IMAGE, scaleFactor);
+    }
+
+    public void drawUserEventListener(GraphicInfo graphicInfo, double scaleFactor) {
+        drawEventListener(graphicInfo, USERLISTENER_IMAGE, scaleFactor);
     }
     
     public void drawEventListener(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {

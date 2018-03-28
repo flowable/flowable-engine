@@ -34,6 +34,7 @@ import java.util.List;
  * @author martin.grofcik
  */
 @RestController
+@RequestMapping("/app")
 public class DebuggerResource {
 
     @Autowired

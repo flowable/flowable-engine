@@ -4,21 +4,22 @@
 
 <mapper namespace="org.flowable.app.domain.editor.Model">
 
-	<resultMap id="modelResultMap" type="org.flowable.app.domain.editor.Model">
-		<id property="id" column="id" jdbcType="VARCHAR" />
-		<result property="name" column="name" jdbcType="VARCHAR" />
-		<result property="key" column="model_key" jdbcType="VARCHAR" />
-		<result property="description" column="description" jdbcType="VARCHAR" />
-		<result property="comment" column="model_comment" jdbcType="VARCHAR" />
-		<result property="created" column="created" jdbcType="TIMESTAMP" />
-		<result property="createdBy" column="created_by" jdbcType="VARCHAR" />
-		<result property="lastUpdated" column="last_updated" jdbcType="TIMESTAMP" />
-		<result property="lastUpdatedBy" column="last_updated_by" jdbcType="VARCHAR" />
-		<result property="version" column="version" jdbcType="INTEGER" />
-		<result property="modelEditorJson" column="model_editor_json" jdbcType="VARCHAR" />
-		<result property="modelType" column="model_type" jdbcType="INTEGER" />
-		<result property="thumbnail" column="thumbnail" jdbcType="${blobType}" />
-	</resultMap>
+    <resultMap id="modelResultMap" type="org.flowable.app.domain.editor.Model">
+        <id property="id" column="id" jdbcType="VARCHAR" />
+        <result property="name" column="name" jdbcType="VARCHAR" />
+        <result property="key" column="model_key" jdbcType="VARCHAR" />
+        <result property="description" column="description" jdbcType="VARCHAR" />
+        <result property="comment" column="model_comment" jdbcType="VARCHAR" />
+        <result property="created" column="created" jdbcType="TIMESTAMP" />
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR" />
+        <result property="lastUpdated" column="last_updated" jdbcType="TIMESTAMP" />
+        <result property="lastUpdatedBy" column="last_updated_by" jdbcType="VARCHAR" />
+        <result property="version" column="version" jdbcType="INTEGER" />
+        <result property="modelEditorJson" column="model_editor_json" jdbcType="VARCHAR" />
+        <result property="modelType" column="model_type" jdbcType="INTEGER" />
+        <result property="thumbnail" column="thumbnail" jdbcType="${blobType}" />
+        <result property="tenantId" column="tenantId" jdbcType="VARCHAR" />
+    </resultMap>
 
     <insert id="insertModel" parameterType="org.flowable.app.domain.editor.Model">
         insert into ${prefix}ACT_DE_MODEL (
@@ -34,7 +35,8 @@
             version,
             model_editor_json,
             model_type,
-            thumbnail) 
+            thumbnail,
+            tenant_id) 
          values (
             #{id, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -48,7 +50,8 @@
             #{version, jdbcType=INTEGER},
             #{modelEditorJson, jdbcType=VARCHAR},
             #{modelType, jdbcType=INTEGER},
-            #{thumbnail, jdbcType=${blobType}}
+            #{thumbnail, jdbcType=${blobType}},
+            #{tenantId, jdbcType=VARCHAR}
           )
     </insert>
     
@@ -66,57 +69,64 @@
             version = #{version, jdbcType=INTEGER},
             model_editor_json = #{modelEditorJson, jdbcType=VARCHAR},
             model_type = #{modelType, jdbcType=INTEGER},
-            thumbnail = #{thumbnail, jdbcType=${blobType}}
+            thumbnail = #{thumbnail, jdbcType=${blobType}},
+            tenant_id = #{tenantId, jdbcType=VARCHAR}
         </set>
         where id = #{id, jdbcType=VARCHAR}
     </update>
     
-	<select id="selectModel" parameterType="string" resultMap="modelResultMap">
-		select * from ${prefix}ACT_DE_MODEL where id = #{id, jdbcType=VARCHAR}
-	</select>
-	
-	<select id="selectModelByParentModelId" parameterType="string" resultMap="modelResultMap">
-	   select model.* from ${prefix}ACT_DE_MODEL_RELATION modelrelation 
-	   inner join ${prefix}ACT_DE_MODEL model on modelrelation.model_id = model.id
-	   where modelrelation.parent_model_id = #{parentModelId, jdbcType=VARCHAR}
-	</select>
-	
-	<select id="selectModelByParameters" parameterType="map" resultMap="modelResultMap">
-		select * from ${prefix}ACT_DE_MODEL
-	   	<where> 
-		   	<if test="modelType != null">
-		       model_type = #{modelType, jdbcType=VARCHAR}
-		   	</if>
-		   	<if test="filter != null">
-	           and (lower(name) like #{filter, jdbcType=VARCHAR} or lower(description) like #{filter, jdbcType=VARCHAR}) 
-	      	</if>
-	      	<if test="key != null">
-	           and model_key = #{key, jdbcType=VARCHAR}
-	      	</if>
-      	</where>
-      	<if test="sort != null">
-	        <if test="sort == 'nameAsc'">
-	            order by name asc
-	        </if>
-	        <if test="sort == 'nameDesc'">
-	            order by name desc
-	        </if>
-	        <if test="sort == 'modifiedAsc'">
-	            order by last_updated asc
-	        </if>
-	        <if test="sort == 'modifiedDesc'">
-	            order by last_updated desc
-	        </if>
-      	</if>
-	</select>
-	
-	<select id="countByModelTypeAndCreatedBy" parameterType="map">
-	   select count(m.id) from ${prefix}ACT_DE_MODEL m 
-	   where m.created_by = #{createdBy, jdbcType=VARCHAR} and m.model_type = #{modelType, jdbcType=INTEGER}
-	</select>
+    <select id="selectModel" parameterType="string" resultMap="modelResultMap">
+        select * from ${prefix}ACT_DE_MODEL where id = #{id, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectModelByParentModelId" parameterType="string" resultMap="modelResultMap">
+       select model.* from ${prefix}ACT_DE_MODEL_RELATION modelrelation 
+       inner join ${prefix}ACT_DE_MODEL model on modelrelation.model_id = model.id
+       where modelrelation.parent_model_id = #{parentModelId, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectModelByParameters" parameterType="map" resultMap="modelResultMap">
+        select * from ${prefix}ACT_DE_MODEL
+        <where> 
+            <if test="modelType != null">
+               model_type = #{modelType, jdbcType=VARCHAR}
+            </if>
+            <if test="filter != null">
+               and (lower(name) like #{filter, jdbcType=VARCHAR} or lower(description) like #{filter, jdbcType=VARCHAR}) 
+            </if>
+            <if test="key != null">
+               and model_key = #{key, jdbcType=VARCHAR}
+            </if>
+            <if test="tenantId != null">
+               and tenant_id = #{tenantId, jdbcType=VARCHAR}
+            </if>
+        </where>
+        <if test="sort != null">
+            <if test="sort == 'nameAsc'">
+                order by name asc
+            </if>
+            <if test="sort == 'nameDesc'">
+                order by name desc
+            </if>
+            <if test="sort == 'modifiedAsc'">
+                order by last_updated asc
+            </if>
+            <if test="sort == 'modifiedDesc'">
+                order by last_updated desc
+            </if>
+        </if>
+    </select>
+    
+    <select id="countByModelTypeAndCreatedBy" parameterType="map">
+       select count(m.id) from ${prefix}ACT_DE_MODEL m 
+       where m.created_by = #{createdBy, jdbcType=VARCHAR} and m.model_type = #{modelType, jdbcType=INTEGER}
+      <if test="tenantId != null">
+         and tenant_id = #{tenantId, jdbcType=VARCHAR}
+      </if>
+    </select>
 
-	<delete id="deleteModel" parameterType="org.flowable.app.domain.editor.Model">
-		delete from ${prefix}ACT_DE_MODEL where id = #{id}
-	</delete>
+    <delete id="deleteModel" parameterType="org.flowable.app.domain.editor.Model">
+        delete from ${prefix}ACT_DE_MODEL where id = #{id}
+    </delete>
     
 </mapper>

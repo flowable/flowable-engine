@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Yvo Swillens
  */
 @RestController
+@RequestMapping("/app")
 public class ContentItemsClientResource extends AbstractClientResource {
 
     @Autowired

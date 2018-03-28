@@ -41,7 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author erikwinlof
  */
 @RestController
-@RequestMapping("/rest/decision-table-models")
+@RequestMapping("/app/rest/decision-table-models")
 public class DecisionTableResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableResource.class);
