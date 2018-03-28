@@ -33,7 +33,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * @param xtw                the XML to write the definition to
      * @throws Exception in case of write exception
      */
-    public final void writePlanItemDefinition(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    public void writePlanItemDefinition(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         writePlanItemDefinitionStartElement(planItemDefinition, xtw);
         writePlanItemDefinitionCommonAttributes(planItemDefinition, xtw);
         writePlanItemDefinitionSpecificAttributes(planItemDefinition, xtw);
@@ -42,7 +42,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
         writePlanItemDefinitionEndElement(xtw);
     }
 
-    private void writePlanItemDefinitionStartElement(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writePlanItemDefinitionStartElement(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(getPlanItemDefinitionXmlElementValue(planItemDefinition));
     }
 
@@ -54,7 +54,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      */
     protected abstract String getPlanItemDefinitionXmlElementValue(T planItemDefinition);
 
-    private void writePlanItemDefinitionCommonAttributes(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writePlanItemDefinitionCommonAttributes(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         xtw.writeAttribute(ATTRIBUTE_ID, planItemDefinition.getId());
 
         if (StringUtils.isNotEmpty(planItemDefinition.getName())) {
@@ -80,7 +80,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
 
     }
 
-    private void writePlanItemDefinitionDefaultItemControl(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writePlanItemDefinitionDefaultItemControl(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         if (planItemDefinition.getDefaultControl() != null) {
             PlanItemControlExport.writeDefaultControl(planItemDefinition.getDefaultControl(), xtw);
         }
@@ -97,7 +97,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
 
     }
 
-    private void writePlanItemDefinitionEndElement(XMLStreamWriter xtw) throws Exception {
+    protected void writePlanItemDefinitionEndElement(XMLStreamWriter xtw) throws Exception {
         xtw.writeEndElement();
     }
 
