@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.env.Environment;
 
 /**
  * Generates the minimal data needed when the application is booted with no data at all.
@@ -31,9 +30,6 @@ import org.springframework.core.env.Environment;
 public class MinimalDataGenerator implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MinimalDataGenerator.class);
-
-    @Autowired
-    protected Environment environment;
 
     @Autowired
     protected ServerConfigService serverConfigService;

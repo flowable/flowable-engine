@@ -15,10 +15,12 @@ package org.flowable.admin.conf;
 import java.util.Collections;
 
 import org.flowable.admin.security.AjaxLogoutSuccessHandler;
-import org.flowable.app.filter.FlowableCookieFilter;
+import org.flowable.app.filter.FlowableCookieFilterRegistrationBean;
+import org.flowable.app.properties.FlowableRemoteIdmProperties;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.CookieConstants;
 import org.flowable.app.security.DefaultPrivileges;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,17 +34,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     @Bean
-    public FlowableCookieFilter flowableCookieFilter() {
-        FlowableCookieFilter filter = new FlowableCookieFilter();
-        filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
-        return filter;
+    public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
+        FlowableCookieFilterRegistrationBean registrationBean = new FlowableCookieFilterRegistrationBean(remoteIdmService, properties);
+        registrationBean.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
+        return registrationBean;
     }
 
     @Configuration
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
         @Autowired
-        protected FlowableCookieFilter flowableCookieFilter;
+        protected FlowableCookieFilterRegistrationBean flowableCookieFilterRegistrationBean;
 
         @Autowired
         private AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
@@ -50,7 +52,7 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
-                    .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(flowableCookieFilterRegistrationBean.getFilter(), UsernamePasswordAuthenticationFilter.class)
                     .logout()
                     .logoutUrl("/app/logout")
                     .logoutSuccessHandler(ajaxLogoutSuccessHandler)

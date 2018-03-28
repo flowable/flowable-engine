@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Rest resource for managing users, specifically related to tasks and processes.
  */
 @RestController
+@RequestMapping("/app")
 public class WorkflowUsersResource {
 
     @Autowired

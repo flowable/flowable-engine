@@ -211,7 +211,7 @@
       "name": "datasource.jndi.resourceRef",
       "deprecation": {
         "level": "error",
-        "reason": "Spring Boot does not support using JNDI resourceRef."
+        "reason": "Spring Boot does not support configuring JNDI resourceRef. Use entire resource reference in the name."
       }
     },
     {

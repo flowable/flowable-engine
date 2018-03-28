@@ -330,6 +330,7 @@ public class ModelServiceImpl implements ModelService {
         newModel.setModelEditorJson(editorJson);
         newModel.setLastUpdated(Calendar.getInstance().getTime());
         newModel.setLastUpdatedBy(createdBy.getId());
+        newModel.setTenantId(model.getTenantId());
 
         persistModel(newModel);
         return newModel;
@@ -830,6 +831,7 @@ public class ModelServiceImpl implements ModelService {
         historyModel.setVersion(model.getVersion());
         historyModel.setModelId(model.getId());
         historyModel.setComment(model.getComment());
+        historyModel.setTenantId(model.getTenantId());
 
         return historyModel;
     }
@@ -846,6 +848,7 @@ public class ModelServiceImpl implements ModelService {
         model.setModelType(basedOn.getModelType());
         model.setVersion(basedOn.getVersion());
         model.setComment(basedOn.getComment());
+        model.setTenantId(basedOn.getTenantId());
     }
 
     protected Map<String, String> convertToModelKeyMap(Map<String, Model> modelMap) {

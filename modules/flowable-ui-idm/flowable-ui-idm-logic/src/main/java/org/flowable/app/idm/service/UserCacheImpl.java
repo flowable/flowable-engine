@@ -26,11 +26,11 @@ import javax.annotation.PostConstruct;
 
 import org.flowable.app.idm.cache.UserCache;
 import org.flowable.app.idm.model.UserInformation;
+import org.flowable.app.properties.FlowableRemoteIdmProperties;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
+import org.flowable.spring.boot.ldap.FlowableLdapProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,14 +44,16 @@ import org.springframework.stereotype.Service;
  *
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 @Service
 public class UserCacheImpl implements UserCache {
 
     @Autowired
-    protected Environment environment;
+    protected FlowableRemoteIdmProperties properties;
 
-    @Qualifier("defaultIdmIdentityService")
+    protected FlowableLdapProperties ldapProperties;
+
     @Autowired
     protected IdmIdentityService identityService;
 
@@ -62,15 +64,16 @@ public class UserCacheImpl implements UserCache {
 
     @PostConstruct
     protected void initCache() {
-        Long userCacheMaxSize = environment.getProperty("cache.users.max.size", Long.class);
-        Long userCacheMaxAge = environment.getProperty("cache.users.max.age", Long.class);
+        FlowableRemoteIdmProperties.Cache cache = properties.getCacheUsers();
+        long userCacheMaxSize = cache.getMaxSize();
+        long userCacheMaxAge = cache.getMaxAge();
 
-        userCache = CacheBuilder.newBuilder().maximumSize(userCacheMaxSize != null ? userCacheMaxSize : 2048)
-                .expireAfterAccess(userCacheMaxAge != null ? userCacheMaxAge : (24 * 60 * 60), TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
+        userCache = CacheBuilder.newBuilder().maximumSize(userCacheMaxSize)
+            .expireAfterAccess(userCacheMaxAge, TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
 
                     public CachedUser load(final String userId) throws Exception {
                         User userFromDatabase = null;
-                        if (!environment.getProperty("ldap.enabled", Boolean.class, false)) {
+                        if (ldapProperties == null || !ldapProperties.isEnabled()) {
                             userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(userId.toLowerCase()).singleResult();
                         } else {
                             userFromDatabase = identityService.createUserQuery().userId(userId).singleResult();
@@ -140,5 +143,10 @@ public class UserCacheImpl implements UserCache {
     @Override
     public void invalidate(String userId) {
         userCache.invalidate(userId);
+    }
+
+    @Autowired(required = false)
+    public void setLdapProperties(FlowableLdapProperties ldapProperties) {
+        this.ldapProperties = ldapProperties;
     }
 }

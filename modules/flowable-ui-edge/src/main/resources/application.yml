@@ -1,0 +1,37 @@
+server:
+  port: 8080
+  use-forward-headers: true
+
+
+spring:
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  http:
+    multipart:
+      max-file-size: 104MB
+      max-request-size: 104MB
+
+zuul:
+  routes:
+    flowable_admin:
+      path: /flowable-admin/**
+      url: http://localhost:8083
+    flowable_idm:
+      path: /flowable-idm/**
+      url: http://localhost:8084
+    flowable_modeler:
+      path: /flowable-modeler/**
+      url: http://localhost:8082
+    flowable_task:
+      path: /flowable-task/**
+      url: http://localhost:8081
+  sensitive-headers:
+  host:
+    max-per-route-connections: 100
+    connect-timeout-millis: 10000
+    max-total-connections: 500
+
+ribbon:
+  eureka:
+    enabled: false

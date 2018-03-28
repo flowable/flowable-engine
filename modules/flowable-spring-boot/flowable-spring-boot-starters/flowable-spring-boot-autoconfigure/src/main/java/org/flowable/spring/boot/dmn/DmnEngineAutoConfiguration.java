@@ -89,6 +89,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
         configuration.setHistoryEnabled(dmnProperties.isHistoryEnabled());
         configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());
+        configuration.setStrictMode(dmnProperties.isStrictMode());
 
         return configuration;
     }

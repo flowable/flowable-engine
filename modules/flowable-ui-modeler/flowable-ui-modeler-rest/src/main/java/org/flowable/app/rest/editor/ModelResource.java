@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
+@RequestMapping("/app")
 public class ModelResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelResource.class);

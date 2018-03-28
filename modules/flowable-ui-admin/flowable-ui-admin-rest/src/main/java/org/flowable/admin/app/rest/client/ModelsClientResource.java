@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Bassam Al-Sarori
  */
 @RestController
-@RequestMapping("/rest/admin/models")
+@RequestMapping("/app/rest/admin/models")
 public class ModelsClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelsClientResource.class);

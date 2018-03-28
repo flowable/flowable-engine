@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 @RestController
+@RequestMapping("/app")
 public class AccountResource {
 
     @Autowired

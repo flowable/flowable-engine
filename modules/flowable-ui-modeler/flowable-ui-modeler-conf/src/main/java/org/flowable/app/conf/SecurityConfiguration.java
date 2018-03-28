@@ -15,17 +15,20 @@ package org.flowable.app.conf;
 import java.util.Collections;
 
 import org.flowable.app.filter.FlowableCookieFilter;
+import org.flowable.app.properties.FlowableModelerAppProperties;
+import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableRestAppProperties;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.app.security.RemoteIdmAuthenticationProvider;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,6 +42,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * 
  * @author Joram Barrez
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 @Configuration
 @EnableWebSecurity
@@ -52,8 +56,8 @@ public class SecurityConfiguration {
     protected RemoteIdmAuthenticationProvider authenticationProvider;
 
     @Bean
-    public FlowableCookieFilter flowableCookieFilter() {
-        FlowableCookieFilter filter = new FlowableCookieFilter();
+    public FlowableCookieFilter flowableCookieFilter(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
+        FlowableCookieFilter filter = new FlowableCookieFilter(remoteIdmService, properties);
         filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_MODELER));
         return filter;
     }
@@ -110,9 +114,15 @@ public class SecurityConfiguration {
     @Configuration
     @Order(1)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-        
-        @Autowired
-        protected Environment env;
+
+        protected final FlowableRestAppProperties restAppProperties;
+        protected final FlowableModelerAppProperties modelerAppProperties;
+
+        public ApiWebSecurityConfigurationAdapter(FlowableRestAppProperties restAppProperties,
+            FlowableModelerAppProperties modelerAppProperties) {
+            this.restAppProperties = restAppProperties;
+            this.modelerAppProperties = modelerAppProperties;
+        }
 
         protected void configure(HttpSecurity http) throws Exception {
 
@@ -122,10 +132,10 @@ public class SecurityConfiguration {
                 .and()
                     .csrf()
                     .disable();
-            
-            if (isEnableRestApi()) {
-                
-                if (RestApiUtil.isVerifyRestApiPrivilege(env)) {
+
+            if (modelerAppProperties.isRestEnabled()) {
+
+                if (restAppProperties.isVerifyRestApiPrivilege()) {
                     http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
                 } else {
                     http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").authenticated().and().httpBasic();
@@ -138,10 +148,5 @@ public class SecurityConfiguration {
             }
             
         }
-        
-        protected boolean isEnableRestApi() {
-            return env.getProperty("rest.modeler-app.enabled", Boolean.class, true);
-        }
-        
     }
 }

@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Joram Barrez
  */
 @RestController
-@RequestMapping(value = "/rest/admin/groups")
+@RequestMapping(value = "/app/rest/admin/groups")
 public class IdmGroupsResource {
 
     @Autowired

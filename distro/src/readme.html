@@ -40,7 +40,7 @@ All all property files (e.g. <i>db.properties</i> for the REST app) are still re
 
 <p>
 The default way user credentials are authenticated and verified when calling the Flowable REST API has changed. A user now needs to have the <i>access-rest-api</i> privilege (before, any valid credentials could be used).
-An admin user can be given this privilege by setting the <i>rest-admin.userid</i> and <i>rest-admin.password</i> properties in the <i>flowable-app.properties</i> file. On bootup, the admin user will be created if it doesn't exist yet or it will be given the <i>access-rest-api</i> privilege. This admin user can now give other users this privilige using the Flowable IDM app or through a REST call (doing an HTTP post to <i>privileges/{privilegeId}/users</i> with the userId in the body). 
+An admin user can be given this privilege by setting the <i>flowable.rest.app.admin.user-id</i> and <i>flowable.rest.app.admin.password</i> properties in the <i>flowable-app.properties</i> file. On bootup, the admin user will be created if it doesn't exist yet or it will be given the <i>access-rest-api</i> privilege. This admin user can now give other users this privilige using the Flowable IDM app or through a REST call (doing an HTTP post to <i>privileges/{privilegeId}/users</i> with the userId in the body).
 </p>
 
 <p>

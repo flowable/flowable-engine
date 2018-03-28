@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author martin.grofcik
  */
 @RestController
+@RequestMapping("/app")
 public class DebuggerResource {
 
     @Autowired

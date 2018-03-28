@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @RestController
+@RequestMapping("/app")
 public class CaseDefinitionsClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CaseDefinitionsClientResource.class);

@@ -12,7 +12,11 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-	
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-modeler-logic</artifactId>
@@ -81,10 +85,6 @@
             <artifactId>liquibase-core</artifactId>
         </dependency>
         <!-- COMMON dependencies -->
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>

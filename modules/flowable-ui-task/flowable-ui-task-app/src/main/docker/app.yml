@@ -6,14 +6,13 @@ services:
             - flowable-task-db
             - flowable-idm-app
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-task-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
-            - idm.app.url=http://flowable-idm-app:8080/flowable-idm
-            - idm.app.redirect.url=http://localhost:8080/flowable-idm
-            - idm.admin.user=admin
-            - idm.admin.password=test
+            - spring.datasource.driver-class-name=org.postgresql.Driver
+            - spring.datasource.url=jdbc:postgresql://flowable-task-db:5432/flowable
+            - spring.datasource.username=flowable
+            - spring.datasource.password=flowable
+            - flowable.app.idm.url=http://flowable-idm-app:8080/flowable-idm
+            - flowable.app.idm.admin.user=admin
+            - flowable.app.idm.admin.password=test
         ports:
             - 9999:9999
         entrypoint: ["./wait-for-something.sh", "flowable-task-db", "5432", "PostgreSQL", "java", "-jar", "flowable-task.jar", "-httpPort=9999", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
@@ -22,10 +21,10 @@ services:
         depends_on:
             - flowable-task-db
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-task-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
+            - spring.datasource.driver-class-name=org.postgresql.Driver
+            - spring.datasource.url=jdbc:postgresql://flowable-task-db:5432/flowable
+            - spring.datasource.username=flowable
+            - spring.datasource.password=flowable
         ports:
             - 8080:8080
         entrypoint: ["./wait-for-something.sh", "flowable-task-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]

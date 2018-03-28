@@ -20,6 +20,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.flowable.app.properties.FlowableModelerAppProperties;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.engine.common.api.FlowableException;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -29,12 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -44,7 +41,6 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 @Configuration
-@EnableTransactionManagement
 public class DatabaseConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConfiguration.class);
@@ -52,7 +48,7 @@ public class DatabaseConfiguration {
     protected static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DE_";
 
     @Autowired
-    protected Environment env;
+    protected FlowableModelerAppProperties modelerAppProperties;
 
     @Autowired
     protected ResourceLoader resourceLoader;
@@ -100,21 +96,8 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public DataSource dataSource() {
-        return FlowableAppDatasourceUtil.createDataSource(env);
-    }
-
-    @Bean
-    public PlatformTransactionManager annotationDrivenTransactionManager() {
-        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-        dataSourceTransactionManager.setDataSource(dataSource());
-        return dataSourceTransactionManager;
-    }
-
-    @Bean
-    public SqlSessionFactory sqlSessionFactory() {
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        DataSource dataSource = dataSource();
         sqlSessionFactoryBean.setDataSource(dataSource);
         String databaseType = initDatabaseType(dataSource);
         if (databaseType == null) {
@@ -123,7 +106,7 @@ public class DatabaseConfiguration {
 
         try {
             Properties properties = new Properties();
-            properties.put("prefix", env.getProperty("datasource.prefix", ""));
+            properties.put("prefix", modelerAppProperties.getDataSourcePrefix());
             properties.put("blobType", "BLOB");
             properties.put("boolValue", "TRUE");
 
@@ -141,16 +124,16 @@ public class DatabaseConfiguration {
     }
 
     @Bean(destroyMethod = "clearCache") // destroyMethod: see https://github.com/mybatis/old-google-code-issues/issues/778
-    public SqlSessionTemplate SqlSessionTemplate() {
-        return new SqlSessionTemplate(sqlSessionFactory());
+    public SqlSessionTemplate SqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
     @Bean
-    public Liquibase liquibase() {
+    public Liquibase liquibase(DataSource dataSource) {
         LOGGER.info("Configuring Liquibase");
 
         try {
-            DatabaseConnection connection = new JdbcConnection(dataSource().getConnection());
+            DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
             database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());

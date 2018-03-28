@@ -39,6 +39,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Yvo Swillens
  */
 @RestController
+@RequestMapping("/app")
 public class FormInstancesClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormInstancesClientResource.class);

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for managing a case instance.
  */
 @RestController
+@RequestMapping("/app")
 public class CaseInstanceResource {
 
     @Autowired

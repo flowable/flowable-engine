@@ -32,11 +32,11 @@ public class SchedulingConfiguration implements SchedulingConfigurer {
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        taskRegistrar.setScheduler(taskExecutor());
+        taskRegistrar.setScheduler(taskTaskExecutor());
     }
 
     @Bean(destroyMethod = "shutdownNow")
-    public Executor taskExecutor() {
+    public Executor taskTaskExecutor() {
         ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(5);
         return scheduledExecutorService;
     }

@@ -21,7 +21,6 @@ import org.flowable.admin.dto.ServerConfigRepresentation;
 import org.flowable.admin.service.engine.ServerConfigService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,13 +38,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@RequestMapping("/app")
 public class ServerConfigsResource {
 
     @Autowired
     protected ServerConfigService serverConfigService;
-
-    @Autowired
-    protected Environment env;
 
     @RequestMapping(value = "/rest/server-configs", method = RequestMethod.GET, produces = "application/json")
     public List<ServerConfigRepresentation> getServers() {

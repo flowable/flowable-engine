@@ -14,6 +14,7 @@ package org.flowable.admin.service.engine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.admin.properties.FlowableAdminAppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,10 @@ public class AppVersionClientService extends AbstractEncryptingService {
 
     @Autowired
     protected FlowableClientService clientUtil;
+
+    public AppVersionClientService(FlowableAdminAppProperties properties) {
+        super(properties);
+    }
 
     public String getEndpointTypeUsingEncryptedPassword(String contextRoot, String restRoot,
             String serverAddress, Integer port,
