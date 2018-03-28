@@ -101,7 +101,7 @@ public class BootstrapConfiguration {
     
     protected void initializeDefaultPrivileges(String restAdminId) {
         initializePrivilege(restAdminId, SecurityConstants.PRIVILEGE_ACCESS_REST_API);
-        initializePrivilege(restAdminId, "ROLE_ACTUATOR");
+        initializePrivilege(restAdminId, SecurityConstants.ACCESS_ADMIN);
     }
 
     protected void initializePrivilege(String restAdminId, String privilegeName) {

@@ -16,6 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.rest.app.properties.RestAppProperties;
 import org.flowable.rest.security.BasicAuthenticationProvider;
 import org.flowable.rest.security.SecurityConstants;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -61,6 +64,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/docs/**").denyAll();
             
         }
+
+        httpSecurity
+            .authorizeRequests()
+            .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
+            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(SecurityConstants.ACCESS_ADMIN);
 
         // Rest API access
         if (isVerifyRestApiPrivilege()) {

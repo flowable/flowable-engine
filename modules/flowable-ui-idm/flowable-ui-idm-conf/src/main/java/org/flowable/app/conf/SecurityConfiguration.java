@@ -26,6 +26,10 @@ import org.flowable.app.security.Http401UnauthorizedEntryPoint;
 import org.flowable.app.web.CustomFormLoginConfig;
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.info.InfoEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -206,4 +210,30 @@ public class SecurityConfiguration {
         }
     }
 
+    //
+    // Actuator
+    //
+
+    @ConditionalOnClass(EndpointRequest.class)
+    @Configuration
+    @Order(15) // Actuator configuration should kick in after the Form Login so the custom login filter can be applied before
+    public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+
+            http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .csrf()
+                .disable();
+
+            http
+                .authorizeRequests()
+                .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
+                .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN)
+                .and().httpBasic();
+        }
+    }
 }
