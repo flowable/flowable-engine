@@ -35,8 +35,8 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      */
     public void writePlanItemDefinition(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         writePlanItemDefinitionStartElement(planItemDefinition, xtw);
-        writePlanItemDefinitionCommonAttributes(planItemDefinition, xtw);
         writePlanItemDefinitionSpecificAttributes(planItemDefinition, xtw);
+        writePlanItemDefinitionCommonAttributes(planItemDefinition, xtw);
         writePlanItemDefinitionDefaultItemControl(planItemDefinition, xtw);
         writePlanItemDefinitionBody(planItemDefinition, xtw);
         writePlanItemDefinitionEndElement(xtw);
