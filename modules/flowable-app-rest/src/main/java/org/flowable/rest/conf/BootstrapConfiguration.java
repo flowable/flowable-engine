@@ -56,7 +56,7 @@ public class BootstrapConfiguration {
      * Initialize the rest admin user
      */
     @Bean
-    @ConditionalOnProperty(prefix = "flowable.rest.app.admin", name = "userId")
+    @ConditionalOnProperty(prefix = "flowable.rest.app.admin", name = "user-id")
     public CommandLineRunner initDefaultAdminUserAndPrivilegesRunner() {
         return args -> {
             if (StringUtils.isNotEmpty(restAppProperties.getAdmin().getUserId())) {

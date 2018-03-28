@@ -181,7 +181,7 @@
       }
     },
     {
-      "name": "contentstorage.fs.rootFolder",
+      "name": "contentstorage.fs.root-folder",
       "type": "java.lang.String",
       "deprecation": {
         "level": "error",
@@ -190,7 +190,7 @@
       }
     },
     {
-      "name": "contentstorage.fs.createRoot",
+      "name": "contentstorage.fs.create-root",
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
@@ -208,7 +208,7 @@
       }
     },
     {
-      "name": "datasource.jndi.resourceRef",
+      "name": "datasource.jndi.resource-ref",
       "deprecation": {
         "level": "error",
         "reason": "Spring Boot does not support configuring JNDI resourceRef. Use entire resource reference in the name."
@@ -350,7 +350,7 @@
       }
     },
     {
-      "name": "email.useCredentials",
+      "name": "email.use-credentials",
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
@@ -376,7 +376,7 @@
       }
     },
     {
-      "name": "email.useSSL",
+      "name": "email.use-ssl",
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
@@ -385,7 +385,7 @@
       }
     },
     {
-      "name": "email.useTLS",
+      "name": "email.use-tls",
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
