@@ -41,6 +41,7 @@ import org.springframework.web.servlet.DispatcherServlet;
         "org.flowable.app.service",
         "org.flowable.app.filter",
         "org.flowable.app.security",
+        "org.flowable.app.tenant",
         "org.flowable.app.model.component" })
 public class ApplicationConfiguration {
 
