@@ -534,6 +534,9 @@ function _drawBoundaryEvent(element)
 	innerCircle.id = element.id + "_inner";
 }
 
+function _drawStringDataObject(element) {
+}
+
 function _drawIntermediateCatchEvent(element)
 {
 	var x = element.x + (element.width / 2);
