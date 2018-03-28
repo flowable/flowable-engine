@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8090
   use-forward-headers: true
 
 
@@ -30,16 +30,16 @@ zuul:
   routes:
     flowable_admin:
       path: /flowable-admin/**
-      url: http://localhost:8083
+      url: http://localhost:9988/flowable-admin/
     flowable_idm:
       path: /flowable-idm/**
-      url: http://localhost:8084
+      url: http://localhost:8080/flowable-idm/
     flowable_modeler:
       path: /flowable-modeler/**
-      url: http://localhost:8082
+      url: http://localhost:8888/flowable-modeler/
     flowable_task:
       path: /flowable-task/**
-      url: http://localhost:8081
+      url: http://localhost:9999/flowable-task/
   sensitive-headers:
   host:
     max-per-route-connections: 100
