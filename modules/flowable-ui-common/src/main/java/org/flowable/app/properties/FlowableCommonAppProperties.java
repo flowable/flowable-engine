@@ -28,11 +28,24 @@ public class FlowableCommonAppProperties {
      */
     private String tenantId;
 
+    /**
+     * The default role prefix that needs to be used by Spring Security.
+     */
+    private String rolePrefix = "ROLE_";
+
     public String getTenantId() {
         return tenantId;
     }
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public String getRolePrefix() {
+        return rolePrefix;
+    }
+
+    public void setRolePrefix(String rolePrefix) {
+        this.rolePrefix = rolePrefix;
     }
 }

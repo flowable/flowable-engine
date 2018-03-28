@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -60,5 +61,10 @@ public class FlowableRestApplication extends SpringBootServletInitializer {
                 registry.addViewController("/docs/").setViewName("forward:/docs/index.html");
             }
         };
+    }
+
+    @Bean
+    public GrantedAuthorityDefaults grantedAuthorityDefaults(RestAppProperties commonAppProperties) {
+        return new GrantedAuthorityDefaults(commonAppProperties.getRolePrefix());
     }
 }

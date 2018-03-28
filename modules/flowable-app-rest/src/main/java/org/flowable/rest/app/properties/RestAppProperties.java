@@ -44,6 +44,11 @@ public class RestAppProperties {
     @NestedConfigurationProperty
     private final Admin admin = new Admin();
 
+    /**
+     * The default role prefix that needs to be used by Spring Security.
+     */
+    private String rolePrefix = "ROLE_";
+
     public String getAuthenticationMode() {
         return authenticationMode;
     }
@@ -70,6 +75,14 @@ public class RestAppProperties {
 
     public Admin getAdmin() {
         return admin;
+    }
+
+    public String getRolePrefix() {
+        return rolePrefix;
+    }
+
+    public void setRolePrefix(String rolePrefix) {
+        this.rolePrefix = rolePrefix;
     }
 
     public static class Admin {
