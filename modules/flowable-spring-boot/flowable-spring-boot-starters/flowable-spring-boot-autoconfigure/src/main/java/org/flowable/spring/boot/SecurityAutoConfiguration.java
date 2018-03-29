@@ -33,7 +33,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -47,7 +47,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
     AuthenticationManager.class,
     GlobalAuthenticationConfigurerAdapter.class
 })
-@AutoConfigureBefore(org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class)
+@AutoConfigureBefore(org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class)
 @AutoConfigureAfter({
     IdmEngineServicesAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class
@@ -79,16 +79,6 @@ public class SecurityAutoConfiguration {
                 } else {
                     LOGGER.warn("There is no authentication provider configured. However, there is no single one in the context."
                         + " Please configure the global authentication provider by yourself.");
-                }
-            }
-
-            if (auth.getDefaultUserDetailsService() == null) {
-                UserDetailsService userDetailsService = userDetailsServiceProvider.getIfUnique();
-                if (userDetailsService != null) {
-                    auth.userDetailsService(userDetailsService);
-                } else {
-                    LOGGER.warn("There is no default UserDetailsService configured, but there is no single one in the context."
-                        + " Please configure it by yourself");
                 }
             }
         }

@@ -27,6 +27,7 @@
         <module>flowable-spring-boot-sample-content</module>
         <module>flowable-spring-boot-sample-cmmn</module>
         <module>flowable-spring-boot-sample-ldap</module>
+        <module>flowable-spring-boot-sample-rest-1.5.x</module>
     </modules>
     <dependencies>
         <dependency>

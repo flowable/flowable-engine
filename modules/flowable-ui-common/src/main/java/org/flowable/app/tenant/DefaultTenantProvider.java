@@ -1,11 +1,11 @@
 package org.flowable.app.tenant;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,9 +15,9 @@ public class DefaultTenantProvider implements TenantProvider {
 
     private String tenantId;
     
-    public DefaultTenantProvider(Environment environment) {
+    public DefaultTenantProvider(FlowableCommonAppProperties commonAppProperties) {
         super();
-        String configuredTenantId = environment.getProperty("flowable.tenant.tenant_id");
+        String configuredTenantId = commonAppProperties.getTenantId();
         if(! StringUtils.isBlank(configuredTenantId)) {
             // trim whitespace as trailing whitespace are possible in properties files and easy to do
             configuredTenantId = configuredTenantId.trim();

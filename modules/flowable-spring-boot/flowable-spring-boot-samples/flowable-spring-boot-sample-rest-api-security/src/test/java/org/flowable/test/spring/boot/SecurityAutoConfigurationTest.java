@@ -51,7 +51,7 @@ public class SecurityAutoConfigurationTest {
             IdmEngineAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
             IdmEngineServicesAutoConfiguration.class,
-            org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
+            org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
             SecurityAutoConfiguration.class })
     public static class SecurityConfiguration {
 
