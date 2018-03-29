@@ -20,19 +20,21 @@ import javax.xml.stream.XMLStreamWriter;
 /**
  * @author Dennis Federico
  */
-public class UserEventListenerExport extends AbstractPlanItemDefinitionExport {
+public class UserEventListenerExport extends AbstractPlanItemDefinitionExport<UserEventListener> {
 
-    public static void writeUserEventListener(UserEventListener userEventListener, XMLStreamWriter xtw) throws Exception {
-        xtw.writeStartElement(ELEMENT_USER_EVENT_LISTENER);
-
-        writeUserEventListernerAttributes(userEventListener, xtw);
-
-        writeCommonPlanItemDefinitionAttributes(userEventListener, xtw);
-
-        xtw.writeEndElement();
+    @Override
+    protected Class<? extends UserEventListener> getExportablePlanItemDefinitionClass() {
+        return UserEventListener.class;
     }
 
-    private static void writeUserEventListernerAttributes(UserEventListener userEventListener, XMLStreamWriter xtw) throws XMLStreamException {
+    @Override
+    protected String getPlanItemDefinitionXmlElementValue(UserEventListener planItemDefinition) {
+        return ELEMENT_USER_EVENT_LISTENER;
+    }
+
+    @Override
+    protected void writePlanItemDefinitionSpecificAttributes(UserEventListener userEventListener, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(userEventListener, xtw);
         String[] authorizedRoleRefs = userEventListener.getAuthorizedRoleRefs();
         if (authorizedRoleRefs != null && authorizedRoleRefs.length > 0) {
             xtw.writeAttribute(ATTRIBUTE_AUTHORIZED_ROLE_REFS, String.join(",", authorizedRoleRefs));

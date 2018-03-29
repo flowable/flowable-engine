@@ -13,19 +13,19 @@
 package org.flowable.cmmn.converter;
 
 import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.PlanItemControl;
-import org.flowable.cmmn.model.PlanItemDefinition;
 
 import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Dennis Federico
  */
-public class DefaultControlXmlConverter extends CaseElementXmlConverter {
+public class CompletionNeutralRuleXmlConverter extends CaseElementXmlConverter {
 
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_DEFAULT_CONTROL;
+        return CmmnXmlConstants.ELEMENT_COMPLETION_NEUTRAL_RULE;
     }
 
     @Override
@@ -35,11 +35,15 @@ public class DefaultControlXmlConverter extends CaseElementXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        PlanItemControl planItemControl = new PlanItemControl();
-        CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
-        if (currentCmmnElement instanceof PlanItemDefinition) {
-            ((PlanItemDefinition) currentCmmnElement).setDefaultControl(planItemControl);
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+            CompletionNeutralRule completionNeutralRule = new CompletionNeutralRule();
+            completionNeutralRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+
+            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+            planItemControl.setCompletionNeutralRule(completionNeutralRule);
+
+            return completionNeutralRule;
         }
-        return planItemControl;
+        return null;
     }
 }
