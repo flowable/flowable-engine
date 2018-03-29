@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -34,7 +32,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,11 +55,11 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     protected String adminUser;
     protected String adminPassword;
 
-    public RemoteIdmServiceImpl(FlowableRemoteIdmProperties properties) {
+    public RemoteIdmServiceImpl(FlowableCommonAppProperties properties) {
         url = properties.determineIdmAppUrl();
-        adminUser = properties.getAdmin().getUser();
+        adminUser = properties.getIdmAdmin().getUser();
         Assert.hasText(adminUser, "Admin user must not be empty");
-        adminPassword = properties.getAdmin().getPassword();
+        adminPassword = properties.getIdmAdmin().getPassword();
         Assert.hasText(adminUser, "Admin user password should not be empty");
     }
 

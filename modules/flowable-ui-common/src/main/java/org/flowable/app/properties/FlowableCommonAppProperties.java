@@ -13,9 +13,11 @@
 package org.flowable.app.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.util.Assert;
 
 /**
- * Common properties for the Flowable UI Apps
+ * Common configuration properties that needs to be shared by all the UI apps.
  *
  * @author Filip Hrisafov
  */
@@ -33,6 +35,40 @@ public class FlowableCommonAppProperties {
      */
     private String rolePrefix = "ROLE_";
 
+    /**
+     * The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
+     */
+    private String idmUrl;
+
+    /**
+     * The URL to which the redirect should occur after a successful authentication.
+     */
+    private String redirectOnAuthSuccess;
+
+    /**
+     * The cache configuration for the login tokens.
+     */
+    @NestedConfigurationProperty
+    private final Cache cacheLoginTokens = new Cache();
+
+    /**
+     * The cache configuration for the login users.
+     */
+    @NestedConfigurationProperty
+    private final Cache cacheLoginUsers = new Cache();
+
+    /**
+     * The cache configuration for the users.
+     */
+    @NestedConfigurationProperty
+    private final Cache cacheUsers = new Cache();
+
+    /**
+     * The information for the IDM Admin user.
+     */
+    @NestedConfigurationProperty
+    private final Admin idmAdmin = new Admin();
+
     public String getTenantId() {
         return tenantId;
     }
@@ -47,5 +83,109 @@ public class FlowableCommonAppProperties {
 
     public void setRolePrefix(String rolePrefix) {
         this.rolePrefix = rolePrefix;
+    }
+
+    public String getIdmUrl() {
+        return idmUrl;
+    }
+
+    public void setIdmUrl(String idmUrl) {
+        this.idmUrl = idmUrl;
+    }
+
+    public String getRedirectOnAuthSuccess() {
+        return redirectOnAuthSuccess;
+    }
+
+    public void setRedirectOnAuthSuccess(String redirectOnAuthSuccess) {
+        this.redirectOnAuthSuccess = redirectOnAuthSuccess;
+    }
+
+    public Cache getCacheLoginTokens() {
+        return cacheLoginTokens;
+    }
+
+    public Cache getCacheLoginUsers() {
+        return cacheLoginUsers;
+    }
+
+    public Cache getCacheUsers() {
+        return cacheUsers;
+    }
+
+    public Admin getIdmAdmin() {
+        return idmAdmin;
+    }
+
+    public String determineIdmAppUrl() {
+        String idmAppUrl = getIdmUrl();
+        Assert.hasText(idmAppUrl, "`flowable.common.app.idm-url` must be set");
+
+        if (!idmAppUrl.endsWith("/")) {
+            idmAppUrl += "/";
+        }
+
+        return idmAppUrl;
+    }
+
+    /**
+     * The cache configuration for the for login users and token.
+     */
+    public static class Cache {
+
+        /**
+         * The maximum number of entries that the cache should contain.
+         */
+        private long maxSize = 2048L;
+
+        /**
+         * The max age in seconds after which the entry should be invalidated.
+         */
+        private long maxAge = 30L;
+
+        public long getMaxSize() {
+            return maxSize;
+        }
+
+        public void setMaxSize(long maxSize) {
+            this.maxSize = maxSize;
+        }
+
+        public long getMaxAge() {
+            return maxAge;
+        }
+
+        public void setMaxAge(long maxAge) {
+            this.maxAge = maxAge;
+        }
+    }
+
+    public static class Admin {
+
+        /**
+         * The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin
+         */
+        private String user = "admin";
+
+        /**
+         * The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.
+         */
+        private String password;
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 }

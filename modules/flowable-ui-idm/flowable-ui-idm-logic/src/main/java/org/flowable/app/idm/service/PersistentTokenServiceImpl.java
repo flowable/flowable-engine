@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.User;
@@ -54,7 +54,7 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
     private SecureRandom random;
 
     @Autowired
-    private FlowableRemoteIdmProperties properties;
+    private FlowableCommonAppProperties properties;
 
     @Autowired
     private IdmIdentityService idmIdentityService;
@@ -69,7 +69,7 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
 
     @PostConstruct
     protected void initTokenCache() {
-        FlowableRemoteIdmProperties.Cache cacheLoginUsers = properties.getCacheLoginUsers();
+        FlowableCommonAppProperties.Cache cacheLoginUsers = properties.getCacheLoginUsers();
         long maxSize = cacheLoginUsers.getMaxSize();
         long maxAge = cacheLoginUsers.getMaxAge();
         tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(maxAge, TimeUnit.SECONDS).recordStats()
