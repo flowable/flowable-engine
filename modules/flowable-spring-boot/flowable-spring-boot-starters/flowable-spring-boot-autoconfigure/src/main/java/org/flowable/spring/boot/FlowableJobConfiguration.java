@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
@@ -39,6 +40,7 @@ public class FlowableJobConfiguration {
     @Bean
     @ConfigurationProperties(prefix = "flowable.async.executor")
     @ConditionalOnMissingBean
+    @Scope("prototype")
     public SpringAsyncExecutor springAsyncExecutor(TaskExecutor taskExecutor) {
         return new SpringAsyncExecutor(taskExecutor, springRejectedJobsHandler());
     }
