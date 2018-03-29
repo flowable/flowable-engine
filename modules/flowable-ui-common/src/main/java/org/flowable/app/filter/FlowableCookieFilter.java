@@ -302,14 +302,6 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
         String[] tokens = StringUtils.delimitedListToStringArray(cookieAsPlainText, DELIMITER);
 
-        if ((tokens[0].equalsIgnoreCase("http") || tokens[0].equalsIgnoreCase("https")) && tokens[1].startsWith("//")) {
-            // Assume we've accidentally split a URL (OpenID identifier)
-            String[] newTokens = new String[tokens.length - 1];
-            newTokens[0] = tokens[0] + ":" + tokens[1];
-            System.arraycopy(tokens, 2, newTokens, 1, newTokens.length - 1);
-            tokens = newTokens;
-        }
-
         for (int i = 0; i < tokens.length; i++)
         {
             try
