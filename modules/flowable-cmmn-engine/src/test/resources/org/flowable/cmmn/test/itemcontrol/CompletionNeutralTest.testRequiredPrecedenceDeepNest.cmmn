@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="testRequiredPrecedenceDeepNest">
+
+        <casePlanModel id="myCompletionNeutralTestPlanModel" name="My completion neutral test plan model">
+            <documentation>A required task deeply nested with some completionNeutral planItems along the way</documentation>
+            <planItem id="caseKeepAlive" definitionRef="taskA"/>
+            <planItem id="firstStage" definitionRef="stageOne">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule/>
+                    </extensionElements>
+                </itemControl>
+                <entryCriterion sentryRef="startStageOneEvent"/>
+            </planItem>
+            <planItem id="userEventListenerOne" definitionRef="userEventOne">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule/>
+                    </extensionElements>
+                </itemControl>
+            </planItem>
+            <planItem id="userEventListenerTwo" definitionRef="userEventTwo">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule/>
+                    </extensionElements>
+                </itemControl>
+            </planItem>
+            <planItem id="userEventListenerThree" definitionRef="userEventThree">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule/>
+                    </extensionElements>
+                </itemControl>
+            </planItem>
+            <sentry id="startStageOneEvent">
+                <planItemOnPart sourceRef="userEventListenerOne">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="taskA"/>
+            <userEventListener id="userEventOne"/>
+            <userEventListener id="userEventTwo"/>
+            <userEventListener id="userEventThree"/>
+
+            <stage id="stageOne">
+                <planItem id="completionNeutralTaskB" definitionRef="taskB">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:completionNeutralRule/>
+                        </extensionElements>
+                    </itemControl>
+                    <entryCriterion sentryRef="taskBActivator"/>
+                </planItem>
+                <planItem id="secondStage" definitionRef="stageTwo">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:completionNeutralRule/>
+                        </extensionElements>
+                    </itemControl>
+                    <entryCriterion sentryRef="stageTwoTaskAComplete"/>
+                </planItem>
+                <sentry id="taskBActivator">
+                    <planItemOnPart sourceRef="userEventListenerTwo">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <sentry id="stageTwoTaskAComplete">
+                    <planItemOnPart sourceRef="caseKeepAlive">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <humanTask id="taskB"/>
+
+                <stage id="stageTwo">
+                    <planItem id="requiredCompletionNeutralTask" definitionRef="taskC">
+                        <itemControl>
+                            <extensionElements>
+                                <flowable:completionNeutralRule/>
+                            </extensionElements>
+                            <requiredRule/>
+                        </itemControl>
+                        <entryCriterion sentryRef="userEventSentry"/>
+                    </planItem>
+                    <sentry id="userEventSentry">
+                        <planItemOnPart sourceRef="userEventListenerThree">
+                            <standardEvent>occur</standardEvent>
+                        </planItemOnPart>
+                    </sentry>
+                    <humanTask id="taskC"/>
+                </stage>
+            </stage>
+        </casePlanModel>
+    </case>
+
+</definitions>

@@ -316,7 +316,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
         return false;
     }
-    
+
     protected boolean isEndStateReachedForAllRequiredChildPlanItems(PlanItemInstanceContainer planItemInstanceContainer) {
         if (planItemInstanceContainer.getChildPlanItemInstances() != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
@@ -397,8 +397,16 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         if (allRequiredChildrenInEndState) {
             stagePlanItemInstanceEntity.setCompleteable(true);
         }
-        return (stage.isAutoComplete() && allRequiredChildrenInEndState)
-                || (!stage.isAutoComplete() && isAvailableChildPlanCompletionNeutralOrNotActive(stagePlanItemInstanceEntity));
+
+        if (stagePlanItemInstanceEntity.isCompleteable()) {
+            if (stage.isAutoComplete()) {
+                return true;
+            } else {
+                return isAvailableChildPlanCompletionNeutralOrNotActive(stagePlanItemInstanceEntity);
+            }
+        } else {
+            return false;
+        }
     }
     
     protected boolean isPlanModelComplete() {
@@ -408,7 +416,16 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
         
         boolean isAutoComplete = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel().isAutoComplete();
-        return (isAutoComplete && allRequiredChildrenInEndState) || (!isAutoComplete && isAvailableChildPlanCompletionNeutralOrNotActive(caseInstanceEntity));
+
+        if (caseInstanceEntity.isCompleteable()) {
+            if (isAutoComplete) {
+                return true;
+            } else {
+                return isAvailableChildPlanCompletionNeutralOrNotActive(caseInstanceEntity);
+            }
+        } else {
+            return false;
+        }
     }
 
     @Override
