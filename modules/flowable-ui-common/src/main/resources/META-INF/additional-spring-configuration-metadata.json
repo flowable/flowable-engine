@@ -15,7 +15,7 @@
       "deprecation": {
         "level": "error",
         "reason": "Using Spring Boot MultiPartAutoConfiguration instead.",
-        "replacement": "spring.http.multipart.max-file-size"
+        "replacement": "spring.servlet.multipart.max-file-size"
       }
     },
     {

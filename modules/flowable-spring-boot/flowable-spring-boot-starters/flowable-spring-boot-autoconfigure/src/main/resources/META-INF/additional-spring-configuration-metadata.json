@@ -354,7 +354,7 @@
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
-        "reason": "Using improved setup for Spring Boot. In case you don't want to use credentials, set the password and user to empty."
+        "reason": "In case you don't want to use credentials, set the password and user to empty."
       }
     },
     {

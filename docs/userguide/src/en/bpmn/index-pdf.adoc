@@ -14,5 +14,6 @@
 :github-code: https://github.com/flowable/flowable-engine/tree/{github-tag}
 :sc-flowable-starter: {github-code}/modules/flowable-spring-boot/flowable-spring-boot-starters
 :sc-flowable-boot: {sc-flowable-starter}/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot
+:sc-flowable-ui-admin: {github-code}/modules/flowable-ui-admin
 
 include::index-common.adoc[]

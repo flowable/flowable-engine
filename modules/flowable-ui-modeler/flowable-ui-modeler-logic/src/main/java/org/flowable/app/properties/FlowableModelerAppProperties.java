@@ -25,7 +25,7 @@ public class FlowableModelerAppProperties {
     /**
      * Enables the REST API (this is not the REST api used by the UI, but an api that's available over basic auth authentication).
      */
-    private boolean restEnabled;
+    private boolean restEnabled = true;
 
     /**
      * The root URI to the REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine.
