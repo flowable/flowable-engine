@@ -831,6 +831,23 @@
       "popular" : true
     }]
   }, {
+    "name" : "completionneutralrulepackage",
+    "properties" : [ {
+      "id" : "completionneutralenabled",
+      "type" : "Boolean",
+      "title" : "Completion neutral",
+      "value" : "",
+      "description" : "Flag indicating if the plan item is completion neutral. False by default.",
+      "popular" : true
+    }, {
+      "id" : "completionneutralrulecondition",
+      "type" : "String",
+      "title" : "Completion neutral Rule",
+      "value" : "",
+      "description" : "An expression that is resolved to determine if the plan item is completion neutral.",
+      "popular" : true
+    }]
+  }, {
     "name": "scriptformatpackage",
     "properties" : [ {
         "id": "scriptformat",
@@ -910,7 +927,8 @@
       "autocompletepackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" 
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"
     ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "StageActivity", "all", "association_start", "association_end" ]
@@ -930,7 +948,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -954,7 +973,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" ],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -977,7 +997,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" ],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   },
@@ -1000,7 +1021,8 @@
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
-        "manualactivationrulepackage"
+        "manualactivationrulepackage",
+        "completionneutralrulepackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -1029,6 +1051,7 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "manualactivationrulepackage",
+        "completionneutralrulepackage",
         "httptaskrequestmethodpackage",
         "httptaskrequesturlpackage",
         "httptaskrequestheaderspackage",
@@ -1070,6 +1093,7 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "manualactivationrulepackage",
+        "completionneutralrulepackage",
         "scriptformatpackage", 
         "scripttextpackage",
         "servicetaskresultvariablepackage"
@@ -1089,7 +1113,8 @@
       "namepackage",
       "documentationpackage",
       "requiredrulepackage",
-      "repetitionrulepackage" ],
+      "repetitionrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1109,7 +1134,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1129,7 +1155,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1145,7 +1172,8 @@
       "namepackage",
       "documentationpackage",
       "timerexpressionpackage",
-      "timerstarttriggerpackage"],
+      "timerstarttriggerpackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1159,7 +1187,8 @@
       "propertyPackages" : [
         "overrideidpackage",
         "namepackage",
-        "documentationpackage"],
+        "documentationpackage",
+        "completionneutralrulepackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {

@@ -80,6 +80,9 @@ public interface CmmnStencilConstants {
     
     String PROPERTY_MANUAL_ACTIVATION_ENABLED = "manualactivationenabled";
     String PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION = "manualactivationrulecondition";
+    
+    String PROPERTY_COMPLETION_NEUTRAL_ENABLED = "completionneutralenabled";
+    String PROPERTY_COMPLETION_NEUTRAL_RULE_CONDITION = "completionneutralrulecondition";
 
     String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
     String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";
