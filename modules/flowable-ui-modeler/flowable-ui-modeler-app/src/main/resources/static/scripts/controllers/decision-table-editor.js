@@ -33,7 +33,7 @@ angular.module('flowableModeler')
             var booleanOperators = ['==', '!='];
             var dateOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
             var collectionOperators = ['IN', 'NOT IN', 'ANY', 'NOT ANY', '==', '!='];
-            var allOperators = ['==', '!=', '<', '>', '>=', '<='];
+            var allOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
             var collectOperators = {
                 'SUM': '+',
                 'MIN': '<',
@@ -56,7 +56,8 @@ angular.module('flowableModeler')
                 columnVariableIdMap: {},
                 startOutputExpression: 0,
                 selectedRow: undefined,
-                availableVariableTypes: ['string', 'number', 'boolean', 'date', 'collection']
+                availableInputVariableTypes: ['string', 'number', 'boolean', 'date', 'collection'],
+                availableOutputVariableTypes: ['string', 'number', 'boolean', 'date']
             };
 
             // Hot Model init
@@ -838,11 +839,6 @@ angular.module('flowableModeler')
                                 rowData[key] = '==';
                             }
                         }
-                        // else if (type === 'input-expression') {
-                        //     if (!(key in rowData) || rowData[key] === '') {
-                        //         rowData[key] = '-';
-                        //     }
-                        // }
                     });
                 }
             };
@@ -965,7 +961,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
                 selectedExpressionVariableId: $scope.model.selectedExpression.variableId,
-                selectedExpressionVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableVariableTypes[0],
+                selectedExpressionVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableInputVariableTypes[0],
                 selectedExpressionInputValues: $scope.model.selectedExpression.entries && $scope.model.selectedExpression.entries.length > 0 ? createEntriesValues($scope.model.selectedExpression.entries) : [['']],
                 columnDefs: [
                     {
@@ -985,7 +981,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: '',
                 selectedExpressionVariableId: '',
-                selectedExpressionVariableType: $scope.model.availableVariableTypes[0],
+                selectedExpressionVariableType: $scope.model.availableInputVariableTypes[0],
                 selectedExpressionInputValues: [['']],
                 columnDefs: [
                     {
@@ -1098,7 +1094,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
                 selectedExpressionNewVariableId: $scope.model.selectedExpression.variableId,
-                selectedExpressionNewVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableVariableTypes[0],
+                selectedExpressionNewVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableOutputVariableTypes[0],
                 selectedExpressionOutputValues: $scope.model.selectedExpression.entries && $scope.model.selectedExpression.entries.length > 0 ? createEntriesValues($scope.model.selectedExpression.entries) : [['']],
                 currentHitPolicy: $scope.model.hitPolicy,
                 columnDefs: [
@@ -1122,7 +1118,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: '',
                 selectedExpressionNewVariableId: '',
-                selectedExpressionNewVariableType: $scope.model.availableVariableTypes[0],
+                selectedExpressionNewVariableType: $scope.model.availableOutputVariableTypes[0],
                 selectedExpressionOutputValues: [['']],
                 currentHitPolicy: $scope.model.hitPolicy,
                 columnDefs: [
