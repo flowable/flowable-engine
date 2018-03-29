@@ -410,7 +410,7 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.hibernate</groupId>
+                    <groupId>org.hibernate.validator</groupId>
                     <artifactId>hibernate-validator</artifactId>
                 </exclusion>
             </exclusions>
@@ -428,6 +428,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
