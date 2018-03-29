@@ -16,7 +16,7 @@ import java.util.Collections;
 
 import org.flowable.app.filter.FlowableCookieFilter;
 import org.flowable.app.properties.FlowableModelerAppProperties;
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.properties.FlowableRestAppProperties;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
@@ -60,7 +60,7 @@ public class SecurityConfiguration {
     protected RemoteIdmAuthenticationProvider authenticationProvider;
 
     @Bean
-    public FlowableCookieFilter flowableCookieFilter(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
+    public FlowableCookieFilter flowableCookieFilter(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
         FlowableCookieFilter filter = new FlowableCookieFilter(remoteIdmService, properties);
         filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_MODELER));
         return filter;

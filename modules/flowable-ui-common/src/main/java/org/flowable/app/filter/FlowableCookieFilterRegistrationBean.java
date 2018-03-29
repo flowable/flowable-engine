@@ -16,7 +16,7 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -28,12 +28,12 @@ public class FlowableCookieFilterRegistrationBean extends FilterRegistrationBean
 
     protected final RemoteIdmService remoteIdmService;
 
-    protected final FlowableRemoteIdmProperties properties;
+    protected final FlowableCommonAppProperties properties;
 
     protected FlowableCookieFilterCallback filterCallback;
     protected Collection<String> requiredPrivileges;
 
-    public FlowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
+    public FlowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
         this.remoteIdmService = remoteIdmService;
         this.properties = properties;
     }

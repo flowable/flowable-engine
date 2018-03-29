@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.security.CookieConstants;
 import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.service.idm.RemoteIdmService;
@@ -58,7 +58,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
     protected final RemoteIdmService remoteIdmService;
 
-    protected final FlowableRemoteIdmProperties properties;
+    protected final FlowableCommonAppProperties properties;
 
     protected FlowableCookieFilterCallback filterCallback;
 
@@ -73,7 +73,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
     protected LoadingCache<String, FlowableAppUser> userCache;
 
-    public FlowableCookieFilter(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
+    public FlowableCookieFilter(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
         this.remoteIdmService = remoteIdmService;
         this.properties = properties;
     }
@@ -92,7 +92,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected void initTokenCache() {
-        FlowableRemoteIdmProperties.Cache cache = properties.getCacheLoginTokens();
+        FlowableCommonAppProperties.Cache cache = properties.getCacheLoginTokens();
         Long maxSize = cache.getMaxSize();
         Long maxAge = cache.getMaxAge();
         tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(maxAge, TimeUnit.SECONDS).recordStats()
@@ -112,7 +112,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected void initUserCache() {
-        FlowableRemoteIdmProperties.Cache cache = properties.getCacheLoginUsers();
+        FlowableCommonAppProperties.Cache cache = properties.getCacheLoginUsers();
         Long userMaxSize = cache.getMaxSize();
         Long userMaxAge = cache.getMaxAge();
         userCache = CacheBuilder.newBuilder().maximumSize(userMaxSize).expireAfterWrite(userMaxAge, TimeUnit.SECONDS).recordStats()

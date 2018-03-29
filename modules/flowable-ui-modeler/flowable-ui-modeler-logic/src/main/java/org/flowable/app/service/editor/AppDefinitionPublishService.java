@@ -37,7 +37,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.properties.FlowableModelerAppProperties;
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.service.api.AppDefinitionService;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.app.tenant.TenantProvider;
@@ -60,10 +60,10 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDefinitionPublishService.class);
 
-    protected final FlowableRemoteIdmProperties properties;
+    protected final FlowableCommonAppProperties properties;
     protected final FlowableModelerAppProperties modelerAppProperties;
 
-    public AppDefinitionPublishService(FlowableRemoteIdmProperties properties, FlowableModelerAppProperties modelerAppProperties) {
+    public AppDefinitionPublishService(FlowableCommonAppProperties properties, FlowableModelerAppProperties modelerAppProperties) {
         this.properties = properties;
         this.modelerAppProperties = modelerAppProperties;
     }
@@ -98,8 +98,8 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
     protected void deployZipArtifact(String artifactName, byte[] zipArtifact, String deploymentKey, String deploymentName) {
         String deployApiUrl = modelerAppProperties.getDeploymentApiUrl();
         Assert.hasText(deployApiUrl, "flowable.modeler.app.deployment-api-url must be set");
-        String basicAuthUser = properties.getAdmin().getUser();
-        String basicAuthPassword = properties.getAdmin().getPassword();
+        String basicAuthUser = properties.getIdmAdmin().getUser();
+        String basicAuthPassword = properties.getIdmAdmin().getPassword();
 
         String tenantId = tenantProvider.getTenantId();
         if (!deployApiUrl.endsWith("/")) {
