@@ -264,6 +264,16 @@
                         spring-boot-configuration-processor
                     </excludeArtifactIds>
                 </configuration>
+                <executions>
+                  <execution>
+                    <goals>
+                      <goal>repackage</goal>
+                    </goals>
+                    <configuration>
+                      <classifier>exec</classifier>
+                    </configuration>
+                  </execution>
+                </executions>
             </plugin>
 
             <plugin>
