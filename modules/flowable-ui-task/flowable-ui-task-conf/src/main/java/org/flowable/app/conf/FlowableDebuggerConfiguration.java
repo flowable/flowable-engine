@@ -16,6 +16,8 @@ import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.event.BreakpointJobHandler;
 import org.flowable.engine.runtime.ProcessDebugger;
+import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
+import org.flowable.job.service.impl.asyncexecutor.DefaultDebuggerExecutionExceptionHandler;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -24,6 +26,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
 
 /**
  * Auto configuration for the process debugger.
@@ -50,6 +54,9 @@ public class FlowableDebuggerConfiguration {
             processEngineConfiguration.setEnableDatabaseEventLogging(true);
             processEngineConfiguration.setAgendaFactory(agendaFactory);
             processEngineConfiguration.addCustomJobHandler(new BreakpointJobHandler());
+            ArrayList<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>(processEngineConfiguration.getCustomAsyncRunnableExecutionExceptionHandlers());
+            exceptionHandlers.add(new DefaultDebuggerExecutionExceptionHandler());
+            processEngineConfiguration.setCustomAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
         };
     }
 }
