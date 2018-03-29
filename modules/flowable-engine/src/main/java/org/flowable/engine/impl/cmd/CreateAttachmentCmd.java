@@ -99,7 +99,17 @@ public class CreateAttachmentCmd implements Command<Attachment> {
             attachment.setContent(byteArray);
         }
 
-        CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(taskId, processInstanceId, attachmentName, true);
+        ExecutionEntity processInstance = null;
+        if (processInstanceId != null) {
+            processInstance = CommandContextUtil.getExecutionEntityManager().findById(processInstanceId);
+        }
+        
+        TaskEntity task = null;
+        if (taskId != null) {
+            task = CommandContextUtil.getTaskService().getTask(taskId);
+        }
+        
+        CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(task, processInstance, attachmentName, true);
 
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right

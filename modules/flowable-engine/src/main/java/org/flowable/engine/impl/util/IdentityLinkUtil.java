@@ -47,7 +47,7 @@ public class IdentityLinkUtil {
         List<IdentityLinkEntity> removedIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().deleteProcessInstanceIdentityLink(
                         processInstanceEntity.getId(), userId, groupId, type);
         for (IdentityLinkEntity identityLinkEntity : removedIdentityLinkEntities) {
-            CommandContextUtil.getHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
+            CommandContextUtil.getHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
         }
         processInstanceEntity.getIdentityLinks().removeAll(removedIdentityLinkEntities);
     }
@@ -84,7 +84,7 @@ public class IdentityLinkUtil {
     public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascadeHistory, boolean updateTaskCounts) {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             if (cascadeHistory) {
-                CommandContextUtil.getHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
+                CommandContextUtil.getHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
             }
             if (updateTaskCounts) {
                 handleTaskCountsForIdentityLinkDeletion(taskEntity, identityLinkEntity);

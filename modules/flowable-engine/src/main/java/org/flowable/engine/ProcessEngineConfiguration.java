@@ -102,6 +102,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
 
     protected HistoryLevel historyLevel;
+    protected boolean enableProcessDefinitionHistoryLevel;
 
     protected String jpaPersistenceUnitName;
     protected Object jpaEntityManagerFactory;
@@ -389,6 +390,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
+        return this;
+    }
+
+    public boolean isEnableProcessDefinitionHistoryLevel() {
+        return enableProcessDefinitionHistoryLevel;
+    }
+
+    public ProcessEngineConfiguration setEnableProcessDefinitionHistoryLevel(boolean enableProcessDefinitionHistoryLevel) {
+        this.enableProcessDefinitionHistoryLevel = enableProcessDefinitionHistoryLevel;
         return this;
     }
 
