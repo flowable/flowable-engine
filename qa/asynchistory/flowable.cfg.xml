@@ -43,6 +43,7 @@
     </property>
     
     <property name="asyncHistoryEnabled" value="true" />
+    <property name="enableProcessDefinitionHistoryLevel" value="true" />
     <property name="asyncHistoryExecutorNumberOfRetries" value="10" />
     <property name="asyncHistoryJsonGzipCompressionEnabled" value="true" />
     <property name="asyncHistoryJsonGroupingEnabled" value="true" />

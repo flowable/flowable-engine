@@ -44,6 +44,7 @@
     </property>
     
     <property name="asyncHistoryEnabled" value="true" />
+    <property name="enableProcessDefinitionHistoryLevel" value="true" />
     <property name="asyncHistoryExecutorNumberOfRetries" value="99999999" />
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
