@@ -12,52 +12,58 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.converter.CmmnXmlConstants;
-import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.Stage;
 
-public class StageExport implements CmmnXmlConstants {
+import javax.xml.stream.XMLStreamWriter;
 
-    public static void writeStage(Stage stage, XMLStreamWriter xtw) throws Exception {
+public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
+
+    private static final StageExport instance = new StageExport();
+
+    public static StageExport getInstance() {
+        return instance;
+    }
+
+    private StageExport() {
+    }
+
+    @Override
+    protected Class<Stage> getExportablePlanItemDefinitionClass() {
+        return Stage.class;
+    }
+
+    @Override
+    protected String getPlanItemDefinitionXmlElementValue(Stage stage) {
         // start plan model or stage element
         if (stage.isPlanModel()) {
-            xtw.writeStartElement(ELEMENT_PLAN_MODEL);
+            return ELEMENT_PLAN_MODEL;
         } else {
-            xtw.writeStartElement(ELEMENT_STAGE);
+            return ELEMENT_STAGE;
         }
+    }
 
-        xtw.writeAttribute(ATTRIBUTE_ID, stage.getId());
-
-        if (StringUtils.isNotEmpty(stage.getName())) {
-            xtw.writeAttribute(ATTRIBUTE_NAME, stage.getName());
-        }
-
-        if (StringUtils.isNotEmpty(stage.getDocumentation())) {
-
-            xtw.writeStartElement(ELEMENT_DOCUMENTATION);
-            xtw.writeCharacters(stage.getDocumentation());
-            xtw.writeEndElement();
-        }
-
+    @Override
+    protected void writePlanItemDefinitionSpecificAttributes(Stage stage, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(stage, xtw);
         if (StringUtils.isNotEmpty(stage.getFormKey())) {
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
-                    ATTRIBUTE_FORM_KEY, stage.getFormKey());
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, stage.getFormKey());
         }
-        
+
         if (stage.isAutoComplete()) {
             xtw.writeAttribute(ATTRIBUTE_IS_AUTO_COMPLETE, Boolean.toString(stage.isAutoComplete()));
         }
         if (StringUtils.isNotEmpty(stage.getAutoCompleteCondition())) {
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
-                    ATTRIBUTE_AUTO_COMPLETE_CONDITION, stage.getAutoCompleteCondition());
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_AUTO_COMPLETE_CONDITION, stage.getAutoCompleteCondition());
         }
+    }
 
+    @Override
+    protected void writePlanItemDefinitionBody(Stage stage, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionBody(stage, xtw);
         for (PlanItem planItem : stage.getPlanItems()) {
             PlanItemExport.writePlanItem(planItem, xtw);
         }
@@ -71,24 +77,7 @@ public class StageExport implements CmmnXmlConstants {
         }
 
         if (stage.isPlanModel() && stage.getExitCriteria() != null && !stage.getExitCriteria().isEmpty()) {
-            for (Criterion exitCriterion : stage.getExitCriteria()) {
-                xtw.writeStartElement(ELEMENT_EXIT_CRITERION);
-                xtw.writeAttribute(ATTRIBUTE_ID, exitCriterion.getId());
-
-                if (StringUtils.isNotEmpty(exitCriterion.getName())) {
-                    xtw.writeAttribute(ATTRIBUTE_NAME, exitCriterion.getName());
-                }
-
-                if (StringUtils.isNotEmpty(exitCriterion.getSentryRef())) {
-                    xtw.writeAttribute(ATTRIBUTE_SENTRY_REF, exitCriterion.getSentryRef());
-                }
-
-                // end entry criterion element
-                xtw.writeEndElement();
-            }
+            CriteriaExport.writeCriteriaElements(ELEMENT_EXIT_CRITERION, stage.getExitCriteria(), xtw);
         }
-
-        // end plan model or stage element
-        xtw.writeEndElement();
     }
 }

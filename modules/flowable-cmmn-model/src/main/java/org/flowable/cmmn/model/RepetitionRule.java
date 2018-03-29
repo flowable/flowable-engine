@@ -32,5 +32,11 @@ public class RepetitionRule extends PlanItemRule {
     public void setRepetitionCounterVariableName(String repetitionCounterVariableName) {
         this.repetitionCounterVariableName = repetitionCounterVariableName;
     }
-    
+
+    @Override
+    public String toString() {
+        return "RepetitionRule{" +
+                "repetitionCounterVariableName='" + repetitionCounterVariableName + '\'' +
+                "} " + super.toString();
+    }
 }

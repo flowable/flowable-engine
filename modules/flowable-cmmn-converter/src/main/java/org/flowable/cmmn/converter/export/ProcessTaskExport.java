@@ -12,29 +12,40 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.ProcessTask;
 
-public class ProcessTaskExport extends AbstractPlanItemDefinitionExport {
+import javax.xml.stream.XMLStreamWriter;
 
-    public static void writeProcessTask(ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
-        // start process task element
-        xtw.writeStartElement(ELEMENT_PROCESS_TASK);
-        writeCommonTaskAttributes(xtw, processTask);
+public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessTask> {
 
+    @Override
+    protected Class<ProcessTask> getExportablePlanItemDefinitionClass() {
+        return ProcessTask.class;
+    }
+
+    @Override
+    protected String getPlanItemDefinitionXmlElementValue(ProcessTask planItemDefinition) {
+        return ELEMENT_PROCESS_TASK;
+    }
+
+    @Override
+    protected void writePlanItemDefinitionSpecificAttributes(ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(processTask, xtw);
+        TaskExport.writeCommonTaskAttributes(processTask, xtw);
+    }
+
+    @Override
+    protected void writePlanItemDefinitionBody(ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionBody(processTask, xtw);
         if (StringUtils.isNotEmpty(processTask.getProcessRef()) || StringUtils.isNotEmpty(processTask.getProcessRefExpression())) {
             xtw.writeStartElement(ELEMENT_PROCESS_REF_EXPRESSION);
             xtw.writeCData(
                     StringUtils.isNotEmpty(processTask.getProcessRef()) ?
-                            processTask.getProcessRef():
+                            processTask.getProcessRef() :
                             processTask.getProcessRefExpression()
             );
             xtw.writeEndElement();
         }
-
-        // end process task element
-        xtw.writeEndElement();
     }
 }
