@@ -164,7 +164,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
                 // should continue evaluating
                 if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ContinueEvaluatingBehavior) {
-                    if (((ContinueEvaluatingBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).shouldContinueEvaluating(ruleResult) == false) {
+                    if (getHitPolicyBehavior(decisionTable.getHitPolicy()).shouldContinueEvaluating(ruleResult) == false) {
                         LOGGER.debug("Stopping execution; hit policy {} specific behaviour", decisionTable.getHitPolicy());
                         break;
                     }
@@ -178,7 +178,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
             // post rule conclusion actions
             if (getHitPolicyBehavior(decisionTable.getHitPolicy()) instanceof ComposeDecisionResultBehavior) {
-                ((ComposeDecisionResultBehavior) getHitPolicyBehavior(decisionTable.getHitPolicy())).composeDecisionResults(executionContext);
+                getHitPolicyBehavior(decisionTable.getHitPolicy()).composeDecisionResults(executionContext);
             }
 
         } catch (FlowableException ade) {
@@ -241,7 +241,9 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             if (!conditionResult) {
                 break;
             }
+        }
 
+        if (conditionResult) {
             // mark rule valid
             executionContext.getAuditContainer().markRuleValid(rule.getRuleNumber());
         }
