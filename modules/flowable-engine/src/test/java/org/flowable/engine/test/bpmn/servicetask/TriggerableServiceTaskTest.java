@@ -14,11 +14,15 @@
 package org.flowable.engine.test.bpmn.servicetask;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 
 public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
 
@@ -64,6 +68,11 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
     @Deployment
     public void testAsyncJobs() {
         String processId = runtimeService.startProcessInstanceByKey("process").getProcessInstanceId();
+        
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processId).list();
+        assertEquals(1, jobs.size());
+        assertEquals(AsyncContinuationJobHandler.TYPE, jobs.get(0).getJobHandlerType());
+        
         waitForJobExecutorToProcessAllJobs(5000L, 250L);
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
@@ -73,7 +82,12 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
 
         Map<String,Object> processVariables = new HashMap<>();
         processVariables.put("count", ++count);
-        runtimeService.triggerAsync(execution.getId(), processVariables, null);
+        runtimeService.triggerAsync(execution.getId(), processVariables);
+        
+        jobs = managementService.createJobQuery().processInstanceId(processId).list();
+        assertEquals(1, jobs.size());
+        assertEquals(AsyncTriggerJobHandler.TYPE, jobs.get(0).getJobHandlerType());
+        
         waitForJobExecutorToProcessAllJobs(5000L, 250L);
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();

@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import java.util.Map;
-
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.common.impl.agenda.AbstractAgenda;
 import org.flowable.engine.common.impl.context.Context;
@@ -95,8 +93,8 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     }
 
     @Override
-    public void planAsyncTriggerExecutionOperation(ExecutionEntity execution, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
-        planOperation(new TriggerExecutionOperation(commandContext, execution, true, processVariables, transientVariables), execution);
+    public void planAsyncTriggerExecutionOperation(ExecutionEntity execution) {
+        planOperation(new TriggerExecutionOperation(commandContext, execution, true), execution);
     }
 
     @Override

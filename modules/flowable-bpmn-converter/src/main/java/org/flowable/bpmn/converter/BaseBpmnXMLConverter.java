@@ -80,7 +80,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         String elementId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
         String elementName = xtr.getAttributeValue(null, ATTRIBUTE_NAME);
         boolean async = parseAsync(xtr);
-        String triggerable = parseTriggerable(xtr);
+        boolean triggerable = parseTriggerable(xtr);
         boolean notExclusive = parseNotExclusive(xtr);
         String defaultFlow = xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT);
         boolean isForCompensation = parseForCompensation(xtr);
@@ -129,10 +129,6 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 if (currentFlowElement instanceof ServiceTask) {
                     ServiceTask serviceTask = (ServiceTask) currentFlowElement;
                     serviceTask.setTriggerable(triggerable);
-                    if(ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(triggerable)) {
-                        serviceTask.setAsynchronous(true);
-                        serviceTask.setNotExclusive(false);
-                    }
                 }
             }
 
@@ -310,12 +306,12 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         return notExclusive;
     }
 
-    protected String parseTriggerable(XMLStreamReader xtr) {
+    protected boolean parseTriggerable(XMLStreamReader xtr) {
         String triggerable = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_TRIGGERABLE, xtr);
-        if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(triggerable) || ServiceTask.TRIGGER_SYNCHRONOUSLY.equalsIgnoreCase(triggerable)) {
-            return triggerable;
+        if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(triggerable)) {
+            return true;
         }
-        return ATTRIBUTE_VALUE_FALSE;
+        return false;
     }
 
     protected boolean parseForCompensation(XMLStreamReader xtr) {

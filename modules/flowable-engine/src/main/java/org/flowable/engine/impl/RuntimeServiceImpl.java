@@ -421,10 +421,6 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
 
     @Override
-    public void triggerAsync(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
-        commandExecutor.execute(new TriggerCmd(executionId, processVariables, transientVariables, true));
-    }
-    @Override
     public void addUserIdentityLink(String processInstanceId, String userId, String identityLinkType) {
         commandExecutor.execute(new AddIdentityLinkForProcessInstanceCmd(processInstanceId, userId, null, identityLinkType));
     }

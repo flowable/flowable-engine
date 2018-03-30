@@ -51,12 +51,6 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
         this.transientVariables = transientVariables;
     }
 
-    public TriggerCmd(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables, boolean async) {
-        this(executionId, processVariables);
-        this.transientVariables = transientVariables;
-        this.async = async;
-    }
-
     @Override
     protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
@@ -64,12 +58,12 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
             compatibilityHandler.trigger(executionId, processVariables, transientVariables);
             return null;
         }
+        
+        if (processVariables != null) {
+            execution.setVariables(processVariables);
+        }
 
         if (!async) {
-            if (processVariables != null) {
-                execution.setVariables(processVariables);
-            }
-
             if (transientVariables != null) {
                 execution.setTransientVariables(transientVariables);
             }
@@ -79,9 +73,9 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
                             null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
 
             CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
-        }
-        else {
-            CommandContextUtil.getAgenda(commandContext).planAsyncTriggerExecutionOperation(execution, processVariables, transientVariables);
+            
+        } else {
+            CommandContextUtil.getAgenda(commandContext).planAsyncTriggerExecutionOperation(execution);
         }
 
         return null;

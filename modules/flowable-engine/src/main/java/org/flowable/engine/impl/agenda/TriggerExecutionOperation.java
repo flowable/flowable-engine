@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import java.util.Map;
-
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -22,8 +20,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
-import org.flowable.engine.impl.jobexecutor.AsyncContinuationEventHandler;
-import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobService;
@@ -38,20 +35,16 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
  * @author Joram Barrez
  */
 public class TriggerExecutionOperation extends AbstractOperation {
+    
     protected boolean triggerAsync;
-    protected Map<String, Object> processVariables;
-    protected Map<String, Object> transientVariables;
 
     public TriggerExecutionOperation(CommandContext commandContext, ExecutionEntity execution) {
         super(commandContext, execution);
     }
 
-    public TriggerExecutionOperation(CommandContext commandContext, ExecutionEntity execution, boolean triggerAsync, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
+    public TriggerExecutionOperation(CommandContext commandContext, ExecutionEntity execution, boolean triggerAsync) {
         super(commandContext, execution);
         this.triggerAsync = triggerAsync;
-        this.processVariables = processVariables;
-        this.transientVariables = transientVariables;
-
     }
 
     @Override
@@ -71,16 +64,13 @@ public class TriggerExecutionOperation extends AbstractOperation {
                     ((TriggerableActivityBehavior) activityBehavior).trigger(execution, null, null);
                 }
                 else {
-                    String configuration = AsyncContinuationEventHandler.createConfiguration(processVariables, transientVariables);
-
                     JobService jobService = CommandContextUtil.getJobService();
                     JobEntity job = jobService.createJob();
                     job.setExecutionId(execution.getId());
                     job.setProcessInstanceId(execution.getProcessInstanceId());
                     job.setProcessDefinitionId(execution.getProcessDefinitionId());
-                    job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-                    job.setJobHandlerConfiguration(configuration);
-
+                    job.setJobHandlerType(AsyncTriggerJobHandler.TYPE);
+                    
                     // Inherit tenant id (if applicable)
                     if(execution.getTenantId() != null) {
                         job.setTenantId(execution.getTenantId());

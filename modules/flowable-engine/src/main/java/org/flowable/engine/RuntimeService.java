@@ -398,11 +398,6 @@ public interface RuntimeService {
     void trigger(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables);
 
     /**
-     * Similar to {@link #triggerAsync(String, Map)}, but with an extra parameter that allows to pass transient variables.
-     */
-    void triggerAsync(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables);
-
-    /**
      * Updates the business key for the provided process instance
      * 
      * @param processInstanceId
