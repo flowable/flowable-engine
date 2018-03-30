@@ -373,7 +373,7 @@ angular.module('flowableModeler')
             };
 
             var isOperatorCell = function (cellMeta) {
-                return !(cellMeta == null || cellMeta.prop == null || cellMeta.prop.endsWith("_operator") === false);
+                return !(cellMeta == null || cellMeta.prop == null || typeof cellMeta.prop !== 'string'|| cellMeta.prop.endsWith("_operator") === false);
             };
 
             var createNewInputExpression = function (inputExpression) {
@@ -710,10 +710,6 @@ angular.module('flowableModeler')
                         break;
                     default:
                         type = 'text';
-                }
-
-                if (outputExpression.complexExpression) {
-                    type = 'text';
                 }
 
                 var title = '';
@@ -1108,10 +1104,8 @@ angular.module('flowableModeler')
                 hotSettings: {
                     currentColClassName: 'currentCol',
                     stretchH: 'none'
-                },
-                complexExpression: $scope.model.selectedExpression.complexExpression
+                }
             };
-
         } else {
             $scope.popup = {
                 selectedExpressionLabel: '',
@@ -1131,8 +1125,7 @@ angular.module('flowableModeler')
                 ],
                 hotSettings: {
                     stretchH: 'none'
-                },
-                complexExpression: false
+                }
             };
         }
 
@@ -1148,8 +1141,7 @@ angular.module('flowableModeler')
                     variableId: $scope.popup.selectedExpressionNewVariableId,
                     type: $scope.popup.selectedExpressionNewVariableType,
                     label: $scope.popup.selectedExpressionLabel,
-                    entries: getEntriesValues(hotInstance.getData()),
-                    complexExpression: $scope.popup.complexExpression
+                    entries: getEntriesValues(hotInstance.getData())
                 };
                 $scope.addNewOutputExpression(newOutputExpression, $scope.model.selectedColumn + 1);
 
@@ -1158,7 +1150,6 @@ angular.module('flowableModeler')
                 $scope.model.selectedExpression.type = $scope.popup.selectedExpressionNewVariableType;
                 $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
                 $scope.model.selectedExpression.entries = getEntriesValues(hotInstance.getData());
-                $scope.model.selectedExpression.complexExpression = $scope.popup.complexExpression;
                 $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             }
 
