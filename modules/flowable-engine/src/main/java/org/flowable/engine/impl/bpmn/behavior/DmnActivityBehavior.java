@@ -135,6 +135,19 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                 }
             }
         }
+        
+        //Call custom decision table response handler if present
+        FieldExtension handlerFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_UPDATE_VARIABLE);
+        String handlerName = handlerFieldExtension.getStringValue();
+        try {
+			Class<?> handlerClass = Class.forName(handlerName);
+			DmnResponseHandler handler = (DmnResponseHandler) handlerClass.newInstance();
+			handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue);
+		} catch (ClassNotFoundException e) {
+		} catch (InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		}
+        
 
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 
@@ -145,9 +158,6 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (executionResult == null || executionResult.isEmpty()) {
             return;
         }
-        FieldExtension fieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_UPDATE_VARIABLE);
-        String updateName = fieldExtension.getStringValue();
-        ArrayList<String> updates = new ArrayList<String>();
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
         if (executionResult.size() > 1) {
@@ -164,7 +174,6 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             }
 
             execution.setVariable(decisionKey, ruleResultNode);
-            updates.add(decisionKey);
         } else {
             // single rule result
             // put on execution output id (key) and output value (value)
@@ -172,9 +181,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
             for (Map.Entry<String, Object> outputResult : ruleResult.entrySet()) {
                 execution.setVariable(outputResult.getKey(), outputResult.getValue());
-                updates.add(outputResult.getKey());
             }
         }
-        execution.setVariable(updateName, updates);
     }
 }
