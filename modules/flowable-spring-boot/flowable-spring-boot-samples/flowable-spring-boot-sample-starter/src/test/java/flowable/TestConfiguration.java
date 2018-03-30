@@ -10,33 +10,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.spring.boot;
+package flowable;
 
-import org.flowable.spring.job.service.SpringCallerRunsRejectedJobsHandler;
-import org.flowable.spring.job.service.SpringRejectedJobsHandler;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.cmmn.engine.test.FlowableCmmnRule;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.test.FlowableRule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 
 /**
- * Common configuration for engines that need the job executions setup.
- *
  * @author Filip Hrisafov
  */
 @Configuration
-public class FlowableJobConfiguration {
+public class TestConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean
-    public TaskExecutor taskExecutor() {
-        return new SimpleAsyncTaskExecutor();
+    public FlowableRule flowableProcessRule(ProcessEngine processEngine) {
+        return new FlowableRule(processEngine);
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public SpringRejectedJobsHandler springRejectedJobsHandler() {
-        return new SpringCallerRunsRejectedJobsHandler();
+    public FlowableCmmnRule flowableCmmnRule(CmmnEngine cmmnEngine) {
+        return new FlowableCmmnRule(cmmnEngine);
     }
 }

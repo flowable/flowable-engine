@@ -664,6 +664,16 @@ flowable.process.servlet.load-on-startup=-1 # Load on startup of the Process dis
 flowable.process.servlet.name=Flowable BPMN Rest API # The name of the Process servlet.
 flowable.process.servlet.path=/process-api # The context path for the Process rest servlet.
 
+# Process Async Executor
+flowable.process.async-executor-activate=true # Whether the async executor should be activated.
+flowable.process.async.executor.async-job-lock-time-in-millis=300000 # The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+flowable.process.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+flowable.process.async.executor.default-queue-size-full-wait-time-in-millis=0 # The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
+flowable.process.async.executor.default-timer-job-acquire-wait-time-in-millis=1000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+flowable.process.async.executor.max-async-jobs-due-per-acquisition=1 # ???
+flowable.process.async.executor.retry-wait-time-in-millis=500 # ???
+flowable.process.async.executor.timer-lock-time-in-millis=300000 # The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+
 
 # CMMN {sc-flowable-boot}/cmmn/FlowableCmmnProperties.java[FlowableCmmnProperties]
 flowable.cmmn.deploy-resources=true # Whether to perform deployment of resources, default is 'true'.
@@ -676,15 +686,15 @@ flowable.cmmn.servlet.load-on-startup=-1 # Load on startup of the CMMN dispatche
 flowable.cmmn.servlet.name=Flowable CMMN Rest API # The name of the CMMN servlet.
 flowable.cmmn.servlet.path=/cmmn-api # The context path for the CMMN rest servlet.
 
-# Async Executor
-flowable.async-executor-activate=true # Whether the async executor should be activated.
-flowable.async.executor.async-job-lock-time-in-millis=300000 # The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
-flowable.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
-flowable.async.executor.default-queue-size-full-wait-time-in-millis=0 # The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
-flowable.async.executor.default-timer-job-acquire-wait-time-in-millis=1000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
-flowable.async.executor.max-async-jobs-due-per-acquisition=1 # ???
-flowable.async.executor.retry-wait-time-in-millis=500 # ???
-flowable.async.executor.timer-lock-time-in-millis=300000 # The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+# CMMN Async Executor
+flowable.cmmn.async-executor-activate=true # Whether the async executor should be activated.
+flowable.cmmn.async.executor.async-job-lock-time-in-millis=300000 # The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+flowable.cmmn.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+flowable.cmmn.async.executor.default-queue-size-full-wait-time-in-millis=0 # The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
+flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis=1000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+flowable.cmmn.async.executor.max-async-jobs-due-per-acquisition=1 # ???
+flowable.cmmn.async.executor.retry-wait-time-in-millis=500 # ???
+flowable.cmmn.async.executor.timer-lock-time-in-millis=300000 # The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
 
 # Content {sc-flowable-boot}/content/FlowableContentProperties.java[FlowableContentProperties]
 flowable.content.enabled=true # Whether the content engine needs to be started.
@@ -910,6 +920,8 @@ Obviously, there is a lot about Spring Boot that hasn't been touched upon yet, l
 
 ==== Advanced Configuration
 
+===== Customizing Engine Configuration
+
 It's possible to get a hold of the engine configuration by implementing the _org.flowable.spring.boot.EngineConfigurationConfigurer<T>_ interface.
 Where _T_ is the Spring Type of the particular Engine Configuration.
 This can be useful for advanced configuration settings or simply because a property has not been exposed (yet).
@@ -932,6 +944,8 @@ By exposing an instance of this class as an _@Bean_ in the Spring Boot configura
 ====
 You can provide a custom implementation of a Flowable Service by using this. See {sc-flowable-boot}/ldap/FlowableLdapAutoConfiguration.java[FlowableLdapAutoConfiguration]
 ====
+
+===== Combining starters
 
 In case you need only a combination of the engines then you can add only the required depdenencies.
 For example to use the Process, CMMN, Form and IDM engine and use LDAP you need to add the following dependencies:
@@ -960,4 +974,40 @@ For example to use the Process, CMMN, Form and IDM engine and use LDAP you need 
 </dependency>
 ----
 
+===== Configuring Async Executors
+
+The Process and CMMN engines have dedicated `AsyncExecutor`(s) and they can be configured with the `flowable.{engine}.async.executor` property group.
+Where `engine` is either `process` or `cmmn`.
+
+The `AsyncExecutor`(s) per default share the same Spring `TaskExecutor` and `SpringRejectedJobsHandler`.
+In case you want to provide a dedicated executor for each of the engines you need define a qualified bean with `@Process` and `@Cmmn`.
+
+You can configure custom executors in the following way:
+
+[source,java,linenums]
+----
+@Configuration
+public class MyConfiguration {
+
+    @Process <1>
+    @Bean
+    public TaskExecutor processTaskExecutor() {
+        return new SimpleAsyncTaskExecutor();
+    }
+
+    @Cmmn <2>
+    @Bean
+    public TaskExecutor cmmnTaskExecutor() {
+        return new SyncTaskExecutor();
+    }
+}
+----
+<1> The Async Executor for the Process Engine would use a `SimpleAsyncTaskExecutor`
+<2> The Async Executor for the CMMN Engine would use a `SyncTaskExecutor`
+
+[IMPORTANT]
+======
+If you define a custom `TaskExecutor` bean the Flowable creation of the bean is not trigerred.
+Which means that if you define a bean qualified with `@Process` you have to define one with `@Cmmn` or `@Primary`, otherwise the Cmmn Async Executor will use the one for the Process
+======
 
