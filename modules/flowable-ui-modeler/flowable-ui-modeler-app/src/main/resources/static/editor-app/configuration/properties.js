@@ -30,6 +30,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/multiinstance-property-write-template.html"
     },
+    "flowable-processhistorylevel" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/process-historylevel-property-write-template.html"
+    },
     "flowable-ordering" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/ordering-property-write-template.html"

@@ -64,6 +64,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "process_historylevelpackage",
+    "properties" : [ {
+      "id" : "process_historylevel",
+      "type" : "flowable-processhistorylevel",
+      "title" : "Set a specific history level for this process definition",
+      "value" : "",
+      "description" : "Set a specific history level for this process definition",
+      "popular" : true
+    } ]
+  }, {
     "name" : "isexecutablepackage",
     "properties" : [ {
       "id" : "isexecutable",
@@ -291,6 +301,16 @@
       "title" : "Use local scope for result variable",
       "value" : "false",
       "description" : "Flag that marks that the used resultVariable needs to be saved as a local variable",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "servicetasktriggerablepackage",
+    "properties" : [ {
+      "id" : "servicetasktriggerable",
+      "type" : "Boolean",
+      "title" : "Set service task to be triggerable",
+      "value" : "false",
+      "description" : "Sets the service task to be triggerable",
       "popular" : true
     } ]
   }, {

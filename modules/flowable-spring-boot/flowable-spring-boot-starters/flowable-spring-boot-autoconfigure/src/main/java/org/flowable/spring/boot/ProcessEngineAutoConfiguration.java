@@ -121,6 +121,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setMailServerUseSSL(mailProperties.isUseSsl());
         conf.setMailServerUseTLS(mailProperties.isUseTls());
 
+        conf.setEnableProcessDefinitionHistoryLevel(processProperties.isEnableProcessDefinitionHistoryLevel());
         conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
 
