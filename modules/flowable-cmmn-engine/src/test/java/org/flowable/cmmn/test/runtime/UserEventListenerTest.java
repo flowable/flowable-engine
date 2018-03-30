@@ -46,7 +46,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
 
         //3 PlanItems reachable
-        assertEquals(3, cmmnRuntimeService.createPlanItemInstanceQuery().list().size());
+        assertEquals(3, cmmnRuntimeService.createPlanItemInstanceQuery().count());
 
         //1 User Event Listener
         PlanItemInstance listenerInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();

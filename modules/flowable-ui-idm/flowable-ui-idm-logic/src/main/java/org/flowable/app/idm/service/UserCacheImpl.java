@@ -26,7 +26,7 @@ import javax.annotation.PostConstruct;
 
 import org.flowable.app.idm.cache.UserCache;
 import org.flowable.app.idm.model.UserInformation;
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.spring.boot.ldap.FlowableLdapProperties;
@@ -50,7 +50,7 @@ import org.springframework.stereotype.Service;
 public class UserCacheImpl implements UserCache {
 
     @Autowired
-    protected FlowableRemoteIdmProperties properties;
+    protected FlowableCommonAppProperties properties;
 
     protected FlowableLdapProperties ldapProperties;
 
@@ -64,7 +64,7 @@ public class UserCacheImpl implements UserCache {
 
     @PostConstruct
     protected void initCache() {
-        FlowableRemoteIdmProperties.Cache cache = properties.getCacheUsers();
+        FlowableCommonAppProperties.Cache cache = properties.getCacheUsers();
         long userCacheMaxSize = cache.getMaxSize();
         long userCacheMaxAge = cache.getMaxAge();
 

@@ -1,6 +1,5 @@
-spring:
-  flowable:
-    customMybatisXMLMappers:
-      - mappers/CustomMybatisXmlMapper.xml
-    customMybatisMappers:
-      - activiti.mappers.CustomMybatisMapper
+flowable:
+  customMybatisXMLMappers:
+    - mappers/CustomMybatisXmlMapper.xml
+  customMybatisMappers:
+    - flowable.mappers.CustomMybatisMapper

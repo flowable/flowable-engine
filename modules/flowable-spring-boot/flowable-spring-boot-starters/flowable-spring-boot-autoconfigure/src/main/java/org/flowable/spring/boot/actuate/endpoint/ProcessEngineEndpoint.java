@@ -24,25 +24,24 @@ import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.springframework.boot.actuate.endpoint.AbstractEndpoint;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
 /**
  * Registers a Boot Actuator endpoint that provides information on the running process instance and renders BPMN diagrams of the deployed processes.
  *
  * @author Josh Long
  */
-@ConfigurationProperties(prefix = "endpoints.flowable")
-public class ProcessEngineEndpoint extends AbstractEndpoint<Map<String, Object>> {
+@Endpoint(id = "flowable")
+public class ProcessEngineEndpoint {
 
     private final ProcessEngine processEngine;
 
     public ProcessEngineEndpoint(ProcessEngine processEngine) {
-        super("flowable");
         this.processEngine = processEngine;
     }
 
-    @Override
+    @ReadOperation
     public Map<String, Object> invoke() {
 
         Map<String, Object> metrics = new HashMap<>();

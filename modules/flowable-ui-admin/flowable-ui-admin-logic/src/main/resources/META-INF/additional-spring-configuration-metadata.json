@@ -10,7 +10,7 @@
       }
     },
     {
-      "name": "security.encryption.credentialsIVSpec",
+      "name": "security.encryption.credentials-i-v-spec",
       "type": "java.lang.String",
       "deprecation": {
         "level": "error",
@@ -19,7 +19,7 @@
       }
     },
     {
-      "name": "security.encryption.credentialsSecretSpec",
+      "name": "security.encryption.credentials-secret-spec",
       "type": "java.lang.String",
       "deprecation": {
         "level": "error",

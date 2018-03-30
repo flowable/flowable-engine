@@ -18,14 +18,14 @@ import org.flowable.rest.conf.SecurityConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * @author Filip Hrisafov
@@ -53,7 +53,7 @@ public class FlowableRestApplication extends SpringBootServletInitializer {
 
     @Bean
     public WebMvcConfigurer swaggerDocsConfigurer() {
-        return new WebMvcConfigurerAdapter() {
+        return new WebMvcConfigurer() {
 
             @Override
             public void addViewControllers(ViewControllerRegistry registry) {
@@ -61,5 +61,10 @@ public class FlowableRestApplication extends SpringBootServletInitializer {
                 registry.addViewController("/docs/").setViewName("forward:/docs/index.html");
             }
         };
+    }
+
+    @Bean
+    public GrantedAuthorityDefaults grantedAuthorityDefaults(RestAppProperties commonAppProperties) {
+        return new GrantedAuthorityDefaults(commonAppProperties.getRolePrefix());
     }
 }

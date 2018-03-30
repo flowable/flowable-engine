@@ -38,6 +38,7 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
 
                 byte[] bytes = getJobBytes(job);
                 JsonNode historyNode = objectMapper.readTree(bytes);
+                LOGGER.debug("historyNode " + historyNode);
                 if (isAsyncHistoryJsonGroupingEnabled() && historyNode.isArray()) {
                     ArrayNode arrayNode = (ArrayNode) historyNode;
                     for (JsonNode jsonNode : arrayNode) {

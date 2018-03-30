@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="testEmbeddedStage">
+
+        <casePlanModel id="myCompletionNeutralTestPlanModel" name="My completion neutral test plan model">
+            <documentation>Contains a cascade of</documentation>
+
+            <planItem id="caseKeepAlive" definitionRef="taskA"/>
+            <planItem id="oneStage" definitionRef="stageOne"/>
+            <humanTask id="taskA"/>
+            <stage id="stageOne" name="A completion neutral stage">
+                <planItem id="embeddedStage" definitionRef="completionNeutralStage">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:completionNeutralRule/>
+                        </extensionElements>
+                    </itemControl>
+                </planItem>
+                <planItem id="completionNeutralTask" definitionRef="taskB">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:completionNeutralRule/>
+                        </extensionElements>
+                    </itemControl>
+                    <entryCriterion sentryRef="onTaskACompleteSentry"/>
+                </planItem>
+                <sentry id="onTaskACompleteSentry">
+                    <planItemOnPart sourceRef="caseKeepAlive">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <humanTask id="taskB"/>
+
+                <stage id="completionNeutralStage">
+                    <planItem id="completionNeutralTask2" definitionRef="taskC">
+                        <itemControl>
+                            <extensionElements>
+                                <flowable:completionNeutralRule/>
+                            </extensionElements>
+                        </itemControl>
+                        <entryCriterion sentryRef="onTaskACompleteSentry"/>
+                    </planItem>
+                    <planItem id="stageKeepAliveTask" definitionRef="taskD"/>
+                    <humanTask id="taskC"/>
+                    <humanTask id="taskD"/>
+                </stage>
+            </stage>
+        </casePlanModel>
+    </case>
+
+</definitions>

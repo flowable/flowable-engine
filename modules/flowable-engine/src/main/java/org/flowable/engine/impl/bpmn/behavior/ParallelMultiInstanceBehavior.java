@@ -83,7 +83,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             if (concurrentExecution.isActive() 
                     && !concurrentExecution.isEnded() 
                     && !concurrentExecution.getParent().isEnded()) {
-                executeOriginalBehavior(concurrentExecution, loopCounter);
+                executeOriginalBehavior(concurrentExecution, (ExecutionEntity) multiInstanceRootExecution, loopCounter);
             } 
         }
 

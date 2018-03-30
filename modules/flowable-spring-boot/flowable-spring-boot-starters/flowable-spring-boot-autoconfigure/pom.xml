@@ -139,8 +139,7 @@
         <!-- integration -->
         <dependency>
             <groupId>org.springframework.integration</groupId>
-            <artifactId>spring-integration-java-dsl</artifactId>
-            <version>${spring-integration-java-dsl.version}</version>
+            <artifactId>spring-integration-core</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>

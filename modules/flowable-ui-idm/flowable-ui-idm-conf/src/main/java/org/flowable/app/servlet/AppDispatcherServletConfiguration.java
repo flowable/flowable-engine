@@ -15,7 +15,7 @@ package org.flowable.app.servlet;
 import org.flowable.app.rest.idm.remote.RemoteAccountResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +28,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @Configuration
 @ComponentScan(value = { "org.flowable.app.rest.idm", "org.flowable.app.rest.exception" }, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RemoteAccountResource.class))
 @EnableAsync
-public class AppDispatcherServletConfiguration extends WebMvcRegistrationsAdapter {
+public class AppDispatcherServletConfiguration implements WebMvcRegistrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDispatcherServletConfiguration.class);
 

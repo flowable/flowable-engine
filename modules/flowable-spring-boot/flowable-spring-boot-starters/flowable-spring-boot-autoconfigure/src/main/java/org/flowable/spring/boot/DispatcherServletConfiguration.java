@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.web.MultipartProperties;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -63,9 +63,10 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     }
 
     @Bean
-    public MultipartResolver multipartResolver(MultipartProperties multipartProperties) {
+    public MultipartResolver multipartResolver() {
         PutAwareStandardServletMultiPartResolver multipartResolver = new PutAwareStandardServletMultiPartResolver();
-        multipartResolver.setResolveLazily(multipartProperties.isResolveLazily());
+        //FIXME in order to support both 1.5.x and 2.0 we can't use MultipartProperties (the package is changed)
+        //multipartResolver.setResolveLazily(multipartProperties.isResolveLazily());
         return multipartResolver;
     }
 

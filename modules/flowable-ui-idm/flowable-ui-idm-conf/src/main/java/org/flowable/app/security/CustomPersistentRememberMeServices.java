@@ -192,10 +192,13 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
             // has not been put into the token cache yet. Invalidate the token and refetch and it the new token value from the db is now returned.
 
             token = persistentTokenService.getPersistentToken(presentedSeries, true); // Note the 'true' here, which invalidates the cache before fetching
-            if (!presentedToken.equals(token.getTokenValue())) {
+            if (token != null && !presentedToken.equals(token.getTokenValue())) {
 
                 // Token doesn't match series value. Delete this session and throw an exception.
-                persistentTokenService.delete(token);
+                if (token != null) {
+                    persistentTokenService.delete(token);
+                }
+                
                 throw new CookieTheftException("Invalid remember-me token (Series/token) mismatch. Implies previous cookie theft attack.");
 
             }

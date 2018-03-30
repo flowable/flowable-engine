@@ -18,6 +18,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -38,13 +39,23 @@ public class FlowableLiquibaseEnvironmentPostProcessor implements EnvironmentPos
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if (!environment.containsProperty("liquibase.enabled")) {
+        String liquibaseProperty = getLiquibaseProperty();
+        if (!environment.containsProperty(liquibaseProperty)) {
             LOGGER.warn("Liquibase has not been explicitly enabled or disabled. Overriding default from Spring Boot from `true` to `false`. "
                 + "Flowable pulls in Liquibase, but does not use the Spring Boot configuration for it. "
-                + "If you are using it you would need to set `liquibase.enabled` to `true` by yourself");
+                + "If you are using it you would need to set `{}` to `true` by yourself", liquibaseProperty);
             Map<String, Object> source = new HashMap<>();
-            source.put("liquibase.enabled", false);
+            source.put(liquibaseProperty, false);
             environment.getPropertySources().addLast(new MapPropertySource("flowable-liquibase-override", source));
         }
+    }
+
+    protected String getLiquibaseProperty() {
+        String liquibaseProperty = "liquibase.enabled";
+        String springBootVersion = SpringBootVersion.getVersion();
+        if (springBootVersion.startsWith("2")) {
+            liquibaseProperty = "spring." + liquibaseProperty;
+        }
+        return liquibaseProperty;
     }
 }
