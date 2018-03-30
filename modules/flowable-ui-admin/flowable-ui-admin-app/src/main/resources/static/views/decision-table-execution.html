@@ -1,0 +1,119 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="execution" style="min-height: 210px;">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{execution.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEFINITION-ID"></td>
+							<td><a ng-href="#/decision-table/{{execution.decisionDefinitionId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.decisionDefinitionId}}</a></td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEPLOYMENT-ID"></td>
+							<td><a ng-href="#/decision-table-deployment/{{execution.deploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.deploymentId}}</a></td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEFINITION-KEY"></td>
+							<td>{{execution.decisionKey}}</td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEFINITION-VERSION"></td>
+							<td>{{execution.decisionVersion}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEFINITION-NAME"></td>
+							<td>{{execution.decisionName}}</td>
+							<td class="property-name" ng-if="!execution.scopeType || execution.scopeType != 'cmmn'" translate="DECISION-TABLE-EXECUTION.PROCESS-INSTANCE-ID"></td>
+							<td ng-if="!execution.scopeType || execution.scopeType != 'cmmn'"><a ng-href="#/process-instance/{{execution.instanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.instanceId}}</a></td>
+							<td class="property-name" ng-if="execution.scopeType && execution.scopeType == 'cmmn'" translate="DECISION-TABLE-EXECUTION.CASE-INSTANCE-ID"></td>
+                            <td ng-if="execution.scopeType && execution.scopeType == 'cmmn'"><a ng-href="#/case-instance/{{execution.instanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.instanceId}}</a></td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.FAILED"></td>
+							<td>{{execution.failed}}</td>
+						</tr>
+					</table>
+				</div>
+				<div class="seperator"></div>
+				<div class="property-wrapper">
+					<table>
+						<tr class="property" >
+							<td class="property-name"><span class="glyphicon glyphicon-time"></span> {{'DECISION-TABLE-EXECUTION.EXECUTION-START-TIME' | translate}}</td>
+							<td>{{execution.startTime | dateformat | empty}}</td>
+							<td class="property-name"><span class="glyphicon glyphicon-time"></span> {{'DECISION-TABLE-EXECUTION.EXECUTION-END-TIME' | translate}}</td>
+							<td>{{execution.endTime| dateformat}}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	    <div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+				<ul class="list-group">
+
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component">
+				<div class="title">
+					<h2 translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.HEADER"></h2>
+				</div>
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.HIT-POLICY"></td>
+							<td>{{auditData.hitPolicy}}</td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.STRICT-MODE"></td>
+							<td>{{auditData.strictMode == null ? 'true' : auditData.strictMode}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.RESULT"></td>
+							<td ng-if="auditData.decisionResult.length > 0"><json-formatter json="auditData.decisionResult" open="2"></json-formatter></td>
+							<td ng-if="auditData.decisionResult.length === 0">no result</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.RULE-EXECUTIONS"></td>
+							<td colspan="3"><json-formatter json="auditData.ruleExecutions"></json-formatter></td>
+						</tr>
+						<tr class="property" ng-if="auditData.failed">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.EXCEPTION-MESSAGE"></td>
+							<td colspan="3">{{auditData.exception}}</td>
+						</tr>
+						<tr class="property" ng-if="!auditData.failed">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.VALIDATION-MESSAGE"></td>
+							<td colspan="3">{{auditData.validationMessage}}</td>
+						</tr>
+					</table>
+				</div>
+				<div ng-if="auditData.inputVariables">
+					<div class="seperator"></div>
+					<div class="property-wrapper">
+						<table>
+							<tr class="property">
+								<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.INPUT-VARIABLES" colspan="4"></td>
+							</tr>
+							<tr class="property" ng-if="formattedInputVariables.length > 0" data-ng-repeat="row in formattedInputVariables">
+								<td class="property-name">{{row[0].key}} <i>({{row[0].type}})</i></td>
+								<td>{{row[0].value}}</td>
+								<td class="property-name">{{row[1].key}} <i>({{row[0].type}})</i></td>
+								<td>{{row[1].value}}</td>
+							</tr>
+							<tr class="property" ng-if="formattedInputVariables.length === 0">
+								<td colspan="4" class="property-name">no input variables</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

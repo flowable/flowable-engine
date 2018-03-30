@@ -75,6 +75,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue("resultVariable", xtr));
         }
 
+        serviceTask.setUseLocalScopeForResultVariable(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, xtr)));
+
         serviceTask.setType(serviceTaskType);
         serviceTask.setExtensionId(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_EXTENSIONID, xtr));
 
@@ -110,6 +112,10 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         }
         if (StringUtils.isNotEmpty(serviceTask.getSkipExpression())) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, serviceTask.getSkipExpression(), xtw);
+        }
+
+        if (serviceTask.isUseLocalScopeForResultVariable()) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, "true", xtw);
         }
     }
 

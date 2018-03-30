@@ -95,6 +95,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new RequiredRuleXmlConverter());
         addElementConverter(new RepetitionRuleXmlConverter());
         addElementConverter(new ManualActivationRuleXmlConverter());
+        addElementConverter(new CompletionNeutralRuleXmlConverter());
         addElementConverter(new SentryXmlConverter());
         addElementConverter(new EntryCriterionXmlConverter());
         addElementConverter(new ExitCriterionXmlConverter());
@@ -106,6 +107,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new DecisionXmlConverter());
         addElementConverter(new DecisionTaskXmlConverter());
         addElementConverter(new TimerEventListenerXmlConverter());
+        addElementConverter(new UserEventListenerXmlConverter());
         addElementConverter(new PlanItemStartTriggerXmlConverter());
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
@@ -290,7 +292,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 CaseExport.writeCase(caseModel, xtw);
 
                 Stage planModel = caseModel.getPlanModel();
-                StageExport.writeStage(planModel, xtw);
+
+                StageExport.getInstance().writePlanItemDefinition(planModel, xtw);
 
                 // end case element
                 xtw.writeEndElement();
@@ -476,7 +479,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     planItem.addEntryCriterion(criterion);
                 }
             }
-
         }
 
     }

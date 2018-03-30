@@ -12,7 +12,60 @@
 
     <dependencies>
 
-    	<dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate.validator</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-task-conf</artifactId>
         </dependency>
@@ -123,10 +176,6 @@
             <artifactId>liquibase-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
@@ -152,21 +201,12 @@
 
         <!-- COMMON dependencies -->
 		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
   			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -176,10 +216,6 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
-		<dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
 
 		<!-- JODA TIME -->
 		<dependency>
@@ -267,25 +303,30 @@
                 <includes>
                     <include>**/*</include>
                 </includes>
+                <excludes>
+                    <exclude>static/fonts/**</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/fonts/**</include>
+                </includes>
             </resource>
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>org.zeroturnaround</groupId>
-                <artifactId>jrebel-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <executions>
-                    <execution>
-                        <id>generate-rebel-xml</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludeArtifactIds>
+                        spring-boot-configuration-processor
+                    </excludeArtifactIds>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -304,43 +345,6 @@
 
         </plugins>
 
-        <pluginManagement>
-            <plugins>
-
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven
-                    build itself. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.zeroturnaround
-                                        </groupId>
-                                        <artifactId>
-                                            jrebel-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [1.1.1,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>generate</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
     <profiles>
         <profile>
@@ -357,15 +361,12 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>9999</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <com.sun.management.jmxremote.port>4001</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--com.sun.management.jmxremote.port=4001</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -383,19 +384,16 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>8080</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <datasource.driver>org.postgresql.Driver</datasource.driver>
-                                <datasource.url>jdbc:postgresql://localhost:5432/flowable</datasource.url>
-                                <datasource.username>flowable</datasource.username>
-                                <datasource.password>flowable</datasource.password>
-                                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--spring.datasource.driver-class-name=org.postgresql.Driver</argument>
+                                <argument>--spring.datasource.url=jdbc:postgresql://localhost:5432/flowable</argument>
+                                <argument>--spring.datasource.username=flowable</argument>
+                                <argument>--spring.datasource.password=flowable</argument>
+                                <argument>--com.sun.management.jmxremote.port=4000</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -413,19 +411,16 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>9999</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <datasource.driver>com.mysql.jdbc.Driver</datasource.driver>
-                                <datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</datasource.url>
-                                <datasource.username>flowable</datasource.username>
-                                <datasource.password>flowable</datasource.password>
-                                <com.sun.management.jmxremote.port>4001</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--spring.datasource.driver-class-name=com.mysql.jdbc.Driver</argument>
+                                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
+                                <argument>--spring.datasource.username=flowable</argument>
+                                <argument>--spring.datasource.password=flowable</argument>
+                                <argument>--com.sun.management.jmxremote.port=4001</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>

@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.util;
 
+import java.time.Instant;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +31,7 @@ import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
@@ -114,9 +115,12 @@ public class TimerUtil {
             // JodaTime support
             duedate = ((DateTime) dueDateValue).toDate();
 
+        } else if (dueDateValue instanceof Instant) {
+            duedate = Date.from((Instant) dueDateValue);
+            
         } else if (dueDateValue != null) {
             throw new FlowableException("Timer '" + executionEntity.getActivityId()
-                    + "' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
+                    + "' was not configured with a valid duration/time, either hand in a java.util.Date or a java.time.Instant or a org.joda.time.DateTime or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
         }
 
         if (duedate == null && dueDateString != null) {

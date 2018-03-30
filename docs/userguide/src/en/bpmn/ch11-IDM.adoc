@@ -39,11 +39,11 @@ By default, the user passwords will be saved in plain text in the IDM database t
 
 [source,xml,linenums]
 ----
-<bean id="shaEncoder"
-      class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
+<bean id="bCryptEncoder"
+      class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
       
 <bean id="passwordEncoder" class="org.flowable.idm.spring.authentication.SpringEncoder">
-    <constructor-arg ref="shaEncoder"/>
+    <constructor-arg ref="bCryptEncoder"/>
 </bean>
 
 <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">

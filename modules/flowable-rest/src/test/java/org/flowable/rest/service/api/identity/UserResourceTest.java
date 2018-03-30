@@ -22,9 +22,12 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -34,6 +37,7 @@ public class UserResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single user.
      */
+    @Test
     public void testGetUser() throws Exception {
         User savedUser = null;
         try {
@@ -67,6 +71,7 @@ public class UserResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting user.
      */
+    @Test
     public void testGetUnexistingUser() throws Exception {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER, "unexisting")), HttpStatus.SC_NOT_FOUND));
     }
@@ -74,6 +79,7 @@ public class UserResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single user.
      */
+    @Test
     public void testDeleteUser() throws Exception {
         User savedUser = null;
         try {
@@ -102,6 +108,7 @@ public class UserResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting an unexisting user.
      */
+    @Test
     public void testDeleteUnexistingUser() throws Exception {
         closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER, "unexisting")), HttpStatus.SC_NOT_FOUND));
     }
@@ -109,6 +116,7 @@ public class UserResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single user.
      */
+    @Test
     public void testUpdateUser() throws Exception {
         User savedUser = null;
         try {
@@ -156,6 +164,7 @@ public class UserResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single user passing in no fields in the json, user should remain unchanged.
      */
+    @Test
     public void testUpdateUserNoFields() throws Exception {
         User savedUser = null;
         try {
@@ -199,6 +208,7 @@ public class UserResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single user passing in no fields in the json, user should remain unchanged.
      */
+    @Test
     public void testUpdateUserNullFields() throws Exception {
         User savedUser = null;
         try {
@@ -245,6 +255,7 @@ public class UserResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating an unexisting user.
      */
+    @Test
     public void testUpdateUnexistingUser() throws Exception {
         HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER, "unexisting"));
         httpPut.setEntity(new StringEntity(objectMapper.createObjectNode().toString()));

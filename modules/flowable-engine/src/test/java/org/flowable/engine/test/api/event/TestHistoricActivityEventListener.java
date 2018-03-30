@@ -20,6 +20,7 @@ import java.util.List;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 
 /**
@@ -70,5 +71,15 @@ public class TestHistoricActivityEventListener extends AbstractFlowableEngineEve
     @Override
     public boolean isFailOnException() {
         return false;
+    }
+    
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return true;
+    }
+    
+    @Override
+    public String getOnTransaction() {
+        return TransactionState.COMMITTED.name();
     }
 }

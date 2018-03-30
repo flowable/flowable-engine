@@ -20,6 +20,10 @@ public class SpringEncoder implements PasswordEncoder {
     private org.springframework.security.authentication.encoding.PasswordEncoder encodingPasswordEncoder;
     private org.springframework.security.crypto.password.PasswordEncoder cryptoPasswordEncoder;
 
+    /**
+     * @deprecated use {@link SpringEncoder#SpringEncoder(org.springframework.security.crypto.password.PasswordEncoder)} instead
+     */
+    @Deprecated
     public SpringEncoder(org.springframework.security.authentication.encoding.PasswordEncoder passwordEncoder) {
         this.encodingPasswordEncoder = passwordEncoder;
     }

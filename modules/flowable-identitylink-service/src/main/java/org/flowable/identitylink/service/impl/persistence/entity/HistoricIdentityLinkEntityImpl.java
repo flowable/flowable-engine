@@ -32,6 +32,9 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
     protected String groupId;
     protected String taskId;
     protected String processInstanceId;
+    protected String scopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected Date createTime;
 
     public HistoricIdentityLinkEntityImpl() {
@@ -58,6 +61,18 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
 
         if (this.processInstanceId != null) {
             persistentState.put("processInstanceId", this.processInstanceId);
+        }
+        
+        if (this.scopeId != null) {
+            persistentState.put("scopeId", this.scopeId);
+        }
+        
+        if (this.scopeType!= null) {
+            persistentState.put("scopeType", this.scopeType);
+        }
+        
+        if (this.scopeDefinitionId != null) {
+            persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
         }
 
         if (this.createTime != null) {
@@ -131,6 +146,36 @@ public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision imp
     @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+    
+    @Override
+    public String getScopeId() {
+        return this.scopeId;
+    }
+    
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return this.scopeType;
+    }
+    
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return this.scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override

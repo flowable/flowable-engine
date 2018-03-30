@@ -24,6 +24,7 @@ import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GraphicInfo;
@@ -157,6 +158,15 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                 propertiesNode.put(PROPERTY_REQUIRED_RULE_CONDITION, requiredRule.getCondition());
             }
         }
+        
+        CompletionNeutralRule completionNeutralRule = planItem.getItemControl().getCompletionNeutralRule();
+        if (completionNeutralRule != null) {
+            propertiesNode.put(PROPERTY_COMPLETION_NEUTRAL_ENABLED, true);
+            
+            if (StringUtils.isNotEmpty(completionNeutralRule.getCondition())) {
+                propertiesNode.put(PROPERTY_COMPLETION_NEUTRAL_RULE_CONDITION, completionNeutralRule.getCondition());
+            }
+        }
     }
 
     public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
@@ -197,6 +207,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             handleRequiredRule(elementNode, planItem);
             handleRepetitionRule(elementNode, planItem);
             handleManualActivationRule(elementNode, planItem);
+            handleCompletionNeutralRule(elementNode, planItem);
 
             planItemDefinition.setPlanItemRef(planItem.getId());
 
@@ -268,6 +279,23 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             planItem.getItemControl().setManualActivationRule(manualActivationRule);
         }
     }
+    
+    protected void handleCompletionNeutralRule(JsonNode elementNode, PlanItem planItem) {
+        boolean completionNeutralEnabled = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_COMPLETION_NEUTRAL_ENABLED, elementNode);
+        String completionNeutralCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_COMPLETION_NEUTRAL_RULE_CONDITION, elementNode);
+        if (completionNeutralEnabled || StringUtils.isNotEmpty(completionNeutralCondition)) {
+            CompletionNeutralRule completionNeutralRule = new CompletionNeutralRule();
+            
+            if (StringUtils.isNotEmpty(completionNeutralCondition)) {
+                completionNeutralRule.setCondition(completionNeutralCondition);
+            }
+            
+            if (planItem.getItemControl() == null) {
+                planItem.setItemControl(new PlanItemControl());
+            }
+            planItem.getItemControl().setCompletionNeutralRule(completionNeutralRule);
+        }
+    }
 
     protected abstract void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel);
 
@@ -322,11 +350,18 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
     }
 
     protected void addField(String name, String propertyName, JsonNode elementNode, ServiceTask task) {
+       addField(name, propertyName, null, elementNode, task);
+    }
+    
+    protected void addField(String name, String propertyName, String defaultValue, JsonNode elementNode, ServiceTask task) {
         FieldExtension field = new FieldExtension();
         field.setFieldName(name);
         String value = CmmnJsonConverterUtil.getPropertyValueAsString(propertyName, elementNode);
         if (StringUtils.isNotEmpty(value)) {
             field.setStringValue(value);
+            task.getFieldExtensions().add(field);
+        } else if (StringUtils.isNotEmpty(defaultValue)) {
+            field.setStringValue(defaultValue);
             task.getFieldExtensions().add(field);
         }
     }

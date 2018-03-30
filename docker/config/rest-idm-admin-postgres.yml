@@ -5,10 +5,14 @@ services:
         depends_on:
             - flowable-db
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
+            - spring.datasource.driver-class-name=org.postgresql.Driver
+            - spring.datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - spring.datasource.username=flowable
+            - spring.datasource.password=flowable
+            - flowable.rest.app.admin.user-id=rest-admin
+            - flowable.rest.app.admin.password=test
+            - flowable.rest.app.admin.first-name=Rest
+            - flowable.rest.app.admin.last-name=Admin
         ports:
             - 9977:9977
         depends_on:
@@ -21,30 +25,29 @@ services:
             - flowable-idm-app
             - flowable-rest-app
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
-            - idm.app.url=http://flowable-idm-app:8080/flowable-idm
-            - idm.app.redirect.url=http://localhost:8080/flowable-idm
-            - idm.admin.user=admin
-            - idm.admin.password=test
-            - rest.process.app.host=http://flowable-rest-app
-            - rest.process.app.port=9977
-            - rest.process.app.contextroot=flowable-rest
-            - rest.process.app.restroot=service
-            - rest.dmn.app.host=http://flowable-rest-app
-            - rest.dmn.app.port=9977
-            - rest.dmn.app.contextroot=flowable-rest
-            - rest.dmn.app.restroot=dmn-api
-            - rest.form.app.host=http://flowable-rest-app
-            - rest.form.app.port=9977
-            - rest.form.app.contextroot=flowable-rest
-            - rest.form.app.restroot=form-api
-            - rest.content.app.host=http://flowable-rest-app
-            - rest.content.app.port=9977
-            - rest.content.app.contextroot=flowable-rest
-            - rest.content.app.restroot=content-api
+            - spring.datasource.driver-class-name=org.postgresql.Driver
+            - spring.datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - spring.datasource.username=flowable
+            - spring.datasource.password=flowable
+            - flowable.common.app.idm-url=http://flowable-idm-app:8080/flowable-idm
+            - flowable.common.app.idm-admin.user=admin
+            - flowable.common.app.idm-admin.password=test
+            - flowable.admin.app.server-config.process.server-address=http://flowable-rest-app
+            - flowable.admin.app.server-config.process.port=9977
+            - flowable.admin.app.server-config.process.context-root=flowable-rest
+            - flowable.admin.app.server-config.process.rest-root=service
+            - flowable.admin.app.server-config.dmn.app.server-address=http://flowable-rest-app
+            - flowable.admin.app.server-config.dmn.app.port=9977
+            - flowable.admin.app.server-config.dmn.app.context-root=flowable-rest
+            - flowable.admin.app.server-config.dmn.app.rest-root=dmn-api
+            - flowable.admin.app.server-config.form.app.server-address=http://flowable-rest-app
+            - flowable.admin.app.server-config.form.app.port=9977
+            - flowable.admin.app.server-config.form.app.context-root=flowable-rest
+            - flowable.admin.app.server-config.form.app.rest-root=form-api
+            - flowable.admin.app.server-config.content.app.server-address=http://flowable-rest-app
+            - flowable.admin.app.server-config.content.app.port=9977
+            - flowable.admin.app.server-config.content.app.context-root=flowable-rest
+            - flowable.admin.app.server-config.content.app.rest-root=content-api
         ports:
             - 9988:9988
         entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-admin.jar", "-httpPort=9988", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
@@ -53,10 +56,10 @@ services:
         depends_on:
             - flowable-db
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
+            - spring.datasource.driver-class-name=org.postgresql.Driver
+            - spring.datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - spring.datasource.username=flowable
+            - spring.datasource.password=flowable
         ports:
             - 8080:8080
         entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]

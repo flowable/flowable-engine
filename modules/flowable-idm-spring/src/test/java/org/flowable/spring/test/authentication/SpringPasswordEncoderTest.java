@@ -12,8 +12,8 @@
  */
 package org.flowable.spring.test.authentication;
 
-import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 
 import org.flowable.idm.api.IdmIdentityService;
@@ -21,7 +21,6 @@ import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.IdmEngines;
-import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.authentication.PasswordSaltImpl;
 import org.flowable.idm.spring.authentication.SpringEncoder;
 import org.flowable.idm.spring.authentication.SpringSaltProvider;
@@ -71,11 +70,11 @@ public class SpringPasswordEncoderTest {
 
         IdmEngineConfiguration defaultIdmEngineConfiguration = IdmEngines.getDefaultIdmEngine().getIdmEngineConfiguration();
 
-        assertTrue(defaultIdmEngineConfiguration.getPasswordEncoder() instanceof ClearTextPasswordEncoder);
-        assertTrue(passwordEncoder instanceof SpringEncoder);
-        assertNotNull(((SpringEncoder) passwordEncoder).getSpringEncodingProvider());
-        assertTrue(((SpringEncoder) passwordEncoder).getSpringEncodingProvider() instanceof org.springframework.security.authentication.encoding.PasswordEncoder ||
-                ((SpringEncoder) passwordEncoder).getSpringEncodingProvider() instanceof org.springframework.security.crypto.password.PasswordEncoder);
+        assertThat(defaultIdmEngineConfiguration.getPasswordEncoder())
+            .isInstanceOf(SpringEncoder.class)
+            .isEqualTo(passwordEncoder);
+        assertThat(passwordEncoder).isInstanceOfSatisfying(SpringEncoder.class,
+            encoder -> assertThat(encoder.getSpringEncodingProvider()).isInstanceOf(BCryptPasswordEncoder.class));
 
     }
 

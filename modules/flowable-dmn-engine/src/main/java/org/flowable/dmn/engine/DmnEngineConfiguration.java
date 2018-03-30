@@ -45,7 +45,11 @@ import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.dmn.engine.impl.el.FlowableAddDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableContainsAnyFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableContainsFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableCurrentDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableNotContainsAnyFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableNotContainsFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableSubtractDateFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableToDateFunctionDelegate;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
@@ -79,8 +83,8 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecision
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoricDecisionExecutionDataManager;
-import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.el.DefaultExpressionManager;
@@ -93,7 +97,7 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -388,10 +392,16 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     public void initFunctionDelegates() {
         if (this.flowableFunctionDelegates == null) {
             this.flowableFunctionDelegates = new ArrayList<>();
+            // dates
             this.flowableFunctionDelegates.add(new FlowableToDateFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableSubtractDateFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableAddDateFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableCurrentDateFunctionDelegate());
+            // collections
+            this.flowableFunctionDelegates.add(new FlowableContainsFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableNotContainsFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableContainsAnyFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableNotContainsAnyFunctionDelegate());
         }
 
         if (this.customFlowableFunctionDelegates != null) {

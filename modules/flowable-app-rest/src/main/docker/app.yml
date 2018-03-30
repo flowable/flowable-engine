@@ -5,10 +5,14 @@ services:
         depends_on:
             - flowable-rest-db
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-rest-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
+            - spring.datasource.driver-class-name=org.postgresql.Driver
+            - spring.datasource.url=jdbc:postgresql://flowable-rest-db:5432/flowable
+            - spring.datasource.username=flowable
+            - spring.datasource.password=flowable
+            - flowable.rest.app.admin.user-id=rest-admin
+            - flowable.rest.app.admin.password=test
+            - flowable.rest.app.admin.first-name=Rest
+            - flowable.rest.app.admin.last-name=Admin
         ports:
             - 8080:8080
         depends_on:

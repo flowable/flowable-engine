@@ -24,7 +24,7 @@ import org.flowable.engine.ProcessEngineLifecycleListener;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.EngineConfigurator;
+import org.flowable.engine.common.impl.EngineConfigurator;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.test.FlowableRule;

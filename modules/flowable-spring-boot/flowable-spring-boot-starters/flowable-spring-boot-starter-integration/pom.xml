@@ -17,8 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-spring-boot-starter-basic</artifactId>
-            <version>${project.version}</version>
+            <artifactId>flowable-spring-boot-starter-process</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -30,14 +29,6 @@
             <artifactId>spring-integration-amqp</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- bring in the Java configuration DSL for Spring Integration
-        -->
-        <dependency>
-            <groupId>org.springframework.integration</groupId>
-            <artifactId>spring-integration-java-dsl</artifactId>
-            <version>${spring-integration-java-dsl.version}</version>
-        </dependency>
-
 
         <dependency>
             <groupId>org.codehaus.groovy</groupId>

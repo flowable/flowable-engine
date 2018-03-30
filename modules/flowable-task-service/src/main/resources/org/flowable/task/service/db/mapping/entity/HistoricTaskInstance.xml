@@ -24,6 +24,7 @@
       insert into ${prefix}ACT_HI_TASKINST (
         ID_,
         REV_,
+        TASK_DEF_ID_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
@@ -51,6 +52,7 @@
       ) values (
         #{id ,jdbcType=VARCHAR},
         1,
+        #{taskDefinitionId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
@@ -82,6 +84,7 @@
       insert into ${prefix}ACT_HI_TASKINST (
         ID_,
         REV_,
+        TASK_DEF_ID_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
@@ -110,6 +113,7 @@
         <foreach collection="list" item="historicTask" index="index" separator=",">
           (#{historicTask.id ,jdbcType=VARCHAR},
            1,
+           #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
            #{historicTask.processDefinitionId, jdbcType=VARCHAR},
            #{historicTask.processInstanceId, jdbcType=VARCHAR},
            #{historicTask.executionId, jdbcType=VARCHAR},
@@ -143,6 +147,7 @@
           INTO ${prefix}ACT_HI_TASKINST (
             ID_,
             REV_,
+            TASK_DEF_ID_,
             PROC_DEF_ID_,
             PROC_INST_ID_,
             EXECUTION_ID_,
@@ -170,6 +175,7 @@
           ) VALUES 
             (#{historicTask.id ,jdbcType=VARCHAR},
              1, 
+             #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processInstanceId, jdbcType=VARCHAR},
              #{historicTask.executionId, jdbcType=VARCHAR},
@@ -204,6 +210,9 @@
     update ${prefix}ACT_HI_TASKINST
       <set>
       	  REV_ = #{revisionNext, jdbcType=INTEGER},
+	      <if test="originalPersistentState.taskDefinitionId != taskDefinitionId">
+	      	TASK_DEF_ID_ = #{taskDefinitionId, jdbcType=VARCHAR},
+	      </if>	
 	      <if test="originalPersistentState.processDefinitionId != processDefinitionId">
 	      	PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
 	      </if>	
@@ -290,6 +299,7 @@
   <resultMap id="historicTaskInstanceResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
+    <result property="taskDefinitionId" column="TASK_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -319,6 +329,7 @@
   <resultMap id="historicTaskAndRelatedEntitiesResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
+    <result property="taskDefinitionId" column="TASK_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -431,8 +442,8 @@
     </if>
     <if test="_databaseId == 'db2' || _databaseId == 'mssql'">
       select distinct TEMPRES_ID_ as ID_, TEMPRES_REV_ as REV_, 
-      TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_, TEMPRES_PROC_INST_ID_ as PROC_INST_ID_, TEMPRES_EXECUTION_ID_ as EXECUTION_ID_,
-      TEMPRES_NAME_ as NAME_, TEMPRES_PARENT_TASK_ID_ as PARENT_TASK_ID_,
+      TEMPRES_TASK_DEF_ID_ as TASK_DEF_ID_, TEMPRES_PROC_DEF_ID_ as PROC_DEF_ID_, TEMPRES_PROC_INST_ID_ as PROC_INST_ID_, 
+      TEMPRES_EXECUTION_ID_ as EXECUTION_ID_, TEMPRES_NAME_ as NAME_, TEMPRES_PARENT_TASK_ID_ as PARENT_TASK_ID_,
       TEMPRES_DESCRIPTION_ as DESCRIPTION_, TEMPRES_OWNER_ as OWNER_, TEMPRES_ASSIGNEE_ as ASSIGNEE_,
       TEMPRES_START_TIME_ as START_TIME_, TEMPRES_CLAIM_TIME_ as CLAIM_TIME_, TEMPRES_END_TIME_ as END_TIME_,
       TEMPRES_DURATION_ as DURATION_, TEMPRES_TASK_DEF_KEY_ as TASK_DEF_KEY_, TEMPRES_FORM_KEY_ as FORM_KEY_,
@@ -452,7 +463,8 @@
         TEMPILINK_PROC_INST_ID_ as ILINK_PROC_INST_ID_, TEMPILINK_CREATE_TIME_ as ILINK_CREATE_TIME_
       </if>
       <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
-      RES.ID_ as TEMPRES_ID_, RES.REV_ as TEMPRES_REV_, RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_, RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_,
+      RES.ID_ as TEMPRES_ID_, RES.REV_ as TEMPRES_REV_, RES.TASK_DEF_ID_ as TEMPRES_TASK_DEF_ID_,
+      RES.PROC_DEF_ID_ as TEMPRES_PROC_DEF_ID_, RES.PROC_INST_ID_ as TEMPRES_PROC_INST_ID_,
       RES.EXECUTION_ID_ as TEMPRES_EXECUTION_ID_, RES.NAME_ as TEMPRES_NAME_ , RES.PARENT_TASK_ID_ as TEMPRES_PARENT_TASK_ID_,
       RES.DESCRIPTION_ as TEMPRES_DESCRIPTION_, RES.OWNER_ as TEMPRES_OWNER_, RES.ASSIGNEE_ as TEMPRES_ASSIGNEE_,
       RES.START_TIME_ as TEMPRES_START_TIME_, RES.END_TIME_ as TEMPRES_END_TIME_, RES.CLAIM_TIME_ as TEMPRES_CLAIM_TIME_,
@@ -538,7 +550,7 @@
       <if test="orQueryObject.deploymentId != null || (orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0)">
         left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P_OR${orIndex} ON RES.PROC_DEF_ID_ = DEPLOY_P_OR${orIndex}.ID_
       </if>
-      <if test="orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentId.size() &gt; 0)">
+      <if test="orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0)">
         left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C_OR${orIndex} ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C_OR${orIndex}.ID_
       </if>
       <if test="orQueryObject.queryVariableValues.size() &gt; 0">
@@ -555,6 +567,9 @@
     <where>
       <if test="taskId != null">
         RES.ID_ = #{taskId}
+      </if>
+      <if test="taskDefinitionId != null">
+        and RES.TASK_DEF_ID_ = #{taskDefinitionId}
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
@@ -923,6 +938,9 @@
         <trim prefix="(" prefixOverrides="OR" suffix=")">
           <if test="orQueryObject.taskId != null">
             RES.ID_ = #{orQueryObject.taskId}
+          </if>
+          <if test="orQueryObject.taskDefinitionId != null">
+            or RES.TASK_DEF_ID_ = #{orQueryObject.taskDefinitionId}
           </if>
           <if test="orQueryObject.processDefinitionId != null">
             or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}

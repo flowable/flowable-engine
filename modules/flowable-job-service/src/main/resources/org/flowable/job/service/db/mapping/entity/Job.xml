@@ -175,11 +175,8 @@
         delete from ${prefix}ACT_RU_JOB where ID_ = #{id} and REV_ = #{revision}
     </delete>
 
-    <delete id="bulkDeleteJob" parameterType="java.util.Collection">
-        delete from ${prefix}ACT_RU_JOB where
-        <foreach item="job" collection="list" index="index" separator=" or ">
-            ID_ = #{job.id, jdbcType=VARCHAR}
-        </foreach>
+    <delete id="deleteJobsByExecutionId" parameterType="string">
+        delete from ${prefix}ACT_RU_JOB where PROCESS_INSTANCE_ID_ = #{id}
     </delete>
 
     <!-- JOB UPDATE STATEMENTS -->
@@ -390,6 +387,9 @@
             </if>
             <if test="originalPersistentState.retries != retries">
                 RETRIES_ = #{retries, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.createTime != createTime">
                 CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP}

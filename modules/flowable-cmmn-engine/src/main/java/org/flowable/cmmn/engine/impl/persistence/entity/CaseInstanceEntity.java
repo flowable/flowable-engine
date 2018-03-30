@@ -34,5 +34,4 @@ public interface CaseInstanceEntity extends Entity, EntityWithSentryPartInstance
     void setCallbackType(String callbackType);
     void setCompleteable(boolean completeable);
     void setTenantId(String tenantId);
-    
 }

@@ -18,16 +18,59 @@ public class ServerConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The id of the server config.
+     */
     protected String id;
+
+    /**
+     * The name of the endpoint.
+     */
     protected String name;
+
+    /**
+     * The description for the endpoint.
+     */
     protected String description;
+
+    /**
+     * The server host for the endpoint.
+     */
     protected String serverAddress;
+
+    /**
+     * The port for the endpoint.
+     */
     protected Integer port;
+
+    /**
+     * The context root under which the application where the rest endpoint is running on.
+     */
     protected String contextRoot;
+
+    /**
+     * The path for accessing the endpoint.
+     */
     protected String restRoot;
+
+    /**
+     * The username that needs to be used when accessing the endpoint.
+     */
     protected String userName;
+
+    /**
+     * The password that needs to be used when accessing the endpoint.
+     */
     protected String password;
+
+    /**
+     * The code of the endpoint. Setting this property via configuration parameters has no effect.
+     */
     protected Integer endpointType;
+
+    /**
+     * The tenant id of the endpoint.
+     */
     protected String tenantId;
 
     public String getId() {

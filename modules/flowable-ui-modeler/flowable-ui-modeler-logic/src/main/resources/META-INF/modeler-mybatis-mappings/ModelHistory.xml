@@ -4,22 +4,23 @@
 
 <mapper namespace="org.flowable.app.domain.editor.ModelHistory">
 
-	<resultMap id="modelHistoryResultMap" type="org.flowable.app.domain.editor.ModelHistory">
-		<id property="id" column="id" jdbcType="VARCHAR" />
-		<result property="name" column="name" jdbcType="VARCHAR" />
-		<result property="key" column="model_key" jdbcType="VARCHAR" />
-		<result property="description" column="description" jdbcType="VARCHAR" />
-		<result property="comment" column="model_comment" jdbcType="VARCHAR" />
-		<result property="created" column="created" jdbcType="TIMESTAMP" />
-		<result property="createdBy" column="created_by" jdbcType="VARCHAR" />
-		<result property="lastUpdated" column="last_updated" jdbcType="TIMESTAMP" />
-		<result property="lastUpdatedBy" column="last_updated_by" jdbcType="VARCHAR" />
-		<result property="version" column="version" jdbcType="INTEGER" />
-		<result property="modelEditorJson" column="model_editor_json" jdbcType="VARCHAR" />
-		<result property="modelType" column="model_type" jdbcType="INTEGER" />
-		<result property="modelId" column="model_id" jdbcType="VARCHAR" />
-		<result property="removalDate" column="removal_date" jdbcType="TIMESTAMP" />
-	</resultMap>
+    <resultMap id="modelHistoryResultMap" type="org.flowable.app.domain.editor.ModelHistory">
+        <id property="id" column="id" jdbcType="VARCHAR" />
+        <result property="name" column="name" jdbcType="VARCHAR" />
+        <result property="key" column="model_key" jdbcType="VARCHAR" />
+        <result property="description" column="description" jdbcType="VARCHAR" />
+        <result property="comment" column="model_comment" jdbcType="VARCHAR" />
+        <result property="created" column="created" jdbcType="TIMESTAMP" />
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR" />
+        <result property="lastUpdated" column="last_updated" jdbcType="TIMESTAMP" />
+        <result property="lastUpdatedBy" column="last_updated_by" jdbcType="VARCHAR" />
+        <result property="version" column="version" jdbcType="INTEGER" />
+        <result property="modelEditorJson" column="model_editor_json" jdbcType="VARCHAR" />
+        <result property="modelType" column="model_type" jdbcType="INTEGER" />
+        <result property="modelId" column="model_id" jdbcType="VARCHAR" />
+        <result property="removalDate" column="removal_date" jdbcType="TIMESTAMP" />
+        <result property="tenantId" column="tenant_id" jdbcType="VARCHAR" />
+    </resultMap>
 
     <insert id="insertModelHistory" parameterType="org.flowable.app.domain.editor.ModelHistory">
         insert into ${prefix}ACT_DE_MODEL_HISTORY (
@@ -36,7 +37,8 @@
             model_editor_json,
             model_type,
             model_id,
-            removal_date) 
+            removal_date,
+            tenant_id) 
          values (
              #{id, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -51,7 +53,8 @@
             #{modelEditorJson, jdbcType=VARCHAR},
             #{modelType, jdbcType=INTEGER},
             #{modelId, jdbcType=VARCHAR},
-            #{removalDate, jdbcType=TIMESTAMP}
+            #{removalDate, jdbcType=TIMESTAMP},
+            #{tenantId, jdbcType=VARCHAR}
           )
     </insert>
     
@@ -69,23 +72,27 @@
             version = #{version, jdbcType=INTEGER},
             model_editor_json = #{modelEditorJson, jdbcType=VARCHAR},
             model_id = #{modelId, jdbcType=VARCHAR},
-            removal_date = #{removalDate, jdbcType=TIMESTAMP}
+            removal_date = #{removalDate, jdbcType=TIMESTAMP},
+            tenant_id = #{tenantId, jdbcType=VARCHAR}
         </set>
         where id = #{id, jdbcType=VARCHAR}
     </update>
 
-	<select id="selectModelHistory" parameterType="string" resultMap="modelHistoryResultMap">
-		select * from ${prefix}ACT_DE_MODEL_HISTORY where id = #{id, jdbcType=VARCHAR}
-	</select>
-	
-	<select id="selectModelHistoryByTypeAndCreatedBy" parameterType="map" resultMap="modelHistoryResultMap">
-	   select * from ${prefix}ACT_DE_MODEL_HISTORY 
-	   where created_by = #{createdBy, jdbcType=VARCHAR}
-	   and model_type = #{modelType, jdbcType=INTEGER}
-	   and removal_date is null
-	</select>
-	
-	<select id="selectModelHistoryByModelId" parameterType="string" resultMap="modelHistoryResultMap">
+    <select id="selectModelHistory" parameterType="string" resultMap="modelHistoryResultMap">
+        select * from ${prefix}ACT_DE_MODEL_HISTORY where id = #{id, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectModelHistoryByTypeAndCreatedBy" parameterType="map" resultMap="modelHistoryResultMap">
+       select * from ${prefix}ACT_DE_MODEL_HISTORY 
+       where created_by = #{createdBy, jdbcType=VARCHAR}
+       and model_type = #{modelType, jdbcType=INTEGER}
+       and removal_date is null
+      <if test="tenantId != null">
+       and tenant_id = #{tenantId, jdbcType=VARCHAR}
+      </if>
+    </select>
+    
+    <select id="selectModelHistoryByModelId" parameterType="string" resultMap="modelHistoryResultMap">
        select * from ${prefix}ACT_DE_MODEL_HISTORY 
        where model_id = #{modelId, jdbcType=VARCHAR}
        and removal_date is null
@@ -94,5 +101,5 @@
     <delete id="deleteModelHistory" parameterType="org.flowable.app.domain.editor.ModelHistory">
         delete from ${prefix}ACT_DE_MODEL_HISTORY where id = #{id, jdbcType=VARCHAR}
     </delete>
-	
+    
 </mapper>

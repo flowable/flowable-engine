@@ -24,6 +24,7 @@ import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
@@ -44,11 +45,12 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
 
         String processInstanceId = attachment.getProcessInstanceId();
         String processDefinitionId = null;
+        ExecutionEntity processInstance = null;
         if (attachment.getProcessInstanceId() != null) {
-            ExecutionEntity process = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
-            if (process != null) {
-                processDefinitionId = process.getProcessDefinitionId();
-                if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, process.getProcessDefinitionId())) {
+            processInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
+            if (processInstance != null) {
+                processDefinitionId = processInstance.getProcessDefinitionId();
+                if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processInstance.getProcessDefinitionId())) {
                     Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
                     compatibilityHandler.deleteAttachment(attachmentId);
                     return null;
@@ -61,9 +63,14 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
         if (attachment.getContentId() != null) {
             CommandContextUtil.getByteArrayEntityManager().deleteByteArrayById(attachment.getContentId());
         }
+        
+        TaskEntity task = null;
+        if (attachment.getTaskId() != null) {
+            task = CommandContextUtil.getTaskService().getTask(attachment.getTaskId());
+        }
 
         if (attachment.getTaskId() != null) {
-            CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(attachment.getTaskId(), attachment.getProcessInstanceId(), attachment.getName(), false);
+            CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(task, processInstance, attachment.getName(), false);
         }
 
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {

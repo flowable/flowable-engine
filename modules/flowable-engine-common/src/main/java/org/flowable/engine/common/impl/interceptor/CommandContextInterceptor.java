@@ -16,8 +16,8 @@ package org.flowable.engine.common.impl.interceptor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.AbstractServiceConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,6 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         if (!config.isContextReusePossible() || commandContext == null || commandContext.getException() != null) {
             commandContext = commandContextFactory.createCommandContext(command);
             commandContext.setEngineConfigurations(engineConfigurations);
-            commandContext.setServiceConfigurations(serviceConfigurations);
             
         } else {
             LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());

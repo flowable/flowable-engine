@@ -14,10 +14,14 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -35,7 +39,8 @@ public class HistoricCaseInstanceEntityImpl extends AbstractEntity implements Hi
     protected String callbackId;
     protected String callbackType;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
-    
+    protected List<HistoricVariableInstanceEntity> queryVariables;
+
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("businessKey", businessKey);
@@ -118,5 +123,29 @@ public class HistoricCaseInstanceEntityImpl extends AbstractEntity implements Hi
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
-    
+
+    @Override
+    public Map<String, Object> getCaseVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
+                if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
+                    variables.put(variableInstance.getName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
+    @Override
+    public List<HistoricVariableInstanceEntity> getQueryVariables() {
+        if (queryVariables == null && Context.getCommandContext() != null) {
+            queryVariables = new HistoricVariableInitializingList();
+        }
+        return queryVariables;
+    }
+
+    public void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables) {
+        this.queryVariables = queryVariables;
+    }
 }

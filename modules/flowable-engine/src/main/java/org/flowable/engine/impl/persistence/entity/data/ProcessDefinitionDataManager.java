@@ -28,6 +28,10 @@ public interface ProcessDefinitionDataManager extends DataManager<ProcessDefinit
     ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey);
 
     ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId);
+    
+    ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKey(String processDefinitionKey);
+
+    ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId);
 
     void deleteProcessDefinitionsByDeploymentId(String deploymentId);
 

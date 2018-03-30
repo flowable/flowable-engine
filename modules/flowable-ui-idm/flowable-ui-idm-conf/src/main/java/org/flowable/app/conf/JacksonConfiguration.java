@@ -12,8 +12,10 @@
  */
 package org.flowable.app.conf;
 
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -24,14 +26,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @Configuration
 public class JacksonConfiguration {
 
-    @Bean()
-    public ObjectMapper objectMapper() {
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer objectMapperBuilderCustomizer() {
+        return new Jackson2ObjectMapperBuilderCustomizer() {
 
-        // To avoid instantiating and configuring the mapper everywhere
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-        return mapper;
+            @Override
+            public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
+                jacksonObjectMapperBuilder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            }
+        };
     }
-
 }

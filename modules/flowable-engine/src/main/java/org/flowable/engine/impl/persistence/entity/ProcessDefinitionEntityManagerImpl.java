@@ -52,6 +52,16 @@ public class ProcessDefinitionEntityManagerImpl extends AbstractEntityManager<Pr
     public ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
         return processDefinitionDataManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
     }
+    
+    @Override
+    public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKey(String processDefinitionKey) {
+        return processDefinitionDataManager.findLatestDerivedProcessDefinitionByKey(processDefinitionKey);
+    }
+
+    @Override
+    public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+        return processDefinitionDataManager.findLatestDerivedProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+    }
 
     @Override
     public void deleteProcessDefinitionsByDeploymentId(String deploymentId) {

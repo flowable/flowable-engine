@@ -14,14 +14,13 @@ package org.flowable.rest;
 
 import java.util.List;
 
-import org.flowable.rest.service.api.PutAwareCommonsMultipartResolver;
+import org.flowable.common.rest.multipart.PutAwareCommonsMultipartResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
@@ -41,9 +40,6 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private Environment environment;
 
     @Bean
     public SessionLocaleResolver localeResolver() {
@@ -91,5 +87,5 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer.favorPathExtension(false);
     }
-
+    
 }

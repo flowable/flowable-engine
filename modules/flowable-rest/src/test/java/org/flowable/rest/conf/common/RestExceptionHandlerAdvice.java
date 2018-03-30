@@ -12,12 +12,12 @@
  */
 package org.flowable.rest.conf.common;
 
-import org.flowable.rest.exception.ProcessExceptionHandlerAdvice;
+import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 /**
  * @author Yvo Swillens
  */
 @ControllerAdvice
-public class RestExceptionHandlerAdvice extends ProcessExceptionHandlerAdvice {
+public class RestExceptionHandlerAdvice extends BaseExceptionHandlerAdvice {
 }

@@ -82,7 +82,7 @@ public class CxfWSDLImporter implements XMLImporter {
     public void importFrom(Import theImport, String sourceSystemId) {
         this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
         try {
-            final URIResolver uriResolver = new URIResolver(sourceSystemId, theImport.getLocation());
+            final URIResolver uriResolver = this.createUriResolver(sourceSystemId, theImport);
             if (uriResolver.isResolved()) {
                 if (uriResolver.getURI() != null) {
                     this.importFrom(uriResolver.getURI().toString());
@@ -98,6 +98,10 @@ public class CxfWSDLImporter implements XMLImporter {
         } catch (final IOException e) {
             throw new UncheckedException(e);
         }
+    }
+
+    protected URIResolver createUriResolver(String sourceSystemId, Import theImport) throws IOException {
+        return new URIResolver(sourceSystemId, theImport.getLocation());
     }
 
     public void importFrom(String url) {

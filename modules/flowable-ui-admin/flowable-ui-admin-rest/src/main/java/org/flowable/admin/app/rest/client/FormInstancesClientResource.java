@@ -12,10 +12,6 @@
  */
 package org.flowable.admin.app.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +21,7 @@ import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormInstanceService;
 import org.flowable.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.app.service.exception.BadRequestException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +30,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Bassam Al-Sarori
  * @author Yvo Swillens
  */
 @RestController
+@RequestMapping("/app")
 public class FormInstancesClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormInstancesClientResource.class);
@@ -74,6 +76,22 @@ public class FormInstancesClientResource extends AbstractClientResource {
             return clientService.getFormInstances(serverConfig, bodyNode);
         } catch (FlowableServiceException e) {
             LOGGER.error("Error getting form instances for process instance id {}", processInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+    
+    @RequestMapping(value = "/rest/admin/case-form-instances/{caseInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getCaseFormInstances(@PathVariable String caseInstanceId) {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
+
+        try {
+            ObjectNode bodyNode = objectMapper.createObjectNode();
+            bodyNode.put("scopeId", caseInstanceId);
+            bodyNode.put("scopeType", ScopeTypes.CMMN);
+
+            return clientService.getFormInstances(serverConfig, bodyNode);
+        } catch (FlowableServiceException e) {
+            LOGGER.error("Error getting form instances for case instance id {}", caseInstanceId, e);
             throw new BadRequestException(e.getMessage());
         }
     }

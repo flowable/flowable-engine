@@ -13,47 +13,42 @@
 package org.flowable.cmmn.converter.export;
 
 import org.flowable.cmmn.converter.CmmnXmlConstants;
-import org.flowable.cmmn.model.CaseTask;
-import org.flowable.cmmn.model.DecisionTask;
-import org.flowable.cmmn.model.HumanTask;
-import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.ProcessTask;
-import org.flowable.cmmn.model.ServiceTask;
-import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.Task;
-import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.engine.common.api.FlowableException;
 
 import javax.xml.stream.XMLStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlanItemDefinitionExport implements CmmnXmlConstants {
+    protected static Map<String, AbstractPlanItemDefinitionExport> planItemDefinitionExporters = new HashMap<>();
+
+    static {
+        addPlanItemDefinitionExport(StageExport.getInstance());
+        addPlanItemDefinitionExport(new TaskExport());
+        addPlanItemDefinitionExport(new HumanTaskExport());
+        addPlanItemDefinitionExport(new CaseTaskExport());
+        addPlanItemDefinitionExport(new DecisionTaskExport());
+        addPlanItemDefinitionExport(new ProcessTaskExport());
+        addPlanItemDefinitionExport(new AbstractServiceTaskExport.ServiceTaskExport());
+        addPlanItemDefinitionExport(new AbstractServiceTaskExport.HttpServiceTaskExport());
+        addPlanItemDefinitionExport(new AbstractServiceTaskExport.ScriptServiceTaskExport());
+        addPlanItemDefinitionExport(new MilestoneExport());
+        addPlanItemDefinitionExport(new TimerEventListenerExport());
+        addPlanItemDefinitionExport(new UserEventListenerExport());
+    }
+
+    public static void addPlanItemDefinitionExport(AbstractPlanItemDefinitionExport exporter) {
+        planItemDefinitionExporters.put(exporter.getExportablePlanItemDefinitionClass().getCanonicalName(), exporter);
+    }
 
     public static void writePlanItemDefinition(PlanItemDefinition planItemDefinition, XMLStreamWriter xtw) throws Exception {
-        if (planItemDefinition instanceof Stage) {
-            StageExport.writeStage((Stage) planItemDefinition, xtw);
 
-        } else if (planItemDefinition instanceof HumanTask) {
-            HumanTaskExport.writeHumanTask((HumanTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof ProcessTask) {
-            ProcessTaskExport.writeProcessTask((ProcessTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof DecisionTask) {
-            DecisionTaskExport.writeDecisionTask((DecisionTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof CaseTask) {
-            CaseTaskExport.writeCaseTask((CaseTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof ServiceTask) {
-            ServiceTaskExport.writeTask((ServiceTask) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof Task) {
-            TaskExport.writeTask((Task) planItemDefinition, xtw);
-
-        } else if (planItemDefinition instanceof Milestone) {
-            MilestoneExport.writeMilestone((Milestone) planItemDefinition, xtw);
-        } else if (planItemDefinition instanceof TimerEventListener) {
-            TimerEventListenerExport.writeTimerEventListener((TimerEventListener) planItemDefinition, xtw);
+        String exporterType = planItemDefinition.getClass().getCanonicalName();
+        AbstractPlanItemDefinitionExport exporter = planItemDefinitionExporters.get(exporterType);
+        if (exporter == null) {
+            throw new FlowableException("Cannot find a PlanItemDefinitionExporter for '" + exporterType + "'");
         }
+        exporter.writePlanItemDefinition(planItemDefinition, xtw);
     }
 }

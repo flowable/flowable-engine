@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Joram Barrez
  */
 @RestController
-@RequestMapping("/rest/task-forms")
+@RequestMapping("/app/rest/task-forms")
 public class TaskFormResource {
 
     @Autowired

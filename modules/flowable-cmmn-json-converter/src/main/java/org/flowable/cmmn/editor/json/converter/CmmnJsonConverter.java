@@ -34,19 +34,7 @@ import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
-import org.flowable.cmmn.model.Association;
-import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.Case;
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.Criterion;
-import org.flowable.cmmn.model.GraphicInfo;
-import org.flowable.cmmn.model.HasEntryCriteria;
-import org.flowable.cmmn.model.HasExitCriteria;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.SentryOnPart;
-import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +72,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         TimerEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
+        UserEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         TaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
+        ScriptTaskJsonConverter.fillTypes(convertersToCmmnMap);
 
         // milestone
         MilestoneJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
@@ -102,6 +92,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
 
     static {
         DI_CIRCLES.add(STENCIL_TIMER_EVENT_LISTENER);
+        DI_CIRCLES.add(STENCIL_USER_EVENT_LISTENER);
 
         DI_RECTANGLES.add(STENCIL_TASK);
         DI_RECTANGLES.add(STENCIL_TASK_HUMAN);
@@ -288,7 +279,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CmmnModel cmmnModel = new CmmnModel();
         CmmnModelIdHelper cmmnModelIdHelper = new CmmnModelIdHelper();
 
-        
+
         cmmnModel.setTargetNamespace("http://flowable.org/cmmn"); // will be overriden later with actual value
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
@@ -327,7 +318,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         planModelStage.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, planModelShape));
         planModelStage.setDocumentation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, planModelShape));
         planModelStage.setAutoComplete(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_AUTOCOMPLETE, planModelShape));
-        
+
         String autocompleteCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_AUTOCOMPLETE_CONDITION, planModelShape);
         if (StringUtils.isNotEmpty(autocompleteCondition)) {
             planModelStage.setAutoCompleteCondition(autocompleteCondition);
@@ -477,7 +468,6 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                     PlanItemDefinition referencedPlanItemDefinition = parentStage.findPlanItemDefinition(startTriggerSourceRef);
                     timerEventListener.setTimerStartTriggerSourceRef(referencedPlanItemDefinition.getPlanItemRef());
                 }
-
             }
 
              if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {

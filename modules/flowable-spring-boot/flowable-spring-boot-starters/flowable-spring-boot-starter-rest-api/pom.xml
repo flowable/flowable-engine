@@ -48,5 +48,11 @@
         </dependency>
 
     </dependencies>
+    <distributionManagement>
+        <relocation>
+            <artifactId>flowable-spring-boot-starter-process-rest</artifactId>
+            <message>The rest API starter for the Process engine has been moved. If you want to use the API of all engines use flowable-spring-boot-starter-rest</message>
+        </relocation>
+    </distributionManagement>
 
 </project>

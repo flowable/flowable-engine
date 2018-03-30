@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Joram Barrez
  */
 @RestController
+@RequestMapping("/app")
 public class CommentsResource {
 
     @Autowired

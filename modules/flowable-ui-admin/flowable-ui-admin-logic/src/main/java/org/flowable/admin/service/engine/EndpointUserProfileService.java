@@ -13,6 +13,7 @@
 package org.flowable.admin.service.engine;
 
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.admin.properties.FlowableAdminAppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,10 @@ public class EndpointUserProfileService extends AbstractEncryptingService {
 
     @Autowired
     protected FlowableClientService clientUtil;
+
+    public EndpointUserProfileService(FlowableAdminAppProperties properties) {
+        super(properties);
+    }
 
     public String getEndpointUserTenantIdUsingEncryptedPassword(String contextRoot, String restRoot,
             String serverAddress, Integer port,

@@ -1,0 +1,210 @@
+{
+  "modelId": "519f155c-2d00-11e8-abb8-00155d018402",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "case_id": "SimpleSentry",
+    "name": "Sentry",
+    "documentation": "",
+    "case_initiatorvariablename": "",
+    "case_author": "",
+    "case_version": "",
+    "case_namespace": "http://www.flowable.org/casedef"
+  },
+  "childShapes": [
+    {
+      "resourceId": "casePlanModel",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "formkeydefinition": "",
+        "formreference": "",
+        "autocompleteenabled": "",
+        "autocompletecondition": ""
+      },
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "childShapes": [
+        {
+          "resourceId": "sid-861D1882-8B9F-41D1-A188-5454546B7945",
+          "properties": {
+            "overrideid": "taskA",
+            "name": "Task A",
+            "documentation": "",
+            "isblocking": true,
+            "isblockingexpression": "",
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": ""
+          },
+          "stencil": {
+            "id": "Task"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "sid-0A2EB8C8-0767-49E7-A36D-64ECBA7CF67E"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 120,
+              "y": 100
+            },
+            "upperLeft": {
+              "x": 20,
+              "y": 20
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "sid-8C17EB6C-D68D-4F9A-BEAD-1A7F3DB5E228",
+          "properties": {
+            "overrideid": "taskB",
+            "name": "TaskB",
+            "documentation": "",
+            "isblocking": true,
+            "isblockingexpression": "",
+            "isasync": "",
+            "isexclusive": "",
+            "requiredenabled": "",
+            "requiredrulecondition": "",
+            "repetitionenabled": "",
+            "repetitionrulecondition": "",
+            "repetitioncountervariablename": "",
+            "manualactivationenabled": "",
+            "manualactivationrulecondition": ""
+          },
+          "stencil": {
+            "id": "Task"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "sid-3A39B213-36C7-4150-A80F-D60512A594AE"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 300,
+              "y": 100
+            },
+            "upperLeft": {
+              "x": 200,
+              "y": 20
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "sid-3A39B213-36C7-4150-A80F-D60512A594AE",
+          "properties": {
+            "overrideid": "entryCriterion",
+            "name": "",
+            "documentation": "",
+            "ifpartcondition": ""
+          },
+          "stencil": {
+            "id": "EntryCriterion"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 206.661865234375,
+              "y": 71
+            },
+            "upperLeft": {
+              "x": 192.661865234375,
+              "y": 49
+            }
+          },
+          "dockers": [
+            {
+              "x": 3.5,
+              "y": 40
+            }
+          ]
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 758,
+          "y": 754
+        },
+        "upperLeft": {
+          "x": 40,
+          "y": 40
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "sid-0A2EB8C8-0767-49E7-A36D-64ECBA7CF67E",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "transitionevent": "complete"
+      },
+      "stencil": {
+        "id": "Association"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-3A39B213-36C7-4150-A80F-D60512A594AE"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 232.58396530151367,
+          "y": 100
+        },
+        "upperLeft": {
+          "x": 160.63618278503418,
+          "y": 100
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 40
+        },
+        {
+          "x": 7,
+          "y": 11
+        }
+      ],
+      "target": {
+        "resourceId": "sid-3A39B213-36C7-4150-A80F-D60512A594AE"
+      }
+    }
+  ],
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  },
+  "modelType": "model"
+}

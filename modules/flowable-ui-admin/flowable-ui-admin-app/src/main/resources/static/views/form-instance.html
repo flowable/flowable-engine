@@ -1,0 +1,75 @@
+<!-- LIST PAGE -->
+<div class="container" id="list-container">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="component" ng-show="formInstance">
+                <div class="title">
+                    <div class="pull-right">
+                        <a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+                    </div>
+                    <h2>{{formInstance.name &amp;&amp; formInstance.name +" - " || ""}}{{formInstance.id}}</h2>
+                </div>
+
+                <div class="property-wrapper">
+                    <table>
+                        <tr class="property">
+                            <td class="property-name" translate="FORM-INSTANCE.HEADER.ID"></td>
+                            <td>{{formInstance.id}}</td>
+                            <td class="property-name" translate="FORM-INSTANCE.HEADER.TASK-ID"></td>
+                            <td ng-if="formInstance.taskId"><a ng-href="#/task/{{formInstance.taskId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.taskId}}</a></td>
+                            <td ng-if="!formInstance.taskId">{{formInstance.taskId | empty}}</td>
+                        </tr>
+                        <tr class="property">
+                        	<td class="property-name" ng-if="!formInstance.scopeType || formInstance.scopeType != 'cmmn'" translate="FORM-INSTANCE.HEADER.PROCESS-ID"></td>
+                            <td ng-if="(!formInstance.scopeType || formInstance.scopeType != 'cmmn') && formInstance.processInstanceId"><a ng-href="#/process-instance/{{formInstance.processInstanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.processInstanceId}}</a></td>
+                            <td ng-if="(!formInstance.scopeType || formInstance.scopeType != 'cmmn') && !formInstance.processInstanceId">{{formInstance.processInstanceId | empty}}</td>
+                            <td class="property-name" ng-if="formInstance.scopeType && formInstance.scopeType == 'cmmn'" translate="FORM-INSTANCE.HEADER.CASE-INSTANCE-ID"></td>
+                            <td ng-if="formInstance.scopeType && formInstance.scopeType == 'cmmn' && formInstance.scopeId"><a ng-href="#/case-instance/{{formInstance.scopeId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.scopeId}}</a></td>
+                            <td ng-if="formInstance.scopeType && formInstance.scopeType == 'cmmn' && !formInstance.scopeId">{{formInstance.scopeId | empty}}</td>
+                            <td class="property-name" translate="FORM-INSTANCE.HEADER.SUBMITTED"></td>
+                            <td>{{formInstance.submittedDate | date}}</td>
+                        </tr>
+                        <tr class="property">
+                            <td class="property-name" translate="FORM-INSTANCE.HEADER.SUBMITTED-BY"></td>
+                            <td user="formInstance.submittedBy"></td>
+                            <td class="property-name" translate="FORM-INSTANCE.HEADER.FORM-DEFINITION-ID"></td>
+                            <td><a ng-href="#/form-definition/{{formInstance.formDefinitionId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formInstance.formDefinitionId}}</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="component tip-left">
+                <div class="title">
+                    <h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+                </div>
+                <ul class="list-group">
+                    <li>
+                        <!--TODO: <button type="button" class="btn btn-sm btn-default" ng-click="showFormInstance()">-->
+                            <!--<i class="glyphicon glyphicon-zoom-in"></i>{{'FORM-INSTANCE.ACTION.SHOW-FORM-INSTANCE' | translate}}-->
+                        <!--</button>-->
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <div class="component">
+                <div class="title">
+                    <h2 translate="FORM-INSTANCE.TITLE.FORM-FIELD-VALUES"></h2>
+                </div>
+                <div class="grid-wrapper grid-wrapper-compact" ng-if="formFieldValues">
+                    <div class="grid-message" ng-if="formFieldValues.size > 0">
+                        <span>{{'FORM-INSTANCE.FORM-FIELD-VALUES-MESSAGE' | translate:formFieldValues}}</span>
+                    </div>
+                    <div class="grid-message" ng-if="formFieldValues.size == 0">
+                        <span>{{'FORM-INSTANCE.FORM-FIELD-VALUES-MESSAGE' | translate}}</span>
+                    </div>
+                    <div ng-grid="gridFormFieldValues" class="gridStyle" ng-if="gridFormFieldValues && formFieldValues.data" ng-show="formFieldValues.size > 0"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

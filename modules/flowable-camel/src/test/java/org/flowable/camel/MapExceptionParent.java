@@ -14,6 +14,8 @@ package org.flowable.camel;
 
 public class MapExceptionParent extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     public MapExceptionParent(String string) {
         super(string);
     }

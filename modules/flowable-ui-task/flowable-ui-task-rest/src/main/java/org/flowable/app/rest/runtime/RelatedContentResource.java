@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Frederik Heremans
  */
 @RestController
+@RequestMapping("/app")
 public class RelatedContentResource extends AbstractRelatedContentResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedContentResource.class);

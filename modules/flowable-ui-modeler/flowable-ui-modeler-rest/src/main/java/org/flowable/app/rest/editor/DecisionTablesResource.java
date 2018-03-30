@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping("/rest/decision-table-models")
+@RequestMapping("/app/rest/decision-table-models")
 public class DecisionTablesResource {
 
     @Autowired

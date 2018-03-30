@@ -114,6 +114,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 decisionExecutionEntity.setInstanceId(executeDecisionInfo.getInstanceId());
                 decisionExecutionEntity.setExecutionId(executeDecisionInfo.getExecutionId());
                 decisionExecutionEntity.setActivityId(executeDecisionInfo.getActivityId());
+                decisionExecutionEntity.setScopeType(executeDecisionInfo.getScopeType());
                 decisionExecutionEntity.setTenantId(executeDecisionInfo.getTenantId());
 
                 Boolean failed = executionContext.getAuditContainer().isFailed();
@@ -280,6 +281,9 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             try {
                 Object resultValue = ELExpressionExecutor.executeOutputExpression(ruleClauseContainer.getOutputClause(), outputEntryExpression, expressionManager, executionContext);
                 executionVariable = ExecutionVariableFactory.getExecutionVariable(outputVariableType, resultValue);
+
+                // update execution context
+                executionContext.getStackVariables().put(outputVariableId, executionVariable);
 
                 // create result
                 if (getHitPolicyBehavior(hitPolicy) instanceof ComposeRuleResultBehavior) {

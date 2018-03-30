@@ -49,6 +49,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_PROCESS_TASK = "processTask";
     String ELEMENT_DECISION_TASK = "decisionTask";
     String ELEMENT_TIMER_EVENT_LISTENER = "timerEventListener";
+    String ELEMENT_USER_EVENT_LISTENER = "userEventListener";
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_ITEM_CONTROL = "itemControl";
     String ELEMENT_DEFAULT_CONTROL = "defaultControl";
@@ -61,10 +62,11 @@ public interface CmmnXmlConstants {
     String ELEMENT_EXTENSIONS = "extensionElements";
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
-    
+
     String ELEMENT_REQUIRED_RULE = "requiredRule";
     String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
     String ELEMENT_REPETITION_RULE = "repetitionRule";
+    String ELEMENT_COMPLETION_NEUTRAL_RULE = "completionNeutralRule";
 
     String ELEMENT_PROCESS = "process";
     String ELEMENT_DECISION = "decision";
@@ -82,10 +84,10 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
     String ATTRIBUTE_IS_ASYNCHRONOUS = "async";
     String ATTRIBUTE_IS_EXCLUSIVE = "exclusive";
-    
+
     String ATTRIBUTE_IS_AUTO_COMPLETE = "autoComplete";
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
-    
+
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
     String ATTRIBUTE_DECISION_REF = "decisionRef";
@@ -98,6 +100,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_PLAN_ITEM_START_TRIGGER = "planItemStartTrigger";
     String ATTRIBUTE_PLAN_ITEM_START_TRIGGER_SRC_REF = "sourceRef";
 
+    String ATTRIBUTE_AUTHORIZED_ROLE_REFS = "authorizedRoleRefs";
+
     String ATTRIBUTE_TYPE = "type";
 
     String ATTRIBUTE_CLASS = "class";
@@ -105,6 +109,8 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
 
     String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
+
+    String ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
 
     String ELEMENT_FIELD = "field";
     String ATTRIBUTE_FIELD_STRING = "stringValue";
@@ -120,8 +126,10 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_FORM_KEY = "formKey";
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
-    
+
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
+
+    String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

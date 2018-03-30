@@ -14,6 +14,8 @@ package org.flowable.engine.impl.history.async;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
@@ -38,10 +40,11 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
     
     @Override
     public void historyDataGenerated(List<ObjectNode> historyObjectNodes) {
-        createJobsWithHistoricalData(historyObjectNodes, Context.getCommandContext());
+        List<HistoryJobEntity> historyJobEntities = createJobsWithHistoricalData(historyObjectNodes, Context.getCommandContext());
+        processHistoryJobEntities(historyJobEntities);
     }
 
-    protected void createJobsWithHistoricalData(List<ObjectNode> historyObjectNodes, CommandContext commandContext) {
+    protected List<HistoryJobEntity> createJobsWithHistoricalData(List<ObjectNode> historyObjectNodes, CommandContext commandContext) {
         AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
         if (isAsyncHistoryJsonGroupingEnabled && historyObjectNodes.size() >= asyncHistoryJsonGroupingThreshold) {
             String jobType = isJsonGzipCompressionEnabled ? AsyncHistoryJobZippedHandler.JOB_TYPE : AsyncHistoryJobHandler.JOB_TYPE;
@@ -51,12 +54,15 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
                 arrayNode.add(historyJsonNode);
             }
             addJsonToJob(commandContext, jobEntity, arrayNode, isJsonGzipCompressionEnabled);
-            
+            return Collections.singletonList(jobEntity);
         } else {
+            List<HistoryJobEntity> historyJobEntities = new ArrayList<>(historyObjectNodes.size());
             for (ObjectNode historyJsonNode : historyObjectNodes) {
                 HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, AsyncHistoryJobHandler.JOB_TYPE);
                 addJsonToJob(commandContext, jobEntity, historyJsonNode, false);
+                historyJobEntities.add(jobEntity);
             }
+            return historyJobEntities;
             
         }
     }
@@ -94,6 +100,10 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         } catch (IOException e) {
             throw new FlowableException("Error while compressing json", e);
         }
+    }
+    
+    protected void processHistoryJobEntities(List<HistoryJobEntity> historyJobEntities) {
+        // Meant to be overidden in case something extra needs to happen with the created history job entities. 
     }
 
     public boolean isJsonGzipCompressionEnabled() {

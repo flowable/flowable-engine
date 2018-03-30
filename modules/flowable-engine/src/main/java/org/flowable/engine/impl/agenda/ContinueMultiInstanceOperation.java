@@ -44,10 +44,12 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContinueMultiInstanceOperation.class);
     
+    protected ExecutionEntity multiInstanceRootExecution;
     protected int loopCounter;
 
-    public ContinueMultiInstanceOperation(CommandContext commandContext, ExecutionEntity execution, int loopCounter) {
+    public ContinueMultiInstanceOperation(CommandContext commandContext, ExecutionEntity execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
         super(commandContext, execution);
+        this.multiInstanceRootExecution = multiInstanceRootExecution;
         this.loopCounter = loopCounter;
     }
 
@@ -119,7 +121,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         
         execution.getJobs().add(job);
         
-        jobService.setAsyncJobProperties(job, flowNode.isExclusive());
+        jobService.createAsyncJob(job, flowNode.isExclusive());
         jobService.scheduleAsyncJob(job);
     }
     
@@ -130,7 +132,11 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         }
         MultiInstanceActivityBehavior multiInstanceActivityBehavior = (MultiInstanceActivityBehavior) activityBehavior;
         String elementIndexVariable = multiInstanceActivityBehavior.getCollectionElementIndexVariable();
-        execution.setVariableLocal(elementIndexVariable, loopCounter);
+        if (!flowNode.isAsynchronous()) {
+            execution.setVariableLocal(elementIndexVariable, loopCounter);
+        } else {
+            multiInstanceRootExecution.setVariableLocal(elementIndexVariable, loopCounter);
+        }
         return activityBehavior;
     }
     

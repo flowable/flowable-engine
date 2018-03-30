@@ -659,6 +659,28 @@
       ]
     },
     {
+      "name" : "httptasksaveresponseparameterstransientpackage",
+      "properties" : [ {
+        "id" : "httptasksaveresponseparameterstransient",
+        "type" : "String",
+        "title" : "Save response as a transient variable",
+        "value" : "",
+        "description" : "Flag indicating to store the response variable(s) transient",
+        "popular" : true
+      } ]
+    }, 
+    {
+      "name" : "httptasksaveresponseasjsonpackage",
+      "properties" : [ {
+        "id" : "httptasksaveresponseasjson",
+        "type" : "String",
+        "title" : "Save response as JSON",
+        "value" : "",
+        "description" : "Flag indicating to store the response variable as a JSON variable instead of a String",
+        "popular" : true
+      } ]
+    },
+    {
     "name" : "casetaskcasereferencepackage",
     "properties" : [ {
       "id" : "casetaskcasereference",
@@ -809,6 +831,44 @@
       "popular" : true
     }]
   }, {
+    "name" : "completionneutralrulepackage",
+    "properties" : [ {
+      "id" : "completionneutralenabled",
+      "type" : "Boolean",
+      "title" : "Completion neutral",
+      "value" : "",
+      "description" : "Flag indicating if the plan item is completion neutral. False by default.",
+      "popular" : true
+    }, {
+      "id" : "completionneutralrulecondition",
+      "type" : "String",
+      "title" : "Completion neutral Rule",
+      "value" : "",
+      "description" : "An expression that is resolved to determine if the plan item is completion neutral.",
+      "popular" : true
+    }]
+  }, {
+    "name": "scriptformatpackage",
+    "properties" : [ {
+        "id": "scriptformat",
+        "type": "String",
+        "title": "Script format",
+        "value": "",
+        "description": "Script format of the script task (JavaScript, groovy, etc).",
+        "popular": true
+  } ]
+  }, {
+    "name": "scripttextpackage",
+    "properties" : [ {
+        "id": "scripttext",
+        "type": "Text",
+        "title": "Script",
+        "value": "",
+        "description": "Script text of the script task.",
+        "popular": true
+      }
+    ]
+  }, {
     "name" : "transitioneventpackage",
     "properties" : [ {
       "id" : "transitionevent",
@@ -867,7 +927,8 @@
       "autocompletepackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" 
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"
     ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "StageActivity", "all", "association_start", "association_end" ]
@@ -887,7 +948,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -911,7 +973,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" ],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -934,7 +997,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" ],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   },
@@ -957,7 +1021,8 @@
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
-        "manualactivationrulepackage"
+        "manualactivationrulepackage",
+        "completionneutralrulepackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -981,6 +1046,12 @@
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
+        "servicetaskclasspackage",
+        "asyncpackage",
+        "requiredrulepackage",
+        "repetitionrulepackage",
+        "manualactivationrulepackage",
+        "completionneutralrulepackage",
         "httptaskrequestmethodpackage",
         "httptaskrequesturlpackage",
         "httptaskrequestheaderspackage",
@@ -994,11 +1065,8 @@
         "httptasksaverequestvariablespackage",
         "httptasksaveresponseparameterspackage",
         "httptaskresultvariableprefixpackage",
-        "servicetaskclasspackage",
-        "asyncpackage",
-        "requiredrulepackage",
-        "repetitionrulepackage",
-        "manualactivationrulepackage"
+        "httptasksaveresponseparameterstransientpackage",
+        "httptasksaveresponseasjsonpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -1008,6 +1076,30 @@
         "ActivitiesMorph",
         "all"
       ]
+    }, {
+      "type" : "node",
+      "id" : "ScriptTask",
+      "title" : "Script task",
+      "description" : "An automatic task with script logic",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"scriptTask\" transform=\"translate(2,2)\">\n\t\t<path oryx:anchors=\"top left\"\n\t\t\td=\"m 5,2 0,0.094 c 0.23706,0.064 0.53189,0.1645 0.8125,0.375 0.5582,0.4186 1.05109,1.228 1.15625,2.5312 l 8.03125,0 1,0 1,0 c 0,-3 -2,-3 -2,-3 l -10,0 z M 4,3 4,13 2,13 c 0,3 2,3 2,3 l 9,0 c 0,0 2,0 2,-3 L 15,6 6,6 6,5.5 C 6,4.1111 5.5595,3.529 5.1875,3.25 4.8155,2.971 4.5,3 4.5,3 L 4,3 z\"\n     \t\tstyle=\"fill:#72a7d0;stroke:none\"\n\t\t/>\n\t</g><g id=\"required\" display=\"inherit\" stroke=\"#000000\"><g oryx:anchors=\"bottom\"><path fill=\"none\" oryx:anchors=\"bottom\" d=\"M49 67 L49 74 M49 76 L49 78\" transform=\"translate(-11,0)\"></path></g></g><g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/></g><g id=\"manualActivation\" display=\"inherit\" stroke=\"#000000\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" d=\"M45.5 68 L54 73 L45.5 77 L45.5 69z\" transform=\"translate(-2,0)\"></path></g></g></svg>",
+      "icon" : "activity/scripttask.png",
+      "groups" : [ "Activities" ],
+      "propertyPackages" : [  
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "servicetaskclasspackage",
+        "asyncpackage",
+        "requiredrulepackage",
+        "repetitionrulepackage",
+        "manualactivationrulepackage",
+        "completionneutralrulepackage",
+        "scriptformatpackage", 
+        "scripttextpackage",
+        "servicetaskresultvariablepackage"
+      ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {
     "type" : "node",
     "id" : "Milestone",
@@ -1021,7 +1113,8 @@
       "namepackage",
       "documentationpackage",
       "requiredrulepackage",
-      "repetitionrulepackage" ],
+      "repetitionrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1041,7 +1134,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1061,7 +1155,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1077,9 +1172,25 @@
       "namepackage",
       "documentationpackage",
       "timerexpressionpackage",
-      "timerstarttriggerpackage"],
+      "timerstarttriggerpackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
+  }, {
+      "type" : "node",
+      "id" : "UserEventListener",
+      "title" : "User event listener",
+      "description" : "An listener for user events",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" width=\"40\" height=\"40\" version=\"1.0\"> <defs></defs> <oryx:magnets> <oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" /> </oryx:magnets> <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /> <g pointer-events=\"fill\"> <defs> <radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"> <stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> <stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> </radialGradient> </defs> <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"black\" fill=\"url(#background) white\" stroke-width=\"1\"/> <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"black\" fill=\"none\" stroke-width=\"1\"/> <g id=\"humanTaskBlock\" transform=\"scale(0.8,0.8) translate(7.5,7)\" display=\"inherit\"> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F4F6F7\" d=\"M0.585,24.167h24.083v-7.833c0,0-2.333-3.917-7.083-5.167h-9.25 c-4.417,1.333-7.833,5.75-7.833,5.75L0.585,24.167z\"/> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:none\" d=\"M 6 20 L 6 24\" /> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:none\" d=\"M 20 20 L 20 24\" /> <circle oryx:anchors=\"top left\" fill=\"#000000\" cx=\"13.002\" cy=\"5.916\" r=\"5.417\"/> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F0EFF0\" d=\"M8.043,7.083c0,0,2.814-2.426,5.376-1.807s4.624-0.693,4.624-0.693 c0.25,1.688,0.042,3.75-1.458,5.584c0,0,1.083,0.75,1.083,1.5s0.125,1.875-1,3s-5.5,1.25-6.75,0S8.668,12.834,8.668,12 s0.583-1.25,1.25-1.917C8.835,9.5,7.419,7.708,8.043,7.083z\"/> </g> <text font-size=\"11\" id=\"text_name\" x=\"16\" y=\"33\" oryx:align=\"top center\" stroke=\"black\" ></text> </g></svg>",
+      "icon" : "event/userlistener.png",
+      "groups" : [ "Event Listeners" ],
+      "propertyPackages" : [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "completionneutralrulepackage"],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
     "type" : "node",
     "id" : "EntryCriterion",

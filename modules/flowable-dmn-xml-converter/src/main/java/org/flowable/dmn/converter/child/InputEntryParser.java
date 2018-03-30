@@ -14,9 +14,11 @@ package org.flowable.dmn.converter.child;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.flowable.dmn.converter.util.DmnXMLUtil;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnElement;
+import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.UnaryTests;
@@ -48,7 +50,18 @@ public class InputEntryParser extends BaseChildElementParser {
                 xtr.next();
                 if (xtr.isStartElement() && ELEMENT_TEXT.equalsIgnoreCase(xtr.getLocalName())) {
                     inputEntry.setText(xtr.getElementText());
-
+                } else if (xtr.isStartElement() && ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
+                    while (xtr.hasNext()) {
+                        xtr.next();
+                        if (xtr.isStartElement()) {
+                            DmnExtensionElement extensionElement = DmnXMLUtil.parseExtensionElement(xtr);
+                            inputEntry.addExtensionElement(extensionElement);
+                        } else if (xtr.isEndElement()) {
+                            if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
+                                break;
+                            }
+                        }
+                    }
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithInputEntry = true;
                 }

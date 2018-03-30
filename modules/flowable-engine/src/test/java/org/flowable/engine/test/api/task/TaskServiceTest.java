@@ -13,8 +13,7 @@
 
 package org.flowable.engine.test.api.task;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -24,11 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.util.CollectionUtil;
@@ -1731,11 +1730,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.setVariableLocal(currentTask.getId(), "variable1", "value1");
 
-        catchException(taskService).getVariableLocal(currentTask.getId(), "variable1", Boolean.class);
-
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> taskService.getVariableLocal(currentTask.getId(), "variable1", Boolean.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
@@ -1770,11 +1766,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.setVariable(currentTask.getId(), "variable1", "value1");
 
-        catchException(taskService).getVariable(currentTask.getId(), "variable1", Boolean.class);
-
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> taskService.getVariable(currentTask.getId(), "variable1", Boolean.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     public void testClaimTime() {

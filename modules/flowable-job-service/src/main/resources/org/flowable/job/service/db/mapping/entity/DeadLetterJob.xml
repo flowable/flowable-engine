@@ -30,6 +30,10 @@
     <delete id="deleteDeadLetterJob" parameterType="org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl">
         delete from ${prefix}ACT_RU_DEADLETTER_JOB where ID_ = #{id} and REV_ = #{revision}
     </delete>
+    
+    <delete id="deleteDeadLetterJobsByExecutionId" parameterType="string">
+        delete from ${prefix}ACT_RU_DEADLETTER_JOB where PROCESS_INSTANCE_ID_ = #{id}
+    </delete>
 
     <select id="selectDeadLetterJob" parameterType="string" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_DEADLETTER_JOB where ID_ = #{id, jdbcType=VARCHAR}
@@ -302,5 +306,26 @@
         ) AS tempTask
 
         )
+    </update>
+    
+    <update id="updateDeadLetterJob" parameterType="org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl">
+        update ${prefix}ACT_RU_JOB
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.retries != retries">
+                RETRIES_ = #{retries, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
+                EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            </if>
+            <if test="originalPersistentState.exceptionMessage != exceptionMessage">
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
+            </if>
+        </set>
+        where ID_= #{id, jdbcType=VARCHAR}
+        and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 </mapper>

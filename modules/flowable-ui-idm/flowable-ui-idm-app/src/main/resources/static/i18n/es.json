@@ -1,0 +1,272 @@
+{
+   "GENERAL": {
+        "MAIN-TITLE": "Flowable",
+        "ERROR": {
+            "GENERIC": "Lo sentimos un error ha ocurrido...",
+            "UNKNOWN": "Lo sentimos un error ha ocurrido mientras se realizaba la operacion solicitada.",
+            "BAD_REQUEST": "Un error ha ocurrido mientras se realizaba la operacion solicitada",
+            "NOT_FOUND": "El recurso al que intentas acceder no existe",
+            "UNAUTHORIZED": "Debes iniciar sesion para poder realizar la operacion seleccionada.",
+            "FORBIDDEN": "La operacion que deseas realizar no esta permitida",
+            "INTERNAL_SERVER_ERROR": "Lo sentimos, ocurrio un error inesperado mientras se realizaba la accion seleccionada."
+        },
+        "ACTION": {
+            "LOGOUT": "Salir",
+            "HELP": "Empezando",
+            "EDIT-PROFILE": "Editar perfil",
+            "SAVE": "Guardar",
+            "CANCEL": "Cancelar",
+            "CLOSE": "Cerrar",
+            "DEPLOY": "Desplegar",
+            "ABOUT": "Acerca de Flowable"
+        },
+        "MESSAGE": {
+            "SELECT-PEOPLE-HELP": "Usa &flecha arriba ; and &flecha abajo; para seleccionar y presiona Enter para confirmar",
+            "SELECT-GROUP-HELP": "Usa &flecha arriba ; and &flecha abajo; para seleccionar y presiona Enter para confirmar",
+            "SELECT-GROUP-SEARCH-PLACEHOLDER": "Buscar Grupo",
+            "SELECT-GROUP-NO-MATCHING-RESULTS": "Usa el campo buscar de arriba para encontrar Grupos"
+        },
+        "TITLE": {
+            "MATCHING-PEOPLE": "Personas parecidas",
+            "SELECT-GROUP": "Seleccionar Grupo",
+            "MATCHING-GROUPS": "Grupos parecidos"
+        }
+    },
+    "LOGIN": {
+        "TITLE": "Iniciar sesion",
+        "USERNAME": "Usuario",
+        "USERNAME-PLACEHOLDER": "Introduce tu usuario",
+        "PASSWORD": "Password",
+        "PASSWORD-PLACEHOLDER": "Introduce tu password",
+        "INVALID-CREDENTIALS": "Datos invalidos",
+        "ACTION": {
+            "CONFIRM": "Iniciar sesion"
+        }
+    },
+    "ACCOUNT": {
+        "ACTIVATE": {
+          "TITLE": "Activar cuenta",
+          "ACTIVATING-MESSAGE": "Por favor espera {{userFullName}} estamos activando tu cuenta...",
+          "SUCCESS-MESSAGE": "Tu cuenta ha sido activada. Por favor inicia sesion para comenzar a diseñar y correr procesos",
+          "FAILURE-MESSAGE": "Tu cuenta no puede ser activada, esto puede ser por que ya se ha activado o el link de activacion ha expirado"
+        },
+
+        "RESET-PASSWORD-REQUEST": {
+          "MESSAGE": "Olvidaste tu password? Proporciona tu Email para resetear tu password.",
+          "TITLE": "Resetear password",
+          "EMAIL": "Direccion de email",
+          "EMAIL-PLACEHOLDER": "Introduce tu email",
+          "SECURITY-SECTION": "Validacion de seguridad",
+          "CONFIRM": "Pedir reset de password",
+          "SUCCESS-MESSAGE": "Recibiras un email para resetear tu password.",
+          "ERROR": {
+              "UNEXISTING-USER": "No existe un usuario con el email proporcionado."
+          }
+        },
+
+        "RESET-PASSWORD": {
+          "TITLE": "Reset password",
+          "PASSWORD": "Password",
+          "PASSWORD-CONFIRM": "Confirmar password",
+          "PASSWORD-PLACEHOLDER": "Introduce un nuevo password",
+          "PASSWORD-CONFIRM-PLACEHOLDER": "Confirmar nuevo password",
+          "CONFIRM": "Cambiar password",
+          "LOADING": "Reseteando password...",
+          "SUCCESS-MESSAGE": "Tu password ha cambiado.",
+          "LOGIN": "Iniciar sesion ahora",
+          "FAILURE-MESSAGE": "Tu password no puede ser reseteado. El link para resetearlo es invalido o ha expirado"
+        }
+    },
+    "IDM": {
+      "GENERAL" : {
+        "MAIN-TITLE": "Flowable - Identity Management",
+        "NAVIGATION": {
+            "PROFILE": "Personal",
+            "USER-MGMT": "Usuarios",
+            "GROUP-MGMT": "Grupos",
+            "PRIVILEGE-MGMT": "Privilegios"
+        },
+        "ACTION": {
+          "CANCEL": "Cancelar",
+          "CREATE": "Crear",
+          "SAVE": "Guardar",
+          "CLOSE": "Cerrar",
+          "LOGOUT": "Salir",
+          "ABOUT": "Acerca de Flowable"
+        },
+        "ERROR": {
+            "GENERIC": "Lo sentimos ocurrio un error...",
+            "UNKNOWN": "Lo sentimos ocurrio un error mientras solucionabamos la operacion selecionada.",
+            "BAD_REQUEST": "Ocurrio un error mientras solucionabamos la operacion selecionada",
+            "NOT_FOUND": "El recurso al que intentas accesar no existe",
+            "UNAUTHORIZED": "Debes iniciar sesion para poder realizar la accion seleccionada",
+            "FORBIDDEN": "No puedes realizar la accion seleccionada",
+            "INTERNAL_SERVER_ERROR": "Lo sentimos ocurrio un error mientras solucionabamos la operacion selecionada."
+        }
+      },
+      "USER-MGMT": {
+        "TITLE": "Usuarios parecidos",
+         "CREATE-USER": "Crear usuario",
+         "NAME-SEARCH": "Buscar por nombre",
+         "COMPANY": "Compania",
+         "STATUS": "Estatus",
+         "ACCOUNT": "Tipo de cuenta",
+         "ACTIONS": "Seleciona una accion",
+         "CHANGE-STATUS": "Cambiar estatus",
+         "CHANGE-ACCOUNT-TYPE": "Cambiar tipo de cuenta",
+         "CHANGE-PASSWORD": "Cambiar password",
+         "EDIT-USER": "Cambiar detalles",
+         "DELETE-USERS": "Borrar",
+         "TOTAL-USERS": "total",
+         "INACTIVE-USERS": "inactivo",
+         "ENTERPRISE-USERS": "empresa",
+         "ACTIVE-USERS": "activo",
+         "DELETED-USERS": "eliminado",
+         "ORDER-BY": "Ordenar por",
+         "SHOW-NEXT": "Mostrar siguiente",
+         "SHOW-PREVIOUS": "Mostrar anterior",
+         "NO-MATCHING-USERS": "No se encontraron usuarios parecidos",
+         "MATCHING-USERS": "Se encontraron {{total | number}} usuarios parecidos, mostrando de {{start + 1}} a {{start + size}}",
+         "ID": "Identificador",
+         "EMAIL": "Email",
+         "NAME": "Nombre",
+         "CREATED": "Creado",
+         "TYPE": "Tipo",
+         "EXTERNAL-ID": "Identificador externo",
+         "LAST-SYNC-TIME": "Ultima actualizacion",
+         "FILTERS": {
+             "STATUS-ANY": "Cualquier estatus",
+             "STATUS-ACTIVE": "Activo",
+             "STATUS-INACTIVE": "Inactivo",
+             "STATUS-PENDING": "Pendiente",
+             "STATUS-DELETED": "Eliminado",
+             "TYPE-ANY": "Cualquier tipo",
+             "SORT-DATE-NEWEST": "Fecha de creacion, mas nueva",
+             "SORT-DATE-OLDEST": "Fecha de creacion, mas vieja",
+             "SORT-EMAIL-A": "Email, A-Z",
+             "SORT-EMAIL-Z": "Email, Z-A",
+             "SORT-ID-A": "Identificador de usuario, A-Z",
+             "SORT-ID-Z": "Identificador de usuario, Z-A"
+         },
+         "POPUP": {
+             "CREATE-TITLE": "Crear usuario",
+             "EDIT-TITLE": "Editar detalles de usuario",
+             "CREATE-ID": "Identificador de usuario",
+             "CREATE-EMAIL": "Email",
+             "CREATE-INVALID-EMAIL": "Invalido",
+             "CREATE-PASSWORD": "Password",
+             "CREATE-FIRSTNAME": "Nombre",
+             "CREATE-LASTNAME": "Apellidos",
+             "CREATE-TENANT": "Tenant",
+             "CREATE-COMPANY": "Compañia",
+             "CREATE-STATUS": "Estatus",
+             "CREATE-TYPE": "Tipo",
+             "BULK-UPDATE-TITLE": "Actualizacion masiva de usuarios",
+             "BULK-UPDATE-NEW-STATUS": "Nuevo estatus:",
+             "BULK-UPDATE-NEW-TYPE": "Nuevo tipo de cuenta:",
+             "BULK-UPDATE-EMAIL-NOTIFICATIONS": "Enviar notificaciones por email de cambio de estatus",
+             "BULK-UPDATE-STATUS-USERS": "Estas apunto de actualizar el estatus de los siguientes {{length}} usuarios:",
+             "BULK-UPDATE-TYPE-USERS": "Estas apunto de actualizar el tipo de cuenta de los siguientes {{length}} usuarios:",
+             "BULK-UPDATE-CANCEL": "Cancelar y cerrar",
+             "BULK-UPDATE-CONFIRM": "Actualizar usuarios",
+             "BULK-UPDATE-PASSWORD-TITLE": "Cambiar password",
+             "BULK-UPDATE-PASSWORD": "Password",
+             "BULK-UPDATE-PASSWORD-REPEAT": "Repetir password",
+             "BULK-UPDATE-PASSWORD-CONFIRM": "Cambiar"
+         }
+      },
+      "FUNCTIONAL-GROUP-MGMT": {
+        "CREATE": "Crear grupo",
+        "NO-GROUPS": "No se encontraron grupos",
+        "NO-SELECTION": "Selecciona un grupo de la lista de la izquierda",
+        "SYNC-DETAILS": "Detalles de sincronizacion",
+        "EXTERNAL-ID": "Identificador externo:",
+        "LAST-SYNC-TIME": "Ultima actualizacion:",
+        "MEMBERS": "Miembros del grupo",
+        "SUBGROUPS": "Subgrupos",
+        "NO-MEMBERS": "No se encontraron usuarios",
+        "ADD-USER": "+ agregar usuario",
+        "ADD-SUBGROUP": "+ agregar subgrupo",
+        "NO-SUBGROUPS": "No se encontraron subgrupos",
+        "USER-ADDED": "Los usuarios se agregaron al grupo",
+        "INACTIVE": "desactivado",
+        "INACTIVE-DESCRIPTION": "Este grupo ha sido desactivado. Los usuarios aun podran completar las tareas asignadas a este grupo, pero las nuevas definiciones de proceso no podran utilizar mas este grupo.",
+        "ADD-POPOVER-TITLE": "Seleccionar usuario",
+            "POPUP": {
+                "CREATE-TITLE": "Crear grupo",
+                "CREATE-ID": "Grupo identificador",
+                "CREATE-NAME": "Nombre",
+                "DELETE-TITLE": "Borrar grupo",
+                "DELETE-DESCRIPTION": "Estas seguro que deseas borrar este grupo?",
+                "DELETE-CONFIRM": "Confirmar",
+                "DEACTIVATE-TITLE": "Desactivar grupo",
+                "DEACTIVATE-DESCRIPTION": "Estas seguro que deseas borrar este grupo? Esto borrara tambien todos los subgrupos. El grupo primero sera desactivado, para que las tareas del proceso puedan ser completadas correctamente. Dando click en el boton remover por segunda vez, eliminara el grupo permanentemente.",
+                "DELETE-MEMBER-TITLE": "Borrar miembro del grupo",
+                "DELETE-MEMBER-DESCRIPTION": "Estas seguro que deseas borrar este usuario del grupo?",
+                "ADD-MEMBER-TITLE": "Agregar usuario",
+                "ADD-MEMBER-NO-USERS": "No se encontraron usuarios",
+                "ADD-MEMBER-CONFIRM": "Agregar ({{selectedUsers.length}})",
+                "ACTIVATE-TITLE": "Activar grupo",
+                "ACTIVATE-DESCRIPTION": "Activar este grupo nuevamente? EDIT-PROFILEsto significa que este grupo estara disponible para la asignacion de tareas. Por default los subgrupos de un grupo no estan activos.",
+                "ACTIVATE-CONFIRM": "Activar",
+                "EDIT-TITLE": "Editar grupo"
+            }
+        },
+      "PRIVILEGE-MGMT": {
+          "access-idm": "Acceso a la App de gestion de identidad",
+          "access-admin": "Acceso a la App de administrador",
+          "access-modeler": "Acceso a la App de modelador",
+          "access-task": "Acceso a la App de workflow",
+          "access-rest-api": "Acceso a la REST API",
+          "NO-SELECTION": "No se seleccionaron privilegios",
+          "USERS": "Usuarios",
+          "GROUPS": "Grupos",
+          "NO-USERS": "Aun no se agregaron usuarios. Click aqui para agregar un usuario.",
+          "NO-GROUPS": "Aun no se han agregado grupos. Click aqui para agregar un grupo.",
+          "ADD-USER": "Agregar un usuario",
+          "ADD-GROUP": "Agregar un grupo",
+          "POPOVER-SELECT-USER-TITLE": "Usuario seleccionado",
+          "POPOVER-SELECT-GROUP-TITLE": "Grupo seleccionado",
+          "GROUP-ID": "Identificador de grupo",
+          "GROUP-NAME": "Nombre de grupo"
+      },
+      "PROFILE-MGMT": {
+         "CREATED": "Registrado desde",
+         "CHANGE-PASSWORD": "Cambiar password",
+         "DETAILS": "Detalles",
+         "DETAILS-DESCRIPTION": "Click en cualquiera de los campos debajo para cambiar sus valores",
+         "FIRST-NAME": "Nombre",
+         "NOTHING-SET": "Nada fijado",
+         "LAST-NAME": "Apellido",
+         "EMAIL": "Email",
+         "COMPANY": "Compania",
+         "GROUPS": "Tus grupos",
+         "POPUP": {
+            "UPLOAD-PICTURE-TITLE": "Cambiar imagen",
+            "UPLOAD-PICTURE-DESCRIPTION": "Por favor selecciona una imagen de tu PC o arrastrala en la zona debajo.",
+            "UPLOAD-PICTURE-CANCEL-UPLOAD": "Cancelar carga",
+            "UPLOAD-PICTURE-DROPZONE": "Arrastra un archivo de imagen de tu logo aqui",
+            "UPLOAD-PICTURE-NO-DROP": "Arastre no soportado por tu navegador",
+            "UPLOAD-PICTURE-ERROR": "Error",
+            "CHANGE-PASSWORD-TITLE": "Cambiar password",
+            "CHANGE-PASSWORD-ORIGINAL": "Original password",
+            "CHANGE-PASSWORD-NEW-PASSWORD": "Nuevo password",
+            "CHANGE-PASSWORD-NEW-PASSWORD2": "Repetir nuevo password",
+            "CHANGE-PASSWORD-CONFIRM": "Confirmar",
+            "CHANGE-PASSWORD-NOT-MATCHING": "Los passwords no coinciden",
+            "CHANGE-PASSWORD-INVALID": "Password invalido"
+         }
+      },
+      "USERS": {
+        "TITLE": "Administracion de usuarios",
+        "ACTION": {
+          "CREATE": "Crear usuario"
+        }
+      }
+    },
+    "INVOLVE-PEOPLE": {
+        "ACTION-SELECT": "Seleccionar",
+        "SEARCH-PLACEHOLDER": "Buscar por nombre",
+        "NO-MATCHING-RESULTS": "Usa el campo de busqueda de arriba para encontrar usuarios"
+    }
+}

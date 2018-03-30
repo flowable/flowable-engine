@@ -29,7 +29,8 @@ public class CommandContextUtil {
     
     public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
         if (commandContext != null) {
-            return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+            return (VariableServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                            .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
         }
         return null;
     }

@@ -21,8 +21,8 @@ import org.flowable.app.idm.model.UserInformation;
 import org.flowable.app.idm.service.UserService;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
+import org.flowable.spring.boot.ldap.FlowableLdapProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,8 +45,8 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Autowired
     protected UserService userService;
 
-    @Autowired
-    protected Environment environment;
+    @Autowired(required = false)
+    protected FlowableLdapProperties ldapProperties;
 
     protected long userValidityPeriod;
 
@@ -61,7 +61,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         String actualLogin = login;
         User userFromDatabase = null;
 
-        if (!environment.getProperty("ldap.enabled", Boolean.class, false)) {
+        if (ldapProperties == null || !ldapProperties.isEnabled()) {
             actualLogin = login.toLowerCase();
             userFromDatabase = identityService.createUserQuery().userIdIgnoreCase(actualLogin).singleResult();
 

@@ -36,7 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author jbarrez
  */
 @RestController
-@RequestMapping("/rest/admin/deployments")
+@RequestMapping("/app/rest/admin/deployments")
 public class DeploymentsClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeploymentsClientResource.class);

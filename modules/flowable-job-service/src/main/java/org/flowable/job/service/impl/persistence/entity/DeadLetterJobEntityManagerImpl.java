@@ -21,15 +21,11 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLetterJobEntity> implements DeadLetterJobEntityManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeadLetterJobEntityManagerImpl.class);
 
     protected DeadLetterJobDataManager jobDataManager;
 
@@ -41,6 +37,11 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
     @Override
     public List<DeadLetterJobEntity> findJobsByExecutionId(String id) {
         return jobDataManager.findJobsByExecutionId(id);
+    }
+    
+    @Override
+    public List<DeadLetterJobEntity> findJobsByProcessInstanceId(String id) {
+        return jobDataManager.findJobsByProcessInstanceId(id);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
             getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
-
+    
     protected DeadLetterJobEntity createDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity newJobEntity = create();
         newJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());

@@ -129,7 +129,7 @@ Example database configuration:
 <property name="jdbcPassword" value="" />
 ----
 
-Our benchmarks have shown that the MyBatis connection pool is not the most efficient or resilient when dealing with a lot of concurrent requests. As such, it is advised to us a +javax.sql.DataSource+ implementation and inject it into the process engine configuration (For example DBCP, C3P0, Hikari, Tomcat Connection Pool, etc.):
+Our benchmarks have shown that the MyBatis connection pool is not the most efficient or resilient when dealing with a lot of concurrent requests. As such, it is advised to us a +javax.sql.DataSource+ implementation and inject it into the process engine configuration (For example HikariCP, Tomcat JDBC Connection Pool, etc.):
 
 [source,xml,linenums]
 ----
@@ -202,7 +202,7 @@ If using Tomcat, the JNDI resource is configured within $CATALINA_BASE/conf/[eng
 
 To configure a JNDI data source, use following properties in the properties file for the Flowable UI:
 
-* datasource.jndi.name: the JNDI name of the data source.
+* spring.datasource.jndi-name=: the JNDI name of the data source.
 * datasource.jndi.resourceRef: Set whether the lookup occurs in a J2EE container, for example, the prefix "java:comp/env/" needs to be added if the JNDI name doesn't already contain it. Default is "true".
 
 

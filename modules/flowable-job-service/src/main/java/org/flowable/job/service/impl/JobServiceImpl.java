@@ -55,7 +55,17 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     public List<JobEntity> findJobsByExecutionId(String executionId) {
         return getJobEntityManager().findJobsByExecutionId(executionId);
     }
-
+    
+    @Override
+    public List<SuspendedJobEntity> findSuspendedJobsByExecutionId(String executionId) {
+        return getSuspendedJobEntityManager().findJobsByExecutionId(executionId);
+    }
+    
+    @Override
+    public List<DeadLetterJobEntity> findDeadLetterJobsByExecutionId(String executionId) {
+        return getDeadLetterJobEntityManager().findJobsByExecutionId(executionId);
+    }
+    
     @Override
     public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
         return getJobEntityManager().findJobsByProcessInstanceId(processInstanceId);
@@ -64,6 +74,11 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     @Override
     public List<SuspendedJobEntity> findSuspendedJobsByProcessInstanceId(String processInstanceId) {
         return getSuspendedJobEntityManager().findJobsByProcessInstanceId(processInstanceId);
+    }
+    
+    @Override
+    public List<DeadLetterJobEntity> findDeadLetterJobsByProcessInstanceId(String processInstanceId) {
+        return getDeadLetterJobEntityManager().findJobsByProcessInstanceId(processInstanceId);
     }
     
     @Override
@@ -100,8 +115,8 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     }
     
     @Override
-    public void setAsyncJobProperties(JobEntity job, boolean isExclusive) {
-        getJobManager().setAsyncJobProperties(job, isExclusive);
+    public void createAsyncJob(JobEntity job, boolean isExclusive) {
+        getJobManager().createAsyncJob(job, isExclusive);
     }
 
     @Override
@@ -169,4 +184,5 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
             }
         }
     }
+    
 }

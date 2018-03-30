@@ -24,10 +24,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.service.api.UserCache;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,12 +40,13 @@ import org.springframework.stereotype.Service;
  *
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 @Service
 public class UserCacheImpl implements UserCache {
 
     @Autowired
-    protected Environment environment;
+    protected FlowableCommonAppProperties properties;
 
     @Autowired
     protected RemoteIdmService remoteIdmService;
@@ -54,11 +55,12 @@ public class UserCacheImpl implements UserCache {
 
     @PostConstruct
     protected void initCache() {
-        Long userCacheMaxSize = environment.getProperty("cache.users.max.size", Long.class);
-        Long userCacheMaxAge = environment.getProperty("cache.users.max.age", Long.class);
+        FlowableCommonAppProperties.Cache cache = properties.getCacheUsers();
+        long userCacheMaxSize = cache.getMaxSize();
+        long userCacheMaxAge = cache.getMaxAge();
 
-        userCache = CacheBuilder.newBuilder().maximumSize(userCacheMaxSize != null ? userCacheMaxSize : 2048)
-                .expireAfterAccess(userCacheMaxAge != null ? userCacheMaxAge : (24 * 60 * 60), TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
+        userCache = CacheBuilder.newBuilder().maximumSize(userCacheMaxSize)
+            .expireAfterAccess(userCacheMaxAge, TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
 
                     public CachedUser load(final String userId) throws Exception {
                         User user = remoteIdmService.getUser(userId);

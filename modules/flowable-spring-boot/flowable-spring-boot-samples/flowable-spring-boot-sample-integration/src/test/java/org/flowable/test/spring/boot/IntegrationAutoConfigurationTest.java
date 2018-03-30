@@ -11,7 +11,8 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.spring.boot.DataSourceProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.integration.FlowableInboundGateway;
 import org.flowable.spring.integration.IntegrationActivityBehavior;
 import org.junit.Assert;
@@ -26,7 +27,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.support.GenericHandler;
+import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.support.MessageBuilder;
 
 /**
@@ -118,7 +119,8 @@ public class IntegrationAutoConfigurationTest {
 
     @Configuration
     @Import({ DataSourceAutoConfiguration.class,
-            DataSourceProcessEngineAutoConfiguration.DataSourceProcessEngineConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class,
             IntegrationAutoConfiguration.class })
     public static class BaseConfiguration {
 

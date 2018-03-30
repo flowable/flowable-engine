@@ -87,6 +87,8 @@ public class HttpServiceTaskTestServer {
             contextHandler.setContextPath("/");
             contextHandler.addServlet(new ServletHolder(new HttpServiceTaskTestServlet()), "/api/*");
             contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskTestServlet()), "/test");
+            contextHandler.addServlet(new ServletHolder(new HelloServlet()), "/hello");
+            contextHandler.addServlet(new ServletHolder(new ArrayResponseServlet()), "/array-response");
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
@@ -249,6 +251,40 @@ public class HttpServiceTaskTestServer {
 
             resp.getWriter().println(responseNode);
         }
+    }
+    
+    private static class HelloServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private ObjectMapper objectMapper = new ObjectMapper();
+        
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setStatus(200);
+            resp.setContentType("application/json");
+            
+            JsonNode body = objectMapper.readTree(req.getInputStream());
+            String name = body.get("name").asText();
+
+            ObjectNode responseNode = objectMapper.createObjectNode();
+            responseNode.put("result", "Hello " + name);
+            resp.getWriter().println(responseNode);
+        }
+
+    }
+    
+    private static class ArrayResponseServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setStatus(200);
+            resp.setContentType("application/json");
+            resp.getWriter().println("{ \"total\": 3, \"data\": [ { \"name\" : \"abc\"}, { \"name\" : \"def\"}, { \"name\" : \"ghi\"} ] }");
+        }
+
     }
 
     public static void setUp() {

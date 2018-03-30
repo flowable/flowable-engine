@@ -170,6 +170,16 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
     public String getKey() {
         return null;
     }
+    
+    @Override
+    public String getDerivedFrom() {
+        return null;
+    }
+
+    @Override
+    public String getDerivedFromRoot() {
+        return null;
+    }
 
     @Override
     public String getEngineVersion() {

@@ -12,6 +12,10 @@
  */
 package org.flowable.rest.service;
 
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -33,7 +37,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -45,6 +48,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.server.Server;
+import org.flowable.common.rest.util.RestUrlBuilder;
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -60,7 +65,6 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -68,15 +72,18 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.rest.conf.ApplicationConfiguration;
-import org.flowable.rest.service.api.RestUrlBuilder;
 import org.flowable.rest.util.TestServerUtil;
 import org.flowable.rest.util.TestServerUtil.TestServer;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -86,49 +93,71 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import junit.framework.AssertionFailedError;
 
-public class BaseSpringRestTestCase extends AbstractTestCase {
+public class BaseSpringRestTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
-
+    
     protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
             "ACT_GE_PROPERTY",
             "ACT_ID_PROPERTY");
-
-    protected static String SERVER_URL_PREFIX;
+    
+    @Rule 
+    public TestName testName = new TestName();
+    
+    protected static String SERVER_URL_PREFIX = "";
     protected static RestUrlBuilder URL_BUILDER;
 
-    protected static Server server;
-    protected static ApplicationContext appContext;
     protected ObjectMapper objectMapper = new ObjectMapper();
-
-    protected static ProcessEngine processEngine;
 
     protected String deploymentId;
     protected Throwable exception;
 
-    protected static ProcessEngineConfigurationImpl processEngineConfiguration;
-    protected static RepositoryService repositoryService;
-    protected static RuntimeService runtimeService;
-    protected static TaskService taskService;
-    protected static FormService formService;
-    protected static HistoryService historyService;
-    protected static IdentityService identityService;
-    protected static ManagementService managementService;
+    protected static ProcessEngine processEngine;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected RepositoryService repositoryService;
+    protected RuntimeService runtimeService;
+    protected TaskService taskService;
+    protected FormService formService;
+    protected HistoryService historyService;
+    protected IdentityService identityService;
+    protected ManagementService managementService;
+    protected DynamicBpmnService dynamicBpmnService;
 
     protected static CloseableHttpClient client;
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
 
     protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
-
-    static {
-
-        TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
-        server = testServer.getServer();
-        appContext = testServer.getApplicationContext();
-        SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
-        URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
-
-        // Lookup services
+    
+    protected static Server server;
+    
+    protected static Class<?> configurationClass;
+    protected static AnnotationConfigWebApplicationContext appContext;
+    
+    @Before
+    public void init() throws Exception {
+        
+        if (configurationClass != null && !configurationClass.equals(getConfigurationClass())) {
+            if (appContext != null) {
+                appContext.close();
+            }
+            if (server != null && server.isRunning()) {
+                try {
+                    server.stop();
+                    server = null;
+                } catch (Exception e) {
+                    LOGGER.error("Error stopping server", e);
+                    throw e;
+                }
+            }
+        }
+        
+        if (configurationClass == null || appContext == null || !configurationClass.equals(getConfigurationClass())) {
+            appContext = new AnnotationConfigWebApplicationContext();
+            appContext.register(getConfigurationClass());
+            appContext.refresh();
+            configurationClass = getConfigurationClass();
+        }
+        
         processEngine = appContext.getBean("processEngine", ProcessEngine.class);
         processEngineConfiguration = appContext.getBean(ProcessEngineConfigurationImpl.class);
         repositoryService = appContext.getBean(RepositoryService.class);
@@ -138,8 +167,32 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
         historyService = appContext.getBean(HistoryService.class);
         identityService = appContext.getBean(IdentityService.class);
         managementService = appContext.getBean(ManagementService.class);
+        dynamicBpmnService = appContext.getBean(DynamicBpmnService.class);
+        
+        if (server == null) {
+            TestServer testServer = TestServerUtil.createAndStartServer(appContext);
+            server = testServer.getServer();
+            SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
+            URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
+        }
+        
+        createHttpClient();
+        createUsers();
+        
+        deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), testName.getMethodName());
+    }
+    
+    protected Class<?> getConfigurationClass() {
+        return ApplicationConfiguration.class;
+    }
 
-        // Create http client for all tests
+    protected void createHttpClient() {
+        
+        if (client != null) {
+            return;
+        }
+        
+        // Create Http client for all tests
         CredentialsProvider provider = new BasicCredentialsProvider();
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
         provider.setCredentials(AuthScope.ANY, credentials);
@@ -150,7 +203,6 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
 
             @Override
             public void run() {
-
                 if (client != null) {
                     try {
                         client.close();
@@ -158,7 +210,6 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
                         LOGGER.error("Could not close http client", e);
                     }
                 }
-
                 if (server != null && server.isRunning()) {
                     try {
                         server.stop();
@@ -169,37 +220,33 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
             }
         });
     }
-
-    @Override
-    public void runBare() throws Throwable {
-        createUsers();
-
+    
+    @After
+    public void cleanup() throws Throwable {
         try {
-
-            deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
-
-            super.runBare();
+            TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), testName.getMethodName());
 
         } catch (AssertionFailedError e) {
-            LOGGER.error(EMPTY_LINE);
+            LOGGER.error(System.lineSeparator());
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
             throw e;
 
         } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
+            LOGGER.error(System.lineSeparator());
             LOGGER.error("EXCEPTION: {}", e, e);
             exception = e;
             throw e;
 
         } finally {
-            TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
+            TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), testName.getMethodName());
             dropUsers();
             assertAndEnsureCleanDb();
             processEngineConfiguration.getClock().reset();
             closeHttpConnections();
         }
     }
+
 
     protected void createUsers() {
         User user = identityService.newUser("kermit");
@@ -226,6 +273,10 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
      * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
      */
     public CloseableHttpResponse executeBinaryRequest(HttpUriRequest request, int expectedStatusCode) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
         return internalExecuteRequest(request, expectedStatusCode, false);
     }
 
@@ -249,10 +300,8 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
             httpResponses.add(response);
             return response;
 
-        } catch (ClientProtocolException e) {
-            Assert.fail(e.getMessage());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage(), e);
         }
         return null;
     }
@@ -262,7 +311,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
             try {
                 response.close();
             } catch (IOException e) {
-                fail("Could not close http connection");
+                fail("Could not close http connection", e);
             }
         }
     }
@@ -294,7 +343,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
         }
         if (outputMessage.length() > 0) {
             outputMessage.insert(0, "DB NOT CLEAN: \n");
-            LOGGER.error(EMPTY_LINE);
+            LOGGER.error(System.lineSeparator());
             LOGGER.error(outputMessage.toString());
 
             LOGGER.info("dropping and recreating db");
@@ -313,10 +362,10 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
             if (exception != null) {
                 throw exception;
             } else {
-                Assert.fail(outputMessage.toString());
+                fail(outputMessage.toString());
             }
         } else {
-            LOGGER.info("database was clean");
+            LOGGER.debug("database was clean");
         }
     }
 

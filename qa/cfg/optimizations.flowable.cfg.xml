@@ -39,6 +39,7 @@
       </map>
     </property>
     
+    <property name="enableProcessDefinitionHistoryLevel" value="true" />
     <property name="enableProcessDefinitionInfoCache" value="true" />
     
     <!-- OPTIMIZATION FLAGS -->

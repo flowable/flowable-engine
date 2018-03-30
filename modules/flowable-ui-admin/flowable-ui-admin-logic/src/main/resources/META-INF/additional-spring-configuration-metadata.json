@@ -1,0 +1,391 @@
+{
+  "properties": [
+    {
+      "name": "datasource.prefix",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.data-source-prefix"
+      }
+    },
+    {
+      "name": "security.encryption.credentials-i-v-spec",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.security.encryption.credentials-i-v-spec"
+      }
+    },
+    {
+      "name": "security.encryption.credentials-secret-spec",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.security.encryption.credentials-secret-spec"
+      }
+    },
+    {
+      "name": "rest.process.app.name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.process.name"
+      }
+    },
+    {
+      "name": "rest.process.app.description",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.process.description"
+      }
+    },
+    {
+      "name": "rest.process.app.host",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.process.server-address"
+      }
+    },
+    {
+      "name": "rest.process.app.port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.process.prot"
+      }
+    },
+    {
+      "name": "rest.process.app.contextroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.process.context-root"
+      }
+    },
+    {
+      "name": "rest.process.app.restroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.process.rest-root"
+      }
+    },
+    {
+      "name": "rest.process.app.user",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.process.user-name"
+      }
+    },
+    {
+      "name": "rest.process.app.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.process.password"
+      }
+    },
+    {
+      "name": "rest.cmmn.app.name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.cmmn.name"
+      }
+    },
+    {
+      "name": "rest.cmmn.app.description",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.cmmn.description"
+      }
+    },
+    {
+      "name": "rest.cmmn.app.host",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.cmmn.server-address"
+      }
+    },
+    {
+      "name": "rest.cmmn.app.port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.cmmn.prot"
+      }
+    },
+    {
+      "name": "rest.cmmn.app.contextroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.cmmn.context-root"
+      }
+    },
+    {
+      "name": "rest.cmmn.app.restroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.cmmn.rest-root"
+      }
+    },
+    {
+      "name": "rest.cmmn.app.user",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.cmmn.user-name"
+      }
+    },
+    {
+      "name": "rest.cmmn.app.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.cmmn.password"
+      }
+    },
+    {
+      "name": "rest.dmn.app.name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.dmn.name"
+      }
+    },
+    {
+      "name": "rest.dmn.app.description",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.dmn.description"
+      }
+    },
+    {
+      "name": "rest.dmn.app.host",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.dmn.server-address"
+      }
+    },
+    {
+      "name": "rest.dmn.app.port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.dmn.prot"
+      }
+    },
+    {
+      "name": "rest.dmn.app.contextroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.dmn.context-root"
+      }
+    },
+    {
+      "name": "rest.dmn.app.restroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.dmn.rest-root"
+      }
+    },
+    {
+      "name": "rest.dmn.app.user",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.dmn.user-name"
+      }
+    },
+    {
+      "name": "rest.dmn.app.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.dmn.password"
+      }
+    },
+    {
+      "name": "rest.form.app.name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.form.name"
+      }
+    },
+    {
+      "name": "rest.form.app.description",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.form.description"
+      }
+    },
+    {
+      "name": "rest.form.app.host",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.form.server-address"
+      }
+    },
+    {
+      "name": "rest.form.app.port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.form.prot"
+      }
+    },
+    {
+      "name": "rest.form.app.contextroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.form.context-root"
+      }
+    },
+    {
+      "name": "rest.form.app.restroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.form.rest-root"
+      }
+    },
+    {
+      "name": "rest.form.app.user",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.form.user-name"
+      }
+    },
+    {
+      "name": "rest.form.app.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.form.password"
+      }
+    },
+    {
+      "name": "rest.content.app.name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.content.name"
+      }
+    },
+    {
+      "name": "rest.content.app.description",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.content.description"
+      }
+    },
+    {
+      "name": "rest.content.app.host",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.content.server-address"
+      }
+    },
+    {
+      "name": "rest.content.app.port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.content.prot"
+      }
+    },
+    {
+      "name": "rest.content.app.contextroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.content.context-root"
+      }
+    },
+    {
+      "name": "rest.content.app.restroot",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.content.rest-root"
+      }
+    },
+    {
+      "name": "rest.content.app.user",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.content.user-name"
+      }
+    },
+    {
+      "name": "rest.content.app.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Admin App Auto Configuration properties.",
+        "replacement": "flowable.admin.app.server-config.content.password"
+      }
+    }
+  ]
+}

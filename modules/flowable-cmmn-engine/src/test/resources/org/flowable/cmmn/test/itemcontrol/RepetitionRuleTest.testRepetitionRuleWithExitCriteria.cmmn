@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testRepetitionRuleWithExitCriteria" name="testRepetitionRuleWithExitCriteria">
+        <casePlanModel id="casePlanModel">
+
+            <planItem id="planItemStage" name="Stage One" definitionRef="stage1"/>
+
+            <stage id="stage1" name="Stage One">
+
+                <planItem id="planItemTaskA" name="Task A" definitionRef="taskA">
+                    <itemControl>
+                        <repetitionRule>
+                            <condition><![CDATA[${whileTrue}]]></condition>
+                        </repetitionRule>
+                    </itemControl>
+                    <exitCriterion sentryRef="onTaskBComplete"/>
+                </planItem>
+
+                <planItem id="planItemTaskB" name="Task B" definitionRef="taskB"/>
+
+                <sentry id="onTaskBComplete">
+                    <planItemOnPart sourceRef="planItemTaskB">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <humanTask id="taskA" name="Task A"/>
+                <humanTask id="taskB" name="Task B"/>
+
+            </stage>
+
+        </casePlanModel>
+    </case>
+</definitions>

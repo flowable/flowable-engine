@@ -20,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 /**
  * Utility class for Spring Security.
  */
-public final class SecurityUtils {
+public class SecurityUtils {
 
     private static User assumeUser;
 

@@ -13,8 +13,8 @@
 
 package org.flowable.engine.common.impl.db;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.query.Query.NullHandlingOnOrder;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.query.QueryProperty;
 
 /**

@@ -12,8 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
@@ -33,6 +37,7 @@ import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.el.ExpressionManager;
@@ -43,17 +48,17 @@ import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Joram Barrez
@@ -78,6 +83,10 @@ public class CommandContextUtil {
     public static CmmnRuntimeService getCmmnRuntimeService() {
         return getCmmnEngineConfiguration().getCmmnRuntimeService();
     }
+    
+    public static CmmnTaskService getCmmnTaskService() {
+        return getCmmnEngineConfiguration().getCmmnTaskService();
+    }
 
     public static ExpressionManager getExpressionManager() {
         return getExpressionManager(getCommandContext());
@@ -85,6 +94,14 @@ public class CommandContextUtil {
 
     public static ExpressionManager getExpressionManager(CommandContext commandContext) {
         return getCmmnEngineConfiguration(commandContext).getExpressionManager();
+    }
+    
+    public static FlowableEventDispatcher getEventDispatcher() {
+        return getEventDispatcher(getCommandContext());
+    }
+    
+    public static FlowableEventDispatcher getEventDispatcher(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getEventDispatcher();
     }
 
     public static CmmnHistoryManager getCmmnHistoryManager() {
@@ -201,7 +218,7 @@ public class CommandContextUtil {
         return historicVariableService;
     }
 
-// FORM ENGINE
+    // FORM ENGINE
 
     public static FormEngineConfigurationApi getFormEngineConfiguration() {
         return getFormEngineConfiguration(getCommandContext());
@@ -260,13 +277,34 @@ public class CommandContextUtil {
 
         return contentService;
     }
+    
+    // IDM ENGINE
+
+    public static IdmEngineConfiguration getIdmEngineConfiguration() {
+        return getIdmEngineConfiguration(getCommandContext());
+    }
+
+    public static IdmEngineConfiguration getIdmEngineConfiguration(CommandContext commandContext) {
+        return (IdmEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    }
+
+    public static IdmIdentityService getIdmIdentityService() {
+        IdmIdentityService identityService = null;
+        IdmEngineConfiguration idmEngineConfiguration = getIdmEngineConfiguration();
+        if (idmEngineConfiguration != null) {
+            identityService = idmEngineConfiguration.getIdmIdentityService();
+        }
+
+        return identityService;
+    }
 
     public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
         return getIdentityLinkServiceConfiguration(getCommandContext());
     }
 
     public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
-        return (IdentityLinkServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+        return (IdentityLinkServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
     }
 
     public static IdentityLinkService getIdentityLinkService() {
@@ -276,13 +314,22 @@ public class CommandContextUtil {
     public static IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
         return getIdentityLinkServiceConfiguration(commandContext).getIdentityLinkService();
     }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService() {
+        return getHistoricIdentityLinkService(getCommandContext());
+    }
+
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService(CommandContext commandContext) {
+        return getIdentityLinkServiceConfiguration(commandContext).getHistoricIdentityLinkService();
+    }
 
     public static VariableServiceConfiguration getVariableServiceConfiguration() {
         return getVariableServiceConfiguration(getCommandContext());
     }
 
     public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
-        return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+        return (VariableServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
     }
 
     public static TaskService getTaskService() {
@@ -306,7 +353,8 @@ public class CommandContextUtil {
     }
 
     public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
-        return (TaskServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        return (TaskServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
     }
 
     public static CmmnEngineAgenda getAgenda() {

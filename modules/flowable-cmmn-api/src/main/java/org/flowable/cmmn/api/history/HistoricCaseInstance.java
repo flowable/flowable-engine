@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.history;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -31,5 +32,6 @@ public interface HistoricCaseInstance {
     String getCallbackId();
     String getCallbackType();
     String getTenantId();
-    
+
+    Map<String, Object> getCaseVariables();
 }

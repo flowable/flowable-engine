@@ -58,7 +58,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 TaskHelper.changeTaskAssignee(task, userId);
             }
             
-            CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(taskId, userId, IdentityLinkType.ASSIGNEE, true);
+            CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(task, userId, IdentityLinkType.ASSIGNEE, true);
             
         } else {
             if (task.getAssignee() != null) {
@@ -70,7 +70,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 // Task should be assigned to no one
                 TaskHelper.changeTaskAssignee(task, null);
                 
-                CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(taskId, oldAssigneeId, IdentityLinkType.ASSIGNEE, true, true);
+                CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(task, oldAssigneeId, IdentityLinkType.ASSIGNEE, true, true);
             }
         }
 

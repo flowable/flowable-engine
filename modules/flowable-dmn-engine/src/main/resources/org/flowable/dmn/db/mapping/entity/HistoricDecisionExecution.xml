@@ -8,7 +8,7 @@
 
   <insert id="insertHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
     insert into ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
-    	ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_)
+    	ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_, SCOPE_TYPE_)
     values (#{id, jdbcType=VARCHAR},
             #{decisionDefinitionId, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
@@ -19,12 +19,13 @@
             #{activityId, jdbcType=VARCHAR},
             #{failed, jdbcType=BOOLEAN},
             #{tenantId, jdbcType=VARCHAR},
-            #{executionJson, jdbcType=VARCHAR})
+            #{executionJson, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR})
   </insert>
   
   <insert id="bulkInsertHistoricDecisionExecution" parameterType="java.util.List">
     insert into ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
-        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_)
+        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_, SCOPE_TYPE_)
     values
     <foreach collection="list" item="historicDecisionExecution" index="index" separator=",">
         (#{historicDecisionExecution.id, jdbcType=VARCHAR},
@@ -37,7 +38,8 @@
          #{historicDecisionExecution.activityId, jdbcType=VARCHAR},
          #{historicDecisionExecution.failed, jdbcType=BOOLEAN},
          #{historicDecisionExecution.tenantId, jdbcType=VARCHAR},
-         #{historicDecisionExecution.executionJson, jdbcType=VARCHAR})
+         #{historicDecisionExecution.executionJson, jdbcType=VARCHAR},
+         #{historicDecisionExecution.scopeType, jdbcType=VARCHAR})
     </foreach>
   </insert>
   
@@ -45,7 +47,7 @@
     INSERT ALL
     <foreach collection="list" item="historicDecisionExecution" index="index">
      INTO ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
-        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_) VALUES
+        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_, SCOPE_TYPE_) VALUES
         values
             (#{historicDecisionExecution.id, jdbcType=VARCHAR},
              #{historicDecisionExecution.decisionDefinitionId, jdbcType=VARCHAR},
@@ -57,7 +59,8 @@
              #{historicDecisionExecution.activityId, jdbcType=VARCHAR},
              #{historicDecisionExecution.failed, jdbcType=BOOLEAN},
              #{historicDecisionExecution.tenantId, jdbcType=VARCHAR},
-             #{historicDecisionExecution.executionJson, jdbcType=VARCHAR})
+             #{historicDecisionExecution.executionJson, jdbcType=VARCHAR},
+             #{historicDecisionExecution.scopeType, jdbcType=VARCHAR})
     </foreach>
     SELECT * FROM dual   
   </insert>
@@ -89,6 +92,7 @@
     <result property="failed" column="FAILED_" jdbcType="BOOLEAN"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="executionJson" column="EXECUTION_JSON_" jdbcType="VARCHAR" />
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
     <result property="decisionKey" column="DEC_DEF_KEY_" jdbcType="VARCHAR"/>
     <result property="decisionName" column="DEC_DEF_NAME_" jdbcType="VARCHAR"/>
     <result property="decisionVersion" column="DEC_DEF_VERSION_" jdbcType="VARCHAR"/>
@@ -143,6 +147,9 @@
       </if>
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="scopeType != null">
+        and RES.SCOPE_TYPE_ = #{scopeType}
       </if>
       <if test="failed != null">
         and RES.FAILED_ = #{failed}

@@ -90,10 +90,15 @@ public class CommandContextUtil {
     }
     
     public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
-        return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+        return (VariableServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
     }
     
     public static VariableService getVariableService() {
+        return getVariableService(getCommandContext());
+    }
+    
+    public static VariableService getVariableService(CommandContext commandContext) {
         VariableService variableService = null;
         VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
         if (variableServiceConfiguration != null) {
@@ -119,12 +124,17 @@ public class CommandContextUtil {
     }
     
     public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
-        return (IdentityLinkServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+        return (IdentityLinkServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
     }
     
     public static IdentityLinkService getIdentityLinkService() {
+        return getIdentityLinkService(getCommandContext());
+    }
+    
+    public static IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
         IdentityLinkService identityLinkService = null;
-        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration();
+        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration(commandContext);
         if (identityLinkServiceConfiguration != null) {
             identityLinkService = identityLinkServiceConfiguration.getIdentityLinkService();
         }
@@ -148,7 +158,8 @@ public class CommandContextUtil {
     }
     
     public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
-        return (TaskServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        return (TaskServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
     }
     
     public static TaskService getTaskService() {
@@ -180,7 +191,8 @@ public class CommandContextUtil {
     }
     
     public static JobServiceConfiguration getJobServiceConfiguration(CommandContext commandContext) {
-        return (JobServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+        return (JobServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
     }
     
     public static JobService getJobService() {

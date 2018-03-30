@@ -15,9 +15,9 @@ package org.flowable.engine.common.impl.query;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.BaseNativeQuery;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.query.NativeQuery;
+import org.flowable.engine.common.impl.BaseNativeQuery;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;

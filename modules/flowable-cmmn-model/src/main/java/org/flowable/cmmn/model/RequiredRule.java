@@ -16,5 +16,8 @@ package org.flowable.cmmn.model;
  * @author Joram Barrez
  */
 public class RequiredRule extends PlanItemRule {
-    
+    @Override
+    public String toString() {
+        return "RequiredRule{} " + super.toString();
+    }
 }

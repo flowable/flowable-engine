@@ -15,13 +15,21 @@ package org.flowable.app.conf;
 import java.util.Collections;
 
 import org.flowable.app.filter.FlowableCookieFilter;
+import org.flowable.app.properties.FlowableModelerAppProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
+import org.flowable.app.properties.FlowableRestAppProperties;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.app.security.RemoteIdmAuthenticationProvider;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.info.InfoEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -38,6 +46,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
  * 
  * @author Joram Barrez
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 @Configuration
 @EnableWebSecurity
@@ -51,8 +60,8 @@ public class SecurityConfiguration {
     protected RemoteIdmAuthenticationProvider authenticationProvider;
 
     @Bean
-    public FlowableCookieFilter flowableCookieFilter() {
-        FlowableCookieFilter filter = new FlowableCookieFilter();
+    public FlowableCookieFilter flowableCookieFilter(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
+        FlowableCookieFilter filter = new FlowableCookieFilter(remoteIdmService, properties);
         filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_MODELER));
         return filter;
     }
@@ -110,6 +119,15 @@ public class SecurityConfiguration {
     @Order(1)
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
+        protected final FlowableRestAppProperties restAppProperties;
+        protected final FlowableModelerAppProperties modelerAppProperties;
+
+        public ApiWebSecurityConfigurationAdapter(FlowableRestAppProperties restAppProperties,
+            FlowableModelerAppProperties modelerAppProperties) {
+            this.restAppProperties = restAppProperties;
+            this.modelerAppProperties = modelerAppProperties;
+        }
+
         protected void configure(HttpSecurity http) throws Exception {
 
             http
@@ -117,9 +135,47 @@ public class SecurityConfiguration {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .csrf()
-                    .disable()
-                    .antMatcher("/api/**").authorizeRequests()
-                    .antMatchers("/api/**").authenticated()
+                    .disable();
+
+            if (modelerAppProperties.isRestEnabled()) {
+
+                if (restAppProperties.isVerifyRestApiPrivilege()) {
+                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API).and().httpBasic();
+                } else {
+                    http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").authenticated().and().httpBasic();
+                    
+                }
+                
+            } else {
+                http.antMatcher("/api/**").authorizeRequests().antMatchers("/api/**").denyAll();
+                
+            }
+            
+        }
+    }
+
+    //
+    // Actuator
+    //
+
+    @ConditionalOnClass(EndpointRequest.class)
+    @Configuration
+    @Order(15) // Actuator configuration should kick in after the Form Login so the custom login filter can be applied before
+    public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+        protected void configure(HttpSecurity http) throws Exception {
+
+            http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .csrf()
+                .disable();
+
+            http
+                .authorizeRequests()
+                .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
+                .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN)
                 .and().httpBasic();
         }
     }

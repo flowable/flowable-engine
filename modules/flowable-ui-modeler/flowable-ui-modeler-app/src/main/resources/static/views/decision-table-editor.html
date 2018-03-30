@@ -1,0 +1,100 @@
+<div class="subheader editor-toolbar" id="editor-header">
+    <div class="fixed-container">
+        <div class="btn-group">
+            <div class="btn-toolbar pull-left" ng-controller="DecisionTableToolbarController" ng-cloak>
+                <button id="{{item.id}}"dec
+                        title="{{item.title | translate}}"
+                        ng-repeat="item in items"
+                        ng-switch on="item.type"
+                        class="btn btn-inverse" ng-class="{'separator': item.type == 'separator'}"
+                        ng-disabled="item.type == 'separator' || item.enabled == false || (readOnly && item.disableOnReadonly)"
+                        ng-click="toolbarButtonClicked($index)">
+                    <i ng-switch-when="button" ng-class="item.cssClass" class="toolbar-button" data-toggle="tooltip"
+                       title="{{item.title | translate}}"></i>
+                    <div ng-switch-when="separator" ng-class="item.cssClass"></div>
+                </button>
+            </div>
+        </div>
+        <div class="btn-group pull-right" ng-show="!secondaryItems.length">
+            <div class="btn-toolbar pull-right" ng-controller="DecisionTableToolbarController">
+                <button title="{{item.title | translate}}" ng-repeat="item in secondaryItems" ng-switch on="item.type"
+                        class="btn btn-inverse" ng-class="{'separator': item.type == 'separator'}"
+                        ng-disabled="item.type == 'separator' || (readOnly && item.disableOnReadonly)"
+                        ng-click="toolbarSecondaryButtonClicked($index)" id="{{item.id}}">
+                    <i ng-switch-when="button" ng-class="item.cssClass" class="toolbar-button" data-toggle="tooltip"
+                       title="{{item.title | translate}}"></i>
+                    <div ng-switch-when="separator" ng-class="item.cssClass"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid content decision-table" auto-height offset="40">
+
+    <br/>
+
+    <div class="row">
+        <div class="col-xs-12 text-right">
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="actionsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    {{"DECISION-TABLE-EDITOR.BUTTON-ACTIONS-LABEL" | translate}}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="actionsMenu">
+                    <li><a href ng-click="addRule()">{{"DECISION-TABLE-EDITOR.BUTTON-ADD-RULE-LABEL" | translate}}</a></li>
+                    <li ng-if="model.selectedRow !== undefined && model.rulesData.length >= 2 && model.selectedRow >= 1"><a href ng-click="moveRuleUpwards()">{{"DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-UPWARDS-LABEL" | translate}}</a></li>
+                    <li ng-if="model.selectedRow !== undefined && model.selectedRow !== model.rulesData.length - 1"><a href ng-click="moveRuleDownwards()">{{"DECISION-TABLE-EDITOR.BUTTON-MOVE-RULE-DOWNWARDS-LABEL" | translate}}</a></li>
+                    <li class="danger" ng-if="model.selectedRow !== undefined &&  model.rulesData.length > 1"><a href ng-click="removeRule()">{{"DECISION-TABLE-EDITOR.BUTTON-REMOVE-RULE-LABEL" | translate}}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="decision-table-grid-wrapper" id="decisionTableGrid">
+        <div class="decision-name-container">
+            <div class="decision-name">
+                {{currentDecisionTable.name}}
+            </div>
+        </div>
+        <hot-table hot-auto-destroy
+                hot-id="decision-table-editor"
+                settings="model.hotSettings"
+                columns="model.columnDefs"
+                row-headers="true"
+                datarows="model.rulesData"
+                auto-row-size="'true'"
+                on-after-get-col-header=doAfterGetColHeader
+                on-modify-col-width=doAfterModifyColWidth
+                on-after-render=doAfterRender
+                on-after-on-cell-mouse-down=doAfterOnCellMouseDown
+                on-after-scroll-horizontally=doAfterScroll
+                on-after-scroll-vertically=doAfterScroll
+                current-row-class-name="'currentRow'"
+                on-after-validate=doAfterValidate
+                height="500">
+        </hot-table>
+    </div>
+</div>
+
+<script>
+    function triggerExpressionEditor(expressionType, expressionPos, newExpression) {
+        if (expressionType === 'input') {
+            extScope.openInputExpressionEditor(expressionPos, newExpression);
+        } else {
+            extScope.openOutputExpressionEditor(expressionPos, newExpression);
+        }
+    }
+
+    function triggerRemoveExpression(expressionType, expressionPos) {
+        if (expressionType === 'input') {
+            extScope.removeInputExpression(expressionPos);
+        } else {
+            extScope.removeOutputExpression(expressionPos);
+        }
+    }
+
+    function triggerHitPolicyEditor() {
+        extScope.openHitPolicyEditor();
+    }
+</script>

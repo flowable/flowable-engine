@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.scope.ScopeTypes;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
@@ -27,7 +28,6 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.util.CommandContextUtil;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
@@ -39,6 +39,7 @@ import org.flowable.variable.service.impl.QueryVariableValue;
 public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricTaskInstanceQuery, HistoricTaskInstance> implements HistoricTaskInstanceQuery {
 
     private static final long serialVersionUID = 1L;
+    protected String taskDefinitionId;
     protected String processDefinitionId;
     protected String processDefinitionKey;
     protected String processDefinitionKeyLike;
@@ -235,10 +236,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricTaskInstanceQueryImpl caseInstanceId(String caseInstanceId) {
         if (inOrStatement) {
             currentOrQueryObject.scopeId(caseInstanceId);
-            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+            currentOrQueryObject.scopeType(ScopeTypes.CMMN);
         } else {
             this.scopeId(caseInstanceId);
-            this.scopeType(VariableScopeType.CMMN);
+            this.scopeType(ScopeTypes.CMMN);
         }
         return this;
     }
@@ -247,10 +248,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricTaskInstanceQueryImpl caseDefinitionId(String caseDefinitionId) {
         if (inOrStatement) {
             currentOrQueryObject.scopeDefinitionId(caseDefinitionId);
-            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+            currentOrQueryObject.scopeType(ScopeTypes.CMMN);
         } else {
             this.scopeDefinitionId(caseDefinitionId);
-            this.scopeType(VariableScopeType.CMMN);
+            this.scopeType(ScopeTypes.CMMN);
         }
         return this;
     }
@@ -259,10 +260,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricTaskInstanceQueryImpl planItemInstanceId(String planItemInstanceId) {
         if (inOrStatement) {
             currentOrQueryObject.subScopeId(planItemInstanceId);
-            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+            currentOrQueryObject.scopeType(ScopeTypes.CMMN);
         } else {
             this.subScopeId(planItemInstanceId);
-            this.scopeType(VariableScopeType.CMMN);
+            this.scopeType(ScopeTypes.CMMN);
         }
         return this;
     }
@@ -303,6 +304,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
         } else {
             this.scopeDefinitionId = scopeDefinitionId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQueryImpl taskDefinitionId(String taskDefinitionId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.taskDefinitionId = taskDefinitionId;
+        } else {
+            this.taskDefinitionId = taskDefinitionId;
         }
         return this;
     }
@@ -1568,6 +1579,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getTaskDefinitionId() {
+        return taskDefinitionId;
     }
 
     public String getProcessDefinitionId() {

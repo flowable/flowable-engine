@@ -13,7 +13,7 @@
 package org.flowable.engine.test.impl.logger;
 
 import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 
 /**
  * @author jbarrez

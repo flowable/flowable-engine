@@ -12,11 +12,6 @@
  */
 package org.flowable.app.rest.runtime;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -75,7 +70,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 @RestController
+@RequestMapping("/app")
 public class RuntimeDisplayJsonClientResource {
 
     @Autowired
@@ -260,6 +261,7 @@ public class RuntimeDisplayJsonClientResource {
 
         ArrayNode elementArray = objectMapper.createArrayNode();
         ArrayNode flowArray = objectMapper.createArrayNode();
+        ArrayNode collapsedArray = objectMapper.createArrayNode();
 
         if (CollectionUtils.isNotEmpty(pojoModel.getPools())) {
             ArrayNode poolArray = objectMapper.createArrayNode();
@@ -311,12 +313,14 @@ public class RuntimeDisplayJsonClientResource {
         }
 
         for (org.flowable.bpmn.model.Process process : pojoModel.getProcesses()) {
-            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, diagramInfo, completedElements, currentElements, breakpoints, processInstanceId);
+            processElements(process.getFlowElements(), pojoModel, elementArray, flowArray, collapsedArray, 
+                            diagramInfo, completedElements, currentElements, breakpoints, null, processInstanceId);
             processArtifacts(process.getArtifacts(), pojoModel, elementArray, flowArray, diagramInfo);
         }
 
         displayNode.set("elements", elementArray);
         displayNode.set("flows", flowArray);
+        displayNode.set("collapsed", collapsedArray);
 
         displayNode.put("diagramBeginX", diagramInfo.getX());
         displayNode.put("diagramBeginY", diagramInfo.getY());
@@ -325,8 +329,9 @@ public class RuntimeDisplayJsonClientResource {
         return displayNode;
     }
 
-    protected void processElements(Collection<FlowElement> elementList, BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, GraphicInfo diagramInfo, Set<String> completedElements,
-                                   Set<String> currentElements, Collection<String> breakpoints, String processInstanceId) {
+    protected void processElements(Collection<FlowElement> elementList, BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, 
+                    ArrayNode collapsedArray, GraphicInfo diagramInfo, Set<String> completedElements, 
+                    Set<String> currentElements, Collection<String> breakpoints, ObjectNode collapsedNode, String processInstanceId) {
 
         for (FlowElement element : elementList) {
 
@@ -371,7 +376,11 @@ public class RuntimeDisplayJsonClientResource {
                         elementNode.set("properties", propertyMappers.get(className).map(element));
                     }
 
-                    flowArray.add(elementNode);
+                    if (collapsedNode != null) {
+                        ((ArrayNode) collapsedNode.get("flows")).add(elementNode);
+                    } else {
+                        flowArray.add(elementNode);
+                    }
                 }
 
             } else {
@@ -411,11 +420,27 @@ public class RuntimeDisplayJsonClientResource {
                     elementNode.set("properties", propertyMappers.get(className).map(element));
                 }
 
-                elementArray.add(elementNode);
+                if (collapsedNode != null) {
+                    ((ArrayNode) collapsedNode.get("elements")).add(elementNode);
+                } else {
+                    elementArray.add(elementNode);
+                }
 
                 if (element instanceof SubProcess) {
                     SubProcess subProcess = (SubProcess) element;
-                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, diagramInfo, completedElements, currentElements, breakpoints, processInstanceId);
+                    ObjectNode newCollapsedNode = collapsedNode;
+                    // skip collapsed sub processes
+                    if (graphicInfo != null && graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
+                        elementNode.put("collapsed", "true");
+                        newCollapsedNode = objectMapper.createObjectNode();
+                        newCollapsedNode.put("id", subProcess.getId());
+                        newCollapsedNode.putArray("elements");
+                        newCollapsedNode.putArray("flows");
+                        collapsedArray.add(newCollapsedNode);
+                    }
+
+                    processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray, 
+                                    diagramInfo, completedElements, currentElements, breakpoints, newCollapsedNode, processInstanceId);
                     processArtifacts(subProcess.getArtifacts(), model, elementArray, flowArray, diagramInfo);
                 }
             }

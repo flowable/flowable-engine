@@ -43,7 +43,7 @@ import org.flowable.content.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.content.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
-import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
@@ -53,7 +53,7 @@ import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.engine.common.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -413,6 +413,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         return this;
     }
 
+    @Override
     public ContentManagementService getContentManagementService() {
         return contentManagementService;
     }

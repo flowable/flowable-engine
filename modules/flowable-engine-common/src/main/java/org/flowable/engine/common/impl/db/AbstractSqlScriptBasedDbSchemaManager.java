@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.FlowableVersion;
 import org.flowable.engine.common.impl.FlowableVersions;
@@ -122,6 +123,11 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
             String schema = dbSqlSession.getConnectionMetadataDefaultSchema();
             if (dbSqlSessionFactory.getDatabaseSchema() != null && dbSqlSessionFactory.getDatabaseSchema().length() > 0) {
                 schema = dbSqlSessionFactory.getDatabaseSchema();
+            } else if (dbSqlSessionFactory.isTablePrefixIsSchema() && StringUtils.isNotEmpty(dbSqlSessionFactory.getDatabaseTablePrefix())) {
+                schema = dbSqlSessionFactory.getDatabaseTablePrefix();
+                if (StringUtils.isNotEmpty(schema) && schema.endsWith(".")) {
+                    schema = schema.substring(0, schema.length() - 1);
+                }
             }
 
             String databaseType = dbSqlSessionFactory.getDatabaseType();
@@ -164,14 +170,14 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
     
     public String getProperty(String propertyName) {
         String tableName = getPropertyTable();
-        if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
-            tableName = prependDatabaseTablePrefix(tableName);
-        }
-        
-        if (!isTablePresent(tableName)) {
+       
+        if (!isTablePresent(tableName)) { // isTablePresent will add the prefix, so adding it later
             return null;
         }
         
+        if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
+            tableName = prependDatabaseTablePrefix(tableName);
+        }
         PreparedStatement statement = null;
         try {
             

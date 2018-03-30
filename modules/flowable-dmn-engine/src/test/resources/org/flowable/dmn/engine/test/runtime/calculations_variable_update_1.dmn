@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="simple" name="Simple" namespace="http://flowable.org/dmn">
+    <decision id="decision" name="Simple decision">
+        <decisionTable id="decisionTable" hitPolicy="RULE ORDER">
+          <input>
+            <inputExpression id="inputExpression1" typeRef="string">
+                <text>input1</text>
+            </inputExpression>
+          </input>
+          <output id="output1" label="Output 1" name="output1" typeRef="number" />
+          <rule>
+            <inputEntry id="inputEntry1">
+              <text>"blablatest"</text>
+            </inputEntry>
+            <outputEntry id="outputEntry1">
+              <text><![CDATA[${output1 + 10}]]></text>
+            </outputEntry>
+          </rule>
+          <rule>
+              <inputEntry id="inputEntry2">
+                <text>"blablatest"</text>
+              </inputEntry>
+              <outputEntry id="outputEntry2">
+              <text><![CDATA[${output1 + 10}]]></text>
+              </outputEntry>
+          </rule>
+        </decisionTable>
+    </decision>
+</definitions>

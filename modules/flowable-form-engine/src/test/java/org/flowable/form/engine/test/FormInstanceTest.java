@@ -13,6 +13,7 @@
 package org.flowable.form.engine.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -124,4 +125,63 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
 
         assertEquals(1, formService.createFormInstanceQuery().formDefinitionId(formInfo.getId()).count());
     }
+    
+    @Test
+    @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/hyperlink.form")
+    public void hyperlinkForm() throws Exception {
+        FormInfo formInfo = repositoryService.getFormModelByKey("hyperlink");
+
+        // test setting hyperlink from variable
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("plainLink", "http://notmylink.com");
+        variables.put("page", "downloads.html");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, variables, "default");
+        // Should be null as this is not an input element
+        assertEquals("http://notmylink.com", formValues.get("plainLink"));
+        assertNull(formValues.get("expressionLink"));
+
+        // test setting hyperlink from variable
+        FormInstance formInstance = formService.createFormInstance(formValues, formInfo, null, null, null);
+        assertEquals(formInfo.getId(), formInstance.getFormDefinitionId());
+        JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
+        assertEquals("http://notmylink.com", formNode.get("values").get("plainLink").asText());
+        // no variable provided for expressionLink and anotherPlainLink
+        assertNull(formNode.get("values").get("expressionLink"));
+        assertNull(formNode.get("values").get("anotherPlainLink"));
+
+        // test hyperlink expression parsing in GetFormInstanceModelCmd
+        FormInstanceInfo formInstanceModel = formService.getFormInstanceModelById(formInstance.getId(), variables);
+        assertEquals("hyperlink", formInstanceModel.getKey());
+
+        SimpleFormModel formModel = (SimpleFormModel) formInstanceModel.getFormModel();
+        assertEquals(3, formModel.getFields().size());
+        FormField plainLinkField = formModel.getFields().get(0);
+        assertEquals("plainLink", plainLinkField.getId());
+        assertEquals("http://notmylink.com", plainLinkField.getValue());
+
+        FormField expressionLinkField = formModel.getFields().get(1);
+        assertEquals("expressionLink", expressionLinkField.getId());
+        assertEquals("http://www.flowable.org/downloads.html", expressionLinkField.getValue());
+
+        FormField anotherPlainLinkField = formModel.getFields().get(2);
+        assertEquals("anotherPlainLink", anotherPlainLinkField.getId());
+        assertEquals("http://blog.flowable.org", anotherPlainLinkField.getValue());
+
+        // test hyperlink expression parsing in GetFormModelWithVariablesCmd
+        FormInfo formInfoWithVars = formService.getFormModelWithVariablesById(formInfo.getId(), null, variables);
+        SimpleFormModel model = (SimpleFormModel) formInfoWithVars.getFormModel();
+        assertEquals(3, model.getFields().size());
+        plainLinkField = model.getFields().get(0);
+        assertEquals("plainLink", plainLinkField.getId());
+        assertEquals("http://notmylink.com", plainLinkField.getValue());
+
+        expressionLinkField = model.getFields().get(1);
+        assertEquals("expressionLink", expressionLinkField.getId());
+        assertEquals("http://www.flowable.org/downloads.html", expressionLinkField.getValue());
+
+        anotherPlainLinkField = model.getFields().get(2);
+        assertEquals("anotherPlainLink", anotherPlainLinkField.getId());
+        assertEquals("http://blog.flowable.org", anotherPlainLinkField.getValue());
+    }
+
 }

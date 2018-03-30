@@ -40,6 +40,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         executeDecisionInfo.setInstanceId(decisionBuilder.getInstanceId());
         executeDecisionInfo.setExecutionId(decisionBuilder.getExecutionId());
         executeDecisionInfo.setActivityId(decisionBuilder.getActivityId());
+        executeDecisionInfo.setScopeType(decisionBuilder.getScopeType());
         executeDecisionInfo.setVariables(decisionBuilder.getVariables());
         executeDecisionInfo.setTenantId(decisionBuilder.getTenantId());
     }

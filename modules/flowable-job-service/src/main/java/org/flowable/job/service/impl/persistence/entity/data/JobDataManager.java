@@ -28,4 +28,6 @@ public interface JobDataManager extends DataManager<JobEntity>, JobInfoDataManag
 
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
 
+    void deleteJobsByExecutionId(String executionId);
+    
 }

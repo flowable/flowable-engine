@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author Yvo Swillens
  */
 @RestController
+@RequestMapping("/app")
 public class FormDefinitionClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FormDefinitionClientResource.class);

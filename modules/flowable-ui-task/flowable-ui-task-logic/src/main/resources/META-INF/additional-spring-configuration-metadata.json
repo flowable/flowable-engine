@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "rest.task-app.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Task App Auto configuration.",
+        "replacement": "flowable.task.app.rest-enabled"
+      }
+    }
+  ]
+}

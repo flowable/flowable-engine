@@ -59,6 +59,8 @@ public class DefaultExpressionManager implements ExpressionManager {
     public Expression createExpression(String expression) {
         if (parsingElContext == null) {
             this.parsingElContext = new ParsingElContext(functionDelegates);
+        } else if (parsingElContext.getFunctionMapper() != null && parsingElContext.getFunctionMapper() instanceof FlowableFunctionMapper) {
+            ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionDelegates(functionDelegates);
         }
 
         ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);

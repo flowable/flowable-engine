@@ -15,6 +15,7 @@ package org.flowable.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -56,6 +57,9 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
     protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected volatile boolean running = false;
+    protected List<String> enginesBuild = new ArrayList<>();
+    protected final Object lifeCycleMonitor = new Object();
 
     public SpringProcessEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -69,7 +73,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     public ProcessEngine buildProcessEngine() {
         ProcessEngine processEngine = super.buildProcessEngine();
         ProcessEngines.setInitialized(true);
-        autoDeployResources(processEngine);
+        enginesBuild.add(processEngine.getName());
         return processEngine;
     }
 
@@ -186,4 +190,30 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         return result;
     }
 
+    @Override
+    public void start() {
+        synchronized (lifeCycleMonitor) {
+            if (!isRunning()) {
+                enginesBuild.forEach(name -> autoDeployResources(ProcessEngines.getProcessEngine(name)));
+                running = true;
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        synchronized (lifeCycleMonitor) {
+            running = false;
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        return SpringEngineConfiguration.super.getPhase() + SpringEngineConfiguration.PHASE_DELTA * 2;
+    }
 }

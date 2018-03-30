@@ -25,6 +25,12 @@ import org.flowable.cmmn.model.CmmnModel;
  * @author Joram Barrez
  */
 public class CaseDefinitionUtil {
+    
+    public static CaseDefinition getCaseDefinition(String caseDefinitionId) {
+        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration().getDeploymentManager();
+        CaseDefinitionCacheEntry cacheEntry = deploymentManager.getCaseDefinitionCache().get(caseDefinitionId);
+        return getCaseDefinition(caseDefinitionId, deploymentManager, cacheEntry);
+    }
 
     public static String getDefinitionDeploymentId(String caseDefinitionId) {
         CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration().getDeploymentManager();
@@ -36,7 +42,7 @@ public class CaseDefinitionUtil {
         }
         return caseDeployment.getParentDeploymentId();
     }
-
+    
     protected static CaseDefinition getCaseDefinition(String caseDefinitionId, CmmnDeploymentManager deploymentManager, CaseDefinitionCacheEntry cacheEntry) {
         if (cacheEntry != null) {
             return cacheEntry.getCaseDefinition();

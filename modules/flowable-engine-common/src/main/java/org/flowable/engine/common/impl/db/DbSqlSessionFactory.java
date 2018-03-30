@@ -63,6 +63,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     protected Map<Class<?>, String> bulkInsertStatements = new ConcurrentHashMap<>();
 
     protected int maxNrOfStatementsInBulkInsert = 100;
+    
+    protected Map<String, Class<?>> logicalNameToClassMapping = new ConcurrentHashMap<>();
 
     @Override
     public Class<?> getSessionType() {
@@ -320,5 +322,17 @@ public class DbSqlSessionFactory implements SessionFactory {
     public void setDeletionOrder(List<Class<? extends Entity>> deletionOrder) {
         this.deletionOrder = deletionOrder;
     }
+    public void addLogicalEntityClassMapping(String logicalName, Class<?> entityClass) {
+        logicalNameToClassMapping.put(logicalName, entityClass);
+    }
+
+    public Map<String, Class<?>> getLogicalNameToClassMapping() {
+        return logicalNameToClassMapping;
+    }
+
+    public void setLogicalNameToClassMapping(Map<String, Class<?>> logicalNameToClassMapping) {
+        this.logicalNameToClassMapping = logicalNameToClassMapping;
+    }
+    
 
 }

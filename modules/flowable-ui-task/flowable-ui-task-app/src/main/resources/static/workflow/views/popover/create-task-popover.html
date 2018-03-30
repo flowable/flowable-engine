@@ -1,0 +1,41 @@
+<div class="popover" ignore-class="toggle-create-task">
+    <div class="arrow"></div>
+    <div class="popover-header">
+        <span translate="TASK.TITLE.CREATE-NEW"></span>
+        <div class="actions">
+            <a ng-click="$hide()" ng-show="!newTask.loading">{{'GENERAL.ACTION.CLOSE' | translate}}</a>
+        </div>
+    </div>
+    <div class="popover-wrapper clearfix">
+        <div class="form-group">
+            <label translate="TASK.FIELD.NAME"></label>
+            <input type="text" class="form-control" ng-model="newTask.name" ng-placeholder="Name" auto-focus
+                   select-text="newTask.name" ng-disabled="newTask.loading"
+                   custom-keys enter-pressed="confirmTaskCreation()">
+        </div>
+        <div class="form-group">
+            <label translate="TASK.FIELD.DESCRIPTION"></label>
+            <textarea class="form-control" rows="3" id="add-comment-input" ng-model="newTask.description" ng-disabled="newTask.loading"></textarea>
+        </div>
+        <div class="form-group">
+            <span class="glyphicon glyphicon-user"></span>
+            <span ng-model="newTask.assignee"
+                    select-people-popover
+                  close-on-select="true"
+                  on-people-selected="setTaskAssignee(user)"
+                  on-email-selected="setTaskAssigneeByEmail(email)"
+                  placement="bottom"
+                  exclude-user-id="newTask.assignee.id"
+                  title="{{'TASK.FIELD.ASSIGNEE' | translate}}">{{'TASK.FIELD.ASSIGNEE' | translate}}
+            </span>
+            <span ng-if="newTask.assignee" user-name="newTask.assignee"></span>
+        </div>
+    </div>
+    <div class="popover-footer">
+        <div class="btn-group pull-right">
+        <button class="btn btn-default" ng-click="$hide();" ng-disabled="newTask.loading" translate="GENERAL.ACTION.CANCEL" ></button>
+        <button class="btn btn-default" ng-click="confirmTaskCreation();" ng-disabled="!newTask.name || newTask.name.length == 0 || newTask.loading" translate="TASK.ACTION.CREATE-CONFIRM" ></button>
+    </div>
+        <div loading="newTask.loading"></div>
+    </div>
+</div>
