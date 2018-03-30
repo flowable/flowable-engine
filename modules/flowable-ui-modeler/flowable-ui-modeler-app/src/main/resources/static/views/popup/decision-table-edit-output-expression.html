@@ -39,19 +39,9 @@
                                 translate}}</label>
                         </div>
                         <div class="col-xs-8">
-                            <select class="form-control" ng-options="type for type in model.availableVariableTypes"
+                            <select class="form-control" ng-options="type for type in model.availableOutputVariableTypes"
                                     ng-model="popup.selectedExpressionNewVariableType" name="newVariable"
                                     ng-required="true" ng-disabled="model.readOnly"/>
-                        </div>
-                    </div>
-
-                    <div class="clearfix form-group">
-                        <div class="col-xs-4">
-                            <label>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.COMPLEX-EXPRESSION-LABEL' |
-                                translate}}</label>
-                        </div>
-                        <div class="col-xs-8">
-                            <input type="checkbox" ng-model="popup.complexExpression" ng-disabled="model.readOnly"/>
                         </div>
                     </div>
 

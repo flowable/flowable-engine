@@ -33,7 +33,7 @@ angular.module('flowableModeler')
             var booleanOperators = ['==', '!='];
             var dateOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
             var collectionOperators = ['IN', 'NOT IN', 'ANY', 'NOT ANY', '==', '!='];
-            var allOperators = ['==', '!=', '<', '>', '>=', '<='];
+            var allOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
             var collectOperators = {
                 'SUM': '+',
                 'MIN': '<',
@@ -56,7 +56,8 @@ angular.module('flowableModeler')
                 columnVariableIdMap: {},
                 startOutputExpression: 0,
                 selectedRow: undefined,
-                availableVariableTypes: ['string', 'number', 'boolean', 'date', 'collection']
+                availableInputVariableTypes: ['string', 'number', 'boolean', 'date', 'collection'],
+                availableOutputVariableTypes: ['string', 'number', 'boolean', 'date']
             };
 
             // Hot Model init
@@ -372,7 +373,7 @@ angular.module('flowableModeler')
             };
 
             var isOperatorCell = function (cellMeta) {
-                return !(cellMeta == null || cellMeta.prop == null || cellMeta.prop.endsWith("_operator") === false);
+                return !(cellMeta == null || cellMeta.prop == null || typeof cellMeta.prop !== 'string'|| cellMeta.prop.endsWith("_operator") === false);
             };
 
             var createNewInputExpression = function (inputExpression) {
@@ -711,10 +712,6 @@ angular.module('flowableModeler')
                         type = 'text';
                 }
 
-                if (outputExpression.complexExpression) {
-                    type = 'text';
-                }
-
                 var title = '';
                 var columnDefinition = {
                     data: outputExpression.id,
@@ -838,11 +835,6 @@ angular.module('flowableModeler')
                                 rowData[key] = '==';
                             }
                         }
-                        // else if (type === 'input-expression') {
-                        //     if (!(key in rowData) || rowData[key] === '') {
-                        //         rowData[key] = '-';
-                        //     }
-                        // }
                     });
                 }
             };
@@ -920,8 +912,6 @@ angular.module('flowableModeler')
 angular.module('flowableModeler')
     .controller('DecisionTableInputConditionEditorCtlr', ['$rootScope', '$scope', 'hotRegisterer', '$timeout', function ($rootScope, $scope, hotRegisterer, $timeout) {
 
-        var hotInstance;
-
         var getEntriesValues = function (entriesArrayOfArrays) {
             var newEntriesArray = [];
             // remove last value
@@ -965,7 +955,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
                 selectedExpressionVariableId: $scope.model.selectedExpression.variableId,
-                selectedExpressionVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableVariableTypes[0],
+                selectedExpressionVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableInputVariableTypes[0],
                 selectedExpressionInputValues: $scope.model.selectedExpression.entries && $scope.model.selectedExpression.entries.length > 0 ? createEntriesValues($scope.model.selectedExpression.entries) : [['']],
                 columnDefs: [
                     {
@@ -985,7 +975,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: '',
                 selectedExpressionVariableId: '',
-                selectedExpressionVariableType: $scope.model.availableVariableTypes[0],
+                selectedExpressionVariableType: $scope.model.availableInputVariableTypes[0],
                 selectedExpressionInputValues: [['']],
                 columnDefs: [
                     {
@@ -1010,7 +1000,7 @@ angular.module('flowableModeler')
                     variableId: $scope.popup.selectedExpressionVariableId,
                     type: $scope.popup.selectedExpressionVariableType,
                     label: $scope.popup.selectedExpressionLabel,
-                    entries: getEntriesValues($scope.popup.selectedExpressionInputValues)
+                    entries: $scope.popup.selectedExpressionVariableType !== 'collection' ? getEntriesValues($scope.popup.selectedExpressionInputValues) : []
                 };
 
                 $scope.addNewInputExpression(newInputExpression, $scope.model.selectedColumn + 1);
@@ -1019,7 +1009,7 @@ angular.module('flowableModeler')
                 $scope.model.selectedExpression.variableId = $scope.popup.selectedExpressionVariableId;
                 $scope.model.selectedExpression.type = $scope.popup.selectedExpressionVariableType;
                 $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
-                $scope.model.selectedExpression.entries = getEntriesValues($scope.popup.selectedExpressionInputValues);
+                $scope.model.selectedExpression.entries = $scope.popup.selectedExpressionVariableType !== 'collection' ? getEntriesValues($scope.popup.selectedExpressionInputValues) : [];
                 $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             }
 
@@ -1098,7 +1088,7 @@ angular.module('flowableModeler')
             $scope.popup = {
                 selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
                 selectedExpressionNewVariableId: $scope.model.selectedExpression.variableId,
-                selectedExpressionNewVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableVariableTypes[0],
+                selectedExpressionNewVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableOutputVariableTypes[0],
                 selectedExpressionOutputValues: $scope.model.selectedExpression.entries && $scope.model.selectedExpression.entries.length > 0 ? createEntriesValues($scope.model.selectedExpression.entries) : [['']],
                 currentHitPolicy: $scope.model.hitPolicy,
                 columnDefs: [
@@ -1114,15 +1104,13 @@ angular.module('flowableModeler')
                 hotSettings: {
                     currentColClassName: 'currentCol',
                     stretchH: 'none'
-                },
-                complexExpression: $scope.model.selectedExpression.complexExpression
+                }
             };
-
         } else {
             $scope.popup = {
                 selectedExpressionLabel: '',
                 selectedExpressionNewVariableId: '',
-                selectedExpressionNewVariableType: $scope.model.availableVariableTypes[0],
+                selectedExpressionNewVariableType: $scope.model.availableOutputVariableTypes[0],
                 selectedExpressionOutputValues: [['']],
                 currentHitPolicy: $scope.model.hitPolicy,
                 columnDefs: [
@@ -1137,8 +1125,7 @@ angular.module('flowableModeler')
                 ],
                 hotSettings: {
                     stretchH: 'none'
-                },
-                complexExpression: false
+                }
             };
         }
 
@@ -1154,8 +1141,7 @@ angular.module('flowableModeler')
                     variableId: $scope.popup.selectedExpressionNewVariableId,
                     type: $scope.popup.selectedExpressionNewVariableType,
                     label: $scope.popup.selectedExpressionLabel,
-                    entries: getEntriesValues(hotInstance.getData()),
-                    complexExpression: $scope.popup.complexExpression
+                    entries: getEntriesValues(hotInstance.getData())
                 };
                 $scope.addNewOutputExpression(newOutputExpression, $scope.model.selectedColumn + 1);
 
@@ -1164,7 +1150,6 @@ angular.module('flowableModeler')
                 $scope.model.selectedExpression.type = $scope.popup.selectedExpressionNewVariableType;
                 $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
                 $scope.model.selectedExpression.entries = getEntriesValues(hotInstance.getData());
-                $scope.model.selectedExpression.complexExpression = $scope.popup.complexExpression;
                 $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             }
 
