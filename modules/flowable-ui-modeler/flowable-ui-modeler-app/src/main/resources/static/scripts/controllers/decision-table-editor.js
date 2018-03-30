@@ -916,8 +916,6 @@ angular.module('flowableModeler')
 angular.module('flowableModeler')
     .controller('DecisionTableInputConditionEditorCtlr', ['$rootScope', '$scope', 'hotRegisterer', '$timeout', function ($rootScope, $scope, hotRegisterer, $timeout) {
 
-        var hotInstance;
-
         var getEntriesValues = function (entriesArrayOfArrays) {
             var newEntriesArray = [];
             // remove last value
@@ -1006,7 +1004,7 @@ angular.module('flowableModeler')
                     variableId: $scope.popup.selectedExpressionVariableId,
                     type: $scope.popup.selectedExpressionVariableType,
                     label: $scope.popup.selectedExpressionLabel,
-                    entries: getEntriesValues($scope.popup.selectedExpressionInputValues)
+                    entries: $scope.popup.selectedExpressionVariableType !== 'collection' ? getEntriesValues($scope.popup.selectedExpressionInputValues) : []
                 };
 
                 $scope.addNewInputExpression(newInputExpression, $scope.model.selectedColumn + 1);
@@ -1015,7 +1013,7 @@ angular.module('flowableModeler')
                 $scope.model.selectedExpression.variableId = $scope.popup.selectedExpressionVariableId;
                 $scope.model.selectedExpression.type = $scope.popup.selectedExpressionVariableType;
                 $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
-                $scope.model.selectedExpression.entries = getEntriesValues($scope.popup.selectedExpressionInputValues);
+                $scope.model.selectedExpression.entries = $scope.popup.selectedExpressionVariableType !== 'collection' ? getEntriesValues($scope.popup.selectedExpressionInputValues) : [];
                 $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             }
 
