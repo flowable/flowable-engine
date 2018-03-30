@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.runtime;
 
+import java.util.Map;
+
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.common.api.FlowableException;
@@ -88,6 +90,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         @Override
         public void planTriggerExecutionOperation(ExecutionEntity execution) {
             agenda.planTriggerExecutionOperation(execution);
+        }
+
+        @Override
+        public void planAsyncTriggerExecutionOperation(ExecutionEntity execution, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
+            agenda.planAsyncTriggerExecutionOperation(execution, processVariables, transientVariables);
         }
 
         @Override

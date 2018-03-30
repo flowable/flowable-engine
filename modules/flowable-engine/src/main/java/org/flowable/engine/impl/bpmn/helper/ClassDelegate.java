@@ -65,14 +65,17 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     protected Expression skipExpression;
     protected List<MapExceptionEntry> mapExceptions;
     protected CustomPropertiesResolver customPropertiesResolverInstance;
+    protected boolean triggerable;
 
     public ClassDelegate(String className, List<FieldDeclaration> fieldDeclarations, Expression skipExpression) {
         super(className, fieldDeclarations);
         this.skipExpression = skipExpression;
     }
 
-    public ClassDelegate(String id, String className, List<FieldDeclaration> fieldDeclarations, Expression skipExpression, List<MapExceptionEntry> mapExceptions) {
+    public ClassDelegate(String id, String className, List<FieldDeclaration> fieldDeclarations, boolean triggerable, Expression skipExpression,
+                         List<MapExceptionEntry> mapExceptions) {
         this(className, fieldDeclarations, skipExpression);
+        this.triggerable = triggerable;
         this.serviceTaskId = id;
         this.mapExceptions = mapExceptions;
     }
@@ -136,7 +139,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (delegateInstance instanceof ExecutionListener) {
             return (ExecutionListener) delegateInstance;
         } else if (delegateInstance instanceof JavaDelegate) {
-            return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, skipExpression);
+            return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, triggerable, skipExpression);
         } else {
             throw new FlowableIllegalArgumentException(delegateInstance.getClass().getName() + " doesn't implement " + ExecutionListener.class + " nor " + JavaDelegate.class);
         }
@@ -215,6 +218,9 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
         if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
             ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
+            if(triggerable) {
+                leave(execution);
+            }
         } else {
             throw new FlowableException("signal() can only be called on a " + TriggerableActivityBehavior.class.getName() + " instance");
         }
@@ -254,7 +260,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (delegateInstance instanceof ActivityBehavior) {
             return determineBehaviour((ActivityBehavior) delegateInstance);
         } else if (delegateInstance instanceof JavaDelegate) {
-            return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, skipExpression));
+            return determineBehaviour(new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, triggerable, skipExpression));
         } else {
             throw new FlowableIllegalArgumentException(delegateInstance.getClass().getName() + " doesn't implement " + JavaDelegate.class.getName() + " nor " + ActivityBehavior.class.getName());
         }
