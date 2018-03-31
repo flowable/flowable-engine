@@ -36,9 +36,14 @@ public class FlowableCommonAppProperties {
     private String rolePrefix = "ROLE_";
 
     /**
-     * The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
+     * The URL to the IDM application, used for the user info and token info REST GET calls. It's also used as a fallback for the redirect url to the login page in the UI apps.
      */
     private String idmUrl;
+    
+    /**
+     * The redirect URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid.
+     */
+    private String idmRedirectUrl;
 
     /**
      * The URL to which the redirect should occur after a successful authentication.
@@ -92,6 +97,14 @@ public class FlowableCommonAppProperties {
     public void setIdmUrl(String idmUrl) {
         this.idmUrl = idmUrl;
     }
+    
+    public String getIdmRedirectUrl() {
+        return idmRedirectUrl;
+    }
+
+    public void setIdmRedirectUrl(String idmRedirectUrl) {
+        this.idmRedirectUrl = idmRedirectUrl;
+    }
 
     public String getRedirectOnAuthSuccess() {
         return redirectOnAuthSuccess;
@@ -118,6 +131,26 @@ public class FlowableCommonAppProperties {
     }
 
     public String determineIdmAppUrl() {
+        String idmAppUrl = getIdmUrl();
+        Assert.hasText(idmAppUrl, "`flowable.common.app.idm-url` must be set");
+
+        if (!idmAppUrl.endsWith("/")) {
+            idmAppUrl += "/";
+        }
+
+        return idmAppUrl;
+    }
+    
+    public String determineIdmAppRedirectUrl() {
+        String idmAppRedirectUrl = getIdmRedirectUrl();
+        if (idmAppRedirectUrl != null && idmAppRedirectUrl.length() > 0) {
+            if (!idmAppRedirectUrl.endsWith("/")) {
+                idmAppRedirectUrl += "/";
+            }
+            
+            return idmAppRedirectUrl;
+        }
+        
         String idmAppUrl = getIdmUrl();
         Assert.hasText(idmAppUrl, "`flowable.common.app.idm-url` must be set");
 
