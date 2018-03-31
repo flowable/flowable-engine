@@ -33,10 +33,17 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
 
     protected Map<String, Object> processVariables;
     protected Map<String, Object> transientVariables;
+    protected boolean async;
 
     public TriggerCmd(String executionId, Map<String, Object> processVariables) {
         super(executionId);
         this.processVariables = processVariables;
+    }
+
+    public TriggerCmd(String executionId, Map<String, Object> processVariables, boolean async) {
+        super(executionId);
+        this.processVariables = processVariables;
+        this.async = async;
     }
 
     public TriggerCmd(String executionId, Map<String, Object> processVariables, Map<String, Object> transientVariables) {
@@ -51,20 +58,26 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
             compatibilityHandler.trigger(executionId, processVariables, transientVariables);
             return null;
         }
-
+        
         if (processVariables != null) {
             execution.setVariables(processVariables);
         }
 
-        if (transientVariables != null) {
-            execution.setTransientVariables(transientVariables);
+        if (!async) {
+            if (transientVariables != null) {
+                execution.setTransientVariables(transientVariables);
+            }
+
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
+                            null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
+
+            CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
+            
+        } else {
+            CommandContextUtil.getAgenda(commandContext).planAsyncTriggerExecutionOperation(execution);
         }
 
-        CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
-                        null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
-
-        CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
         return null;
     }
 

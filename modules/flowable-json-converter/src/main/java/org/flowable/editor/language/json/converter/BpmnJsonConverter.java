@@ -264,6 +264,17 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         if (CollectionUtils.isNotEmpty(mainProcess.getCandidateStarterUsers())) {
             propertiesNode.put(PROPERTY_PROCESS_POTENTIALSTARTERUSER, StringUtils.join(mainProcess.getCandidateStarterUsers(), ","));
         }
+        
+        if (mainProcess.getExtensionElements().containsKey("historyLevel")) {
+            List<ExtensionElement> historyExtensionElements = mainProcess.getExtensionElements().get("historyLevel");
+            if (historyExtensionElements != null && historyExtensionElements.size() > 0) {
+                String historyLevel = historyExtensionElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(historyLevel)) {
+                    propertiesNode.put(PROPERTY_PROCESS_HISTORYLEVEL, historyLevel);
+                }
+            }
+        }
+        
         propertiesNode.put(PROPERTY_IS_EAGER_EXECUTION_FETCHING, Boolean.valueOf(mainProcess.isEnableEagerExecutionTreeFetching()));
 
         BpmnJsonConverterUtil.convertMessagesToJson(model.getMessages(), propertiesNode);
@@ -549,6 +560,15 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             JsonNode processExecutableNode = JsonConverterUtil.getProperty(PROPERTY_IS_EXECUTABLE, modelNode);
             if (processExecutableNode != null && StringUtils.isNotEmpty(processExecutableNode.asText())) {
                 process.setExecutable(JsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_EXECUTABLE, modelNode));
+            }
+            String historyLevel = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_HISTORYLEVEL, modelNode);
+            if (StringUtils.isNotEmpty(historyLevel)) {
+                ExtensionElement historyExtensionElement = new ExtensionElement();
+                historyExtensionElement.setName("historyLevel");
+                historyExtensionElement.setNamespace("http://flowable.org/bpmn");
+                historyExtensionElement.setNamespacePrefix("flowable");
+                historyExtensionElement.setElementText(historyLevel);
+                process.addExtensionElement(historyExtensionElement);
             }
 
             BpmnJsonConverterUtil.convertJsonToMessages(modelNode, bpmnModel);

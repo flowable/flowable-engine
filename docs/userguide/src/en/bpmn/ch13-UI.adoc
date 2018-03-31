@@ -98,9 +98,14 @@ You can also use YAML based properties.
 |Description
 
 |flowable.common.app.idm-url
-|idm.app.redirect.url, idm.app.url
+|idm.app.url
 |-
-|The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
+|The URL to the IDM application, used for the user info and token info REST GET calls. It's also used as a fallback for the redirect url to the login page in the UI apps.
+
+|flowable.common.app.idm-redirect-url
+|idm.app.redirect.url
+|-
+|The redirect URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid.
 
 |flowable.common.app.redirect-on-auth-success
 |app.redirect.url.on.authsuccess

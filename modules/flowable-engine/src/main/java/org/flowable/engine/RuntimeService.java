@@ -358,6 +358,17 @@ public interface RuntimeService {
 
     /**
      * Sends an external trigger to an activity instance that is waiting inside the given execution.
+     * The waiting execution is notified <strong>asynchronously</strong>.
+     *
+     * @param executionId
+     *            id of execution to signal, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when no execution is found for the given executionId.
+     */
+    void triggerAsync(String executionId);
+
+    /**
+     * Sends an external trigger to an activity instance that is waiting inside the given execution.
      * 
      * @param executionId
      *            id of execution to signal, cannot be null.
@@ -367,6 +378,19 @@ public interface RuntimeService {
      *             when no execution is found for the given executionId.
      */
     void trigger(String executionId, Map<String, Object> processVariables);
+
+    /**
+     * Sends an external trigger to an activity instance that is waiting inside the given execution.
+     * The waiting execution is notified <strong>asynchronously</strong>.
+     *
+     * @param executionId
+     *            id of execution to signal, cannot be null.
+     * @param processVariables
+     *            a map of process variables
+     * @throws FlowableObjectNotFoundException
+     *             when no execution is found for the given executionId.
+     */
+    void triggerAsync(String executionId, Map<String, Object> processVariables);
 
     /**
      * Similar to {@link #trigger(String, Map)}, but with an extra parameter that allows to pass transient variables.

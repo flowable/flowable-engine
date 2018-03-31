@@ -203,6 +203,7 @@ import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
 import org.flowable.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
@@ -1685,6 +1686,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         AsyncContinuationJobHandler asyncContinuationJobHandler = new AsyncContinuationJobHandler();
         jobHandlers.put(asyncContinuationJobHandler.getType(), asyncContinuationJobHandler);
+        
+        AsyncTriggerJobHandler asyncTriggerJobHandler = new AsyncTriggerJobHandler();
+        jobHandlers.put(asyncTriggerJobHandler.getType(), asyncTriggerJobHandler);
 
         TriggerTimerEventJobHandler triggerTimerEventJobHandler = new TriggerTimerEventJobHandler();
         jobHandlers.put(triggerTimerEventJobHandler.getType(), triggerTimerEventJobHandler);

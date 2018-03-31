@@ -47,6 +47,7 @@ import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
@@ -79,6 +80,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         String elementId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
         String elementName = xtr.getAttributeValue(null, ATTRIBUTE_NAME);
         boolean async = parseAsync(xtr);
+        boolean triggerable = parseTriggerable(xtr);
         boolean notExclusive = parseNotExclusive(xtr);
         String defaultFlow = xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT);
         boolean isForCompensation = parseForCompensation(xtr);
@@ -122,6 +124,11 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                     if (StringUtils.isNotEmpty(defaultFlow)) {
                         gateway.setDefaultFlow(defaultFlow);
                     }
+                }
+
+                if (currentFlowElement instanceof ServiceTask) {
+                    ServiceTask serviceTask = (ServiceTask) currentFlowElement;
+                    serviceTask.setTriggerable(triggerable);
                 }
             }
 
@@ -297,6 +304,14 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
             notExclusive = true;
         }
         return notExclusive;
+    }
+
+    protected boolean parseTriggerable(XMLStreamReader xtr) {
+        String triggerable = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_TRIGGERABLE, xtr);
+        if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(triggerable)) {
+            return true;
+        }
+        return false;
     }
 
     protected boolean parseForCompensation(XMLStreamReader xtr) {
