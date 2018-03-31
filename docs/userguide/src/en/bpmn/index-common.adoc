@@ -10,6 +10,8 @@ include::ch04-API.adoc[]
 
 include::ch05-Spring.adoc[]
 
+include::ch05a-Spring-Boot.adoc[]
+
 include::ch06-Deployment.adoc[]
 
 include::ch07a-BPMN-Introduction.adoc[]

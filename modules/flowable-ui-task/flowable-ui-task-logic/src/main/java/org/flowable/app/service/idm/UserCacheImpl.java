@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.service.api.UserCache;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Service;
 public class UserCacheImpl implements UserCache {
 
     @Autowired
-    protected FlowableRemoteIdmProperties properties;
+    protected FlowableCommonAppProperties properties;
 
     @Autowired
     protected RemoteIdmService remoteIdmService;
@@ -55,7 +55,7 @@ public class UserCacheImpl implements UserCache {
 
     @PostConstruct
     protected void initCache() {
-        FlowableRemoteIdmProperties.Cache cache = properties.getCacheUsers();
+        FlowableCommonAppProperties.Cache cache = properties.getCacheUsers();
         long userCacheMaxSize = cache.getMaxSize();
         long userCacheMaxAge = cache.getMaxAge();
 

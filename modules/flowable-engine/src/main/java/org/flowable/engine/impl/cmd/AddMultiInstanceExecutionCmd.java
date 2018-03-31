@@ -81,7 +81,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
             miExecution.setScope(false);
             
             childExecution.setCurrentFlowElement(miActivityElement);
-            CommandContextUtil.getAgenda().planContinueMultiInstanceOperation(childExecution, currentNumberOfInstances);
+            CommandContextUtil.getAgenda().planContinueMultiInstanceOperation(childExecution, miExecution, currentNumberOfInstances);
         }
         
         return childExecution;

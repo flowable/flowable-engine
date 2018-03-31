@@ -73,8 +73,8 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     }
 
     @Override
-    public void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter) {
-        planOperation(new ContinueMultiInstanceOperation(commandContext, execution, loopCounter), execution);
+    public void planContinueMultiInstanceOperation(ExecutionEntity execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
+        planOperation(new ContinueMultiInstanceOperation(commandContext, execution, multiInstanceRootExecution, loopCounter), execution);
     }
 
     @Override
@@ -90,6 +90,11 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     @Override
     public void planTriggerExecutionOperation(ExecutionEntity execution) {
         planOperation(new TriggerExecutionOperation(commandContext, execution), execution);
+    }
+
+    @Override
+    public void planAsyncTriggerExecutionOperation(ExecutionEntity execution) {
+        planOperation(new TriggerExecutionOperation(commandContext, execution, true), execution);
     }
 
     @Override

@@ -27,6 +27,11 @@ public class FlowableProcessProperties {
      */
     @NestedConfigurationProperty
     private final FlowableServlet servlet = new FlowableServlet("/process-api", "Flowable BPMN Rest API");
+    
+    /**
+     * Allow to override default history level for specific process definitions using the historyLevel extension element
+     */
+    protected boolean enableProcessDefinitionHistoryLevel = true;
 
     /**
      * The maximum amount of process definitions available in the process definition cache.
@@ -43,6 +48,14 @@ public class FlowableProcessProperties {
 
     public FlowableServlet getServlet() {
         return servlet;
+    }
+
+    public boolean isEnableProcessDefinitionHistoryLevel() {
+        return enableProcessDefinitionHistoryLevel;
+    }
+
+    public void setEnableProcessDefinitionHistoryLevel(boolean enableProcessDefinitionHistoryLevel) {
+        this.enableProcessDefinitionHistoryLevel = enableProcessDefinitionHistoryLevel;
     }
 
     public int getDefinitionCacheLimit() {

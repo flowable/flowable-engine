@@ -46,13 +46,13 @@
                                 translate}}</label><span class="marker">*</span>
                         </div>
                         <div class="col-xs-8">
-                            <select class="form-control" ng-options="type for type in model.availableVariableTypes"
+                            <select class="form-control" ng-options="type for type in model.availableInputVariableTypes"
                                     ng-model="popup.selectedExpressionVariableType" name="variableType"
                                     ng-required="true" ng-disabled="model.readOnly"/>
                         </div>
                     </div>
 
-                    <div>
+                    <div ng-if="popup.selectedExpressionVariableType != 'collection'">
                         <div class="clearfix form-group">
                             <div class="col-xs-4">
                                 <label>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.ALLOWED-VALUES' |

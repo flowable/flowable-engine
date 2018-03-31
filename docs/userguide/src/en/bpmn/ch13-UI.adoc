@@ -11,6 +11,9 @@ Flowable provides several web applications to demonstrate and leverage the funct
 
 The Flowable IDM is required for all other apps to enable authentication. The WAR files for each app can be deployed to the same servlet container (such as Apache Tomcat), but can also be deployed on different servlet containers. Because the same cookie is used for authentication with each app, the apps need to run on the same domain.
 
+The apps are Spring Boot 2.0 based, which means that that the WAR files are actually executable and can be run as a normal standalone applications.
+See  https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-maven-packaging[The Executable Jar Format] in the Spring Boot reference documentation.
+
 
 [[uiAppInstallation]]
 
@@ -32,7 +35,18 @@ By default, the Flowable IDM application will create an admin user that has priv
 
 image::images/flowable_modeler_startup_screen.png[align="center"]
 
-Usually, you will want to change the default H2 in-memory database configuration to a MySQL or Postgres (or other persistent database) configuration. You can do this per app by changing the flowable-app.properties file in the _WEB-INF/classes/META-INF/flowable-app_ directory of each app. But it's easier to copy the flowable-app.properties file from one of the apps or get it from link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/META-INF/flowable-app/flowable-app.properties$$[Github], and put it on the classpath of all apps (for example in the Tomcat lib folder). The UI applications will first look at a flowable-app.properties file available on the classpath directly and this configuration will have precedence over the configuration file in the WAR. To change the default configuration to MySQL the following changes are needed to the properties file:
+Since the UI apps are Spring Boot executable apps it is possible to run them as standalone applications without the need of an application server.
+Starting single application looks like:
+
+```
+java -jar flowable-idm.war
+```
+
+Usually, you will want to change the default H2 in-memory database configuration to a MySQL or Postgres (or other persistent database) configuration.
+You can do this per app by changing the application.properties file in the _WEB-INF/classes/_ directory of each app.
+However, it is easier to use the Spring Boot https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html[Externalized Configuration].
+An example configuration can be found on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/application.properties$$[Github]
+To change the default configuration to MySQL the following changes are needed to the properties file:
 
 [source,linenums]
 ----
@@ -57,62 +71,407 @@ In addition to changing the configuration, make sure the database driver is avai
 * MySQL: link:$$https://dev.mysql.com/downloads/connector/j$$[https://dev.mysql.com/downloads/connector/j]
 * Postgres: link:$$https://jdbc.postgresql.org/$$[https://jdbc.postgresql.org/]
 
-The additional configuration options are described in the table below:
+When running the apps as standalone applications the database driver can be added by using the `loader.path` property.
 
-[options="header"]
+```
+java -Dloader.path=/location/to/your/driverfolder -jar flowable-idm.war
+```
+
+See the https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar-property-launcher-features[`PropertiesLauncher` Features] in the Spring Boot reference documentation for more information.
+
+=== Flowable UI Applications Configurations
+
+As the Flowable UI apps are Spring Boot applications you can use all the properties Spring Boot provides.
+In order to provide custom configuration for the apps have a look at the https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html[Externalized Configuration] section of the Spring Boot documentation.
+
+[TIP]
+-----
+You can also use YAML based properties.
+-----
+
+.Common UI App Properties
+[cols="4*",options="header"]
 |===============
-|Property name|Description
-|flowable.idm.app.security.remember-me-key|The hash key that is used by Spring Security to hash the password values in the applications. Make sure that you change the value of this property.
-|flowable.idm.password-encoder|Define a password encoder for the IDM users. Use a value of spring_bcrypt to use the Spring password encoder. By default, the passwords will be saved in plain text.
-|spring.datasource.jndi-name=|JNDI name of the data source, to be used when the datasource is configured in the servlet container instead of defining the datasource url and driver in this configuration file
-|datasource.jndi.resourceRef|Set whether the lookup occurs in a J2EE container, i.e. if the prefix "java:comp/env/" needs to be added if the JNDI name doesn't already contain it. Default is "true".
-|spring.datasource.driver-class-name|The JDBC driver class name
-|spring.datasource.url|The JDBC driver url
-|spring.datasource.username|The username to be used for the JDBC connection
-|spring.datasource.password|The password to be used for the JDBC connection
-|spring.datasource.hikari.minimum-idle|The minimum datasource pool size
-|spring.datasource.hikari.maximum-pool-size|The maximum datasource pool size
-|spring.datasource.hikari.connection-timeout|The timeout, in milliseconds, that the connection pool will wait to acquire a connection
-|spring.datasource.hikari.connection-test-query|Defines the query that will be executed for all connection tests
-|spring.datasource.hikari.idle-timeout|Seconds (not *not* milliseconds) a connection can remain pooled but unused before being discarded. Zero means idle connections never expire
-|spring.datasource.hikari.max-lifetime|The time, in milliseconds, a connection will be kept in the connection pool (if set)
-|flowable.mail-server-host|Hostname of the email server for the Flowable Task application email service task
-|flowable.mail-server-port|Port of the email server
-|flowable.mail-server-user-name|Username for the email server connection
-|flowable.mail-server-password|Password for the email server connection
-|flowable.process-definitions.cache.max|Defines the maximum amount of process definitions available in the process definition cache
-|flowable.idm.app.admin.user-id|Username of the default administrator user for the Flowable IDM application. Default is admin.
-|flowable.idm.app.admin.password|Password of the default administrator user for the Flowable IDM application. Default is test.
-|flowable.idm.app.admin.first-name|Firstname of the default administrator user for the Flowable IDM application. Default is Test.
-|flowable.idm.app.admin.last-name|Lastname of the default administrator user for the Flowable IDM application. Default is Administrator.
-|flowable.idm.app.admin.email|Email of the default administrator user for the Flowable IDM application. Default is admin@flowable.org.
-|spring.http.multipart.max-file-size|Maximum size of file uploads, such as attachments and model files
-|flowable.content.storage.root-folder|Root folder location where content files will be stored, for example, task attachments or form file uploads
-|flowable.content.storage.create-root|If the root folder doesn't exist, should the Flowable Task application create it?
-|flowable.app.idm.url|The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
-|flowable.app.idm.admin.user|The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin.
-|flowable.app.idm.admin.password|The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.
-|flowable.modeler.app.deployment-api-url|The root URI to th REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine. Default url for the Flowable Task application is http://localhost:8080/flowable-task/process-api
-|flowable.(task|idm|modeler).app.rest-enabled|Enables the REST API (this is not the REST api used by the UI, but an api that's availble over basic auth authentication). Default is true.
-|flowable.rest.app.authentication-mode|Sets the mode of verifying the user when accessing the REST API. By default this is 'verify-privilege', which means that the user passing the credentials with basic authentication needs to have the 'access-rest-api' privilege. Can be set to 'any-users', which means that any valid user/password pair passed as basic auth credentials can access the rest api (as it was in earlier versions of Flowable).
+|Property name
+|Old Property
+|Default value
+|Description
+
+|flowable.common.app.idm-url
+|idm.app.redirect.url, idm.app.url
+|-
+|The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
+
+|flowable.common.app.redirect-on-auth-success
+|app.redirect.url.on.authsuccess
+|-
+|The URL to which the redirect should occur after a successful authentication.
+
+|flowable.common.app.role-prefix
+|-
+|ROLE_
+|The default role prefix that needs to be used by Spring Security.
+
+|flowable.common.app.tenant-id
+|-
+|-
+|The static tenant id used for the DefaultTenantProvider. The modeler app uses this to determine under which tenant id to store and publish models.
+ When not provided, empty or only contains whitespace it defaults to the user's tenant id if available otherwise it uses no tenant id.
+
+|flowable.common.app.cache-login-tokens.max-age
+|cache.login-tokens.max.age
+|30
+|The max age in seconds after which the entry should be invalidated.
+
+|flowable.common.app.cache-login-tokens.max-size
+|cache.login-tokens.max.size
+|2048
+|The maximum number of entries that the cache should contain.
+
+|flowable.common.app.cache-login-users.max-age
+|cache.login-users.max.age
+|30
+|The max age in seconds after which the entry should be invalidated.
+
+|flowable.common.app.cache-login-users.max-size
+|cache.login-users.max.size
+|2048
+|The maximum number of entries that the cache should contain.
+
+|flowable.common.app.cache-users.max-age
+|cache.users.max.age
+|30
+|The max age in seconds after which the entry should be invalidated.
+
+|flowable.common.app.cache-users.max-size
+|cache.users.max.size
+|2048
+|The maximum number of entries that the cache should contain.
+
+|flowable.common.app.idm-admin.password
+|idm.admin.password
+|-
+|The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.
+
+|flowable.common.app.idm-admin.user
+|idm.admin.user
+|admin
+|The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin
+
+|flowable.rest.app.authentication-mode
+|rest.authentication.mode
+|verify-privilege
+|Configures the way user credentials are verified when doing a REST API call:
+ 'any-user' : the user needs to exist and the password need to match. Any user is allowed to do the call (this is the pre 6.3.0 behavior)
+ 'verify-privilege' : the user needs to exist, the password needs to match and the user needs to have the 'rest-api' privilege
+ If nothing set, defaults to 'verify-privilege'
 |===============
 
-In addition to these properties that are used by multiple Flowable web applications, the Flowable admin application has a few more properties. The full
-content of the properties file can be viewed on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-admin/flowable-ui-admin-app/src/main/resources/META-INF/flowable-app/flowable-app.properties$$[Github]. The additional properties are mainly used for defining the initial values for the REST endpoints for the different engines. The Admin application uses the initial values to make a connection to the Flowable engines, but the values can be overridden in the Admin application configuration view and these values are stored in the __ACT\_ADM\_SERVER\_CONFIG__ table. An example of the BPMN Engine REST properties is shown below:
 
-[source,linenums]
-----
-flowable.admin.app.server-config.process.app.name=Flowable Process app
-flowable.admin.app.server-config.description=Flowable Process REST config
-flowable.admin.app.server-config.process.server-address=http://localhost
-flowable.admin.app.server-config.process.app.port=8080
-flowable.admin.app.server-config.process.context-root=flowable-task
-flowable.admin.app.server-config.process.rest-root=process-api
-flowable.admin.app.server-config.process.app.user=admin
-flowable.admin.app.server-config.process.app.password=test
-----
+Some of the old properties have been moved to be managed by the Flowable Spring Boot starter (or Spring Boot itself)
 
-These values can be used when the Flowable Task app (with all the Flowable engines included) is managed by the Flowable Admin application.
+.Old properties managed by the Flowable Spring Boot Starter
+[cols="4*",options="header"]
+|===============
+|Property name
+|Old Property
+|Default value
+|Description
+
+|flowable.async-executor-activate
+|engine.process.asyncexecutor.activate
+|true
+|Whether the async executor should be activated.
+
+|flowable.database-schema-update
+|engine.process.schema.update
+|true
+|The strategy that should be used for the database schema.
+
+|flowable.history-level
+|engine.process.history.level
+|-
+|The history level that needs to be used.
+
+|flowable.process.servlet.name
+|flowable.rest-api-servlet-name
+|Flowable BPMN Rest API
+|The name of the Process servlet.
+
+|flowable.process.servlet.path
+|flowable.rest-api-mapping
+|/process-api
+|The context path for the Process rest servlet.
+
+|flowable.content.storage.create-root
+|contentstorage.fs.create-root
+|true
+|If the root folder doesn't exist, should it be created?
+
+|flowable.content.storage.root-folder
+|contentstorage.fs.root-folder
+|-
+|Root folder location where content files will be stored, for example, task attachments or form file uploads.
+
+|flowable.idm.enabled
+|flowable.db-identity-used
+|true
+|Whether the idm engine needs to be started.
+
+|flowable.idm.password-encoder
+|security.passwordencoder
+|-
+|The type of the password encoder that needs to be used.
+
+|flowable.idm.ldap.base-dn
+|ldap.basedn
+|-
+|The base 'distinguished name' (DN) from which the searches for users and groups are started. Use 'user-base-dn' or 'group-base-dn' when needing to differentiate between user and group base DN.
+
+|flowable.idm.ldap.enabled
+|ldap.enabled
+|false
+|Whether to enable LDAP IDM Service.
+
+|flowable.idm.ldap.password
+|ldap.password
+|-
+|The password that is used to connect to the LDAP system.
+
+|flowable.idm.ldap.port
+|ldap.port
+|-1
+|The port on which the LDAP system is running.
+
+|flowable.idm.ldap.server
+|ldap.server
+|-
+|The server host on which the LDAP system can be reached. For example 'ldap://localhost'.
+
+|flowable.idm.ldap.user
+|ldap.user
+|-
+|The user id that is used to connect to the LDAP system.
+
+|flowable.idm.ldap.attribute.email
+|ldap.attribute.email
+|-
+|Name of the attribute that matches the user email.
+This property is used when looking for an 'org.flowable.idm.api.User' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.User' object is done.
+
+|flowable.idm.ldap.attribute.first-name
+|ldap.attribute.firstname
+|-
+|Name of the attribute that matches the user first name.
+This property is used when looking for a 'org.flowable.idm.api.User' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.User' object is done.
+
+|flowable.idm.ldap.attribute.group-id
+|ldap.attribute.groupid
+|-
+|Name of the attribute that matches the group id.
+This property is used when looking for a 'org.flowable.idm.api.Group' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.Group' object is done.
+
+|flowable.idm.ldap.attribute.group-name
+|ldap.attribute.groupname
+|-
+|Name of the attribute that matches the group name.
+This property is used when looking for a 'org.flowable.idm.api.Group' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.Group' object is done.
+
+|flowable.idm.ldap.attribute.last-name
+|ldap.attribute.lastname
+|-
+|Name of the attribute that matches the user last name.
+This property is used when looking for a 'org.flowable.idm.api.User' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.User' object is done.
+
+|flowable.idm.ldap.attribute.user-id
+|ldap.attribute.userid
+|-
+|Name of the attribute that matches the user id.
+This property is used when looking for a 'org.flowable.idm.api.User' object and the mapping between the LDAP object and the Flowable 'org.flowable.idm.api.User' object is done. This property is optional and is only needed if searching for 'org.flowable.idm.api.User' objects using the Flowable API.
+
+|flowable.idm.ldap.cache.group-size
+|ldap.cache.groupsize
+|-1
+|Allows to set the size of the 'org.flowable.ldap.LDAPGroupCache'.
+This is an LRU cache that caches groups for users and thus avoids hitting the LDAP system each time the groups of a user needs to be known.
+The cache will not be instantiated if the value is less then zero. By default set to -1, so no caching is done.
+Note that the group cache is instantiated on the 'org.flowable.ldap.LDAPIdentityServiceImpl'.
+As such, if you have a custom implementation of the 'org.flowable.ldap.LDAPIdentityServiceImpl', do not forget to add the group cache functionality.
+
+|flowable.idm.ldap.query.all-groups
+|ldap.query.groupall
+|-
+|The query that is executed when searching for all groups.
+
+|flowable.idm.ldap.query.all-users
+|ldap.query.userall
+|-
+|The query that is executed when searching for all users.
+
+|flowable.idm.ldap.query.groups-for-user
+|ldap.query.groupsforuser
+|-
+|The query that is executed when searching for the groups of a specific user.
+ For example: `(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))`
+ Here, all the objects in LDAP with the class 'groupOfUniqueNames' and where the provided DN is a 'uniqueMember' are returned.
+ As shown in the example, the user id is injected by the typical {@link java.text.MessageFormat}, ie by using _{0}_
+ If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different
+ `org.flowable.ldap.LDAPQueryBuilder`, which allows for more customization than only the query.
+
+|flowable.idm.ldap.query.user-by-full-name-like
+|ldap.query.userbyname
+|-
+|The query that is executed when searching for a user by full name.
+ For example: `(&(objectClass=inetOrgPerson)(\|({0}=**{1}**)({2}={3})))`
+ Here, all the objects in LDAP with the class 'inetOrgPerson' and who have the matching first name or last name will be returned
+ Several things will be injected in the expression: {0} : the first name attribute {1} : the search text {2} : the last name attribute {3} : the search text
+ If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different
+ 'org.flowable.ldap.LDAPQueryBuilder', which allows for more customization than only the query.
+
+|flowable.idm.ldap.query.user-by-id
+|ldap.query.userbyid
+|-
+|The query that is executed when searching for a user by userId.
+ For example: `(&(objectClass=inetOrgPerson)(uid={0}))`
+ Here, all the objects in LDAP with the class 'inetOrgPerson' and who have the matching 'uid' attribute value will be returned.
+ As shown in the example, the user id is injected by the typical {@link java.text.MessageFormat}, ie by using _{0}_
+ If setting the query alone is insufficient for your specific LDAP setup, you can alternatively plug in a different
+ 'org.flowable.ldap.LDAPQueryBuilder', which allows for more customization than only the query.
+
+|flowable.mail.server.host
+|email.host
+|localhost
+|The host of the mail server.
+
+|flowable.mail.server.password
+|email.password
+|-
+|The password for the mail server authentication.
+
+|flowable.mail.server.port
+|email.port
+|1025
+|The port of the mail server.
+
+|flowable.mail.server.use-ssl
+|email.use-ssl
+|false
+|Sets whether SSL/TLS encryption should be enabled for the SMTP transport upon connection (SMTPS/POPS).
+
+|flowable.mail.server.use-tls
+|email.use-tls
+|false
+|Set or disable the STARTTLS encryption.
+
+|flowable.mail.server.username
+|email.username
+|-
+|The username that needs to be used for the mail server authentication.
+ If empty no authentication would be used.
+
+|flowable.process.definition-cache-limit
+|flowable.process-definitions.cache.max
+|-1
+|The maximum amount of process definitions available in the process definition cache.
+ Per default it is 1 (all process definitions)
+|===============
+
+.Old properties managed by Spring Boot
+[cols="4*",options="header"]
+|===============
+|Property name
+|Old Property
+|Default value
+|Description
+
+|spring.datasource.driver-class-name
+|datasource.driver
+|-
+|Fully qualified name of the JDBC driver. Auto-detected based on the URL by default.
+
+|spring.datasource.jndi-name
+|datasource.jndi.name
+|-
+|JNDI location of the datasource. Class, url, username & password are ignored when
+ set.
+
+|spring.datasource.password
+|datasource.password
+|-
+|Login password of the database.
+
+|spring.datasource.url
+|datasource.url
+|-
+|JDBC URL of the database.
+
+|spring.datasource.username
+|datasource.username
+|-
+|Login username of the database.
+
+|spring.datasource.hikari.connection-test-query
+|datasource.preferred-test-query
+|-
+|The SQL query to be executed to test the validity of connections.
+
+|spring.datasource.hikari.connection-timeout
+|datasource.connection.timeout
+|-
+|The maximum number of milliseconds that a client will wait for a connection from the pool. If this time is exceeded without a connection becoming available, a SQLException will be thrown when getting a connection.
+
+|spring.datasource.hikari.idle-timeout
+|datasource.connection.idletimeout
+|-
+|The maximum amount of time (in milliseconds) that a connection is allowed to sit idle in the pool.
+Whether a connection is retired as idle or not is subject to a maximum variation of +30 seconds, and average variation of +15 seconds.
+A connection will never be retired as idle before this timeout.
+A value of 0 means that idle connections are never removed from the pool.
+
+|spring.datasource.hikari.max-lifetime
+|datasource.connection.maxlifetime
+|-
+|This property controls the maximum lifetime of a connection in the pool. When a connection reaches this
+timeout, even if recently used, it will be retired from the pool. An in-use connection will never be
+retired, only when it is idle will it be removed.
+
+|spring.datasource.hikari.maximum-pool-size
+|datasource.connection.maxpoolsize
+|-
+|The property controls the maximum size that the pool is allowed to reach, including both idle and in-use
+connections. Basically this value will determine the maximum number of actual connections to the database
+backend.
+When the pool reaches this size, and no idle connections are available, calls to getConnection() will
+block for up to connectionTimeout milliseconds before timing out.
+
+|spring.datasource.hikari.minimum-idle
+|datasource.connection.minidle
+|-
+|The property controls the minimum number of idle connections that HikariCP tries to maintain in the pool,
+including both idle and in-use connections. If the idle connections dip below this value, HikariCP will
+make a best effort to restore them quickly and efficiently.
+
+|spring.servlet.multipart.max-file-size
+|file.upload.max.size
+|10MB
+|Max file size. Values can use the suffixes "MB" or "KB" to indicate megabytes or kilobytes, respectively.
+|===============
+
+
+.Not used old properties
+[cols="2*",options="header"]
+|===============
+|Old property
+|Description
+
+|datasource.jndi.resource-ref
+|Spring Boot does not support configuring JNDI resourceRef. Use entire resource reference in the name.
+
+|email.use-credentials
+|In case you don't want to use credentials, set the password and user to empty.
+|===============
+
+
 
 [[flowableIDMApp]]
 
@@ -122,10 +481,11 @@ The Flowable IDM application is used by all other three Flowable web application
 
 The IDM application boots the IDM engine at startup and will create the identity tables as defined in the IDM engine in the datasource defined in the properties configuration.
 
-When the Flowable IDM application is deployed and started, it will check if there's a user available in the ACT_ID_USER table, and if not it will use the admin.userid property to create a new default admin user in this table. It will also add all available privileges in the Flowable project to the newly created admin user:
+When the Flowable IDM application is deployed and started, it will check if there's a user available in the ACT_ID_USER table, and if not it will use the `flowable.common.app.idm-admin.user` property to create a new default admin user in this table.
+It will also add all available privileges in the Flowable project to the newly created admin user:
 
 * access-idm: provides the privilege to manage users, groups and privileges
-* access-admin: allows the user to login to the Flowable Admin application and manage the Flowable engines
+* access-admin: allows the user to login to the Flowable Admin application, manage the Flowable engines and access the Actuator endpoints of all the applications
 * access-modeler: enables access to the Flowable Modeler application
 * access-task: provides the privilege to login to the Flowable Task application
 * access-rest-api: allows the user to do call the REST API. Otherwise a 403 (forbidden) http status will be returned. Note that _flowable.rest.app.authentication-mode_ nees to be set to _verify-privilege_, which is the default.
@@ -140,7 +500,79 @@ image::images/flowable_idm_privilege_screen.png[align="center"]
 
 There's no option to define new privileges yet, but you can add and remove users and groups for the existing four privileges.
 
-In addition to the default identity tables, the IDM application can also be configured to use a LDAP server. To connect to a LDAP server, additional properties in the flowable-ui-app.properties file are needed:
+This are the IDM UI App specific properties.
+
+.IDM UI App Properties
+[cols="4*",options="header"]
+|===============
+|Property name
+|Old Property
+|Default value
+|Description
+
+|flowable.idm.app.bootstrap
+|idm.bootstrap.enabled
+|true
+|Whether the IDM App needs to be bootstrapped.
+
+|flowable.idm.app.rest-enabled
+|rest.idm-app.enabled
+|true
+|Enables the REST API (this is not the REST api used by the UI, but an api that's available over basic auth authentication).
+
+|flowable.idm.app.admin.email
+|admin.email
+|-
+|The email of the admin user.
+
+|flowable.idm.app.admin.first-name
+|admin.firstname
+|-
+|The first name of the admin user.
+
+|flowable.idm.app.admin.last-name
+|admin.lastname
+|-
+|The last name of the admin user.
+
+|flowable.idm.app.admin.password
+|admin.password
+|-
+|The password for the admin user.
+
+|flowable.idm.app.admin.user-id
+|admin.userid
+|-
+|The id of the admin user.
+
+|flowable.idm.app.security.remember-me-key
+|security.rememberme.key
+|testKey
+|The hash key that is used by Spring Security to hash the password values in the applications. Make sure that you change the value of this property.
+
+|flowable.idm.app.security.user-validity-period
+|cache.users.recheck.period
+|30000
+|How long should a user be cached before invalidating it in the cache for the cacheable CustomUserDetailsService.
+
+|flowable.idm.app.security.cookie.domain
+|security.cookie.domain
+|-
+|The domain for the cookie.
+
+|flowable.idm.app.security.cookie.max-age
+|security.cookie.max-age
+|2678400
+|The max age of the security cookie in seconds. Default is 31 days.
+
+|flowable.idm.app.security.cookie.refresh-age
+|security.cookie.refresh-age
+|86400
+|The refresh age of the cookie in seconds. Default is 1 day.
+|===============
+
+In addition to the default identity tables, the IDM application can also be configured to use an LDAP server.
+To connect to a LDAP server, additional properties in the application.properties file (or any other way of configuring the application) are needed:
 
 [source,linenums]
 ----
@@ -167,11 +599,15 @@ flowable.idm.ldap.cache.group-size=10000
 flowable.idm.ldap.cache.group-expiration=180000
 ----
 
-When the flowable.idm.ldap.enabled property is set to true, the IDM app will expect the other LDAP properties to have been filled-in. In this example configuration the server configuration + LDAP queries for the Apache Directory Server are provided. For other LDAP servers, like Active Directory, other configuration values are needed.
+When the `flowable.idm.ldap.enabled` property is set to true, the IDM app will expect the other LDAP properties to have been filled-in.
+In this example configuration the server configuration + LDAP queries for the Apache Directory Server are provided.
+For other LDAP servers, like Active Directory, other configuration values are needed.
 
 When LDAP is configured, authentication and group retrieval for a user will be done through the LDAP server. Only privileges will still be retrieved from the Flowable identity tables. So make sure each LDAP user has the correct privileges defined in the IDM application.
 
-If the IDM application is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables. If there are no privileges (only when booting the first time), the 4 default privileges will be created and the admin.userid property value (from flowable-ui-app.properties) will be used as the user id to get all 4 privileges. So make sure that the admin.userid property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.
+If the IDM application is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables.
+If there are no privileges (only when booting the first time), the 4 default privileges will be created and the `flowable.common.app.idm-admin.user` property value (from application.properties or configured in the environment) will be used as the user id to get all 4 privileges.
+So make sure that the `flowable.common.app.idm-admin.user` property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.
 
 [[flowableModelerApp]]
 
@@ -260,7 +696,34 @@ image::images/flowable_modeler_appdetails_screen.png[align="center"]
 From this view, you can download the app definition in two different formats. The first download button (with the arrow pointing downwards) can be used to
 download the app definition with the JSON model files for each included model. This makes it easy to share app definitions between different Flowable Modeler applications. The second download button (with the arrow point to upper right) will provide a BAR file of the app definition models, which can be deployed on the Flowable engine. In the BAR file, only the deployable artifacts are included, such as the BPMN 2.0 XML file and the DMN XML file, and not the JSON model files. All files in a BAR file deployed on a Flowable engine are stored in the database, so therefore only the deployable files are included.
 
-From the app definition details view, you can also _Publish_ the app definition directly to the Flowable engine. The Flowable Modeler uses the URL defined in the flowable-ui-app.properties file with the _flowable.modeler.app.deployment-api-url_ property key. By default, the deployment URL is configured so the app definition will be deployed on the Flowable Task application when it's running. However, this can be changed to use the Flowable REST application, for example. Make sure the Flowable Task application is running and click on the _Publish_ button. The app definition is now deployed as a BAR file to the Flowable Task application.
+From the app definition details view, you can also _Publish_ the app definition directly to the Flowable engine. The Flowable Modeler uses the URL defined in the application.properties file with the _flowable.modeler.app.deployment-api-url_ property key. By default, the deployment URL is configured so the app definition will be deployed on the Flowable Task application when it's running. However, this can be changed to use the Flowable REST application, for example. Make sure the Flowable Task application is running and click on the _Publish_ button. The app definition is now deployed as a BAR file to the Flowable Task application.
+
+This are the Modeler UI App specific properties.
+
+.Modeler UI App Properties
+[cols="4*",options="header"]
+|===============
+|Property name
+|Old Property
+|Default value
+|Description
+
+|flowable.modeler.app.data-source-prefix
+|datasource.prefix
+|-
+|The prefix for the database tables.
+
+|flowable.modeler.app.deployment-api-url
+|deployment.api.url
+|http://localhost:8080/flowable-task/process-api
+|The root URI to the REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine.
+ Default url for the Flowable Task application is http://localhost:8080/flowable-task/process-api
+
+|flowable.modeler.app.rest-enabled
+|rest.modeler-app.enabled
+|true
+|Enables the REST API (this is not the REST api used by the UI, but an api that's available over basic auth authentication).
+|===============
 
 
 [[flowableTaskApp]]
@@ -304,6 +767,27 @@ image::images/flowable_task_taskfilter_screen.png[align="center", width="400"]
 
 By default, the assignment filter is set to _Tasks where I am involved_. This doesn't show the tasks where you are a candidate, such as tasks that are available to a specific candidate group before they are assigned to a specific person. To show candidate tasks you can select the _Tasks where I am one of the candidates_ assignment filter option.
 
+This are the Task UI App specific properties.
+
+.Task UI App Properties
+[cols="4*",options="header"]
+|===============
+|Property name
+|Old Property
+|Default value
+|Description
+
+|flowable.experimental.debugger.enabled
+|debugger.enabled
+|false
+|Whether the process debugger should be enabled.
+
+|flowable.task.app.rest-enabled
+|rest.task-app.enabled
+|true
+|Enables the REST API (this is not the REST api used by the UI, but an api that's available over basic auth authentication).
+|===============
+
 
 [[flowableAdminApp]]
 
@@ -330,6 +814,62 @@ image::images/flowable_admin_processdefinitiondetails_screen.png[align="center"]
 In the process definition details view, the first page of process instances is shown, together with optional decision table definitions and form definitions that are used in the process definition. For the vacation request process definition, there's one connected decision table and one connected form definition. Clicking on the decision table definition navigates the Flowable Admin application to the DMN engine. You can always navigate back to the Process engine by clicking on the _Parent Deployment ID_ link.
 
 In addition to the deployments and definitions, you can also query on process instances, tasks, jobs and event subscriptions in the Process engine. The views all work in a similar way to what's already been described.
+
+This are the Admin UI App specific properties
+
+.Admin UI App Properties
+[cols="4*",options="header"]
+|===============
+|Property name
+|Old Property
+|Default value
+|Description
+
+|flowable.admin.app.data-source-prefix
+|datasource.prefix
+|
+|The prefix for the database tables.
+
+|flowable.admin.app.security.encryption.credentials-i-v-spec
+|security.encryption.credentials-i-v-spec
+|-
+|The string that needs to be used to create an IvParameterSpec object using it's the bytes.
+
+|flowable.admin.app.security.encryption.credentials-secret-spec
+|security.encryption.credentials-secret-spec
+|-
+|The string that needs to be used to create a SecretKeySpec using it's bytes.
+|===============
+
+In addition to these properties, the Flowable admin application has a few more properties. The full
+content of the properties file can be viewed on {sc-flowable-ui-admin}/flowable-ui-admin-app/src/main/resources/application.properties[Github].
+The additional properties are mainly used for defining the initial values for the REST endpoints for the different engines.
+The Admin application uses the initial values to make a connection to the Flowable engines, but the values can be overridden in the Admin application configuration view and these values are stored in the __ACT\_ADM\_SERVER\_CONFIG__ table.
+An example of the BPMN Engine REST properties is shown below:
+
+[source,linenums]
+----
+flowable.admin.app.server-config.process.app.name=Flowable Process app
+flowable.admin.app.server-config.process.description=Flowable Process REST config
+flowable.admin.app.server-config.process.server-address=http://localhost
+flowable.admin.app.server-config.process.app.port=8080
+flowable.admin.app.server-config.process.context-root=flowable-task
+flowable.admin.app.server-config.process.rest-root=process-api
+flowable.admin.app.server-config.process.app.user=admin
+flowable.admin.app.server-config.process.app.password=test
+----
+
+These values can be used when the Flowable Task app (with all the Flowable engines included) is managed by the Flowable Admin application.
+
+.Admin UI App Properties managed by Spring Boot
+[cols="2*",options="header"]
+|===============
+|Old property
+|Description
+
+|message.reloading.enabled
+|Using Spring Boot MessageSourceAutoConfiguration. Set the duration with `spring.messages.cache-duration`.
+|===============
 
 
 === Internationalization
@@ -363,3 +903,26 @@ $translateProvider.useStaticFilesLoader({
 For example; your browser is configured for English (United States) and provides the language key _en-US_. Without the mapping Angular Translate will try to fetch the corresponding translation file _en-US.json_. (If this is not available it will fallback to 'en' and load the _en.json_ translation file)
 
 By uncommenting the _.registerAvailableLanguageKeys_ block you can map _en-US_ (and all other _en_ language keys) to the _en.json_ language file.
+
+=== Production ready endpoints
+
+The https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html[Production ready endpoints] from Spring Boot are present for all applications.
+To have an overview of all the available Endpoints have a look at the https://docs.spring.io/spring-boot/docs/current/actuator-api/html/[Actuator Web API Documentation].
+
+This properties are set per default:
+
+[source,linenums]
+-----
+# Expose all actuator endpoints to the web
+# They are exposed, but only authenticated users can see /info and /health abd users with access-admin can see the others
+management.endpoints.web.exposure.include=*
+# Full health details should only be displayed when a user is authorized
+management.endpoint.health.show-details=when_authorized
+# Only users with role access-admin can access full health details
+management.endpoint.health.roles=access-admin
+-----
+
+The security is configured in such way that the `info` and `health` endpoint are exposed to all authenticated users.
+Full details of the `health` endpoint can only be seen by users with the privilege `access-admin`.
+In case you want to change that you need to configure `management.endpoint.health.show-details`.
+All the rest of the endpoints are accessing only to users with the `access-admin` privilege.

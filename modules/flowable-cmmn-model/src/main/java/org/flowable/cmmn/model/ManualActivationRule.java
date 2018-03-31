@@ -16,5 +16,8 @@ package org.flowable.cmmn.model;
  * @author Joram Barrez
  */
 public class ManualActivationRule extends PlanItemRule {
-    
+    @Override
+    public String toString() {
+        return "ManualActivationRule{} " + super.toString();
+    }
 }

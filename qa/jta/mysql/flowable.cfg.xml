@@ -51,6 +51,7 @@
     <property name="idGenerator">
       <bean class="org.flowable.engine.impl.persistence.StrongUuidGenerator" />
     </property>
+    <property name="enableProcessDefinitionHistoryLevel" value="true" />
     <property name="enableProcessDefinitionInfoCache" value="true" />
   </bean>
   

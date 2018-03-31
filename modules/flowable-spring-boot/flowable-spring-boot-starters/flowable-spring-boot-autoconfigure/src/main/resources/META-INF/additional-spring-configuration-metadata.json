@@ -181,7 +181,7 @@
       }
     },
     {
-      "name": "contentstorage.fs.rootFolder",
+      "name": "contentstorage.fs.root-folder",
       "type": "java.lang.String",
       "deprecation": {
         "level": "error",
@@ -190,7 +190,7 @@
       }
     },
     {
-      "name": "contentstorage.fs.createRoot",
+      "name": "contentstorage.fs.create-root",
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
@@ -208,7 +208,7 @@
       }
     },
     {
-      "name": "datasource.jndi.resourceRef",
+      "name": "datasource.jndi.resource-ref",
       "deprecation": {
         "level": "error",
         "reason": "Spring Boot does not support configuring JNDI resourceRef. Use entire resource reference in the name."
@@ -337,7 +337,7 @@
       "deprecation": {
         "level": "error",
         "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.mail-server-host"
+        "replacement": "flowable.mail.server.host"
       }
     },
     {
@@ -346,15 +346,15 @@
       "deprecation": {
         "level": "error",
         "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.mail-server-port"
+        "replacement": "flowable.mail.server.port"
       }
     },
     {
-      "name": "email.useCredentials",
+      "name": "email.use-credentials",
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
-        "reason": "Using improved setup for Spring Boot. In case you don't want to use credentials, set the password and user to empty."
+        "reason": "In case you don't want to use credentials, set the password and user to empty."
       }
     },
     {
@@ -363,7 +363,7 @@
       "deprecation": {
         "level": "error",
         "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.mail-server-user-name"
+        "replacement": "flowable.mail.server.username"
       }
     },
     {
@@ -372,25 +372,88 @@
       "deprecation": {
         "level": "error",
         "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.mail-server-password"
+        "replacement": "flowable.mail.server.password"
       }
     },
     {
-      "name": "email.useSSL",
+      "name": "email.use-ssl",
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
         "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.mail-server-use-ssl"
+        "replacement": "flowable.mail.server.use-ssl"
       }
     },
     {
-      "name": "email.useTLS",
+      "name": "email.use-tls",
       "type": "java.lang.Boolean",
       "deprecation": {
         "level": "error",
         "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.mail-server-use-tls"
+        "replacement": "flowable.mail.server.use-tls"
+      }
+    },
+    {
+      "name": "flowable.mail-server-host",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Moved properties to new group.",
+        "replacement": "flowable.mail.server.host"
+      }
+    },
+    {
+      "name": "flowable.mail-server-port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Moved properties to new group.",
+        "replacement": "flowable.mail.server.port"
+      }
+    },
+    {
+      "name": "flowable.mail-server-user-name",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Moved properties to new group.",
+        "replacement": "flowable.mail.server.username"
+      }
+    },
+    {
+      "name": "flowable.mail-server-password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Moved properties to new group.",
+        "replacement": "flowable.mail.server.password"
+      }
+    },
+    {
+      "name": "flowable.mail-server-default-from",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Moved properties to new group.",
+        "replacement": "flowable.mail.server.default-from"
+      }
+    },
+    {
+      "name": "flowable.mail-server-use-ssl",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Moved properties to new group.",
+        "replacement": "flowable.mail.server.use-ssl"
+      }
+    },
+    {
+      "name": "flowable.mail-server-use-tls",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Moved properties to new group.",
+        "replacement": "flowable.mail.server.use-tls"
       }
     },
     {
@@ -401,6 +464,21 @@
         "reason": "Using improved setup for Spring Boot.",
         "replacement": "flowable.process.definition-cache-limit"
       }
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.dmn.FlowableDmnProperties",
+      "name": "flowable.process-definition-location-suffixes",
+      "defaultValue": "**.bpmn20.xml,**.bpmn"
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.cmmn.FlowableCmmnProperties",
+      "name": "flowable.cmmn.resource-suffixes",
+      "defaultValue": "**.cmmn,**.cmmn11,**.cmmn.xml,**.cmmn11.xml"
+    },
+    {
+      "sourceType": "org.flowable.spring.boot.dmn.FlowableDmnProperties",
+      "name": "flowable.dmn.resource-suffixes",
+      "defaultValue": "**.dmn,**.dmn.xml,**.dmn11,**.dmn11.xml"
     },
     {
       "sourceType": "org.flowable.spring.boot.FlowableServlet",

@@ -13,20 +13,32 @@
 package org.flowable.app.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.util.Assert;
 
 /**
- * Configuration properties for the remote IDM authentication.
+ * Common configuration properties that needs to be shared by all the UI apps.
  *
  * @author Filip Hrisafov
  */
-@ConfigurationProperties(prefix = "flowable.app.idm")
-public class FlowableRemoteIdmProperties {
+@ConfigurationProperties(prefix = "flowable.common.app")
+public class FlowableCommonAppProperties {
+
+    /**
+     * The static tenant id used for the DefaultTenantProvider. The modeler app uses this to determine under which tenant id to store and publish models.
+     * When not provided, empty or only contains whitespace it defaults to the user's tenant id if available otherwise it uses no tenant id.
+     */
+    private String tenantId;
+
+    /**
+     * The default role prefix that needs to be used by Spring Security.
+     */
+    private String rolePrefix = "ROLE_";
 
     /**
      * The URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid, and for the user info and token info REST GET calls.
      */
-    private String url;
+    private String idmUrl;
 
     /**
      * The URL to which the redirect should occur after a successful authentication.
@@ -36,29 +48,49 @@ public class FlowableRemoteIdmProperties {
     /**
      * The cache configuration for the login tokens.
      */
+    @NestedConfigurationProperty
     private final Cache cacheLoginTokens = new Cache();
 
     /**
      * The cache configuration for the login users.
      */
+    @NestedConfigurationProperty
     private final Cache cacheLoginUsers = new Cache();
 
     /**
      * The cache configuration for the users.
      */
+    @NestedConfigurationProperty
     private final Cache cacheUsers = new Cache();
 
     /**
      * The information for the IDM Admin user.
      */
-    private final Admin admin = new Admin();
+    @NestedConfigurationProperty
+    private final Admin idmAdmin = new Admin();
 
-    public String getUrl() {
-        return url;
+    public String getTenantId() {
+        return tenantId;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getRolePrefix() {
+        return rolePrefix;
+    }
+
+    public void setRolePrefix(String rolePrefix) {
+        this.rolePrefix = rolePrefix;
+    }
+
+    public String getIdmUrl() {
+        return idmUrl;
+    }
+
+    public void setIdmUrl(String idmUrl) {
+        this.idmUrl = idmUrl;
     }
 
     public String getRedirectOnAuthSuccess() {
@@ -81,13 +113,13 @@ public class FlowableRemoteIdmProperties {
         return cacheUsers;
     }
 
-    public Admin getAdmin() {
-        return admin;
+    public Admin getIdmAdmin() {
+        return idmAdmin;
     }
 
     public String determineIdmAppUrl() {
-        String idmAppUrl = getUrl();
-        Assert.hasText(idmAppUrl, "`flowable.app.idm.url` must be set");
+        String idmAppUrl = getIdmUrl();
+        Assert.hasText(idmAppUrl, "`flowable.common.app.idm-url` must be set");
 
         if (!idmAppUrl.endsWith("/")) {
             idmAppUrl += "/";

@@ -56,7 +56,7 @@ public class BootstrapConfiguration {
      * Initialize the rest admin user
      */
     @Bean
-    @ConditionalOnProperty(prefix = "flowable.rest.app.admin", name = "userId")
+    @ConditionalOnProperty(prefix = "flowable.rest.app.admin", name = "user-id")
     public CommandLineRunner initDefaultAdminUserAndPrivilegesRunner() {
         return args -> {
             if (StringUtils.isNotEmpty(restAppProperties.getAdmin().getUserId())) {
@@ -101,7 +101,7 @@ public class BootstrapConfiguration {
     
     protected void initializeDefaultPrivileges(String restAdminId) {
         initializePrivilege(restAdminId, SecurityConstants.PRIVILEGE_ACCESS_REST_API);
-        initializePrivilege(restAdminId, "ROLE_ACTUATOR");
+        initializePrivilege(restAdminId, SecurityConstants.ACCESS_ADMIN);
     }
 
     protected void initializePrivilege(String restAdminId, String privilegeName) {

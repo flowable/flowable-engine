@@ -1081,7 +1081,11 @@
 							</goals>
 							<configuration>
 								<mainClass>${start-class}</mainClass>
-								<executable>true</executable>
+								<!-- The generated Spring Boot jar / war should not be made executable be prepending a launch script to the jar / war
+								Such jars cause issues when being unpacked by maven dependency:unpack, it can also cause issues when deploying in a servlet container.
+								NB: The jar / war is still self contained and can be run with java -jar
+								-->
+								<executable>false</executable>
 							</configuration>
 						</execution>
 					</executions>
@@ -1369,6 +1373,7 @@
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
 				<module>modules/flowable-ui-common</module>
+				<module>modules/flowable-ui-edge</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>

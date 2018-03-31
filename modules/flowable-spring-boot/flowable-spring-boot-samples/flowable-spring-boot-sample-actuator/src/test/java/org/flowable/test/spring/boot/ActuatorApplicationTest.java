@@ -22,9 +22,9 @@ import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -41,7 +41,6 @@ import flowable.Application;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebClient(registerRestTemplate = true)
-@TestPropertySource("/test-actuator-endpoint.properties")
 public class ActuatorApplicationTest {
 
     @LocalServerPort
@@ -57,7 +56,7 @@ public class ActuatorApplicationTest {
     public void mvcEndpoint() throws Throwable {
 
         ResponseEntity<Map<String, Object>> mapResponseEntity = restTemplate.exchange(
-            "http://localhost:" + serverPort + "/flowable/",
+            "http://localhost:" + serverPort + "/actuator/flowable/",
             HttpMethod.GET,
             null,
             new ParameterizedTypeReference<Map<String, Object>>() {
@@ -79,7 +78,7 @@ public class ActuatorApplicationTest {
     @Test
     public void infoEndpoint() {
         ResponseEntity<Map<String, Object>> response = restTemplate
-            .exchange("http://localhost:" + serverPort + "/info/", HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
+            .exchange("http://localhost:" + serverPort + "/actuator/info/", HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
 
             });
 

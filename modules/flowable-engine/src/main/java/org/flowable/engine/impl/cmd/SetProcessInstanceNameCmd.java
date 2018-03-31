@@ -73,7 +73,7 @@ public class SetProcessInstanceNameCmd implements Command<Void>, Serializable {
         execution.setName(name);
 
         // Record the change in history
-        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceNameChange(processInstanceId, name);
+        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceNameChange(execution, name);
 
         return null;
     }

@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -304,7 +305,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
 
     @SuppressWarnings("rawtypes")
-    protected void executeOriginalBehavior(DelegateExecution execution, int loopCounter) {
+    protected void executeOriginalBehavior(DelegateExecution execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
         if (usesCollection() && collectionElementVariable != null) {
             Collection collection = (Collection) resolveAndValidateCollection(execution);
 
@@ -319,7 +320,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         }
 
         execution.setCurrentFlowElement(activity);
-        CommandContextUtil.getAgenda().planContinueMultiInstanceOperation((ExecutionEntity) execution, loopCounter);
+        CommandContextUtil.getAgenda().planContinueMultiInstanceOperation((ExecutionEntity) execution, multiInstanceRootExecution, loopCounter);
     }
 
     @SuppressWarnings("rawtypes")
@@ -401,7 +402,27 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
 
     protected Integer getLocalLoopVariable(DelegateExecution execution, String variableName) {
-        return (Integer) execution.getVariableLocal(variableName);
+        Map<String, Object> localVariables = execution.getVariablesLocal();
+        if (localVariables.containsKey(variableName)) {
+            return (Integer) execution.getVariableLocal(variableName);
+            
+        } else if (!execution.isMultiInstanceRoot()) {
+            DelegateExecution parentExecution = execution.getParent();
+            localVariables = parentExecution.getVariablesLocal();
+            if (localVariables.containsKey(variableName)) {
+                return (Integer) parentExecution.getVariableLocal(variableName);
+                
+            } else if (!parentExecution.isMultiInstanceRoot()) {
+                DelegateExecution superExecution = parentExecution.getParent();
+                return (Integer) superExecution.getVariableLocal(variableName);
+                
+            } else {
+                return null;
+            }
+            
+        } else {
+            return null;
+        }
     }
 
     /**

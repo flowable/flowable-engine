@@ -33,7 +33,7 @@ angular.module('flowableApp')
             ];
 
             // Init state options
-            $scope.model.stateFilterOptions  = [
+            $scope.model.stateFilterOptions = [
                 { id: 'open', title: 'TASK.FILTER.STATE-OPEN' },
                 { id: 'completed', title: 'TASK.FILTER.STATE-COMPLETED' }
             ];

@@ -17,6 +17,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -31,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
-import org.flowable.app.properties.FlowableRemoteIdmProperties;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.security.CookieConstants;
 import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.service.idm.RemoteIdmService;
@@ -55,7 +58,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
     protected final RemoteIdmService remoteIdmService;
 
-    protected final FlowableRemoteIdmProperties properties;
+    protected final FlowableCommonAppProperties properties;
 
     protected FlowableCookieFilterCallback filterCallback;
 
@@ -70,7 +73,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
     protected LoadingCache<String, FlowableAppUser> userCache;
 
-    public FlowableCookieFilter(RemoteIdmService remoteIdmService, FlowableRemoteIdmProperties properties) {
+    public FlowableCookieFilter(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
         this.remoteIdmService = remoteIdmService;
         this.properties = properties;
     }
@@ -89,7 +92,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected void initTokenCache() {
-        FlowableRemoteIdmProperties.Cache cache = properties.getCacheLoginTokens();
+        FlowableCommonAppProperties.Cache cache = properties.getCacheLoginTokens();
         Long maxSize = cache.getMaxSize();
         Long maxAge = cache.getMaxAge();
         tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(maxAge, TimeUnit.SECONDS).recordStats()
@@ -109,7 +112,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected void initUserCache() {
-        FlowableRemoteIdmProperties.Cache cache = properties.getCacheLoginUsers();
+        FlowableCommonAppProperties.Cache cache = properties.getCacheLoginUsers();
         Long userMaxSize = cache.getMaxSize();
         Long userMaxAge = cache.getMaxAge();
         userCache = CacheBuilder.newBuilder().maximumSize(userMaxSize).expireAfterWrite(userMaxAge, TimeUnit.SECONDS).recordStats()
@@ -299,12 +302,16 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
 
         String[] tokens = StringUtils.delimitedListToStringArray(cookieAsPlainText, DELIMITER);
 
-        if ((tokens[0].equalsIgnoreCase("http") || tokens[0].equalsIgnoreCase("https")) && tokens[1].startsWith("//")) {
-            // Assume we've accidentally split a URL (OpenID identifier)
-            String[] newTokens = new String[tokens.length - 1];
-            newTokens[0] = tokens[0] + ":" + tokens[1];
-            System.arraycopy(tokens, 2, newTokens, 1, newTokens.length - 1);
-            tokens = newTokens;
+        for (int i = 0; i < tokens.length; i++)
+        {
+            try
+            {
+                tokens[i] = URLDecoder.decode(tokens[i], StandardCharsets.UTF_8.toString());
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                logger.error(e.getMessage(), e);
+            }
         }
 
         return tokens;

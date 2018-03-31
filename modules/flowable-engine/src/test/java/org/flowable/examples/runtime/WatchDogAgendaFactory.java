@@ -71,8 +71,8 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
-        public void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter) {
-            agenda.planContinueMultiInstanceOperation(execution, loopCounter);
+        public void planContinueMultiInstanceOperation(ExecutionEntity execution, ExecutionEntity multiInstanceExecution, int loopCounter) {
+            agenda.planContinueMultiInstanceOperation(execution, multiInstanceExecution, loopCounter);
         }
 
         @Override
@@ -88,6 +88,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         @Override
         public void planTriggerExecutionOperation(ExecutionEntity execution) {
             agenda.planTriggerExecutionOperation(execution);
+        }
+
+        @Override
+        public void planAsyncTriggerExecutionOperation(ExecutionEntity execution) {
+            agenda.planAsyncTriggerExecutionOperation(execution);
         }
 
         @Override
