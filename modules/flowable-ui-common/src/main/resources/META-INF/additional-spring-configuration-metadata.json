@@ -42,7 +42,7 @@
       "deprecation": {
         "level": "error",
         "reason": "Using Flowable IDM App auto-configuration instead.",
-        "replacement": "flowable.common.app.idm-url"
+        "replacement": "flowable.common.app.idm-redirect-url"
       }
     },
     {
