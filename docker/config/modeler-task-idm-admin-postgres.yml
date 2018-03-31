@@ -8,17 +8,18 @@ services:
               - flowable-idm-app
               - flowable-task-app
           environment:
-              - spring.datasource.driver-class-name=org.postgresql.Driver
-              - spring.datasource.url=jdbc:postgresql://flowable-db:5432/flowable
-              - spring.datasource.username=flowable
-              - spring.datasource.password=flowable
-              - flowable.common.app.idm-url=http://flowable-idm-app:8080/flowable-idm
-              - flowable.common.app.idm-admin.user=admin
-              - flowable.common.app.idm-admin.password=test
-              - flowable.modeler.app.deployment-api-url=http://flowable-task-app:9999/flowable-task/process-api
+              - SERVER_PORT=8888
+              - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+              - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
+              - SPRING_DATASOURCE_USERNAME=flowable
+              - SPRING_DATASOURCE_PASSWORD=flowable
+              - FLOWABLE_COMMON_APP_IDM-URL=http://localhost:8080/flowable-idm
+              - FLOWABLE_COMMON_APP_IDM-ADMIN.USER=admin
+              - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
+              - FLOWABLE.MODELER.APP.DEPLOYMENT-API-URL=http://flowable-task-app:9999/flowable-task/process-api
           ports:
               - 8888:8888
-          entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-modeler.jar", "-httpPort=8888", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+          entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-modeler.war"]
     flowable-task-app:
         image: flowable/flowable-task
         container_name: flowable-task
@@ -26,29 +27,31 @@ services:
             - flowable-db
             - flowable-idm-app
         environment:
-            - spring.datasource.driver-class-name=org.postgresql.Driver
-            - spring.datasource.url=jdbc:postgresql://flowable-db:5432/flowable
-            - spring.datasource.username=flowable
-            - spring.datasource.password=flowable
-            - flowable.common.app.idm-url=http://flowable-idm-app:8080/flowable-idm
-            - flowable.common.app.idm-admin.user=admin
-            - flowable.common.app.idm-admin.password=test
+            - SERVER_PORT=9999
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+            - FLOWABLE_COMMON_APP_IDM-URL=http://flowable-idm-app:8080/flowable-idm
+            - FLOWABLE_COMMON_APP_IDM-ADMIN.USER=admin
+            - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
         ports:
             - 9999:9999
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-task.jar", "-httpPort=9999", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-task.war"]
     flowable-idm-app:
         image: flowable/flowable-idm
         container_name: flowable-idm
         depends_on:
             - flowable-db
         environment:
-            - spring.datasource.driver-class-name=org.postgresql.Driver
-            - spring.datasource.url=jdbc:postgresql://flowable-db:5432/flowable
-            - spring.datasource.username=flowable
-            - spring.datasource.password=flowable
+            - SERVER_PORT=8080
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
     flowable-admin-app:
         image: flowable/flowable-admin
         container_name: flowable-admin
@@ -57,10 +60,11 @@ services:
             - flowable-idm-app
             - flowable-task-app
         environment:
-            - spring.datasource.driver-class-name=org.postgresql.Driver
-            - spring.datasource.url=jdbc:postgresql://flowable-db:5432/flowable
-            - spring.datasource.username=flowable
-            - spring.datasource.password=flowable
+            - SERVER_PORT=9988
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
             - flowable.common.app.idm-url=http://flowable-idm-app:8080/flowable-idm
             - flowable.common.app.idm-admin.user=admin
             - flowable.common.app.idm-admin.password=test
