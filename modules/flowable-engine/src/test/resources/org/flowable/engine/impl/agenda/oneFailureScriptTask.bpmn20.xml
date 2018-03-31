@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:activiti="http://activiti.org/bpmn"
+        targetNamespace="ExamplesCategory">
+
+    <process id="oneTaskFailingProcess" name="The One Task Process">
+        <documentation>This is a process for testing purposes</documentation>
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask"/>
+        <scriptTask id="theTask" name="failing script task" scriptFormat="groovy">
+            <script>FAIL COMMAND</script>
+        </scriptTask>
+        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>
