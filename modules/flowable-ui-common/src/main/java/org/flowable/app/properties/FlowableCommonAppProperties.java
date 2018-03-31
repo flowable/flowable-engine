@@ -151,14 +151,7 @@ public class FlowableCommonAppProperties {
             return idmAppRedirectUrl;
         }
         
-        String idmAppUrl = getIdmUrl();
-        Assert.hasText(idmAppUrl, "`flowable.common.app.idm-url` must be set");
-
-        if (!idmAppUrl.endsWith("/")) {
-            idmAppUrl += "/";
-        }
-
-        return idmAppUrl;
+        return determineIdmAppUrl();
     }
 
     /**
