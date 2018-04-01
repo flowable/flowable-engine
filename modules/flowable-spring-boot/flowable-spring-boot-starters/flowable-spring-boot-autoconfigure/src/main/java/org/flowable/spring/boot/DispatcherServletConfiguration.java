@@ -14,12 +14,12 @@ package org.flowable.spring.boot;
 
 import java.util.List;
 
+import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
 import org.flowable.common.rest.multipart.PutAwareStandardServletMultiPartResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Base dispatcher configuration that can be used to configure context for the REST API.
  */
 @Configuration
-@ComponentScan("org.flowable.rest.exception")
+@ComponentScan(basePackageClasses = BaseExceptionHandlerAdvice.class)
 @ConditionalOnClass(WebMvcConfigurationSupport.class)
 @EnableAsync
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
