@@ -321,7 +321,7 @@
             </configuration>
             <executions>
               <execution>
-                <phase>compile</phase>
+                <phase>generate-resources</phase>
                 <goals>
                   <goal>generate</goal>
                 </goals>
@@ -431,34 +431,13 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.tomcat.maven</groupId>
-            <artifactId>tomcat7-maven-plugin</artifactId>
-            <version>2.1</version>
-            <configuration>
-              <path>/</path>
-              <finalName>${project.build.finalName}.jar</finalName>
-            </configuration>
-            <executions>
-              <execution>
-                <id>tomcat-run</id>
-                <goals>
-                  <goal>exec-war-only</goal>
-                </goals>
-                <phase>package</phase>
-                <configuration>
-                  <path>/flowable-rest</path>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <groupId>com.spotify</groupId>
             <artifactId>docker-maven-plugin</artifactId>
             <version>0.4.13</version>
             <configuration>
               <imageName>flowable/${project.build.finalName}</imageName>
               <baseImage>flowable/java8_server</baseImage>
-              <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
+              <entryPoint>["java", "-jar", "/${project.build.finalName}.war"]</entryPoint>
               <forceTags>true</forceTags>
               <imageTags>
                 <imageTag>${project.version}</imageTag>
@@ -468,7 +447,7 @@
                 <resource>
                   <targetPath>/</targetPath>
                   <directory>${project.build.directory}</directory>
-                  <include>${project.build.finalName}.jar</include>
+                  <include>${project.build.finalName}.war</include>
                 </resource>
                 <resource>
                 <targetPath>/</targetPath>
