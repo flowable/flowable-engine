@@ -12,6 +12,8 @@
  */
 package org.flowable.app.service.runtime;
 
+import java.util.Map;
+
 import org.flowable.app.model.runtime.CompleteFormRepresentation;
 import org.flowable.app.model.runtime.SaveFormRepresentation;
 import org.flowable.app.security.SecurityUtils;
@@ -87,13 +89,16 @@ public class FlowableTaskFormService {
         }
 
         checkCurrentUserCanModifyTask(task);
-
+            
+        FormInfo formInfo = formRepositoryService.getFormModelById(saveFormRepresentation.getFormId());
+        Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo, saveFormRepresentation.getValues(), null);
+        
         if (task.getProcessInstanceId() != null) {
-            formService.saveFormInstanceByFormDefinitionId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, 
+            formService.saveFormInstanceByFormDefinitionId(formVariables, saveFormRepresentation.getFormId(), taskId, 
                             task.getProcessInstanceId(), task.getProcessDefinitionId());
             
         } else {
-            formService.saveFormInstanceWithScopeId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, 
+            formService.saveFormInstanceWithScopeId(formVariables, saveFormRepresentation.getFormId(), taskId, 
                             task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId());
         }
 
