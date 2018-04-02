@@ -42,9 +42,9 @@ import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.ExpressionFormField;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
-import org.flowable.form.model.SimpleFormModel;
 import org.flowable.form.model.Option;
 import org.flowable.form.model.OptionFormField;
+import org.flowable.form.model.SimpleFormModel;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,6 +168,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
                     }
                     Object variableValue = variables.get(field.getId());
                     optionFormField.setValue(variableValue);
+                    
                 } else if(FormFieldTypes.HYPERLINK.equals(field.getType())) {
                     Object variableValue = variables.get(field.getId());
                     // process expression if there is no value, otherwise keep it
@@ -185,6 +186,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
                             }
                         }
                     }
+                    
                 } else if (field instanceof ExpressionFormField) {
                     ExpressionFormField expressionField = (ExpressionFormField) field;
                     Expression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
@@ -349,11 +351,11 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
         for (FormField field : allFields) {
 
             JsonNode fieldValueNode = submittedFormFieldMap.get(field.getId());
-
+            
             if (fieldValueNode == null || fieldValueNode.isNull()) {
                 continue;
             }
-
+            
             String fieldType = field.getType();
             String fieldValue = fieldValueNode.asText();
 
@@ -366,6 +368,15 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
                 } catch (Exception e) {
                     LOGGER.error("Error parsing form date value for process instance {} and task {} with value {}", processInstanceId, taskId, fieldValue, e);
                 }
+                
+            } else if (fieldValueNode.isBoolean()) {
+                variables.put(field.getId(), fieldValueNode.asBoolean());
+                
+            } else if (fieldValueNode.isLong()) {
+                variables.put(field.getId(), fieldValueNode.asLong());
+                
+            } else if (fieldValueNode.isDouble()) {
+                variables.put(field.getId(), fieldValueNode.asDouble());
 
             } else {
                 variables.put(field.getId(), fieldValue);

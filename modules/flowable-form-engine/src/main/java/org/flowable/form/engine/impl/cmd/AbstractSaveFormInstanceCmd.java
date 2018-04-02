@@ -120,6 +120,9 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
 
                 } else if (variableValue instanceof Double) {
                     valuesNode.put(fieldId, (Double) variables.get(fieldId));
+                    
+                } else if (variableValue instanceof Boolean) {
+                    valuesNode.put(fieldId, (Boolean) variables.get(fieldId));
 
                 } else if (variableValue instanceof LocalDate) {
                     valuesNode.put(fieldId, ((LocalDate) variableValue).toString());
