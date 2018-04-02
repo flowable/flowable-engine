@@ -18,14 +18,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
-		<spring.framework.version>4.3.14.RELEASE</spring.framework.version>
-		<spring.security.version>4.2.4.RELEASE</spring.security.version>
+		<spring.framework.version>5.0.4.RELEASE</spring.framework.version>
+		<spring.security.version>5.0.3.RELEASE</spring.security.version>
 		<jackson.version>2.8.11</jackson.version>
 		<mule.version>3.8.0</mule.version>
     <camel.version>2.22.0</camel.version>
 		<cxf.version>3.2.5</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<spring.boot.version>1.5.10.RELEASE</spring.boot.version>
+		<spring.boot.version>2.0.0.RELEASE</spring.boot.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -161,9 +161,10 @@
 				<version>1.6.1</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.persistence</groupId>
-				<artifactId>persistence-api</artifactId>
-				<version>1.0</version>
+				<!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
+				<groupId>org.hibernate.javax.persistence</groupId>
+				<artifactId>hibernate-jpa-2.1-api</artifactId>
+				<version>1.0.0.Final</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
@@ -664,16 +665,10 @@
 				<version>1.1.1</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.openjpa</groupId>
-				<artifactId>openjpa</artifactId>
-				<version>1.2.2</version>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>5.2.16.Final</version>
 				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<artifactId>commons-logging</artifactId>
-						<groupId>commons-logging</groupId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
