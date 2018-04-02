@@ -17,11 +17,9 @@
     <modules>
         <module>flowable-spring-boot-starters</module>
         <module>flowable-spring-boot-samples</module>
-
     </modules>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <flowable.artifact>
             org.flowable.spring.boot
         </flowable.artifact>
@@ -30,7 +28,6 @@
         <spring.security.version>5.0.7.RELEASE</spring.security.version>
         <jackson.version>2.9.6</jackson.version>
         <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
-
     </properties>
 
     <dependencyManagement>
