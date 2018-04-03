@@ -37,16 +37,12 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT = "resourcedata";
 
     public static final String SEGMENT_TASK_RESOURCE = "tasks";
-    public static final String SEGMENT_EXECUTION_RESOURCE = "executions";
     public static final String SEGMENT_CASE_INSTANCE_RESOURCE = "case-instances";
+    public static final String SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE = "plan-item-instances";
     public static final String SEGMENT_VARIABLES = "variables";
-    public static final String SEGMENT_EVENT_SUBSCRIPTIONS = "event-subscriptions";
     public static final String SEGMENT_SUBTASKS = "subtasks";
     public static final String SEGMENT_IDENTITYLINKS = "identitylinks";
-    public static final String SEGMENT_COMMENTS = "comments";
     public static final String SEGMENT_EVENTS = "events";
-    public static final String SEGMENT_ATTACHMENTS = "attachments";
-    public static final String SEGMENT_ATTACHMENT_CONTENT = "content";
     public static final String SEGMENT_IDENTITYLINKS_FAMILY_GROUPS = "groups";
     public static final String SEGMENT_IDENTITYLINKS_FAMILY_USERS = "users";
     public static final String SEGMENT_VARIABLE_DATA = "data";
@@ -191,17 +187,7 @@ public final class CmmnRestUrls {
      * URL template for an identitylink on a task: <i>runtime/tasks/{0:taskId}/identitylinks /{1:family}/{2:identityId}/{3:type}</i>
      */
     public static final String[] URL_TASK_IDENTITYLINK = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS, "{1}", "{2}", "{3}" };
-
-    /**
-     * URL template for a task's identity links: <i>runtime/tasks/{0:taskId}/comments</i>
-     */
-    public static final String[] URL_TASK_COMMENT_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_COMMENTS };
-
-    /**
-     * URL template for a comment on a task: <i>runtime/tasks/{0:taskId}/comments/{1:commentId}</i>
-     */
-    public static final String[] URL_TASK_COMMENT = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_COMMENTS, "{1}" };
-
+    
     /**
      * URL template for an task's events: <i>runtime/tasks/{0:taskId}/events</i>
      */
@@ -211,21 +197,6 @@ public final class CmmnRestUrls {
      * URL template for an event on a task: <i>runtime/tasks/{0:taskId}/events/{1:eventId}</i>
      */
     public static final String[] URL_TASK_EVENT = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_EVENTS, "{1}" };
-
-    /**
-     * URL template for an task's attachments: <i>runtime/tasks/{0:taskId}/attachments</i>
-     */
-    public static final String[] URL_TASK_ATTACHMENT_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_ATTACHMENTS };
-
-    /**
-     * URL template for an attachment on a task: <i>runtime/tasks/{0:taskId}/attachments/{1:attachmentId}</i>
-     */
-    public static final String[] URL_TASK_ATTACHMENT = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_ATTACHMENTS, "{1}" };
-
-    /**
-     * URL template for the content for an attachment on a task: <i>runtime/tasks/{0:taskId}/attachments/{1:attachmentId}/content</i>
-     */
-    public static final String[] URL_TASK_ATTACHMENT_DATA = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_TASK_RESOURCE, "{0}", SEGMENT_ATTACHMENTS, "{1}", SEGMENT_ATTACHMENT_CONTENT };
 
     /**
      * URL template for process instance collection: <i>runtime/case-instances</i>
@@ -272,6 +243,21 @@ public final class CmmnRestUrls {
      */
     public static final String[] URL_CASE_INSTANCE_IDENTITYLINK = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS, 
                     SEGMENT_IDENTITYLINKS_FAMILY_USERS, "{1}", "{2}" };
+    
+    /**
+     * URL template for plan item instance collection: <i>cmmn-runtime/plan-item-instances</i>
+     */
+    public static final String[] URL_PLAN_ITEM_INSTANCE_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE };
+
+    /**
+     * URL template for process instance query: <i>cmmn-query/plan-item-instances</i>
+     */
+    public static final String[] URL_PLAN_ITEM_INSTANCE_QUERY = { SEGMENT_QUERY_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE };
+
+    /**
+     * URL template for a single case instance: <i>cmmn-runtime/plan-item-instances/{0:planItemInstanceId}</i>
+     */
+    public static final String[] URL_PLAN_ITEM_INSTANCE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}" };
     
     /**
      * URL template for a single job: <i>cmmn-management/jobs/{0:jobId}</i>

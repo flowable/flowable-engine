@@ -25,6 +25,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.deployer.ResourceNameUtil;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
@@ -41,6 +42,7 @@ import org.flowable.cmmn.rest.service.api.repository.DecisionTableResponse;
 import org.flowable.cmmn.rest.service.api.repository.DeploymentResourceResponse;
 import org.flowable.cmmn.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceResponse;
+import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceResponse;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskResponse;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.util.RestUrlBuilder;
@@ -461,6 +463,40 @@ public class CmmnRestResponseFactory {
 
         return result;
     }
+    
+    public List<PlanItemInstanceResponse> createPlanItemInstanceResponseList(List<PlanItemInstance> planItemInstances) {
+        List<PlanItemInstanceResponse> responseList = new ArrayList<>();
+        for (PlanItemInstance planItemInstance : planItemInstances) {
+            responseList.add(createPlanItemInstanceResponse(planItemInstance));
+        }
+        return responseList;
+    }
+    
+    public PlanItemInstanceResponse createPlanItemInstanceResponse(PlanItemInstance planItemInstance) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        PlanItemInstanceResponse result = new PlanItemInstanceResponse();
+        result.setId(planItemInstance.getId());
+        result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItemInstance.getId()));
+        result.setCaseDefinitionId(planItemInstance.getCaseDefinitionId());
+        result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, planItemInstance.getCaseDefinitionId()));
+        result.setCaseInstanceId(planItemInstance.getCaseInstanceId());
+        result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, planItemInstance.getCaseInstanceId()));
+        result.setStageInstanceId(planItemInstance.getStageInstanceId());
+        result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItemInstance.getStageInstanceId()));
+        result.setPlanItemDefinitionId(planItemInstance.getPlanItemDefinitionId());
+        result.setPlanItemDefinitionType(planItemInstance.getPlanItemDefinitionType());
+        result.setState(planItemInstance.getState());
+        result.setElementId(planItemInstance.getElementId());
+        result.setReferenceId(planItemInstance.getReferenceId());
+        result.setReferenceType(planItemInstance.getReferenceType());
+        result.setStartTime(planItemInstance.getStartTime());
+        result.setStartUserId(planItemInstance.getStartUserId());
+        result.setStage(planItemInstance.isStage());
+        result.setCompleteable(planItemInstance.isCompleteable());
+        result.setTenantId(planItemInstance.getTenantId());
+        
+        return result;
+    }
 
     public List<HistoricCaseInstanceResponse> createHistoricCaseInstanceResponseList(List<HistoricCaseInstance> caseInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
@@ -475,7 +511,6 @@ public class CmmnRestResponseFactory {
         return createHistoricCaseInstanceResponse(caseInstance, createUrlBuilder());
     }
 
-    @SuppressWarnings("deprecation")
     public HistoricCaseInstanceResponse createHistoricCaseInstanceResponse(HistoricCaseInstance caseInstance, RestUrlBuilder urlBuilder) {
         HistoricCaseInstanceResponse result = new HistoricCaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
