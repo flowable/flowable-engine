@@ -473,7 +473,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
-    protected List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers = Collections.EMPTY_LIST;
+    protected List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers;
     protected boolean addDefaultExceptionHandler = true;
 
     protected List<HistoryJobHandler> customHistoryJobHandlers;
@@ -1368,7 +1368,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
 
         List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
-        exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
+        if (customAsyncRunnableExecutionExceptionHandlers != null) {
+            exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
+        }
 
         if (addDefaultExceptionHandler) {
             exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
