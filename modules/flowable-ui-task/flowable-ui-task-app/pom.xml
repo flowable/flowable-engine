@@ -305,6 +305,7 @@
                 </includes>
                 <excludes>
                     <exclude>static/fonts/**</exclude>
+                    <exclude>static/libs/ui-grid_3.0.0/**</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -312,6 +313,7 @@
                 <filtering>false</filtering>
                 <includes>
                     <include>static/fonts/**</include>
+                    <include>static/libs/ui-grid_3.0.0/**</include>
                 </includes>
             </resource>
         </resources>
