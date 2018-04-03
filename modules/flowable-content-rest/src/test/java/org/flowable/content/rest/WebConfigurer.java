@@ -16,6 +16,7 @@ import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -81,6 +82,7 @@ public class WebConfigurer implements ServletContextListener {
         LOGGER.debug("Registering Spring MVC Servlet");
         ServletRegistration.Dynamic dispatcherServlet = servletContext.addServlet("dispatcher", new DispatcherServlet(dispatcherServletConfiguration));
         dispatcherServlet.addMapping("/service/*");
+        dispatcherServlet.setMultipartConfig(new MultipartConfigElement((String) null));
         dispatcherServlet.setLoadOnStartup(1);
         dispatcherServlet.setAsyncSupported(true);
 

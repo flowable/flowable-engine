@@ -14,7 +14,7 @@ package org.flowable.content.rest;
 
 import java.util.List;
 
-import org.flowable.common.rest.multipart.PutAwareCommonsMultipartResolver;
+import org.flowable.common.rest.multipart.PutAwareStandardServletMultiPartResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,8 +60,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Bean
     public MultipartResolver multipartResolver() {
-        PutAwareCommonsMultipartResolver multipartResolver = new PutAwareCommonsMultipartResolver();
-        return multipartResolver;
+        return new PutAwareStandardServletMultiPartResolver();
     }
 
     @Bean
