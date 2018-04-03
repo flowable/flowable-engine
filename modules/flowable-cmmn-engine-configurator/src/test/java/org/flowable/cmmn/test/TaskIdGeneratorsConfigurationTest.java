@@ -107,8 +107,23 @@ public class TaskIdGeneratorsConfigurationTest extends AbstractProcessEngineInte
             processEngineTask.ifPresent(task -> processEngineTaskService.deleteTask(task.getId(), true));
             cmmnEngineTask.ifPresent(task -> cmmnTaskService.deleteTask(task.getId(), true));
         }
-        
-        
+    }
+
+    @Test
+    public void testDeleteTasks() {
+        Optional<Task> processEngineTask = Optional.empty();
+        Optional<Task> cmmnEngineTask = Optional.empty();
+        try {
+            processEngineTask = Optional.of(this.processEngineTaskService.createTaskBuilder().name("process engine task").create());
+            assertTrue(processEngineTask.isPresent());
+
+            cmmnEngineTask = Optional.of(this.cmmnTaskService.createTaskBuilder().name("cmmn engine task").create());
+            assertTrue(cmmnEngineTask.isPresent());
+        } finally {
+            // processTaskService can delete cmmn task and cmmnTaskService can delete process task 
+            processEngineTask.ifPresent(task -> cmmnTaskService.deleteTask(task.getId(), true));
+            cmmnEngineTask.ifPresent(task -> processEngineTaskService.deleteTask(task.getId(), true));
+        }
     }
 
     @Test
