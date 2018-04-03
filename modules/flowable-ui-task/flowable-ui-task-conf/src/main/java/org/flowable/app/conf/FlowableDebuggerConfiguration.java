@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Auto configuration for the process debugger.
@@ -54,7 +55,14 @@ public class FlowableDebuggerConfiguration {
             processEngineConfiguration.setEnableDatabaseEventLogging(true);
             processEngineConfiguration.setAgendaFactory(agendaFactory);
             processEngineConfiguration.addCustomJobHandler(new BreakpointJobHandler());
-            ArrayList<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>(processEngineConfiguration.getCustomAsyncRunnableExecutionExceptionHandlers());
+
+            List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers = processEngineConfiguration.getCustomAsyncRunnableExecutionExceptionHandlers();
+            ArrayList<AsyncRunnableExecutionExceptionHandler> exceptionHandlers;
+            if (customAsyncRunnableExecutionExceptionHandlers == null) {
+                exceptionHandlers = new ArrayList<>();
+            } else {
+                exceptionHandlers = new ArrayList<>(customAsyncRunnableExecutionExceptionHandlers);
+            }
             exceptionHandlers.add(new DefaultDebuggerExecutionExceptionHandler());
             processEngineConfiguration.setCustomAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
         };
