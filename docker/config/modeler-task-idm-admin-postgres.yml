@@ -17,7 +17,7 @@ services:
               - FLOWABLE_COMMON_APP_IDM-REDIRECT-URL=http://localhost:8080/flowable-idm
               - FLOWABLE_COMMON_APP_IDM-ADMIN.USER=admin
               - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
-              - FLOWABLE.MODELER.APP.DEPLOYMENT-API-URL=http://flowable-task-app:9999/flowable-task/process-api
+              - FLOWABLE_MODELER_APP_DEPLOYMENT-API-URL=http://flowable-task-app:9999/flowable-task/process-api
           ports:
               - 8888:8888
           entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-modeler.war"]
