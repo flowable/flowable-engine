@@ -332,7 +332,7 @@ You can also inject your own cache implementation. This must be a bean that impl
 
 === Strict mode
 
-By default *strict mode* is enabled. This means that the hit policies will act as described in the DMN 1.1 spec.
+By default strict mode is *enabled*. This means that the hit policies will act as described in the DMN 1.1 spec.
 It is however possible to disable strict mode. 
 
 [source,xml,linenums]
@@ -348,7 +348,7 @@ It is however possible to disable strict mode.
 </beans>
 ----
 
-The effect will be that a result will not be invalidad when a hit policy contstraint is violated. A possible violation will be logged in the audit log as a validation message.
+The effect will be that a result will not be invalidated when a hit policy contstraint is violated. A possible violation will be logged in the audit log as a validation message.
 
 
 
