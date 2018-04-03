@@ -48,10 +48,17 @@ public class FormEngineFactoryBean implements FactoryBean<FormEngine>, Disposabl
 
     @Override
     public FormEngine getObject() throws Exception {
+        configureExpressionManager();
         configureExternallyManagedTransactions();
 
         this.formEngine = formEngineConfiguration.buildFormEngine();
         return this.formEngine;
+    }
+    
+    protected void configureExpressionManager() {
+        if (formEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
+            formEngineConfiguration.setExpressionManager(new SpringFormExpressionManager(applicationContext, formEngineConfiguration.getBeans()));
+        }
     }
 
     protected void configureExternallyManagedTransactions() {

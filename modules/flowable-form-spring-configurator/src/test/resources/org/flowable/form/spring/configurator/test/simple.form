@@ -1,0 +1,20 @@
+{
+    "key": "form1",
+    "name": "My first form",
+    "fields": [
+        {
+            "id": "input1",
+            "name": "Input1",
+            "type": "text",
+            "required": false,
+            "placeholder": "empty"
+        },
+        {
+            "id": "expression1",
+            "name": "Expression",
+            "type": "expression",
+            "fieldType": "ExpressionFormField",
+            "expression": "#{testFormBean.getExpressionText(var1)}"
+        }
+    ]
+}
