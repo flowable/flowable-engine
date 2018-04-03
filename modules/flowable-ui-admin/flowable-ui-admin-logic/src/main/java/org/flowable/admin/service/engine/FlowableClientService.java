@@ -573,7 +573,7 @@ public class FlowableClientService {
         if (StringUtils.isNotEmpty(uri) && !uri.startsWith("/")) {
             uri = "/" + uri;
         }
-        
+
         URIBuilder builder = createUriBuilder(finalUrl + uri);
 
         return builder.toString();

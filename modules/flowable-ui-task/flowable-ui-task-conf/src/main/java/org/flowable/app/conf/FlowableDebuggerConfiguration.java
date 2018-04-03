@@ -16,6 +16,8 @@ import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.event.BreakpointJobHandler;
 import org.flowable.engine.runtime.ProcessDebugger;
+import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
+import org.flowable.job.service.impl.asyncexecutor.DefaultDebuggerExecutionExceptionHandler;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -24,6 +26,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Auto configuration for the process debugger.
@@ -47,8 +52,19 @@ public class FlowableDebuggerConfiguration {
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> debuggerProcessEngineConfigurationConfigurer(
         FlowableEngineAgendaFactory agendaFactory) {
         return processEngineConfiguration -> {
+            processEngineConfiguration.setEnableDatabaseEventLogging(true);
             processEngineConfiguration.setAgendaFactory(agendaFactory);
             processEngineConfiguration.addCustomJobHandler(new BreakpointJobHandler());
+
+            List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers = processEngineConfiguration.getCustomAsyncRunnableExecutionExceptionHandlers();
+            ArrayList<AsyncRunnableExecutionExceptionHandler> exceptionHandlers;
+            if (customAsyncRunnableExecutionExceptionHandlers == null) {
+                exceptionHandlers = new ArrayList<>();
+            } else {
+                exceptionHandlers = new ArrayList<>(customAsyncRunnableExecutionExceptionHandlers);
+            }
+            exceptionHandlers.add(new DefaultDebuggerExecutionExceptionHandler());
+            processEngineConfiguration.setCustomAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
         };
     }
 }
