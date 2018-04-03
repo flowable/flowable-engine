@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -91,7 +92,25 @@ public class TaskIdGeneratorsConfigurationTest extends AbstractProcessEngineInte
         assertTrue(task.getProcessVariables().containsKey("processVariable"));
         assertThat(task.getId(), startsWith("TASK-"));
     }
-    
+
+    @Test
+    public void testTaskBuilder() {
+        Optional<Task> processEngineTask = Optional.empty();
+        Optional<Task> cmmnEngineTask = Optional.empty();
+        try {
+            processEngineTask = Optional.of(this.processEngineTaskService.createTaskBuilder().name("process engine task").create());
+            assertThat(processEngineTask.map(Task::getId).orElse("The task does not exist"), startsWith("TASK-"));
+
+            cmmnEngineTask = Optional.of(this.cmmnTaskService.createTaskBuilder().name("cmmn engine task").create());
+            assertThat(cmmnEngineTask.map(Task::getId).orElse("The task does not exist"), startsWith("CMMN-TASK-"));
+        } finally {
+            processEngineTask.ifPresent(task -> processEngineTaskService.deleteTask(task.getId(), true));
+            cmmnEngineTask.ifPresent(task -> cmmnTaskService.deleteTask(task.getId(), true));
+        }
+        
+        
+    }
+
     @Test
     public void testOneTaskProcess() {
         this.processEngineRuntimeService.startProcessInstanceByKey("oneTask");

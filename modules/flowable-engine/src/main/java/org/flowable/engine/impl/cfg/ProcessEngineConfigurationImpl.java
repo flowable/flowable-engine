@@ -301,6 +301,7 @@ import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.task.service.InternalTaskAssignmentManager;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -1311,6 +1312,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setIdGenerator(this.taskIdGenerator);
+        this.taskServiceConfiguration.setTaskBuilderPostProcessor(this.taskBuilderPostProcessor);
 
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);

@@ -13,13 +13,20 @@
 package org.flowable.engine.common.impl;
 
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.task.api.TaskInfo;
+
+import java.util.function.UnaryOperator;
 
 /**
  * @author martin.grofcik
  */
-public interface HasTaskIdGeneratorEngineConfiguration {
+public interface HasTasksEngineConfiguration {
     
     IdGenerator getTaskIdGenerator();
     
     void setTaskIdGenerator(IdGenerator taskIdGenerator);
+    
+    UnaryOperator<TaskInfo> getTaskBuilderPostProcessor();
+    
+    void setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor);
 }

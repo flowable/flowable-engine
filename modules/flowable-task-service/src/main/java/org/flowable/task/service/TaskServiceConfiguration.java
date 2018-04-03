@@ -14,6 +14,7 @@ package org.flowable.task.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
@@ -21,6 +22,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;
 import org.flowable.task.service.impl.TaskServiceImpl;
@@ -70,6 +72,8 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected int historicTaskQueryLimit;
     
     protected IdGenerator idGenerator;
+    
+    protected UnaryOperator<TaskInfo> taskBuilderPostProcessor;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -78,6 +82,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         checkIdGenerator();
         initDataManagers();
         initEntityManagers();
+        initTaskBuilderPostProcessor();
     }
 
     protected void checkIdGenerator() {
@@ -104,6 +109,12 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (historicTaskInstanceEntityManager == null) {
             historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
+        }
+    }
+
+    public void initTaskBuilderPostProcessor() {
+        if (taskBuilderPostProcessor == null) {
+            taskBuilderPostProcessor = UnaryOperator.identity();
         }
     }
 
@@ -272,5 +283,14 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public IdGenerator getIdGenerator() {
         return idGenerator;
+    }
+
+    public UnaryOperator<TaskInfo> getTaskBuilderPostProcessor() {
+        return taskBuilderPostProcessor;
+    }
+
+    public TaskServiceConfiguration setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor) {
+        this.taskBuilderPostProcessor = processor;
+        return this;
     }
 }

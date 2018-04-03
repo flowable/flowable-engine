@@ -12,15 +12,18 @@
  */
 package org.flowable.task.service.impl;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.identitylink.api.IdentityLinkInfo;
+import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Tom Baeyens
@@ -105,5 +108,36 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     @Override
     public void deleteTasksByExecutionId(String executionId) {
         getTaskEntityManager().deleteTasksByExecutionId(executionId);
+    }
+
+    @Override
+    public Task createTask(TaskInfo taskTemplate) {
+        TaskInfo task = this.taskServiceConfiguration.getTaskBuilderPostProcessor().apply(taskTemplate);
+        TaskEntity taskEntity = getTaskEntityManager().create();
+        taskEntity.setId(task.getId());
+        taskEntity.setName(task.getName());
+        taskEntity.setDescription(task.getDescription());
+        taskEntity.setPriority(task.getPriority());
+        taskEntity.setOwner(task.getOwner());
+        taskEntity.setAssignee(task.getAssignee());
+        taskEntity.setDueDate(task.getDueDate());
+        taskEntity.setCategory(task.getCategory());
+        taskEntity.setParentTaskId(task.getParentTaskId());
+        taskEntity.setTenantId(task.getTenantId());
+        taskEntity.setFormKey(task.getFormKey());
+        taskEntity.setTaskDefinitionId(task.getTaskDefinitionId());
+        taskEntity.setTaskDefinitionKey(task.getTaskDefinitionKey());
+        getTaskEntityManager().insert(taskEntity);
+        taskEntity.addCandidateGroups(task.getIdentityLinks().stream().
+                filter( identityLink -> StringUtils.isNotEmpty(identityLink.getGroupId()) && IdentityLinkType.CANDIDATE.equals(identityLink.getType())).
+                map(IdentityLinkInfo::getGroupId).
+                collect(Collectors.toSet())
+        );
+        taskEntity.addCandidateUsers(task.getIdentityLinks().stream().
+                filter( identityLink -> StringUtils.isNotEmpty(identityLink.getUserId()) && IdentityLinkType.CANDIDATE.equals(identityLink.getType())).
+                map(IdentityLinkInfo::getUserId).
+                collect(Collectors.toSet())
+        );
+        return taskEntity;
     }
 }

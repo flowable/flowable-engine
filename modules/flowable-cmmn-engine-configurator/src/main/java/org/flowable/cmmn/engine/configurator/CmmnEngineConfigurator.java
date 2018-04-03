@@ -23,7 +23,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.AbstractEngineConfigurator;
 import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
+import org.flowable.engine.common.impl.HasTasksEngineConfiguration;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
@@ -118,11 +118,11 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     @Override
     protected void initIdGenerator(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         super.initIdGenerator(engineConfiguration, targetEngineConfiguration);
-        if (targetEngineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
-            HasTaskIdGeneratorEngineConfiguration targetEgineConfiguration = (HasTaskIdGeneratorEngineConfiguration) targetEngineConfiguration;
+        if (targetEngineConfiguration instanceof HasTasksEngineConfiguration) {
+            HasTasksEngineConfiguration targetEgineConfiguration = (HasTasksEngineConfiguration) targetEngineConfiguration;
             if (targetEgineConfiguration.getTaskIdGenerator() == null) {
-                if (engineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
-                    targetEgineConfiguration.setTaskIdGenerator(((HasTaskIdGeneratorEngineConfiguration) engineConfiguration).getTaskIdGenerator());
+                if (engineConfiguration instanceof HasTasksEngineConfiguration) {
+                    targetEgineConfiguration.setTaskIdGenerator(((HasTasksEngineConfiguration) engineConfiguration).getTaskIdGenerator());
                 } else {
                     targetEgineConfiguration.setTaskIdGenerator(engineConfiguration.getIdGenerator());
                 }

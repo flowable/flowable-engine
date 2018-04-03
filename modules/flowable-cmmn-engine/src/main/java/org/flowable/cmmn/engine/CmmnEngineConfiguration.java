@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.function.UnaryOperator;
 
 import javax.sql.DataSource;
 
@@ -121,7 +122,7 @@ import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.EngineConfigurator;
 import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
+import org.flowable.engine.common.impl.HasTasksEngineConfiguration;
 import org.flowable.engine.common.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
@@ -165,6 +166,7 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
@@ -197,8 +199,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, 
-        HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
+        HasTasksEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -543,6 +545,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * generator used to generate task ids
      */
     protected IdGenerator taskIdGenerator;
+
+    /**
+     * postprocessor for a task builder
+     */
+    protected UnaryOperator<TaskInfo> taskBuilderPostProcessor = UnaryOperator.identity();
 
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -1095,6 +1102,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setIdGenerator(taskIdGenerator);
+        this.taskServiceConfiguration.setTaskBuilderPostProcessor(this.taskBuilderPostProcessor);
 
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
@@ -2290,7 +2298,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
         this.taskIdGenerator = taskIdGenerator;
     }
-    
+
+    @Override
+    public UnaryOperator<TaskInfo> getTaskBuilderPostProcessor() {
+        return taskBuilderPostProcessor;
+    }
+
+    @Override
+    public void setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor) {
+        this.taskBuilderPostProcessor = processor;
+    }
+
     @Override
     public ScriptingEngines getScriptingEngines() {
         return scriptingEngines;

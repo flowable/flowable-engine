@@ -16,13 +16,14 @@ package org.flowable.engine;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import javax.sql.DataSource;
 
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
+import org.flowable.engine.common.impl.HasTasksEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.history.HistoryLevel;
@@ -31,6 +32,7 @@ import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.task.api.TaskInfo;
 
 /**
  * Configuration information from which a process engine can be build.
@@ -79,7 +81,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration implements HasTaskIdGeneratorEngineConfiguration {
+public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration implements HasTasksEngineConfiguration {
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
     protected int idBlockSize = 2500;
@@ -142,6 +144,9 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
      * generator used to generate task ids
      */
     protected IdGenerator taskIdGenerator;
+
+    /** postprocessor for a task builder */
+    protected UnaryOperator<TaskInfo> taskBuilderPostProcessor = UnaryOperator.identity();
 
     /** use one of the static createXxxx methods instead */
     protected ProcessEngineConfiguration() {
@@ -696,5 +701,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     @Override
     public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
         this.taskIdGenerator = taskIdGenerator;
+    }
+
+    @Override
+    public UnaryOperator<TaskInfo> getTaskBuilderPostProcessor() {
+        return taskBuilderPostProcessor;
+    }
+
+    @Override
+    public void setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor) {
+        this.taskBuilderPostProcessor = processor;
     }
 }
