@@ -131,6 +131,7 @@
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- SPRING -->
