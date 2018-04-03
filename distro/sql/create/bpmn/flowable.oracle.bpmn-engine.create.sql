@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '6.2.1.0', 1);
+values ('common.schema.version', '6.3.0.1', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -30,19 +30,25 @@ create table ACT_RU_IDENTITYLINK (
     TASK_ID_ NVARCHAR2(64),
     PROC_INST_ID_ NVARCHAR2(64),
     PROC_DEF_ID_ NVARCHAR2(64),
+    SCOPE_ID_ NVARCHAR2(255),
+    SCOPE_TYPE_ NVARCHAR2(255),
+    SCOPE_DEFINITION_ID_ NVARCHAR2(255),
     primary key (ID_)
 );
 
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
+create index ACT_IDX_IDENT_LNK_SCOPE on ACT_RU_IDENTITYLINK(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_IDENT_LNK_SCOPE_DEF on ACT_RU_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.2.1.0', 1);
+insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.3.0.1', 1);
 create table ACT_RU_TASK (
     ID_ NVARCHAR2(64),
     REV_ INTEGER,
     EXECUTION_ID_ NVARCHAR2(64),
     PROC_INST_ID_ NVARCHAR2(64),
     PROC_DEF_ID_ NVARCHAR2(64),
+    TASK_DEF_ID_ NVARCHAR2(64),
     SCOPE_ID_ NVARCHAR2(255),
     SUB_SCOPE_ID_ NVARCHAR2(255),
     SCOPE_TYPE_ NVARCHAR2(255),
@@ -65,6 +71,7 @@ create table ACT_RU_TASK (
     IS_COUNT_ENABLED_ NUMBER(1,0) CHECK (IS_COUNT_ENABLED_ IN (1,0)),
     VAR_COUNT_ INTEGER, 
     ID_LINK_COUNT_ INTEGER,
+    SUB_TASK_COUNT_ INTEGER,
     primary key (ID_)
 );
 
@@ -73,7 +80,7 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.2.1.0', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.3.0.1', 1);
 create table ACT_RU_VARIABLE (
     ID_ NVARCHAR2(64) not null,
     REV_ INTEGER,
@@ -102,7 +109,7 @@ alter table ACT_RU_VARIABLE
     foreign key (BYTEARRAY_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.2.1.0', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.3.0.1', 1);
 create table ACT_RU_JOB (
     ID_ NVARCHAR2(64) NOT NULL,
     REV_ INTEGER,
@@ -291,7 +298,7 @@ create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_)
 create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);     
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.2.1.0', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.3.0.1', 1);
 create table ACT_RE_DEPLOYMENT (
     ID_ NVARCHAR2(64),
     NAME_ NVARCHAR2(255),
@@ -299,6 +306,8 @@ create table ACT_RE_DEPLOYMENT (
     KEY_ NVARCHAR2(255),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     DEPLOY_TIME_ TIMESTAMP(6),
+    DERIVED_FROM_ NVARCHAR2(64),
+    DERIVED_FROM_ROOT_ NVARCHAR2(64),
     ENGINE_VERSION_ NVARCHAR2(255),
     primary key (ID_)
 );
@@ -372,6 +381,9 @@ create table ACT_RE_PROCDEF (
     HAS_GRAPHICAL_NOTATION_ NUMBER(1,0) CHECK (HAS_GRAPHICAL_NOTATION_ IN (1,0)),
     SUSPENSION_STATE_ INTEGER,
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
+    DERIVED_FROM_ NVARCHAR2(64),
+    DERIVED_FROM_ROOT_ NVARCHAR2(64),
+    DERIVED_VERSION_ INTEGER DEFAULT 0 NOT NULL,
     ENGINE_VERSION_ NVARCHAR2(255),
     primary key (ID_)
 );
@@ -430,7 +442,7 @@ alter table ACT_GE_BYTEARRAY
 
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
-    unique (KEY_,VERSION_, TENANT_ID_);
+    unique (KEY_,VERSION_, DERIVED_VERSION_, TENANT_ID_);
     
 create index ACT_IDX_EXE_PROCINST on ACT_RU_EXECUTION(PROC_INST_ID_);
 alter table ACT_RU_EXECUTION
@@ -617,8 +629,8 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
     
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.2.1.0', 1);   
+values ('schema.version', '6.3.0.1', 1);   
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.2.1.0)', 1);  
+values ('schema.history', 'create(6.3.0.1)', 1);  
 
