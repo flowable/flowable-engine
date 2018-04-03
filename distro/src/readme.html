@@ -104,7 +104,7 @@ But most of this should be automatically handled by your IDE.
 <p>
 All Flowable apps (IDM, Modeler, Task, Admin and REST) now read their configuration from the <i>flowable-app.properties</i> file, which is included in each WAR file in the <i>META-INF/flowable-app</i> folder.
 Consequently, a shared <i>flowable-app.properties</i> can be put on the classpath for all apps.
-All all property files (e.g. <i>db.properties</i> for the REST app) are still read and work in a backwards compatible way.  
+All property files (e.g. <i>db.properties</i> for the REST app) are still read and work in a backwards compatible way.  
 </p>
 
 <p>
@@ -113,7 +113,13 @@ An admin user can be given this privilege by setting the <i>flowable.rest.app.ad
 </p>
 
 <p>
-By default, all Flowable apps (IDM, Modeler, Task, Admin and REST) are configured to use an in-memory H2 database that is shared between all apps by default. Before, each app had their own in-memory H2 database.
+By default, all Flowable apps (IDM, Modeler, Task, Admin and REST) are configured to use an in-memory H2 database in the user home folder that is shared between all apps by default. Before, each app had their own in-memory H2 database.
+</p>
+
+<p>
+Due to upgrading to the latest Spring Security dependencies for handling the authentication for all the Flowable apps, users can get a "cookie theft exception" when accessing the apps with a cookie of a previous version that is still present in the browser.
+The reason for this is that Spring Security has changed the way cookie tokens are hashed. A hard refresh or relogin fixes this by generating a new cookie.
+In case you don't want to confront your users with this, it is possible to delete all rows from the <i>ACT_ID_TOKEN</i> database table. This will invalidate all old cookies and all users will have to relogin.
 </p>
 
 <h3>Release Notes - Flowable - 6.2.1</h3>
