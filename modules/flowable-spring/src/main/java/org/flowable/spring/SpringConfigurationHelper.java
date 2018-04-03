@@ -20,7 +20,6 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.UrlResource;
 
@@ -34,16 +33,17 @@ public class SpringConfigurationHelper {
     public static ProcessEngine buildProcessEngine(URL resource) {
         LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND PROCESS ENGINE =========================================");
 
-        ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
-        Map<String, ProcessEngine> beansOfType = applicationContext.getBeansOfType(ProcessEngine.class);
-        if ((beansOfType == null) || (beansOfType.isEmpty())) {
-            throw new FlowableException("no " + ProcessEngine.class.getName() + " defined in the application context " + resource.toString());
+        try (GenericXmlApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource))) {
+            Map<String, ProcessEngine> beansOfType = applicationContext.getBeansOfType(ProcessEngine.class);
+            if ((beansOfType == null) || (beansOfType.isEmpty())) {
+                throw new FlowableException("no " + ProcessEngine.class.getName() + " defined in the application context " + resource.toString());
+            }
+
+            ProcessEngine processEngine = beansOfType.values().iterator().next();
+
+            LOGGER.debug("==== SPRING PROCESS ENGINE CREATED ==================================================================");
+            return processEngine;
         }
-
-        ProcessEngine processEngine = beansOfType.values().iterator().next();
-
-        LOGGER.debug("==== SPRING PROCESS ENGINE CREATED ==================================================================");
-        return processEngine;
     }
 
 }
