@@ -12,11 +12,9 @@
  */
 package org.flowable.dmn.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 
-import org.flowable.common.rest.multipart.PutAwareCommonsMultipartResolver;
+import org.flowable.common.rest.multipart.PutAwareStandardServletMultiPartResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @ComponentScan({ "org.flowable.dmn.rest.exception", "org.flowable.dmn.rest.service.api" })
@@ -60,8 +60,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Bean
     public MultipartResolver multipartResolver() {
-        PutAwareCommonsMultipartResolver multipartResolver = new PutAwareCommonsMultipartResolver();
-        return multipartResolver;
+        return new PutAwareStandardServletMultiPartResolver();
     }
 
     @Bean

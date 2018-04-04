@@ -13,6 +13,7 @@
 package org.flowable.spring.boot.cmmn;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -35,6 +36,7 @@ import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -72,6 +74,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties) {
         super(flowableProperties);
@@ -136,6 +139,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
 
+        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+
         return configuration;
     }
 
@@ -157,5 +162,10 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
             return cmmnEngineConfigurator;
         }
+    }
+
+    @Autowired(required = false)
+    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers) {
+        this.engineConfigurers = engineConfigurers;
     }
 }

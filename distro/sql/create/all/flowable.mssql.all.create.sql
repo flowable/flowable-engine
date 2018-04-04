@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '6.2.1.0', 1);
+values ('common.schema.version', '6.3.0.1', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -30,19 +30,25 @@ create table ACT_RU_IDENTITYLINK (
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
+    SCOPE_ID_ nvarchar(255),
+    SCOPE_TYPE_ nvarchar(255),
+    SCOPE_DEFINITION_ID_ nvarchar(255),
     primary key (ID_)
 );
 
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
+create index ACT_IDX_IDENT_LNK_SCOPE on ACT_RU_IDENTITYLINK(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_IDENT_LNK_SCOPE_DEF on ACT_RU_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.2.1.0', 1);
+insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.3.0.1', 1);
 create table ACT_RU_TASK (
     ID_ nvarchar(64),
     REV_ int,
     EXECUTION_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
+    TASK_DEF_ID_ nvarchar(64),
     SCOPE_ID_ nvarchar(255),
     SUB_SCOPE_ID_ nvarchar(255),
     SCOPE_TYPE_ nvarchar(255),
@@ -65,6 +71,7 @@ create table ACT_RU_TASK (
     IS_COUNT_ENABLED_ tinyint,
     VAR_COUNT_ int, 
     ID_LINK_COUNT_ int,
+    SUB_TASK_COUNT_ int,
     primary key (ID_)
 );
 
@@ -73,7 +80,7 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.2.1.0', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.3.0.1', 1);
 create table ACT_RU_VARIABLE (
     ID_ nvarchar(64) not null,
     REV_ int,
@@ -102,7 +109,7 @@ alter table ACT_RU_VARIABLE
     foreign key (BYTEARRAY_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.2.1.0', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.3.0.1', 1);
 create table ACT_RU_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
@@ -291,7 +298,7 @@ create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_)
 create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_); 
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.2.1.0', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.3.0.1', 1);
 create table ACT_RE_DEPLOYMENT (
     ID_ nvarchar(64),
     NAME_ nvarchar(255),
@@ -299,6 +306,8 @@ create table ACT_RE_DEPLOYMENT (
     KEY_ nvarchar(255),
     TENANT_ID_ nvarchar(255) default '',
     DEPLOY_TIME_ datetime,
+    DERIVED_FROM_ nvarchar(64),
+    DERIVED_FROM_ROOT_ nvarchar(64),
     ENGINE_VERSION_ nvarchar(255),
     primary key (ID_)
 );
@@ -372,6 +381,9 @@ create table ACT_RE_PROCDEF (
     HAS_GRAPHICAL_NOTATION_ tinyint,
     SUSPENSION_STATE_ tinyint,
     TENANT_ID_ nvarchar(255) default '',
+    DERIVED_FROM_ nvarchar(64),
+    DERIVED_FROM_ROOT_ nvarchar(64),
+    DERIVED_VERSION_ int not null default 0,
     ENGINE_VERSION_ nvarchar(255),
     primary key (ID_)
 );
@@ -454,7 +466,7 @@ alter table ACT_GE_BYTEARRAY
 
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
-    unique (KEY_,VERSION_, TENANT_ID_);
+    unique (KEY_,VERSION_, DERIVED_VERSION_, TENANT_ID_);
     
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PARENT 
@@ -606,10 +618,10 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
     
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.2.1.0', 1);  
+values ('schema.version', '6.3.0.1', 1);  
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.2.1.0)', 1);   
+values ('schema.history', 'create(6.3.0.1)', 1);   
 
 create table ACT_HI_IDENTITYLINK (
     ID_ nvarchar(64),
@@ -619,14 +631,21 @@ create table ACT_HI_IDENTITYLINK (
     TASK_ID_ nvarchar(64),
     CREATE_TIME_ datetime,
     PROC_INST_ID_ nvarchar(64),
+    SCOPE_ID_ nvarchar(255),
+    SCOPE_TYPE_ nvarchar(255),
+    SCOPE_DEFINITION_ID_ nvarchar(255),
     primary key (ID_)
 );
 
 create index ACT_IDX_HI_IDENT_LNK_USER on ACT_HI_IDENTITYLINK(USER_ID_);
+create index ACT_IDX_HI_IDENT_LNK_SCOPE on ACT_HI_IDENTITYLINK(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_IDENT_LNK_SCOPE_DEF on ACT_HI_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+
 create table ACT_HI_TASKINST (
     ID_ nvarchar(64) not null,
     REV_ int default 1,
     PROC_DEF_ID_ nvarchar(64),
+    TASK_DEF_ID_ nvarchar(64),
     TASK_DEF_KEY_ nvarchar(255),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
@@ -883,7 +902,7 @@ GO
 CREATE TABLE [ACT_CMMN_HI_MIL_INST] ([ID_] [varchar](255) NOT NULL, [REV_] [int] NOT NULL, [NAME_] [varchar](255) NOT NULL, [TIME_STAMP_] [datetime] NOT NULL, [CASE_INST_ID_] [varchar](255) NOT NULL, [CASE_DEF_ID_] [varchar](255) NOT NULL, [ELEMENT_ID_] [varchar](255) NOT NULL, CONSTRAINT [PK_ACT_CMMN_HI_MIL_INST] PRIMARY KEY ([ID_]))
 GO
 
-INSERT INTO [ACT_CMMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 1, '7:1ed01100eeb9bb6054c28320b6c5fb22', 'createTable tableName=ACT_CMMN_DEPLOYMENT; createTable tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addForeignKeyConstraint baseTableName=ACT_CMMN_DEPLOYMENT_RESOURCE, constraintName=ACT_FK_CMMN_RSRC_DPL, referencedTableName=ACT_CMMN_DEPLOYMENT; create...', '', 'EXECUTED', NULL, NULL, '3.5.3', '2985401077')
+INSERT INTO [ACT_CMMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 1, '7:1ed01100eeb9bb6054c28320b6c5fb22', 'createTable tableName=ACT_CMMN_DEPLOYMENT; createTable tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addForeignKeyConstraint baseTableName=ACT_CMMN_DEPLOYMENT_RESOURCE, constraintName=ACT_FK_CMMN_RSRC_DPL, referencedTableName=ACT_CMMN_DEPLOYMENT; create...', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591377')
 GO
 
 ALTER TABLE [ACT_CMMN_CASEDEF] ADD [DGRM_RESOURCE_NAME_] [varchar](4000)
@@ -904,7 +923,28 @@ GO
 ALTER TABLE [ACT_CMMN_RU_PLAN_ITEM_INST] ADD [ITEM_DEFINITION_TYPE_] [varchar](255)
 GO
 
-INSERT INTO [ACT_CMMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('2', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 3, '7:72a1f3f4767524ec0e22288a1621ebb9', 'addColumn tableName=ACT_CMMN_CASEDEF; addColumn tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addColumn tableName=ACT_CMMN_RU_CASE_INST; addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST', '', 'EXECUTED', NULL, NULL, '3.5.3', '2985401077')
+INSERT INTO [ACT_CMMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('2', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 3, '7:72a1f3f4767524ec0e22288a1621ebb9', 'addColumn tableName=ACT_CMMN_CASEDEF; addColumn tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addColumn tableName=ACT_CMMN_RU_CASE_INST; addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591377')
+GO
+
+ALTER TABLE [ACT_CMMN_RU_PLAN_ITEM_INST] ADD [IS_COMPLETEABLE_] [bit]
+GO
+
+ALTER TABLE [ACT_CMMN_RU_CASE_INST] ADD [IS_COMPLETEABLE_] [bit]
+GO
+
+CREATE NONCLUSTERED INDEX ACT_IDX_PLAN_ITEM_STAGE_INST ON [ACT_CMMN_RU_PLAN_ITEM_INST]([STAGE_INST_ID_])
+GO
+
+ALTER TABLE [ACT_CMMN_RU_PLAN_ITEM_INST] ADD [IS_COUNT_ENABLED_] [bit]
+GO
+
+ALTER TABLE [ACT_CMMN_RU_PLAN_ITEM_INST] ADD [VAR_COUNT_] [int]
+GO
+
+ALTER TABLE [ACT_CMMN_RU_PLAN_ITEM_INST] ADD [SENTRY_PART_INST_COUNT_] [int]
+GO
+
+INSERT INTO [ACT_CMMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('3', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 5, '7:1c0c14847bb4a891aaf91668d14240c1', 'addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST; addColumn tableName=ACT_CMMN_RU_CASE_INST; createIndex indexName=ACT_IDX_PLAN_ITEM_STAGE_INST, tableName=ACT_CMMN_RU_PLAN_ITEM_INST; addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST; addColumn tableNam...', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591377')
 GO
 
 
@@ -921,13 +961,19 @@ GO
 CREATE TABLE [ACT_DMN_DECISION_TABLE] ([ID_] [varchar](255) NOT NULL, [NAME_] [varchar](255), [VERSION_] [int], [KEY_] [varchar](255), [CATEGORY_] [varchar](255), [DEPLOYMENT_ID_] [varchar](255), [PARENT_DEPLOYMENT_ID_] [varchar](255), [TENANT_ID_] [varchar](255), [RESOURCE_NAME_] [varchar](255), [DESCRIPTION_] [varchar](255), CONSTRAINT [PK_ACT_DMN_DECISION_TABLE] PRIMARY KEY ([ID_]))
 GO
 
-INSERT INTO [ACT_DMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'activiti', 'org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml', GETDATE(), 1, '7:d878c2672ead57b5801578fd39c423af', 'createTable tableName=ACT_DMN_DEPLOYMENT; createTable tableName=ACT_DMN_DEPLOYMENT_RESOURCE; createTable tableName=ACT_DMN_DECISION_TABLE', '', 'EXECUTED', NULL, NULL, '3.5.3', '7878884777')
+INSERT INTO [ACT_DMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'activiti', 'org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml', GETDATE(), 1, '7:d878c2672ead57b5801578fd39c423af', 'createTable tableName=ACT_DMN_DEPLOYMENT; createTable tableName=ACT_DMN_DEPLOYMENT_RESOURCE; createTable tableName=ACT_DMN_DECISION_TABLE', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591426')
 GO
 
 CREATE TABLE [ACT_DMN_HI_DECISION_EXECUTION] ([ID_] [varchar](255) NOT NULL, [DECISION_DEFINITION_ID_] [varchar](255), [DEPLOYMENT_ID_] [varchar](255), [START_TIME_] [datetime], [END_TIME_] [datetime], [INSTANCE_ID_] [varchar](255), [EXECUTION_ID_] [varchar](255), [ACTIVITY_ID_] [varchar](255), [FAILED_] [bit] CONSTRAINT [DF_ACT_DMN_HI_DECISION_EXECUTION_FAILED_] DEFAULT 0, [TENANT_ID_] [varchar](255), [EXECUTION_JSON_] [varchar](MAX), CONSTRAINT [PK_ACT_DMN_HI_DECISION_EXECUTION] PRIMARY KEY ([ID_]))
 GO
 
-INSERT INTO [ACT_DMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('2', 'flowable', 'org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml', GETDATE(), 3, '7:15a6bda1fce898a58e04fe6ac2d89f54', 'createTable tableName=ACT_DMN_HI_DECISION_EXECUTION', '', 'EXECUTED', NULL, NULL, '3.5.3', '7878884777')
+INSERT INTO [ACT_DMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('2', 'flowable', 'org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml', GETDATE(), 3, '7:15a6bda1fce898a58e04fe6ac2d89f54', 'createTable tableName=ACT_DMN_HI_DECISION_EXECUTION', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591426')
+GO
+
+ALTER TABLE [ACT_DMN_HI_DECISION_EXECUTION] ADD [SCOPE_TYPE_] [varchar](255)
+GO
+
+INSERT INTO [ACT_DMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('3', 'flowable', 'org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml', GETDATE(), 5, '7:eed5dec2f94778b62d0b0b4beebc191d', 'addColumn tableName=ACT_DMN_HI_DECISION_EXECUTION', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591426')
 GO
 
 
@@ -947,7 +993,7 @@ GO
 CREATE TABLE [ACT_FO_FORM_INSTANCE] ([ID_] [varchar](255) NOT NULL, [FORM_DEFINITION_ID_] [varchar](255) NOT NULL, [TASK_ID_] [varchar](255), [PROC_INST_ID_] [varchar](255), [PROC_DEF_ID_] [varchar](255), [SUBMITTED_DATE_] [datetime], [SUBMITTED_BY_] [varchar](255), [FORM_VALUES_ID_] [varchar](255), [TENANT_ID_] [varchar](255), CONSTRAINT [PK_ACT_FO_FORM_INSTANCE] PRIMARY KEY ([ID_]))
 GO
 
-INSERT INTO [ACT_FO_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'activiti', 'org/flowable/form/db/liquibase/flowable-form-db-changelog.xml', GETDATE(), 1, '7:252bd5cb28cf86685ed67eb15d910118', 'createTable tableName=ACT_FO_FORM_DEPLOYMENT; createTable tableName=ACT_FO_FORM_RESOURCE; createTable tableName=ACT_FO_FORM_DEFINITION; createTable tableName=ACT_FO_FORM_INSTANCE', '', 'EXECUTED', NULL, NULL, '3.5.3', '7878884806')
+INSERT INTO [ACT_FO_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'activiti', 'org/flowable/form/db/liquibase/flowable-form-db-changelog.xml', GETDATE(), 1, '7:252bd5cb28cf86685ed67eb15d910118', 'createTable tableName=ACT_FO_FORM_DEPLOYMENT; createTable tableName=ACT_FO_FORM_RESOURCE; createTable tableName=ACT_FO_FORM_DEFINITION; createTable tableName=ACT_FO_FORM_INSTANCE', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591458')
 GO
 
 ALTER TABLE [ACT_FO_FORM_INSTANCE] ADD [SCOPE_ID_] [varchar](255)
@@ -959,7 +1005,7 @@ GO
 ALTER TABLE [ACT_FO_FORM_INSTANCE] ADD [SCOPE_DEFINITION_ID_] [varchar](255)
 GO
 
-INSERT INTO [ACT_FO_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('2', 'flowable', 'org/flowable/form/db/liquibase/flowable-form-db-changelog.xml', GETDATE(), 3, '7:4850f9311e7503d7ea30a372e79b4ea2', 'addColumn tableName=ACT_FO_FORM_INSTANCE', '', 'EXECUTED', NULL, NULL, '3.5.3', '7878884806')
+INSERT INTO [ACT_FO_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('2', 'flowable', 'org/flowable/form/db/liquibase/flowable-form-db-changelog.xml', GETDATE(), 3, '7:4850f9311e7503d7ea30a372e79b4ea2', 'addColumn tableName=ACT_FO_FORM_INSTANCE', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591458')
 GO
 
 
@@ -976,7 +1022,19 @@ GO
 CREATE NONCLUSTERED INDEX idx_contitem_procid ON [ACT_CO_CONTENT_ITEM]([PROC_INST_ID_])
 GO
 
-INSERT INTO [ACT_CO_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'activiti', 'org/flowable/content/db/liquibase/flowable-content-db-changelog.xml', GETDATE(), 1, '7:a17df43ed0c96adfef5271e1781aaed2', 'createTable tableName=ACT_CO_CONTENT_ITEM; createIndex indexName=idx_contitem_taskid, tableName=ACT_CO_CONTENT_ITEM; createIndex indexName=idx_contitem_procid, tableName=ACT_CO_CONTENT_ITEM', '', 'EXECUTED', NULL, NULL, '3.5.3', '7878884836')
+INSERT INTO [ACT_CO_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'activiti', 'org/flowable/content/db/liquibase/flowable-content-db-changelog.xml', GETDATE(), 1, '7:a17df43ed0c96adfef5271e1781aaed2', 'createTable tableName=ACT_CO_CONTENT_ITEM; createIndex indexName=idx_contitem_taskid, tableName=ACT_CO_CONTENT_ITEM; createIndex indexName=idx_contitem_procid, tableName=ACT_CO_CONTENT_ITEM', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591484')
+GO
+
+ALTER TABLE [ACT_CO_CONTENT_ITEM] ADD [SCOPE_ID_] [varchar](255)
+GO
+
+ALTER TABLE [ACT_CO_CONTENT_ITEM] ADD [SCOPE_TYPE_] [varchar](255)
+GO
+
+CREATE NONCLUSTERED INDEX idx_contitem_scope ON [ACT_CO_CONTENT_ITEM]([SCOPE_ID_], [SCOPE_TYPE_])
+GO
+
+INSERT INTO [ACT_CO_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('2', 'flowable', 'org/flowable/content/db/liquibase/flowable-content-db-changelog.xml', GETDATE(), 3, '7:5aa445d140a638ee432a00c23134dd98', 'addColumn tableName=ACT_CO_CONTENT_ITEM; createIndex indexName=idx_contitem_scope, tableName=ACT_CO_CONTENT_ITEM', '', 'EXECUTED', NULL, NULL, '3.5.3', '2784591484')
 GO
 
 
@@ -988,7 +1046,7 @@ create table ACT_ID_PROPERTY (
 );
 
 insert into ACT_ID_PROPERTY
-values ('schema.version', '6.2.1.0', 1);
+values ('schema.version', '6.3.0.1', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ nvarchar(64),
@@ -1020,6 +1078,7 @@ create table ACT_ID_USER (
     EMAIL_ nvarchar(255),
     PWD_ nvarchar(255),
     PICTURE_ID_ nvarchar(64),
+    TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
 );
 
@@ -1049,7 +1108,7 @@ create table ACT_ID_TOKEN (
 
 create table ACT_ID_PRIV (
     ID_ nvarchar(64) not null,
-    NAME_ nvarchar(255),
+    NAME_ nvarchar(255) not null,
     primary key (ID_)
 );
 
@@ -1071,10 +1130,15 @@ alter table ACT_ID_MEMBERSHIP
     foreign key (USER_ID_)
     references ACT_ID_USER (ID_);
 
-alter table ACT_ID_PRIV_MAPPING 
-    add constraint ACT_FK_PRIV_MAPPING 
-    foreign key (PRIV_ID_) 
+alter table ACT_ID_PRIV_MAPPING
+    add constraint ACT_FK_PRIV_MAPPING
+    foreign key (PRIV_ID_)
     references ACT_ID_PRIV (ID_);
-    
+
 create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
-create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);      
+create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);
+
+alter table ACT_ID_PRIV
+    add constraint ACT_UNIQ_PRIV_NAME
+    unique (NAME_);
+

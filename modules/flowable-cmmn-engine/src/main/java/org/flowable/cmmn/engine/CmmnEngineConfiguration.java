@@ -156,6 +156,7 @@ import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.job.service.InternalJobManager;
+import org.flowable.job.service.InternalJobParentStateResolver;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -334,6 +335,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers;
     protected boolean addDefaultExceptionHandler = true;
     protected FailedJobCommandFactory failedJobCommandFactory;
+    protected InternalJobParentStateResolver internalJobParentStateResolver;
 
     protected FormFieldHandler formFieldHandler;
 
@@ -1192,6 +1194,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
         if (customAsyncRunnableExecutionExceptionHandlers != null) {
             exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
+        }
+        
+        if (this.internalJobParentStateResolver != null) {
+            this.jobServiceConfiguration.setJobParentStateResolver(this.internalJobParentStateResolver);
+        } else {
+            this.jobServiceConfiguration.setJobParentStateResolver(new DefaultCmmnJobParentStateResolver(this));
         }
 
         if (addDefaultExceptionHandler) {

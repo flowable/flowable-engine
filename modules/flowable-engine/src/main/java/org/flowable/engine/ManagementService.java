@@ -133,6 +133,16 @@ public interface ManagementService {
     Job moveDeadLetterJobToExecutableJob(String jobId, int retries);
 
     /**
+     * Moves a suspendend job from the suspended letter job table back to be an executable job. The retries are untouched.
+     * 
+     * @param jobId
+     *            id of the job to move, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     */
+    Job moveSuspendedJobToExecutableJob(String jobId);
+
+    /**
      * Delete the job with the provided id.
      * 
      * @param jobId

@@ -96,6 +96,7 @@ import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
 import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.form.AbstractFormType;
+import org.flowable.engine.impl.DefaultProcessJobParentStateResolver;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
 import org.flowable.engine.impl.FormServiceImpl;
 import org.flowable.engine.impl.HistoryServiceImpl;
@@ -288,6 +289,7 @@ import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.HistoryJobProcessor;
 import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.InternalJobManager;
+import org.flowable.job.service.InternalJobParentStateResolver;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobProcessor;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -643,6 +645,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
+    protected InternalJobParentStateResolver internalJobParentStateResolver;
 
     // JUEL functions ///////////////////////////////////////////////////////////
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
@@ -1373,6 +1376,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (addDefaultExceptionHandler) {
             exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
+        }
+
+        if (internalJobParentStateResolver != null) {
+            this.jobServiceConfiguration.setJobParentStateResolver(internalJobParentStateResolver); 
+        } else {
+            this.jobServiceConfiguration.setJobParentStateResolver(new DefaultProcessJobParentStateResolver(this));
         }
 
         this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);

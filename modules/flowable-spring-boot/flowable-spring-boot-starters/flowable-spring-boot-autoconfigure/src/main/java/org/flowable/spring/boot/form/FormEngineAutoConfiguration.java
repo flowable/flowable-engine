@@ -13,6 +13,7 @@
 package org.flowable.spring.boot.form;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -29,6 +30,7 @@ import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -59,6 +61,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableFormProperties formProperties;
+    protected List<EngineConfigurationConfigurer<SpringFormEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public FormEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableFormProperties formProperties) {
         super(flowableProperties);
@@ -87,6 +90,8 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
 
+        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+
         return configuration;
     }
 
@@ -109,6 +114,11 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             formEngineConfigurator.setFormEngineConfiguration(configuration);
             return formEngineConfigurator;
         }
+    }
+
+    @Autowired(required = false)
+    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringFormEngineConfiguration>> engineConfigurers) {
+        this.engineConfigurers = engineConfigurers;
     }
 }
 

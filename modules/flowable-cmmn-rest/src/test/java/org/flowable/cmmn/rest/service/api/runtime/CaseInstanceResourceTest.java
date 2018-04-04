@@ -13,10 +13,14 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import java.io.Serializable;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
@@ -94,6 +98,40 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
      */
     public void testDeleteUnexistingCaseInstance() {
         closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexistini")), HttpStatus.SC_NOT_FOUND));
+    }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/testManualEvaluateCriteria.cmmn" })
+    public void testEvaluateCriteria() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testManualEvaluateCriteria")
+                .variable("someBean", new TestBean())
+                .start();
+        
+        // Triggering the evaluation twice will satisfy the entry criterion for B
+        assertEquals(1, runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
+        
+        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        
+        httpPut.setEntity(new StringEntity("{\"action\": \"evaluateCriteria\"}"));
+        executeRequest(httpPut, HttpStatus.SC_OK);
+        
+        assertEquals(1, runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
+        
+        TestBean.RETURN_VALUE = true;
+        executeRequest(httpPut, HttpStatus.SC_OK);
+        
+        assertEquals(2, runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
+    }
+    
+    public static class TestBean implements Serializable {
+        
+        public static boolean RETURN_VALUE;
+        
+        public boolean isSatisfied() {
+            return RETURN_VALUE;
+        }
+        
     }
 
 }
