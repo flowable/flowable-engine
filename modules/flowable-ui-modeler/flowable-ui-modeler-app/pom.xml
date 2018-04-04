@@ -247,6 +247,7 @@
                     <exclude>static/fonts/**</exclude>
                     <exclude>static/libs/bootstrap_3.1.1/fonts/**</exclude>
                     <exclude>static/editor-app/fonts/**</exclude>
+		    <exclude>static/libs/ui-grid_3.0.0/**</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -256,6 +257,7 @@
                     <include>static/fonts/**</include>
                     <include>static/libs/bootstrap_3.1.1/fonts/**</include>
                     <include>static/editor-app/fonts/**</include>
+		    <include>static/libs/ui-grid_3.0.0/**</include>
                 </includes>
             </resource>
         </resources>
