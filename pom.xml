@@ -1117,6 +1117,7 @@
 				<module>modules/flowable-bpmn-converter</module>
 				<module>modules/flowable-engine</module>
 				<module>modules/flowable-secure-javascript</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>modules/flowable-bpmn-layout</module>
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
@@ -1177,7 +1178,6 @@
 				<module>modules/flowable-ui-modeler</module>
 				<module>modules/flowable-ui-task</module>
 				<module>modules/flowable-ui-admin</module>
-				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1327,6 +1327,7 @@
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
 				<module>modules/flowable-secure-javascript</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-json-converter</module>
 				<module>modules/flowable-dmn-xml-converter</module>
@@ -1381,7 +1382,6 @@
 				<module>modules/flowable-crystalball</module>
 				<module>modules/flowable-ui-common</module>
 				<module>modules/flowable-ui-edge</module>
-				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 		</profile>
