@@ -1,4 +1,4 @@
-= Flowable DOCS (v 6.3.0-SNAPSHOT)
+= Flowable DOCS (v 6.3.0)
 :doctype: book
 :toc: left
 :toclevels: 4

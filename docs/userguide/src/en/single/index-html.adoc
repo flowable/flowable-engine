@@ -1,4 +1,4 @@
-= Flowable Unified DOCS (v 6.3.0-SNAPSHOT)
+= Flowable Unified DOCS (v 6.3.0)
 :doctype: book
 :docinfodir: ../base
 :docinfo1: header
