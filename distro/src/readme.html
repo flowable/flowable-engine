@@ -50,7 +50,7 @@ Check the completely revised documentation for more details!</p>
 
 <ul>
     <li>Performance enhancements with great results. Read all about it here: <a href="https://blog.flowable.org/2018/03/05/flowable-6-3-0-performance-benchmark/">https://blog.flowable.org/2018/03/05/flowable-6-3-0-performance-benchmark/</a></li>
-    <li>Dynamic task and subprocess injection into running process instances</li>
+    <li>Dynamic task and subprocess injection into running process instances is now fully supported and out of experimental state</li>
     <li>Allow the configuration of history on individual process definitions, overriding the engine default setting</li>
     <li>Introduce the 'triggerable' service task: a service task that provides configurable service calls that are executed externally and call the engine when done. 
     The implementation is guaranteed to be correct with regards to the transactional behavior of the engine.</li>
@@ -119,7 +119,7 @@ By default, all Flowable apps (IDM, Modeler, Task, Admin and REST) are configure
 <p>
 Due to upgrading to the latest Spring Security dependencies for handling the authentication for all the Flowable apps, users can get a "cookie theft exception" when accessing the apps with a cookie from a previous version that is still present in the browser.
 The reason for this is that Spring Security has changed the way cookie tokens are hashed. A hard refresh or relogin fixes this by generating a new cookie.
-If you don't want to force your users to do this, you can delete all rows from the <i>ACT_ID_TOKEN</i> database table. This will invalidate all old cookies and all users will have to relogin.
+If you don't want to force your users to do this, you can delete all rows from the <i>ACT_ID_TOKEN</i> database table. This will invalidate all old cookies and all users will have to login again.
 </p>
 
 <h3>Release Notes - Flowable - 6.2.1</h3>
