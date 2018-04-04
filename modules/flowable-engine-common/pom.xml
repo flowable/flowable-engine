@@ -183,11 +183,6 @@
             <artifactId>geronimo-jta_1.1_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-task-service-api</artifactId>
-            <version>6.2.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
 </project>
