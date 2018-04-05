@@ -33,6 +33,8 @@ This will look for a +flowable.dmn.cfg.xml+ file on the classpath and construct 
 
     <property name="databaseSchemaUpdate" value="true" />
 
+    <property name="strictMode" value="false"/>
+    
   </bean>
 
 </beans>
@@ -325,6 +327,57 @@ You can also inject your own cache implementation. This must be a bean that impl
   <bean class="org.flowable.MyCache" />
 </property>
 ----
+
+[[strictMode]]
+
+=== Strict mode
+
+By default strict mode is *enabled*. This means that the hit policies will act as described in the DMN 1.1 spec.
+It is however possible to disable strict mode. 
+
+[source,xml,linenums]
+----
+<beans>
+
+  <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+    <!-- ... -->
+      <property name="strictMode" value="false"/>
+    <!-- ... -->
+  </bean>
+
+</beans>
+----
+
+The effect will be that a result will not be invalidated when a hit policy contstraint is violated. A possible violation will be logged in the audit log as a validation message.
+
+
+
+=== Custom Flowable Function Delegates
+
+Flowable DMN provides some built-in JUEL Function Delegates. By setting the *customFlowableFunctionDelegates* property on the dmnEngineConfiguration bean you can provide own. These can be used in expressions to execute your own logic.
+
+[source,xml,linenums]
+----
+<beans>
+
+  <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+    <!-- ... -->
+    <property name="customFlowableFunctionDelegates">
+      <list>
+          <bean ref="myOwnFunctionDelegateOne" />
+          <bean ref="myOwnFunctionDelegateTwo" />
+      </list>
+    </property>
+    <!-- ... -->
+  </bean>
+
+  <bean id="myOwnFunctionDelegateOne" class="org.acme.MyOwnFunctionDelegateOne" />
+  <bean id="myOwnFunctionDelegateTwo" class="org.acme.MyOwnFunctionDelegateTwo" />
+
+</beans>
+----
+
+Note that the custom Function Delegates must extend from org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate.
 
 
 [[loggingConfiguration]]

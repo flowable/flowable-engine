@@ -89,6 +89,10 @@ public class FlowableCmmnRule implements TestRule {
         this.configurationResource = configurationResource;
     }
 
+    public FlowableCmmnRule(CmmnEngine cmmnEngine) {
+        setCmmnEngine(cmmnEngine);
+    }
+
     /**
      * Implementation based on {@link TestWatcher}.
      */
@@ -240,6 +244,11 @@ public class FlowableCmmnRule implements TestRule {
 
     public CmmnEngine getCmmnEngine() {
         return cmmnEngine;
+    }
+
+    public void setCmmnEngine(CmmnEngine cmmnEngine) {
+        this.cmmnEngine = cmmnEngine;
+        initializeServices();
     }
 
     public CmmnRepositoryService getCmmnRepositoryService() {

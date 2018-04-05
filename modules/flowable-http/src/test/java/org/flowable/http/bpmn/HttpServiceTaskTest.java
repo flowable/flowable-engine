@@ -14,6 +14,7 @@ package org.flowable.http.bpmn;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +121,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
             fail("FlowableException expected");
         } catch (final Exception e) {
             assertTrue(e instanceof FlowableException);
-            assertTrue(e.getCause() instanceof SocketException);
+            assertTrue(e.getCause() instanceof SocketTimeoutException
+                    || e.getCause() instanceof SocketException);
         }
     }
 

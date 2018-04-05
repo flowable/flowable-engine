@@ -19,6 +19,12 @@ package org.flowable.cmmn.rest.service.api;
  * @author Frederik Heremans
  */
 public class RestActionRequest {
+    
+    public static final String EVALUATE_CRITERIA = "evaluateCriteria";
+    public static final String TRIGGER = "trigger";
+    public static final String ENABLE = "enable";
+    public static final String DISABLE = "disable";
+    public static final String START = "start";
 
     private String action;
 

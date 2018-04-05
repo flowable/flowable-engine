@@ -12,14 +12,15 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * This class tests {@link DebugContinueProcessOperation}, {@link ProcessDebugger} and {@link DebugFlowableEngineAgenda}
@@ -54,11 +55,27 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
         assertThat("No process instance is running.", this.runtimeService.createExecutionQuery().count(), is(0L));
     }
 
-    protected void triggerBreakPoint() {
-        Job job = managementService.createDeadLetterJobQuery().handlerType("breakpoint").singleResult();
+    @Deployment(resources = "org/flowable/engine/impl/agenda/oneFailureScriptTask.bpmn20.xml")
+    public void testDebuggerExecutionFailure() {
+        ProcessInstance oneTaskProcess = this.runtimeService.startProcessInstanceByKey("oneTaskFailingProcess");
+
+        assertProcessActivityId("The execution must stop on the start node.", oneTaskProcess, "theStart");
+        triggerBreakPoint();
+
+        assertProcessActivityId("The execution must stop on the user task node before it's execution.", oneTaskProcess, "theTask");
+        Job job = managementService.createSuspendedJobQuery().handlerType("breakpoint").singleResult();
         assertNotNull(job);
-        Job deadLetterJob = managementService.moveDeadLetterJobToExecutableJob(job.getId(), 3);
-        managementService.executeJob(deadLetterJob.getId());
+        managementService.moveSuspendedJobToExecutableJob(job.getId());
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(this.processEngineConfiguration, this.managementService, 10000, 500);
+        Job updatedJob = managementService.createSuspendedJobQuery().handlerType("breakpoint").singleResult();
+        assertNotNull("Triggering breakpoint and failure must reassign breakpoint to suspended jobs again", updatedJob);
+    }
+
+    protected void triggerBreakPoint() {
+        Job job = managementService.createSuspendedJobQuery().handlerType("breakpoint").singleResult();
+        assertNotNull(job);
+        Job activatedJob = managementService.moveSuspendedJobToExecutableJob(job.getId());
+        managementService.executeJob(activatedJob.getId());
     }
 
     protected void assertProcessActivityId(String message, ProcessInstance process, String activityId) {

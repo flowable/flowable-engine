@@ -339,7 +339,7 @@ angular.module('flowableModeler')
             };
 
             var isOperatorCell = function (cellMeta) {
-                return !(cellMeta == null || cellMeta.prop == null || cellMeta.prop.endsWith("_operator") === false);
+                return !(cellMeta == null || cellMeta.prop == null || typeof cellMeta.prop !== 'string'|| cellMeta.prop.endsWith("_operator") === false);
             };
 
             var createNewInputExpression = function (inputExpression) {
@@ -631,10 +631,6 @@ angular.module('flowableModeler')
                         break;
                     default:
                         type = 'text';
-                }
-
-                if (outputExpression.complexExpression) {
-                    type = 'text';
                 }
 
                 var title = '';

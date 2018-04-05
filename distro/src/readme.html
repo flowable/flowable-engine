@@ -28,25 +28,99 @@
 
 <h3>Release Notes - Flowable - 6.3.0</h3>
 
+<p>Flowable 6.3.0 has turned out to be a big release with many new features (and even more fixes). Many thanks to all the community contributers that participated in the release
+and a special shout-out to Pascal Schumacher, Zach Visagie, Robert Hafner, Christophe Deneux and Seif El Deen Khaled</p>
+
 <h4>Highlights</h4>
+
+<h4>Note: Flowable now requires JDK 8 as a minimum version!</h4>
+
+<h4>GENERAL</h4>
+
+<p>The Spring Boot starters have all been updated to version 2.0. There are now starters available for each engine (BPMN, CMMN and DMN). 
+Check the completely revised documentation for more details!</p>
+
+<ul>
+    <li>Support and fixes for running various modules on JDK 9 (the engines themselves already ran on JDK 9)</li>
+    <li>Updated all 3rd-party libraries to latest versions</li>
+    <li>The REST app can now be configured to use privileges, instead of all users being able to make REST calls.</li>
+</ul>
+
+<h4>BPMN</h4>
+
+<ul>
+    <li>Performance enhancements with great results. Read all about it here: <a href="https://blog.flowable.org/2018/03/05/flowable-6-3-0-performance-benchmark/">https://blog.flowable.org/2018/03/05/flowable-6-3-0-performance-benchmark/</a></li>
+    <li>Dynamic task and subprocess injection into running process instances is now fully supported and out of experimental state</li>
+    <li>Allow the configuration of history on individual process definitions, overriding the engine default setting</li>
+    <li>Introduce the 'triggerable' service task: a service task that provides configurable service calls that are executed externally and call the engine when done. 
+    The implementation is guaranteed to be correct with regards to the transactional behavior of the engine.</li>
+    <li>Support for a transaction-lifecycle based event listener</li>
+    <li>Support for 'sameDeployment' when looking up the called process definition for a call activity</li>
+    <li>HTTP task: support for storing response variables transiently</li>
+    <li>Multi instance: support for Iterable when resolving a collection (e.g. ArrayNode)</li>
+</ul>
+
+<h4>CMMN</h4>
+
+<ul>
+    <li>REST API support for all CMMN services and operations</li>
+    <li>Support for asynchronous service tasks</li>
+    <li>Support for manual activation rules and enabling/manually starting plan items through the runtime service</li>
+    <li>Support for required rule</li>
+    <li>Support for autocomplete</li>
+    <li>Support for completion neutral</li>
+    <li>A Script task type has been added</li>
+    <li>Support for User event listeners</li>
+    <li>Support for viewing and managing CMMN date in the Admin app</li>
+</ul>
+
+<h4>DMN</h4>
+
+<ul>
+    <li>Support for collection expressions, such as IN and NOT IN</li>
+    <li>Improved decision table editor user experience to make it easier to add JUEL expressions in specific rules</li>
+    <li>Support for viewing and managing decision executions in the Admin app</li>
+</ul>
+
+<h4>APPS</h4>
+
+<ul>
+    <li>All apps have been rewritten to use Spring Boot 2.0. All apps now use one property file for configuration. 
+    Please check the documentation, as many new configuration options are available (with backwards compatibility for old properties).</li>
+    <li>Support for expressions in the options fields, including dropdown, radio and hyperlink fields</li>
+    <li>Support for a password fields in the form editor and runtime</li>
+    <li>Multi-tenancy support in the Modeler by defining the active tenant in the Modeler property file</li>
+</ul>
 
 <h4>Upgrade notes</h4>
 
 <p>
+To remove duplicate code, some more logic has been added to the common modules, such as flowable-engine-common and flowable-common-rest. 
+For example, the scripting engine has been moved to the flowable-engine-common module so it can be used by both the BPMN and the CMMN engine.
+If you are using Flowable internal classes then it is possible that some package changes to the common modules are required.
+Most of this should be automatically handled by your IDE.
+</p>
+
+<p>
 All Flowable apps (IDM, Modeler, Task, Admin and REST) now read their configuration from the <i>flowable-app.properties</i> file, which is included in each WAR file in the <i>META-INF/flowable-app</i> folder.
-Consequently, a shared <i>flowable-app.properties</i> can be put on the classpath for all apps.
-All all property files (e.g. <i>db.properties</i> for the REST app) are still read and work in a backwards compatible way.  
+Consequently, a single, shared <i>flowable-app.properties</i> can be placed on the classpath for all apps.
+All property files (e.g. <i>db.properties</i> for the REST app) are still read and work in a backwards-compatible way.  
 </p>
 
 <p>
 The default way user credentials are authenticated and verified when calling the Flowable REST API has changed. A user now needs to have the <i>access-rest-api</i> privilege (before, any valid credentials could be used).
-An admin user can be given this privilege by setting the <i>flowable.rest.app.admin.user-id</i> and <i>flowable.rest.app.admin.password</i> properties in the <i>flowable-app.properties</i> file. On bootup, the admin user will be created if it doesn't exist yet or it will be given the <i>access-rest-api</i> privilege. This admin user can now give other users this privilige using the Flowable IDM app or through a REST call (doing an HTTP post to <i>privileges/{privilegeId}/users</i> with the userId in the body).
+An admin user can be given this privilege by setting the <i>flowable.rest.app.admin.user-id</i> and <i>flowable.rest.app.admin.password</i> properties in the <i>flowable-app.properties</i> file. On start-up, the admin user will be created if it doesn't exist, or it will be given the <i>access-rest-api</i> privilege. This admin user can then give other users this privilige using the Flowable IDM app or through a REST call (doing an HTTP post to <i>privileges/{privilegeId}/users</i> with the userId in the body).
 </p>
 
 <p>
-By default, all Flowable apps (IDM, Modeler, Task, Admin and REST) are configured to use an in-memory H2 database that is shared between all apps by default. Before, each app had their own in-memory H2 database.
+By default, all Flowable apps (IDM, Modeler, Task, Admin and REST) are configured to use an in-memory H2 database that is persisted in the user home folder, which is shared between all apps by default. Previously, each app had its own in-memory H2 database.
 </p>
 
+<p>
+Due to upgrading to the latest Spring Security dependencies for handling the authentication for all the Flowable apps, users can get a "cookie theft exception" when accessing the apps with a cookie from a previous version that is still present in the browser.
+The reason for this is that Spring Security has changed the way cookie tokens are hashed. A hard refresh or relogin fixes this by generating a new cookie.
+If you don't want to force your users to do this, you can delete all rows from the <i>ACT_ID_TOKEN</i> database table. This will invalidate all old cookies and all users will have to login again.
+</p>
 
 <h3>Release Notes - Flowable - 6.2.1</h3>
 

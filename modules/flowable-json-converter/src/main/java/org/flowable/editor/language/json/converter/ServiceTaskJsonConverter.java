@@ -14,7 +14,6 @@ package org.flowable.editor.language.json.converter;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.node.BooleanNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FieldExtension;
@@ -25,6 +24,7 @@ import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.editor.language.json.model.ModelInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
@@ -138,6 +138,10 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
                 propertiesNode.put(PROPERTY_SERVICETASK_DELEGATE_EXPRESSION, serviceTask.getImplementation());
             }
+            
+            if (serviceTask.isTriggerable()) {
+                propertiesNode.put(PROPERTY_SERVICETASK_TRIGGERABLE, serviceTask.isTriggerable());
+            }
 
             if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
                 propertiesNode.put(PROPERTY_SERVICETASK_RESULT_VARIABLE, serviceTask.getResultVariableName());
@@ -165,6 +169,10 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         } else if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_DELEGATE_EXPRESSION, elementNode))) {
             task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
             task.setImplementation(getPropertyValueAsString(PROPERTY_SERVICETASK_DELEGATE_EXPRESSION, elementNode));
+        }
+        
+        if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_TRIGGERABLE, elementNode)) {
+            task.setTriggerable(true);
         }
 
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode))) {

@@ -13,6 +13,7 @@
 package org.flowable.spring.boot.cmmn;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -32,15 +33,20 @@ import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.spring.job.service.SpringAsyncExecutor;
+import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -68,6 +74,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties) {
         super(flowableProperties);
@@ -75,10 +82,30 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         this.idmProperties = idmProperties;
     }
 
+    /**
+     * The Async Executor must not be shared between the engines.
+     * Therefore a dedicated one is always created.
+     */
+    @Bean
+    @Cmmn
+    @ConfigurationProperties(prefix = "flowable.cmmn.async.executor")
+    @ConditionalOnMissingBean(name = "cmmnAsyncExecutor")
+    public SpringAsyncExecutor cmmnAsyncExecutor(
+        ObjectProvider<TaskExecutor> taskExecutor,
+        @Cmmn ObjectProvider<TaskExecutor> cmmnTaskExecutor,
+        ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
+        @Cmmn ObjectProvider<SpringRejectedJobsHandler> cmmnRejectedJobsHandler
+    ) {
+        return new SpringAsyncExecutor(
+            getIfAvailable(cmmnTaskExecutor, taskExecutor),
+            getIfAvailable(cmmnRejectedJobsHandler, rejectedJobsHandler)
+        );
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-        ObjectProvider<AsyncExecutor> asyncExecutorProvider)
+        @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider)
         throws IOException {
         SpringCmmnEngineConfiguration configuration = new SpringCmmnEngineConfiguration();
 
@@ -112,6 +139,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
 
+        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+
         return configuration;
     }
 
@@ -133,5 +162,10 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
             return cmmnEngineConfigurator;
         }
+    }
+
+    @Autowired(required = false)
+    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers) {
+        this.engineConfigurers = engineConfigurers;
     }
 }

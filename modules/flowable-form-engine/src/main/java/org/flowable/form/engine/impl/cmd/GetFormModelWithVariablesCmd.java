@@ -38,9 +38,9 @@ import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.ExpressionFormField;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
-import org.flowable.form.model.SimpleFormModel;
 import org.flowable.form.model.Option;
 import org.flowable.form.model.OptionFormField;
+import org.flowable.form.model.SimpleFormModel;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -296,6 +296,15 @@ public class GetFormModelWithVariablesCmd implements Command<FormInfo>, Serializ
                 } catch (Exception e) {
                     LOGGER.error("Error parsing form date value for form instance {} with value {}", formInstanceId, fieldValue, e);
                 }
+                
+            } else if (fieldValueNode.isBoolean()) {
+                variables.put(field.getId(), fieldValueNode.asBoolean());
+                
+            } else if (fieldValueNode.isLong()) {
+                variables.put(field.getId(), fieldValueNode.asLong());
+                
+            } else if (fieldValueNode.isDouble()) {
+                variables.put(field.getId(), fieldValueNode.asDouble());
 
             } else {
                 variables.put(field.getId(), fieldValue);

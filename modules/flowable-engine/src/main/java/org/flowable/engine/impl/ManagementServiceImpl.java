@@ -12,10 +12,6 @@
  */
 package org.flowable.engine.impl;
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -58,9 +54,14 @@ import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.flowable.job.service.impl.cmd.JobType;
 import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveJobToDeadLetterJobCmd;
+import org.flowable.job.service.impl.cmd.MoveSuspendedJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.SetJobRetriesCmd;
 import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
+
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tom Baeyens
@@ -69,7 +70,7 @@ import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
  * @author Saeid Mizaei
  */
 public class ManagementServiceImpl extends ServiceImpl implements ManagementService {
-
+    
     @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd());
@@ -116,6 +117,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     @Override
     public Job moveDeadLetterJobToExecutableJob(String jobId, int retries) {
         return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries));
+    }
+
+    @Override
+    public Job moveSuspendedJobToExecutableJob(String jobId) {
+        return commandExecutor.execute(new MoveSuspendedJobToExecutableJobCmd(jobId));
     }
 
     @Override

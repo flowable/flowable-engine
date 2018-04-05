@@ -12,10 +12,6 @@
  */
 package org.flowable.app.filter;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -49,6 +45,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class FlowableCookieFilter extends OncePerRequestFilter {
 
@@ -86,7 +86,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
     }
 
     protected void initIdmAppRedirectUrl() {
-        idmAppUrl = properties.determineIdmAppUrl();
+        idmAppUrl = properties.determineIdmAppRedirectUrl();
 
         redirectUrlOnAuthSuccess = properties.getRedirectOnAuthSuccess();
     }

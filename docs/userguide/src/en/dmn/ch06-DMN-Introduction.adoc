@@ -58,9 +58,33 @@ You're now ready to define your decision table. Let's describe what is presented
 
 In the top left corner you can select a *hit policy*.
 
-There are 2 hit policies available; *first (single pass)* and *any (single pass)*.
-When hit policy first is selected the execution of the decision table will stop when a rule is valid.
-When hit policy any is selected all valid rules will executed.
+There are 7 hit policies available;
+
+*single hit*
+
+* **F**IRST: multiple (overlapping) rules can match, with different output entries. The first hit by rule order is returned (and evaluation can halt).
+
+* **U**NIQUE: no overlap is possible and all rules are disjoint. Only a single rule can be matched.
+
+* **A**NY: there may be overlap, but all of the matching rules show equal output entries for each output, so any match can be used. If the output entries are non-equal, the hit policy is incorrect and the result will be empty and marked as failed. When link:$$#strictMode$$[strict mode] is disabled the last valid rule be the result. (The violation will be present as a validation message)
+
+* **P**RIORITY: multiple rules can match, with different output entries. This policy returns the matching rule with the highest output priority. Output priorities are specified in the ordered list of output values, in decreasing order of priority.
+When link:$$#strictMode$$[strict mode] is disabled and there are no output values defined the first valid rule be the result. (The violation will be present as a validation message)
+
+
+*multiple hit*
+
+* **O**UTPUT ORDER: returns all hits in decreasing output priority order. Output priorities are specified in the ordered list of output values in decreasing order of priority.
+
+* **R**ULE ORDER: returns all hits in rule order.
+
+* **C**OLLECT: returns all hits in arbitrary order. An operator (‘+’, ‘<’, ‘>’, ‘#’) can be added to apply a simple function to the outputs. If no operator is present, the result is the list of all the output entries.
+
+** + (sum): the result of the decision table is the sum of all the distinct outputs.
+** < (min): the result of the decision table is the smallest value of all the outputs.
+** > (max): the result of the decision table is the largest value of all the outputs.
+** # (count): the result of the decision table is the number of distinct outputs.
+
 
 ==== Input and Output expressions
 
@@ -68,11 +92,11 @@ The header of the decision table itself is divided in two sections; blue and gre
 
 image::images/decision_tables_4.png[align="center"]
 
-Within an input expression, you can define the variable that will be used in the expression of the rule input entries (explained below). It's possible to define multiple input expressions by selecting *Add Input*.
+Within an input expression, you can define the variable that will be used in the expression of the rule input entries (explained below). It's possible to define multiple input expressions by selecting *Add Input* (right click option menu or by clicking the plus icon).
 
 image::images/decision_tables_5.png[align="center"]
 
-Within an output expression, you can define what variable will be created to form the result of a decision table execution (the value of the variable will be determined by the output entry expression; explained below). It's possible to define multiple output expressions by selecting *Add Output*.
+Within an output expression, you can define what variable will be created to form the result of a decision table execution (the value of the variable will be determined by the output entry expression; explained below). It's possible to define multiple output expressions by selecting *Add Output* (right click option menu or by clicking the plus icon).
 
 
 ==== Rules
@@ -82,13 +106,13 @@ A input entry is an expression that will be evaluated against the input variable
 
 [NOTE]
 ====
-The DMN specification defines an expression language: (S)-FEEL. Currently, we do not supported this part of the specification. Within Flowable DMN, we use link:$$https://github.com/mvel/mvel$$[ MVEL] as the expression language.
+The DMN specification defines an expression language: (S)-FEEL. Currently, we do not supported this part of the specification. Within Flowable DMN, we use JUEL as the expression language.
 ====
 
 image::images/decision_tables_6.png[align="center"]
 
 To enter an expression, double-click on the corresponding cell. 
-In this example, the expression _== "BRONZE"_ is entered. Combined with the variable defined in the corresponding input expression (column header), this will result at runtime in the full expression _customerCat == "BRONZE"_.
+In this example, the expression _== BRONZE_ is entered. Combined with the variable defined in the corresponding input expression (column header), this will result at runtime in the full expression _customerCat == "BRONZE"_.
 
 image::images/decision_tables_7.png[align="center"]
 
@@ -121,45 +145,52 @@ The full DMN 1.1 XML of the example above.
 
 [source,xml,linenums]
 ----
-<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_052249e2-f35d-11e6-9c45-0242ac120005" name="Determine Discount" namespace="http://www.flowable.org/dmn">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_78d09dd7-374c-11e8-b5d8-0242ac120005" name="Determine Discount" namespace="http://www.flowable.org/dmn">
   <decision id="DET_DISC_1" name="Determine Discount">
-    <decisionTable id="decisionTable_052249e2-f35d-11e6-9c45-0242ac120005" hitPolicy="FIRST">
+    <decisionTable id="decisionTable_78d09dd7-374c-11e8-b5d8-0242ac120005" hitPolicy="UNIQUE">
       <input label="Customer Category">
-        <inputExpression id="inputExpression_5">
-          <text>customercat</text>
+        <inputExpression id="inputExpression_1" typeRef="string">
+          <text>customerCat</text>
         </inputExpression>
+        <inputValues>
+          <text>"BRONZE","SILVER","GOLD"</text>
+        </inputValues>
       </input>
-      <output id="outputExpression_6" label="Discount Percentage" name="discountperc" typeRef="number"></output>
+      <output id="outputExpression_2" label="Discount Percentage" name="discountPerc" typeRef="number">
+        <outputValues>
+          <text>"0","5","10","20"</text>
+        </outputValues>
+      </output>
       <rule>
-        <inputEntry id="inputEntry_5_1">
-          <text>== "BRONZE"</text>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[== "BRONZE"]]></text>
         </inputEntry>
-        <outputEntry id="outputEntry_6_1">
-          <text>5</text>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA[5]]></text>
         </outputEntry>
       </rule>
       <rule>
-        <inputEntry id="inputEntry_5_2">
-          <text>== "SILVER"</text>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[== "SILVER"]]></text>
         </inputEntry>
-        <outputEntry id="outputEntry_6_2">
-          <text>10</text>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA[10]]></text>
         </outputEntry>
       </rule>
       <rule>
-        <inputEntry id="inputEntry_5_3">
-          <text>== "GOLD"</text>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[== "GOLD"]]></text>
         </inputEntry>
-        <outputEntry id="outputEntry_6_3">
-          <text>20</text>
+        <outputEntry id="outputEntry_2_3">
+          <text><![CDATA[20]]></text>
         </outputEntry>
       </rule>
       <rule>
-        <inputEntry id="inputEntry_5_4">
-          <text></text>
+        <inputEntry id="inputEntry_1_4">
+          <text><![CDATA[-]]></text>
         </inputEntry>
-        <outputEntry id="outputEntry_6_4">
-          <text>0</text>
+        <outputEntry id="outputEntry_2_4">
+          <text><![CDATA[0]]></text>
         </outputEntry>
       </rule>
     </decisionTable>

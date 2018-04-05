@@ -1,0 +1,140 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.flowable.cmmn.rest.service.api.runtime.planitem;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
+
+/**
+ * @author Tijs Rademakers
+ */
+@RestController
+@Api(tags = { "Plan Item Instances" }, description = "Manage Plan Item Instances", authorizations = { @Authorization(value = "basicAuth") })
+public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseResource {
+
+    // FIXME naming issue ?
+    @ApiOperation(value = "List of plan item instances", tags = { "Executions" }, nickname = "listPlanItemInstances")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return plan item instances with the given case definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "Only return plan item instances which are part of the case instance with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "stageInstanceId", dataType = "string", value = "Only return plan item instances which are part of the given stage instance.", paramType = "query"),
+            @ApiImplicitParam(name = "planItemDefinitionId", dataType = "string", value = "Only return plan item instances which have the given plan item definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "planItemDefinitionType", dataType = "string", value = "Only return plan item instances which have the given plan item definition type.", paramType = "query"),
+            @ApiImplicitParam(name = "state", dataType = "string", value = "Only return plan item instances which have the given state.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return plan item instances which have the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return plan item instances which have the given element id.", paramType = "query"),
+            @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return plan item instances which have the given reference id.", paramType = "query"),
+            @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return plan item instances which have the given reference type.", paramType = "query"),
+            @ApiImplicitParam(name = "startedBefore", dataType = "date", value = "Only return plan item instances which are started before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "startedAfter", dataType = "date", value = "Only return plan item instances which are started after the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "startUserId", dataType = "string", value = "Only return plan item instances which are started by the given user id.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenantId.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns process instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "processInstanceId ,processDefinitionId,processDefinitionKey ,tenantId", paramType = "query"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned"),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+    })
+    @GetMapping(value = "/cmmn-runtime/plan-item-instances", produces = "application/json")
+    public DataResponse<PlanItemInstanceResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+        // Populate query based on request
+        PlanItemInstanceQueryRequest queryRequest = new PlanItemInstanceQueryRequest();
+
+        if (allRequestParams.containsKey("id")) {
+            queryRequest.setId(allRequestParams.get("id"));
+        }
+
+        if (allRequestParams.containsKey("caseInstanceId")) {
+            queryRequest.setCaseInstanceId(allRequestParams.get("caseInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("caseDefinitionId")) {
+            queryRequest.setCaseDefinitionId(allRequestParams.get("caseDefinitionId"));
+        }
+
+        if (allRequestParams.containsKey("stageInstanceId")) {
+            queryRequest.setStageInstanceId(allRequestParams.get("stageInstanceId"));
+        }
+        
+        if (allRequestParams.containsKey("planItemDefinitionId")) {
+            queryRequest.setPlanItemDefinitionId(allRequestParams.get("planItemDefinitionId"));
+        }
+        
+        if (allRequestParams.containsKey("planItemDefinitionType")) {
+            queryRequest.setPlanItemDefinitionType(allRequestParams.get("planItemDefinitionType"));
+        }
+        
+        if (allRequestParams.containsKey("state")) {
+            queryRequest.setState(allRequestParams.get("state"));
+        }
+        
+        if (allRequestParams.containsKey("elementId")) {
+            queryRequest.setElementId(allRequestParams.get("elementId"));
+        }
+        
+        if (allRequestParams.containsKey("referenceId")) {
+            queryRequest.setReferenceId(allRequestParams.get("referenceId"));
+        }
+        
+        if (allRequestParams.containsKey("referenceType")) {
+            queryRequest.setReferenceType(allRequestParams.get("referenceType"));
+        }
+        
+        if (allRequestParams.containsKey("startedBefore")) {
+            queryRequest.setStartedBefore(RequestUtil.getDate(allRequestParams, "startedBefore"));
+        }
+        
+        if (allRequestParams.containsKey("startedAfter")) {
+            queryRequest.setStartedAfter(RequestUtil.getDate(allRequestParams, "startedAfter"));
+        }
+        
+        if (allRequestParams.containsKey("startUserId")) {
+            queryRequest.setStartUserId(allRequestParams.get("startUserId"));
+        }
+        
+        if (allRequestParams.containsKey("name")) {
+            queryRequest.setName(allRequestParams.get("name"));
+        }
+        
+        if (allRequestParams.containsKey("tenantId")) {
+            queryRequest.setTenantId(allRequestParams.get("tenantId"));
+        }
+
+        if (allRequestParams.containsKey("withoutTenantId")) {
+            if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+                queryRequest.setWithoutTenantId(Boolean.TRUE);
+            }
+        }
+
+        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/cmmn-runtime/plan-item-instances", ""));
+    }
+}

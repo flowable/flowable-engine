@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer;
+import org.hamcrest.core.AnyOf;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Assert;
 import org.junit.Before;
@@ -132,7 +134,9 @@ public class CmmnHttpTaskTest {
     @CmmnDeployment
     public void testRequestTimeout() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectCause(IsInstanceOf.<Throwable>instanceOf(SocketException.class));
+        this.expectedException.expectCause(AnyOf.anyOf(
+                IsInstanceOf.<Throwable>instanceOf(SocketTimeoutException.class),
+                IsInstanceOf.<Throwable>instanceOf(IOException.class)));
 
         createCaseInstance();
     }

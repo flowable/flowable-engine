@@ -311,7 +311,7 @@
     
     </changeSet>
     
-    <!-- Version 6.3.0 -->
+    <!-- Version 6.3.1-SNAPSHOT -->
     <changeSet id="3" author="flowable">
     
         <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">

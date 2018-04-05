@@ -20,7 +20,6 @@ import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.UrlResource;
 
@@ -34,16 +33,17 @@ public class SpringDmnConfigurationHelper {
     public static DmnEngine buildDmnEngine(URL resource) {
         LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND DMN ENGINE =========================================");
 
-        ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
-        Map<String, DmnEngine> beansOfType = applicationContext.getBeansOfType(DmnEngine.class);
-        if ((beansOfType == null) || (beansOfType.isEmpty())) {
-            throw new FlowableException("no " + DmnEngine.class.getName() + " defined in the application context " + resource.toString());
+        try (GenericXmlApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource))) {
+            Map<String, DmnEngine> beansOfType = applicationContext.getBeansOfType(DmnEngine.class);
+            if ((beansOfType == null) || (beansOfType.isEmpty())) {
+                throw new FlowableException("no " + DmnEngine.class.getName() + " defined in the application context " + resource.toString());
+            }
+
+            DmnEngine dmnEngine = beansOfType.values().iterator().next();
+
+            LOGGER.debug("==== SPRING DMN ENGINE CREATED ==================================================================");
+            return dmnEngine;
         }
-
-        DmnEngine dmnEngine = beansOfType.values().iterator().next();
-
-        LOGGER.debug("==== SPRING DMN ENGINE CREATED ==================================================================");
-        return dmnEngine;
     }
 
 }

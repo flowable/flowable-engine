@@ -17,6 +17,7 @@ import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
+import org.flowable.form.spring.SpringFormExpressionManager;
 import org.flowable.spring.common.SpringEngineConfiguration;
 
 /**
@@ -36,6 +37,8 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
         initialiseCommonProperties(engineConfiguration, formEngineConfiguration);
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
         ((SpringFormEngineConfiguration) formEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
+        formEngineConfiguration.setExpressionManager(new SpringFormExpressionManager(
+                        springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
 
         initFormEngine();
         

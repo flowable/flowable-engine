@@ -182,10 +182,198 @@ angular.module('flowableApp')
 }]);
 
 angular.module('flowableApp')
-    .controller('ShowProcessDiagramCtrl', ['$scope', '$timeout', 'ResourceService', 'appResourceRoot',
-        function ($scope, $timeout, ResourceService, appResourceRoot) {
+    .controller('ShowProcessDiagramCtrl', ['$scope', '$http', '$interval', '$timeout', '$translate', '$q', 'ResourceService', 'appResourceRoot',
+        function ($scope, $http, $interval, $timeout, $translate, $q, ResourceService, appResourceRoot) {
 
-            $timeout(function() {
+            $scope.model.isDebuggerEnabled = false;
+
+            $http({
+                method: 'GET',
+                url: '../app/rest/debugger/',
+                async: false
+            }).success(function (data) {
+                $scope.model.isDebuggerEnabled = data;
+            });
+
+            $scope.model.variables = [];
+            $scope.model.executions = undefined;
+            $scope.model.selectedExecution = $scope.model.processInstance.id;
+            $scope.model.displayVariables = true;
+
+            $scope.model.errorMessage = '';
+
+            // config for executions grid
+            $scope.gridExecutions = {
+                data: $scope.model.executions,
+                columnDefs: [
+                    {field: 'id', displayName: "Id", name: 'id', maxWidth: 10},
+                    {field: 'parentId', displayName: "Parent id", name: 'parentId', maxWidth: 10},
+                    {
+                        field: 'processInstanceId',
+                        displayName: "Process id",
+                        name: 'processInstanceId',
+                        maxWidth: 90
+                    },
+                    {
+                        field: 'superExecutionId',
+                        displayName: "Super execution id",
+                        name: 'superExecutionId',
+                        maxWidth: 90
+                    },
+                    {field: 'activityId', displayName: "Activity", name: 'activityId', maxWidth: 90},
+                    {field: 'suspended', displayName: "Suspended", name: 'suspended', maxWidth: 90},
+                    {field: 'tenantId', displayName: "Tenant id", name: 'tenantId', maxWidth: 90}
+                ],
+                enableRowSelection: true,
+                multiSelect: false,
+                noUnselect: true,
+                enableRowHeaderSelection: false,
+                onRegisterApi: function (gridApi) {
+                    $scope.gridExecutionsApi = gridApi;
+                    $scope.gridExecutionsApi.grid.modifyRows($scope.gridExecutions.data);
+                    if ($scope.gridExecutions.data) {
+                        for (var i = 0; i < $scope.gridExecutions.data.length; i++) {
+                            if ($scope.model.selectedExecution == $scope.gridExecutions.data[i].id) {
+                                $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[i]);
+                                i = $scope.gridExecutions.data.length;
+                            }
+                        }
+                    }
+                    $scope.gridExecutionsApi.selection.on.rowSelectionChanged($scope, function (row) {
+                        var activityToUnselect = modelDiv.attr("selected-activity");
+                        if (activityToUnselect) {
+                            var rectangleToUnselect = paper.getById(activityToUnselect);
+                            if (rectangleToUnselect) {
+                                rectangleToUnselect.attr({"stroke": "green"});
+                            }
+                        }
+                        modelDiv.attr("selected-execution", row.entity.id);
+                        $scope.model.selectedExecution = row.entity.id;
+                        modelDiv.attr("selected-activity", row.entity.activityId);
+                        if (row.entity.activityId) {
+                            var paperActivity = paper.getById(row.entity.activityId);
+                            if (paperActivity) {
+                                paperActivity.attr({"stroke": "red"});
+                            }
+                        }
+
+                        $scope.loadVariables();
+                    });
+                }
+            };
+
+            $scope.getExecutions = function () {
+                $http({
+                    method: 'GET',
+                    url: '../app/rest/debugger/executions/' + $scope.model.processInstance.id
+                }).success(function (data) {
+                    $scope.model.executions = data;
+                    $scope.gridExecutions.data = data;
+                    if ($scope.gridExecutionsApi) {
+                        $scope.gridExecutionsApi.grid.modifyRows($scope.gridExecutions.data);
+                        for (var i = 0; i < $scope.gridExecutions.data.length; i++) {
+                            if ($scope.model.selectedExecution == $scope.gridExecutions.data[i].id) {
+                                $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[i]);
+                                i = $scope.gridExecutions.data.length;
+                            }
+                        }
+                    }
+                    jQuery("#bpmnModel").data($scope.model.executions);
+                }).error(function (data, status, headers, config) {
+                    $scope.model.errorMessage = data;
+                });
+            }
+
+            $scope.getExecutions();
+
+            $http({
+                method: 'GET',
+                url: '../app/rest/debugger/variables/' + $scope.model.processInstance.id 
+            }).success(function (data) {
+                $scope.gridVariables.data = data;
+                if ($scope.gridVariablesApi) {
+                    $scope.gridVariablesApi.core.refresh();
+                }
+            });
+
+            $scope.getEventLog = function () {
+                $http({
+                    method: 'GET',
+                    url: '../app/rest/debugger/eventlog/' + $scope.model.processInstance.id
+                }).success(function (data) {
+                    $scope.gridLog.data = data;
+                    if ($scope.gridLogApi) {
+                        $scope.gridLogApi.core.refresh();
+                    }
+                });
+            }
+            $scope.getEventLog();
+
+            $scope.tabData = {
+                tabs: [
+                    {id: 'variables', name: 'PROCESS.TITLE.VARIABLES'},
+                    {id: 'executions', name: 'PROCESS.TITLE.EXECUTIONS'},
+                    {id: 'log', name: 'PROCESS.TITLE.LOG'}
+                ],
+                activeTab: 'variables'
+            };
+
+            $scope.loadVariables = function () {
+                $http({
+                    method: 'GET',
+                    url: '../app/rest/debugger/variables/' + jQuery("#bpmnModel").attr("selected-execution")
+                }).success(function (data, status, headers, config) {
+                    $scope.model.variables = data;
+                    $scope.gridVariables.data = data;
+                    if ($scope.gridVariablesApi) {
+                        $scope.gridVariablesApi.core.refresh();
+                    }
+                });
+            };
+
+            $scope.executionSelected = function () {
+                jQuery("#bpmnModel").attr("selectedElement", $scope.model.selectedExecution.activityId);
+                $scope.loadVariables();
+            }
+
+            // Config for variable grid
+            $scope.gridVariables = {
+                data: $scope.model.variables,
+                columnDefs: [
+                    {field: 'processId', displayName: "Process", maxWidth: 10},
+                    {field: 'executionId', displayName: "Execution", maxWidth: 10},
+                    {field: 'taskId', displayName: "Task", maxWidth: 10},
+                    {field: 'type', displayName: "Type", maxWidth: 10},
+                    {field: 'name', displayName: "Name", maxWidth: 10},
+                    {
+                        field: 'value', displayName: "Value",
+                        cellTemplate: '<div><div style="text-align: left" class="ngCellText">{{grid.getCellValue(row, col)}}</div></div>'
+                    }
+                ],
+                onRegisterApi: function (gridApi) {
+                    $scope.gridVariablesApi = gridApi;
+                }
+            };
+
+            // Config for variable grid
+            $scope.gridLog = {
+                columnDefs: [
+                    {field: 'id', displayName: "Id", maxWidth: 10},
+                    {field: 'type', displayName: "Type", maxWidth: 10},
+                    {field: 'timeStamp', displayName: "Time Stamp", maxWidth: 90},
+                    {field: 'executionId', displayName: "Execution", maxWidth: 90},
+                    {field: 'taskId', displayName: "Task id", maxWidth: 90}
+                ],
+                enableRowSelection: true,
+                multiSelect: false,
+                noUnselect: true,
+                enableRowHeaderSelection: false,
+                onRegisterApi: function (gridApi) {
+                    $scope.gridLogApi = gridApi;
+                }
+            };
+
+            $timeout(function () {
                 jQuery("#bpmnModel").attr('data-model-id', $scope.model.processInstance.id);
                 jQuery("#bpmnModel").attr('data-model-type', 'runtime');
 
@@ -193,7 +381,7 @@ angular.module('flowableApp')
                 if ($scope.model.processInstance.ended) {
                     jQuery("#bpmnModel").attr('data-history-id', $scope.model.processInstance.id);
                 }
-                
+
                 var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
 
                 // If Flowable has been deployed inside an AMD environment Raphael will fail to register
@@ -202,14 +390,14 @@ angular.module('flowableApp')
                 // and assume/hope its not used during.
                 var amdDefine = window.define;
                 window.define = undefined;
-                ResourceService.loadFromHtml(viewerUrl, function(){
+                ResourceService.loadFromHtml(viewerUrl, function () {
                     // Restore AMD's define method again
                     window.define = amdDefine;
                 });
             }, 100);
         }
-    ]
-);
+        ]
+    );
 
 angular.module('flowableApp')
 .controller('CancelProcessCtrl', ['$scope', '$http', '$route', 'ProcessService', function ($scope, $http, $route, ProcessService) {

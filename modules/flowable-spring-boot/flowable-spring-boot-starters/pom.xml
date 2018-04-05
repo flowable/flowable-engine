@@ -7,7 +7,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot</artifactId>
         <relativePath>../</relativePath>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>6.3.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>flowable-spring-boot-starters</artifactId>
@@ -16,7 +16,6 @@
     <modules>
         <module>flowable-spring-boot-autoconfigure</module>
         <module>flowable-spring-boot-starter-basic</module>
-        <module>flowable-spring-boot-starter-rest-api</module>
         <module>flowable-spring-boot-starter-integration</module>
         <module>flowable-spring-boot-starter-actuator</module>
         <module>flowable-spring-boot-starter</module>
@@ -26,6 +25,7 @@
         <module>flowable-spring-boot-starter-dmn-rest</module>
         <module>flowable-spring-boot-starter-process</module>
         <module>flowable-spring-boot-starter-process-rest</module>
+        <module>flowable-spring-boot-starter-rest-api</module>
         <module>flowable-spring-boot-starter-rest</module>
     </modules>
     <dependencies>

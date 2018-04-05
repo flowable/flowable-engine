@@ -190,11 +190,11 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
 
     @Override
-    public PlanItemInstanceQuery planItemInstanceStarterAfter(Date startedAfer) {
-        if (startedAfer == null) {
+    public PlanItemInstanceQuery planItemInstanceStartedAfter(Date startedAfter) {
+        if (startedAfter == null) {
             throw new FlowableIllegalArgumentException("StartedAfter is null");
         }
-        this.startedAfter = startedAfer;
+        this.startedAfter = startedAfter;
         return this;
     }
 

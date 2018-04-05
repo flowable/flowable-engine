@@ -213,6 +213,8 @@ drop index ACT_IDX_TASK_SCOPE_DEF;
 drop table ACT_RU_TASK;
 drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
+drop index ACT_IDX_IDENT_LNK_SCOPE;
+drop index ACT_IDX_IDENT_LNK_SCOPE_DEF;
 
 drop table ACT_RU_IDENTITYLINK;
 drop table ACT_GE_BYTEARRAY;

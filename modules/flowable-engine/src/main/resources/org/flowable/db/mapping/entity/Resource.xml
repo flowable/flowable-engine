@@ -66,6 +66,11 @@
 
   <select id="selectResourcesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
-  </select>  
+  </select>
   
+  <update id="updateResource" parameterType="org.flowable.engine.impl.persistence.entity.ResourceEntityImpl">
+    update ${prefix}ACT_GE_BYTEARRAY set BYTES_ = #{bytes, jdbcType=${blobType}}
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
 </mapper>

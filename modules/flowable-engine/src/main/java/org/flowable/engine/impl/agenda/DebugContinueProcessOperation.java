@@ -55,10 +55,10 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
 
     protected void breakExecution(FlowNode flowNode) {
         JobService jobService = CommandContextUtil.getJobService();
-        DeadLetterJobEntity brokenJob = jobService.createDeadLetterJob();
+        JobEntity brokenJob = jobService.createJob();
         brokenJob.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         brokenJob.setRevision(1);
-        brokenJob.setRetries(0);
+        brokenJob.setRetries(1);
         brokenJob.setExecutionId(execution.getId());
         brokenJob.setProcessInstanceId(execution.getProcessInstanceId());
         brokenJob.setProcessDefinitionId(execution.getProcessDefinitionId());
@@ -70,6 +70,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
             brokenJob.setTenantId(execution.getTenantId());
         }
 
-        jobService.insertDeadLetterJob(brokenJob);
+        jobService.insertJob(brokenJob);
+        jobService.moveJobToSuspendedJob(brokenJob);
     }
 }

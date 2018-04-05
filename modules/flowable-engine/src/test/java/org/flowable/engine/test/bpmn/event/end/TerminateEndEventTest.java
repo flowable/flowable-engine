@@ -99,6 +99,19 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi, DeleteReason.TERMINATE_END_EVENT, "preNormalTerminateTask");
         assertHistoricActivitiesDeleteReason(pi, null, "preTerminateTask");
     }
+    
+    @Deployment
+    public void testTerminateExecutionListener() throws Exception {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
+        taskService.complete(task.getId());
+
+        assertProcessEnded(pi.getId());
+        
+        assertEquals(1, TerminateExecutionListener.startCalled);
+        assertEquals(1, TerminateExecutionListener.endCalled);
+    }
 
     @Deployment
     public void testProcessTerminateAll() throws Exception {

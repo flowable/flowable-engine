@@ -5,19 +5,20 @@ services:
         depends_on:
             - flowable-rest-db
         environment:
-            - spring.datasource.driver-class-name=org.postgresql.Driver
-            - spring.datasource.url=jdbc:postgresql://flowable-rest-db:5432/flowable
-            - spring.datasource.username=flowable
-            - spring.datasource.password=flowable
-            - flowable.rest.app.admin.user-id=rest-admin
-            - flowable.rest.app.admin.password=test
-            - flowable.rest.app.admin.first-name=Rest
-            - flowable.rest.app.admin.last-name=Admin
+            - SERVER_PORT=8080
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-rest-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+            - FLOWABLE.REST.APP.ADMIN.USER-ID=rest-admin
+            - FLOWABLE.REST.APP.ADMIN.PASSWORD=test
+            - FLOWABLE.REST.APP.ADMIN.FIRST-NAME=Rest
+            - FLOWABLE.REST.APP.ADMIN.LAST-NAME=Admin
         ports:
             - 8080:8080
         depends_on:
             - flowable-rest-db
-        entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+        entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.war"]
     flowable-rest-db:
         extends:
             file: postgres.yml

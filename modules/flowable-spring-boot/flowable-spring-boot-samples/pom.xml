@@ -7,7 +7,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot</artifactId>
         <relativePath>../</relativePath>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>6.3.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>flowable-spring-boot-samples</artifactId>
@@ -28,6 +28,7 @@
         <module>flowable-spring-boot-sample-cmmn</module>
         <module>flowable-spring-boot-sample-ldap</module>
         <module>flowable-spring-boot-sample-rest-1.5.x</module>
+        <module>flowable-spring-boot-sample-starter</module>
     </modules>
     <dependencies>
         <dependency>

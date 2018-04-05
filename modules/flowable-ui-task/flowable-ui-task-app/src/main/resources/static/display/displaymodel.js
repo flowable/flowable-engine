@@ -52,6 +52,7 @@ var modelId = modelDiv.attr('data-model-id');
 var historyModelId = modelDiv.attr('data-history-id');
 var processDefinitionId = modelDiv.attr('data-process-definition-id');
 var modelType = modelDiv.attr('data-model-type');
+var isDebuggerEnabled = angular.element(document.querySelector('#bpmnModel')).scope().model.isDebuggerEnabled;
 
 // Support for custom background colors for activities
 var customActivityColors = modelDiv.attr('data-activity-color-mapping');
@@ -71,6 +72,7 @@ var customActivityBackgroundOpacity = modelDiv.attr('data-activity-opacity');
 
 var elementsAdded = new Array();
 var elementsRemoved = new Array();
+var selectedElement = undefined;
 
 var collapsedItemNavigation = new Array();
 var bpmnData;
@@ -307,8 +309,60 @@ function _addHoverLogic(element, type, defaultColor)
     });
 
     topBodyRect.mouseout(function () {
-        paper.getById(element.id).attr({"stroke": strokeColor});
+        paper.getById(element.id).attr({"stroke": _bpmnGetColor(element, defaultColor)});
     });
+
+    if (isDebuggerEnabled) {
+        if (element.current || element.brokenExecutions) {
+            topBodyRect.click(function () {
+                if (selectedElement != element.id) {
+                    paper.getById(element.id).attr({"stroke": "green"});
+                    selectedElement = element.id;
+                    paper.getById(element.id).attr({"stroke": "red"});
+                    _executionClicked(element.id);
+                } else {
+                    selectedElement = undefined;
+                    paper.getById(element.id).attr({"stroke": "green"});
+                    var scope = angular.element(document.querySelector('#bpmnModel')).scope();
+                    modelDiv.attr("selected-execution", scope.model.processInstance.id);
+                    scope.model.selectedExecution = scope.model.processInstance.id;
+                    angular.element(document.querySelector('#variablesUi')).scope().loadVariables();
+                }
+            });
+        }
+    }
+}
+
+function _executionClicked(activityId) {
+    var executions = angular.element(document.querySelector('#bpmnModel')).scope().model.executions;
+    for (var i in executions) {
+        if (executions[i]["activityId"] == activityId) {
+            var activityToUnselect = modelDiv.attr("selected-activity");
+            if (activityToUnselect) {
+                var rectangleToUnselect = paper.getById(activityToUnselect);
+                if (rectangleToUnselect) {
+                    rectangleToUnselect.attr({"stroke": "green"});
+                }
+            }
+            modelDiv.attr("selected-execution", executions[i].id);
+            modelDiv.attr("selected-activity", activityId);
+            if (activityId) {
+                paper.getById(activityId).attr({"stroke": "red"});
+            }
+
+            var scope = angular.element(document.querySelector('#bpmnModel')).scope();
+            if (scope.gridExecutions.data) {
+                for (var j = 0; j < scope.gridExecutions.data.length; j++) {
+                    if (executions[i].id == scope.gridExecutions.data[j].id) {
+                        scope.gridExecutionsApi.selection.selectRow(scope.gridExecutions.data[j]);
+                        j = scope.gridExecutions.data.length;
+                    }
+                }
+            }
+            scope.loadVariables();
+            return;
+        }
+    }
 }
 
 function _breakpointRestCall(actionType, activityId) {
@@ -321,10 +375,8 @@ function _breakpointRestCall(actionType, activityId) {
         }),
         success: function () {
             paper.clear();
+            angular.element(document.querySelector('#bpmnModel')).scope().getEventLog();
             _showProcessDiagram();
-        },
-        error: function () {
-            alert("error");
         }
     })
 }
@@ -347,7 +399,7 @@ function _drawBreakpoint(element, breakpoints) {
         circle.click(function () {
             _breakpointRestCall("DELETE", element.id);
         });
-        
+
     } else {
         breakpointTipText = breakpointTipText + "<br/> Click to add breakpoint";
         circle.click(function () {
@@ -405,6 +457,8 @@ var modelUrl;
 if (modelType == 'runtime') {
     if (historyModelId) {
         modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/history/' + historyModelId + '/model-json';
+    } else if (isDebuggerEnabled) {
+        modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/debugger/' + modelId + '/model-json';
     } else {
         modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + modelId + '/model-json';
     }
@@ -428,6 +482,13 @@ function _drawContinueExecution(x, y , executionId, activityId) {
                 contentType: 'application/json; charset=utf-8',
                 success: function () {
                     paper.clear();
+                    var processInstanceId = angular.element(document.querySelector('#bpmnModel')).scope().model.processInstance.id;
+                    modelDiv.attr("selected-execution", processInstanceId);
+                    angular.element(document.querySelector('#bpmnModel')).scope().model.selectedExecution = processInstanceId;
+                    angular.element(document.querySelector('#bpmnModel')).scope().getExecutions();
+                    angular.element(document.querySelector('#bpmnModel')).scope().model.variables = undefined;
+                    angular.element(document.querySelector('#bpmnModel')).scope().loadVariables();
+                    angular.element(document.querySelector('#bpmnModel')).scope().getEventLog();
                     _showProcessDiagram();
                 },
                 error: function () {
@@ -517,16 +578,19 @@ function _showProcessDiagram() {
 
         for (var i = 0; i < modelElements.length; i++) {
             var element = modelElements[i];
-            //try {
+//            try {
             var drawFunction = eval("_draw" + element.type);
             drawFunction(element);
-            //_drawBreakpoint(element);
-            /*if (element.brokenExecutions) {
-                for (var j = 0; j < element.brokenExecutions.length; j++) {
-                    _drawContinueExecution(element.x +25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
+            if (isDebuggerEnabled) {
+                _drawBreakpoint(element);
+
+                if (element.brokenExecutions) {
+                    for (var j = 0; j < element.brokenExecutions.length; j++) {
+                        _drawContinueExecution(element.x + 25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
+                    }
                 }
-            }*/
-            //} catch(err) {console.log(err);}
+            }
+//            } catch(err) {console.log(err);}
         }
 
         if (data.flows) {

@@ -2998,6 +2998,23 @@ When a result variable name is not specified, the service execution result value
 
 In the example above, the result of the service execution (the return value of the __'doSomething()'__ method invocation on an object is made available under the name __'myService'__, either in the process variables or as a Spring bean) is set to the process variable named __'myVar'__ after the service execution completes.
 
+[[serviceTaskTriggerable]]
+
+
+===== Triggerable
+
+A common pattern is to trigger an external serviced by sending a JMS message or do a HTTP call and have the process instance go into a wait state. Then at some point the external service will return a response and the process instance continues to the next activity. With default BPMN you would need to model a service task and a receive task. This however introduces some racing conditions because the external service response could be returned before the process instance is persisted and the receive task is active. To solve this, Flowable supports a triggerable attribute on a service task that transforms the single service task in a task that will execute the service logic and then will wait for an external trigger before it continues to the next activity in the process definition. If the async attribute is also set to true for a triggerable service task, the process instance state is first persisted and then the service task logic will be executed in an async job. In BPMN XML an async triggerable service task would be implemented like this:
+
+[source,xml,linenums]
+----
+<serviceTask id="aTriggerableServiceTask"
+    flowable:expression="#{myService.doSomething()}"
+    flowable:triggerable="true"
+    flowable:async="true" />
+----
+
+When the external service wants to trigger the waiting process instance again, this can be done synchronously and asynchronously. To prevent optimistic lock exceptions, the asynchronous trigger would be the best solution. By default an async job is exclusive, which means that the process instance will be locked and it's guaranteed that no other activity on the process instance can interfere with the trigger logic. The RuntimeService triggerAsync methods can be used to trigger the waiting process instance in an asynchronous way. Of course it's also still possible to do this in an synchronous way using the trigger methods of the RuntimeService.
+
 
 [[serviceTaskExceptionHandling]]
 

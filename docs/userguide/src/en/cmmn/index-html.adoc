@@ -1,4 +1,4 @@
-= Flowable CMMN DOCS (v 6.3.0-SNAPSHOT)
+= Flowable CMMN DOCS (v 6.3.1-SNAPSHOT)
 :doctype: book
 :docinfodir: ../base
 :docinfo1: header

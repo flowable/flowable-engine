@@ -821,6 +821,7 @@ hot-table .column-header.label {
     margin: 0 auto 0 -20%;
 
     max-width: 60%;
+    min-height: 90px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -832,6 +833,7 @@ hot-table .column-header.label {
     margin: 0 auto;
 
     max-width: 150px;
+    min-height: 90px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -930,7 +932,7 @@ hot-table .column-header.label {
     width: 100%;
     margin: 0 auto;
     overflow: hidden;
-    padding: 4px 0px 4px 0px;
+    padding: 4px 0 4px 0;
 }
 
 #decisionTableGrid .input-operator-select {

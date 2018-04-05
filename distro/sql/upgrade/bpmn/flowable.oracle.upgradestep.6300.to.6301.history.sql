@@ -1,0 +1,2 @@
+alter table ACT_HI_TASKINST add TASK_DEF_ID_ NVARCHAR2(64);
+
