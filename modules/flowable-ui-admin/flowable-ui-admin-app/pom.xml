@@ -608,6 +608,30 @@
 	<!-- BUILD -->
 	<build>
 		<finalName>flowable-admin</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <excludes>
+                    <exclude>static/fonts/**</exclude>
+                    <exclude>static/additional_components/ui-grid/**</exclude>
+                    <exclude>application-dev.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/fonts/**</include>
+                    <include>static/additional_components/ui-grid/**</include>
+                </includes>
+            </resource>
+        </resources>
+
 		<plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
