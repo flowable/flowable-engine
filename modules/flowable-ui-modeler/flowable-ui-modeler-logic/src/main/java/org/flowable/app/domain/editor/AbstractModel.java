@@ -34,6 +34,7 @@ public class AbstractModel {
     protected String modelEditorJson;
     protected String comment;
     protected Integer modelType;
+    protected String tenantId;
 
     public AbstractModel() {
         this.created = new Date();
@@ -135,4 +136,12 @@ public class AbstractModel {
         this.modelType = modelType;
     }
 
+    public String getTenantId() {
+        return tenantId;
+    }
+    
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    
 }

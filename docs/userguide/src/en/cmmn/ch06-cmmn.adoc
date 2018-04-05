@@ -767,6 +767,18 @@ A timer event listener is visualized as circle with a clock icon inside:
 
 image::images/cmmn.timereventlistener.png[align="center"]
 
+===== User Event Listener
+
+A user event listener can be used when neededing to capture a user interaction that influences the proceeding of a case directly,
+instead of indirectly via impacting variables or information in the case. When the event is captured an Occur transition is triggered on the event listener.
+Like timer event listeners, it has a much simpler lifecycle that a _task_.
+
+image::images/cmmn.usereventlistener.png[align="center"]
+
+User event listeners can be queried using the _org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery_. Such a query can be created by calling the _cmmnRuntimeService.createUserEventListenerInstanceQuery()_ method. Note that a user event listener is a plan item instance under the hood, which means it can also be queried through the _org.flowable.cmmn.api.runtime.PlanItemInstanceQuery_ API.
+
+A user event listener can be completed by calling the _cmmnRuntimeService.completeUserEventListenerInstance(id)_ method.
+
 ==== Item control: Repetition Rule
 
 Plan items on the case model can have a _repetition rule_, an expression that can be used to indicate a certain plan item needs to be repeated.
@@ -862,3 +874,30 @@ Here, user task D is required, and user task B is manually activated.
 
 * If D is completed, the stage will automatically complete, as B is not required and it is not active.
 * If B would be required too, it would need to be manually started (using _cmmnRuntimeService.startPlanItemInstance(String planItemInstanceId)_) before the stage would automatically complete, even if D would be completed before the manual start of B.
+
+==== Item control: Completion Neutral Rule
+
+_Completion Neutral Rule_ is not a CMMN 1.1 Standard. The completion neutral rule impacts the interpretation of the *AVAILABLE* state of plan items that have it, when evaluating whether or not a Stage containing such plan items can complete.
+
+Following the specification, a stage with a plan item in state *AVAILABLE* does not complete unless its _autoComplete_ attribute is set _true_.
+But an _autoCompletable_ stage would _ignore_, for the purposes of completing, *all* plan items in _ENABLE_ and _AVAILABLE_ state that are _not required_ (*requiredRule* not present or evaluates to _false_).
+
+_Completion Neutral_ offers the flexibility to mark only some containing plan items without setting the containing parent stage as _autoComplete_.
+
+_Required Rule_ takes precedence when plan items that having both rules, both evaluate to _true_.
+
+As a summary:
+
+* a plan item configured to be _"completion neutral"_ will not prevent a stage from completing if its in *AVAILABLE* state (i.e. waiting for a entry criteria sentry),
+meaning that such a plan item is neutral with respect to its parent stage completion evaluation.
+
+* a stage will remain *ACTIVE* on any of these conditions:
+    1. It has at least one plan item in *ACTIVE* state
+    2. It has at least one plan item with _requiredRule_ in *AVAILABLE* or *ENABLE* state
+    3. If it isn't _autoComplete_ and has at least one plan item on *ENABLED* state (irrespectively on its _requiredRule_)
+    4. If it isn't _autoComplete_ and has at least one plan item on *AVAILABLE* state that is *not* _completionNeutral_
+
+* a stage will *COMPLETE* if:
+    1. It contains *no* plan items or all child plan items are in a _Terminal_ or _Semi-terminal_ state (CLOSED, COMPLETED, DISABLED, FAILED)
+    2. If it isn't _autoComplete_, all remaining plan items (not _Terminal_ or _Semi-terminal_ state) are in *AVAILABLE* state and are _completionNeutral_ and not _required_
+    3. If is is _autoComplete_, all remaining plan items (not _Terminal_ or _Semi-terminal) are _not required_ in *ENABLED* or *AVAILABLE* state (regardless of its completion neutrality)

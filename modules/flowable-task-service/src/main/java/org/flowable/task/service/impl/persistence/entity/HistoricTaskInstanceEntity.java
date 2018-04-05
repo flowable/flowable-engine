@@ -73,6 +73,8 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
 
     void setProcessDefinitionId(String processDefinitionId);
 
+    void setTaskDefinitionId(String taskDefinitionId);
+
     void setScopeId(String scopeId);
 
     void setSubScopeId(String subScopeId);

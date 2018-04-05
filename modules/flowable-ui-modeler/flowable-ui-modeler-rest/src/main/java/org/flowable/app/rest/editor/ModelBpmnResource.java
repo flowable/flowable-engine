@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author jbarrez
  */
 @RestController
+@RequestMapping("/app")
 public class ModelBpmnResource extends AbstractModelBpmnResource {
 
     /**

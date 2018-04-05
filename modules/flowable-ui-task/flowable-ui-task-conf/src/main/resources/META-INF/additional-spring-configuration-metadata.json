@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "debugger.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using Spring Boot Process debugger auto configuration instead.",
+        "replacement": "flowable.experimental.debugger.enabled"
+      }
+    }
+  ]
+}

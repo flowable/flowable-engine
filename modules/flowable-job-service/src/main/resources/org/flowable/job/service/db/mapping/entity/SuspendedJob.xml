@@ -316,4 +316,25 @@
             where D.ID_ = #{deploymentId, jdbcType=VARCHAR}) AS tempTask
         )
     </update>
+    
+    <update id="updateSuspendedJob" parameterType="org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl">
+        update ${prefix}ACT_RU_JOB
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.retries != retries">
+                RETRIES_ = #{retries, jdbcType=INTEGER},
+            </if>
+            <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
+                EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            </if>
+            <if test="originalPersistentState.exceptionMessage != exceptionMessage">
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
+            </if>
+        </set>
+        where ID_= #{id, jdbcType=VARCHAR}
+        and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
 </mapper>

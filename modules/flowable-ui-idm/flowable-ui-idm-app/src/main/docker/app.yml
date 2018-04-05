@@ -5,13 +5,14 @@ services:
         depends_on:
             - flowable-idm-db
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-idm-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
+            - SERVER_PORT=8080
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-idm-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-idm-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+        entrypoint: ["./wait-for-something.sh", "flowable-idm-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
     flowable-idm-db:
         extends:
             file: postgres.yml

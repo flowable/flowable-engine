@@ -1,0 +1,51 @@
+server:
+  port: 8090
+  use-forward-headers: true
+
+
+spring:
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  servlet:
+    multipart:
+      max-file-size: 104MB
+      max-request-size: 104MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expose all actuator endpoints to the web
+        # They are exposed, but only authenticated users can see /info and /health abd users with access-admin can see the others
+        include: "*"
+  endpoint:
+    health:
+      # Full health details should only be displayed when a user is authorized
+      show-details: when_authorized
+      # Only users with role access-admin can access full health details
+      roles: access-admin
+
+zuul:
+  routes:
+    flowable_admin:
+      path: /flowable-admin/**
+      url: http://localhost:9988/flowable-admin/
+    flowable_idm:
+      path: /flowable-idm/**
+      url: http://localhost:8080/flowable-idm/
+    flowable_modeler:
+      path: /flowable-modeler/**
+      url: http://localhost:8888/flowable-modeler/
+    flowable_task:
+      path: /flowable-task/**
+      url: http://localhost:9999/flowable-task/
+  sensitive-headers:
+  host:
+    max-per-route-connections: 100
+    connect-timeout-millis: 10000
+    max-total-connections: 500
+
+ribbon:
+  eureka:
+    enabled: false

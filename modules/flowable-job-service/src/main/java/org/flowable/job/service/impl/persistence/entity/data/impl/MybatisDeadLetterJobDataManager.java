@@ -65,6 +65,12 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
         
         return getList(dbSqlSession, "selectDeadLetterJobsByExecutionId", executionId, deadLetterByExecutionIdMatcher, true);
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<DeadLetterJobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
+        return getDbSqlSession().selectList("selectDeadLetterJobsByProcessInstanceId", processInstanceId);
+    }
 
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {

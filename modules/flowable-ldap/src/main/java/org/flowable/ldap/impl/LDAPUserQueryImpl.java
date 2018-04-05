@@ -109,7 +109,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
                     return user;
 
                 } catch (NamingException ne) {
-                    LOGGER.debug("Could not find user {} : {}", userId, ne.getMessage(), ne);
+                    LOGGER.error("Could not find user {} : {}", userId, ne.getMessage(), ne);
                     return null;
                 }
             }

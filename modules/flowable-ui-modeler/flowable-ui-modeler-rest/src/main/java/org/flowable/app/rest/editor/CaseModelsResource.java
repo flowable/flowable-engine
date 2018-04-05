@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Tijs Rademakers
  */
 @RestController
-@RequestMapping("/rest/case-models")
+@RequestMapping("/app/rest/case-models")
 public class CaseModelsResource {
 
     @Autowired

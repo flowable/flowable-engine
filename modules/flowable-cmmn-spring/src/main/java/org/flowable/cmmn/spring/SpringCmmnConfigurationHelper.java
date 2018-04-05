@@ -20,7 +20,6 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.UrlResource;
 
@@ -34,16 +33,17 @@ public class SpringCmmnConfigurationHelper {
     public static CmmnEngine buildCmmnEngine(URL resource) {
         LOGGER.debug("==== BUILDING SPRING APPLICATION CONTEXT AND CMMN ENGINE =========================================");
 
-        ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
-        Map<String, CmmnEngine> beansOfType = applicationContext.getBeansOfType(CmmnEngine.class);
-        if ((beansOfType == null) || (beansOfType.isEmpty())) {
-            throw new FlowableException("no " + CmmnEngine.class.getName() + " defined in the application context " + resource.toString());
+        try (GenericXmlApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource))) {
+            Map<String, CmmnEngine> beansOfType = applicationContext.getBeansOfType(CmmnEngine.class);
+            if ((beansOfType == null) || (beansOfType.isEmpty())) {
+                throw new FlowableException("no " + CmmnEngine.class.getName() + " defined in the application context " + resource.toString());
+            }
+
+            CmmnEngine cmmnEngine = beansOfType.values().iterator().next();
+
+            LOGGER.debug("==== SPRING CMMN ENGINE CREATED ==================================================================");
+            return cmmnEngine;
         }
-
-        CmmnEngine cmmnEngine = beansOfType.values().iterator().next();
-
-        LOGGER.debug("==== SPRING CMMN ENGINE CREATED ==================================================================");
-        return cmmnEngine;
     }
 
 }

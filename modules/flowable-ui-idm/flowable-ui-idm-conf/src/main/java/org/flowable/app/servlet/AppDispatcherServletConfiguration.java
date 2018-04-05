@@ -12,22 +12,15 @@
  */
 package org.flowable.app.servlet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.List;
-
 import org.flowable.app.rest.idm.remote.RemoteAccountResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -35,12 +28,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @Configuration
 @ComponentScan(value = { "org.flowable.app.rest.idm", "org.flowable.app.rest.exception" }, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = RemoteAccountResource.class))
 @EnableAsync
-public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
+public class AppDispatcherServletConfiguration implements WebMvcRegistrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDispatcherServletConfiguration.class);
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Bean
     public SessionLocaleResolver localeResolver() {
@@ -55,8 +45,7 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
         return localeChangeInterceptor;
     }
 
-    @Bean
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
         requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
@@ -64,17 +53,5 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
         Object[] interceptors = { localeChangeInterceptor() };
         requestMappingHandlerMapping.setInterceptors(interceptors);
         return requestMappingHandlerMapping;
-    }
-
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        addDefaultHttpMessageConverters(converters);
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-                jackson2HttpMessageConverter.setObjectMapper(objectMapper);
-                break;
-            }
-        }
     }
 }

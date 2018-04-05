@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for managing a process instance.
  */
 @RestController
+@RequestMapping("/app")
 public class ProcessInstanceResource {
 
     @Autowired

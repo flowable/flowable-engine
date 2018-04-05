@@ -62,6 +62,11 @@ public interface TaskInfo {
     String getExecutionId();
 
     /**
+     * Reference to the task definition or null if it is not related to any task definition.
+     */
+    String getTaskDefinitionId();
+
+    /**
      * Reference to the process definition or null if it is not related to a process.
      */
     String getProcessDefinitionId();

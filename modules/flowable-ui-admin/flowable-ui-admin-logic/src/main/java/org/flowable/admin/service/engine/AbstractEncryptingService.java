@@ -20,15 +20,14 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
+import org.flowable.admin.properties.FlowableAdminAppProperties;
 
 /**
  * Superclass for services that want to encrypt certain properties
  *
  * @author jbarrez
  */
-public abstract class AbstractEncryptingService implements EnvironmentAware {
+public abstract class AbstractEncryptingService {
 
     public static final String UTF8_ENCODING = "UTF-8";
     public static final String AES_KEY = "AES";
@@ -38,10 +37,10 @@ public abstract class AbstractEncryptingService implements EnvironmentAware {
 
     protected SecretKeySpec secretKeySpec;
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        String ivString = environment.getRequiredProperty("security.encryption.credentialsIVSpec");
-        String secretString = environment.getRequiredProperty("security.encryption.credentialsSecretSpec");
+    protected AbstractEncryptingService(FlowableAdminAppProperties properties) {
+        FlowableAdminAppProperties.Encryption encryption = properties.getSecurity().getEncryption();
+        String ivString = encryption.getCredentialsIVSpec();
+        String secretString = encryption.getCredentialsSecretSpec();
 
         try {
             initializationVectorSpec = new IvParameterSpec(ivString.getBytes(UTF8_ENCODING));

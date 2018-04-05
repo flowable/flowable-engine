@@ -13,6 +13,7 @@
 package org.flowable.spring.boot.dmn;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -21,13 +22,15 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -57,6 +60,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableDmnProperties dmnProperties;
+    protected List<EngineConfigurationConfigurer<SpringDmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public DmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableDmnProperties dmnProperties) {
         super(flowableProperties);
@@ -88,6 +92,9 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
         configuration.setHistoryEnabled(dmnProperties.isHistoryEnabled());
         configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());
+        configuration.setStrictMode(dmnProperties.isStrictMode());
+
+        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
 
         return configuration;
     }
@@ -98,7 +105,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
         @Bean
         @ConditionalOnMissingBean(name = "dmnProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer dmnProcessEngineConfigurationConfigurer(
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> dmnProcessEngineConfigurationConfigurer(
             DmnEngineConfigurator dmnEngineConfigurator
         ) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(dmnEngineConfigurator);
@@ -111,6 +118,11 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
             dmnEngineConfigurator.setDmnEngineConfiguration(configuration);
             return dmnEngineConfigurator;
         }
+    }
+
+    @Autowired(required = false)
+    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringDmnEngineConfiguration>> engineConfigurers) {
+        this.engineConfigurers = engineConfigurers;
     }
 }
 

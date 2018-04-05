@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Yvo Swillens
  */
 @RestController
+@RequestMapping("/app")
 public class DecisionTableClientResource extends AbstractClientResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableClientResource.class);

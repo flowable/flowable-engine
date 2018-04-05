@@ -21,7 +21,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -180,7 +183,7 @@ public class DmnJsonConverterUtil {
         String expressionType = null;
         if (!"-".equals(expressionValue)) {
             expressionType = "string";
-            if (NumberUtils.isNumber(expressionValue)) {
+            if (NumberUtils.isCreatable(expressionValue)) {
                 expressionType = "number";
             } else {
                 try {
@@ -194,5 +197,99 @@ public class DmnJsonConverterUtil {
             }
         }
         return expressionType;
+    }
+
+    public static String formatCollectionExpression(String containsOperator, String inputVariable, String expressionValue) {
+        String containsPrefixAndMethod = getDMNContainsExpressionMethod(containsOperator);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (containsPrefixAndMethod != null) {
+            stringBuilder.append("${");
+            stringBuilder.append(containsPrefixAndMethod);
+            stringBuilder.append("(");
+            stringBuilder.append(formatCollectionExpressionValue(inputVariable));
+            stringBuilder.append(", ");
+
+            String formattedExpressionValue = formatCollectionExpressionValue(expressionValue);
+            stringBuilder.append(formattedExpressionValue);
+
+            stringBuilder.append(")}");
+        } else {
+            stringBuilder.append(containsOperator);
+            stringBuilder.append(" ");
+            stringBuilder.append(formatCollectionExpressionValue(expressionValue));
+        }
+
+       return stringBuilder.toString();
+    }
+
+    public static boolean isCollectionOperator(String operator) {
+        return "IN".equals(operator) || "NOT IN".equals(operator) || "ANY".equals(operator) || "NOT ANY".equals(operator);
+    }
+
+    protected static String getDMNContainsExpressionMethod(String containsOperator) {
+        if (StringUtils.isEmpty(containsOperator)) {
+            throw new IllegalArgumentException("containsOperator must be provided");
+        }
+
+        String containsPrefixAndMethod;
+
+        switch (containsOperator) {
+            case "IN":
+                containsPrefixAndMethod = "collection:contains";
+                break;
+            case "NOT IN":
+                containsPrefixAndMethod = "collection:notContains";
+                break;
+            case "ANY":
+                containsPrefixAndMethod = "collection:containsAny";
+                break;
+            case "NOT ANY":
+                containsPrefixAndMethod = "collection:notContainsAny";
+                break;
+            default:
+                containsPrefixAndMethod = null;
+        }
+
+        return containsPrefixAndMethod;
+    }
+
+    protected static String formatCollectionExpressionValue(String expressionValue) {
+        if (StringUtils.isEmpty(expressionValue)) {
+            return  "\"\"";
+        }
+
+        StringBuilder formattedExpressionValue = new StringBuilder();
+
+        // if multiple values
+        if (expressionValue.contains(",")) {
+            formattedExpressionValue.append("'");
+
+            List<String> formattedValues = split(expressionValue);
+            formattedExpressionValue.append(StringUtils.join(formattedValues, ','));
+        } else {
+            String formattedValue = expressionValue;
+            formattedExpressionValue.append(formattedValue);
+        }
+
+        // if multiple values
+        if (expressionValue.contains(",")) {
+            formattedExpressionValue.append("'");
+        }
+
+        return formattedExpressionValue.toString();
+    }
+
+    protected static List<String> split(String str) {
+        String regex;
+        if (str.contains("\"")) {
+            // only split on comma between matching quotes
+            regex  =",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+        } else {
+            regex = ",";
+        }
+        return Stream.of(str.split(regex))
+            .map(elem -> elem.trim())
+            .collect(Collectors.toList());
     }
 }

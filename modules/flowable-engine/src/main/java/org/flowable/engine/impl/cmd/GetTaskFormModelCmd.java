@@ -75,7 +75,7 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
                     .getProcessDefinition(task.getProcessDefinitionId());
             parentDeploymentId = processDefinition.getDeploymentId();
         }
-
+        
         FormInfo formInfo = null;
         if (task.getEndTime() != null) {
             formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,

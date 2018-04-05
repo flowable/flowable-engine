@@ -14,7 +14,8 @@ package org.flowable.spring.boot;
 
 import java.util.List;
 
-import org.flowable.rest.service.api.PutAwareCommonsMultipartResolver;
+import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
+import org.flowable.common.rest.multipart.PutAwareStandardServletMultiPartResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Base dispatcher configuration that can be used to configure context for the REST API.
  */
 @Configuration
-@ComponentScan("org.flowable.rest.exception")
+@ComponentScan(basePackageClasses = BaseExceptionHandlerAdvice.class)
 @ConditionalOnClass(WebMvcConfigurationSupport.class)
 @EnableAsync
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
@@ -48,9 +48,6 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private Environment environment;
 
     @Bean
     public SessionLocaleResolver localeResolver() {
@@ -67,7 +64,9 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Bean
     public MultipartResolver multipartResolver() {
-        PutAwareCommonsMultipartResolver multipartResolver = new PutAwareCommonsMultipartResolver();
+        PutAwareStandardServletMultiPartResolver multipartResolver = new PutAwareStandardServletMultiPartResolver();
+        //FIXME in order to support both 1.5.x and 2.0 we can't use MultipartProperties (the package is changed)
+        //multipartResolver.setResolveLazily(multipartProperties.isResolveLazily());
         return multipartResolver;
     }
 

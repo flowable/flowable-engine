@@ -34,6 +34,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.flowable.admin.domain.EndpointType.CMMN;
+
 @Service
 public class ProcessEngineInfoService {
 
@@ -41,6 +43,7 @@ public class ProcessEngineInfoService {
     public static final String DMN_ENGINE_INFO_URL = "dmn-management/engine";
     public static final String FORM_ENGINE_INFO_URL = "form-management/engine";
     public static final String CONTENT_ENGINE_INFO_URL = "content-management/engine";
+    public static final String CMMN_ENGINE_INFO_URL = "cmmn-management/engine";
 
     @Autowired
     protected FlowableClientService clientUtil;
@@ -70,6 +73,10 @@ public class ProcessEngineInfoService {
 
         case CONTENT:
             builder = clientUtil.createUriBuilder(CONTENT_ENGINE_INFO_URL);
+            break;
+
+        case CMMN:
+            builder = clientUtil.createUriBuilder(CMMN_ENGINE_INFO_URL);
             break;
         }
 

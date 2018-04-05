@@ -96,6 +96,7 @@ import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
 import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.form.AbstractFormType;
+import org.flowable.engine.impl.DefaultProcessJobParentStateResolver;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
 import org.flowable.engine.impl.FormServiceImpl;
 import org.flowable.engine.impl.HistoryServiceImpl;
@@ -203,6 +204,7 @@ import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
 import org.flowable.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
@@ -287,6 +289,7 @@ import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.HistoryJobProcessor;
 import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.InternalJobManager;
+import org.flowable.job.service.InternalJobParentStateResolver;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobProcessor;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -299,6 +302,7 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -640,6 +644,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
+    protected InternalJobParentStateResolver internalJobParentStateResolver;
 
     // JUEL functions ///////////////////////////////////////////////////////////
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
@@ -673,6 +678,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
+    protected InternalTaskAssignmentManager internalTaskAssignmentManager;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
     protected InternalJobManager internalJobManager;
     protected InternalJobCompatibilityManager internalJobCompatibilityManager;
@@ -1320,6 +1326,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         } else {
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultTaskVariableScopeResolver(this));
         }
+        
+        if (this.internalTaskAssignmentManager != null) {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
+        } else {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
+        }
 
         if (this.internalTaskLocalizationManager != null) {
             this.taskServiceConfiguration.setInternalTaskLocalizationManager(this.internalTaskLocalizationManager);
@@ -1362,6 +1374,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (addDefaultExceptionHandler) {
             exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
+        }
+
+        if (internalJobParentStateResolver != null) {
+            this.jobServiceConfiguration.setJobParentStateResolver(internalJobParentStateResolver); 
+        } else {
+            this.jobServiceConfiguration.setJobParentStateResolver(new DefaultProcessJobParentStateResolver(this));
         }
 
         this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
@@ -1677,6 +1695,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         AsyncContinuationJobHandler asyncContinuationJobHandler = new AsyncContinuationJobHandler();
         jobHandlers.put(asyncContinuationJobHandler.getType(), asyncContinuationJobHandler);
+        
+        AsyncTriggerJobHandler asyncTriggerJobHandler = new AsyncTriggerJobHandler();
+        jobHandlers.put(asyncTriggerJobHandler.getType(), asyncTriggerJobHandler);
 
         TriggerTimerEventJobHandler triggerTimerEventJobHandler = new TriggerTimerEventJobHandler();
         jobHandlers.put(triggerTimerEventJobHandler.getType(), triggerTimerEventJobHandler);
@@ -2538,6 +2559,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.internalHistoryTaskManager = internalHistoryTaskManager;
         return this;
     }
+    
+    public InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return internalTaskAssignmentManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalTaskAssignmentManager(InternalTaskAssignmentManager internalTaskAssignmentManager) {
+        this.internalTaskAssignmentManager = internalTaskAssignmentManager;
+        return this;
+    }
 
     public InternalTaskLocalizationManager getInternalTaskLocalizationManager() {
         return internalTaskLocalizationManager;
@@ -2706,6 +2736,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setCustomJobHandlers(List<JobHandler> customJobHandlers) {
         this.customJobHandlers = customJobHandlers;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addCustomJobHandler(JobHandler customJobHandler) {
+        if (this.customJobHandlers == null) {
+            this.customJobHandlers = new ArrayList<>();
+        }
+        this.customJobHandlers.add(customJobHandler);
         return this;
     }
 

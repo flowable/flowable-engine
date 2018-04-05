@@ -831,6 +831,23 @@
       "popular" : true
     }]
   }, {
+    "name" : "completionneutralrulepackage",
+    "properties" : [ {
+      "id" : "completionneutralenabled",
+      "type" : "Boolean",
+      "title" : "Completion neutral",
+      "value" : "",
+      "description" : "Flag indicating if the plan item is completion neutral. False by default.",
+      "popular" : true
+    }, {
+      "id" : "completionneutralrulecondition",
+      "type" : "String",
+      "title" : "Completion neutral Rule",
+      "value" : "",
+      "description" : "An expression that is resolved to determine if the plan item is completion neutral.",
+      "popular" : true
+    }]
+  }, {
     "name": "scriptformatpackage",
     "properties" : [ {
         "id": "scriptformat",
@@ -910,7 +927,8 @@
       "autocompletepackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" 
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"
     ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "StageActivity", "all", "association_start", "association_end" ]
@@ -930,7 +948,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -954,7 +973,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" ],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -977,7 +997,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage" ],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   },
@@ -1000,7 +1021,8 @@
         "asyncpackage",
         "requiredrulepackage",
         "repetitionrulepackage",
-        "manualactivationrulepackage"
+        "manualactivationrulepackage",
+        "completionneutralrulepackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -1029,6 +1051,7 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "manualactivationrulepackage",
+        "completionneutralrulepackage",
         "httptaskrequestmethodpackage",
         "httptaskrequesturlpackage",
         "httptaskrequestheaderspackage",
@@ -1070,6 +1093,7 @@
         "requiredrulepackage",
         "repetitionrulepackage",
         "manualactivationrulepackage",
+        "completionneutralrulepackage",
         "scriptformatpackage", 
         "scripttextpackage",
         "servicetaskresultvariablepackage"
@@ -1089,7 +1113,8 @@
       "namepackage",
       "documentationpackage",
       "requiredrulepackage",
-      "repetitionrulepackage" ],
+      "repetitionrulepackage",
+      "completionneutralrulepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1109,7 +1134,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1129,7 +1155,8 @@
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",
-      "manualactivationrulepackage"],
+      "manualactivationrulepackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -1145,9 +1172,25 @@
       "namepackage",
       "documentationpackage",
       "timerexpressionpackage",
-      "timerstarttriggerpackage"],
+      "timerstarttriggerpackage",
+      "completionneutralrulepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
+  }, {
+      "type" : "node",
+      "id" : "UserEventListener",
+      "title" : "User event listener",
+      "description" : "An listener for user events",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" width=\"40\" height=\"40\" version=\"1.0\"> <defs></defs> <oryx:magnets> <oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" /> </oryx:magnets> <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /> <g pointer-events=\"fill\"> <defs> <radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"> <stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> <stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> </radialGradient> </defs> <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"black\" fill=\"url(#background) white\" stroke-width=\"1\"/> <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"black\" fill=\"none\" stroke-width=\"1\"/> <g id=\"humanTaskBlock\" transform=\"scale(0.8,0.8) translate(7.5,7)\" display=\"inherit\"> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F4F6F7\" d=\"M0.585,24.167h24.083v-7.833c0,0-2.333-3.917-7.083-5.167h-9.25 c-4.417,1.333-7.833,5.75-7.833,5.75L0.585,24.167z\"/> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:none\" d=\"M 6 20 L 6 24\" /> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:none\" d=\"M 20 20 L 20 24\" /> <circle oryx:anchors=\"top left\" fill=\"#000000\" cx=\"13.002\" cy=\"5.916\" r=\"5.417\"/> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F0EFF0\" d=\"M8.043,7.083c0,0,2.814-2.426,5.376-1.807s4.624-0.693,4.624-0.693 c0.25,1.688,0.042,3.75-1.458,5.584c0,0,1.083,0.75,1.083,1.5s0.125,1.875-1,3s-5.5,1.25-6.75,0S8.668,12.834,8.668,12 s0.583-1.25,1.25-1.917C8.835,9.5,7.419,7.708,8.043,7.083z\"/> </g> <text font-size=\"11\" id=\"text_name\" x=\"16\" y=\"33\" oryx:align=\"top center\" stroke=\"black\" ></text> </g></svg>",
+      "icon" : "event/userlistener.png",
+      "groups" : [ "Event Listeners" ],
+      "propertyPackages" : [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "completionneutralrulepackage"],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
     "type" : "node",
     "id" : "EntryCriterion",

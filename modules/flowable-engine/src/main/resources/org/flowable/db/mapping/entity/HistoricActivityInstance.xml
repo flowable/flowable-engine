@@ -144,6 +144,9 @@
     update ${prefix}ACT_HI_ACTINST
     <set>
         REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+            PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+        </if>
         <if test="originalPersistentState.executionId != executionId">
             EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
         </if>

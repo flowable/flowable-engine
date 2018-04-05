@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for managing the Engine process definitions.
  */
 @RestController
+@RequestMapping("/app")
 public class ProcessDefinitionsResource {
 
     @Autowired

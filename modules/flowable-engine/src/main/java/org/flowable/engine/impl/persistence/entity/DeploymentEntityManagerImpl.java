@@ -153,7 +153,7 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
 
     protected void restorePreviousStartEventsIfNeeded(ProcessDefinition processDefinition) {
         ProcessDefinitionEntity latestProcessDefinition = findLatestProcessDefinition(processDefinition);
-        if (processDefinition.getId().equals(latestProcessDefinition.getId())) {
+        if (latestProcessDefinition != null && processDefinition.getId().equals(latestProcessDefinition.getId())) {
 
             // Try to find a previous version (it could be some versions are missing due to deletions)
             ProcessDefinition previousProcessDefinition = findNewLatestProcessDefinitionAfterRemovalOf(processDefinition);
@@ -273,7 +273,9 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
             query.processDefinitionWithoutTenantId();
         }
 
-        query.processDefinitionVersionLowerThan(processDefinitionToBeRemoved.getVersion());
+        if (processDefinitionToBeRemoved.getVersion() > 0) {
+            query.processDefinitionVersionLowerThan(processDefinitionToBeRemoved.getVersion());
+        }
         query.orderByProcessDefinitionVersion().desc();
 
         query.setFirstResult(0);

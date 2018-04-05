@@ -6,14 +6,15 @@ services:
             - flowable-admin-db
             - flowable-idm-app
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-admin-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
-            - idm.app.url=http://flowable-idm-app:8080/flowable-idm
-            - idm.app.redirect.url=http://localhost:8080/flowable-idm
-            - idm.admin.user=admin
-            - idm.admin.password=test
+            - SERVER_PORT=9988
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-admin-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+            - FLOWABLE_COMMON_APP_IDM-URL=http://flowable-idm-app:8080/flowable-idm
+            - FLOWABLE_COMMON_APP_IDM-REDIRECT-URL=http://localhost:8080/flowable-idm
+            - FLOWABLE_COMMON_APP_IDM-ADMIN.USER=admin
+            - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
         ports:
             - 9988:9988
         entrypoint: ["./wait-for-something.sh", "flowable-admin-db", "5432", "PostgreSQL", "java", "-jar", "flowable-admin.jar", "-httpPort=9988", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
@@ -22,10 +23,11 @@ services:
         depends_on:
             - flowable-admin-db
         environment:
-            - datasource.driver=org.postgresql.Driver
-            - datasource.url=jdbc:postgresql://flowable-admin-db:5432/flowable
-            - datasource.username=flowable
-            - datasource.password=flowable
+            - SERVER_PORT=8080
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-admin-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
         entrypoint: ["./wait-for-something.sh", "flowable-admin-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]

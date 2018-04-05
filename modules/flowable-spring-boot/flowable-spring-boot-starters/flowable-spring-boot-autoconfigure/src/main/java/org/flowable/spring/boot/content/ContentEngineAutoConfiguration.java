@@ -12,19 +12,24 @@
  */
 package org.flowable.spring.boot.content;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.configurator.ContentEngineConfigurator;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnContentEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -53,6 +58,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
 
     protected final FlowableContentProperties contentProperties;
+    protected List<EngineConfigurationConfigurer<SpringContentEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public ContentEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableContentProperties contentProperties) {
         super(flowableProperties);
@@ -71,6 +77,8 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
         configuration.setContentRootFolder(storage.getRootFolder());
         configuration.setCreateContentRootFolder(storage.getCreateRoot());
 
+        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+
         return configuration;
     }
 
@@ -80,7 +88,8 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
 
         @Bean
         @ConditionalOnMissingBean(name = "contentProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer contentProcessEngineConfigurationConfigurer(ContentEngineConfigurator contentEngineConfigurator) {
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> contentProcessEngineConfigurationConfigurer(
+            ContentEngineConfigurator contentEngineConfigurator) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(contentEngineConfigurator);
         }
 
@@ -91,5 +100,10 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
             contentEngineConfigurator.setContentEngineConfiguration(configuration);
             return contentEngineConfigurator;
         }
+    }
+
+    @Autowired(required = false)
+    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringContentEngineConfiguration>> engineConfigurers) {
+        this.engineConfigurers = engineConfigurers;
     }
 }

@@ -12,7 +12,6 @@
  */
 package org.flowable.spring.test.authentication;
 
-import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -74,10 +73,8 @@ public class SpringPasswordEncoderTest {
         assertThat(defaultIdmEngineConfiguration.getPasswordEncoder())
             .isInstanceOf(SpringEncoder.class)
             .isEqualTo(passwordEncoder);
-        assertThat(passwordEncoder).isInstanceOf(SpringEncoder.class);
-        assertNotNull(((SpringEncoder) passwordEncoder).getSpringEncodingProvider());
-        assertTrue(((SpringEncoder) passwordEncoder).getSpringEncodingProvider() instanceof org.springframework.security.authentication.encoding.PasswordEncoder ||
-                ((SpringEncoder) passwordEncoder).getSpringEncodingProvider() instanceof org.springframework.security.crypto.password.PasswordEncoder);
+        assertThat(passwordEncoder).isInstanceOfSatisfying(SpringEncoder.class,
+            encoder -> assertThat(encoder.getSpringEncodingProvider()).isInstanceOf(BCryptPasswordEncoder.class));
 
     }
 

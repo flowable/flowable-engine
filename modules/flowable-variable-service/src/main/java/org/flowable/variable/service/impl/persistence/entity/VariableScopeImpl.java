@@ -942,7 +942,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public Object getTransientVariableLocal(String variableName) {
-        if (transientVariabes != null) {
+        if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
             return transientVariabes.get(variableName).getValue();
         }
         return null;

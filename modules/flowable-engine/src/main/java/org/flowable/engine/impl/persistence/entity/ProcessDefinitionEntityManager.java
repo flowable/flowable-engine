@@ -27,6 +27,10 @@ public interface ProcessDefinitionEntityManager extends EntityManager<ProcessDef
     ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey);
 
     ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId);
+    
+    ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKey(String processDefinitionKey);
+
+    ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId);
 
     List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery);
 

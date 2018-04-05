@@ -43,8 +43,8 @@ public class DbScriptUtil {
     protected static DatabaseConnection createDbConnection() throws Exception {
         Properties properties = new Properties();
         properties.load(DbScriptUtil.class.getClassLoader().getResourceAsStream("META-INF/flowable-admin/TEST-db.properties"));
-        Connection connection = DriverManager.getConnection(properties.getProperty("datasource.url"),
-                properties.getProperty("datasource.username"), properties.getProperty("datasource.password"));
+        Connection connection = DriverManager.getConnection(properties.getProperty("spring.datasource.url"),
+                properties.getProperty("spring.datasource.username"), properties.getProperty("spring.datasource.password"));
         DatabaseConnection databaseConnection = new JdbcConnection(connection);
         return databaseConnection;
     }

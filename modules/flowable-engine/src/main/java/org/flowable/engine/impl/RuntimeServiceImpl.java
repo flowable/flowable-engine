@@ -396,6 +396,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
         commandExecutor.execute(new TriggerCmd(executionId, null));
     }
 
+    @Override
+    public void triggerAsync(String executionId) {
+        commandExecutor.execute(new TriggerCmd(executionId, null, true));
+    }
+
     public void signal(String executionId, Map<String, Object> processVariables) {
         commandExecutor.execute(new TriggerCmd(executionId, processVariables));
     }
@@ -403,6 +408,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     @Override
     public void trigger(String executionId, Map<String, Object> processVariables) {
         commandExecutor.execute(new TriggerCmd(executionId, processVariables));
+    }
+
+    @Override
+    public void triggerAsync(String executionId, Map<String, Object> processVariables) {
+        commandExecutor.execute(new TriggerCmd(executionId, processVariables, true));
     }
 
     @Override

@@ -20,7 +20,8 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
-import org.springframework.boot.actuate.endpoint.mvc.EndpointMvcAdapter;
+import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpoint;
+import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,12 +39,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Joram Barrez
  * @author Josh Long
  */
-public class ProcessEngineMvcEndpoint extends EndpointMvcAdapter {
+@EndpointWebExtension(endpoint = ProcessEngineEndpoint.class)
+public class ProcessEngineMvcEndpoint {
 
     private final RepositoryService repositoryService;
 
-    public ProcessEngineMvcEndpoint(ProcessEngineEndpoint processEngineEndpoint, RepositoryService repositoryService) {
-        super(processEngineEndpoint);
+    public ProcessEngineMvcEndpoint(RepositoryService repositoryService) {
         this.repositoryService = repositoryService;
     }
 

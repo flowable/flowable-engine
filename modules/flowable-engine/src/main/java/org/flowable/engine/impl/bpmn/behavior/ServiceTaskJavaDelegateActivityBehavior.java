@@ -19,6 +19,7 @@ import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -31,13 +32,23 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
 
     protected JavaDelegate javaDelegate;
     protected Expression skipExpression;
+    protected boolean triggerable;
 
     protected ServiceTaskJavaDelegateActivityBehavior() {
     }
 
-    public ServiceTaskJavaDelegateActivityBehavior(JavaDelegate javaDelegate, Expression skipExpression) {
+    public ServiceTaskJavaDelegateActivityBehavior(JavaDelegate javaDelegate, boolean triggerable, Expression skipExpression) {
         this.javaDelegate = javaDelegate;
+        this.triggerable = triggerable;
         this.skipExpression = skipExpression;
+    }
+
+    @Override
+    public void trigger(DelegateExecution execution, String signalName, Object signalData) {
+        if (triggerable && javaDelegate instanceof TriggerableActivityBehavior) {
+            ((TriggerableActivityBehavior) javaDelegate).trigger(execution, signalName, signalData);
+            leave(execution);
+        }
     }
 
     @Override
@@ -47,7 +58,10 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
             CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor()
                 .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
         }
-        leave(execution);
+
+        if (!triggerable) {
+            leave(execution);
+        }
     }
 
     @Override

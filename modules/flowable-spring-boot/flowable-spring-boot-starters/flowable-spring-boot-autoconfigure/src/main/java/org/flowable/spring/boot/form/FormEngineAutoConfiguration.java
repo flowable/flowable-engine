@@ -13,6 +13,7 @@
 package org.flowable.spring.boot.form;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -21,13 +22,15 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -58,6 +61,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableFormProperties formProperties;
+    protected List<EngineConfigurationConfigurer<SpringFormEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public FormEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableFormProperties formProperties) {
         super(flowableProperties);
@@ -86,6 +90,8 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
 
+        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+
         return configuration;
     }
 
@@ -95,7 +101,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         @Bean
         @ConditionalOnMissingBean(name = "formProcessEngineConfigurationConfigurer")
-        public ProcessEngineConfigurationConfigurer formProcessEngineConfigurationConfigurer(
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> formProcessEngineConfigurationConfigurer(
             FormEngineConfigurator formEngineConfigurator
         ) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(formEngineConfigurator);
@@ -108,6 +114,11 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             formEngineConfigurator.setFormEngineConfiguration(configuration);
             return formEngineConfigurator;
         }
+    }
+
+    @Autowired(required = false)
+    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringFormEngineConfiguration>> engineConfigurers) {
+        this.engineConfigurers = engineConfigurers;
     }
 }
 

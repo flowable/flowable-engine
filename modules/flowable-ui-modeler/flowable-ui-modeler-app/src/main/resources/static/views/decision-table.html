@@ -1,0 +1,103 @@
+<div class="subheader" ng-if="model.decisionTable">
+    <div class="fixed-container">
+        <div class="btn-group pull-right" ng-if="!(currentKickstartModel)">
+            <button type="button" class="btn btn-default" ng-click="openEditor()"
+                    ng-if="model.decisionTable.latestVersion">
+                <i class="glyphicon glyphicon-edit icon-and-label"></i> {{'DECISION-TABLE.ACTION.OPEN-IN-EDITOR' |
+                translate}}
+            </button>
+            <button type="button" class="btn btn-default" ng-click="useAsNewVersion()"
+                    ng-if="!model.decisionTable.latestVersion">
+                {{'DECISION-TABLE.ACTION.USE-AS-NEW-VERSION' | translate}}
+            </button>
+        </div>
+
+        <div class="btn-group pull-right" ng-if="!(currentKickstartModel)">
+            <a href="{{model.decisionTableDownloadUrl}}" class="btn btn-default"
+               title="{{'DECISION-TABLE.ACTION.EXPORT' | translate}}">
+                <i class="glyphicon glyphicon-save"></i>
+            </a>
+        </div>
+
+        <div class="btn-group pull-right" ng-if="!(currentKickstartModel)">
+            <button type="button" class="btn btn-default" ng-click="editDecisionTable()"
+                    ng-disabled="!model.decisionTable.latestVersion"
+                    title="{{'DECISION-TABLE.ACTION.EDIT' | translate}}">
+                <i class="glyphicon glyphicon-pencil"></i>
+            </button>
+            <button type="button" class="btn btn-default" ng-click="duplicateDecisionTable()"
+                    ng-disabled="!model.decisionTable.latestVersion"
+                    title="{{'DECISION-TABLE.ACTION.DUPLICATE' | translate}}">
+                <i class="editor-icon editor-icon-copy"></i>
+            </button>
+            <button type="button" class="btn btn-default" ng-click="deleteDecisionTable()"
+                    title="{{'DECISION-TABLE.ACTION.DELETE' | translate}}"
+                    ng-disabled="!model.decisionTable.latestVersion">
+                <i class="glyphicon glyphicon-trash"></i>
+            </button>
+        </div>
+        <div class="pull-right" ng-if="!(currentKickstartModel)">
+            <a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+        </div>
+
+        <h2><span class="version">v{{model.decisionTable.version}}</span>{{model.decisionTable.name}}</h2>
+        <div class="clearfix">
+            <div class="col-xs-4 details">
+                <span><i class="glyphicon glyphicon-user"></i><span translate="DECISION-TABLE.DETAILS.CREATED-BY"
+                                                                    translate-values="model.decisionTable"></span></span>
+                <span><i class="glyphicon glyphicon-pencil"></i><span translate="DECISION-TABLE.DETAILS.LAST-UPDATED-BY"
+                                                                      translate-values="model.decisionTable"></span></span>
+            </div>
+            <div class="col-xs-8 details clearfix">
+                <div class="related btn-group">
+                    <button id="toggle-history" ng-if="!(currentKickstartModel)" type="button" class="btn btn-subtle"
+                            ng-click="toggleHistory($event)"
+                            title="{{'DECISION-TABLE.ACTION.EDIT' | translate}}">
+                        {{'DECISION-TABLE.DETAILS.HISTORY-TITLE' | translate}} <span class="counter"
+                                                                                     ng-show="model.versions.data.length">{{model.versions.data.length}}</span>
+                    </button>
+                </div>
+                <p ng-if="model.decisionTable.description">
+                    {{model.decisionTable.description}}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid content decision-table read-only" ng-if="model.decisionTable" auto-height offset="40">
+
+    <div class="decision-table-grid-wrapper" id="decisionTableGrid">
+        <div class="decision-name-container">
+            <div class="decision-name">
+                {{currentDecisionTable.name}}
+            </div>
+        </div>
+        <hot-table class="decision-table-editor" hot-auto-destroy
+                   hot-id="read-only-decision-table-editor"
+                   settings="model.hotSettings"
+                   columns="model.columnDefs"
+                   row-headers="true"
+                   datarows="model.rulesData"
+                   auto-row-size="'true'"
+                   on-after-render=doAfterRender
+                   on-after-get-col-header=doAfterGetColHeader
+                   on-modify-col-width=doAfterModifyColWidth
+                   on-after-validate=doAfterValidate
+                   height="500">
+        </hot-table>
+    </div>
+</div>
+
+<script>
+    function triggerExpressionEditor(expressionType, expressionPos, newExpression) {
+        if (expressionType === 'input') {
+            extScope.openInputExpressionEditor(expressionPos, newExpression);
+        } else {
+            extScope.openOutputExpressionEditor(expressionPos, newExpression);
+        }
+    }
+
+    function triggerHitPolicyEditor() {
+        extScope.openHitPolicyEditor();
+    }
+</script>

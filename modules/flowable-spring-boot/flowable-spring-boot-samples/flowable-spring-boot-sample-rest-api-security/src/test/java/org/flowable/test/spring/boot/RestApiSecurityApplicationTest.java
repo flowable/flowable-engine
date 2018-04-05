@@ -14,10 +14,10 @@ package org.flowable.test.spring.boot;
 
 import flowable.Application;
 
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.cmmn.service.api.repository.CaseDefinitionResponse;
-import org.flowable.rest.content.service.api.content.ContentItemResponse;
-import org.flowable.rest.dmn.service.api.repository.DmnDeploymentResponse;
+import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.content.rest.service.api.content.ContentItemResponse;
+import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
@@ -25,9 +25,9 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -82,7 +82,7 @@ public class RestApiSecurityApplicationTest {
                     .as("jlong authorities")
                     .hasSize(1)
                     .extracting(GrantedAuthority::getAuthority)
-                    .containsExactlyInAnyOrder("users");
+                    .containsExactlyInAnyOrder("user-privilege");
             });
 
         assertThat(userDetailsService.loadUserByUsername("jbarrez"))
@@ -93,7 +93,7 @@ public class RestApiSecurityApplicationTest {
                     .as("jbarrez authorities")
                     .hasSize(2)
                     .extracting(GrantedAuthority::getAuthority)
-                    .containsExactlyInAnyOrder("users", "admin");
+                    .containsExactlyInAnyOrder("user-privilege", "admin-privilege");
             });
     }
 

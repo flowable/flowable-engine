@@ -20,6 +20,7 @@ import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.spring.DmnEngineFactoryBean;
+import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
@@ -60,7 +61,8 @@ public class DmnEngineServicesAutoConfiguration {
     })
     static class AlreadyInitializedEngineConfiguration {
         @Bean
-        public DmnEngine dmnEngine() {
+        public DmnEngine dmnEngine(@SuppressWarnings("unused") ProcessEngine processEngine) {
+            // The process engine needs to be injected, as otherwise it won't be initialized, which means that the DmnEngine is not initialized yet
             if (!DmnEngines.isInitialized()) {
                 throw new IllegalStateException("DMN engine has not been initialized");
             }

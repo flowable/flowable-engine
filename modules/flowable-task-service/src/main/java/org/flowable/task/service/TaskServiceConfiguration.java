@@ -61,6 +61,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
+    protected InternalTaskAssignmentManager internalTaskAssignmentManager;
     
     protected boolean enableTaskRelationshipCounts;
     protected boolean enableLocalization;
@@ -194,6 +195,14 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public void setInternalTaskLocalizationManager(InternalTaskLocalizationManager internalTaskLocalizationManager) {
         this.internalTaskLocalizationManager = internalTaskLocalizationManager;
+    }
+
+    public InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return internalTaskAssignmentManager;
+    }
+
+    public void setInternalTaskAssignmentManager(InternalTaskAssignmentManager internalTaskAssignmentManager) {
+        this.internalTaskAssignmentManager = internalTaskAssignmentManager;
     }
 
     public boolean isEnableTaskRelationshipCounts() {

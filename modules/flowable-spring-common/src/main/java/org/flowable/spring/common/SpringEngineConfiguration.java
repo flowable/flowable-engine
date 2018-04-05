@@ -13,6 +13,8 @@
 
 package org.flowable.spring.common;
 
+import java.util.Map;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.SmartLifecycle;
@@ -43,6 +45,8 @@ public interface SpringEngineConfiguration extends ApplicationContextAware, Smar
     ApplicationContext getApplicationContext();
 
     void setApplicationContext(ApplicationContext applicationContext);
+    
+    Map<Object, Object> getBeans();
 
     String getDeploymentMode();
 

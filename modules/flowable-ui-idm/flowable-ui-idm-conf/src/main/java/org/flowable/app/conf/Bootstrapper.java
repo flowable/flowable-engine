@@ -17,19 +17,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.idm.properties.FlowableIdmAppProperties;
 import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
+import org.flowable.spring.boot.ldap.FlowableLdapProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * Responsible for executing all action required after booting up the Spring container.
@@ -42,30 +43,32 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrapper.class);
 
-    @Qualifier("defaultIdmIdentityService")
     @Autowired
     private IdmIdentityService identityService;
 
+    private FlowableLdapProperties ldapProperties;
+
     @Autowired
-    private Environment env;
+    private FlowableIdmAppProperties idmAppProperties;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
 
-            if (!env.getProperty("ldap.enabled", Boolean.class, false)) {
-                if (env.getProperty("idm.bootstrap.enabled", Boolean.class, true)){
+            if (ldapProperties == null || !ldapProperties.isEnabled()) {
+                if (idmAppProperties.isBootstrap()) {
                     // First create the default IDM entities
                     createDefaultAdminUserAndPrivileges();
                 }
             
             } else {
                 if (identityService.createPrivilegeQuery().privilegeName(DefaultPrivileges.ACCESS_IDM).count() == 0) {
-                    String adminUserId = env.getProperty("admin.userid");
+                    String adminUserId = idmAppProperties.getAdmin().getUserId();
                     if (StringUtils.isNotEmpty(adminUserId)) {
                         initializeDefaultPrivileges(adminUserId);
                     } else {
-                        LOGGER.warn("No user found with IDM access. Set admin.userid to give at least one user access to the IDM application to configure privileges.");
+                        LOGGER.warn(
+                            "No user found with IDM access. Set flowable.idp.app.admin.user-id to give at least one user access to the IDM application to configure privileges.");
                     }
                 }
             }
@@ -73,7 +76,7 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     protected void createDefaultAdminUserAndPrivileges() {
-        String adminUserId = env.getProperty("admin.userid");
+        String adminUserId = idmAppProperties.getAdmin().getUserId();
         if (StringUtils.isNotEmpty(adminUserId)) {
             User adminUser = identityService.createUserQuery().userId(adminUserId).singleResult();
             if (adminUser == null) {
@@ -86,11 +89,16 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     protected User initializeAdminUser() {
-        String adminUserId = env.getRequiredProperty("admin.userid");
-        String adminPassword = env.getRequiredProperty("admin.password");
-        String adminFirstname = env.getRequiredProperty("admin.firstname");
-        String adminLastname = env.getRequiredProperty("admin.lastname");
-        String adminEmail = env.getProperty("admin.email");
+        FlowableIdmAppProperties.Admin adminConfig = idmAppProperties.getAdmin();
+        String adminUserId = adminConfig.getUserId();
+        Assert.notNull(adminUserId, "flowable.idm.app.admin.user-id property must be set");
+        String adminPassword = adminConfig.getPassword();
+        Assert.notNull(adminPassword, "flowable.idm.app.admin.password property must be set");
+        String adminFirstname = adminConfig.getFirstName();
+        Assert.notNull(adminFirstname, "flowable.idm.app.admin.first-name property must be set");
+        String adminLastname = adminConfig.getLastName();
+        Assert.notNull(adminLastname, "flowable.idm.app.admin.last-name property must be set");
+        String adminEmail = adminConfig.getEmail();
 
         User admin = identityService.newUser(adminUserId);
         admin.setFirstName(adminFirstname);
@@ -160,4 +168,8 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
                 .singleResult() != null;
     }
 
+    @Autowired(required = false)
+    public void setLdapProperties(FlowableLdapProperties ldapProperties) {
+        this.ldapProperties = ldapProperties;
+    }
 }

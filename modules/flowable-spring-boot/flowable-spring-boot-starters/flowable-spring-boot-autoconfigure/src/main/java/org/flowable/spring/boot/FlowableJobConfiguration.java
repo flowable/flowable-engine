@@ -12,7 +12,6 @@
  */
 package org.flowable.spring.boot;
 
-import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringCallerRunsRejectedJobsHandler;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -33,12 +32,6 @@ public class FlowableJobConfiguration {
     @ConditionalOnMissingBean
     public TaskExecutor taskExecutor() {
         return new SimpleAsyncTaskExecutor();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SpringAsyncExecutor springAsyncExecutor(TaskExecutor taskExecutor) {
-        return new SpringAsyncExecutor(taskExecutor, springRejectedJobsHandler());
     }
 
     @Bean

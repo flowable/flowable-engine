@@ -64,6 +64,11 @@
 
   <select id="selectCmmnResourcesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="cmmnResourceResultMap">
     select * from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
-  </select>  
+  </select>
+  
+  <update id="updateCmmnResource" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
+    update ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE set RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}}
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update> 
   
 </mapper>

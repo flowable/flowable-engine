@@ -15,34 +15,55 @@ package org.flowable.admin.conf;
 import java.util.Collections;
 
 import org.flowable.admin.security.AjaxLogoutSuccessHandler;
-import org.flowable.app.filter.FlowableCookieFilter;
+import org.flowable.admin.security.RemoteIdmAuthenticationProvider;
+import org.flowable.app.filter.FlowableCookieFilterRegistrationBean;
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.CookieConstants;
 import org.flowable.app.security.DefaultPrivileges;
+import org.flowable.app.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.info.InfoEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
+    @Autowired
+    private RemoteIdmAuthenticationProvider authenticationProvider;
+
     @Bean
-    public FlowableCookieFilter flowableCookieFilter() {
-        FlowableCookieFilter filter = new FlowableCookieFilter();
-        filter.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
-        return filter;
+    public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
+        FlowableCookieFilterRegistrationBean registrationBean = new FlowableCookieFilterRegistrationBean(remoteIdmService, properties);
+        registrationBean.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
+        return registrationBean;
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
+
+        // Default auth (database backed)
+        auth.authenticationProvider(authenticationProvider);
     }
 
     @Configuration
+    @Order(10)
     public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
         @Autowired
-        protected FlowableCookieFilter flowableCookieFilter;
+        protected FlowableCookieFilterRegistrationBean flowableCookieFilterRegistrationBean;
 
         @Autowired
         private AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
@@ -50,7 +71,7 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
-                    .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(flowableCookieFilterRegistrationBean.getFilter(), UsernamePasswordAuthenticationFilter.class)
                     .logout()
                     .logoutUrl("/app/logout")
                     .logoutSuccessHandler(ajaxLogoutSuccessHandler)
@@ -61,6 +82,32 @@ public class SecurityConfiguration {
                     .disable()
                     .authorizeRequests()
                     .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_ADMIN);
+        }
+    }
+
+    //
+    // Actuator
+    //
+
+    @ConditionalOnClass(EndpointRequest.class)
+    @Configuration
+    @Order(15) // Actuator configuration should kick in after the Form Login so the custom login filter can be applied before
+    public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+        protected void configure(HttpSecurity http) throws Exception {
+
+            http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .csrf()
+                .disable();
+
+            http
+                .authorizeRequests()
+                .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
+                .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN)
+                .and().httpBasic();
         }
     }
 }

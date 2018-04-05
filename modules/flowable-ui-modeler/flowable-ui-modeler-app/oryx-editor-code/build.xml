@@ -20,7 +20,7 @@
 	<property name="root" value="." />
 	<property name="src" value="${root}/scripts" />
 	<property name="data" value="${root}/data" />
-	<property name="destdir" value="../src/main/webapp/editor-app/editor" />
+	<property name="destdir" value="../src/main/resources/static/editor-app/editor" />
 	<property name="target" value="target" />
 	<property name="temp" value="temp" />
 	

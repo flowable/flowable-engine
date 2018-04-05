@@ -5,14 +5,67 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-ui-task</artifactId>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>6.3.1-SNAPSHOT</version>
     </parent>
     <artifactId>flowable-ui-task-app</artifactId>
     <packaging>war</packaging>
 
     <dependencies>
 
-    	<dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate.validator</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-task-conf</artifactId>
         </dependency>
@@ -250,11 +303,32 @@
                 <includes>
                     <include>**/*</include>
                 </includes>
+                <excludes>
+                    <exclude>static/fonts/**</exclude>
+                    <exclude>static/libs/ui-grid_3.0.0/**</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/fonts/**</include>
+                    <include>static/libs/ui-grid_3.0.0/**</include>
+                </includes>
             </resource>
         </resources>
 
         <plugins>
 
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludeArtifactIds>
+                        spring-boot-configuration-processor
+                    </excludeArtifactIds>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -289,15 +363,12 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>9999</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <com.sun.management.jmxremote.port>4001</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--com.sun.management.jmxremote.port=4001</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -315,19 +386,16 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>8080</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <datasource.driver>org.postgresql.Driver</datasource.driver>
-                                <datasource.url>jdbc:postgresql://localhost:5432/flowable</datasource.url>
-                                <datasource.username>flowable</datasource.username>
-                                <datasource.password>flowable</datasource.password>
-                                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--spring.datasource.driver-class-name=org.postgresql.Driver</argument>
+                                <argument>--spring.datasource.url=jdbc:postgresql://localhost:5432/flowable</argument>
+                                <argument>--spring.datasource.username=flowable</argument>
+                                <argument>--spring.datasource.password=flowable</argument>
+                                <argument>--com.sun.management.jmxremote.port=4000</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -345,19 +413,16 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <path>/flowable-task</path>
-                            <port>9999</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <datasource.driver>com.mysql.jdbc.Driver</datasource.driver>
-                                <datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</datasource.url>
-                                <datasource.username>flowable</datasource.username>
-                                <datasource.password>flowable</datasource.password>
-                                <com.sun.management.jmxremote.port>4001</com.sun.management.jmxremote.port>
-                            </systemProperties>
+                            <arguments>
+                                <argument>--spring.datasource.driver-class-name=com.mysql.jdbc.Driver</argument>
+                                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
+                                <argument>--spring.datasource.username=flowable</argument>
+                                <argument>--spring.datasource.password=flowable</argument>
+                                <argument>--com.sun.management.jmxremote.port=4001</argument>
+                            </arguments>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -375,33 +440,13 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
-                        <version>2.1</version>
-                        <configuration>
-                            <finalName>${project.build.finalName}.jar</finalName>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>tomcat-run</id>
-                                <goals>
-                                    <goal>exec-war-only</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <path>/flowable-task</path>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>com.spotify</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
                         <version>0.4.13</version>
                         <configuration>
                             <imageName>flowable/${project.build.finalName}</imageName>
                             <baseImage>flowable/java8_server</baseImage>
-                            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=9999", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
+                            <entryPoint>["java", "-jar", "/${project.build.finalName}.war"]</entryPoint>
                             <forceTags>true</forceTags>
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
@@ -411,7 +456,7 @@
                                 <resource>
                                     <targetPath>/</targetPath>
                                     <directory>${project.build.directory}</directory>
-                                    <include>${project.build.finalName}.jar</include>
+                                    <include>${project.build.finalName}.war</include>
                                 </resource>
                                 <resource>
                                   <targetPath>/</targetPath>

@@ -19,4 +19,5 @@ public interface SecurityConstants {
     
     String PRIVILEGE_ACCESS_REST_API = "access-rest-api";
 
+    String ACCESS_ADMIN = "access-admin";
 }

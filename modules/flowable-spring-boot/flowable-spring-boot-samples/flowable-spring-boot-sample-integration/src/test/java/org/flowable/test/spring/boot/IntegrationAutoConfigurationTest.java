@@ -27,7 +27,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.support.GenericHandler;
+import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.support.MessageBuilder;
 
 /**

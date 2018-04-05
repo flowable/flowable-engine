@@ -14,7 +14,7 @@
 	</parent>
 
 	<packaging>pom</packaging>
-	<version>6.3.0-SNAPSHOT</version>
+	<version>6.3.1-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
@@ -22,9 +22,10 @@
 		<spring.security.version>4.2.4.RELEASE</spring.security.version>
 		<jackson.version>2.8.11</jackson.version>
 		<mule.version>3.8.0</mule.version>
-		<camel.version>2.20.2</camel.version>
-		<cxf.version>3.2.2</cxf.version>
+		<camel.version>2.21.0</camel.version>
+		<cxf.version>3.2.3</cxf.version>
 		<slf4j.version>1.7.25</slf4j.version>
+		<spring.boot.version>1.5.10.RELEASE</spring.boot.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -112,11 +113,6 @@
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>2.6</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-fileupload</groupId>
-				<artifactId>commons-fileupload</artifactId>
-				<version>1.3.3</version>
 			</dependency>
 			<dependency>
 			    <groupId>commons-codec</groupId>
@@ -647,7 +643,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-all</artifactId>
-				<version>2.4.13</version>
+				<version>2.4.15</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -1023,6 +1019,26 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.0.2</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+						</archive>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.5</version>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+						<archive>
+							<manifest>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+						</archive>
+					</configuration>
 				</plugin>
 				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
@@ -1060,6 +1076,27 @@
 						<arguments>${arguments} -Psonatype-oss-release</arguments>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring.boot.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>build-info</goal>
+								<goal>repackage</goal>
+							</goals>
+							<configuration>
+								<mainClass>${start-class}</mainClass>
+								<!-- The generated Spring Boot jar / war should not be made executable be prepending a launch script to the jar / war
+								Such jars cause issues when being unpacked by maven dependency:unpack, it can also cause issues when deploying in a servlet container.
+								NB: The jar / war is still self contained and can be run with java -jar
+								-->
+								<executable>false</executable>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -1080,6 +1117,7 @@
 				<module>modules/flowable-bpmn-converter</module>
 				<module>modules/flowable-engine</module>
 				<module>modules/flowable-secure-javascript</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>modules/flowable-bpmn-layout</module>
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
@@ -1135,11 +1173,11 @@
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-ui-common</module>
+				<module>modules/flowable-ui-edge</module>
 				<module>modules/flowable-ui-idm</module>
 				<module>modules/flowable-ui-modeler</module>
 				<module>modules/flowable-ui-task</module>
 				<module>modules/flowable-ui-admin</module>
-				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1196,9 +1234,10 @@
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
 				<module>modules/flowable-idm-spring</module>
+                <module>modules/flowable-idm-rest</module>
+                <module>modules/flowable-ldap</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
-				<module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-cxf</module>
@@ -1231,9 +1270,10 @@
 				<module>modules/flowable-content-spring</module>
 				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-content-rest</module>
+                <module>modules/flowable-http</module>
+                <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-ui-common</module>
-				<module>modules/flowable-http</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1287,6 +1327,7 @@
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
 				<module>modules/flowable-secure-javascript</module>
+				<module>modules/flowable-groovy-script-static-engine</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-json-converter</module>
 				<module>modules/flowable-dmn-xml-converter</module>
@@ -1340,7 +1381,7 @@
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
 				<module>modules/flowable-ui-common</module>
-				<module>modules/flowable-groovy-script-static-engine</module>
+				<module>modules/flowable-ui-edge</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 		</profile>

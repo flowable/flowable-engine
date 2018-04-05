@@ -15,27 +15,26 @@ package org.flowable.test.spring.boot;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.cmmn.service.api.repository.CaseDefinitionResponse;
-import org.flowable.rest.content.service.api.content.ContentItemResponse;
-import org.flowable.rest.dmn.service.api.repository.DmnDeploymentResponse;
+import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.content.rest.service.api.content.ContentItemResponse;
+import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.BasicJsonTester;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.DefaultResponseErrorHandler;
-import org.springframework.web.client.RestTemplate;
 
 import flowable.Application;
 
@@ -48,15 +47,10 @@ import flowable.Application;
 public class RestApiApplicationTest {
 
     @Autowired
-    private RestTemplate restTemplate;
+    private TestRestTemplate restTemplate;
 
     @LocalServerPort
     private int serverPort;
-
-    @After
-    public void tearDown() {
-        restTemplate.setErrorHandler(new DefaultResponseErrorHandler());
-    }
 
     @Test
     public void testRestApiIntegration() {
@@ -100,6 +94,23 @@ public class RestApiApplicationTest {
                 tuple("case1", "http://localhost:" + serverPort + "/cmmn-api/cmmn-repository/case-definitions/3")
             );
         assertThat(caseDefinitions.getTotal()).isEqualTo(1);
+    }
+
+    @Test
+    public void testCmmnRestApiIntegrationNotFound() {
+        String processDefinitionsUrl = "http://localhost:" + serverPort + "/cmmn-api/cmmn-repository/case-definitions/does-not-exist";
+
+        ResponseEntity<String> response = restTemplate.getForEntity(processDefinitionsUrl, String.class);
+
+        BasicJsonTester jsonTester = new BasicJsonTester(getClass());
+
+        assertThat(jsonTester.from(response.getBody())).isEqualToJson("{"
+            + "\"message\": \"Not found\","
+            + "\"exception\": \"no deployed case definition found with id 'does-not-exist'\""
+            + "}");
+        assertThat(response.getStatusCode())
+            .as("Status code")
+            .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test

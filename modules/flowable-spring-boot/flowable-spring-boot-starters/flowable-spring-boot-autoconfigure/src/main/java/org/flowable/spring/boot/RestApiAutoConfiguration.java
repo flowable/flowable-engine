@@ -13,18 +13,18 @@
 package org.flowable.spring.boot;
 
 import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.common.rest.resolver.ContentTypeResolver;
+import org.flowable.common.rest.resolver.DefaultContentTypeResolver;
 import org.flowable.content.engine.ContentEngine;
+import org.flowable.content.rest.ContentRestUrls;
 import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.form.engine.FormEngine;
+import org.flowable.form.rest.FormRestUrls;
 import org.flowable.idm.engine.IdmEngine;
-import org.flowable.rest.application.ContentTypeResolver;
-import org.flowable.rest.application.DefaultContentTypeResolver;
-import org.flowable.rest.cmmn.service.api.CmmnRestUrls;
-import org.flowable.rest.content.ContentRestUrls;
-import org.flowable.rest.dmn.service.api.DmnRestUrls;
-import org.flowable.rest.form.FormRestUrls;
-import org.flowable.rest.idm.service.api.IdmRestResponseFactory;
+import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.spring.boot.cmmn.CmmnEngineRestConfiguration;
 import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
@@ -48,6 +48,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +66,8 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass(ContentTypeResolver.class)
 @ConditionalOnWebApplication
 @AutoConfigureAfter({
+    //FIXME in order to support both 1.5.x and 2.0 we can't use MultipartAutoConfiguration (the package is changed)
+    //MultipartAutoConfiguration.class,
     SecurityAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
     CmmnEngineServicesAutoConfiguration.class,

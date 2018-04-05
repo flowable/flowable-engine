@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot.idm;
 
-import org.flowable.rest.idm.service.api.IdmRestResponseFactory;
+import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
  * @author Filip Hrisafov
  */
 @Import(DispatcherServletConfiguration.class)
-@ComponentScan("org.flowable.rest.idm.service.api")
+@ComponentScan("org.flowable.idm.rest.service.api")
 public class IdmEngineRestConfiguration {
 
     @Bean

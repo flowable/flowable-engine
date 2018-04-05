@@ -91,6 +91,7 @@ public interface StencilConstants {
     final String PROPERTY_PROCESS_VERSION = "process_version";
     final String PROPERTY_PROCESS_AUTHOR = "process_author";
     final String PROPERTY_PROCESS_NAMESPACE = "process_namespace";
+    final String PROPERTY_PROCESS_HISTORYLEVEL = "process_historylevel";
 
     final String PROPERTY_IS_EXECUTABLE = "isexecutable";
     final String PROPERTY_IS_EAGER_EXECUTION_FETCHING = "iseagerexecutionfetch";
@@ -176,6 +177,7 @@ public interface StencilConstants {
     final String PROPERTY_SERVICETASK_FIELD_STRING_VALUE = "stringValue";
     final String PROPERTY_SERVICETASK_FIELD_STRING = "string";
     final String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
+    final String PROPERTY_SERVICETASK_TRIGGERABLE = "servicetasktriggerable";
     final String PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "servicetaskUseLocalScopeForResultVariable";
 
     final String PROPERTY_FORM_PROPERTIES = "formproperties";

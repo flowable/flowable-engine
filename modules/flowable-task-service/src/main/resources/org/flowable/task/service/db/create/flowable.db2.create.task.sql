@@ -4,6 +4,7 @@ create table ACT_RU_TASK (
     EXECUTION_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    TASK_DEF_ID_ varchar(64),
     SCOPE_ID_ varchar(255),
     SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
@@ -35,4 +36,4 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.3.0.0', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.3.1.0', 1);

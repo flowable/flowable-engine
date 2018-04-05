@@ -32,6 +32,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_SCRIPT = "ScriptTask";
     String STENCIL_MILESTONE = "Milestone";
     String STENCIL_TIMER_EVENT_LISTENER ="TimerEventListener";
+    String STENCIL_USER_EVENT_LISTENER ="UserEventListener";
 
     String STENCIL_ENTRY_CRITERION = "EntryCriterion";
     String STENCIL_EXIT_CRITERION = "ExitCriterion";
@@ -79,6 +80,9 @@ public interface CmmnStencilConstants {
     
     String PROPERTY_MANUAL_ACTIVATION_ENABLED = "manualactivationenabled";
     String PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION = "manualactivationrulecondition";
+    
+    String PROPERTY_COMPLETION_NEUTRAL_ENABLED = "completionneutralenabled";
+    String PROPERTY_COMPLETION_NEUTRAL_RULE_CONDITION = "completionneutralrulecondition";
 
     String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
     String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";

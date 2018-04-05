@@ -14,6 +14,7 @@ package org.flowable.http.bpmn;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer.HttpServiceTaskTestServlet;
+import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -119,7 +121,8 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
             fail("FlowableException expected");
         } catch (final Exception e) {
             assertTrue(e instanceof FlowableException);
-            assertTrue(e.getCause() instanceof SocketException);
+            assertTrue(e.getCause() instanceof SocketTimeoutException
+                    || e.getCause() instanceof SocketException);
         }
     }
 
@@ -378,6 +381,17 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertTrue(variables.get("postResponse") instanceof JsonNode);
         assertEquals("Hello John", ((JsonNode) variables.get("postResponse")).get("result").asText());
     }
+    
+    @Deployment
+    public void testArrayNodeResponse() {
+        runtimeService.startProcessInstanceByKey("testArrayNodeResponse");
+        List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertEquals(3, tasks.size());
+        assertEquals("abc", tasks.get(0).getName());
+        assertEquals("def", tasks.get(1).getName());
+        assertEquals("ghi", tasks.get(2).getName());
+    }
+    
 
     private void assertEquals(final String processInstanceId, final Map<String, Object> vars) {
         for (String key : vars.keySet()) {

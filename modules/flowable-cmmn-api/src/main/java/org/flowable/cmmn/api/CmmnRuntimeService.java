@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
 
@@ -45,6 +46,8 @@ public interface CmmnRuntimeService {
     void terminateCaseInstance(String caseInstanceId);
     
     void evaluateCriteria(String caseInstanceId);
+
+    void completeUserEventListenerInstance(String userEventListenerInstanceId);
     
     Map<String, Object> getVariables(String caseInstanceId);
     
@@ -74,12 +77,14 @@ public interface CmmnRuntimeService {
     void removeLocalVariable(String planItemInstanceId, String variableName);
     
     void removeLocalVariables(String caseInstanceId, Collection<String> variableNames);
-    
+
     CaseInstanceQuery createCaseInstanceQuery();
     
     PlanItemInstanceQuery createPlanItemInstanceQuery();
     
     MilestoneInstanceQuery createMilestoneInstanceQuery();
+
+    UserEventListenerInstanceQuery createUserEventListenerInstanceQuery();
     
     /**
      * Involves a user with a case instance. The type of identity link is defined by the given identityLinkType.

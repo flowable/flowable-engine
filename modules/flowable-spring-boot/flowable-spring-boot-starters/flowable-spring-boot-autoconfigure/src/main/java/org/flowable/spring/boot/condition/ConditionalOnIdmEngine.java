@@ -37,6 +37,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
     "org.flowable.idm.engine.IdmEngine",
     "org.flowable.idm.spring.SpringIdmEngineConfiguration"
 })
-@ConditionalOnProperty(prefix = "flowable", name = {"dbIdentityUsed","idm.enabled"}, havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "flowable", name = {"db-identity-used","idm.enabled"}, havingValue = "true", matchIfMissing = true)
 public @interface ConditionalOnIdmEngine {
 }

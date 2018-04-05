@@ -14,8 +14,14 @@ package org.flowable.spring.boot;
 
 import org.flowable.engine.IdentityService;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.spring.security.IdentityServiceUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
+import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
+import org.flowable.spring.security.FlowableAuthenticationProvider;
+import org.flowable.spring.security.FlowableUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -24,41 +30,70 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
- * Installs a Spring Security adapter for the Flowable {@link org.flowable.engine.IdentityService}.
+ * Installs a Spring Security adapter for the Flowable {@link IdmIdentityService}.
  *
  * @author Josh Long
  */
 @Configuration
+@ConditionalOnIdmEngine
 @ConditionalOnClass({
     AuthenticationManager.class,
     GlobalAuthenticationConfigurerAdapter.class
 })
-@AutoConfigureBefore(org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class)
+@AutoConfigureBefore(org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class)
+@AutoConfigureAfter({
+    IdmEngineServicesAutoConfiguration.class,
+    ProcessEngineAutoConfiguration.class
+})
 public class SecurityAutoConfiguration {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityAutoConfiguration.class);
+
     @Configuration
-    @ConditionalOnMissingBean(UserDetailsService.class)
     public static class UserDetailsServiceConfiguration
             extends GlobalAuthenticationConfigurerAdapter {
 
+        protected final ObjectProvider<AuthenticationProvider> authenticationProviderProvider;
+        protected final ObjectProvider<UserDetailsService> userDetailsServiceProvider;
+
+        public UserDetailsServiceConfiguration(
+            ObjectProvider<AuthenticationProvider> authenticationProviderProvider,
+            ObjectProvider<UserDetailsService> userDetailsServiceProvider) {
+            this.authenticationProviderProvider = authenticationProviderProvider;
+            this.userDetailsServiceProvider = userDetailsServiceProvider;
+        }
+
         @Override
         public void init(AuthenticationManagerBuilder auth) throws Exception {
-            auth.userDetailsService(userDetailsService());
+            if (!auth.isConfigured()) {
+                AuthenticationProvider authenticationProvider = authenticationProviderProvider.getIfUnique();
+                if (authenticationProvider != null) {
+                    auth.authenticationProvider(authenticationProvider);
+                } else {
+                    LOGGER.warn("There is no authentication provider configured. However, there is no single one in the context."
+                        + " Please configure the global authentication provider by yourself.");
+                }
+            }
         }
+    }
 
-        @Bean
-        public UserDetailsService userDetailsService() {
-            return new IdentityServiceUserDetailsService(this.identityService);
-        }
+    @Bean
+    @ConditionalOnMissingBean(UserDetailsService.class)
+    public FlowableUserDetailsService flowableUserDetailsService(IdmIdentityService identityService) {
+        return new FlowableUserDetailsService(identityService);
+    }
 
-        @Autowired
-        private IdentityService identityService;
+    @Bean
+    @ConditionalOnMissingBean(AuthenticationProvider.class)
+    public FlowableAuthenticationProvider flowableAuthenticationProvider(IdmIdentityService idmIdentityService, UserDetailsService userDetailsService) {
+        return new FlowableAuthenticationProvider(idmIdentityService, userDetailsService);
     }
 
     @ConditionalOnBean(type = "org.flowable.engine.IdentityService")

@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -25,6 +26,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.job.api.Job;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Daniel Meyer
@@ -592,4 +596,32 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/ProcessInstanceSuspensionTest.testJobNotExecutedAfterProcessInstanceSuspend.bpmn20.xml")
+    public void testJobActivationAfterProcessInstanceSuspend() {
+
+        Date now = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(now);
+
+        // Suspending the process instance should also stop the execution of jobs for that process instance
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+        assertEquals(1, managementService.createTimerJobQuery().count());
+        runtimeService.suspendProcessInstanceById(processInstance.getId());
+        assertEquals(1, managementService.createSuspendedJobQuery().count());
+
+        Job job = managementService.createTimerJobQuery().executable().singleResult();
+        assertNull(job);
+
+        Job suspendedJob = managementService.createSuspendedJobQuery().singleResult();
+        assertNotNull(suspendedJob);
+
+        // Activation of the suspended job instance should throw exception because parent is suspended
+        try {
+            managementService.moveSuspendedJobToExecutableJob(suspendedJob.getId());
+            fail("FlowableIllegalArgumentException expected. Cannot activate job with suspended parent");
+        } catch (FlowableIllegalArgumentException e) {
+            assertThat(e.getMessage(), containsString("Can not activate job "+ suspendedJob.getId() + ". Parent is suspended."));
+        }
+    }
+    
 }

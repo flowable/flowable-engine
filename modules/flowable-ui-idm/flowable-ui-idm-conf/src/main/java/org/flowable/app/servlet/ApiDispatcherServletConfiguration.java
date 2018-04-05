@@ -12,13 +12,12 @@
  */
 package org.flowable.app.servlet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -26,7 +25,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @ComponentScan(value = { "org.flowable.app.rest.api", "org.flowable.app.rest.exception" })
@@ -35,9 +34,6 @@ public class ApiDispatcherServletConfiguration extends WebMvcConfigurationSuppor
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @Autowired
-    protected Environment environment;
 
     @Bean
     public SessionLocaleResolver localeResolver() {

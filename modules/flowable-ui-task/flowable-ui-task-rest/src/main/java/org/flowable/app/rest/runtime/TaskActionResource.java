@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
+@RequestMapping("/app")
 public class TaskActionResource {
 
     @Autowired

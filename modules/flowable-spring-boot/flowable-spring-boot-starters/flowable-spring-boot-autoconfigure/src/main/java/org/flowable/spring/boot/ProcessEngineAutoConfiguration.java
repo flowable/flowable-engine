@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -26,20 +27,26 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
+import org.flowable.spring.boot.process.Process;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
+import org.flowable.spring.job.service.SpringRejectedJobsHandler;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -53,6 +60,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ConditionalOnProcessEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableMailProperties.class,
     FlowableProcessProperties.class,
     FlowableIdmProperties.class
 })
@@ -65,20 +73,43 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     @Autowired(required = false)
-    private List<ProcessEngineConfigurationConfigurer> processEngineConfigurationConfigurers = new ArrayList<>();
+    private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> processEngineConfigurationConfigurers = new ArrayList<>();
     protected final FlowableProcessProperties processProperties;
     protected final FlowableIdmProperties idmProperties;
+    protected final FlowableMailProperties mailProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
-        FlowableIdmProperties idmProperties) {
+        FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties) {
         super(flowableProperties);
         this.processProperties = processProperties;
         this.idmProperties = idmProperties;
+        this.mailProperties = mailProperties;
+    }
+
+    /**
+     * The Async Executor must not be shared between the engines.
+     * Therefore a dedicated one is always created.
+     */
+    @Bean
+    @Process
+    @ConfigurationProperties(prefix = "flowable.process.async.executor")
+    @ConditionalOnMissingBean(name = "processAsyncExecutor")
+    public SpringAsyncExecutor processAsyncExecutor(
+        ObjectProvider<TaskExecutor> taskExecutor,
+        @Process ObjectProvider<TaskExecutor> processTaskExecutor,
+        ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
+        @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
+    ) {
+        return new SpringAsyncExecutor(
+            getIfAvailable(processTaskExecutor, taskExecutor),
+            getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler)
+        );
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager, SpringAsyncExecutor springAsyncExecutor) throws IOException {
+    public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        @Process ObjectProvider<AsyncExecutor> asyncExecutorProvider) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
@@ -93,6 +124,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             conf.setDeploymentName(flowableProperties.getDeploymentName());
         }
 
+        AsyncExecutor springAsyncExecutor = asyncExecutorProvider.getIfUnique();
         if (springAsyncExecutor != null) {
             conf.setAsyncExecutor(springAsyncExecutor);
         }
@@ -106,14 +138,15 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
 
-        conf.setMailServerHost(flowableProperties.getMailServerHost());
-        conf.setMailServerPort(flowableProperties.getMailServerPort());
-        conf.setMailServerUsername(flowableProperties.getMailServerUserName());
-        conf.setMailServerPassword(flowableProperties.getMailServerPassword());
-        conf.setMailServerDefaultFrom(flowableProperties.getMailServerDefaultFrom());
-        conf.setMailServerUseSSL(flowableProperties.isMailServerUseSsl());
-        conf.setMailServerUseTLS(flowableProperties.isMailServerUseTls());
+        conf.setMailServerHost(mailProperties.getHost());
+        conf.setMailServerPort(mailProperties.getPort());
+        conf.setMailServerUsername(mailProperties.getUsername());
+        conf.setMailServerPassword(mailProperties.getPassword());
+        conf.setMailServerDefaultFrom(mailProperties.getDefaultFrom());
+        conf.setMailServerUseSSL(mailProperties.isUseSsl());
+        conf.setMailServerUseTLS(mailProperties.isUseTls());
 
+        conf.setEnableProcessDefinitionHistoryLevel(processProperties.isEnableProcessDefinitionHistoryLevel());
         conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
 
@@ -157,8 +190,14 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
     @Bean
     @ConditionalOnMissingBean
-    public ManagementService managementServiceBeanBean(ProcessEngine processEngine) {
+    public ManagementService managementServiceBean(ProcessEngine processEngine) {
         return processEngine.getManagementService();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public DynamicBpmnService dynamicBpmnServiceBean(ProcessEngine processEngine) {
+        return processEngine.getDynamicBpmnService();
     }
 
     @Bean

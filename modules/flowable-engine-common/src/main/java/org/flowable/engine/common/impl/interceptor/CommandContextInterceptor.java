@@ -54,7 +54,6 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         if (!config.isContextReusePossible() || commandContext == null || commandContext.getException() != null) {
             commandContext = commandContextFactory.createCommandContext(command);
             commandContext.setEngineConfigurations(engineConfigurations);
-            commandContext.setServiceConfigurations(serviceConfigurations);
             
         } else {
             LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());

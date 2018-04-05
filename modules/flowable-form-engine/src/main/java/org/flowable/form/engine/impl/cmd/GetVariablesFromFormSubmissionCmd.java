@@ -95,7 +95,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
 
     @SuppressWarnings("unchecked")
     protected Object transformFormFieldValueToVariableValue(FormField formField, Object formFieldValue) {
-
+        
         Object result = formFieldValue;
         if (formField.getType().equals(FormFieldTypes.DATE)) {
             if (StringUtils.isNotEmpty((String) formFieldValue)) {
@@ -110,21 +110,22 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
 
         } else if (formField.getType().equals(FormFieldTypes.INTEGER) && formFieldValue instanceof String) {
             String strFieldValue = (String) formFieldValue;
-            if (StringUtils.isNotEmpty(strFieldValue) && NumberUtils.isNumber(strFieldValue)) {
+            if (StringUtils.isNotEmpty(strFieldValue) && NumberUtils.isCreatable(strFieldValue)) {
                 result = Long.valueOf(strFieldValue);
 
             } else {
                 result = null;
             }
-        }
-            else if (formField.getType().equals(FormFieldTypes.DECIMAL) && formFieldValue instanceof String) {
-                String strFieldValue = (String) formFieldValue;
-                if (StringUtils.isNotEmpty(strFieldValue) && NumberUtils.isNumber(strFieldValue)) {
-                    result = Double.valueOf(strFieldValue);
+            
+        } else if (formField.getType().equals(FormFieldTypes.DECIMAL) && formFieldValue instanceof String) {
+            String strFieldValue = (String) formFieldValue;
+            if (StringUtils.isNotEmpty(strFieldValue) && NumberUtils.isCreatable(strFieldValue)) {
+                result = Double.valueOf(strFieldValue);
 
-                } else {
-                    result = null;
-                }
+            } else {
+                result = null;
+            }
+            
         } else if (formField.getType().equals(FormFieldTypes.AMOUNT) && formFieldValue instanceof String) {
             try {
                 result = Double.parseDouble((String) formFieldValue);
@@ -133,7 +134,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
                 result = null;
             }
 
-        } else if (formField.getType().equals(FormFieldTypes.DROPDOWN)) {
+        } else if (formField.getType().equals(FormFieldTypes.DROPDOWN) || formField.getType().equals(FormFieldTypes.RADIO_BUTTONS)) {
             if (formFieldValue instanceof Map<?, ?>) {
                 result = ((Map<?, ?>) formFieldValue).get("id");
                 if (result == null) {
@@ -141,7 +142,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
                     result = ((Map<?, ?>) formFieldValue).get("name");
                 }
             }
-
+            
         } else if (formField.getType().equals(FormFieldTypes.UPLOAD)) {
             result = (String) formFieldValue;
 
@@ -155,7 +156,7 @@ public class GetVariablesFromFormSubmissionCmd implements Command<Map<String, Ob
                 result = null;
             }
         }
-
+        
         // Default: no processing needs to be done, can be stored as-is
         return result;
     }

@@ -15,8 +15,8 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.List;
 
+import org.flowable.common.rest.api.AbstractPaginateList;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
 
 /**

@@ -21,7 +21,6 @@ import java.util.Map;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.AbstractServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,6 @@ public class CommandContext {
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations;
     protected AbstractEngineConfiguration currentEngineConfiguration;
-    protected Map<String, AbstractServiceConfiguration> serviceConfigurations;
     protected Command<?> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected Map<Class<?>, Session> sessions = new HashMap<>();
@@ -276,14 +274,6 @@ public class CommandContext {
             engineConfigurations = new HashMap<>();
         }
         engineConfigurations.put(engineKey, engineConfiguration);
-    }
-    
-    public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {
-        return serviceConfigurations;
-    }
-
-    public void setServiceConfigurations(Map<String, AbstractServiceConfiguration> serviceConfigurations) {
-        this.serviceConfigurations = serviceConfigurations;
     }
     
     // getters and setters

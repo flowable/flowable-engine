@@ -1,0 +1,100 @@
+<div class="modal" ng-controller="DecisionTableInputConditionEditorCtlr">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form name="inputExpressionForm">
+                <div class="modal-header"><h2>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.INPUT-TITLE' |
+                    translate}}</h2>
+                    <p>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.INPUT-DESCRIPTION' | translate}}</p>
+                </div>
+                <div class="modal-body">
+
+                    <div class="clearfix form-group"
+                         ng-class="{'has-error': inputExpressionForm.expressionLabel.$invalid}">
+                        <div class="col-xs-4">
+                            <label>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.EXPRESSION-LABEL' |
+                                translate}}</label>
+                        </div>
+                        <div class="col-xs-8">
+                            <input class="form-control" name="expressionLabel"
+                                   placeholder="{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.EXPRESSION-PLACEHOLDER' | translate}}"
+                                   type="text" ng-model="popup.selectedExpressionLabel" ng-disabled="model.readOnly"/>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div>
+                            <div class="clearfix form-group"
+                                 ng-class="{'has-error': inputExpressionForm.variableId.$invalid}">
+                                <div class="col-xs-4">
+                                    <label>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.EXPRESSION-VARIABLE-NAME' |
+                                        translate}}</label><span class="marker">*</span>
+                                </div>
+                                <div class="col-xs-8">
+                                    <input class="form-control"
+                                           placeholder="{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.EXPRESSION-VARIABLE-NAME-PLACEHOLDER' | translate}}"
+                                           type="text" ng-required="true" name="variableId"
+                                           ng-model="popup.selectedExpressionVariableId" ng-disabled="model.readOnly"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="clearfix form-group"
+                         ng-class="{'has-error': inputExpressionForm.variableType.$invalid}">
+                        <div class="col-xs-4">
+                            <label>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.EXPRESSION-VARIABLE-TYPE' |
+                                translate}}</label><span class="marker">*</span>
+                        </div>
+                        <div class="col-xs-8">
+                            <select class="form-control" ng-options="type for type in model.availableInputVariableTypes"
+                                    ng-model="popup.selectedExpressionVariableType" name="variableType"
+                                    ng-required="true" ng-disabled="model.readOnly"/>
+                        </div>
+                    </div>
+
+                    <div ng-if="popup.selectedExpressionVariableType != 'collection'">
+                        <div class="clearfix form-group">
+                            <div class="col-xs-4">
+                                <label>{{'DECISION-TABLE-EDITOR.POPUP.EXPRESSION-EDITOR.ALLOWED-VALUES' |
+                                    translate}}</label>
+                            </div>
+                            <div ng-if="!model.readOnly" class="col-xs-8">
+                                <hot-table hot-auto-destroy
+                                        hot-id="decision-table-allowed-values"
+                                        settings="popup.hotSettings"
+                                        datarows="popup.selectedExpressionInputValues"
+                                        columns="popup.columnDefs"
+                                        row-heights="30"
+                                        class-name="'htMiddle'"
+                                        min-spare-rows="1"
+                                        read-only="model.readOnly">
+                                </hot-table>
+                            </div>
+                            <div ng-if="model.readOnly" class="col-xs-8">
+                                <div ng-repeat="allowedValue in popup.selectedExpressionInputValues"><span style="font-size: 14px">{{allowedValue[0]}}</span><br></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-sm btn-default" ng-click="cancel()">
+                            {{'GENERAL.ACTION.CANCEL' | translate}}
+                        </button>
+                        <button ng-if="!model.readOnly" type="button" class="btn btn-sm btn-default" ng-click="save()"
+                                ng-disabled="!inputExpressionForm.$valid">
+                            {{'GENERAL.ACTION.SAVE' | translate}}
+                        </button>
+                    </div>
+                    <div class="loading pull-right" ng-show="model.loading">
+                        <div class="l1"></div>
+                        <div class="l2"></div>
+                        <div class="l2"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -20,6 +20,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.app.idm.properties.FlowableIdmAppProperties;
 import org.flowable.app.idm.service.PersistentTokenService;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
@@ -27,8 +28,6 @@ import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -73,7 +72,6 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     @Autowired
     private CustomUserDetailService customUserDetailService;
 
-    @Qualifier("defaultIdmIdentityService")
     @Autowired
     private IdmIdentityService identityService;
 
@@ -83,33 +81,26 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     private final long tokenRefreshDurationInMilliseconds;
 
     @Autowired
-    public CustomPersistentRememberMeServices(Environment env, org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
-        super(env.getProperty("security.rememberme.key"), userDetailsService);
+    public CustomPersistentRememberMeServices(FlowableIdmAppProperties properties,
+        org.springframework.security.core.userdetails.UserDetailsService userDetailsService) {
+        super(properties.getSecurity().getRememberMeKey(), userDetailsService);
 
         setAlwaysRemember(true);
 
-        Integer tokenMaxAgeSeconds = env.getProperty("security.cookie.max-age", Integer.class);
-        if (tokenMaxAgeSeconds != null) {
-            LOGGER.info("Cookie max-age set to {} seconds", tokenMaxAgeSeconds);
-        } else {
-            tokenMaxAgeSeconds = 2678400; // Default: 31 days
-        }
-        tokenMaxAgeInSeconds = tokenMaxAgeSeconds;
-        tokenMaxAgeInMilliseconds = tokenMaxAgeSeconds.longValue() * 1000L;
+        FlowableIdmAppProperties.Cookie cookie = properties.getSecurity().getCookie();
+        tokenMaxAgeInSeconds = cookie.getMaxAge();
+        LOGGER.info("Cookie max-age set to {} seconds", tokenMaxAgeInSeconds);
+        tokenMaxAgeInMilliseconds = tokenMaxAgeInSeconds * 1000L;
 
-        String domain = env.getProperty("security.cookie.domain", String.class);
+        String domain = cookie.getDomain();
         if (domain != null) {
             LOGGER.info("Cookie domain set to {}", domain);
         }
         tokenDomain = domain;
 
-        Integer tokenRefreshSeconds = env.getProperty("security.cookie.refresh-age", Integer.class);
-        if (tokenRefreshSeconds != null) {
-            LOGGER.info("Cookie refresh age set to {} seconds", tokenRefreshSeconds);
-        } else {
-            tokenRefreshSeconds = 86400; // Default : 1 day
-        }
-        tokenRefreshDurationInMilliseconds = tokenRefreshSeconds.longValue() * 1000L;
+        int tokenRefreshSeconds = cookie.getRefreshAge();
+        LOGGER.info("Cookie refresh age set to {} seconds", tokenRefreshSeconds);
+        tokenRefreshDurationInMilliseconds = cookie.getRefreshAge() * 1000L;
 
         setCookieName(CookieConstants.COOKIE_NAME);
     }
@@ -201,10 +192,13 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
             // has not been put into the token cache yet. Invalidate the token and refetch and it the new token value from the db is now returned.
 
             token = persistentTokenService.getPersistentToken(presentedSeries, true); // Note the 'true' here, which invalidates the cache before fetching
-            if (!presentedToken.equals(token.getTokenValue())) {
+            if (token != null && !presentedToken.equals(token.getTokenValue())) {
 
                 // Token doesn't match series value. Delete this session and throw an exception.
-                persistentTokenService.delete(token);
+                if (token != null) {
+                    persistentTokenService.delete(token);
+                }
+                
                 throw new CookieTheftException("Invalid remember-me token (Series/token) mismatch. Implies previous cookie theft attack.");
 
             }

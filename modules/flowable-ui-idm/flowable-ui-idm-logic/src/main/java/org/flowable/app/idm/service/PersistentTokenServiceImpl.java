@@ -25,14 +25,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import org.flowable.app.properties.FlowableCommonAppProperties;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 @Service
 @Transactional
@@ -54,9 +54,8 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
     private SecureRandom random;
 
     @Autowired
-    private Environment environment;
+    private FlowableCommonAppProperties properties;
 
-    @Qualifier("defaultIdmIdentityService")
     @Autowired
     private IdmIdentityService idmIdentityService;
 
@@ -70,9 +69,10 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
 
     @PostConstruct
     protected void initTokenCache() {
-        Long maxSize = environment.getProperty("cache.login-users.max.size", Long.class);
-        Long maxAge = environment.getProperty("cache.login-users.max.age", Long.class);
-        tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize != null ? maxSize : 2048).expireAfterWrite(maxAge != null ? maxAge : 30, TimeUnit.SECONDS).recordStats()
+        FlowableCommonAppProperties.Cache cacheLoginUsers = properties.getCacheLoginUsers();
+        long maxSize = cacheLoginUsers.getMaxSize();
+        long maxAge = cacheLoginUsers.getMaxAge();
+        tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(maxAge, TimeUnit.SECONDS).recordStats()
                 .build(new CacheLoader<String, Token>() {
 
                     public Token load(final String tokenId) throws Exception {

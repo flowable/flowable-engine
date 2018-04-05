@@ -18,11 +18,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.impl.ProcessDefinitionQueryProperty;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
-import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

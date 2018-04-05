@@ -25,6 +25,12 @@ public class PlanItemRule extends CaseElement {
 
     public void setCondition(String condition) {
         this.condition = condition;
-    }   
-    
+    }
+
+    @Override
+    public String toString() {
+        return "PlanItemRule{" +
+                "condition='" + condition + '\'' +
+                "} " + super.toString();
+    }
 }

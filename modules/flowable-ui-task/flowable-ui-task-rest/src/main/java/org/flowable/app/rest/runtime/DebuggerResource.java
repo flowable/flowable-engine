@@ -12,16 +12,21 @@
  */
 package org.flowable.app.rest.runtime;
 
-import java.util.Collection;
-
 import org.flowable.app.model.debugger.BreakpointRepresentation;
+import org.flowable.app.model.debugger.ExecutionRepresentation;
+import org.flowable.app.service.debugger.DebuggerRestVariable;
 import org.flowable.app.service.debugger.DebuggerService;
+import org.flowable.engine.event.EventLogEntry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * REST controller for managing a debugger requests.
@@ -29,10 +34,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @author martin.grofcik
  */
 @RestController
+@RequestMapping("/app")
 public class DebuggerResource {
 
     @Autowired
     protected DebuggerService debuggerService;
+
+    @Autowired
+    protected Environment environment;
 
     @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.GET, produces = "application/json")
     public Collection<BreakpointRepresentation> getBreakpoints() {
@@ -52,6 +61,26 @@ public class DebuggerResource {
     @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.DELETE)
     public void deleteBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
         debuggerService.removeBreakpoint(breakpointRepresentation);
+    }
+
+    @RequestMapping(value = "/rest/debugger/eventlog/{processInstanceId}", method = RequestMethod.GET)
+    public List<EventLogEntry> getEventLog(@PathVariable String processInstanceId) {
+        return debuggerService.getProcessInstanceEventLog(processInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/debugger/variables/{executionId}", method = RequestMethod.GET)
+    public List<DebuggerRestVariable> getExecutionVariables(@PathVariable String executionId) {
+        return debuggerService.getExecutionVariables(executionId);
+    }
+
+    @RequestMapping(value = "/rest/debugger/executions/{processInstanceId}", method = RequestMethod.GET)
+    public List<ExecutionRepresentation> getExecutions(@PathVariable String processInstanceId) {
+        return debuggerService.getExecutions(processInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/debugger", method = RequestMethod.GET)
+    public boolean isDebuggerAllowed() {
+        return environment.getProperty("flowable.experimental.debugger.enabled", Boolean.class, false);
     }
 
 }

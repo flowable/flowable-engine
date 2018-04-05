@@ -166,6 +166,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     public ClassDelegate createClassDelegateServiceTask(ServiceTask serviceTask) {
         return classDelegateFactory.create(serviceTask.getId(), serviceTask.getImplementation(),
                 createFieldDeclarations(serviceTask.getFieldExtensions()),
+                serviceTask.isTriggerable(),
                 getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());
     }
 
@@ -174,7 +175,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
         Expression delegateExpression = expressionManager.createExpression(serviceTask.getImplementation());
         return new ServiceTaskDelegateExpressionActivityBehavior(serviceTask.getId(), delegateExpression,
                 getSkipExpressionFromServiceTask(serviceTask), createFieldDeclarations(serviceTask.getFieldExtensions()),
-                serviceTask.getMapExceptions());
+                serviceTask.getMapExceptions(), serviceTask.isTriggerable());
     }
 
     @Override
