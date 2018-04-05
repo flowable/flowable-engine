@@ -17,17 +17,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 
 @Configuration
-@PropertySources({
-        // For backwards compatibility (pre 6.3.0)
-        @PropertySource(value = "classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true)
-        
-})
 @ComponentScan(basePackages = {
         "org.flowable.admin.repository",
         "org.flowable.admin.service",
