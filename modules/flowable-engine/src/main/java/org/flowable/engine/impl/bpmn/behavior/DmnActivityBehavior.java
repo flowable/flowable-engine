@@ -143,8 +143,13 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 				DmnResponseHandler handler = (DmnResponseHandler) handlerClass.newInstance();
 				handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue);
 			} catch (ClassNotFoundException e) {
+                throw new FlowableException("DMN response handler with reference " + handlerName + " is not found.");
 			} catch (InstantiationException e) {
+				throw new FlowableException("DMN response handler with reference " + handlerName + " could not be instatiated.");
 			} catch (IllegalAccessException e) {
+				throw new FlowableException("DMN response handler with reference " + handlerName + " is not accessible.");
+			} catch (ClassCastException e) {
+				throw new FlowableException("DMN response handler with reference " + handlerName + " is not an instance of DmnResponseHandler.");
 			}
         }
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
