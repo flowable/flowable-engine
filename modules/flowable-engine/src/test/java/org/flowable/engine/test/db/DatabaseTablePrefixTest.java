@@ -89,8 +89,8 @@ public class DatabaseTablePrefixTest extends TestCase {
 
         // create two schemas is the database
         Connection connection = pooledDataSource.getConnection();
-        connection.createStatement().execute("drop schema if exists SCHEMA1");
-        connection.createStatement().execute("drop schema if exists SCHEMA2");
+        connection.createStatement().execute("drop schema if exists SCHEMA1 cascade");
+        connection.createStatement().execute("drop schema if exists SCHEMA2 cascade");
         connection.createStatement().execute("create schema SCHEMA1");
         connection.createStatement().execute("create schema SCHEMA2");
         connection.close();
