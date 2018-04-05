@@ -73,6 +73,12 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter implements 
         decisionTableThrowErrorOnNoHitsField.setFieldName(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
         decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
         serviceTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
+        
+        String decisionTableUpdatedVariableNode = getPropertyValueAsString(PROPERTY_DECISIONTABLE_UPDATED_VARIABLE, elementNode);
+        FieldExtension decisionTableUpdatedVariableField = new FieldExtension();
+        decisionTableUpdatedVariableField.setFieldName(PROPERTY_DECISIONTABLE_UPDATED_VARIABLE_KEY);
+        decisionTableUpdatedVariableField.setStringValue(decisionTableUpdatedVariableNode);
+        serviceTask.getFieldExtensions().add(decisionTableUpdatedVariableField);
 
         return serviceTask;
     }

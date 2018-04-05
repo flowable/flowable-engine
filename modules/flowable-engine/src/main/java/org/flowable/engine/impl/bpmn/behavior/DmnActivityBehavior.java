@@ -46,6 +46,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
+    protected static final String EXPRESSION_DECISION_TABLE_UPDATE_VARIABLE = "decisionTaskUpdatedVariable";
 
     protected Task task;
     
@@ -138,11 +139,18 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                 }
             }
         }
-        
+        //Call custom decision table response handler if present
+        FieldExtension handlerFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_UPDATE_VARIABLE);
+        String handlerName = handlerFieldExtension.getStringValue();
+        try {
+			Class<?> handlerClass = Class.forName(handlerName);
+			DmnResponseHandler handler = (DmnResponseHandler) handlerClass.newInstance();
+			handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue);
+		} catch (ClassNotFoundException e) {
+		} catch (InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		}
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
-        if(responseHandler != null) {
-        		responseHandler.handleResponse(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution);
-        }
         leave(execution);
     }
 

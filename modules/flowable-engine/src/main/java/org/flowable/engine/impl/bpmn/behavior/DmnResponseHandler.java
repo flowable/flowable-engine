@@ -6,7 +6,7 @@ import java.util.Map;
 import org.flowable.engine.delegate.DelegateExecution;
 
 public interface DmnResponseHandler {
-
-	Map<String, Object> handleResponse(List<Map<String, Object>> decisionResult, String finaldecisionTableKeyValue, DelegateExecution execution);
+	
+	public void handleResponse(DelegateExecution execution, List<Map<String, Object>> decisionResult, String finaldecisionTableKeyValue);
 
 }
