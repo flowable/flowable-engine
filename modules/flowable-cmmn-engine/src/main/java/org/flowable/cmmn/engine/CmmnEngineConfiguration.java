@@ -304,8 +304,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected boolean isEnableTaskRelationshipCounts = true;
-    protected int taskQueryLimit;
-    protected int historicTaskQueryLimit;
+    protected int taskQueryLimit = 20000;
+    protected int historicTaskQueryLimit = 20000;
 
     protected int caseQueryLimit = 20000;
     protected int historicCaseQueryLimit = 20000;
