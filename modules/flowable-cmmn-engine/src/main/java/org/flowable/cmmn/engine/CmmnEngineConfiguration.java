@@ -306,8 +306,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected boolean isEnableTaskRelationshipCounts = true;
-    protected int taskQueryLimit;
-    protected int historicTaskQueryLimit;
+    protected int taskQueryLimit = 20000;
+    protected int historicTaskQueryLimit = 20000;
 
     protected int caseQueryLimit = 20000;
     protected int historicCaseQueryLimit = 20000;
@@ -937,7 +937,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             resolverFactories.add(new BeansResolverFactory());
         }
         if (scriptingEngines == null) {
-            
+
             scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
         }
     }
@@ -1123,7 +1123,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
 
         this.taskServiceConfiguration.init();
-        
+
         if (dbSqlSessionFactory != null && taskServiceConfiguration.getTaskDataManager() instanceof AbstractDataManager) {
             dbSqlSessionFactory.addLogicalEntityClassMapping("task", ((AbstractDataManager) taskServiceConfiguration.getTaskDataManager()).getManagedEntityClass());
         }
@@ -1195,7 +1195,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (customAsyncRunnableExecutionExceptionHandlers != null) {
             exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
         }
-        
+
         if (this.internalJobParentStateResolver != null) {
             this.jobServiceConfiguration.setJobParentStateResolver(this.internalJobParentStateResolver);
         } else {
@@ -1337,7 +1337,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.cmmnHistoryService = cmmnHistoryService;
         return this;
     }
-    
+
     public IdmIdentityService getIdmIdentityService() {
         return ((IdmEngineConfiguration) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
