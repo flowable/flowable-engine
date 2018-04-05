@@ -389,11 +389,13 @@
 				    for (var i = 0; i < modelElements.length; i++)
 				    {
 				    	var element = modelElements[i];
-				    	//try {
+				    	try {
 				    		//console.log(element.type);
 				    		var drawFunction = eval("_draw" + element.type);
 				    		drawFunction(element);
-				    	//} catch(err) {console.log(err);}
+				    	} catch (err) {
+							console.warn(err);
+						}
 				    }
 				    
 				    if (data.flows)
