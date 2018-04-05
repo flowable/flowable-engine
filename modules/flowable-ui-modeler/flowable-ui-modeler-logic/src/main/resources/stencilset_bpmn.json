@@ -1143,7 +1143,7 @@
       "type" : "String",
       "title" : "Decision table custom response handler",
       "value" : "",
-      "description" : "Refernce to class that has response handling logic.",
+      "description" : "Reference to class that has response handling logic.",
       "popular" : true
     } ]
   }, {

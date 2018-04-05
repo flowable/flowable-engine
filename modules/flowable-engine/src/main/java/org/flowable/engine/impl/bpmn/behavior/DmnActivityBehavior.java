@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +32,6 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,9 +47,6 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     protected static final String EXPRESSION_DECISION_TABLE_RESPONCE_HANDLER = "decisionTaskReponseHandler";
 
     protected Task task;
-    
-    @Autowired(required = false)
-    DmnResponseHandler responseHandler;
 
     public DmnActivityBehavior(Task task) {
         this.task = task;
