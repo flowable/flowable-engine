@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,7 +55,8 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         task.ifPresent(taskInstance -> this.cmmnTaskService.deleteTask(taskInstance.getId(), true));
     }
 
-    public void testCreateTaskWithBuilder() {
+    @Test
+    public void createTaskWithBuilder() {
         task = Optional.of(
                 this.cmmnTaskService.createTaskBuilder().
                         name("testName").
@@ -88,7 +89,8 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
     }
 
-    public void testCreateTaskWithBuilderAndPostprocessor() {
+    @Test
+    public void createTaskWithBuilderAndPostprocessor() {
         TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.cmmnEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
         UnaryOperator<TaskInfo> previousTaskBuilderPostProcessor = taskServiceConfiguration.getTaskBuilderPostProcessor();
         taskServiceConfiguration.setTaskBuilderPostProcessor(TestTaskInfoWrapper::new);
@@ -98,13 +100,17 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                         create()
         );
         assertTrue(task.isPresent());
-        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.get().getId()).includeIdentityLinks().singleResult();
+        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.orElseThrow(AssertionError::new).getId()).includeIdentityLinks().singleResult();
         assertThat(updatedTask, notNullValue());
         assertThat(updatedTask.getName(), is("testName"));
         assertThat(updatedTask.getIdentityLinks().size(), is(2));
+        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.orElseThrow(AssertionError::new).getId()).includeIdentityLinks().singleResult();
+        assertThat(historicTaskInstance, notNullValue());
+        assertThat(historicTaskInstance.getName(), is("testName"));
+        assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
 
-        cmmnTaskService.deleteUserIdentityLink(task.get().getId(), "testUser", IdentityLinkType.CANDIDATE);
-        cmmnTaskService.deleteGroupIdentityLink(task.get().getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
+        cmmnTaskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
         taskServiceConfiguration.setTaskBuilderPostProcessor(previousTaskBuilderPostProcessor);
     }
 
@@ -117,16 +123,16 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertEquals("The Task", task.getName());
         assertEquals("This is a test documentation", task.getDescription());
         assertEquals("johnDoe", task.getAssignee());
-        
+
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertNotNull(historicTaskInstance);
             assertNull(historicTaskInstance.getEndTime());
         }
-        
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
-        
+
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertNotNull(historicTaskInstance);
@@ -135,7 +141,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertNotNull(historicTaskInstance.getEndTime());
         }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testOneHumanTaskExpressionCase() {
@@ -149,10 +155,10 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertEquals("The Task A", task.getName());
         assertEquals("This is a test YES", task.getDescription());
         assertEquals("johnDoe", task.getAssignee());
-        
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
-        
+
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertNotNull(historicTaskInstance);
@@ -161,19 +167,19 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertNotNull(historicTaskInstance.getEndTime());
         }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTriggerOneHumanTaskCaseProgrammatically() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        
+
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().singleResult();
         assertEquals(planItemInstance.getId(), task.getSubScopeId());
         assertEquals(planItemInstance.getCaseInstanceId(), task.getScopeId());
         assertEquals(planItemInstance.getCaseDefinitionId(), task.getScopeDefinitionId());
         assertEquals(ScopeTypes.CMMN, task.getScopeType());
-        
+
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertEquals(0, cmmnTaskService.createTaskQuery().count());
         assertCaseInstanceEnded(caseInstance);

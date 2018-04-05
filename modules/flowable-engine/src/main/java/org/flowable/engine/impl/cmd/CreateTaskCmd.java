@@ -9,7 +9,7 @@ import org.flowable.task.api.TaskInfo;
 
 /**
  * Creates new task by {@link org.flowable.task.api.TaskBuilder}
- * 
+ *
  * @author martin.grofcik
  */
 public class CreateTaskCmd implements Command<Task> {
@@ -21,9 +21,6 @@ public class CreateTaskCmd implements Command<Task> {
 
     @Override
     public Task execute(CommandContext commandContext) {
-        Task task = CommandContextUtil.getTaskService().createTask(this.taskTemplate);
-        // todo  check better way for history update.
-        task.getIdentityLinks().forEach( identityLink -> CommandContextUtil.getHistoryManager().recordIdentityLinkCreated((IdentityLinkEntity) identityLink));
-        return task;
+        return CommandContextUtil.getTaskService().createTask(this.taskTemplate);
     }
 }

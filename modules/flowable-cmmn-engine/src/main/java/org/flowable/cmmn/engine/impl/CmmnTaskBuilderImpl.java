@@ -17,7 +17,7 @@ public class CmmnTaskBuilderImpl extends BaseTaskBuilderImpl {
 
     @Override
     public Task create() {
-        return commandExecutor.execute(new CreateCmmnTaskCmd(new TemplateTaskInfo()));
+        return commandExecutor.execute(new CreateCmmnTaskCmd(this));
     }
 
 }

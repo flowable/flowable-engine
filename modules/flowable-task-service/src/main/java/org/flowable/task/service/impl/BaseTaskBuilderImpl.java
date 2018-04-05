@@ -13,10 +13,10 @@ import org.flowable.task.api.TaskInfo;
 
 /**
  * Base implementation of the {@link TaskBuilder} interface
- * 
+ *
  * @author martin.grofcik
  */
-public abstract class BaseTaskBuilderImpl implements TaskBuilder {
+public abstract class BaseTaskBuilderImpl implements TaskBuilder, TaskInfo {
     protected CommandExecutor commandExecutor;
     protected String id;
     protected String name;
@@ -117,130 +117,129 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder {
         return this;
     }
 
-    public class TemplateTaskInfo implements TaskInfo {
-        @Override
-        public String getId() {
-            return id;
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String getDescription() {
-            return description;
-        }
-
-        @Override
-        public int getPriority() {
-            return priority;
-        }
-
-        @Override
-        public String getOwner() {
-            return ownerId;
-        }
-
-        @Override
-        public String getAssignee() {
-            return assigneeId;
-        }
-
-        @Override
-        public String getProcessInstanceId() {
-            return null;
-        }
-
-        @Override
-        public String getExecutionId() {
-            return null;
-        }
-
-        @Override
-        public String getTaskDefinitionId() {
-            return taskDefinitionId;
-        }
-
-        @Override
-        public String getProcessDefinitionId() {
-            return null;
-        }
-
-        @Override
-        public String getScopeId() {
-            return null;
-        }
-
-        @Override
-        public String getSubScopeId() {
-            return null;
-        }
-
-        @Override
-        public String getScopeType() {
-            return null;
-        }
-
-        @Override
-        public String getScopeDefinitionId() {
-            return null;
-        }
-
-        @Override
-        public Date getCreateTime() {
-            return null;
-        }
-
-        @Override
-        public String getTaskDefinitionKey() {
-            return taskDefinitionKey;
-        }
-
-        @Override
-        public Date getDueDate() {
-            return dueDate;
-        }
-
-        @Override
-        public String getCategory() {
-            return category;
-        }
-
-        @Override
-        public String getParentTaskId() {
-            return parentTaskId;
-        }
-
-        @Override
-        public String getTenantId() {
-            return tenantId;
-        }
-
-        @Override
-        public String getFormKey() {
-            return formKey;
-        }
-
-        @Override
-        public Map<String, Object> getTaskLocalVariables() {
-            return null;
-        }
-
-        @Override
-        public Map<String, Object> getProcessVariables() {
-            return null;
-        }
-
-        @Override
-        public List<? extends IdentityLinkInfo> getIdentityLinks() {
-            return Collections.EMPTY_LIST;
-        }
-
-        @Override
-        public Date getClaimTime() {
-            return null;
-        }
+    @Override
+    public String getId() {
+        return id;
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
+    }
+
+    @Override
+    public String getOwner() {
+        return ownerId;
+    }
+
+    @Override
+    public String getAssignee() {
+        return assigneeId;
+    }
+
+    @Override
+    public String getProcessInstanceId() {
+        return null;
+    }
+
+    @Override
+    public String getExecutionId() {
+        return null;
+    }
+
+    @Override
+    public String getTaskDefinitionId() {
+        return taskDefinitionId;
+    }
+
+    @Override
+    public String getProcessDefinitionId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getSubScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeType() {
+        return null;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return null;
+    }
+
+    @Override
+    public Date getCreateTime() {
+        return null;
+    }
+
+    @Override
+    public String getTaskDefinitionKey() {
+        return taskDefinitionKey;
+    }
+
+    @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public String getParentTaskId() {
+        return parentTaskId;
+    }
+
+    @Override
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    @Override
+    public String getFormKey() {
+        return formKey;
+    }
+
+    @Override
+    public Map<String, Object> getTaskLocalVariables() {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getProcessVariables() {
+        return null;
+    }
+
+    @Override
+    public List<? extends IdentityLinkInfo> getIdentityLinks() {
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return null;
+    }
+
 }

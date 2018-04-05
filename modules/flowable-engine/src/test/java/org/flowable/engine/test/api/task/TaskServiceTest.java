@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,7 +70,7 @@ import org.junit.Test;
  */
 public class TaskServiceTest extends PluggableFlowableTestCase {
     private Optional<Task> task = Optional.empty();
-    
+
     public void tearDown() throws Exception {
         super.tearDown();
         task.ifPresent(taskInstance -> taskService.deleteTask(taskInstance.getId(), true));
@@ -119,14 +119,18 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
                         name("testName").
                         create()
         );
-        assertTrue(task.isPresent());
-        Task updatedTask = taskService.createTaskQuery().taskId(task.get().getId()).includeIdentityLinks().singleResult();
+        Task updatedTask = taskService.createTaskQuery().taskId(
+                task.orElseThrow(() -> new AssertionError("task must be present")).getId()).includeIdentityLinks().singleResult();
         assertThat(updatedTask, notNullValue());
         assertThat(updatedTask.getName(), is("testName"));
         assertThat(updatedTask.getIdentityLinks().size(), is(2));
-        
-        taskService.deleteUserIdentityLink(task.get().getId(), "testUser", IdentityLinkType.CANDIDATE);
-        taskService.deleteGroupIdentityLink(task.get().getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.orElseThrow(AssertionError::new).getId()).includeIdentityLinks().singleResult();
+        assertThat(historicTaskInstance, notNullValue());
+        assertThat(historicTaskInstance.getName(), is("testName"));
+        assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
+
+        taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
+        taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
         taskServiceConfiguration.setTaskBuilderPostProcessor(previousTaskBuilderPostProcessor);
     }
 
@@ -273,7 +277,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.deleteTask(taskId, true);
         }
     }
-    
+
     public void testUpdateTaskComments() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = taskService.newTask();
@@ -287,14 +291,14 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
             assertEquals(CommentEntity.TYPE_COMMENT, comment.getType());
             assertNotNull(taskService.getComment(comment.getId()));
-            
+
             List<Comment> regularComments = taskService.getTaskComments(taskId);
             assertEquals(1, regularComments.size());
             assertEquals("This is a regular comment", regularComments.get(0).getFullMessage());
 
             comment.setFullMessage("Updated comment");
             taskService.saveComment(comment);
-            
+
             regularComments = taskService.getTaskComments(taskId);
             assertEquals(1, regularComments.size());
             assertEquals("Updated comment", regularComments.get(0).getFullMessage());
@@ -326,7 +330,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.deleteTask(taskId);
 
             assertEquals(0, taskService.getTaskComments(taskId).size());
-            
+
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
             assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).list().size());
 
@@ -356,9 +360,9 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.deleteTask(taskId);
 
             assertEquals(0, taskService.getTaskComments(taskId).size());
-            
+
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
-            
+
             assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).list().size());
 
             taskService.deleteTask(taskId, true);
@@ -1430,7 +1434,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         processEngineConfiguration.setEnableTaskRelationshipCounts(true);
         TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
         taskServiceConfiguration.setEnableTaskRelationshipCounts(true);
-        
+
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         org.flowable.task.api.Task currentTask = taskService.createTaskQuery().singleResult();
 
@@ -1540,7 +1544,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.setVariable(task.getId(), "variable1", "value1");
             Thread.sleep(50L); // to make sure the times for ordering below are different.
             taskService.setVariable(task.getId(), "variable1", "value2");
-            
+
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             HistoricActivityInstance historicActivitiInstance = historyService.createHistoricActivityInstanceQuery()
@@ -1605,7 +1609,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             assertNotNull(task.getId());
 
             taskService.deleteTask(task.getId(), "deleted for testing purposes");
-            
+
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
@@ -1994,7 +1998,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             IdentityLinkEntityImpl identityLinkEntityCandidateGroup = new IdentityLinkEntityImpl();
             identityLinkEntityCandidateGroup.setGroupId("testGroup");
             identityLinkEntityCandidateGroup.setType(IdentityLinkType.CANDIDATE);
-            
+
             return Arrays.asList(
                     identityLinkEntityCandidateUser,
                     identityLinkEntityCandidateGroup

@@ -47,6 +47,7 @@ import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.callback.DefaultInternalCmmnJobManager;
+import org.flowable.cmmn.engine.impl.cfg.DefaultTaskAssignmentManager;
 import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
@@ -168,6 +169,7 @@ import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
@@ -305,6 +307,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
+    protected InternalTaskAssignmentManager internalTaskAssignmentManager;
     protected boolean isEnableTaskRelationshipCounts = true;
     protected int taskQueryLimit = 20000;
     protected int historicTaskQueryLimit = 20000;
@@ -1116,6 +1119,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(this.internalTaskVariableScopeResolver);
         } else {
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultCmmnTaskVariableScopeResolver(this));
+        }
+
+        if (this.internalTaskAssignmentManager != null) {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
+        } else {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
         }
 
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.isEnableTaskRelationshipCounts);

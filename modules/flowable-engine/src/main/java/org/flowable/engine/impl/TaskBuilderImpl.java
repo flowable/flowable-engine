@@ -16,7 +16,7 @@ public class TaskBuilderImpl extends BaseTaskBuilderImpl {
 
     @Override
     public Task create() {
-        return commandExecutor.execute(new CreateTaskCmd(new TemplateTaskInfo()));
+        return commandExecutor.execute(new CreateTaskCmd(this));
     }
 
 }
