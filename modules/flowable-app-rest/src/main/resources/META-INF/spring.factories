@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  org.flowable.rest.app.properties.BackwardsCompatiblePropertiesLoader
