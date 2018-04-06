@@ -440,39 +440,32 @@
                 <plugins>
                     <plugin>
                         <groupId>com.spotify</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.4.13</version>
-                        <configuration>
-                            <imageName>flowable/${project.build.finalName}</imageName>
-                            <baseImage>flowable/java8_server</baseImage>
-                            <entryPoint>["java", "-jar", "/${project.build.finalName}.war"]</entryPoint>
-                            <forceTags>true</forceTags>
-                            <imageTags>
-                                <imageTag>${project.version}</imageTag>
-                                <imageTag>latest</imageTag>
-                            </imageTags>
-                            <resources>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${project.build.directory}</directory>
-                                    <include>${project.build.finalName}.war</include>
-                                </resource>
-                                <resource>
-                                  <targetPath>/</targetPath>
-                                  <directory>${project.basedir}/src/main/docker</directory>
-                                  <include>wait-for-something.sh</include>
-                                </resource>
-                            </resources>
-                        </configuration>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <version>1.4.0</version>
                         <executions>
                             <execution>
-                                <id>build-image</id>
-                                <phase>package</phase>
+                                <id>default</id>
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
                             </execution>
+                            <execution>
+                                <id>tag</id>
+                                <goals>
+                                    <goal>tag</goal>
+                                </goals>
+                                <configuration>
+                                    <tag>latest</tag>
+                                </configuration>
+                            </execution>
                         </executions>
+                        <configuration>
+                            <repository>flowable/${project.build.finalName}</repository>
+                            <tag>${project.version}</tag>
+                            <buildArgs>
+                                <WAR_FILE>${project.build.finalName}.war</WAR_FILE>
+                            </buildArgs>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
