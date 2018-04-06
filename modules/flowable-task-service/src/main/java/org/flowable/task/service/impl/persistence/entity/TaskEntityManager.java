@@ -12,23 +12,24 @@
  */
 package org.flowable.task.service.impl.persistence.entity;
 
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.impl.TaskQueryImpl;
+
+import java.util.List;
+import java.util.Map;
 
 public interface TaskEntityManager extends EntityManager<TaskEntity> {
 
     /**
      * Creates {@link TaskEntity} according to {@link TaskInfo} template
      *
-     * @param taskTemplate template to use when the task is created
+     * @param taskBuilder template to use when the task is created
      * @return created task entity
      */
-    TaskEntity createTask(TaskInfo taskTemplate);
+    TaskEntity createTask(TaskBuilder taskBuilder);
 
     void changeTaskAssignee(TaskEntity taskEntity, String assignee);
 

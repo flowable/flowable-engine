@@ -171,6 +171,7 @@ import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
+import org.flowable.task.service.TaskBuilderPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.db.TaskDbSchemaManager;
@@ -554,7 +555,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     /**
      * postprocessor for a task builder
      */
-    protected UnaryOperator<TaskInfo> taskBuilderPostProcessor = UnaryOperator.identity();
+    protected TaskBuilderPostProcessor taskBuilderPostProcessor = taskBuilder -> taskBuilder;
 
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -2316,11 +2317,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskIdGenerator = taskIdGenerator;
     }
 
-    public UnaryOperator<TaskInfo> getTaskBuilderPostProcessor() {
+    public TaskBuilderPostProcessor getTaskBuilderPostProcessor() {
         return taskBuilderPostProcessor;
     }
 
-    public void setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor) {
+    public void setTaskBuilderPostProcessor(TaskBuilderPostProcessor processor) {
         this.taskBuilderPostProcessor = processor;
     }
 

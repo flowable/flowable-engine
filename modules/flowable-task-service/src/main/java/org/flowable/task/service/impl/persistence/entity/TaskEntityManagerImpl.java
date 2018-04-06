@@ -19,7 +19,7 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
@@ -59,23 +59,23 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
 
     @Override
-    public TaskEntity createTask(TaskInfo taskTemplate) {
+    public TaskEntity createTask(TaskBuilder taskBuilder) {
         // create and insert task
-        TaskInfo task = this.taskServiceConfiguration.getTaskBuilderPostProcessor().apply(taskTemplate);
+        TaskBuilder enrichedTaskBuilder = this.taskServiceConfiguration.getTaskBuilderPostProcessor().enrichTaskBuilder(taskBuilder);
         TaskEntity taskEntity = create();
-        taskEntity.setId(task.getId());
-        taskEntity.setName(task.getName());
-        taskEntity.setDescription(task.getDescription());
-        taskEntity.setPriority(task.getPriority());
-        taskEntity.setOwner(task.getOwner());
-        taskEntity.setAssignee(task.getAssignee());
-        taskEntity.setDueDate(task.getDueDate());
-        taskEntity.setCategory(task.getCategory());
-        taskEntity.setParentTaskId(task.getParentTaskId());
-        taskEntity.setTenantId(task.getTenantId());
-        taskEntity.setFormKey(task.getFormKey());
-        taskEntity.setTaskDefinitionId(task.getTaskDefinitionId());
-        taskEntity.setTaskDefinitionKey(task.getTaskDefinitionKey());
+        taskEntity.setId(enrichedTaskBuilder.getId());
+        taskEntity.setName(enrichedTaskBuilder.getName());
+        taskEntity.setDescription(enrichedTaskBuilder.getDescription());
+        taskEntity.setPriority(enrichedTaskBuilder.getPriority());
+        taskEntity.setOwner(enrichedTaskBuilder.getOwner());
+        taskEntity.setAssignee(enrichedTaskBuilder.getAssignee());
+        taskEntity.setDueDate(enrichedTaskBuilder.getDueDate());
+        taskEntity.setCategory(enrichedTaskBuilder.getCategory());
+        taskEntity.setParentTaskId(enrichedTaskBuilder.getParentTaskId());
+        taskEntity.setTenantId(enrichedTaskBuilder.getTenantId());
+        taskEntity.setFormKey(enrichedTaskBuilder.getFormKey());
+        taskEntity.setTaskDefinitionId(enrichedTaskBuilder.getTaskDefinitionId());
+        taskEntity.setTaskDefinitionKey(enrichedTaskBuilder.getTaskDefinitionKey());
         insert(taskEntity);
 
         if (taskServiceConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
@@ -83,7 +83,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         }
 
         // create task's identity links
-        task.getIdentityLinks().forEach(
+        enrichedTaskBuilder.getIdentityLinks().forEach(
                 identityLink -> {
                     IdentityLinkEntity taskIdentityLink = getIdentityLinkService().createTaskIdentityLink(
                             taskEntity.getId(), identityLink.getUserId(), identityLink.getGroupId(), identityLink.getType()

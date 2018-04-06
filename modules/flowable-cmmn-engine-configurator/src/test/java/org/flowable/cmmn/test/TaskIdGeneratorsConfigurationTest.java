@@ -15,6 +15,7 @@ package org.flowable.cmmn.test;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
@@ -111,18 +112,22 @@ public class TaskIdGeneratorsConfigurationTest extends AbstractProcessEngineInte
 
     @Test
     public void testDeleteTasks() {
-        Optional<Task> processEngineTask = Optional.empty();
-        Optional<Task> cmmnEngineTask = Optional.empty();
+        Task processEngineTask = null;
+        Task cmmnEngineTask = null;
         try {
-            processEngineTask = Optional.of(this.processEngineTaskService.createTaskBuilder().name("process engine task").create());
-            assertTrue(processEngineTask.isPresent());
+            processEngineTask = this.processEngineTaskService.createTaskBuilder().name("process engine task").create();
+            assertNotNull(processEngineTask);
 
-            cmmnEngineTask = Optional.of(this.cmmnTaskService.createTaskBuilder().name("cmmn engine task").create());
-            assertTrue(cmmnEngineTask.isPresent());
+            cmmnEngineTask = this.cmmnTaskService.createTaskBuilder().name("cmmn engine task").create();
+            assertNotNull(cmmnEngineTask);
         } finally {
-            //processTaskService can delete cmmn task and cmmnTaskService can delete process task 
-            processEngineTask.ifPresent(task -> cmmnTaskService.deleteTask(task.getId(), true));
-            cmmnEngineTask.ifPresent(task -> processEngineTaskService.deleteTask(task.getId(), true));
+            //processTaskService can delete cmmn task and cmmnTaskService can delete process task
+            if (processEngineTask != null) {
+                cmmnTaskService.deleteTask(processEngineTask.getId(), true);
+            }
+            if (cmmnEngineTask != null) {
+                processEngineTaskService.deleteTask(cmmnEngineTask.getId(), true);
+            }
         }
     }
 

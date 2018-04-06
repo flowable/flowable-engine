@@ -72,8 +72,8 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected int historicTaskQueryLimit;
     
     protected IdGenerator idGenerator;
-    
-    protected UnaryOperator<TaskInfo> taskBuilderPostProcessor;
+
+    protected TaskBuilderPostProcessor taskBuilderPostProcessor;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initTaskBuilderPostProcessor() {
         if (taskBuilderPostProcessor == null) {
-            taskBuilderPostProcessor = UnaryOperator.identity();
+            taskBuilderPostProcessor = taskBuilder -> taskBuilder;
         }
     }
 
@@ -285,11 +285,11 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return idGenerator;
     }
 
-    public UnaryOperator<TaskInfo> getTaskBuilderPostProcessor() {
+    public TaskBuilderPostProcessor getTaskBuilderPostProcessor() {
         return taskBuilderPostProcessor;
     }
 
-    public TaskServiceConfiguration setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor) {
+    public TaskServiceConfiguration setTaskBuilderPostProcessor(TaskBuilderPostProcessor processor) {
         this.taskBuilderPostProcessor = processor;
         return this;
     }

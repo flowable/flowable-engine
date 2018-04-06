@@ -13,13 +13,6 @@
 
 package org.flowable.engine;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.UnaryOperator;
-
-import javax.sql.DataSource;
-
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
@@ -32,7 +25,12 @@ import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.task.api.TaskInfo;
+import org.flowable.task.service.TaskBuilderPostProcessor;
+
+import javax.sql.DataSource;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Configuration information from which a process engine can be build.
@@ -146,7 +144,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected IdGenerator taskIdGenerator;
 
     /** postprocessor for a task builder */
-    protected UnaryOperator<TaskInfo> taskBuilderPostProcessor = UnaryOperator.identity();
+    protected TaskBuilderPostProcessor taskBuilderPostProcessor = taskBuilder -> taskBuilder;
 
     /** use one of the static createXxxx methods instead */
     protected ProcessEngineConfiguration() {
@@ -703,11 +701,11 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         this.taskIdGenerator = taskIdGenerator;
     }
 
-    public UnaryOperator<TaskInfo> getTaskBuilderPostProcessor() {
+    public TaskBuilderPostProcessor getTaskBuilderPostProcessor() {
         return taskBuilderPostProcessor;
     }
 
-    public void setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor) {
+    public void setTaskBuilderPostProcessor(TaskBuilderPostProcessor processor) {
         this.taskBuilderPostProcessor = processor;
     }
 }

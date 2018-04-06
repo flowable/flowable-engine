@@ -1,22 +1,20 @@
 package org.flowable.task.service.impl;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
-import org.flowable.task.api.TaskInfo;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * Base implementation of the {@link TaskBuilder} interface
  *
  * @author martin.grofcik
  */
-public abstract class BaseTaskBuilderImpl implements TaskBuilder, TaskInfo {
+public abstract class BaseTaskBuilderImpl implements TaskBuilder {
     protected CommandExecutor commandExecutor;
     protected String id;
     protected String name;
@@ -31,6 +29,7 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder, TaskInfo {
     protected String formKey;
     protected String taskDefinitionId;
     protected String taskDefinitionKey;
+    protected Set<? extends IdentityLinkInfo> identityLinks = Collections.EMPTY_SET;
 
     public BaseTaskBuilderImpl(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
@@ -118,6 +117,12 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder, TaskInfo {
     }
 
     @Override
+    public TaskBuilder identityLinks(Set<? extends IdentityLinkInfo> identityLinks) {
+        this.identityLinks = identityLinks;
+        return this;
+    }
+
+    @Override
     public String getId() {
         return id;
     }
@@ -148,48 +153,8 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder, TaskInfo {
     }
 
     @Override
-    public String getProcessInstanceId() {
-        return null;
-    }
-
-    @Override
-    public String getExecutionId() {
-        return null;
-    }
-
-    @Override
     public String getTaskDefinitionId() {
         return taskDefinitionId;
-    }
-
-    @Override
-    public String getProcessDefinitionId() {
-        return null;
-    }
-
-    @Override
-    public String getScopeId() {
-        return null;
-    }
-
-    @Override
-    public String getSubScopeId() {
-        return null;
-    }
-
-    @Override
-    public String getScopeType() {
-        return null;
-    }
-
-    @Override
-    public String getScopeDefinitionId() {
-        return null;
-    }
-
-    @Override
-    public Date getCreateTime() {
-        return null;
     }
 
     @Override
@@ -222,24 +187,9 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder, TaskInfo {
         return formKey;
     }
 
-    @Override
-    public Map<String, Object> getTaskLocalVariables() {
-        return null;
-    }
 
     @Override
-    public Map<String, Object> getProcessVariables() {
-        return null;
+    public Set<? extends IdentityLinkInfo> getIdentityLinks() {
+        return identityLinks;
     }
-
-    @Override
-    public List<? extends IdentityLinkInfo> getIdentityLinks() {
-        return Collections.EMPTY_LIST;
-    }
-
-    @Override
-    public Date getClaimTime() {
-        return null;
-    }
-
 }
