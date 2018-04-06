@@ -69,16 +69,17 @@ import org.junit.Test;
  * @author Falko Menge
  */
 public class TaskServiceTest extends PluggableFlowableTestCase {
-    private Optional<Task> task = Optional.empty();
+    private Task task = null;
 
     public void tearDown() throws Exception {
         super.tearDown();
-        task.ifPresent(taskInstance -> taskService.deleteTask(taskInstance.getId(), true));
+        if (task != null) {
+            taskService.deleteTask(task.getId(), true);
+        };
     }
 
     public void testCreateTaskWithBuilder() {
-        task = Optional.of(
-                taskService.createTaskBuilder().
+        task = taskService.createTaskBuilder().
                         name("testName").
                         description("testDescription").
                         priority(35).
@@ -91,10 +92,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
                         formKey("testFormKey").
                         taskDefinitionId("testDefintionId").
                         taskDefinitionKey("testDefinitionKey").
-                        create()
-        );
-        assertTrue(task.isPresent());
-        Task updatedTask = taskService.createTaskQuery().taskId(task.get().getId()).singleResult();
+                        create();
+        Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).singleResult();
         assertThat(updatedTask, notNullValue());
         assertThat(updatedTask.getName(), is("testName"));
         assertThat(updatedTask.getDescription(), is("testDescription"));
@@ -114,17 +113,14 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
         UnaryOperator<TaskInfo> previousTaskBuilderPostProcessor = taskServiceConfiguration.getTaskBuilderPostProcessor();
         taskServiceConfiguration.setTaskBuilderPostProcessor(TestTaskInfoWrapper::new);
-        task = Optional.of(
-                taskService.createTaskBuilder().
+        task = taskService.createTaskBuilder().
                         name("testName").
-                        create()
-        );
-        Task updatedTask = taskService.createTaskQuery().taskId(
-                task.orElseThrow(() -> new AssertionError("task must be present")).getId()).includeIdentityLinks().singleResult();
+                        create();
+        Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
         assertThat(updatedTask, notNullValue());
         assertThat(updatedTask.getName(), is("testName"));
         assertThat(updatedTask.getIdentityLinks().size(), is(2));
-        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.orElseThrow(AssertionError::new).getId()).includeIdentityLinks().singleResult();
+        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
         assertThat(historicTaskInstance, notNullValue());
         assertThat(historicTaskInstance.getName(), is("testName"));
         assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));

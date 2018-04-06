@@ -48,17 +48,18 @@ import java.util.function.UnaryOperator;
  * @author Joram Barrez
  */
 public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
-    private Optional<Task> task = Optional.empty();
+    private Task task = null;
 
     @After
     public void tearDown() {
-        task.ifPresent(taskInstance -> this.cmmnTaskService.deleteTask(taskInstance.getId(), true));
+        if (task != null) {
+            this.cmmnTaskService.deleteTask(task.getId(), true);
+        }
     }
 
     @Test
     public void createTaskWithBuilder() {
-        task = Optional.of(
-                this.cmmnTaskService.createTaskBuilder().
+        task = this.cmmnTaskService.createTaskBuilder().
                         name("testName").
                         description("testDescription").
                         priority(35).
@@ -71,9 +72,8 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                         formKey("testFormKey").
                         taskDefinitionId("testDefintionId").
                         taskDefinitionKey("testDefinitionKey").
-                        create()
-        );
-        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.map(TaskInfo::getId).orElse("NON-EXISTING-TASK")).singleResult();
+                        create();
+        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
         assertThat(updatedTask, notNullValue());
         assertThat(updatedTask.getName(), is("testName"));
         assertThat(updatedTask.getDescription(), is("testDescription"));
@@ -94,17 +94,14 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.cmmnEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
         UnaryOperator<TaskInfo> previousTaskBuilderPostProcessor = taskServiceConfiguration.getTaskBuilderPostProcessor();
         taskServiceConfiguration.setTaskBuilderPostProcessor(TestTaskInfoWrapper::new);
-        task = Optional.of(
-                cmmnTaskService.createTaskBuilder().
+        task = cmmnTaskService.createTaskBuilder().
                         name("testName").
-                        create()
-        );
-        assertTrue(task.isPresent());
-        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.orElseThrow(AssertionError::new).getId()).includeIdentityLinks().singleResult();
+                        create();
+        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
         assertThat(updatedTask, notNullValue());
         assertThat(updatedTask.getName(), is("testName"));
         assertThat(updatedTask.getIdentityLinks().size(), is(2));
-        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.orElseThrow(AssertionError::new).getId()).includeIdentityLinks().singleResult();
+        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
         assertThat(historicTaskInstance, notNullValue());
         assertThat(historicTaskInstance.getName(), is("testName"));
         assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));

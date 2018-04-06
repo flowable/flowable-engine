@@ -123,7 +123,7 @@ import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.EngineConfigurator;
 import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.HasTasksEngineConfiguration;
+import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.engine.common.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
@@ -203,7 +203,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
-        HasTasksEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
+        HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -2316,12 +2316,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskIdGenerator = taskIdGenerator;
     }
 
-    @Override
     public UnaryOperator<TaskInfo> getTaskBuilderPostProcessor() {
         return taskBuilderPostProcessor;
     }
 
-    @Override
     public void setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor) {
         this.taskBuilderPostProcessor = processor;
     }

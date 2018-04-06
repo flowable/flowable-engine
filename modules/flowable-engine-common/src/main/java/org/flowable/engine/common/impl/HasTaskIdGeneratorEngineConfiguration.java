@@ -20,13 +20,10 @@ import java.util.function.UnaryOperator;
 /**
  * @author martin.grofcik
  */
-public interface HasTasksEngineConfiguration {
+public interface HasTaskIdGeneratorEngineConfiguration {
     
     IdGenerator getTaskIdGenerator();
     
     void setTaskIdGenerator(IdGenerator taskIdGenerator);
     
-    UnaryOperator<TaskInfo> getTaskBuilderPostProcessor();
-    
-    void setTaskBuilderPostProcessor(UnaryOperator<TaskInfo> processor);
 }
