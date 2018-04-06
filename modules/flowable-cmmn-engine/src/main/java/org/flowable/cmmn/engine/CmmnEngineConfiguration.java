@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.UnaryOperator;
 
 import javax.sql.DataSource;
 
@@ -168,12 +167,12 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
-import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
-import org.flowable.task.service.TaskBuilderPostProcessor;
+import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
+import org.flowable.task.service.impl.DefaultTaskPostProcessor;
 import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
@@ -555,7 +554,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     /**
      * postprocessor for a task builder
      */
-    protected TaskBuilderPostProcessor taskBuilderPostProcessor = taskBuilder -> taskBuilder;
+    protected TaskPostProcessor taskPostProcessor;
 
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -1108,7 +1107,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setIdGenerator(taskIdGenerator);
-        this.taskServiceConfiguration.setTaskBuilderPostProcessor(this.taskBuilderPostProcessor);
+
+        if (this.taskPostProcessor != null) {
+            this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
+        } else {
+            this.taskServiceConfiguration.setTaskPostProcessor(new DefaultTaskPostProcessor());
+        }
 
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
@@ -2317,12 +2321,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskIdGenerator = taskIdGenerator;
     }
 
-    public TaskBuilderPostProcessor getTaskBuilderPostProcessor() {
-        return taskBuilderPostProcessor;
+    public TaskPostProcessor getTaskPostProcessor() {
+        return taskPostProcessor;
     }
 
-    public void setTaskBuilderPostProcessor(TaskBuilderPostProcessor processor) {
-        this.taskBuilderPostProcessor = processor;
+    public void setTaskPostProcessor(TaskPostProcessor processor) {
+        this.taskPostProcessor = processor;
     }
 
     @Override

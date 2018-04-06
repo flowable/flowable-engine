@@ -14,7 +14,6 @@ package org.flowable.task.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.UnaryOperator;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
@@ -22,7 +21,6 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;
 import org.flowable.task.service.impl.TaskServiceImpl;
@@ -73,7 +71,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     
     protected IdGenerator idGenerator;
 
-    protected TaskBuilderPostProcessor taskBuilderPostProcessor;
+    protected TaskPostProcessor taskPostProcessor;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -82,7 +80,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         checkIdGenerator();
         initDataManagers();
         initEntityManagers();
-        initTaskBuilderPostProcessor();
+        initTaskPostProcessor();
     }
 
     protected void checkIdGenerator() {
@@ -112,9 +110,9 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         }
     }
 
-    public void initTaskBuilderPostProcessor() {
-        if (taskBuilderPostProcessor == null) {
-            taskBuilderPostProcessor = taskBuilder -> taskBuilder;
+    public void initTaskPostProcessor() {
+        if (taskPostProcessor == null) {
+            taskPostProcessor = taskBuilder -> taskBuilder;
         }
     }
 
@@ -285,12 +283,12 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return idGenerator;
     }
 
-    public TaskBuilderPostProcessor getTaskBuilderPostProcessor() {
-        return taskBuilderPostProcessor;
+    public TaskPostProcessor getTaskPostProcessor() {
+        return taskPostProcessor;
     }
 
-    public TaskServiceConfiguration setTaskBuilderPostProcessor(TaskBuilderPostProcessor processor) {
-        this.taskBuilderPostProcessor = processor;
+    public TaskServiceConfiguration setTaskPostProcessor(TaskPostProcessor processor) {
+        this.taskPostProcessor = processor;
         return this;
     }
 }

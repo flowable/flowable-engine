@@ -25,7 +25,7 @@ import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.task.service.TaskBuilderPostProcessor;
+import org.flowable.task.service.TaskPostProcessor;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
@@ -144,7 +144,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected IdGenerator taskIdGenerator;
 
     /** postprocessor for a task builder */
-    protected TaskBuilderPostProcessor taskBuilderPostProcessor = taskBuilder -> taskBuilder;
+    protected TaskPostProcessor taskPostProcessor = null;
 
     /** use one of the static createXxxx methods instead */
     protected ProcessEngineConfiguration() {
@@ -701,11 +701,11 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         this.taskIdGenerator = taskIdGenerator;
     }
 
-    public TaskBuilderPostProcessor getTaskBuilderPostProcessor() {
-        return taskBuilderPostProcessor;
+    public TaskPostProcessor getTaskPostProcessor() {
+        return taskPostProcessor;
     }
 
-    public void setTaskBuilderPostProcessor(TaskBuilderPostProcessor processor) {
-        this.taskBuilderPostProcessor = processor;
+    public void setTaskPostProcessor(TaskPostProcessor processor) {
+        this.taskPostProcessor = processor;
     }
 }

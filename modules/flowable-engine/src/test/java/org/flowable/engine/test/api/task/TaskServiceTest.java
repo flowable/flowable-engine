@@ -42,7 +42,7 @@ import org.flowable.idm.api.User;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.task.service.TaskBuilderPostProcessor;
+import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 
@@ -111,9 +111,13 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     public void testCreateTaskWithBuilderAndPostprocessor() {
         TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
-        TaskBuilderPostProcessor previousTaskBuilderPostProcessor = taskServiceConfiguration.getTaskBuilderPostProcessor();
-        taskServiceConfiguration.setTaskBuilderPostProcessor(
-                taskBuilder -> taskBuilder.identityLinks(getDefaultIdentityLinks())
+        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
+        taskServiceConfiguration.setTaskPostProcessor(
+                taskEntity -> {
+                    taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
+                    taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
+                    return taskEntity;
+                }
         );
         task = taskService.createTaskBuilder().
                         name("testName").
@@ -129,7 +133,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
         taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
-        taskServiceConfiguration.setTaskBuilderPostProcessor(previousTaskBuilderPostProcessor);
+        taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
     }
 
     public void testCreateTaskWithOwnerAssigneeAndIdentityLinks() {

@@ -23,7 +23,7 @@ import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.task.service.TaskBuilderPostProcessor;
+import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.junit.After;
 import org.junit.Test;
@@ -88,9 +88,13 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
     @Test
     public void createTaskWithBuilderAndPostprocessor() {
         TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.cmmnEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
-        TaskBuilderPostProcessor previousTaskBuilderPostProcessor = taskServiceConfiguration.getTaskBuilderPostProcessor();
-        taskServiceConfiguration.setTaskBuilderPostProcessor(
-                taskBuilder -> taskBuilder.identityLinks(getDefaultIdentityLinks())
+        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
+        taskServiceConfiguration.setTaskPostProcessor(
+                taskEntity -> {
+                    taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
+                    taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
+                    return taskEntity;
+                }
         );
         task = cmmnTaskService.createTaskBuilder().
                         name("testName").
@@ -106,7 +110,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
 
         cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
         cmmnTaskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
-        taskServiceConfiguration.setTaskBuilderPostProcessor(previousTaskBuilderPostProcessor);
+        taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
     }
 
     @Test

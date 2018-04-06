@@ -61,29 +61,38 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     @Override
     public TaskEntity createTask(TaskBuilder taskBuilder) {
         // create and insert task
-        TaskBuilder enrichedTaskBuilder = this.taskServiceConfiguration.getTaskBuilderPostProcessor().enrichTaskBuilder(taskBuilder);
         TaskEntity taskEntity = create();
-        taskEntity.setId(enrichedTaskBuilder.getId());
-        taskEntity.setName(enrichedTaskBuilder.getName());
-        taskEntity.setDescription(enrichedTaskBuilder.getDescription());
-        taskEntity.setPriority(enrichedTaskBuilder.getPriority());
-        taskEntity.setOwner(enrichedTaskBuilder.getOwner());
-        taskEntity.setAssignee(enrichedTaskBuilder.getAssignee());
-        taskEntity.setDueDate(enrichedTaskBuilder.getDueDate());
-        taskEntity.setCategory(enrichedTaskBuilder.getCategory());
-        taskEntity.setParentTaskId(enrichedTaskBuilder.getParentTaskId());
-        taskEntity.setTenantId(enrichedTaskBuilder.getTenantId());
-        taskEntity.setFormKey(enrichedTaskBuilder.getFormKey());
-        taskEntity.setTaskDefinitionId(enrichedTaskBuilder.getTaskDefinitionId());
-        taskEntity.setTaskDefinitionKey(enrichedTaskBuilder.getTaskDefinitionKey());
-        insert(taskEntity);
+        taskEntity.setId(taskBuilder.getId());
+        taskEntity.setName(taskBuilder.getName());
+        taskEntity.setDescription(taskBuilder.getDescription());
+        taskEntity.setPriority(taskBuilder.getPriority());
+        taskEntity.setOwner(taskBuilder.getOwner());
+        taskEntity.setAssignee(taskBuilder.getAssignee());
+        taskEntity.setDueDate(taskBuilder.getDueDate());
+        taskEntity.setCategory(taskBuilder.getCategory());
+        taskEntity.setParentTaskId(taskBuilder.getParentTaskId());
+        taskEntity.setTenantId(taskBuilder.getTenantId());
+        taskEntity.setFormKey(taskBuilder.getFormKey());
+        taskEntity.setTaskDefinitionId(taskBuilder.getTaskDefinitionId());
+        taskEntity.setTaskDefinitionKey(taskBuilder.getTaskDefinitionKey());
+        taskBuilder.getIdentityLinks().forEach(
+                identityLink -> {
+                    if (identityLink.getGroupId() != null) {
+                        taskEntity.addGroupIdentityLink(identityLink.getGroupId(), identityLink.getType());
+                    } else if (identityLink.getUserId() != null) {
+                        taskEntity.addUserIdentityLink(identityLink.getUserId(), identityLink.getType());
+                    }
+                }
+        );
+        TaskEntity enrichedTaskEntity = this.taskServiceConfiguration.getTaskPostProcessor().enrich(taskEntity);
+        insert(enrichedTaskEntity);
 
         if (taskServiceConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             taskServiceConfiguration.getHistoricTaskService().recordTaskCreated(taskEntity);
         }
 
         // create task's identity links
-        enrichedTaskBuilder.getIdentityLinks().forEach(
+        enrichedTaskEntity.getIdentityLinks().forEach(
                 identityLink -> {
                     IdentityLinkEntity taskIdentityLink = getIdentityLinkService().createTaskIdentityLink(
                             taskEntity.getId(), identityLink.getUserId(), identityLink.getGroupId(), identityLink.getType()
