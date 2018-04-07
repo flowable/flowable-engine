@@ -337,6 +337,32 @@
         <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
             <column name="SENTRY_PART_INST_COUNT_" type="integer" />
         </addColumn>
+
+        <createTable tableName="ACT_CMMN_HI_PLAN_ITEM_INST">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="REV_" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="CASE_DEF_ID_" type="varchar(255)" />
+            <column name="CASE_INST_ID_" type="varchar(255)" />
+            <column name="STAGE_INST_ID_" type="varchar(255)" />
+            <column name="IS_STAGE_" type="boolean" />
+            <column name="ELEMENT_ID_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(255)" />
+            <column name="STATE_" type="varchar(255)" />
+            <column name="START_TIME_" type="datetime" />
+            <column name="END_TIME_" type="datetime" />
+            <column name="START_USER_ID_" type="varchar(255)" />
+            <column name="REFERENCE_ID_" type="varchar(255)" />
+            <column name="REFERENCE_TYPE_" type="varchar(255)" />
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="ITEM_DEFINITION_ID_" type="varchar(255)" />
+            <column name="ITEM_DEFINITION_TYPE_" type="varchar(255)" />
+            <column name="REFERENCE_TYPE_" type="varchar(255)" />
+        </createTable>
+
     
     </changeSet>
 

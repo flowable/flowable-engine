@@ -82,6 +82,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
@@ -94,6 +96,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataM
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryPartInstanceDataManager;
@@ -103,6 +106,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseIns
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricMilestoneInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricPlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
@@ -225,6 +229,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected MilestoneInstanceDataManager milestoneInstanceDataManager;
     protected HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager;
     protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
+    protected HistoricPlanItemInstanceDataManager historicPlanItemInstanceDataManager;
 
     protected CmmnDeploymentEntityManager cmmnDeploymentEntityManager;
     protected CmmnResourceEntityManager cmmnResourceEntityManager;
@@ -235,6 +240,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
+    protected HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager;
 
     protected boolean disableIdmEngine;
 
@@ -779,6 +785,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (historicMilestoneInstanceDataManager == null) {
             historicMilestoneInstanceDataManager = new MybatisHistoricMilestoneInstanceDataManager(this);
         }
+        if (historicPlanItemInstanceDataManager == null) {
+            historicPlanItemInstanceDataManager = new MybatisHistoricPlanItemInstanceDataManager(this);
+        }
     }
 
     public void initEntityManagers() {
@@ -808,6 +817,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
         if (historicMilestoneInstanceEntityManager == null) {
             historicMilestoneInstanceEntityManager = new HistoricMilestoneInstanceEntityManagerImpl(this, historicMilestoneInstanceDataManager);
+        }
+        if (historicPlanItemInstanceEntityManager == null) {
+            historicPlanItemInstanceEntityManager = new HistoricPlanItemInstanceEntityManagerImpl(this, historicPlanItemInstanceDataManager);
         }
     }
 
@@ -1511,6 +1523,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setHistoricMilestoneInstanceEntityManager(HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager) {
         this.historicMilestoneInstanceEntityManager = historicMilestoneInstanceEntityManager;
+        return this;
+    }
+
+    public HistoricPlanItemInstanceEntityManager getHistoricPlanItemInstanceEntityManager() {
+        return historicPlanItemInstanceEntityManager;
+    }
+
+    public CmmnEngineConfiguration setHistoricPlanItemInstanceEntityManager(HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager) {
+        this.historicPlanItemInstanceEntityManager = historicPlanItemInstanceEntityManager;
         return this;
     }
 
