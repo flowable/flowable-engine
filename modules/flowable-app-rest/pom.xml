@@ -535,7 +535,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-properties-migrator</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.flowable</groupId>
@@ -605,6 +604,11 @@
     <dependency>
         <groupId>javax.xml.bind</groupId> <!-- Needed for swagger doc generation -->
         <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

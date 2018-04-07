@@ -20,20 +20,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
-@PropertySources({
-    
-    // For backwards compatibility (pre 6.3.0)
-    @PropertySource(value = "classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties", ignoreResourceNotFound = true),
-    @PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
-    @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
-
-})
 @EnableConfigurationProperties(FlowableModelerAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.app.conf",
