@@ -849,7 +849,6 @@
 				<artifactId>guava</artifactId>
 				<version>24.0-jre</version>
 			</dependency>
-			<!-- Flowable Modeler -->
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>
