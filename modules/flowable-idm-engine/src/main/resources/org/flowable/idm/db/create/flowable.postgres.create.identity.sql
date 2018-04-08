@@ -1,12 +1,11 @@
+start transaction;
+
 create table ACT_ID_PROPERTY (
     NAME_ varchar(64),
     VALUE_ varchar(300),
     REV_ integer,
     primary key (NAME_)
 );
-
-insert into ACT_ID_PROPERTY
-values ('schema.version', '6.3.1.0', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ varchar(64),
@@ -81,26 +80,41 @@ create table ACT_ID_PRIV_MAPPING (
 );
 
 create index ACT_IDX_MEMB_GROUP on ACT_ID_MEMBERSHIP(GROUP_ID_);
+
+create index ACT_IDX_MEMB_USER on ACT_ID_MEMBERSHIP(USER_ID_);
+
+create index ACT_IDX_PRIV_MAPPING on ACT_ID_PRIV_MAPPING(PRIV_ID_);
+
+create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
+
+create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);
+
+-- For cockroachdb dml statements must follow ddl statements in a transaction 
+insert into ACT_ID_PROPERTY 
+values ('schema.version', '6.3.1.0', 1);
+
+-- cockroachdb needs to execute foreign keys in a separate transaction to the index creation on those columns
+commit;
+
+start transaction;
+
 alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_GROUP
     foreign key (GROUP_ID_)
     references ACT_ID_GROUP (ID_);
 
-create index ACT_IDX_MEMB_USER on ACT_ID_MEMBERSHIP(USER_ID_);
 alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_USER
     foreign key (USER_ID_)
     references ACT_ID_USER (ID_);
-
-create index ACT_IDX_PRIV_MAPPING on ACT_ID_PRIV_MAPPING(PRIV_ID_);
+    
 alter table ACT_ID_PRIV_MAPPING
     add constraint ACT_FK_PRIV_MAPPING
     foreign key (PRIV_ID_)
     references ACT_ID_PRIV (ID_);
 
-create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
-create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);
-
 alter table ACT_ID_PRIV
     add constraint ACT_UNIQ_PRIV_NAME
     unique (NAME_);
+
+commit; 
