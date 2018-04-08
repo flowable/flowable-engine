@@ -305,6 +305,7 @@
                 <excludes>
                     <exclude>static/fonts/**</exclude>
                     <exclude>static/libs/ui-grid_3.0.0/**</exclude>
+                    <exclude>application-dev.properties</exclude>
                 </excludes>
             </resource>
             <resource>
