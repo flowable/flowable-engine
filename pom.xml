@@ -624,11 +624,6 @@
 				<version>1.1.1</version>
 			</dependency>
 			<dependency>
-				<groupId>org.opensaml</groupId>
-				<artifactId>opensaml</artifactId>
-				<version>1.1</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.openjpa</groupId>
 				<artifactId>openjpa</artifactId>
 				<version>1.2.2</version>
