@@ -41,8 +41,7 @@ import org.springframework.web.servlet.DispatcherServlet;
         "org.flowable.app.service",
         "org.flowable.app.filter",
         "org.flowable.app.security",
-        "org.flowable.app.tenant",
-        "org.flowable.app.model.component" })
+        "org.flowable.app.tenant"})
 public class ApplicationConfiguration {
 
     @Bean
@@ -57,5 +56,4 @@ public class ApplicationConfiguration {
         registrationBean.setAsyncSupported(true);
         return registrationBean;
     }
-
 }

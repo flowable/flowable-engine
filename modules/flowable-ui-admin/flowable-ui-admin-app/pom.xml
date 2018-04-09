@@ -535,7 +535,6 @@
                 <excludes>
                     <exclude>static/fonts/**</exclude>
                     <exclude>static/additional_components/ui-grid/**</exclude>
-                    <exclude>application-dev.properties</exclude>
                 </excludes>
             </resource>
             <resource>
