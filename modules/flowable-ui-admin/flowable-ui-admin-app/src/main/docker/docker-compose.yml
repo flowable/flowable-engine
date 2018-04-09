@@ -1,4 +1,4 @@
-version: '2'
+version: '3.6'
 services:
     flowable-admin-app:
         image: flowable/flowable-admin
@@ -32,6 +32,12 @@ services:
             - 8080:8080
         entrypoint: ["./wait-for-something.sh", "flowable-admin-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
     flowable-admin-db:
-        extends:
-            file: postgres.yml
-            service: flowable-admin-postgres
+        image: postgres:9.6-alpine
+        container_name: flowable-admin-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres

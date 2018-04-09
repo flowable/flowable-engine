@@ -1,5 +1,5 @@
 #!/bin/bash
-DOCKER_COMPOSE_FILE="../modules/flowable-ui-task/flowable-ui-task-app/src/main/docker/app.yml"
+DOCKER_COMPOSE_FILE="../modules/flowable-ui-task/flowable-ui-task-app/src/main/docker/docker-compose.yml"
 
 if [ -z "$1" ]
 then
