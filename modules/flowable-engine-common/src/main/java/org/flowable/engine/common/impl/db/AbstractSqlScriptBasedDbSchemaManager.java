@@ -240,8 +240,12 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         String sqlStatement = null;
         String exceptionSqlStatement = null;
         DbSqlSession dbSqlSession = getDbSqlSession();
+        Boolean originalAutoCommit = null;
+        boolean localTransactionInProgress = false;
+        Connection connection = null;
         try {
-            Connection connection = dbSqlSession.getSqlSession().getConnection();
+            connection = dbSqlSession.getSqlSession().getConnection();
+            originalAutoCommit = connection.getAutoCommit();
             Exception exception = null;
             byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
             String ddlStatements = new String(bytes);
@@ -263,6 +267,9 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
                 LOGGER.info("Could not get database metadata", e);
             }
 
+            // on the first startTransaction statement we need to call commit
+            boolean firstStartTransaction = true;
+            
             BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
             String line = readNextTrimmedLine(reader);
             boolean inOraclePlsqlBlock = false;
@@ -301,21 +308,37 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
                         } else {
                             sqlStatement = addSqlStatementPiece(sqlStatement, line.substring(0, line.length() - 1));
                         }
-
-                        Statement jdbcStatement = connection.createStatement();
+                        
                         try {
                             // no logging needed as the connection will log it
                             LOGGER.debug("SQL: {}", sqlStatement);
-                            jdbcStatement.execute(sqlStatement);
-                            jdbcStatement.close();
-                            
-                        } catch (Exception e) {
-                            if (exception == null) {
-                                exception = e;
-                                exceptionSqlStatement = sqlStatement;
+                            if("start transaction".equalsIgnoreCase(sqlStatement)) {
+                                LOGGER.trace("Setting autocommit to true");
+                                if(firstStartTransaction) {
+                                    firstStartTransaction = false;
+                                    connection.commit();
+                                }
+                                connection.setAutoCommit(false);
+                                localTransactionInProgress = true;
+                            } else if("commit".equalsIgnoreCase(sqlStatement)) {
+                                LOGGER.trace("Calling commit");
+                                connection.commit();
+                                localTransactionInProgress = false;
+                            } else {
+                                Statement jdbcStatement = connection.createStatement();
+                                try {
+                                    jdbcStatement.execute(sqlStatement);
+                                    jdbcStatement.close();
+                                    
+                                } catch (Exception e) {
+                                    if (exception == null) {
+                                        exception = e;
+                                        exceptionSqlStatement = sqlStatement;
+                                    }
+                                    LOGGER.error("problem during schema {}, statement {}", operation, sqlStatement, e);
+                                    
+                                }
                             }
-                            LOGGER.error("problem during schema {}, statement {}", operation, sqlStatement, e);
-                            
                         } finally {
                             sqlStatement = null;
                         }
@@ -335,7 +358,23 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
             LOGGER.debug("flowable db schema {} for component {} successful", operation, component);
 
         } catch (Exception e) {
+            if(connection != null && localTransactionInProgress) {
+                try {
+                    LOGGER.debug("rolling back local transaction");
+                    connection.rollback();
+                } catch (SQLException sqle) {
+                    LOGGER.error("Could not rollback local transaction in schema changes", sqle);
+                }
+            }
             throw new FlowableException("couldn't " + operation + " db schema: " + exceptionSqlStatement, e);
+        } finally {
+            try {
+                if(connection != null && originalAutoCommit != null && originalAutoCommit != connection.getAutoCommit()) {
+                    connection.setAutoCommit(originalAutoCommit);
+                }
+            } catch (SQLException e) {
+                LOGGER.error("Could not reset original autocommit status to:{}", originalAutoCommit);
+            }
         }
     }
 

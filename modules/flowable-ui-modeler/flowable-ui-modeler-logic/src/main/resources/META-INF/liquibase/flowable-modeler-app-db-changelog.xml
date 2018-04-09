@@ -23,13 +23,13 @@
 			<column name="model_comment" type="varchar(4000)">
 				<constraints nullable="true" />
 			</column>
-			<column name="created" type="datetime(6)">
+			<column name="created" type="datetime">
 				<constraints nullable="true" />
 			</column>
 			<column name="created_by" type="varchar(255)">
 				<constraints nullable="true" />
 			</column>
-			<column name="last_updated" type="datetime(6)">
+			<column name="last_updated" type="datetime">
 				<constraints nullable="true" />
 			</column>
 			<column name="last_updated_by" type="varchar(255)">
@@ -71,19 +71,19 @@
             <column name="model_comment" type="varchar(4000)">
                 <constraints nullable="true" />
             </column>
-            <column name="created" type="datetime(6)">
+            <column name="created" type="datetime">
                 <constraints nullable="true" />
             </column>
             <column name="created_by" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="last_updated" type="datetime(6)">
+            <column name="last_updated" type="datetime">
                 <constraints nullable="true" />
             </column>
             <column name="last_updated_by" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="removal_date" type="datetime(6)">
+            <column name="removal_date" type="datetime">
                 <constraints nullable="true" />
             </column>
             <column name="version" type="int">
@@ -115,15 +115,6 @@
             <column name="model_id" type="varchar(255)" />
             <column name="relation_type" type="varchar(255)" />
         </createTable>
-        
-        <addForeignKeyConstraint baseColumnNames="parent_model_id"
-			baseTableName="ACT_DE_MODEL_RELATION" constraintName="fk_relation_parent"
-			referencedColumnNames="id" referencedTableName="ACT_DE_MODEL" />
-			
-		<addForeignKeyConstraint baseColumnNames="model_id"
-			baseTableName="ACT_DE_MODEL_RELATION" constraintName="fk_relation_child"
-			referencedColumnNames="id" referencedTableName="ACT_DE_MODEL" />
-			
 	</changeSet>
     
     <!-- 
@@ -148,6 +139,44 @@
         <addColumn tableName="ACT_DE_MODEL_HISTORY">
             <column  name="tenant_id" type="varchar(255)" />
         </addColumn>
+    </changeSet>
+
+    <changeSet id="4" author="flowable">
+        <createIndex indexName="idx_mod_rel_parent"
+            tableName="ACT_DE_MODEL_RELATION" unique="false">
+            <column name="parent_model_id" />
+        </createIndex>
+
+        <createIndex indexName="idx_mod_rel_mod"
+            tableName="ACT_DE_MODEL_RELATION" unique="false">
+            <column name="model_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="5" author="flowable">
+        <!-- MARK_RAN so it won't keep trying to execute this changesetfor a dbms 
+            that doesn't need it because the FK's exist
+         -->
+        <preConditions onFail="MARK_RAN">
+            <!--  These foreign keys were part of changeset 1, but for 
+                cockroachdb 2.0.0 and earlier compatibility are being 
+                added here separated from index creation because in 
+                cockroachdb a foreign key:
+                  * must have an pre-existing index
+                  * can't create that index in same transaction as FK
+            -->
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_relation_parent"/>
+                <foreignKeyConstraintExists foreignKeyName="fk_relation_child"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="parent_model_id"
+            baseTableName="ACT_DE_MODEL_RELATION" constraintName="fk_relation_parent"
+            referencedColumnNames="id" referencedTableName="ACT_DE_MODEL" />
+            
+        <addForeignKeyConstraint baseColumnNames="model_id"
+            baseTableName="ACT_DE_MODEL_RELATION" constraintName="fk_relation_child"
+            referencedColumnNames="id" referencedTableName="ACT_DE_MODEL" />
     </changeSet>
 
 </databaseChangeLog>
