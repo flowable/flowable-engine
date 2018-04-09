@@ -122,9 +122,11 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getAssignee(), is("testAssignee"));
         assertThat(updatedTask.getOwner(), is("testOwner"));
         assertThat(updatedTask.getIdentityLinks().size(), is(2));
+        assertThat(updatedTask.getPriority(), is(Task.DEFAULT_PRIORITY));
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
         assertThat(historicTaskInstance, notNullValue());
         assertThat(historicTaskInstance.getName(), is("testName"));
+        assertThat(historicTaskInstance.getPriority(), is(Task.DEFAULT_PRIORITY));
         assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
 
         taskService.deleteUserIdentityLink(updatedTask.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);

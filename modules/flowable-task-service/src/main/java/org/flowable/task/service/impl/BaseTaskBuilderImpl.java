@@ -19,7 +19,7 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder {
     protected String id;
     protected String name;
     protected String description;
-    protected int priority;
+    protected int priority = Task.DEFAULT_PRIORITY;
     protected String ownerId;
     protected String assigneeId;
     protected Date dueDate;

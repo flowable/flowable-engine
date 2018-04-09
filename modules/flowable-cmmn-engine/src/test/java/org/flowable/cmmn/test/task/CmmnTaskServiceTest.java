@@ -162,10 +162,12 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertThat(updatedTask.getAssignee(), is("testAssignee"));
             assertThat(updatedTask.getOwner(), is("testOwner"));
             assertThat(updatedTask.getIdentityLinks().size(), is(4));
+            assertThat(updatedTask.getPriority(), is(Task.DEFAULT_PRIORITY));
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
             assertThat(historicTaskInstance, notNullValue());
             assertThat(historicTaskInstance.getName(), is("testNameFromPostProcessor"));
             assertThat(historicTaskInstance.getIdentityLinks().size(), is(4));
+            assertThat(historicTaskInstance.getPriority(), is(Task.DEFAULT_PRIORITY));
 
             cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testUserFromBuilder", IdentityLinkType.CANDIDATE);
             cmmnTaskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupFromBuilder", IdentityLinkType.CANDIDATE);
