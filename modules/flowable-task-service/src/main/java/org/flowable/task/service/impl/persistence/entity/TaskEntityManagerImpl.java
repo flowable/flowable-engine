@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkService;
-import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -75,38 +74,23 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         taskEntity.setFormKey(taskBuilder.getFormKey());
         taskEntity.setTaskDefinitionId(taskBuilder.getTaskDefinitionId());
         taskEntity.setTaskDefinitionKey(taskBuilder.getTaskDefinitionKey());
+        insert(taskEntity);
+
+        TaskEntity enrichedTaskEntity = this.taskServiceConfiguration.getTaskPostProcessor().enrich(taskEntity);
+        update(enrichedTaskEntity, false);
         taskBuilder.getIdentityLinks().forEach(
                 identityLink -> {
                     if (identityLink.getGroupId() != null) {
-                        taskEntity.addGroupIdentityLink(identityLink.getGroupId(), identityLink.getType());
+                        enrichedTaskEntity.addGroupIdentityLink(identityLink.getGroupId(), identityLink.getType());
                     } else if (identityLink.getUserId() != null) {
-                        taskEntity.addUserIdentityLink(identityLink.getUserId(), identityLink.getType());
+                        enrichedTaskEntity.addUserIdentityLink(identityLink.getUserId(), identityLink.getType());
                     }
                 }
         );
-        TaskEntity enrichedTaskEntity = this.taskServiceConfiguration.getTaskPostProcessor().enrich(taskEntity);
-        insert(enrichedTaskEntity);
 
         if (taskServiceConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             taskServiceConfiguration.getHistoricTaskService().recordTaskCreated(taskEntity);
         }
-
-        // create task's identity links
-        enrichedTaskEntity.getIdentityLinks().forEach(
-                identityLink -> {
-                    IdentityLinkEntity taskIdentityLink = getIdentityLinkService().createTaskIdentityLink(
-                            taskEntity.getId(), identityLink.getUserId(), identityLink.getGroupId(), identityLink.getType()
-                    );
-                    getIdentityLinkService().insertIdentityLink(taskIdentityLink);
-                    if (getTaskServiceConfiguration().getInternalTaskAssignmentManager() != null) {
-                        if (identityLink.getUserId() != null)
-                            getTaskServiceConfiguration().getInternalTaskAssignmentManager().addUserIdentityLink(taskEntity, taskIdentityLink);
-                        else if (identityLink.getGroupId() != null) {
-                            getTaskServiceConfiguration().getInternalTaskAssignmentManager().addGroupIdentityLink(taskEntity, taskIdentityLink);
-                        }
-                    }
-                }
-        );
 
         return taskEntity;
     }

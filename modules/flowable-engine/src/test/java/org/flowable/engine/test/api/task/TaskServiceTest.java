@@ -109,33 +109,6 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
     }
 
-    public void testCreateTaskWithBuilderAndPostprocessor() {
-        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
-        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
-        taskServiceConfiguration.setTaskPostProcessor(
-                taskEntity -> {
-                    taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
-                    taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
-                    return taskEntity;
-                }
-        );
-        task = taskService.createTaskBuilder().
-                        name("testName").
-                        create();
-        Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-        assertThat(updatedTask, notNullValue());
-        assertThat(updatedTask.getName(), is("testName"));
-        assertThat(updatedTask.getIdentityLinks().size(), is(2));
-        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-        assertThat(historicTaskInstance, notNullValue());
-        assertThat(historicTaskInstance.getName(), is("testName"));
-        assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
-
-        taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
-        taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
-        taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
-    }
-
     public void testCreateTaskWithOwnerAssigneeAndIdentityLinks() {
         task = taskService.createTaskBuilder().
                         name("testName").
@@ -154,8 +127,77 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(historicTaskInstance.getName(), is("testName"));
         assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
 
-        taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
-        taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        taskService.deleteUserIdentityLink(updatedTask.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
+        taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
+    }
+
+    public void testCreateTaskWithBuilderAndPostprocessor() {
+        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
+        try {
+            taskServiceConfiguration.setTaskPostProcessor(
+                    taskEntity -> {
+                        taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
+                        taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
+                        return taskEntity;
+                    }
+            );
+            task = taskService.createTaskBuilder().
+                    name("testName").
+                    create();
+            Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(updatedTask, notNullValue());
+            assertThat(updatedTask.getName(), is("testName"));
+            assertThat(updatedTask.getIdentityLinks().size(), is(2));
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(historicTaskInstance, notNullValue());
+            assertThat(historicTaskInstance.getName(), is("testName"));
+            assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
+
+            taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
+            taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        } finally {
+            taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
+        }
+    }
+
+    public void testCreateTaskWithOwnerAssigneeAndIdentityLinksAndPostProcessor() {
+        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
+        try {
+            taskServiceConfiguration.setTaskPostProcessor(
+                    taskEntity -> {
+                        taskEntity.setName("testNameFromPostProcessor");
+                        taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
+                        taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
+                        return taskEntity;
+                    }
+            );
+
+            task = taskService.createTaskBuilder().
+                    name("testName").
+                    owner("testOwner").
+                    assignee("testAssignee").
+                    identityLinks(getDefaultIdentityLinks()).
+                    create();
+            Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(updatedTask, notNullValue());
+            assertThat(updatedTask.getName(), is("testNameFromPostProcessor"));
+            assertThat(updatedTask.getAssignee(), is("testAssignee"));
+            assertThat(updatedTask.getOwner(), is("testOwner"));
+            assertThat(updatedTask.getIdentityLinks().size(), is(4));
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(historicTaskInstance, notNullValue());
+            assertThat(historicTaskInstance.getName(), is("testNameFromPostProcessor"));
+            assertThat(historicTaskInstance.getIdentityLinks().size(), is(4));
+
+            taskService.deleteUserIdentityLink(updatedTask.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
+            taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
+            taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
+            taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        } finally {
+            taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
+        }
     }
 
     public void testSaveTaskUpdate() throws Exception {
@@ -1894,10 +1936,10 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
         IdentityLinkEntityImpl identityLinkEntityCandidateUser = new IdentityLinkEntityImpl();
-        identityLinkEntityCandidateUser.setUserId("testUser");
+        identityLinkEntityCandidateUser.setUserId("testUserBuilder");
         identityLinkEntityCandidateUser.setType(IdentityLinkType.CANDIDATE);
         IdentityLinkEntityImpl identityLinkEntityCandidateGroup = new IdentityLinkEntityImpl();
-        identityLinkEntityCandidateGroup.setGroupId("testGroup");
+        identityLinkEntityCandidateGroup.setGroupId("testGroupBuilder");
         identityLinkEntityCandidateGroup.setType(IdentityLinkType.CANDIDATE);
 
         return Stream.of(
