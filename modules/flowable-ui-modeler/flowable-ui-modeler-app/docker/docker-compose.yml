@@ -1,4 +1,4 @@
-version: '2'
+version: '3.6'
 services:
     flowable-modeler-app:
         image: flowable/flowable-modeler
@@ -32,6 +32,12 @@ services:
             - 8080:8080
         entrypoint: ["./wait-for-something.sh", "flowable-modeler-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
     flowable-modeler-db:
-        extends:
-            file: postgres.yml
-            service: flowable-modeler-postgres
+        image: postgres:9.6-alpine
+        container_name: flowable-modeler-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres
