@@ -13,7 +13,7 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
 import java.io.File;

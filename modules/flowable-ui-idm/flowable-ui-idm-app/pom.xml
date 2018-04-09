@@ -170,6 +170,12 @@
             <artifactId>spring-security-web</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <!-- BUILD -->
@@ -186,6 +192,7 @@
                 </includes>
                 <excludes>
                     <exclude>static/fonts/**</exclude>
+                    <exclude>application-dev.properties</exclude>
                 </excludes>
             </resource>
             <resource>

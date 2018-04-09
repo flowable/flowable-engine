@@ -81,7 +81,7 @@
         </profile>
 
         <profile>
-            <id>dev</id>
+            <id>mysql</id>
             <dependencies>
                 <dependency>
                     <groupId>mysql</groupId>
@@ -201,89 +201,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-
-        <profile>
-            <id>oracle</id>
-            <activation>
-                <property>
-                    <name>database</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
-                    <version>12.1.0.1</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>db2</id>
-            <activation>
-                <property>
-                    <name>database</name>
-                    <value>db2</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
-                    <version>10.1</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>mssql</id>
-            <activation>
-                <property>
-                    <name>database</name>
-                    <value>mssql</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.microsoft.sqlserver</groupId>
-                    <artifactId>sqljdbc4</artifactId>
-                    <version>4.0</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>mysql</id>
-            <activation>
-                <property>
-                    <name>database</name>
-                    <value>mysql</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
-                    <version>5.1.30</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>onpremise</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                    <version>9.3-1102-jdbc4</version>
-                </dependency>
-            </dependencies>
         </profile>
 
         <profile>
@@ -607,6 +524,30 @@
 	<!-- BUILD -->
 	<build>
 		<finalName>flowable-admin</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <excludes>
+                    <exclude>static/fonts/**</exclude>
+                    <exclude>static/additional_components/ui-grid/**</exclude>
+                    <exclude>application-dev.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/fonts/**</include>
+                    <include>static/additional_components/ui-grid/**</include>
+                </includes>
+            </resource>
+        </resources>
+
 		<plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

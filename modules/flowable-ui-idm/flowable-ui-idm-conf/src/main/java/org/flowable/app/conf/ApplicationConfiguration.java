@@ -15,7 +15,6 @@ package org.flowable.app.conf;
 import org.flowable.app.idm.properties.FlowableIdmAppProperties;
 import org.flowable.app.service.idm.RemoteIdmServiceImpl;
 import org.flowable.app.servlet.ApiDispatcherServletConfiguration;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
@@ -23,20 +22,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
-@PropertySources({
-    // For backwards compatibility (pre 6.3.0)
-    @PropertySource(value = "classpath:/META-INF/flowable-ui-app/flowable-ui-app.properties", ignoreResourceNotFound = true),
-    @PropertySource(value = "classpath:flowable-ui-app.properties", ignoreResourceNotFound = true),
-    @PropertySource(value = "file:flowable-ui-app.properties", ignoreResourceNotFound = true),
-
-})
 @EnableConfigurationProperties(FlowableIdmAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.app.conf",

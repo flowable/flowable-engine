@@ -20,6 +20,16 @@
 
   <build>
     <finalName>flowable-rest</finalName>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>application-dev.properties</exclude>
+        </excludes>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
 	    <groupId>org.apache.tomcat.maven</groupId>
@@ -401,19 +411,15 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.tomcat.maven</groupId>
-            <artifactId>tomcat7-maven-plugin</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
             <configuration>
-              <path>/flowable-rest</path>
-              <port>8080</port>
-              <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-              <systemProperties>
-                <spring.datasource.driver-class-name>com.mysql.jdbc.Driver</spring.datasource.driver-class-name>
-                <spring.datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</spring.datasource.url>
-                <spring.datasource.username>flowable</spring.datasource.username>
-                <spring.datasource.password>flowable</spring.datasource.password>
-                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-              </systemProperties>
+              <arguments>
+                <argument>--spring.datasource.driver-class-name=com.mysql.jdbc.Driver</argument>
+                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
+                <argument>--spring.datasource.username=flowable</argument>
+                <argument>--spring.datasource.password=flowable</argument>
+              </arguments>
             </configuration>
           </plugin>
         </plugins>
@@ -604,6 +610,11 @@
     <dependency>
         <groupId>javax.xml.bind</groupId> <!-- Needed for swagger doc generation -->
         <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
