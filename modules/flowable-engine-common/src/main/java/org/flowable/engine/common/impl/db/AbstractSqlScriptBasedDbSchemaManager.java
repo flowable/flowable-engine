@@ -241,6 +241,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         String exceptionSqlStatement = null;
         DbSqlSession dbSqlSession = getDbSqlSession();
         Boolean originalAutoCommit = null;
+        boolean localTransactionInProgress = false;
         Connection connection = null;
         try {
             connection = dbSqlSession.getSqlSession().getConnection();
@@ -318,9 +319,11 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
                                     connection.commit();
                                 }
                                 connection.setAutoCommit(false);
+                                localTransactionInProgress = true;
                             } else if("commit".equalsIgnoreCase(sqlStatement)) {
                                 LOGGER.trace("Calling commit");
                                 connection.commit();
+                                localTransactionInProgress = false;
                             } else {
                                 Statement jdbcStatement = connection.createStatement();
                                 try {
@@ -355,6 +358,14 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
             LOGGER.debug("flowable db schema {} for component {} successful", operation, component);
 
         } catch (Exception e) {
+            if(connection != null && localTransactionInProgress) {
+                try {
+                    LOGGER.debug("rolling back local transaction");
+                    connection.rollback();
+                } catch (SQLException sqle) {
+                    LOGGER.error("Could not rollback local transaction in schema changes", sqle);
+                }
+            }
             throw new FlowableException("couldn't " + operation + " db schema: " + exceptionSqlStatement, e);
         } finally {
             try {
