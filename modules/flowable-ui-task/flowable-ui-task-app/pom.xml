@@ -463,7 +463,7 @@
                             <repository>flowable/${project.build.finalName}</repository>
                             <tag>${project.version}</tag>
                             <buildArgs>
-                                <WAR_FILE>${project.build.finalName}.war</WAR_FILE>
+                                <WAR_FILE>target/${project.build.finalName}.war</WAR_FILE>
                             </buildArgs>
                         </configuration>
                     </plugin>
