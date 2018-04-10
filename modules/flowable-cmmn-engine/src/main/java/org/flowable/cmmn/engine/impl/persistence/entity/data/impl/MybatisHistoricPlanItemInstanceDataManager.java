@@ -19,6 +19,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstance
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
 
 import java.util.List;
 
@@ -27,28 +28,38 @@ import java.util.List;
  */
 public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnDataManager<HistoricPlanItemInstanceEntity> implements HistoricPlanItemInstanceDataManager {
 
+    protected CachedEntityMatcherAdapter<HistoricPlanItemInstanceEntity> historicPlanItemInstanceByCaseDefinitionIdMatcher = new CachedEntityMatcherAdapter<HistoricPlanItemInstanceEntity>() {
+        @Override
+        public boolean isRetained(HistoricPlanItemInstanceEntity entity, Object param) {
+            return entity.getCaseDefinitionId().equals(param);
+        }
+    };
+
     public MybatisHistoricPlanItemInstanceDataManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricPlanItemInstance> findByCriteria(HistoricPlanItemInstanceQueryImpl query) {
-        return getDbSqlSession().selectList("somethingWithVariables", query);
+        return getDbSqlSession().selectList("selectHistoricPlanItemInstancesByQueryCriteria", query);
     }
 
     @Override
-    public List<HistoricPlanItemInstance> findByCriteriaWithVariables(HistoricPlanItemInstanceQueryImpl query) {
-        return getDbSqlSession().selectList("somethingWithVariables", query);
+    @SuppressWarnings("unchecked")
+    public List<HistoricPlanItemInstance> findByCaseDefinitionId(String caseDefinitionId) {
+        List<? extends HistoricPlanItemInstance> list = getList("selectHistoricPlanItemInstancesByCaseDefinitionId", caseDefinitionId, historicPlanItemInstanceByCaseDefinitionIdMatcher, true);
+        return (List<HistoricPlanItemInstance>) list;
     }
 
     @Override
     public long countByCriteria(HistoricPlanItemInstanceQueryImpl query) {
-        return (Long) getDbSqlSession().selectOne("somethingCount", query);
+        return (Long) getDbSqlSession().selectOne("selectHistoricPlanItemInstancesCountByQueryCriteria", query);
     }
 
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
-        getDbSqlSession().delete("deleteSomething", caseDefinitionId, getManagedEntityClass());
+        getDbSqlSession().delete("deleteHistoricPlanItemInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
     }
 
     @Override

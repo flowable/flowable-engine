@@ -14,32 +14,26 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
- * @author Joram Barrez
+ * @author Dennis Federico
  */
-public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
-    
-    public EnablePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+public class CreatePlanItemInstanceForRepetitionOperation extends CreatePlanItemInstanceOperation {
+
+    public CreatePlanItemInstanceForRepetitionOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
-    
-    @Override
-    protected String getLifeCycleTransition() {
-        return PlanItemTransition.ENABLE;
-    }
-    
+
     @Override
     protected String getNewState() {
-        return PlanItemInstanceState.ENABLED;
+        return PlanItemInstanceState.WAITING_FOR_REPETITION;
     }
-    
+
     @Override
-    protected void internalExecute() {
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceActivated(planItemInstanceEntity);
+    protected String getLifeCycleTransition() {
+        return PlanItemTransition.CREATE;
     }
-    
+
 }

@@ -20,7 +20,6 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 import java.util.Date;
 import java.util.List;
@@ -43,16 +42,14 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String planItemDefinitionType;
     protected Date startedAfter;
     protected Date startedBefore;
+    protected Date activatedAfter;
+    protected Date activatedBefore;
     protected Date endedAfter;
     protected Date endedBefore;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
-    protected boolean includePlanItemVariables;
-
-    protected List<HistoricVariableInstanceEntity> queryVariable;
-
 
     public HistoricPlanItemInstanceQueryImpl() {
 
@@ -63,56 +60,86 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withId(String planItemInstanceId) {
+    public HistoricPlanItemInstanceQuery planItemInstanceId(String planItemInstanceId) {
         this.planItemInstanceId = planItemInstanceId;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withName(String planItemInstanceName) {
+    public HistoricPlanItemInstanceQuery planItemInstanceName(String planItemInstanceName) {
         this.planItemInstanceName = planItemInstanceName;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withState(String state) {
+    public HistoricPlanItemInstanceQuery planItemInstanceState(String state) {
         this.state = state;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withCaseDefinitionId(String caseDefinitionId) {
+    public HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withCaseInstanceId(String caseInstanceId) {
+    public HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withStageInstanceId(String stageInstanceId) {
+    public HistoricPlanItemInstanceQuery planItemInstanceStageInstanceId(String stageInstanceId) {
         this.stageInstanceId = stageInstanceId;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withElementId(String elementId) {
+    public HistoricPlanItemInstanceQuery planItemInstanceElementId(String elementId) {
         this.elementId = elementId;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withDefinitionId(String planItemDefinitionId) {
+    public HistoricPlanItemInstanceQuery planItemInstanceDefinitionId(String planItemDefinitionId) {
         this.planItemDefinitionId = planItemDefinitionId;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withDefinitionType(String planItemDefinitionType) {
+    public HistoricPlanItemInstanceQuery planItemInstanceDefinitionType(String planItemDefinitionType) {
         this.planItemDefinitionType = planItemDefinitionType;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId) {
+        this.startUserId = startUserId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceTenantId(String tenantId) {
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId() {
+        this.tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
         return this;
     }
 
@@ -129,32 +156,14 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withStartUserId(String startUserId) {
-        this.startUserId = startUserId;
+    public HistoricPlanItemInstanceQuery activatedBefore(Date beforeTime) {
+        this.activatedBefore = beforeTime;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery withReferenceId(String referenceId) {
-        this.referenceId = referenceId;
-        return this;
-    }
-
-    @Override
-    public HistoricPlanItemInstanceQuery withReferenceType(String referenceType) {
-        this.referenceType = referenceType;
-        return this;
-    }
-
-    @Override
-    public HistoricPlanItemInstanceQuery withTenantId(String tenantId) {
-        this.tenantId = tenantId;
-        return this;
-    }
-
-    @Override
-    public HistoricPlanItemInstanceQuery withoutTenantId() {
-        this.tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
+    public HistoricPlanItemInstanceQuery activatedAfter(Date afterTime) {
+        this.activatedAfter = afterTime;
         return this;
     }
 
@@ -167,12 +176,6 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery endedAfter(Date afterTime) {
         this.endedAfter = afterTime;
-        return this;
-    }
-
-    @Override
-    public HistoricPlanItemInstanceQuery includeInstanceVariables() {
-        this.includePlanItemVariables = true;
         return this;
     }
 
@@ -194,10 +197,6 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     @Override
     public List<HistoricPlanItemInstance> executeList(CommandContext commandContext) {
-        if (includePlanItemVariables) {
-            return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteriaWithVariables(this);
-        } else {
-            return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
-        }
+        return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
     }
 }

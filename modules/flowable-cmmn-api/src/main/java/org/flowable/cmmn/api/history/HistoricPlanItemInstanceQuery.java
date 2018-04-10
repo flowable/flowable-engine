@@ -21,25 +21,26 @@ import java.util.Date;
  */
 public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemInstanceQuery, HistoricPlanItemInstance> {
 
-    HistoricPlanItemInstanceQuery withId(String planItemInstanceId);
-    HistoricPlanItemInstanceQuery withName(String planItemInstanceName);
-    HistoricPlanItemInstanceQuery withState(String state);
-    HistoricPlanItemInstanceQuery withCaseDefinitionId(String caseDefinitionId);
-    HistoricPlanItemInstanceQuery withCaseInstanceId(String caseInstanceId);
-    HistoricPlanItemInstanceQuery withStageInstanceId(String stageInstanceId);
-    HistoricPlanItemInstanceQuery withElementId(String elementId);
-    HistoricPlanItemInstanceQuery withDefinitionId(String planItemDefinitionId);
-    HistoricPlanItemInstanceQuery withDefinitionType(String planItemDefinitionType);
-    HistoricPlanItemInstanceQuery withStartUserId(String startUserId);
-    HistoricPlanItemInstanceQuery withReferenceId(String referenceId);
-    HistoricPlanItemInstanceQuery withReferenceType(String referenceType);
-    HistoricPlanItemInstanceQuery withTenantId(String tenantId);
-    HistoricPlanItemInstanceQuery withoutTenantId();
+    HistoricPlanItemInstanceQuery planItemInstanceId(String planItemInstanceId);
+    HistoricPlanItemInstanceQuery planItemInstanceName(String planItemInstanceName);
+    HistoricPlanItemInstanceQuery planItemInstanceState(String state);
+    HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId);
+    HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceId(String caseInstanceId);
+    HistoricPlanItemInstanceQuery planItemInstanceStageInstanceId(String stageInstanceId);
+    HistoricPlanItemInstanceQuery planItemInstanceElementId(String elementId);
+    HistoricPlanItemInstanceQuery planItemInstanceDefinitionId(String planItemDefinitionId);
+    HistoricPlanItemInstanceQuery planItemInstanceDefinitionType(String planItemDefinitionType);
+    HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
+    HistoricPlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
+    HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
+    HistoricPlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
+    HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId();
     HistoricPlanItemInstanceQuery startedBefore(Date startedBefore);
     HistoricPlanItemInstanceQuery startedAfter(Date startedAfter);
+    HistoricPlanItemInstanceQuery activatedBefore(Date beforeTime);
+    HistoricPlanItemInstanceQuery activatedAfter(Date afterTime);
     HistoricPlanItemInstanceQuery endedBefore(Date beforeTime);
     HistoricPlanItemInstanceQuery endedAfter(Date afterTime);
-    HistoricPlanItemInstanceQuery includeInstanceVariables();
     HistoricPlanItemInstanceQuery orderByStartTime();
     HistoricPlanItemInstanceQuery orderByName();
 }

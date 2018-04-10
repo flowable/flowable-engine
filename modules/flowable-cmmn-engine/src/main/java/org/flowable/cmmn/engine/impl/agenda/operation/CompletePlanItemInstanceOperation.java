@@ -40,7 +40,7 @@ public class CompletePlanItemInstanceOperation extends AbstractDeletePlanItemIns
     protected boolean isEvaluateRepetitionRule() {
         return true;
     }
-    
+
     @Override
     protected void internalExecute() {
         if (isStage(planItemInstanceEntity)) {

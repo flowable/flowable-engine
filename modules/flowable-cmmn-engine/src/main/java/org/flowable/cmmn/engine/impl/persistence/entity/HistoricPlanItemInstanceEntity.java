@@ -14,10 +14,8 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author Dennis Federico
@@ -46,6 +44,8 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HistoricPlanItem
 
     void setStartTime(Date startTime);
 
+    void setActivationTime(Date activationTime);
+
     void setEndTime(Date endTime);
 
     void setStartUserId(String startUserId);
@@ -55,8 +55,5 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HistoricPlanItem
     void setReferenceType(String referenceType);
 
     void setTenantId(String tenantId);
-
-    List<HistoricVariableInstanceEntity> getQueryVariables();
-
 
 }

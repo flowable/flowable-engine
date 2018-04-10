@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
@@ -52,7 +53,7 @@ public class TableDataManagerImpl implements TableDataManager {
         entityToTableNameMap.put(MilestoneInstanceEntity.class, "ACT_CMMN_RU_MIL_INST");
         entityToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_CMMN_HI_CASE_INST");
         entityToTableNameMap.put(HistoricMilestoneInstanceEntity.class, "ACT_CMMN_HI_MIL_INST");
-        
+        entityToTableNameMap.put(HistoricPlanItemInstanceEntity.class, "ACT_CMMN_HI_PLAN_ITEM_INST");
         entityToTableNameMap.put(VariableInstanceEntity.class, "ACT_RU_VARIABLE");
         entityToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
         entityToTableNameMap.put(TaskEntity.class, "ACT_RU_TASK");

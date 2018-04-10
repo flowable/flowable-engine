@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -33,6 +34,8 @@ public interface CmmnHistoryService {
     HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
     
     HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
+
+    HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery();
 
     void deleteHistoricCaseInstance(String caseInstanceId);
     

@@ -44,19 +44,14 @@ public class HistoricPlanItemInstanceEntityManagerImpl extends AbstractCmmnEntit
         return new HistoricPlanItemInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }
 
-//    @Override
-//    public List<HistoricPlanItemInstance> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
-//        return null;
-//    }
+    @Override
+    public List<HistoricPlanItemInstance> findByCaseDefinitionId(String caseDefinitionId) {
+        return historicPlanItemInstanceDataManager.findByCaseDefinitionId(caseDefinitionId);
+    }
 
     @Override
     public List<HistoricPlanItemInstance> findByCriteria(HistoricPlanItemInstanceQuery query) {
         return historicPlanItemInstanceDataManager.findByCriteria((HistoricPlanItemInstanceQueryImpl) query);
-    }
-
-    @Override
-    public List<HistoricPlanItemInstance> findByCriteriaWithVariables(HistoricPlanItemInstanceQuery query) {
-        return historicPlanItemInstanceDataManager.findByCriteriaWithVariables((HistoricPlanItemInstanceQueryImpl) query);
     }
 
     @Override

@@ -13,7 +13,6 @@
 package org.flowable.cmmn.api.history;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @author Dennis Federico
@@ -42,6 +41,8 @@ public interface HistoricPlanItemInstance {
 
     Date getStartTime();
 
+    Date getActivationTime();
+
     Date getEndTime();
 
     String getStartUserId();
@@ -51,13 +52,5 @@ public interface HistoricPlanItemInstance {
     String getReferenceType();
 
     String getTenantId();
-
-//    boolean isCountEnabled();
-//
-//    long getVariableCount();
-//
-//    long getSentryPartCount();
-
-    Map<String, Object> getPlanItemVariables();
 
 }
