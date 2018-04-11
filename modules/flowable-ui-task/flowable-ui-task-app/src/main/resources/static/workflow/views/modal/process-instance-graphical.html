@@ -69,7 +69,7 @@
 
                             </div>
                             <div class="grid-wrapper grid-wrapper-compact"
-                                 ng-if="tabData.activeTab == tabData.tabs[3].id">
+                                 ng-if="!model.processInstance.ended && tabData.activeTab == tabData.tabs[3].id">
                                 <div class="col-xs-12">
                                     <label for="expressionText" class="col-xs-1">{{'PROCESS.TITLE.EXPRESSION' | translate}}</label>
                                     <div id="expressionText" class="col-xs-7">

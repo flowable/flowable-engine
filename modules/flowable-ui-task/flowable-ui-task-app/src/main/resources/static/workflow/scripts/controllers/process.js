@@ -313,11 +313,16 @@ angular.module('flowableApp')
                 tabs: [
                     {id: 'variables', name: 'PROCESS.TITLE.VARIABLES'},
                     {id: 'executions', name: 'PROCESS.TITLE.EXECUTIONS'},
-                    {id: 'log', name: 'PROCESS.TITLE.LOG'},
-                    {id: 'watch', name: 'PROCESS.TITLE.WATCH'}
+                    {id: 'log', name: 'PROCESS.TITLE.LOG'}
                 ],
                 activeTab: 'variables'
             };
+
+            if (!$scope.model.processInstance.ended) {
+                $scope.tabData.tabs.push(
+                    {id: 'watch', name: 'PROCESS.TITLE.WATCH'}
+                    );
+            }
 
             $scope.loadVariables = function () {
                 $http({
@@ -376,6 +381,7 @@ angular.module('flowableApp')
 
             $scope.evaluateExpression = function () {
                 $scope.model.errorMessage = '';
+                $scope.model.result = '';
 
                 var selExecution = jQuery("#bpmnModel").attr("selected-execution");
                 if (!selExecution) {
