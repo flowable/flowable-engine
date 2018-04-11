@@ -1,26 +1,26 @@
-version: '2'
+version: '3.6'
 services:
     flowable-modeler-app:
-          image: flowable/flowable-modeler
-          container_name: flowable-modeler
-          depends_on:
-              - flowable-db
-              - flowable-idm-app
-              - flowable-task-app
-          environment:
-              - SERVER_PORT=8888
-              - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
-              - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
-              - SPRING_DATASOURCE_USERNAME=flowable
-              - SPRING_DATASOURCE_PASSWORD=flowable
-              - FLOWABLE_COMMON_APP_IDM-URL=http://flowable-idm-app:8080/flowable-idm
-              - FLOWABLE_COMMON_APP_IDM-REDIRECT-URL=http://localhost:8080/flowable-idm
-              - FLOWABLE_COMMON_APP_IDM-ADMIN.USER=admin
-              - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
-              - FLOWABLE_MODELER_APP_DEPLOYMENT-API-URL=http://flowable-task-app:9999/flowable-task/process-api
-          ports:
-              - 8888:8888
-          entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-modeler.war"]
+        image: flowable/flowable-modeler
+        container_name: flowable-modeler
+        depends_on:
+            - flowable-db
+            - flowable-idm-app
+            - flowable-task-app
+        environment:
+            - SERVER_PORT=8888
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+            - FLOWABLE_COMMON_APP_IDM-URL=http://flowable-idm-app:8080/flowable-idm
+            - FLOWABLE_COMMON_APP_IDM-REDIRECT-URL=http://localhost:8080/flowable-idm
+            - FLOWABLE_COMMON_APP_IDM-ADMIN.USER=admin
+            - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
+            - FLOWABLE_MODELER_APP_DEPLOYMENT-API-URL=http://flowable-task-app:9999/flowable-task/process-api
+        ports:
+            - 8888:8888
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-modeler.war"]
     flowable-task-app:
         image: flowable/flowable-task
         container_name: flowable-task
@@ -95,6 +95,12 @@ services:
             - 9988:9988
         entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-admin.war"]
     flowable-db:
-        extends:
-            file: postgres.yml
-            service: flowable-postgres
+        image: postgres:9.6-alpine
+        container_name: flowable-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres

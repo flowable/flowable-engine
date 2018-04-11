@@ -1,4 +1,4 @@
-version: '2'
+version: '3.6'
 services:
     flowable-rest-app:
         image: flowable/flowable-rest
@@ -20,6 +20,12 @@ services:
             - flowable-rest-db
         entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.war"]
     flowable-rest-db:
-        extends:
-            file: postgres.yml
-            service: flowable-rest-postgres
+        image: postgres:9.6-alpine
+        container_name: flowable-rest-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres
