@@ -313,7 +313,8 @@ angular.module('flowableApp')
                 tabs: [
                     {id: 'variables', name: 'PROCESS.TITLE.VARIABLES'},
                     {id: 'executions', name: 'PROCESS.TITLE.EXECUTIONS'},
-                    {id: 'log', name: 'PROCESS.TITLE.LOG'}
+                    {id: 'log', name: 'PROCESS.TITLE.LOG'},
+                    {id: 'watch', name: 'PROCESS.TITLE.WATCH'}
                 ],
                 activeTab: 'variables'
             };
@@ -372,6 +373,24 @@ angular.module('flowableApp')
                     $scope.gridLogApi = gridApi;
                 }
             };
+
+            $scope.evaluateExpression = function () {
+                $scope.model.errorMessage = '';
+
+                var selExecution = jQuery("#bpmnModel").attr("selected-execution");
+                if (!selExecution) {
+                    selExecution = $scope.model.processInstance.id;
+                }
+                $http({
+                    method: 'POST',
+                    url: '../app/rest/debugger/evaluate/expression/' + selExecution,
+                    data: $scope.model.expression
+                }).success(function (data) {
+                    $scope.model.result = data;
+                }).error(function (data, status, headers, config) {
+                    $scope.model.errorMessage = data;
+                });
+            }
 
             $timeout(function () {
                 jQuery("#bpmnModel").attr('data-model-id', $scope.model.processInstance.id);

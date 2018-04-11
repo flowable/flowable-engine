@@ -213,9 +213,12 @@
         "TITLE": {
             "DIAGRAM": "Process diagram",
             "EXECUTION": "Execution",
-            "VARIABLES": "Variables",
             "EXECUTIONS": "Executions",
-            "LOG": "Log"
+            "EXPRESSION": "Expression",
+            "RESULT": "Result",
+            "VARIABLES": "Variables",
+            "LOG": "Log",
+            "WATCH": "Watch"
         },
         "FILTER": {
             "CREATED-DESC": "Newest first",
@@ -251,6 +254,7 @@
             "BACK-TO-LIST": "Back to process instances",
             "SHOW-DIAGRAM": "Show diagram",
             "CANCEL": "Cancel process",
+            "EXECUTE": "Execute",
             "DELETE": "Delete process",
             "ADD-COMMENT": "+ Add comment",
             "ADD-COMMENT-CONFIRM": "Add comment",

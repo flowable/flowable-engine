@@ -7,11 +7,16 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.job.api.Job;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -144,4 +149,15 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
         }
         return executionRepresentations;
     }
+
+    public Object evaluateExpression(final String executionId, final String expressionString) {
+        final ProcessEngineConfigurationImpl processEngineConfiguration = this.applicationContext.getBean(ProcessEngineConfigurationImpl.class);
+        return processEngineConfiguration.getManagementService().executeCommand(commandContext -> {
+            ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+            Expression expression = expressionManager.createExpression(expressionString);
+            Execution execution = Context.getProcessEngineConfiguration().getExecutionEntityManager().findById(executionId);
+            return expression.getValue((VariableScope) execution);
+        });
+    }
+
 }
