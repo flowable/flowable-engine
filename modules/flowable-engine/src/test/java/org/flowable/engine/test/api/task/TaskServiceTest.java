@@ -112,16 +112,19 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
     public void testBuilderCreateTaskWithParent() {
         Task parentTask = taskService.newTask();
         taskService.saveTask(parentTask);
-
-        task = taskService.createTaskBuilder().
-                        name("testName").
-                        parentTaskId(parentTask.getId()).
-                        identityLinks(getDefaultIdentityLinks()).
-                        create();
-        Task updatedParentTask = taskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
-        assertThat(((CountingTaskEntity) updatedParentTask).getSubTaskCount(), is(1));
-
-        this.taskService.deleteTask(parentTask.getId(), true);
+        try {
+            task = taskService.createTaskBuilder().
+                    name("testName").
+                    parentTaskId(parentTask.getId()).
+                    identityLinks(getDefaultIdentityLinks()).
+                    create();
+            Task updatedParentTask = taskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
+            assertThat(((CountingTaskEntity) updatedParentTask).getSubTaskCount(), is(1));
+            Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(((CountingTaskEntity) updatedTask).getIdentityLinkCount(), is(2));
+        } finally {
+            this.taskService.deleteTask(parentTask.getId(), true);
+        }
     }
 
     public void testCreateTaskWithOwnerAssigneeAndIdentityLinks() {

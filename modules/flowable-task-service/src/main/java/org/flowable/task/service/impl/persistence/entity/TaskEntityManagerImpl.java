@@ -89,10 +89,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                     }
                 }
         );
-        if (CountingTaskUtil.isTaskRelatedEntityCountEnabledGlobally()) {
-            ((CountingTaskEntity)enrichedTaskEntity).setIdentityLinkCount(enrichedTaskEntity.getIdentityLinks().size());
-            update(enrichedTaskEntity, false);
-        }
 
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled() && taskEntity.getAssignee() != null) {
             getEventDispatcher().dispatchEvent(

@@ -110,16 +110,19 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
     public void createTaskWithParent() {
         Task parentTask = cmmnTaskService.newTask();
         cmmnTaskService.saveTask(parentTask);
-
-        task = cmmnTaskService.createTaskBuilder().
-                name("testName").
-                parentTaskId(parentTask.getId()).
-                identityLinks(getDefaultIdentityLinks()).
-                create();
-        Task updatedParentTask = cmmnTaskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
-        assertThat(((CountingTaskEntity) updatedParentTask).getSubTaskCount(), is(1));
-
-        this.cmmnTaskService.deleteTask(parentTask.getId(), true);
+        try {
+            task = cmmnTaskService.createTaskBuilder().
+                    name("testName").
+                    parentTaskId(parentTask.getId()).
+                    identityLinks(getDefaultIdentityLinks()).
+                    create();
+            Task updatedParentTask = cmmnTaskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
+            assertThat(((CountingTaskEntity) updatedParentTask).getSubTaskCount(), is(1));
+            Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(((CountingTaskEntity) updatedTask).getIdentityLinkCount(), is(2));
+        } finally {
+            this.cmmnTaskService.deleteTask(parentTask.getId(), true);
+        }
     }
 
 

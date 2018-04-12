@@ -13,9 +13,6 @@
 package org.flowable.engine.common.impl;
 
 import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.task.api.TaskInfo;
-
-import java.util.function.UnaryOperator;
 
 /**
  * @author martin.grofcik
