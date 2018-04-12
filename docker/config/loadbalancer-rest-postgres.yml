@@ -16,7 +16,7 @@ services:
       - FLOWABLE.REST.APP.ADMIN.LAST-NAME=Admin
     expose:
       - "9977"
-    entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.war"]
+    entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
   flowable-db:
     image: postgres:9.6-alpine
     container_name: flowable-postgres

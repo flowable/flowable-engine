@@ -20,7 +20,7 @@ services:
             - FLOWABLE_MODELER_APP_DEPLOYMENT-API-URL=http://flowable-task-app:9999/flowable-task/process-api
         ports:
             - 8888:8888
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-modeler.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-task-app:
         image: flowable/flowable-task
         container_name: flowable-task
@@ -39,7 +39,7 @@ services:
             - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
         ports:
             - 9999:9999
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-task.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-idm-app:
         image: flowable/flowable-idm
         container_name: flowable-idm
@@ -53,7 +53,7 @@ services:
             - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-admin-app:
         image: flowable/flowable-admin
         container_name: flowable-admin
@@ -93,7 +93,7 @@ services:
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_CONTENT_REST-ROOT=content-api
         ports:
             - 9988:9988
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-admin.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-db:
         image: postgres:9.6-alpine
         container_name: flowable-postgres
