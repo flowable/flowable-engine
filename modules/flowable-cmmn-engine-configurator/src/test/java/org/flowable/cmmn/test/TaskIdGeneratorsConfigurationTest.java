@@ -12,15 +12,6 @@
  */
 package org.flowable.cmmn.test;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-
-import java.util.List;
-import java.util.Optional;
-
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -36,6 +27,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.List;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class TaskIdGeneratorsConfigurationTest extends AbstractProcessEngineIntegrationTest {
 
@@ -96,17 +95,21 @@ public class TaskIdGeneratorsConfigurationTest extends AbstractProcessEngineInte
 
     @Test
     public void testTaskBuilder() {
-        Optional<Task> processEngineTask = Optional.empty();
-        Optional<Task> cmmnEngineTask = Optional.empty();
+        Task processEngineTask = null;
+        Task cmmnEngineTask = null;
         try {
-            processEngineTask = Optional.of(this.processEngineTaskService.createTaskBuilder().name("process engine task").create());
-            assertThat(processEngineTask.map(Task::getId).orElse("The task does not exist"), startsWith("TASK-"));
+            processEngineTask = this.processEngineTaskService.createTaskBuilder().name("process engine task").create();
+            assertThat(processEngineTask.getId(), startsWith("TASK-"));
 
-            cmmnEngineTask = Optional.of(this.cmmnTaskService.createTaskBuilder().name("cmmn engine task").create());
-            assertThat(cmmnEngineTask.map(Task::getId).orElse("The task does not exist"), startsWith("CMMN-TASK-"));
+            cmmnEngineTask = this.cmmnTaskService.createTaskBuilder().name("cmmn engine task").create();
+            assertThat(cmmnEngineTask.getId(), startsWith("CMMN-TASK-"));
         } finally {
-            processEngineTask.ifPresent(task -> processEngineTaskService.deleteTask(task.getId(), true));
-            cmmnEngineTask.ifPresent(task -> cmmnTaskService.deleteTask(task.getId(), true));
+            if (processEngineTask != null) {
+                processEngineTaskService.deleteTask(processEngineTask.getId(), true);
+            }
+            if (cmmnEngineTask != null) {
+                cmmnTaskService.deleteTask(cmmnEngineTask.getId(), true);
+            }
         }
     }
 
