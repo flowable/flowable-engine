@@ -320,7 +320,7 @@ angular.module('flowableApp')
 
             if (!$scope.model.processInstance.ended) {
                 $scope.tabData.tabs.push(
-                    {id: 'watch', name: 'PROCESS.TITLE.WATCH'}
+                    {id: 'expression', name: 'PROCESS.TITLE.EXPRESSION'}
                     );
             }
 

@@ -217,8 +217,7 @@
             "EXPRESSION": "Expression",
             "RESULT": "Result",
             "VARIABLES": "Variables",
-            "LOG": "Log",
-            "WATCH": "Watch"
+            "LOG": "Log"
         },
         "FILTER": {
             "CREATED-DESC": "Newest first",

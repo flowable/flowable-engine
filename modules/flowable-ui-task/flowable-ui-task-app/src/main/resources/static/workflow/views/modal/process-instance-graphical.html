@@ -86,17 +86,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-default" ng-click="evaluateExpression()">
-                                    {{'PROCESS.ACTION.EXECUTE' | translate}}
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!--<div class="pull-left">-->
-                    <!--<input id="displayVariables" type="checkbox" ng-model="model.displayVariables"/>-->
-                <!--</div>-->
+                <div class="pull-left" ng-if="!model.processInstance.ended && tabData.activeTab == tabData.tabs[3].id">
+                    <button type="button" class="btn btn-sm btn-default" ng-click="evaluateExpression()">
+                        {{'PROCESS.ACTION.EXECUTE' | translate}}
+                    </button>
+                </div>
                 <div class="pull-right">
                     <button type="button" class="btn btn-sm btn-default" ng-click="$hide()">
                         {{'GENERAL.ACTION.CLOSE' | translate}}
