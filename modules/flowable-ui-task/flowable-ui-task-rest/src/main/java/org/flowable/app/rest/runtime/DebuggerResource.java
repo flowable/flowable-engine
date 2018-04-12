@@ -83,6 +83,13 @@ public class DebuggerResource {
         return debuggerService.evaluateExpression(executionId, expression);
     }
 
+    @RequestMapping(value = "/rest/debugger/evaluate/{scriptLanguage}/{executionId}", method = RequestMethod.POST)
+    public void evaluateScript(@PathVariable String executionId, @PathVariable String scriptLanguage, @RequestBody String script) {
+        if (environment.getProperty("flowable.experimental.debugger.enabled", Boolean.class, false)) {
+            debuggerService.evaluateScript(executionId, scriptLanguage, script);
+        }
+    }
+
     @RequestMapping(value = "/rest/debugger", method = RequestMethod.GET)
     public boolean isDebuggerAllowed() {
         return environment.getProperty("flowable.experimental.debugger.enabled", Boolean.class, false);

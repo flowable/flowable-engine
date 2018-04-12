@@ -215,6 +215,7 @@
             "EXECUTION": "Execution",
             "EXECUTIONS": "Executions",
             "EXPRESSION": "Expression",
+            "SCRIPT": "Script",
             "RESULT": "Result",
             "VARIABLES": "Variables",
             "LOG": "Log"

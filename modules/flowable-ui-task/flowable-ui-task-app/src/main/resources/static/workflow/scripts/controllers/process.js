@@ -182,10 +182,11 @@ angular.module('flowableApp')
 }]);
 
 angular.module('flowableApp')
-    .controller('ShowProcessDiagramCtrl', ['$scope', '$http', '$interval', '$timeout', '$translate', '$q', 'ResourceService', 'appResourceRoot',
-        function ($scope, $http, $interval, $timeout, $translate, $q, ResourceService, appResourceRoot) {
+    .controller('ShowProcessDiagramCtrl', ['$scope', '$http', '$interval', '$timeout', '$translate', '$q', 'ResourceService', 'appResourceRoot', '$rootScope',
+        function ($scope, $http, $interval, $timeout, $translate, $q, ResourceService, appResourceRoot, $rootScope) {
 
             $scope.model.isDebuggerEnabled = false;
+            $scope.model.scriptLanguage = 'groovy';
 
             $http({
                 method: 'GET',
@@ -322,6 +323,9 @@ angular.module('flowableApp')
                 $scope.tabData.tabs.push(
                     {id: 'expression', name: 'PROCESS.TITLE.EXPRESSION'}
                     );
+                $scope.tabData.tabs.push(
+                    {id: 'script', name: 'PROCESS.TITLE.SCRIPT'}
+                    );
             }
 
             $scope.loadVariables = function () {
@@ -394,7 +398,25 @@ angular.module('flowableApp')
                 }).success(function (data) {
                     $scope.model.result = data;
                 }).error(function (data, status, headers, config) {
-                    $scope.model.errorMessage = data;
+                    $rootScope.addAlert("Execution evaluation failed :" + data , 'error');
+                });
+            }
+
+            $scope.evaluateScript = function () {
+                $scope.model.errorMessage = '';
+
+                var selExecution = jQuery("#bpmnModel").attr("selected-execution");
+                if (!selExecution) {
+                    selExecution = $scope.model.processInstance.id;
+                }
+                $http({
+                    method: 'POST',
+                    url: '../app/rest/debugger/evaluate/'+ $scope.model.scriptLanguage+ '/' + selExecution,
+                    data: $scope.model.scriptText
+                }).success(function (data) {
+                    $rootScope.addAlert( "script executed", 'info')
+                }).error(function (data, status, headers, config) {
+                    $rootScope.addAlert(data, 'error');
                 });
             }
 
