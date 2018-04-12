@@ -10,13 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.common.api.scope;
+package org.flowable.appengine.engine.impl.cfg;
 
-/**
- * @author Joram Barrez
- */
-public interface ScopeTypes {
+import org.flowable.appengine.engine.AppEngineConfiguration;
 
-    String APP = "app";
-    String CMMN = "cmmn";
+public class StandaloneInMemAppEngineConfiguration extends AppEngineConfiguration {
+    
+    public StandaloneInMemAppEngineConfiguration() {
+        this.jdbcUrl = "jdbc:h2:mem:flowable";
+        this.databaseSchemaUpdate = AppEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
+    }
+
 }

@@ -462,6 +462,16 @@
 			</dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
+                <artifactId>flowable-app-engine-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-app-engine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
                 <artifactId>flowable-variable-service-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -934,6 +944,8 @@
         <module>modules/flowable-job-service</module>
         <module>modules/flowable-job-spring-service</module>
 		<module>modules/flowable-engine</module>
+		<module>modules/flowable-app-engine-api</module>
+		<module>modules/flowable-app-engine</module>
 	</modules>
 
 	<build>

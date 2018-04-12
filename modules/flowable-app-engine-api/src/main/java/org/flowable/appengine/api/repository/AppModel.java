@@ -10,13 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.common.api.scope;
+package org.flowable.appengine.api.repository;
 
-/**
- * @author Joram Barrez
- */
-public interface ScopeTypes {
+public interface AppModel {
 
-    String APP = "app";
-    String CMMN = "cmmn";
+    String getKey();
+
+    String getName();
+    
+    String getDescription();
 }
