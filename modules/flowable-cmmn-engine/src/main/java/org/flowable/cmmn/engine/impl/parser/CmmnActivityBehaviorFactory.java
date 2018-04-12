@@ -22,7 +22,7 @@ import org.flowable.cmmn.model.*;
  */
 public interface CmmnActivityBehaviorFactory {
 
-    StageActivityBehavior createStageActivityBehavoir(PlanItem planItem, Stage stage);
+    StageActivityBehavior createStageActivityBehavior(PlanItem planItem, Stage stage);
 
     MilestoneActivityBehavior createMilestoneActivityBehavior(PlanItem planItem, Milestone milestone);
 
