@@ -25,6 +25,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.junit.After;
 import org.junit.Test;
 
@@ -104,6 +105,23 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testAssignee", IdentityLinkType.ASSIGNEE);
         cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testOwner", IdentityLinkType.OWNER);
     }
+
+    @Test
+    public void createTaskWithParent() {
+        Task parentTask = cmmnTaskService.newTask();
+        cmmnTaskService.saveTask(parentTask);
+
+        task = cmmnTaskService.createTaskBuilder().
+                name("testName").
+                parentTaskId(parentTask.getId()).
+                identityLinks(getDefaultIdentityLinks()).
+                create();
+        Task updatedParentTask = cmmnTaskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
+        assertThat(((CountingTaskEntity) updatedParentTask).getSubTaskCount(), is(1));
+
+        this.cmmnTaskService.deleteTask(parentTask.getId(), true);
+    }
+
 
     @Test
     public void createTaskWithBuilderAndPostprocessor() {

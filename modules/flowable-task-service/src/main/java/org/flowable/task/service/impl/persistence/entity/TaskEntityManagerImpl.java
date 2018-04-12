@@ -14,12 +14,14 @@
 package org.flowable.task.service.impl.persistence.entity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
@@ -87,12 +89,21 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                     }
                 }
         );
+        if (CountingTaskUtil.isTaskRelatedEntityCountEnabledGlobally()) {
+            ((CountingTaskEntity)enrichedTaskEntity).setIdentityLinkCount(enrichedTaskEntity.getIdentityLinks().size());
+            update(enrichedTaskEntity, false);
+        }
+
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled() && taskEntity.getAssignee() != null) {
+            getEventDispatcher().dispatchEvent(
+                    FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
+        }
 
         if (taskServiceConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             taskServiceConfiguration.getHistoricTaskService().recordTaskCreated(taskEntity);
         }
 
-        return taskEntity;
+        return enrichedTaskEntity;
     }
 
     protected IdentityLinkService getIdentityLinkService() {
