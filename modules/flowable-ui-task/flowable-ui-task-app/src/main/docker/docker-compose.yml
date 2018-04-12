@@ -17,7 +17,7 @@ services:
             - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
         ports:
             - 9999:9999
-        entrypoint: ["./wait-for-something.sh", "flowable-task-db", "5432", "PostgreSQL", "java", "-jar", "flowable-task.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-task-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-idm-app:
         image: flowable/flowable-idm
         depends_on:
@@ -25,12 +25,12 @@ services:
         environment:
             - SERVER_PORT=8080
             - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-modeler-db:5432/flowable
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-task-db:5432/flowable
             - SPRING_DATASOURCE_USERNAME=flowable
             - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-task-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-task-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-task-db:
         image: postgres:9.6-alpine
         container_name: flowable-task-postgres

@@ -17,7 +17,7 @@ services:
             - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
         ports:
             - 8888:8888
-        entrypoint: ["./wait-for-something.sh", "flowable-modeler-db", "5432", "PostgreSQL", "java", "-jar", "flowable-modeler.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-modeler-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-idm-app:
         image: flowable/flowable-idm
         depends_on:
@@ -30,7 +30,7 @@ services:
             - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-modeler-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-modeler-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-modeler-db:
         image: postgres:9.6-alpine
         container_name: flowable-modeler-postgres

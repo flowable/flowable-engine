@@ -18,7 +18,7 @@ services:
             - 8080:8080
         depends_on:
             - flowable-rest-db
-        entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-rest-db:
         image: postgres:9.6-alpine
         container_name: flowable-rest-postgres

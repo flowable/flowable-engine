@@ -12,7 +12,7 @@ services:
             - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-idm-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-idm-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-idm-db:
         image: postgres:9.6-alpine
         container_name: flowable-idm-postgres
