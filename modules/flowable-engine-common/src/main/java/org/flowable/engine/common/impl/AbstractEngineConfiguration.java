@@ -62,7 +62,10 @@ import org.flowable.engine.common.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
+import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
@@ -538,6 +541,25 @@ public abstract class AbstractEngineConfiguration {
 
     // myBatis SqlSessionFactory
     // ////////////////////////////////////////////////
+
+    public void initSessionFactories() {
+        if (sessionFactories == null) {
+            sessionFactories = new HashMap<>();
+
+            if (usingRelationalDatabase) {
+                initDbSqlSessionFactory();
+            }
+
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            commandContextFactory.setSessionFactories(sessionFactories);
+        }
+
+        if (customSessionFactories != null) {
+            for (SessionFactory sessionFactory : customSessionFactories) {
+                addSessionFactory(sessionFactory);
+            }
+        }
+    }
 
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
