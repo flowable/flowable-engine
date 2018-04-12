@@ -61,7 +61,6 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyPriority;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyRuleOrder;
 import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
-import org.flowable.dmn.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
@@ -92,11 +91,8 @@ import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,26 +317,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     // session factories ////////////////////////////////////////////////////////
-
-    public void initSessionFactories() {
-        if (sessionFactories == null) {
-            sessionFactories = new HashMap<>();
-
-            if (usingRelationalDatabase) {
-                initDbSqlSessionFactory();
-            }
-
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-
-            commandContextFactory.setSessionFactories(sessionFactories);
-        }
-
-        if (customSessionFactories != null) {
-            for (SessionFactory sessionFactory : customSessionFactories) {
-                addSessionFactory(sessionFactory);
-            }
-        }
-    }
 
     @Override
     public void initDbSqlSessionFactory() {

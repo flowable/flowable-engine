@@ -308,26 +308,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // session factories ////////////////////////////////////////////////////////
 
-    public void initSessionFactories() {
-        if (sessionFactories == null) {
-            sessionFactories = new HashMap<>();
-
-            if (usingRelationalDatabase) {
-                initDbSqlSessionFactory();
-            }
-
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-
-            commandContextFactory.setSessionFactories(sessionFactories);
-        }
-
-        if (customSessionFactories != null) {
-            for (SessionFactory sessionFactory : customSessionFactories) {
-                addSessionFactory(sessionFactory);
-            }
-        }
-    }
-
     @Override
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {

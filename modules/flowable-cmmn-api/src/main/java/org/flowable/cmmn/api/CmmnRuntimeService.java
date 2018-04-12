@@ -68,7 +68,7 @@ public interface CmmnRuntimeService {
     
     void setLocalVariables(String planItemInstanceId, Map<String, Object> variables);
     
-    void setLocalVariable(String caseInstanceId, String variableName, Object variableValue);
+    void setLocalVariable(String planItemInstanceId, String variableName, Object variableValue);
     
     void removeVariable(String caseInstanceId, String variableName);
     

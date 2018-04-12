@@ -6,12 +6,13 @@
 
     <case id="scriptCase">
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
-            <planItem id="blockerPlanItem" definitionRef="startTaskEvent"/>
+            <planItem id="blockerPlanItem" definitionRef="caseBlocker"/>
+            <planItem id="taskBlocker" definitionRef="startTaskEvent"/>
             <planItem id="planItemTaskA" name="Plan Item One" definitionRef="taskA">
                 <entryCriterion sentryRef="startTask"/>
             </planItem>
             <sentry id="startTask">
-                <planItemOnPart sourceRef="blockerPlanItem">
+                <planItemOnPart sourceRef="taskBlocker">
                     <standardEvent>occur</standardEvent>
                 </planItemOnPart>
             </sentry>
@@ -19,11 +20,13 @@
                 <documentation>This is a test documentation</documentation>
                 <extensionElements>
                     <flowable:field name="script">
-                        <string><![CDATA[var a = 5;]]></string>
+                        <string>
+                            <![CDATA[var a = 5;planItemInstance.setVariable("aInt",a);planItemInstance.setVariable("aString","value set in the script");]]></string>
                     </flowable:field>
                 </extensionElements>
             </task>
             <userEventListener id="startTaskEvent"/>
+            <userEventListener id="caseBlocker"/>
         </casePlanModel>
     </case>
 </definitions>

@@ -31,7 +31,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     protected ExpressionManager expressionManager;
 
     @Override
-    public StageActivityBehavior createStageActivityBehavoir(PlanItem planItem, Stage stage) {
+    public StageActivityBehavior createStageActivityBehavior(PlanItem planItem, Stage stage) {
         return new StageActivityBehavior(stage);
     }
 

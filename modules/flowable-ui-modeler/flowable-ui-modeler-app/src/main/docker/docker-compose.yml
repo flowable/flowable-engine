@@ -1,14 +1,14 @@
-version: '2'
+version: '3.6'
 services:
-    flowable-task-app:
-        image: flowable/flowable-task
+    flowable-modeler-app:
+        image: flowable/flowable-modeler
         depends_on:
-            - flowable-task-db
+            - flowable-modeler-db
             - flowable-idm-app
         environment:
-            - SERVER_PORT=9999
+            - SERVER_PORT=8888
             - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
-            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-task-db:5432/flowable
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-modeler-db:5432/flowable
             - SPRING_DATASOURCE_USERNAME=flowable
             - SPRING_DATASOURCE_PASSWORD=flowable
             - FLOWABLE_COMMON_APP_IDM-URL=http://flowable-idm-app:8080/flowable-idm
@@ -16,12 +16,12 @@ services:
             - FLOWABLE_COMMON_APP_IDM-ADMIN.USER=admin
             - FLOWABLE_COMMON_APP_IDM-ADMIN.PASSWORD=test
         ports:
-            - 9999:9999
-        entrypoint: ["./wait-for-something.sh", "flowable-task-db", "5432", "PostgreSQL", "java", "-jar", "flowable-task.war"]
+            - 8888:8888
+        entrypoint: ["./wait-for-something.sh", "flowable-modeler-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-idm-app:
         image: flowable/flowable-idm
         depends_on:
-            - flowable-task-db
+            - flowable-modeler-db
         environment:
             - SERVER_PORT=8080
             - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
@@ -30,8 +30,14 @@ services:
             - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-task-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
-    flowable-task-db:
-        extends:
-            file: postgres.yml
-            service: flowable-task-postgres
+        entrypoint: ["./wait-for-something.sh", "flowable-modeler-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
+    flowable-modeler-db:
+        image: postgres:9.6-alpine
+        container_name: flowable-modeler-postgres
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+        command: postgres
