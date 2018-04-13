@@ -133,14 +133,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
 
         <!-- COMMON dependencies -->
 		<dependency>
@@ -272,20 +264,6 @@
                     </excludeArtifactIds>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <configuration>
-                    <path>/flowable-modeler</path>
-                    <port>8888</port>
-                    <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                    <systemProperties>
-                        <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-
         </plugins>
 
     </build>
