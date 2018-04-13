@@ -47,6 +47,8 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     protected static final String EXPRESSION_DECISION_TABLE_RESPONCE_HANDLER = "decisionTaskReponseHandler";
 
     protected Task task;
+    
+    protected DmnResponseHandler handler;
 
     public DmnActivityBehavior(Task task) {
         this.task = task;
@@ -141,7 +143,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 	        if(!StringUtils.isBlank(handlerName)) {
 		        try {
 					Class<?> handlerClass = Class.forName(handlerName);
-					DmnResponseHandler handler = (DmnResponseHandler) handlerClass.newInstance();
+					handler = (DmnResponseHandler) handlerClass.newInstance();
 					handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue);
 				} catch (ClassNotFoundException e) {
 	                throw new FlowableException("DMN response handler with reference " + handlerName + " is not found.");
