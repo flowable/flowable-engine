@@ -122,7 +122,6 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         BpmnModel bpmnModel = readXMLFile();
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         validateModel(parsedModel);
-        deployProcess(parsedModel);
     }
 
     @Override

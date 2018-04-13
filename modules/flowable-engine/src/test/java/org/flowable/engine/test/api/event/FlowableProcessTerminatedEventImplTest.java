@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.delegate.event.impl;
+package org.flowable.engine.test.api.event;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -18,6 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
+import org.flowable.engine.delegate.event.impl.FlowableProcessTerminatedEventImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Test;
 import org.mockito.Mockito;
