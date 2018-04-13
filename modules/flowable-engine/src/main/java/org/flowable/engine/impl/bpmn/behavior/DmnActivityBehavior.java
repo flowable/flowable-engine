@@ -138,6 +138,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         }
         //Call custom decision table response handler if present
         FieldExtension handlerFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_RESPONCE_HANDLER);
+        boolean handlerFound = false;
         if(handlerFieldExtension != null) {
 	        String handlerName = handlerFieldExtension.getStringValue();
 	        if(!StringUtils.isBlank(handlerName)) {
@@ -145,6 +146,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 					Class<?> handlerClass = Class.forName(handlerName);
 					handler = (DmnResponseHandler) handlerClass.newInstance();
 					handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue);
+					handlerFound = true;
 				} catch (ClassNotFoundException e) {
 	                throw new FlowableException("DMN response handler with reference " + handlerName + " is not found.");
 				} catch (InstantiationException e) {
@@ -155,6 +157,9 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 					throw new FlowableException("DMN response handler with reference " + handlerName + " is not an instance of DmnResponseHandler.");
 				}
 	        }
+        }
+        if(!handlerFound && handler != null) {
+			handler.handleResponse(execution, decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue);
         }
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
         leave(execution);
