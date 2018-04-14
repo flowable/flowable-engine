@@ -106,7 +106,6 @@ import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
-import org.flowable.engine.impl.ServiceImpl;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.agenda.AgendaSessionFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
@@ -940,12 +939,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initService(formService);
         initService(managementService);
         initService(dynamicBpmnService);
-    }
-
-    public void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     public void initDbSchemaManagers() {

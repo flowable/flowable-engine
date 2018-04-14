@@ -40,7 +40,6 @@ import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnTaskServiceImpl;
-import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
@@ -205,11 +204,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 
-    protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl();
-    protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl();
-    protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl();
-    protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl();
-    protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl();
+    protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl(this);
+    protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl(this);
+    protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl(this);
+    protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl(this);
+    protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl(this);
 
     protected TableDataManager tableDataManager;
     protected CmmnDeploymentDataManager deploymentDataManager;
@@ -717,13 +716,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setEngineConfig(this);
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     public void initDataManagers() {

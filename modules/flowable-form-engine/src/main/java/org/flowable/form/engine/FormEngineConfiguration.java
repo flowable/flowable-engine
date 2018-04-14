@@ -15,7 +15,6 @@ package org.flowable.form.engine;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,13 +27,8 @@ import org.flowable.engine.common.impl.el.DefaultExpressionManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -43,7 +37,6 @@ import org.flowable.form.engine.impl.FormEngineImpl;
 import org.flowable.form.engine.impl.FormManagementServiceImpl;
 import org.flowable.form.engine.impl.FormRepositoryServiceImpl;
 import org.flowable.form.engine.impl.FormServiceImpl;
-import org.flowable.form.engine.impl.ServiceImpl;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.flowable.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration;
 import org.flowable.form.engine.impl.db.EntityDependencyOrder;
@@ -99,9 +92,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
-    protected FormManagementService formManagementService = new FormManagementServiceImpl();
-    protected FormRepositoryService formRepositoryService = new FormRepositoryServiceImpl();
-    protected FormService formService = new FormServiceImpl();
+    protected FormManagementService formManagementService = new FormManagementServiceImpl(this);
+    protected FormRepositoryService formRepositoryService = new FormRepositoryServiceImpl(this);
+    protected FormService formService = new FormServiceImpl(this);
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
@@ -213,12 +206,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(formManagementService);
         initService(formRepositoryService);
         initService(formService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     public void initExpressionManager() {

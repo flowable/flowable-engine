@@ -30,7 +30,6 @@ import org.flowable.content.api.ContentStorage;
 import org.flowable.content.engine.impl.ContentEngineImpl;
 import org.flowable.content.engine.impl.ContentManagementServiceImpl;
 import org.flowable.content.engine.impl.ContentServiceImpl;
-import org.flowable.content.engine.impl.ServiceImpl;
 import org.flowable.content.engine.impl.cfg.StandaloneContentEngineConfiguration;
 import org.flowable.content.engine.impl.cfg.StandaloneInMemContentEngineConfiguration;
 import org.flowable.content.engine.impl.db.ContentDbSchemaManager;
@@ -154,12 +153,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     protected void initServices() {
         initService(contentManagementService);
         initService(contentService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     // Data managers

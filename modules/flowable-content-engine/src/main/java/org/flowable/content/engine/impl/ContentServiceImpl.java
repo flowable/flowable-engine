@@ -17,17 +17,19 @@ import java.io.InputStream;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentItemQuery;
 import org.flowable.content.api.ContentService;
+import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.cmd.CreateContentItemCmd;
 import org.flowable.content.engine.impl.cmd.DeleteContentItemCmd;
 import org.flowable.content.engine.impl.cmd.DeleteContentItemsByScopeCmd;
 import org.flowable.content.engine.impl.cmd.DeleteContentItemsCmd;
 import org.flowable.content.engine.impl.cmd.GetContentItemStreamCmd;
 import org.flowable.content.engine.impl.cmd.SaveContentItemCmd;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Tijs Rademakers
  */
-public class ContentServiceImpl extends ServiceImpl implements ContentService {
+public class ContentServiceImpl extends CommonEngineServiceImpl<ContentEngineConfiguration> implements ContentService {
 
     @Override
     public ContentItem newContentItem() {

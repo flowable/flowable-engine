@@ -15,6 +15,7 @@ package org.flowable.dmn.engine.impl;
 import java.util.Map;
 
 import org.flowable.dmn.api.DmnManagementService;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.dmn.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.dmn.engine.impl.cmd.GetTableMetaDataCmd;
@@ -22,11 +23,12 @@ import org.flowable.dmn.engine.impl.cmd.GetTableNameCmd;
 import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.engine.common.api.management.TablePageQuery;
 import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Tijs Rademakers
  */
-public class DmnManagementServiceImpl extends ServiceImpl implements DmnManagementService {
+public class DmnManagementServiceImpl extends CommonEngineServiceImpl<DmnEngineConfiguration> implements DmnManagementService {
 
     @Override
     public Map<String, Long> getTableCount() {

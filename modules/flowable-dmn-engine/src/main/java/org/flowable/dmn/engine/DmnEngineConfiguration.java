@@ -35,7 +35,6 @@ import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRuleServiceImpl;
 import org.flowable.dmn.engine.impl.RuleEngineExecutorImpl;
-import org.flowable.dmn.engine.impl.ServiceImpl;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.db.DmnDbSchemaManager;
@@ -259,12 +258,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         initService(dmnRepositoryService);
         initService(ruleService);
         initService(dmnHistoryService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     // Data managers
