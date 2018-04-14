@@ -68,6 +68,7 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.slf4j.Logger;
@@ -536,6 +537,15 @@ public abstract class AbstractEngineConfiguration {
     public void initClock() {
         if (clock == null) {
             clock = new DefaultClockImpl();
+        }
+    }
+
+    // services
+    // /////////////////////////////////////////////////////////////////
+
+    protected void initService(Object service) {
+        if (service instanceof CommonEngineServiceImpl) {
+            ((CommonEngineServiceImpl) service).setCommandExecutor(commandExecutor);
         }
     }
 

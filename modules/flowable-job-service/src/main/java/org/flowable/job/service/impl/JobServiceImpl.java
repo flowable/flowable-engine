@@ -34,10 +34,6 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManage
  */
 public class JobServiceImpl extends ServiceImpl implements JobService {
 
-    public JobServiceImpl() {
-
-    }
-
     public JobServiceImpl(JobServiceConfiguration jobServiceConfiguration) {
         super(jobServiceConfiguration);
     }
@@ -92,7 +88,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     
     @Override
     public AbstractRuntimeJobEntity activateSuspendedJob(SuspendedJobEntity job) {
-        if (jobServiceConfiguration.getJobParentStateResolver().isSuspended(job)) {
+        if (configuration.getJobParentStateResolver().isSuspended(job)) {
             throw new FlowableIllegalArgumentException("Can not activate job "+ job.getId() +". Parent is suspended.");
         }
         return getJobManager().activateSuspendedJob(job);

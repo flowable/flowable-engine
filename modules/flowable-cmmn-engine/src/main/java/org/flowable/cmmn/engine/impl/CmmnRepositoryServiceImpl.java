@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeployCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCmmnModelCmd;
@@ -36,13 +37,18 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormDefinition;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnRepositoryService {
+public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfiguration> implements CmmnRepositoryService {
+
+    public CmmnRepositoryServiceImpl(CmmnEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     @Override
     public CmmnDeploymentBuilder createDeployment() {
@@ -90,12 +96,12 @@ public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnReposi
     
     @Override
     public CmmnDeploymentQuery createDeploymentQuery() {
-        return cmmnEngineConfiguration.getCmmnDeploymentEntityManager().createDeploymentQuery();
+        return configuration.getCmmnDeploymentEntityManager().createDeploymentQuery();
     }
     
     @Override
     public CaseDefinitionQuery createCaseDefinitionQuery() {
-        return cmmnEngineConfiguration.getCaseDefinitionEntityManager().createCaseDefinitionQuery();
+        return configuration.getCaseDefinitionEntityManager().createCaseDefinitionQuery();
     }
 
     @Override

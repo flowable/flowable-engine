@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.AddCommentCmd;
 import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
@@ -85,11 +86,7 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class TaskServiceImpl extends ServiceImpl implements TaskService {
-
-    public TaskServiceImpl() {
-
-    }
+public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements TaskService {
 
     public TaskServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -281,7 +278,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
     @Override
     public TaskQuery createTaskQuery() {
-        return new TaskQueryImpl(commandExecutor, processEngineConfiguration.getDatabaseType());
+        return new TaskQueryImpl(commandExecutor, configuration.getDatabaseType());
     }
 
     @Override
