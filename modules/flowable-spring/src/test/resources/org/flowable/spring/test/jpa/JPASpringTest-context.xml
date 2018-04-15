@@ -10,12 +10,20 @@
 
     <context:component-scan base-package="org.flowable.spring.test.jpa"/>
 
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="org.h2.Driver"/>
-        <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000"/>
-        <property name="username" value="sa"/>
-        <property name="password" value=""/>
-        <property name="defaultAutoCommit" value="false"/>
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <constructor-arg>
+            <bean class="com.zaxxer.hikari.HikariConfig">
+                <property name="autoCommit" value="false" />
+                <property name="dataSourceClassName" value="org.h2.jdbcx.JdbcDataSource" />
+                <property name="dataSourceProperties">
+                    <props>
+                        <prop key="url">jdbc:h2:mem:flowable;DB_CLOSE_ON_EXIT=FALSE</prop>
+                        <prop key="user">sa</prop>
+                        <prop key="password"></prop>
+                    </props>
+                </property>
+            </bean>
+        </constructor-arg>
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false"/>
