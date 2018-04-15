@@ -16,13 +16,19 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.flowable.appengine.api.AppManagementService;
+import org.flowable.appengine.engine.AppEngineConfiguration;
 import org.flowable.appengine.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.appengine.engine.impl.cmd.GetTableNamesCmd;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Tijs Rademakers
  */
-public class AppManagementServiceImpl extends ServiceImpl implements AppManagementService {
+public class AppManagementServiceImpl extends CommonEngineServiceImpl<AppEngineConfiguration> implements AppManagementService {
+    
+    public AppManagementServiceImpl(AppEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     @Override
     public Map<String, Long> getTableCounts() {

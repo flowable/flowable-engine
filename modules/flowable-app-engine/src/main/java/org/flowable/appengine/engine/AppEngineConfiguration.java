@@ -31,7 +31,6 @@ import org.flowable.appengine.api.repository.AppResourceConverter;
 import org.flowable.appengine.engine.impl.AppEngineImpl;
 import org.flowable.appengine.engine.impl.AppManagementServiceImpl;
 import org.flowable.appengine.engine.impl.AppRepositoryServiceImpl;
-import org.flowable.appengine.engine.impl.ServiceImpl;
 import org.flowable.appengine.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.appengine.engine.impl.cfg.StandaloneInMemAppEngineConfiguration;
 import org.flowable.appengine.engine.impl.db.AppDbSchemaManager;
@@ -111,8 +110,8 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     protected String cmmnEngineName = AppEngines.NAME_DEFAULT;
 
-    protected AppManagementService appManagementService = new AppManagementServiceImpl();
-    protected AppRepositoryService appRepositoryService = new AppRepositoryServiceImpl();
+    protected AppManagementService appManagementService = new AppManagementServiceImpl(this);
+    protected AppRepositoryService appRepositoryService = new AppRepositoryServiceImpl(this);
     
     protected TableDataManager tableDataManager;
     protected AppDeploymentDataManager deploymentDataManager;
@@ -278,13 +277,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected void initServices() {
         initService(appManagementService);
         initService(appRepositoryService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setEngineConfig(this);
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     public void initDataManagers() {

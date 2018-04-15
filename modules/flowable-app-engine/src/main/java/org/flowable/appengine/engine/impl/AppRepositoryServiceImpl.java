@@ -22,6 +22,7 @@ import org.flowable.appengine.api.repository.AppDeployment;
 import org.flowable.appengine.api.repository.AppDeploymentBuilder;
 import org.flowable.appengine.api.repository.AppDeploymentQuery;
 import org.flowable.appengine.api.repository.AppModel;
+import org.flowable.appengine.engine.AppEngineConfiguration;
 import org.flowable.appengine.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.appengine.engine.impl.cmd.DeployCmd;
 import org.flowable.appengine.engine.impl.cmd.GetAppModelCmd;
@@ -32,12 +33,17 @@ import org.flowable.appengine.engine.impl.cmd.SetAppDefinitionCategoryCmd;
 import org.flowable.appengine.engine.impl.repository.AppDeploymentBuilderImpl;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class AppRepositoryServiceImpl extends ServiceImpl implements AppRepositoryService {
+public class AppRepositoryServiceImpl extends CommonEngineServiceImpl<AppEngineConfiguration> implements AppRepositoryService {
+    
+    public AppRepositoryServiceImpl(AppEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     @Override
     public AppDeploymentBuilder createDeployment() {
@@ -80,12 +86,12 @@ public class AppRepositoryServiceImpl extends ServiceImpl implements AppReposito
     
     @Override
     public AppDeploymentQuery createDeploymentQuery() {
-        return cmmnEngineConfiguration.getAppDeploymentEntityManager().createDeploymentQuery();
+        return configuration.getAppDeploymentEntityManager().createDeploymentQuery();
     }
     
     @Override
     public AppDefinitionQuery createAppDefinitionQuery() {
-        return cmmnEngineConfiguration.getAppDefinitionEntityManager().createAppDefinitionQuery();
+        return configuration.getAppDefinitionEntityManager().createAppDefinitionQuery();
     }
 
     @Override

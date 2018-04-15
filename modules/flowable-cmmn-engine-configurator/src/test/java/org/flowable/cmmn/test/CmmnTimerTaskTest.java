@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -96,6 +97,10 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         
         cmmnEngineConfiguration.resetClock();
         ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).resetClock();
+        
+        for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
+            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
     
 }
