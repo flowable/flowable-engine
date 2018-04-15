@@ -23,7 +23,9 @@ import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteEventLogEntry;
 import org.flowable.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.engine.impl.cmd.GetEventLogEntriesCmd;
@@ -69,7 +71,7 @@ import java.util.Map;
  * @author Falko Menge
  * @author Saeid Mizaei
  */
-public class ManagementServiceImpl extends ServiceImpl implements ManagementService {
+public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements ManagementService {
     
     @Override
     public Map<String, Long> getTableCount() {
