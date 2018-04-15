@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Import;
         "org.flowable.admin.service",
         "org.flowable.admin.filter",
         "org.flowable.admin.security",
+        "org.flowable.admin.conf",
         "org.flowable.app.conf",
         "org.flowable.app.repository",
         "org.flowable.app.service",

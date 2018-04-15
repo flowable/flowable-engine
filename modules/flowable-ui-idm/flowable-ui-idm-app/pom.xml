@@ -190,7 +190,6 @@
                 </includes>
                 <excludes>
                     <exclude>static/fonts/**</exclude>
-                    <exclude>application-dev.properties</exclude>
                 </excludes>
             </resource>
             <resource>
