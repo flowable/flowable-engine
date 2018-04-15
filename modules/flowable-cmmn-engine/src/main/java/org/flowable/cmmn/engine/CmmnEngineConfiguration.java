@@ -330,6 +330,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean addDefaultExceptionHandler = true;
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected InternalJobParentStateResolver internalJobParentStateResolver;
+    protected String jobExecutionScope = JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN;
 
     protected FormFieldHandler formFieldHandler;
 
@@ -1192,6 +1193,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         } else {
             this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalCmmnJobManager(this));
         }
+        
+        this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
 
         this.jobServiceConfiguration.init();
 
@@ -2247,6 +2250,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public String getJobExecutionScope() {
+        return jobExecutionScope;
+    }
+
+    public CmmnEngineConfiguration setJobExecutionScope(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
+        return this;
+    }
+
     public HttpClientConfig getHttpClientConfig() {
         return httpClientConfig;
     }
@@ -2267,6 +2279,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         super.initIdGenerator();
         if (taskIdGenerator == null) {
             taskIdGenerator = idGenerator;
+        }
+    }
+    
+    public void resetClock() {
+        if (this.clock != null) {
+            clock.reset();
         }
     }
 

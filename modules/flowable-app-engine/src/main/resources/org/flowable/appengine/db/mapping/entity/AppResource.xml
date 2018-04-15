@@ -17,7 +17,7 @@
         (#{resource.id, jdbcType=VARCHAR},
          #{resource.name, jdbcType=VARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
-         #{resource.deploymentId, jdbcType=VARCHAR}})
+         #{resource.deploymentId, jdbcType=VARCHAR})
       </foreach>
   </insert>
 

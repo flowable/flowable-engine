@@ -637,6 +637,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      */
     protected boolean asyncExecutorMessageQueueMode;
     protected boolean asyncHistoryExecutorMessageQueueMode;
+    
+    protected String jobExecutionScope;
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
@@ -1405,6 +1407,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         // set the job processors
         this.jobServiceConfiguration.setJobProcessors(this.jobProcessors);
         this.jobServiceConfiguration.setHistoryJobProcessors(this.historyJobProcessors);
+        
+        this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
 
         this.jobServiceConfiguration.init();
 
@@ -3938,4 +3942,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
         return this;
     }
+
+    public String getJobExecutionScope() {
+        return jobExecutionScope;
+    }
+
+    public ProcessEngineConfigurationImpl setJobExecutionScope(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
+        return this;
+    }
+    
 }

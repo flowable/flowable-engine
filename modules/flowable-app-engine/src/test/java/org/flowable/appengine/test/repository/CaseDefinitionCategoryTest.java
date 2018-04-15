@@ -14,12 +14,13 @@ package org.flowable.appengine.test.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
+import org.flowable.appengine.api.repository.AppDefinition;
+import org.flowable.appengine.api.repository.AppDeployment;
 import org.flowable.appengine.engine.test.FlowableAppTestCase;
-import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,30 +34,30 @@ public class CaseDefinitionCategoryTest extends FlowableAppTestCase {
 
     @Before
     public void deployTestDeployments() {
-        this.deploymentId1 = cmmnRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
+        this.deploymentId1 = appRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/appengine/test/test.app")
                 .deploy()
                 .getId();
     }
 
     @After
     public void deleteTestDeployments() {
-        List<AppDeployment> deployments = cmmnRepositoryService.createDeploymentQuery().list();
-        for (AppDeployment cmmnDeployment : deployments) {
-            cmmnRepositoryService.deleteDeployment(cmmnDeployment.getId(), true);
+        List<AppDeployment> deployments = appRepositoryService.createDeploymentQuery().list();
+        for (AppDeployment appDeployment : deployments) {
+            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
         }
     }
 
     @Test
     public void testUpdateCategory() {
-        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).singleResult();
-        assertEquals("http://flowable.org/cmmn", caseDefinition.getCategory());
+        AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).singleResult();
+        assertNull(appDefinition.getCategory());
         
-        cmmnRepositoryService.setCaseDefinitionCategory(caseDefinition.getId(), "testCategory");
-        caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).singleResult();
-        assertEquals("testCategory", caseDefinition.getCategory());
+        appRepositoryService.setAppDefinitionCategory(appDefinition.getId(), "testCategory");
+        appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).singleResult();
+        assertEquals("testCategory", appDefinition.getCategory());
         
-        caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).caseDefinitionCategory("testCategory").singleResult();
-        assertNotNull(caseDefinition);
+        appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).appDefinitionCategory("testCategory").singleResult();
+        assertNotNull(appDefinition);
     }
 }
