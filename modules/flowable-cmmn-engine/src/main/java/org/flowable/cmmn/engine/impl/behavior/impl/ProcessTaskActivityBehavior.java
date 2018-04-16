@@ -62,9 +62,9 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         String processInstanceId = null;
         boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
         if (blocking) {
-            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getId());
+            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getId(), planItemInstanceEntity.getTenantId());
         } else {
-            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef);
+            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getTenantId());
         }
 
         planItemInstanceEntity.setReferenceType(PlanItemInstanceCallbackType.CHILD_PROCESS);
