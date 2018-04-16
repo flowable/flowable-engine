@@ -375,7 +375,7 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
 
     @Override
     public TaskBuilder createTaskBuilder() {
-        return new CmmnTaskBuilderImpl(this.cmmnEngineConfiguration.getCommandExecutor());
+        return new CmmnTaskBuilderImpl(commandExecutor);
     }
 
 }
