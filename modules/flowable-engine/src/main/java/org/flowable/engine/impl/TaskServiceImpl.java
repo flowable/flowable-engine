@@ -570,6 +570,6 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
     @Override
     public TaskBuilder createTaskBuilder() {
-        return new TaskBuilderImpl(this.processEngineConfiguration.getCommandExecutor());
+        return new TaskBuilderImpl(commandExecutor);
     }
 }
