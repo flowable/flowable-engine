@@ -128,7 +128,14 @@
         select
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_TIMER_JOB RES
-        where DUEDATE_ &lt;= #{parameter, jdbcType=TIMESTAMP}
+        where 
+        <if test="parameter.jobExecutionScope == null">
+            SCOPE_TYPE_ is null
+        </if>
+        <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
+            SCOPE_TYPE_ = #{parameter.jobExecutionScope}
+        </if>
+        and DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP}
         and LOCK_OWNER_ is null
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>

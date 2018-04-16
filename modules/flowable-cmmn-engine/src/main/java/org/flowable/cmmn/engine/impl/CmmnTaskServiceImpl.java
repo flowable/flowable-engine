@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkCmd;
 import org.flowable.cmmn.engine.impl.cmd.ClaimTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
@@ -45,6 +46,7 @@ import org.flowable.cmmn.engine.impl.cmd.SetTaskDueDateCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetTaskPriorityCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetTaskVariablesCmd;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
@@ -57,8 +59,12 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 /**
  * @author Joram Barrez
  */
-public class CmmnTaskServiceImpl extends ServiceImpl implements CmmnTaskService {
-    
+public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfiguration> implements CmmnTaskService {
+
+    public CmmnTaskServiceImpl(CmmnEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
+
     @Override
     public Task newTask() {
         return newTask(null);

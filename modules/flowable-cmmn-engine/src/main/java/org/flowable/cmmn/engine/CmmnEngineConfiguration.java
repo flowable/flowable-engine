@@ -40,7 +40,6 @@ import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnTaskServiceImpl;
-import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
@@ -139,10 +138,6 @@ import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.scripting.BeansResolverFactory;
@@ -213,11 +208,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 
-    protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl();
-    protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl();
-    protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl();
-    protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl();
-    protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl();
+    protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl(this);
+    protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl(this);
+    protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl(this);
+    protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl(this);
+    protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl(this);
 
     protected TableDataManager tableDataManager;
     protected CmmnDeploymentDataManager deploymentDataManager;
@@ -339,6 +334,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean addDefaultExceptionHandler = true;
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected InternalJobParentStateResolver internalJobParentStateResolver;
+    protected String jobExecutionScope = JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN;
 
     protected FormFieldHandler formFieldHandler;
 
@@ -719,25 +715,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    @Override
     public void initSessionFactories() {
-        if (sessionFactories == null) {
-            sessionFactories = new HashMap<>();
-
-            if (usingRelationalDatabase) {
-                initDbSqlSessionFactory();
-            }
-
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-            commandContextFactory.setSessionFactories(sessionFactories);
-        }
-
+        super.initSessionFactories();
         addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
-
-        if (customSessionFactories != null) {
-            for (SessionFactory sessionFactory : customSessionFactories) {
-                addSessionFactory(sessionFactory);
-            }
-        }
     }
 
     protected void initServices() {
@@ -746,13 +727,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setEngineConfig(this);
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     public void initDataManagers() {
@@ -1233,6 +1207,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         } else {
             this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalCmmnJobManager(this));
         }
+        
+        this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
 
         this.jobServiceConfiguration.init();
 
@@ -2288,6 +2264,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public String getJobExecutionScope() {
+        return jobExecutionScope;
+    }
+
+    public CmmnEngineConfiguration setJobExecutionScope(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
+        return this;
+    }
+
     public HttpClientConfig getHttpClientConfig() {
         return httpClientConfig;
     }
@@ -2308,6 +2293,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         super.initIdGenerator();
         if (taskIdGenerator == null) {
             taskIdGenerator = idGenerator;
+        }
+    }
+    
+    public void resetClock() {
+        if (this.clock != null) {
+            clock.reset();
         }
     }
 

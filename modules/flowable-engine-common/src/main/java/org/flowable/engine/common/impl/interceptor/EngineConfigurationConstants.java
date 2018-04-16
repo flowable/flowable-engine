@@ -25,6 +25,8 @@ public interface EngineConfigurationConstants {
     String KEY_CONTENT_ENGINE_CONFIG = "cfg.contentEngine";
     
     String KEY_CMMN_ENGINE_CONFIG = "cfg.cmmnEngine";
+    
+    String KEY_APP_ENGINE_CONFIG = "cfg.appEngine";
 
     String KEY_TASK_SERVICE_CONFIG = "cfg.taskService";
     

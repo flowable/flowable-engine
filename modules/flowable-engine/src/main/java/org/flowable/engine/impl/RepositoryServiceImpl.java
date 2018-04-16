@@ -23,6 +23,8 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.AddEditorSourceExtraForModelCmd;
 import org.flowable.engine.impl.cmd.AddEditorSourceForModelCmd;
@@ -78,7 +80,7 @@ import org.flowable.validation.ValidationError;
  * @author Falko Menge
  * @author Joram Barrez
  */
-public class RepositoryServiceImpl extends ServiceImpl implements RepositoryService {
+public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements RepositoryService {
 
     @Override
     public DeploymentBuilder createDeployment() {

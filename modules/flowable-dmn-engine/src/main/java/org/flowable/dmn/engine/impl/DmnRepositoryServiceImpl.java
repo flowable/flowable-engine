@@ -23,6 +23,7 @@ import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.NativeDecisionTableQuery;
 import org.flowable.dmn.api.NativeDmnDeploymentQuery;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.dmn.engine.impl.cmd.DeployCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentDecisionTableCmd;
@@ -37,11 +38,12 @@ import org.flowable.dmn.engine.impl.repository.DmnDeploymentBuilderImpl;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Tijs Rademakers
  */
-public class DmnRepositoryServiceImpl extends ServiceImpl implements DmnRepositoryService {
+public class DmnRepositoryServiceImpl extends CommonEngineServiceImpl<DmnEngineConfiguration> implements DmnRepositoryService {
 
     @Override
     public DmnDeploymentBuilder createDeployment() {

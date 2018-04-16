@@ -32,6 +32,6 @@
     <property name="debugger" ref="processDebugger"/>
   </bean>
 
-  <bean id="processDebugger" class="org.flowable.engine.impl.agenda.TestProcessDebugger"/>
+  <bean id="processDebugger" class="org.flowable.engine.test.debugger.TestProcessDebugger"/>
 
 </beans>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext 
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="flowable">
+
+        <createTable tableName="ACT_APP_DEPLOYMENT">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="CATEGORY_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="KEY_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="DEPLOY_TIME_" type="datetime">
+                <constraints nullable="true" />
+            </column>
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+        </createTable>
+
+        <createTable tableName="ACT_APP_DEPLOYMENT_RESOURCE">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_APP_DEPLOYMENT_RESOURCE" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="RESOURCE_BYTES_" type="longblob">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint constraintName="ACT_FK_APP_RSRC_DPL" 
+            referencedTableName="ACT_APP_DEPLOYMENT"
+            referencedColumnNames="ID_" 
+            baseTableName="ACT_APP_DEPLOYMENT_RESOURCE" 
+            baseColumnNames="DEPLOYMENT_ID_" />
+            
+        <createIndex tableName="ACT_APP_DEPLOYMENT_RESOURCE" indexName="ACT_IDX_APP_RSRC_DPL">
+            <column name="DEPLOYMENT_ID_" />
+        </createIndex>            
+
+        <createTable tableName="ACT_APP_APPDEF">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="REV_" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="KEY_" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="VERSION_" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="CATEGORY_" type="varchar(255)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="RESOURCE_NAME_" type="varchar(4000)" />
+            <column name="DESCRIPTION_" type="varchar(4000)" />
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+        </createTable>
+        
+        <addForeignKeyConstraint constraintName="ACT_FK_APP_DEF_DPLY" 
+            referencedTableName="ACT_APP_DEPLOYMENT"
+            referencedColumnNames="ID_" 
+            baseTableName="ACT_APP_APPDEF" 
+            baseColumnNames="DEPLOYMENT_ID_" />
+            
+        <createIndex tableName="ACT_APP_APPDEF" indexName="ACT_IDX_APP_DEF_DPLY">
+            <column name="DEPLOYMENT_ID_" />
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>

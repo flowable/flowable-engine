@@ -34,8 +34,12 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 
     protected BpmnModel readXMLFile() throws Exception {
         InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
+        return readXMLFile(xmlStream);
+    }
+    
+    protected BpmnModel readXMLFile(InputStream inputStream) throws Exception {
         XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
+        InputStreamReader in = new InputStreamReader(inputStream, "UTF-8");
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
         return new BpmnXMLConverter().convertToBpmnModel(xtr);
     }
@@ -161,14 +165,6 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 				}
 			}
 		}
-    }
-
-    protected void deployProcess(BpmnModel bpmnModel) {
-        /*
-         * byte[] xml = new BpmnXMLConverter().convertToXML(bpmnModel); ProcessEngineConfiguration configuration = ProcessEngineConfiguration. createStandaloneInMemProcessEngineConfiguration();
-         * ProcessEngine processEngine = configuration.buildProcessEngine(); try { Deployment deployment = processEngine.getRepositoryService().createDeployment().name
-         * ("test").addString("test.bpmn20.xml", new String(xml)).deploy(); processEngine .getRepositoryService().deleteDeployment(deployment.getId()); } finally { processEngine.close(); }
-         */
     }
 
     protected abstract String getResource();

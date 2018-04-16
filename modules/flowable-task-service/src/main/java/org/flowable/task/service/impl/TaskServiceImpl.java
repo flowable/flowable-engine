@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,20 +12,22 @@
  */
 package org.flowable.task.service.impl;
 
+import java.util.List;
+
+import org.flowable.engine.common.impl.service.CommonServiceImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-
-import java.util.List;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class TaskServiceImpl extends ServiceImpl implements TaskService {
+public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration> implements TaskService {
 
     public TaskServiceImpl(TaskServiceConfiguration taskServiceConfiguration) {
         super(taskServiceConfiguration);
@@ -50,7 +52,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     public List<Task> findTasksByParentTaskId(String parentTaskId) {
         return getTaskEntityManager().findTasksByParentTaskId(parentTaskId);
     }
-
+    
     @Override
     public List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType) {
         return getTaskEntityManager().findTasksBySubScopeIdAndScopeType(subScopeId, scopeType);
@@ -80,7 +82,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     public void updateTask(TaskEntity taskEntity, boolean fireUpdateEvent) {
         getTaskEntityManager().update(taskEntity, fireUpdateEvent);
     }
-
+    
     @Override
     public void updateAllTaskRelatedEntityCountFlags(boolean configProperty) {
         getTaskEntityManager().updateAllTaskRelatedEntityCountFlags(configProperty);
@@ -100,10 +102,14 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     public void deleteTask(TaskEntity task, boolean fireEvents) {
         getTaskEntityManager().delete(task, fireEvents);
     }
-
+    
     @Override
     public void deleteTasksByExecutionId(String executionId) {
         getTaskEntityManager().deleteTasksByExecutionId(executionId);
+    }
+
+    public TaskEntityManager getTaskEntityManager() {
+        return configuration.getTaskEntityManager();
     }
 
     @Override

@@ -107,7 +107,7 @@ public class CmmnParserImpl implements CmmnParser {
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavoir(planItem, stage));
+                planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavior(planItem, stage));
 
             } else if (planItemDefinition instanceof HumanTask) {
                 HumanTask humanTask = (HumanTask) planItemDefinition;

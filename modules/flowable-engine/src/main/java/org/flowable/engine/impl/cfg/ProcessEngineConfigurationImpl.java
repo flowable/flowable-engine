@@ -106,7 +106,6 @@ import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
-import org.flowable.engine.impl.ServiceImpl;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.agenda.AgendaSessionFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
@@ -638,6 +637,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      */
     protected boolean asyncExecutorMessageQueueMode;
     protected boolean asyncHistoryExecutorMessageQueueMode;
+    
+    protected String jobExecutionScope;
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
@@ -941,12 +942,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initService(formService);
         initService(managementService);
         initService(dynamicBpmnService);
-    }
-
-    public void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     public void initDbSchemaManagers() {
@@ -1412,6 +1407,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         // set the job processors
         this.jobServiceConfiguration.setJobProcessors(this.jobProcessors);
         this.jobServiceConfiguration.setHistoryJobProcessors(this.historyJobProcessors);
+        
+        this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
 
         this.jobServiceConfiguration.init();
 
@@ -3945,4 +3942,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
         return this;
     }
+
+    public String getJobExecutionScope() {
+        return jobExecutionScope;
+    }
+
+    public ProcessEngineConfigurationImpl setJobExecutionScope(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
+        return this;
+    }
+    
 }

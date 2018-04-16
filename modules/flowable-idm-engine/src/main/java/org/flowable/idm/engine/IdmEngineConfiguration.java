@@ -14,7 +14,6 @@ package org.flowable.idm.engine;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,9 +32,6 @@ import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.runtime.Clock;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
@@ -45,7 +41,6 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.engine.impl.IdmEngineImpl;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.IdmManagementServiceImpl;
-import org.flowable.idm.engine.impl.ServiceImpl;
 import org.flowable.idm.engine.impl.authentication.BlankSalt;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
@@ -217,12 +212,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         initService(idmManagementService);
     }
 
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
-    }
-
     // Data managers
     ///////////////////////////////////////////////////////////
 
@@ -290,26 +279,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     }
 
     // session factories ////////////////////////////////////////////////////////
-
-    public void initSessionFactories() {
-        if (sessionFactories == null) {
-            sessionFactories = new HashMap<>();
-
-            if (usingRelationalDatabase) {
-                initDbSqlSessionFactory();
-            }
-
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-
-            commandContextFactory.setSessionFactories(sessionFactories);
-        }
-
-        if (customSessionFactories != null) {
-            for (SessionFactory sessionFactory : customSessionFactories) {
-                addSessionFactory(sessionFactory);
-            }
-        }
-    }
 
     @Override
     public void initDbSqlSessionFactory() {
