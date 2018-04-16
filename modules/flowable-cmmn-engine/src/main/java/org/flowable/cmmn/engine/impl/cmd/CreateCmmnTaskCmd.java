@@ -30,7 +30,6 @@ public class CreateCmmnTaskCmd implements Command<Task> {
             if (CountingTaskUtil.isTaskRelatedEntityCountEnabled(parentTaskEntity)) {
                 CountingTaskEntity countingParentTaskEntity = (CountingTaskEntity) parentTaskEntity;
                 countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() + 1);
-                parentTaskEntity.forceUpdate();
             }
         }
         return task;

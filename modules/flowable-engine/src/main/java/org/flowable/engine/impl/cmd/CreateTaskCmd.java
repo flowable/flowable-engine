@@ -32,7 +32,6 @@ public class CreateTaskCmd implements Command<Task> {
                 if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(parentTaskEntity)) {
                     CountingTaskEntity countingParentTaskEntity = (CountingTaskEntity) parentTaskEntity;
                     countingParentTaskEntity.setSubTaskCount(countingParentTaskEntity.getSubTaskCount() + 1);
-                    parentTaskEntity.forceUpdate();
                 }
             }
         }
