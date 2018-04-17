@@ -14,6 +14,7 @@ package org.flowable.rest.app;
 
 import org.flowable.rest.app.properties.RestAppProperties;
 import org.flowable.rest.conf.BootstrapConfiguration;
+import org.flowable.rest.conf.DevelopmentConfiguration;
 import org.flowable.rest.conf.SecurityConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -33,8 +34,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 })
 @Import({
     BootstrapConfiguration.class,
-    SecurityConfiguration.class
-
+    SecurityConfiguration.class,
+    DevelopmentConfiguration.class
 })
 @SpringBootApplication
 public class FlowableRestApplication extends SpringBootServletInitializer {

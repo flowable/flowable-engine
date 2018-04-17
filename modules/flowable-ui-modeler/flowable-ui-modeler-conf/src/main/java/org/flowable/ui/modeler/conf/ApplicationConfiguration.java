@@ -30,6 +30,7 @@ import org.springframework.web.servlet.DispatcherServlet;
         "org.flowable.ui.modeler.repository",
         "org.flowable.ui.modeler.service",
         "org.flowable.ui.modeler.security",
+        "org.flowable.ui.common.conf",
         "org.flowable.ui.common.filter",
         "org.flowable.ui.common.service",
         "org.flowable.ui.common.repository",
