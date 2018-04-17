@@ -13,7 +13,11 @@
 
 package org.flowable.engine.test.api.task;
 
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.notNullValue;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -22,6 +26,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -55,22 +61,6 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
-
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toSet;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
  * @author Frederik Heremans
@@ -151,11 +141,14 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getOwner(), is("testOwner"));
         assertThat(updatedTask.getIdentityLinks().size(), is(2));
         assertThat(updatedTask.getPriority(), is(Task.DEFAULT_PRIORITY));
-        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-        assertThat(historicTaskInstance, notNullValue());
-        assertThat(historicTaskInstance.getName(), is("testName"));
-        assertThat(historicTaskInstance.getPriority(), is(Task.DEFAULT_PRIORITY));
-        assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(historicTaskInstance, notNullValue());
+            assertThat(historicTaskInstance.getName(), is("testName"));
+            assertThat(historicTaskInstance.getPriority(), is(Task.DEFAULT_PRIORITY));
+            assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
+        }
 
         taskService.deleteUserIdentityLink(updatedTask.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
         taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
@@ -179,10 +172,13 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             assertThat(updatedTask, notNullValue());
             assertThat(updatedTask.getName(), is("testName"));
             assertThat(updatedTask.getIdentityLinks().size(), is(2));
-            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-            assertThat(historicTaskInstance, notNullValue());
-            assertThat(historicTaskInstance.getName(), is("testName"));
-            assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+                assertThat(historicTaskInstance, notNullValue());
+                assertThat(historicTaskInstance.getName(), is("testName"));
+                assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
+            }
 
             taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
             taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
@@ -216,10 +212,13 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             assertThat(updatedTask.getAssignee(), is("testAssignee"));
             assertThat(updatedTask.getOwner(), is("testOwner"));
             assertThat(updatedTask.getIdentityLinks().size(), is(4));
-            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-            assertThat(historicTaskInstance, notNullValue());
-            assertThat(historicTaskInstance.getName(), is("testNameFromPostProcessor"));
-            assertThat(historicTaskInstance.getIdentityLinks().size(), is(4));
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+                assertThat(historicTaskInstance, notNullValue());
+                assertThat(historicTaskInstance.getName(), is("testNameFromPostProcessor"));
+                assertThat(historicTaskInstance.getIdentityLinks().size(), is(4));
+            }
 
             taskService.deleteUserIdentityLink(updatedTask.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
             taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
