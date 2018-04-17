@@ -21,15 +21,6 @@
   <build>
     <finalName>flowable-rest</finalName>
 
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>application-dev.properties</exclude>
-        </excludes>
-      </resource>
-    </resources>
-
     <plugins>
       <plugin>
 	    <groupId>org.apache.tomcat.maven</groupId>

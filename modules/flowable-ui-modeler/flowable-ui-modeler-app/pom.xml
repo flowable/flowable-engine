@@ -239,7 +239,6 @@
                     <exclude>static/libs/bootstrap_3.1.1/fonts/**</exclude>
                     <exclude>static/editor-app/fonts/**</exclude>
 		            <exclude>static/libs/ui-grid_3.0.0/**</exclude>
-		            <exclude>application-dev.properties</exclude>
                 </excludes>
             </resource>
             <resource>
