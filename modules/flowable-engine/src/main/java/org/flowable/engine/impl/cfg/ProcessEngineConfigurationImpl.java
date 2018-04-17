@@ -1862,12 +1862,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public void initIdGenerator() {
         if (idGenerator == null) {
-            CommandExecutor idGeneratorCommandExecutor = getCommandExecutor();
             DbIdGenerator dbIdGenerator = new DbIdGenerator();
             dbIdGenerator.setIdBlockSize(idBlockSize);
-            dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
-            dbIdGenerator.setCommandConfig(getDefaultCommandConfig().transactionRequiresNew());
             idGenerator = dbIdGenerator;
+        }
+
+        if (idGenerator instanceof DbIdGenerator) {
+            DbIdGenerator dbIdGenerator = (DbIdGenerator) idGenerator;
+            if (dbIdGenerator.getIdBlockSize() == 0) {
+                dbIdGenerator.setIdBlockSize(idBlockSize);
+            }
+            if (dbIdGenerator.getCommandExecutor() == null) {
+                dbIdGenerator.setCommandExecutor(getCommandExecutor());
+            }
+            if (dbIdGenerator.getCommandConfig() == null) {
+                dbIdGenerator.setCommandConfig(getDefaultCommandConfig().transactionRequiresNew());
+            }
         }
         if (taskIdGenerator == null) {
             taskIdGenerator = idGenerator;
