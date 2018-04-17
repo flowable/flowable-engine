@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.spring.common;
+package org.flowable.common.spring;
 
 import java.util.Map;
 

@@ -14,10 +14,10 @@ package org.flowable.content.spring.configurator;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.configurator.ContentEngineConfigurator;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
-import org.flowable.spring.common.SpringEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
