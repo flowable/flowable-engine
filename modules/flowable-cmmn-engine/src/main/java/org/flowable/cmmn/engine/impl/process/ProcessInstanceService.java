@@ -19,7 +19,7 @@ public interface ProcessInstanceService {
     
     String startProcessInstanceByKey(String processDefinitionKey, String tenantId);
 
-    String startProcessInstanceByKey(String externalRef, String planItemInstanceId, String tenantId);
+    String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId, String tenantId);
 
     void deleteProcessInstance(String processInstanceId);
 
