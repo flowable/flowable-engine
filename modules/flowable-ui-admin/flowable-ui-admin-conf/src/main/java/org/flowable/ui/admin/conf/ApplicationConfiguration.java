@@ -20,18 +20,18 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @ComponentScan(basePackages = {
-        "org.flowable.ui.admin.repository",
-        "org.flowable.ui.admin.service",
-        "org.flowable.ui.admin.filter",
-        "org.flowable.ui.admin.security",
-        "org.flowable.ui.common.conf",
-        "org.flowable.ui.common.repository",
-        "org.flowable.ui.common.service",
-        "org.flowable.ui.common.filter",
-        "org.flowable.ui.common.security"
+    "org.flowable.ui.admin.repository",
+    "org.flowable.ui.admin.service",
+    "org.flowable.ui.admin.security",
+    "org.flowable.ui.admin.conf",
+    "org.flowable.ui.common.conf",
+    "org.flowable.ui.common.repository",
+    "org.flowable.ui.common.service",
+    "org.flowable.ui.common.filter",
+    "org.flowable.ui.common.security"
 })
 @Import(value = {
-        SecurityConfiguration.class,
+    SecurityConfiguration.class,
     DatabaseConfiguration.class
 })
 @EnableConfigurationProperties(FlowableAdminAppProperties.class)
