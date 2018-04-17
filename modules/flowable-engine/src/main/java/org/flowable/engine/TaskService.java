@@ -32,6 +32,7 @@ import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -53,6 +54,13 @@ public interface TaskService {
     /** create a new task with a user defined task id */
     Task newTask(String taskId);
 
+    /**
+     * Create a builder for the task
+     * 
+     * @return task builder
+     */
+    TaskBuilder createTaskBuilder();
+    
     /**
      * Saves the given task to the persistent data store. If the task is already present in the persistent store, it is updated. After a new task has been saved, the task instance passed into this
      * method is updated with the id of the newly created task.

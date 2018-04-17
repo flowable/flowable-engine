@@ -45,6 +45,7 @@ import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.callback.DefaultInternalCmmnJobManager;
+import org.flowable.cmmn.engine.impl.cfg.DefaultTaskAssignmentManager;
 import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
@@ -161,9 +162,12 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
+import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
+import org.flowable.task.service.impl.DefaultTaskPostProcessor;
 import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
@@ -193,7 +197,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, 
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
         HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
@@ -298,6 +302,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
+    protected InternalTaskAssignmentManager internalTaskAssignmentManager;
     protected boolean isEnableTaskRelationshipCounts = true;
     protected int taskQueryLimit = 20000;
     protected int historicTaskQueryLimit = 20000;
@@ -541,6 +546,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * generator used to generate task ids
      */
     protected IdGenerator taskIdGenerator;
+
+    /**
+     * postprocessor for a task builder
+     */
+    protected TaskPostProcessor taskPostProcessor;
 
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -904,7 +914,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             resolverFactories.add(new BeansResolverFactory());
         }
         if (scriptingEngines == null) {
-            
+
             scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
         }
     }
@@ -1072,6 +1082,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setIdGenerator(taskIdGenerator);
 
+        if (this.taskPostProcessor != null) {
+            this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
+        } else {
+            this.taskServiceConfiguration.setTaskPostProcessor(new DefaultTaskPostProcessor());
+        }
+
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
         } else {
@@ -1084,12 +1100,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultCmmnTaskVariableScopeResolver(this));
         }
 
+        if (this.internalTaskAssignmentManager != null) {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
+        } else {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
+        }
+
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.isEnableTaskRelationshipCounts);
         this.taskServiceConfiguration.setTaskQueryLimit(this.taskQueryLimit);
         this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
 
         this.taskServiceConfiguration.init();
-        
+
         if (dbSqlSessionFactory != null && taskServiceConfiguration.getTaskDataManager() instanceof AbstractDataManager) {
             dbSqlSessionFactory.addLogicalEntityClassMapping("task", ((AbstractDataManager) taskServiceConfiguration.getTaskDataManager()).getManagedEntityClass());
         }
@@ -1161,7 +1183,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (customAsyncRunnableExecutionExceptionHandlers != null) {
             exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
         }
-        
+
         if (this.internalJobParentStateResolver != null) {
             this.jobServiceConfiguration.setJobParentStateResolver(this.internalJobParentStateResolver);
         } else {
@@ -1305,7 +1327,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.cmmnHistoryService = cmmnHistoryService;
         return this;
     }
-    
+
     public IdmIdentityService getIdmIdentityService() {
         return ((IdmEngineConfiguration) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
@@ -2289,7 +2311,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
         this.taskIdGenerator = taskIdGenerator;
     }
-    
+
+    public TaskPostProcessor getTaskPostProcessor() {
+        return taskPostProcessor;
+    }
+
+    public void setTaskPostProcessor(TaskPostProcessor processor) {
+        this.taskPostProcessor = processor;
+    }
+
     @Override
     public ScriptingEngines getScriptingEngines() {
         return scriptingEngines;

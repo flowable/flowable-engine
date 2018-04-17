@@ -25,6 +25,7 @@ import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -37,6 +38,13 @@ public interface CmmnTaskService {
     
     Task newTask(String taskId);
 
+    /**
+     * Create a builder for the task
+     *
+     * @return task builder
+     */
+    TaskBuilder createTaskBuilder();
+    
     void saveTask(Task task);
 
     void complete(String taskId);

@@ -22,4 +22,5 @@ public interface HasTaskIdGeneratorEngineConfiguration {
     IdGenerator getTaskIdGenerator();
     
     void setTaskIdGenerator(IdGenerator taskIdGenerator);
+    
 }

@@ -71,6 +71,8 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     
     protected IdGenerator idGenerator;
 
+    protected TaskPostProcessor taskPostProcessor;
+
     // init
     // /////////////////////////////////////////////////////////////////////
 
@@ -78,6 +80,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         checkIdGenerator();
         initDataManagers();
         initEntityManagers();
+        initTaskPostProcessor();
     }
 
     protected void checkIdGenerator() {
@@ -104,6 +107,12 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (historicTaskInstanceEntityManager == null) {
             historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
+        }
+    }
+
+    public void initTaskPostProcessor() {
+        if (taskPostProcessor == null) {
+            taskPostProcessor = taskBuilder -> taskBuilder;
         }
     }
 
@@ -272,5 +281,14 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public IdGenerator getIdGenerator() {
         return idGenerator;
+    }
+
+    public TaskPostProcessor getTaskPostProcessor() {
+        return taskPostProcessor;
+    }
+
+    public TaskServiceConfiguration setTaskPostProcessor(TaskPostProcessor processor) {
+        this.taskPostProcessor = processor;
+        return this;
     }
 }

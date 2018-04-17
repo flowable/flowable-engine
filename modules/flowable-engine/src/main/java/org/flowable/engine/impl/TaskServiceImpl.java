@@ -77,6 +77,7 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
@@ -567,4 +568,8 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
         return commandExecutor.execute(new GetTaskDataObjectCmd(taskId, dataObjectName, locale, withLocalizationFallback));
     }
 
+    @Override
+    public TaskBuilder createTaskBuilder() {
+        return new TaskBuilderImpl(commandExecutor);
+    }
 }

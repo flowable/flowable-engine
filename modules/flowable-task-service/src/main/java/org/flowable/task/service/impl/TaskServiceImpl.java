@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -109,5 +110,10 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
 
     public TaskEntityManager getTaskEntityManager() {
         return configuration.getTaskEntityManager();
+    }
+
+    @Override
+    public Task createTask(TaskBuilder taskBuilder) {
+        return getTaskEntityManager().createTask(taskBuilder);
     }
 }

@@ -51,6 +51,7 @@ import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -370,6 +371,11 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     @Override
     public List<IdentityLink> getIdentityLinksForTask(String taskId) {
         return commandExecutor.execute(new GetIdentityLinksForTaskCmd(taskId));
+    }
+
+    @Override
+    public TaskBuilder createTaskBuilder() {
+        return new CmmnTaskBuilderImpl(commandExecutor);
     }
 
 }

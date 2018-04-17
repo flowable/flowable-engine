@@ -12,13 +12,6 @@
  */
 package org.flowable.cmmn.test;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-import java.util.List;
-
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -34,6 +27,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.List;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class TaskIdGeneratorsConfigurationTest extends AbstractProcessEngineIntegrationTest {
 
@@ -91,7 +92,48 @@ public class TaskIdGeneratorsConfigurationTest extends AbstractProcessEngineInte
         assertTrue(task.getProcessVariables().containsKey("processVariable"));
         assertThat(task.getId(), startsWith("TASK-"));
     }
-    
+
+    @Test
+    public void testTaskBuilder() {
+        Task processEngineTask = null;
+        Task cmmnEngineTask = null;
+        try {
+            processEngineTask = this.processEngineTaskService.createTaskBuilder().name("process engine task").create();
+            assertThat(processEngineTask.getId(), startsWith("TASK-"));
+
+            cmmnEngineTask = this.cmmnTaskService.createTaskBuilder().name("cmmn engine task").create();
+            assertThat(cmmnEngineTask.getId(), startsWith("CMMN-TASK-"));
+        } finally {
+            if (processEngineTask != null) {
+                processEngineTaskService.deleteTask(processEngineTask.getId(), true);
+            }
+            if (cmmnEngineTask != null) {
+                cmmnTaskService.deleteTask(cmmnEngineTask.getId(), true);
+            }
+        }
+    }
+
+    @Test
+    public void testDeleteTasks() {
+        Task processEngineTask = null;
+        Task cmmnEngineTask = null;
+        try {
+            processEngineTask = this.processEngineTaskService.createTaskBuilder().name("process engine task").create();
+            assertNotNull(processEngineTask);
+
+            cmmnEngineTask = this.cmmnTaskService.createTaskBuilder().name("cmmn engine task").create();
+            assertNotNull(cmmnEngineTask);
+        } finally {
+            //processTaskService can delete cmmn task and cmmnTaskService can delete process task
+            if (processEngineTask != null) {
+                cmmnTaskService.deleteTask(processEngineTask.getId(), true);
+            }
+            if (cmmnEngineTask != null) {
+                processEngineTaskService.deleteTask(cmmnEngineTask.getId(), true);
+            }
+        }
+    }
+
     @Test
     public void testOneTaskProcess() {
         this.processEngineRuntimeService.startProcessInstanceByKey("oneTask");
