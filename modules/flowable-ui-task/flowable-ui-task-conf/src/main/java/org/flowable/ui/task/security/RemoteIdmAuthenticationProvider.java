@@ -3,7 +3,7 @@ package org.flowable.ui.task.security;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.ui.common.model.RemoteUser;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class RemoteIdmAuthenticationProvider implements AuthenticationProvider {
             grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
         }
 
-        org.flowable.engine.common.impl.identity.Authentication.setAuthenticatedUserId(user.getId());
+        org.flowable.common.engine.impl.identity.Authentication.setAuthenticatedUserId(user.getId());
 
         Authentication auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(),
                 authentication.getCredentials(), grantedAuthorities);

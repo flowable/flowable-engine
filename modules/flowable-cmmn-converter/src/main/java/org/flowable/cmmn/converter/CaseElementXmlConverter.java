@@ -17,7 +17,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez

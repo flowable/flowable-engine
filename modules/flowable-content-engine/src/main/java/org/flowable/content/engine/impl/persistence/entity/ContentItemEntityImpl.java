@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Joram Barrez

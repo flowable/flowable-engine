@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;

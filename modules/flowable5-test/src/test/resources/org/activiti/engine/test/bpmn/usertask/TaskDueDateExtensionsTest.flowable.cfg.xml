@@ -46,24 +46,24 @@
         <property name="clock" ref="clock"/>
 
         <property name="businessCalendarManager">
-            <bean class="org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager">
+            <bean class="org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager">
                 <constructor-arg name="businessCalendars">
                     <map>
                         <entry key="custom">
                             <bean class="org.activiti.engine.test.bpmn.usertask.TaskDueDateExtensionsTest.CustomBusinessCalendar"/>
                         </entry>
                         <entry key="cycle">
-                            <bean class="org.flowable.engine.common.impl.calendar.CycleBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.CycleBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
                         <entry key="duration">
-                            <bean class="org.flowable.engine.common.impl.calendar.DurationBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.DurationBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
                         <entry key="dueDate">
-                            <bean class="org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
@@ -80,6 +80,6 @@
         <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000"/>
     </bean>
 
-    <bean id="clock" class="org.flowable.engine.common.impl.util.DefaultClockImpl"/>
+    <bean id="clock" class="org.flowable.common.engine.impl.util.DefaultClockImpl"/>
 
 </beans>

@@ -34,10 +34,10 @@ import org.flowable.cmmn.engine.impl.cmd.GetFormDefinitionsForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseDefinitionCategoryCmd;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormDefinition;
 
 /**

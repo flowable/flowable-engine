@@ -15,9 +15,9 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 import java.util.HashMap;
 import java.util.List;
 
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;

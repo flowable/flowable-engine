@@ -20,7 +20,7 @@ import java.util.Map;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 
 /**

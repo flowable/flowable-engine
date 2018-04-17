@@ -63,7 +63,7 @@ import org.activiti.engine.runtime.JobProcessorContext;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.api.Job;
 import org.slf4j.Logger;

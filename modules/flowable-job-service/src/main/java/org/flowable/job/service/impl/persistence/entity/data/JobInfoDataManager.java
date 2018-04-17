@@ -14,8 +14,8 @@ package org.flowable.job.service.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 
 public interface JobInfoDataManager<T extends JobInfoEntity> extends DataManager<T> {

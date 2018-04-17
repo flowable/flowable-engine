@@ -12,8 +12,8 @@
  */
 package org.flowable.idm.engine.delegate.event.impl;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 
 /**

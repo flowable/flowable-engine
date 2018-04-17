@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.junit.Before;
 import org.junit.Test;

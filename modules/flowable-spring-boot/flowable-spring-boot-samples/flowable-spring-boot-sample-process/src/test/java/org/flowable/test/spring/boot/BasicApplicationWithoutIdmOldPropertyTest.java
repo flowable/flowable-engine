@@ -15,8 +15,8 @@ package org.flowable.test.spring.boot;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.IdentityService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.IdmIdentityService;
 import org.junit.Test;
 import org.junit.runner.RunWith;

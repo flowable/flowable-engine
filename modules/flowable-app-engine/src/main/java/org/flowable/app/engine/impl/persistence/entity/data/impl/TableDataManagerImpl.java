@@ -21,7 +21,7 @@ import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntity;
 import org.flowable.app.engine.impl.persistence.entity.AppResourceEntity;
 import org.flowable.app.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 

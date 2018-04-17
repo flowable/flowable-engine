@@ -15,7 +15,7 @@ package org.flowable.engine.test.bpmn.multiinstance;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.FlowableCollectionHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;

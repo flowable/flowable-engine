@@ -23,8 +23,8 @@ import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntity;
 import org.flowable.app.engine.impl.persistence.entity.AppResourceEntity;
 import org.flowable.app.engine.impl.persistence.entity.AppResourceEntityManager;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.IoUtil;
 
 public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
 

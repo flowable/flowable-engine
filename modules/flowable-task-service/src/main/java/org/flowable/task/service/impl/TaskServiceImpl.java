@@ -14,7 +14,7 @@ package org.flowable.task.service.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.service.CommonServiceImpl;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;

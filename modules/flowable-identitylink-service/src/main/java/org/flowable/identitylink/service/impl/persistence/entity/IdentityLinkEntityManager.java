@@ -15,7 +15,7 @@ package org.flowable.identitylink.service.impl.persistence.entity;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez

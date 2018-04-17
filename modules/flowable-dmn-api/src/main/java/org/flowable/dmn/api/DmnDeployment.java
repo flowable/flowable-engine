@@ -14,7 +14,7 @@ package org.flowable.dmn.api;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineDeployment;
 
 /**
  * Represents a deployment that is already present in the dmn repository.

@@ -14,7 +14,7 @@ package org.flowable.engine.impl.bpmn.deployer;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
 
 public class ParsedDeploymentBuilderFactory {

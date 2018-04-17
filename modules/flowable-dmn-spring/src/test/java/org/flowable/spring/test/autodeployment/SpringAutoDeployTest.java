@@ -17,13 +17,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
-import org.flowable.engine.common.impl.util.IoUtil;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

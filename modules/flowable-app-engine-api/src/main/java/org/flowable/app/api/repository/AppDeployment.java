@@ -12,7 +12,7 @@
  */
 package org.flowable.app.api.repository;
 
-import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineDeployment;
 
 public interface AppDeployment extends EngineDeployment{
 

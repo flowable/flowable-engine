@@ -14,9 +14,9 @@ package org.flowable.variable.service.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.service.CommonServiceImpl;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;

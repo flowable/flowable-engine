@@ -18,12 +18,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.flowable.engine.common.api.FlowableException;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

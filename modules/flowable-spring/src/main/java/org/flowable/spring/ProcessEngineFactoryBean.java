@@ -13,8 +13,8 @@
 
 package org.flowable.spring;
 
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;

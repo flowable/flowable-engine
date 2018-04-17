@@ -28,7 +28,7 @@ public interface VariableTypes {
 
     /**
      * @return the variable type to be used to store the given value as a variable.
-     * @throws org.flowable.engine.common.api.FlowableException
+     * @throws org.flowable.common.engine.api.FlowableException
      *             When no available type is capable of storing the value.
      */
     public VariableType findVariableType(Object value);

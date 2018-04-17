@@ -14,9 +14,9 @@ package org.flowable.engine.impl.agenda;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.HasExecutionListeners;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.FlowableEngineAgenda;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;

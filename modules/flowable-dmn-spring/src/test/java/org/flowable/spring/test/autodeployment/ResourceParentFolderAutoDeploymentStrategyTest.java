@@ -27,8 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
-import org.flowable.engine.common.api.FlowableException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

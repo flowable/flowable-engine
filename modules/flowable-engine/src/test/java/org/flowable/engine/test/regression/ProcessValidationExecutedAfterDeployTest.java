@@ -14,7 +14,7 @@ package org.flowable.engine.test.regression;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.validation.ProcessValidator;

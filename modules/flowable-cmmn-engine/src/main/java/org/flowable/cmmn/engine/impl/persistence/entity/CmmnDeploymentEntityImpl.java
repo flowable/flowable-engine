@@ -22,8 +22,8 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tijs Rademakers

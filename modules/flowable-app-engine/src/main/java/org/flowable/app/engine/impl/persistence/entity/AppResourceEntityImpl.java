@@ -14,7 +14,7 @@ package org.flowable.app.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 public class AppResourceEntityImpl extends AbstractEntityNoRevision implements AppResourceEntity, Serializable {
 

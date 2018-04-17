@@ -12,9 +12,9 @@
  */
 package org.activiti.examples.bpmn.servicetask;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * Example JavaDelegate that uses an injected {@link Expression}s in fields 'text1' and 'text2'. While executing, 'var1' is set with the reversed result of the method invocation and 'var2' will be the

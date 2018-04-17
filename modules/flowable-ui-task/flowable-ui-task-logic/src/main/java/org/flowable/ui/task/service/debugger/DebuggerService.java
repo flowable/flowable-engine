@@ -1,10 +1,10 @@
 package org.flowable.ui.task.service.debugger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.Execution;

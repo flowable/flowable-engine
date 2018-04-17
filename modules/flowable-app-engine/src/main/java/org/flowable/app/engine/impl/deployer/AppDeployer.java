@@ -22,10 +22,10 @@ import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityManage
 import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntity;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

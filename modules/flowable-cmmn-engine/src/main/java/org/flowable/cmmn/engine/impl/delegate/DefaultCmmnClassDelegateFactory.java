@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.impl.delegate;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.ServiceTask;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 
 import java.util.List;
 

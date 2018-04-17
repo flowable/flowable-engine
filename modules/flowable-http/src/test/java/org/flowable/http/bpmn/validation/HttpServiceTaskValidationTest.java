@@ -12,7 +12,7 @@
  */
 package org.flowable.http.bpmn.validation;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestCase;
 

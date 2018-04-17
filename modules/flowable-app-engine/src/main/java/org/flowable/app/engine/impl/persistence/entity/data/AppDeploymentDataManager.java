@@ -17,7 +17,7 @@ import java.util.List;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntity;
 import org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

@@ -16,10 +16,10 @@ package org.flowable.form.engine.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.engine.impl.util.CommandContextUtil;

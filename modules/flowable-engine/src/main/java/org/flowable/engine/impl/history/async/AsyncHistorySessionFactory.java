@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.history.async;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Session;
+import org.flowable.common.engine.impl.interceptor.SessionFactory;
 
 public class AsyncHistorySessionFactory implements SessionFactory {
 

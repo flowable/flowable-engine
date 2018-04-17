@@ -26,7 +26,7 @@ import javax.interceptor.InvocationContext;
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.annotation.ProcessVariable;
 import org.flowable.cdi.annotation.StartProcess;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * implementation of the {@link StartProcess} annotation

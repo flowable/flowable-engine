@@ -20,9 +20,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.IdentityService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

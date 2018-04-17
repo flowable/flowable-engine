@@ -20,7 +20,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.modeler.properties.FlowableModelerAppProperties;
 import org.mybatis.spring.SqlSessionFactoryBean;

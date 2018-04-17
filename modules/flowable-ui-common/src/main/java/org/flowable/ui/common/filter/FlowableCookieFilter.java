@@ -28,7 +28,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.ui.common.model.RemoteToken;
 import org.flowable.ui.common.model.RemoteUser;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;

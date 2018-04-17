@@ -40,14 +40,14 @@
         select * from ${prefix}ACT_RU_SUSPENDED_JOB where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectSuspendedJobsByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectSuspendedJobsByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from
         ${prefix}ACT_RU_SUSPENDED_JOB J
         where J.EXECUTION_ID_ = #{parameter}
     </select>
 
-    <select id="selectSuspendedJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectSuspendedJobsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_SUSPENDED_JOB J
         where J.PROCESS_INSTANCE_ID_ = #{parameter}

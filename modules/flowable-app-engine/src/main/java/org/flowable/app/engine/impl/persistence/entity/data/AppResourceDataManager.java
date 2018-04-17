@@ -15,7 +15,7 @@ package org.flowable.app.engine.impl.persistence.entity.data;
 import java.util.List;
 
 import org.flowable.app.engine.impl.persistence.entity.AppResourceEntity;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

@@ -235,14 +235,14 @@
       and TENANT_ID_ = #{tenantId}
   </select>
   
-  <select id="selectFormDefinitionsByKeyAndVersion" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="formDefinitionResultMap">
+  <select id="selectFormDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="formDefinitionResultMap">
     select *
     from ${prefix}ACT_FO_FORM_DEFINITION 
     where KEY_ = #{parameter.formDefinitionKey} and VERSION_ = #{parameter.formVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
     
   
-   <select id="selectFormDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="formDefinitionResultMap">
+   <select id="selectFormDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="formDefinitionResultMap">
     select *
     from ${prefix}ACT_FO_FORM_DEFINITION 
     where KEY_ = #{parameter.formDefinitionKey} and VERSION_ = #{parameter.formVersion} and TENANT_ID_ = #{parameter.tenantId}

@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 

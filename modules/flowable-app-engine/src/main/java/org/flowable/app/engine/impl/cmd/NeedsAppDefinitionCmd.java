@@ -16,10 +16,10 @@ import java.io.Serializable;
 
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * An abstract superclass for {@link Command} implementations that want to verify the provided app is always active (ie. not suspended).

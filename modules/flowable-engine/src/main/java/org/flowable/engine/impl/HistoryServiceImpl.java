@@ -16,8 +16,8 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;

@@ -50,7 +50,7 @@ import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.identitylink.api.IdentityLink;
 
 /**

@@ -24,12 +24,12 @@ import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntity;
 import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntityManager;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 public class AppDeploymentManager {
 

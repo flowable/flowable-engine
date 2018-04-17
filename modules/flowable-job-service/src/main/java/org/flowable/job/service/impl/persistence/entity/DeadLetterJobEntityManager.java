@@ -14,7 +14,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;

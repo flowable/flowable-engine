@@ -20,7 +20,7 @@ import org.flowable.app.api.repository.AppDefinitionQuery;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.api.repository.AppDeploymentQuery;
 import org.flowable.app.api.repository.AppModel;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 
 public interface AppRepositoryService {
 

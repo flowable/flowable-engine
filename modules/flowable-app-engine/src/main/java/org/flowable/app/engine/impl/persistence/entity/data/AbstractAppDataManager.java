@@ -13,8 +13,8 @@
 package org.flowable.app.engine.impl.persistence.entity.data;
 
 import org.flowable.app.engine.AppEngineConfiguration;
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

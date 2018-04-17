@@ -18,8 +18,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

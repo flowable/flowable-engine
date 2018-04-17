@@ -23,7 +23,7 @@ import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl;
 import org.flowable.app.engine.impl.persistence.entity.data.AbstractAppDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.AppDefinitionDataManager;
 import org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Tijs Rademakers

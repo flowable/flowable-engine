@@ -21,7 +21,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
-import org.flowable.engine.common.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.ui.common.service.exception.BadRequestException;

@@ -15,7 +15,7 @@ package org.flowable.engine.test.jobexecutor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;

@@ -23,9 +23,9 @@ import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntity;
 import org.flowable.app.engine.impl.repository.AppDeploymentBuilderImpl;
 import org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers

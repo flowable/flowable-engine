@@ -19,7 +19,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.engine.RestIdentityLink;

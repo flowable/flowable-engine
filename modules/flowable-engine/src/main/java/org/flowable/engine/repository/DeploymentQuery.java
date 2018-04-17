@@ -15,8 +15,8 @@ package org.flowable.engine.repository;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link Deployment}s.

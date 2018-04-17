@@ -18,10 +18,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.app.AppModel;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
@@ -135,7 +135,7 @@ public interface RepositoryService {
     ProcessDefinitionQuery createProcessDefinitionQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeProcessDefinitionQuery createNativeProcessDefinitionQuery();
 
@@ -143,7 +143,7 @@ public interface RepositoryService {
     DeploymentQuery createDeploymentQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for deployment.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for deployment.
      */
     NativeDeploymentQuery createNativeDeploymentQuery();
 
@@ -384,7 +384,7 @@ public interface RepositoryService {
     public ModelQuery createModelQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeModelQuery createNativeModelQuery();
 

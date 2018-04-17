@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.impl.agenda;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.engine.common.impl.agenda.Agenda;
+import org.flowable.common.engine.impl.agenda.Agenda;
 
 /**
  * @author Joram Barrez

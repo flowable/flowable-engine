@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tijs Rademakers

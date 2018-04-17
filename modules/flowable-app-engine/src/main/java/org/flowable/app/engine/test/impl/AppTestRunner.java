@@ -19,7 +19,7 @@ import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.test.AppDeployment;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.runner.notification.RunNotifier;

@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.db;
 
-import org.flowable.engine.common.impl.db.ServiceSqlScriptBasedDbSchemaManager;
+import org.flowable.common.engine.impl.db.ServiceSqlScriptBasedDbSchemaManager;
 
 /**
  * @author Joram Barrez 

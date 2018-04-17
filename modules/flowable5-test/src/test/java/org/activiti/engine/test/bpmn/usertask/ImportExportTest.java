@@ -6,8 +6,8 @@ import java.io.InputStream;
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;
 

@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
-import org.flowable.engine.common.impl.identity.Authentication;
+import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.common.engine.impl.identity.Authentication;
 
 /**
  * @author Joram Barrez

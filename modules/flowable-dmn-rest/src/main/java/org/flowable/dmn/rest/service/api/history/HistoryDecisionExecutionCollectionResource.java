@@ -17,12 +17,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryProperty;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

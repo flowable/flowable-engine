@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.repository;
 
-import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineDeployment;
 
 /**
  * Represents a deployment that is already present in the process repository.

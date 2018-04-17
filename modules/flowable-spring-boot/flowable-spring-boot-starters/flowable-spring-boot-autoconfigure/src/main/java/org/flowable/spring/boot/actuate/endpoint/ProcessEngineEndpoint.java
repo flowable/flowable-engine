@@ -18,9 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.repository.ProcessDefinition;

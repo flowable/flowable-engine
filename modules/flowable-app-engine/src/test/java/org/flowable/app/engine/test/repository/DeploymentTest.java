@@ -24,8 +24,8 @@ import org.flowable.app.api.repository.AppModel;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.app.engine.test.AppDeployment;
 import org.flowable.app.engine.test.FlowableAppTestCase;
-import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.junit.Test;
 
 /**

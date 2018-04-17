@@ -19,7 +19,7 @@ import java.util.List;
 import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl;
 import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntityImpl;
 import org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;

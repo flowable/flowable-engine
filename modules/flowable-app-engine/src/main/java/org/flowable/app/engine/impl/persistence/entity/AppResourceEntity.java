@@ -12,8 +12,8 @@
  */
 package org.flowable.app.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 public interface AppResourceEntity extends Entity, EngineResource {
  

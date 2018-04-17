@@ -20,7 +20,7 @@ import org.flowable.app.api.repository.AppDefinitionQuery;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.persistence.entity.data.AppDefinitionDataManager;
 import org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 
 /**

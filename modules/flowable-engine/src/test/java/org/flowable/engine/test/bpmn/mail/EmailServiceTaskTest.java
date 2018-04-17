@@ -27,9 +27,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.test.Deployment;
 import org.subethamail.wiser.WiserMessage;

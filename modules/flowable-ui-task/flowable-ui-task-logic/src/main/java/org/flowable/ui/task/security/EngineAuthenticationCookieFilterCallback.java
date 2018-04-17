@@ -15,7 +15,7 @@ package org.flowable.ui.task.security;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.impl.identity.Authentication;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.ui.common.filter.FlowableCookieFilterCallback;
 import org.flowable.ui.common.model.RemoteToken;
 

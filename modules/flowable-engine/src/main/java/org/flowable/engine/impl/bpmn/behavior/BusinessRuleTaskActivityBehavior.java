@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.rules.RulesAgendaFilter;

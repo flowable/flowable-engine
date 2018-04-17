@@ -13,7 +13,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;

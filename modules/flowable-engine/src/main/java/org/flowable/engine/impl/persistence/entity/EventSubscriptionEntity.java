@@ -15,8 +15,8 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.runtime.EventSubscription;
 
 /**

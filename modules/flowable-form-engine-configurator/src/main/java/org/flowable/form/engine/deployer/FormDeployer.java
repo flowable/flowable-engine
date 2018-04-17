@@ -14,9 +14,9 @@ package org.flowable.form.engine.deployer;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;

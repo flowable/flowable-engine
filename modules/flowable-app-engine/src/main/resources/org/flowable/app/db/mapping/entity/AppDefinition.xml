@@ -109,13 +109,13 @@
       and TENANT_ID_ = #{tenantId}
   </select>
   
-  <select id="selectAppDefinitionsByKeyAndVersion" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="appDefinitionResultMap">
+  <select id="selectAppDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appDefinitionResultMap">
     select *
     from ${prefix}ACT_APP_APPDEF 
     where KEY_ = #{parameter.appDefinitionKey} and VERSION_ = #{parameter.appDefinitionVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
   
-  <select id="selectAppDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="appDefinitionResultMap">
+  <select id="selectAppDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appDefinitionResultMap">
     select *
     from ${prefix}ACT_APP_APPDEF 
     where KEY_ = #{parameter.appDefinitionKey} and VERSION_ = #{parameter.appDefinitionVersion} and TENANT_ID_ = #{parameter.tenantId}

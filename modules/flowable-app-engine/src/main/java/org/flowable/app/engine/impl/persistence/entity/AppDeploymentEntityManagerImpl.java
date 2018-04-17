@@ -21,8 +21,8 @@ import org.flowable.app.api.repository.AppDeploymentQuery;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.persistence.entity.data.AppDeploymentDataManager;
 import org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers

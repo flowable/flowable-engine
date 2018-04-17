@@ -15,7 +15,7 @@ package org.flowable.app.api.repository;
 
 import java.util.Set;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Tijs Rademakers

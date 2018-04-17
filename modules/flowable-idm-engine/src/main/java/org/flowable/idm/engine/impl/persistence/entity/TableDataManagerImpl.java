@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.RowBounds;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePage;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePage;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.Token;

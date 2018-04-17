@@ -18,7 +18,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.rest.FormRestResponseFactory;

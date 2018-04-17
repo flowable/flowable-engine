@@ -14,7 +14,7 @@ package org.flowable.app.engine;
 
 import org.flowable.app.api.AppManagementService;
 import org.flowable.app.api.AppRepositoryService;
-import org.flowable.engine.common.impl.FlowableVersions;
+import org.flowable.common.engine.impl.FlowableVersions;
 
 /**
  * Provides access to all services that expose App management operations.

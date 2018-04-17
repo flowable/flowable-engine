@@ -17,9 +17,9 @@ import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityManager;
 import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntityManager;
 import org.flowable.app.engine.impl.persistence.entity.AppResourceEntityManager;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 

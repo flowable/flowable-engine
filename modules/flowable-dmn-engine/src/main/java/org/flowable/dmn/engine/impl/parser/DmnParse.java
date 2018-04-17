@@ -18,6 +18,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
+import org.flowable.common.engine.impl.util.io.StringStreamSource;
+import org.flowable.common.engine.impl.util.io.UrlStreamSource;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.io.ResourceStreamSource;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
@@ -28,11 +33,6 @@ import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.dmn.xml.exception.DmnXMLException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
-import org.flowable.engine.common.impl.util.io.StreamSource;
-import org.flowable.engine.common.impl.util.io.StringStreamSource;
-import org.flowable.engine.common.impl.util.io.UrlStreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

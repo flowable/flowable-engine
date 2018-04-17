@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.bpmn.helper;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class SkipExpressionUtil {

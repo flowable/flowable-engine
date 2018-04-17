@@ -31,9 +31,9 @@ import org.flowable.app.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.app.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.flowable.app.engine.impl.cmd.SetAppDefinitionCategoryCmd;
 import org.flowable.app.engine.impl.repository.AppDeploymentBuilderImpl;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Joram Barrez

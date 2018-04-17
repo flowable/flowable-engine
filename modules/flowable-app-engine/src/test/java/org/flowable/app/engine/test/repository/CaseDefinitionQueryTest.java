@@ -25,7 +25,7 @@ import java.util.List;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.test.FlowableAppTestCase;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

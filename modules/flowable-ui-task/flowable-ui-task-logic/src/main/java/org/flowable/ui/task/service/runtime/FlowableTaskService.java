@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;

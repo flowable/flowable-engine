@@ -3,7 +3,7 @@ package org.flowable.ui.admin.security;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.ui.common.model.RemoteUser;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.webservice;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.impl.bpmn.data.FieldBaseStructureInstance;

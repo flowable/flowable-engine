@@ -12,9 +12,9 @@
  */
 package org.flowable.app.engine.impl.el;
 
-import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.el.VariableContainerELResolver;
-import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.VariableContainerELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
 
 /**
  * @author Tijs Rademakers

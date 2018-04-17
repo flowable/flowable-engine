@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.task.rest.runtime.variable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.ui.task.model.runtime.RestVariable;
 import org.springframework.stereotype.Component;
 

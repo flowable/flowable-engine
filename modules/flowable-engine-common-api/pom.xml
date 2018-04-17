@@ -16,15 +16,15 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.engine.common.api
+			org.flowable.common.engine.api
 		</flowable.artifact>
 		<flowable.osgi.export.additional>
-			org.flowable.engine.common.api,
-			org.flowable.engine.common.api.delegate.event,
-            org.flowable.engine.common.api.history,
-			org.flowable.engine.common.api.io,
-			org.flowable.engine.common.api.management,
-			org.flowable.engine.common.api.query,
+			org.flowable.common.engine.api,
+			org.flowable.common.engine.api.delegate.event,
+            org.flowable.common.engine.api.history,
+			org.flowable.common.engine.api.io,
+			org.flowable.common.engine.api.management,
+			org.flowable.common.engine.api.query,
 		</flowable.osgi.export.additional>
 	</properties>
     

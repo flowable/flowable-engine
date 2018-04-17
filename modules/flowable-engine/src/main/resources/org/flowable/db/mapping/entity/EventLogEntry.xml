@@ -104,14 +104,14 @@
     select * from ${prefix}ACT_EVT_LOG ORDER BY LOG_NR_
   </select>
   
-  <select id="selectEventLogEntries" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="eventLogEntryResultMap">
+  <select id="selectEventLogEntries" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="eventLogEntryResultMap">
     select * from ${prefix}ACT_EVT_LOG 
     WHERE LOG_NR_ &gt; #{parameter.startLogNr}
     AND LOG_NR_ &lt; #{parameter.endLogNr}
     ORDER BY LOG_NR_ 
   </select>
   
-  <select id="selectEventLogEntriesByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="eventLogEntryResultMap">
+  <select id="selectEventLogEntriesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="eventLogEntryResultMap">
     select * from ${prefix}ACT_EVT_LOG 
     WHERE PROC_INST_ID_ = #{parameter.processInstanceId}
     ORDER BY LOG_NR_ 

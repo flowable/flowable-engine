@@ -71,13 +71,13 @@
         process definitions in the repository.
         -->
         <property name="defaultCommandConfig">
-          <bean class="org.flowable.engine.common.impl.interceptor.CommandConfig">
+          <bean class="org.flowable.common.engine.impl.interceptor.CommandConfig">
             <constructor-arg name="contextReusePossible" value="false"/>
           </bean>
         </property>
 
         <property name="schemaCommandConfig">
-          <bean class="org.flowable.engine.common.impl.interceptor.CommandConfig">
+          <bean class="org.flowable.common.engine.impl.interceptor.CommandConfig">
             <constructor-arg name="contextReusePossible" value="false"/>
           </bean>
         </property>
@@ -89,7 +89,7 @@
     </constructor-arg>
   </bean>
 
-  <bean id="clock" class="org.flowable.engine.common.impl.util.DefaultClockImpl"/>
+  <bean id="clock" class="org.flowable.common.engine.impl.util.DefaultClockImpl"/>
 
   <!-- simulation run is driven by event calendar. -->
   <bean id="eventCalendar" class="org.flowable.crystalball.simulator.SimpleEventCalendarFactory">

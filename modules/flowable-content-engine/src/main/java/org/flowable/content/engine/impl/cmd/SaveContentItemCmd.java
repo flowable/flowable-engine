@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentMetaDataKeys;
 import org.flowable.content.api.ContentObject;
@@ -25,9 +28,6 @@ import org.flowable.content.api.ContentStorage;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers

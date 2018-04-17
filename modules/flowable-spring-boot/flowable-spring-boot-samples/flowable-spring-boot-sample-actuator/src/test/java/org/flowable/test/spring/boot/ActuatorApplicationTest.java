@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.FlowableVersions;
+import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.junit.Test;
 import org.junit.runner.RunWith;

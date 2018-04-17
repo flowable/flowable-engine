@@ -50,7 +50,7 @@
   
   <!-- RESOURCE SELECT -->
 
-  <select id="selectAppResourceNamesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectAppResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select NAME_ from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   
@@ -60,7 +60,7 @@
           AND NAME_ = #{resourceName}
   </select>
 
-  <select id="selectAppResourcesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="appResourceResultMap">
+  <select id="selectAppResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appResourceResultMap">
     select * from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   

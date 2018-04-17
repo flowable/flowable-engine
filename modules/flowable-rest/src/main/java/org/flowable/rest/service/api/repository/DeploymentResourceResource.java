@@ -17,9 +17,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

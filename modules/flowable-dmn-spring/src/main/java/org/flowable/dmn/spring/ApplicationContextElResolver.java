@@ -16,9 +16,9 @@ package org.flowable.dmn.spring;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.springframework.context.ApplicationContext;
 
 /**

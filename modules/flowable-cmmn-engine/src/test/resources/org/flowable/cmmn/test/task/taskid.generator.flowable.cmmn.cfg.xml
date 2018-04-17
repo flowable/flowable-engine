@@ -28,5 +28,5 @@
     
     <bean id="timerBean" class="org.flowable.cmmn.test.bean.TimerBean" />
     
-    <bean id="idGenerator" class="org.flowable.engine.common.impl.persistence.StrongUuidGenerator"/>
+    <bean id="idGenerator" class="org.flowable.common.engine.impl.persistence.StrongUuidGenerator"/>
 </beans>

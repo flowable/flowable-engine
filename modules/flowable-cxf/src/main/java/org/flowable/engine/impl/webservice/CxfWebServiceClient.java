@@ -24,7 +24,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.message.Message;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.BpmnError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

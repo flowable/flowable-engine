@@ -55,7 +55,7 @@
 
   <!-- DEPLOYMENT SELECT -->
 
-  <select id="selectAppDeploymentsByName" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="appDeploymentResultMap">
+  <select id="selectAppDeploymentsByName" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appDeploymentResultMap">
     select * from ${prefix}ACT_APP_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
   </select>
   

@@ -14,7 +14,7 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;

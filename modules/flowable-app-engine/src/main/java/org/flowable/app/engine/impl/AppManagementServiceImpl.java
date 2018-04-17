@@ -19,7 +19,7 @@ import org.flowable.app.api.AppManagementService;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.app.engine.impl.cmd.GetTableNamesCmd;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Tijs Rademakers

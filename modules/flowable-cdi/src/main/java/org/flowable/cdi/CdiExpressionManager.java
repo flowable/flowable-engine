@@ -15,9 +15,9 @@ package org.flowable.cdi;
 import java.util.List;
 
 import org.flowable.cdi.impl.el.CdiResolver;
-import org.flowable.engine.common.impl.el.DefaultExpressionManager;
-import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.el.DefaultExpressionManager;
+import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
 
 /**

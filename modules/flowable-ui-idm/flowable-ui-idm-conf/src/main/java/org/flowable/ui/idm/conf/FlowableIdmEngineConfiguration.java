@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.idm.conf;
 
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.idm.engine.IdmEngine;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

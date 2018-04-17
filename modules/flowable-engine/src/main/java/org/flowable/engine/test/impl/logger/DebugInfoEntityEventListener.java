@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.test.impl.logger;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.BaseEntityEventListener;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 

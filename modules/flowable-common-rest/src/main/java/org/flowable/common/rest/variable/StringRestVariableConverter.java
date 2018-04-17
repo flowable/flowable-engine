@@ -13,7 +13,7 @@
 
 package org.flowable.common.rest.variable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 /**
  * @author Frederik Heremans

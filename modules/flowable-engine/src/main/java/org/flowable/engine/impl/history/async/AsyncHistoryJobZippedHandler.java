@@ -16,7 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
-import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 /**

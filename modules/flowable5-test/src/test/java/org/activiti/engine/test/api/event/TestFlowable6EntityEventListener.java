@@ -15,9 +15,9 @@ package org.activiti.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 
 public class TestFlowable6EntityEventListener implements FlowableEventListener {
 

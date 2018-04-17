@@ -15,9 +15,9 @@ package org.flowable.form.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormDeployment;

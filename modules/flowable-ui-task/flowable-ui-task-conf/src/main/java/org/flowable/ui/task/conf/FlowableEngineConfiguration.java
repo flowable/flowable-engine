@@ -12,8 +12,8 @@
  */
 package org.flowable.ui.task.conf;
 
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.impl.runtime.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

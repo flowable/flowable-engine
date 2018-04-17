@@ -17,9 +17,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.flowable.engine.common.impl.calendar.AdvancedCycleBusinessCalendar;
-import org.flowable.engine.common.impl.runtime.Clock;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
+import org.flowable.common.engine.impl.calendar.AdvancedCycleBusinessCalendar;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
 
 public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {

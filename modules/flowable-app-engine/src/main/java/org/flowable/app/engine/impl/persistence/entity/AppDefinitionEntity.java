@@ -14,7 +14,7 @@
 package org.flowable.app.engine.impl.persistence.entity;
 
 import org.flowable.app.api.repository.AppDefinition;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 public interface AppDefinitionEntity extends Entity, AppDefinition {
     

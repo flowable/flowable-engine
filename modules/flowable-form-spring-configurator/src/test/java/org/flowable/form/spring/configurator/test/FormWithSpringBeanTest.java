@@ -15,7 +15,7 @@ package org.flowable.form.spring.configurator.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.form.api.FormDeployment;

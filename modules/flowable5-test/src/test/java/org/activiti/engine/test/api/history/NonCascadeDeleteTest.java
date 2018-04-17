@@ -1,7 +1,7 @@
 package org.activiti.engine.test.api.history;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 
 public class NonCascadeDeleteTest extends PluggableFlowableTestCase {

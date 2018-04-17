@@ -13,9 +13,9 @@
 package org.flowable.cmmn.engine.impl.scripting;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.scripting.Resolver;
-import org.flowable.engine.common.impl.scripting.ResolverFactory;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.scripting.Resolver;
+import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
