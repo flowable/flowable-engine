@@ -15,7 +15,7 @@ package org.flowable.form.engine.impl.deployer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.form.engine.impl.persistence.deploy.Deployer;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;

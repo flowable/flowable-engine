@@ -16,9 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.ScriptServiceTask;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 
 /**
  * Implementation of ScriptActivity CMMN 2.0 PlanItem.

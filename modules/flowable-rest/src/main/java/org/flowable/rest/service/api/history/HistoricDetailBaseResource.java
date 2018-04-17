@@ -16,9 +16,9 @@ package org.flowable.rest.service.api.history;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.impl.HistoricDetailQueryProperty;
 import org.flowable.rest.service.api.RestResponseFactory;

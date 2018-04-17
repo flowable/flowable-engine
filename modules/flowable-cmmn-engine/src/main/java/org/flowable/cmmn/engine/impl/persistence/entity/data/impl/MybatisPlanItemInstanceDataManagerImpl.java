@@ -23,8 +23,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 
 /**
  * @author Joram Barrez

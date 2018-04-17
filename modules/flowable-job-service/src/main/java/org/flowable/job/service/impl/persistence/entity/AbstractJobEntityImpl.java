@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 

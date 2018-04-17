@@ -87,7 +87,7 @@
     </where>
   </sql>
   
-  <select id="selectMessageEventSubscriptionsByProcessInstanceAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectMessageEventSubscriptionsByProcessInstanceAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     where (EVENT_TYPE_ = 'message')
@@ -95,7 +95,7 @@
         and PROC_INST_ID_ = #{parameter.processInstanceId}
   </select>
   
-  <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     left outer join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_
@@ -114,7 +114,7 @@
     </if>   
   </select>
   
-  <select id="selectSignalEventSubscriptionsByProcessInstanceAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectSignalEventSubscriptionsByProcessInstanceAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     where (EVENT_TYPE_ = 'signal')
@@ -122,7 +122,7 @@
         and PROC_INST_ID_ = #{parameter.processInstanceId}
   </select> 
   
-  <select id="selectSignalEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectSignalEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = 'signal')
@@ -130,20 +130,20 @@
     	and (EVENT_NAME_ = #{parameter.eventName})
   </select>
   
-  <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EXECUTION_ID_ = #{parameter})
   </select>
       
-  <select id="selectEventSubscriptionsByExecutionAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByExecutionAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (EXECUTION_ID_ = #{parameter.executionId})
   </select>
   
-  <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
@@ -151,7 +151,7 @@
     	and (ACTIVITY_ID_ = #{parameter.activityId})
   </select>
   
-  <select id="selectEventSubscriptionsByProcessInstanceTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByProcessInstanceTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
@@ -159,7 +159,7 @@
     	and (ACTIVITY_ID_ = #{parameter.activityId})
   </select>
   
-  <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     <where>
@@ -178,7 +178,7 @@
     </where>   
   </select>
   
-  <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
@@ -191,7 +191,7 @@
     </if>   	
   </select>
   
-  <select id="selectEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})

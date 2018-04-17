@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
-import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.common.engine.api.repository.EngineResource;
 
 /**
  * Static methods for working with CMMN and image resource names.

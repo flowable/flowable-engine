@@ -28,7 +28,7 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.engine.impl.repository.DeploymentBuilderImpl;
 import org.activiti.engine.repository.Deployment;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tom Baeyens

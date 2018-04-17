@@ -12,7 +12,7 @@
  */
 package org.flowable.task.service.impl.persistence;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * Interface to express a condition whether or not one specific cached entity should be used in the return result of a query.

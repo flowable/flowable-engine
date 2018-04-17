@@ -14,8 +14,8 @@ package org.flowable.form.api;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePageQuery;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePageQuery;
 
 /**
  * Service for admin and maintenance operations on the form engine.
@@ -42,7 +42,7 @@ public interface FormManagementService {
     TableMetaData getTableMetaData(String tableName);
 
     /**
-     * Creates a {@link TablePageQuery} that can be used to fetch {@link org.flowable.engine.common.api.management.TablePage} containing specific sections of table row data.
+     * Creates a {@link TablePageQuery} that can be used to fetch {@link org.flowable.common.engine.api.management.TablePage} containing specific sections of table row data.
      */
     TablePageQuery createTablePageQuery();
 

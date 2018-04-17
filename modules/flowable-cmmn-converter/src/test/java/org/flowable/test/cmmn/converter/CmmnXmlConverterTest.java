@@ -33,7 +33,7 @@ import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
-import org.flowable.engine.common.api.io.InputStreamProvider;
+import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.junit.Before;
 import org.junit.Test;
 

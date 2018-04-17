@@ -14,9 +14,9 @@ package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;

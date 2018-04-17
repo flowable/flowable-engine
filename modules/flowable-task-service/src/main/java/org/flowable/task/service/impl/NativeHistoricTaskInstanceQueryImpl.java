@@ -15,9 +15,9 @@ package org.flowable.task.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractNativeQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.util.CommandContextUtil;

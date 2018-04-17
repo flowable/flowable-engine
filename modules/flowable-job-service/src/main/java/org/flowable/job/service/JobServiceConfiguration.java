@@ -16,11 +16,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.HistoryJobServiceImpl;
 import org.flowable.job.service.impl.JobServiceImpl;
 import org.flowable.job.service.impl.TimerJobServiceImpl;

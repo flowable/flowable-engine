@@ -15,11 +15,11 @@ package org.flowable.task.service;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.impl.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;

@@ -13,8 +13,8 @@
 
 package org.flowable.dmn.engine.impl.el;
 
+import org.flowable.common.engine.impl.el.AbstractFlowableFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.util.CollectionUtil;
-import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
 
 import java.lang.reflect.Method;
 

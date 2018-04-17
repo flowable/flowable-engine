@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;

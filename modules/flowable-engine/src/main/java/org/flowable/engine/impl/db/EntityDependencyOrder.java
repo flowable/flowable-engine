@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;

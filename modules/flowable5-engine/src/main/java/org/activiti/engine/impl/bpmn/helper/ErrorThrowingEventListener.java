@@ -15,9 +15,9 @@ package org.activiti.engine.impl.bpmn.helper;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 
 /**
  * An {@link FlowableEventListener} that throws a error event when an event is dispatched to it.

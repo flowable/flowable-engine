@@ -17,7 +17,7 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
-import org.flowable.engine.common.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;

@@ -23,7 +23,7 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

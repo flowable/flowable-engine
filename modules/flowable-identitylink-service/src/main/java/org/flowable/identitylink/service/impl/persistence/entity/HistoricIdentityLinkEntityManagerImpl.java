@@ -15,7 +15,7 @@ package org.flowable.identitylink.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
@@ -33,7 +34,6 @@ import org.flowable.dmn.rest.service.api.decision.DmnRuleServiceSingleResponse;
 import org.flowable.dmn.rest.service.api.history.HistoricDecisionExecutionResponse;
 import org.flowable.dmn.rest.service.api.repository.DecisionTableResponse;
 import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
 /**
  *

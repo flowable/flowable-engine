@@ -13,7 +13,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 
 /**
  * @author Joram Barrez

@@ -14,8 +14,8 @@ package org.flowable.job.service.impl.cmd;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.util.CommandContextUtil;

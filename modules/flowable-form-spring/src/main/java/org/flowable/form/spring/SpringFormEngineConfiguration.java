@@ -19,9 +19,10 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.FormEngines;
@@ -30,7 +31,6 @@ import org.flowable.form.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
-import org.flowable.spring.common.SpringEngineConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;

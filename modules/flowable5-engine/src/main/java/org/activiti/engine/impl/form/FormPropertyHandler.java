@@ -19,9 +19,9 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.el.NoExecutionVariableScope;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Tom Baeyens

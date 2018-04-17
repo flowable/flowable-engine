@@ -15,7 +15,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.repository.ProcessDefinition;
 

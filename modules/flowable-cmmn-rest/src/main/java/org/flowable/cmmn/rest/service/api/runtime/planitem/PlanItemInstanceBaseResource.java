@@ -25,10 +25,10 @@ import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

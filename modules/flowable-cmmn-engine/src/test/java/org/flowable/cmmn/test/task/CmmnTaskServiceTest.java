@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +16,9 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.task.api.Task;
@@ -45,183 +45,7 @@ import static org.junit.Assert.assertNull;
  * @author Joram Barrez
  */
 public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
-    private Task task = null;
-
-    @After
-    public void tearDown() {
-        if (task != null) {
-            this.cmmnTaskService.deleteTask(task.getId(), true);
-        }
-    }
-
-    @Test
-    public void createTask() {
-        // Arrange
-        task = this.cmmnTaskService.newTask();
-        task.setName("testTask");
-        this.cmmnTaskService.saveTask(task);
-
-        // Act
-        this.cmmnTaskService.setAssignee(task.getId(), "testAssignee");
-        this.cmmnTaskService.setOwner(task.getId(), "testOwner");
-
-        // Assert
-        Task updatedTask = this.cmmnTaskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-        assertThat(updatedTask.getIdentityLinks().size(), is(0));
-
-    }
-
-    @Test
-    public void createTaskWithBuilder() {
-        task = this.cmmnTaskService.createTaskBuilder().
-                        name("testName").
-                        description("testDescription").
-                        priority(35).
-                        owner("testOwner").
-                        assignee("testAssignee").
-                        dueDate(new Date(0)).
-                        category("testCategory").
-                        parentTaskId("testParentTaskId").
-                        tenantId("testTenantId").
-                        formKey("testFormKey").
-                        taskDefinitionId("testDefintionId").
-                        taskDefinitionKey("testDefinitionKey").
-                        create();
-        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
-        assertThat(updatedTask, notNullValue());
-        assertThat(updatedTask.getName(), is("testName"));
-        assertThat(updatedTask.getDescription(), is("testDescription"));
-        assertThat(updatedTask.getPriority(), is(35));
-        assertThat(updatedTask.getOwner(), is("testOwner"));
-        assertThat(updatedTask.getAssignee(), is("testAssignee"));
-        assertThat(updatedTask.getDueDate(), is(new Date(0)));
-        assertThat(updatedTask.getCategory(), is("testCategory"));
-        assertThat(updatedTask.getParentTaskId(), is("testParentTaskId"));
-        assertThat(updatedTask.getTenantId(), is("testTenantId"));
-        assertThat(updatedTask.getFormKey(), is("testFormKey"));
-        assertThat(updatedTask.getTaskDefinitionId(), is("testDefintionId"));
-        assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
-
-        cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testAssignee", IdentityLinkType.ASSIGNEE);
-        cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testOwner", IdentityLinkType.OWNER);
-    }
-
-    @Test
-    public void createTaskWithParent() {
-        Task parentTask = cmmnTaskService.newTask();
-        cmmnTaskService.saveTask(parentTask);
-        try {
-            task = cmmnTaskService.createTaskBuilder().
-                    name("testName").
-                    parentTaskId(parentTask.getId()).
-                    identityLinks(getDefaultIdentityLinks()).
-                    create();
-            Task updatedParentTask = cmmnTaskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
-            assertThat(((CountingTaskEntity) updatedParentTask).getSubTaskCount(), is(1));
-            Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-            assertThat(((CountingTaskEntity) updatedTask).getIdentityLinkCount(), is(2));
-        } finally {
-            this.cmmnTaskService.deleteTask(parentTask.getId(), true);
-        }
-    }
-
-
-    @Test
-    public void createTaskWithBuilderAndPostprocessor() {
-        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.cmmnEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
-        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
-        try {
-            taskServiceConfiguration.setTaskPostProcessor(
-                    taskEntity -> {
-                        taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
-                        taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
-                        return taskEntity;
-                    }
-            );
-            task = cmmnTaskService.createTaskBuilder().
-                    name("testName").
-                    create();
-            Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-            assertThat(updatedTask, notNullValue());
-            assertThat(updatedTask.getName(), is("testName"));
-            assertThat(updatedTask.getIdentityLinks().size(), is(2));
-            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-            assertThat(historicTaskInstance, notNullValue());
-            assertThat(historicTaskInstance.getName(), is("testName"));
-            assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
-
-            cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
-            cmmnTaskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
-        } finally {
-            taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
-        }
-    }
-
-    @Test
-    public void createTaskWithOwnerAssigneeAndIdentityLinksAndPostProcessor() {
-        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.cmmnEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
-        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
-        try {
-            taskServiceConfiguration.setTaskPostProcessor(
-                    taskEntity -> {
-                        taskEntity.setName("testNameFromPostProcessor");
-                        taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
-                        taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
-                        return taskEntity;
-                    }
-            );
-
-            task = cmmnTaskService.createTaskBuilder().
-                    name("testName").
-                    owner("testOwner").
-                    assignee("testAssignee").
-                    identityLinks(getDefaultIdentityLinks()).
-                    create();
-            Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-            assertThat(updatedTask, notNullValue());
-            assertThat(updatedTask.getName(), is("testNameFromPostProcessor"));
-            assertThat(updatedTask.getAssignee(), is("testAssignee"));
-            assertThat(updatedTask.getOwner(), is("testOwner"));
-            assertThat(updatedTask.getIdentityLinks().size(), is(4));
-            assertThat(updatedTask.getPriority(), is(Task.DEFAULT_PRIORITY));
-            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-            assertThat(historicTaskInstance, notNullValue());
-            assertThat(historicTaskInstance.getName(), is("testNameFromPostProcessor"));
-            assertThat(historicTaskInstance.getIdentityLinks().size(), is(4));
-            assertThat(historicTaskInstance.getPriority(), is(Task.DEFAULT_PRIORITY));
-
-            cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testUserFromBuilder", IdentityLinkType.CANDIDATE);
-            cmmnTaskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupFromBuilder", IdentityLinkType.CANDIDATE);
-            cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
-            cmmnTaskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
-        } finally {
-            taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
-        }
-    }
-
-    @Test
-    public void createTaskWithOwnerAssigneeAndIdentityLinks() {
-        task = cmmnTaskService.createTaskBuilder().
-                name("testName").
-                owner("testOwner").
-                assignee("testAssignee").
-                identityLinks(getDefaultIdentityLinks()).
-                create();
-        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-        assertThat(updatedTask, notNullValue());
-        assertThat(updatedTask.getName(), is("testName"));
-        assertThat(updatedTask.getAssignee(), is("testAssignee"));
-        assertThat(updatedTask.getOwner(), is("testOwner"));
-        assertThat(updatedTask.getIdentityLinks().size(), is(2));
-        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
-        assertThat(historicTaskInstance, notNullValue());
-        assertThat(historicTaskInstance.getName(), is("testName"));
-        assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
-
-        cmmnTaskService.deleteUserIdentityLink(updatedTask.getId(), "testUserFromBuilder", IdentityLinkType.CANDIDATE);
-        cmmnTaskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupFromBuilder", IdentityLinkType.CANDIDATE);
-    }
-
+    
     @Test
     @CmmnDeployment
     public void testOneHumanTaskCase() {
@@ -263,10 +87,10 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertEquals("The Task A", task.getName());
         assertEquals("This is a test YES", task.getDescription());
         assertEquals("johnDoe", task.getAssignee());
-
+        
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
-
+        
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertNotNull(historicTaskInstance);
@@ -275,19 +99,19 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertNotNull(historicTaskInstance.getEndTime());
         }
     }
-
+    
     @Test
     @CmmnDeployment
     public void testTriggerOneHumanTaskCaseProgrammatically() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-
+        
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().singleResult();
         assertEquals(planItemInstance.getId(), task.getSubScopeId());
         assertEquals(planItemInstance.getCaseInstanceId(), task.getScopeId());
         assertEquals(planItemInstance.getCaseDefinitionId(), task.getScopeDefinitionId());
         assertEquals(ScopeTypes.CMMN, task.getScopeType());
-
+        
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertEquals(0, cmmnTaskService.createTaskQuery().count());
         assertCaseInstanceEnded(caseInstance);

@@ -14,7 +14,7 @@ package org.flowable.form.engine.impl;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceInfo;

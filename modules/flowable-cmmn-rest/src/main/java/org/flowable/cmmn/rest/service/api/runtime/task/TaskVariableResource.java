@@ -18,9 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;

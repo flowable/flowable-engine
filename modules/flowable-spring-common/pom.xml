@@ -16,7 +16,7 @@
 
     <properties>
         <flowable.artifact>
-            org.flowable.spring.common
+            org.flowable.common.spring
         </flowable.artifact>
         <flowable.osgi.import.additional>
           org.springframework.test.context*;resolution:=optional,

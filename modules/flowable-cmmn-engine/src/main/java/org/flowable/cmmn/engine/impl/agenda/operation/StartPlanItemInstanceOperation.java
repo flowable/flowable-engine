@@ -17,7 +17,7 @@ import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez

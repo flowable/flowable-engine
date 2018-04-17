@@ -12,9 +12,9 @@
  */
 package org.flowable.idm.engine.impl.db;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableWrongDbException;
-import org.flowable.engine.common.impl.db.ServiceSqlScriptBasedDbSchemaManager;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableWrongDbException;
+import org.flowable.common.engine.impl.db.ServiceSqlScriptBasedDbSchemaManager;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;

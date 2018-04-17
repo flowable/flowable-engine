@@ -28,8 +28,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataMan
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseInstanceByCaseDefinitionIdMatcher;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**

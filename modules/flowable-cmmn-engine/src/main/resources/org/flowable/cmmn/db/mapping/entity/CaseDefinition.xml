@@ -121,13 +121,13 @@
       and TENANT_ID_ = #{tenantId}
   </select>
   
-  <select id="selectCaseDefinitionsByKeyAndVersion" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_CMMN_CASEDEF 
     where KEY_ = #{parameter.caseDefinitionKey} and VERSION_ = #{parameter.caseDefinitionVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
   
-  <select id="selectCaseDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_CMMN_CASEDEF 
     where KEY_ = #{parameter.caseDefinitionKey} and VERSION_ = #{parameter.caseDefinitionVersion} and TENANT_ID_ = #{parameter.tenantId}

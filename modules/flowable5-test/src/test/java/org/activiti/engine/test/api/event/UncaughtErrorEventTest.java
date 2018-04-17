@@ -13,7 +13,7 @@
 package org.activiti.engine.test.api.event;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.test.Deployment;
 

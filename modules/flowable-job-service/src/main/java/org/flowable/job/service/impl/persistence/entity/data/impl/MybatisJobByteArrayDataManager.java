@@ -14,7 +14,7 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntity;
 import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.JobByteArrayDataManager;

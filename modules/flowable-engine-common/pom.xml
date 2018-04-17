@@ -16,23 +16,23 @@
 
     <properties>
         <flowable.artifact>
-            org.flowable.engine.common.impl
+            org.flowable.common.engine.impl
         </flowable.artifact>
         <flowable.osgi.export.additional>
-            org.flowable.engine.common.impl,
-            org.flowable.engine.common.impl.cfg,
-            org.flowable.engine.common.impl.cmd,
-            org.flowable.engine.common.impl.db,
-            org.flowable.engine.common.impl.el,
-            org.flowable.engine.common.impl.interceptor,
-            org.flowable.engine.common.impl.javax.el,
-            org.flowable.engine.common.impl.persistence,
-            org.flowable.engine.common.impl.persistence.entity,
-            org.flowable.engine.common.impl.persistence.entity.data,
-            org.flowable.engine.common.impl.transaction,
-            org.flowable.engine.common.impl.util,
-            org.flowable.engine.common.impl.util.io,
-            org.flowable.engine.common.impl.runtime,
+            org.flowable.common.engine.impl,
+            org.flowable.common.engine.impl.cfg,
+            org.flowable.common.engine.impl.cmd,
+            org.flowable.common.engine.impl.db,
+            org.flowable.common.engine.impl.el,
+            org.flowable.common.engine.impl.interceptor,
+            org.flowable.common.engine.impl.javax.el,
+            org.flowable.common.engine.impl.persistence,
+            org.flowable.common.engine.impl.persistence.entity,
+            org.flowable.common.engine.impl.persistence.entity.data,
+            org.flowable.common.engine.impl.transaction,
+            org.flowable.common.engine.impl.util,
+            org.flowable.common.engine.impl.util.io,
+            org.flowable.common.engine.impl.runtime,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             org.springframework*;resolution:=optional,

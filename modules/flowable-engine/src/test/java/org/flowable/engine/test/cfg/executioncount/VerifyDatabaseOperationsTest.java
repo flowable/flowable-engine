@@ -17,11 +17,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
+import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.history.AbstractHistoryManager;

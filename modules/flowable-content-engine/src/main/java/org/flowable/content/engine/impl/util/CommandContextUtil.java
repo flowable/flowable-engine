@@ -12,13 +12,13 @@
  */
 package org.flowable.content.engine.impl.util;
 
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManager;
 import org.flowable.content.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 
 public class CommandContextUtil {
     

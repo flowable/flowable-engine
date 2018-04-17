@@ -15,8 +15,8 @@ package org.flowable.engine.impl.event.logger.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;

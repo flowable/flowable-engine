@@ -15,6 +15,9 @@ package org.flowable.dmn.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnDeployment;
@@ -36,9 +39,6 @@ import org.flowable.dmn.engine.impl.cmd.SetDeploymentCategoryCmd;
 import org.flowable.dmn.engine.impl.cmd.SetDeploymentTenantIdCmd;
 import org.flowable.dmn.engine.impl.repository.DmnDeploymentBuilderImpl;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Tijs Rademakers

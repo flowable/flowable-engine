@@ -34,8 +34,8 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**

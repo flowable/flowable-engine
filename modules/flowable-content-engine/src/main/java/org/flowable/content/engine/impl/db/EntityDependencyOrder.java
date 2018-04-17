@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 public class EntityDependencyOrder {
 

@@ -14,8 +14,8 @@ package org.flowable.idm.engine.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.identity.Authentication;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.IdmIdentityService;

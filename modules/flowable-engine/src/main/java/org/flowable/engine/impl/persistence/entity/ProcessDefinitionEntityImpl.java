@@ -18,9 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.db.SuspensionState;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.impl.bpmn.data.IOSpecification;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;

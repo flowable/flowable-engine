@@ -1,9 +1,9 @@
 package org.flowable.dmn.engine.impl.cmd;
 
+import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author jbarrez

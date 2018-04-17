@@ -372,29 +372,29 @@
    select * from ${prefix}ACT_RU_TASK where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
-  <select id="selectTasksByParentTaskId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
+  <select id="selectTasksByParentTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
     select * from ${prefix}ACT_RU_TASK where PARENT_TASK_ID_ = #{parameter}
   </select>
 
-  <select id="selectTasksByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
+  <select id="selectTasksByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
     select distinct T.*
     from ${prefix}ACT_RU_TASK T
     where T.EXECUTION_ID_ = #{parameter}
   </select>
   
-  <select id="selectTasksByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
+  <select id="selectTasksByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
     select T.*
     from ${prefix}ACT_RU_TASK T
     where T.PROC_INST_ID_ = #{parameter}
   </select>
   
-  <select id="selectTasksBySubScopeIdAndScopeType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
+  <select id="selectTasksBySubScopeIdAndScopeType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
     select T.*
     from ${prefix}ACT_RU_TASK T
     where T.SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} and T.SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
   </select>
   
-  <select id="selectTasksByScopeIdAndScopeType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
+  <select id="selectTasksByScopeIdAndScopeType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
     select T.*
     from ${prefix}ACT_RU_TASK T
     where T.SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} and T.SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}

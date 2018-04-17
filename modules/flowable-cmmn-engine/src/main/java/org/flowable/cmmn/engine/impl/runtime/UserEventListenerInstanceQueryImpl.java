@@ -13,8 +13,8 @@
 package org.flowable.cmmn.engine.impl.runtime;
 
 import org.flowable.cmmn.api.runtime.*;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
 import java.util.List;
 import java.util.stream.Collectors;

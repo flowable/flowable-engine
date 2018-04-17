@@ -15,8 +15,8 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePage;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.idm.engine.impl.TablePageQueryImpl;
 
 /**

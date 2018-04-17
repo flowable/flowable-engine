@@ -14,8 +14,8 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.job.api.JobInfo;
 
 public interface JobInfoEntity extends JobInfo, AbstractJobEntity, Entity, HasRevision {

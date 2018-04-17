@@ -13,7 +13,7 @@
 package org.flowable.cmmn.engine.impl.parser;
 
 
-import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.common.engine.api.repository.EngineResource;
 
 /**
  * @author Joram Barrez

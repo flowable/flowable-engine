@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 
 public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTestCase {

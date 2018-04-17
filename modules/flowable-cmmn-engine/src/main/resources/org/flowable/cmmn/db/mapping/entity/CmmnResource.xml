@@ -52,7 +52,7 @@
   
   <!-- RESOURCE SELECT -->
 
-  <select id="selectCmmnResourceNamesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectCmmnResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select NAME_ from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   
@@ -62,7 +62,7 @@
           AND NAME_ = #{resourceName}
   </select>
 
-  <select id="selectCmmnResourcesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="cmmnResourceResultMap">
+  <select id="selectCmmnResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnResourceResultMap">
     select * from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   

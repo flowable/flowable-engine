@@ -25,7 +25,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanc
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;

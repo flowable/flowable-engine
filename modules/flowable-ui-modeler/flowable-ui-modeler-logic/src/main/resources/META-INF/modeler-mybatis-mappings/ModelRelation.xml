@@ -2,22 +2,22 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.flowable.app.domain.editor.ModelRelation">
+<mapper namespace="org.flowable.ui.modeler.domain.ModelRelation">
 
-	<resultMap id="modelRelationResultMap" type="org.flowable.app.domain.editor.ModelRelation">
+	<resultMap id="modelRelationResultMap" type="org.flowable.ui.modeler.domain.ModelRelation">
 		<id property="id" column="id" jdbcType="VARCHAR" />
 		<result property="parentModelId" column="parent_model_id" jdbcType="VARCHAR" />
 		<result property="modelId" column="model_id" jdbcType="VARCHAR" />
 		<result property="type" column="relation_type" jdbcType="VARCHAR" />
 	</resultMap>
 	
-	<resultMap id="modelInformationResultMap" type="org.flowable.app.domain.editor.ModelInformation">
+	<resultMap id="modelInformationResultMap" type="org.flowable.ui.modeler.domain.ModelInformation">
         <id property="id" column="id" jdbcType="VARCHAR" />
         <result property="name" column="name" jdbcType="VARCHAR" />
         <result property="type" column="model_type" jdbcType="INTEGER" />
     </resultMap>
 	
-    <insert id="insertModelRelation" parameterType="org.flowable.app.domain.editor.ModelRelation">
+    <insert id="insertModelRelation" parameterType="org.flowable.ui.modeler.domain.ModelRelation">
         insert into ${prefix}ACT_DE_MODEL_RELATION (
             id,
             parent_model_id,
@@ -31,7 +31,7 @@
           )
     </insert>
     
-    <update id="updateModelRelation" parameterType="org.flowable.app.domain.editor.ModelRelation">
+    <update id="updateModelRelation" parameterType="org.flowable.ui.modeler.domain.ModelRelation">
         update ${prefix}ACT_DE_MODEL_RELATION
         <set>
             parent_model_id = #{parentModelId, jdbcType=VARCHAR},
@@ -58,7 +58,7 @@
         where mr.model_id = #{modelId, jdbcType=VARCHAR}
     </select>
     
-    <delete id="deleteModelRelation" parameterType="org.flowable.app.domain.editor.ModelRelation">
+    <delete id="deleteModelRelation" parameterType="org.flowable.ui.modeler.domain.ModelRelation">
         delete from ${prefix}ACT_DE_MODEL_RELATION where id = #{id, jdbcType=VARCHAR}
     </delete>
     

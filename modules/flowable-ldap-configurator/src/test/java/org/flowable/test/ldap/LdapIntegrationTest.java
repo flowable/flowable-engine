@@ -14,7 +14,7 @@ package org.flowable.test.ldap;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.User;
 import org.springframework.test.context.ContextConfiguration;

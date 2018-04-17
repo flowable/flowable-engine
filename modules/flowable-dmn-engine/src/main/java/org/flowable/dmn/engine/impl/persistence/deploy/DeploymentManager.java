@@ -15,6 +15,9 @@ package org.flowable.dmn.engine.impl.persistence.deploy;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
@@ -24,9 +27,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 
 /**
  * @author Tijs Rademakers

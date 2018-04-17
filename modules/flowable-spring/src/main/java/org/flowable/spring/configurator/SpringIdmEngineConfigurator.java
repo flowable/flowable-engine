@@ -12,10 +12,10 @@
  */
 package org.flowable.spring.configurator;
 
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
-import org.flowable.spring.common.SpringEngineConfiguration;
 
 /**
  * @author Tijs Rademakers

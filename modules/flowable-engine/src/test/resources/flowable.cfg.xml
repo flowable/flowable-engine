@@ -53,7 +53,7 @@
     <property name="enableProcessDefinitionInfoCache" value="true" />
 
     <property name="clock">
-        <bean class="org.flowable.engine.common.impl.util.TestClockImpl" />
+        <bean class="org.flowable.common.engine.impl.util.TestClockImpl" />
     </property>
   </bean>
   

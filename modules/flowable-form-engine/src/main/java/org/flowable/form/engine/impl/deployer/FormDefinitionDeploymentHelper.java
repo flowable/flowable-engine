@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;

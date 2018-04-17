@@ -2,9 +2,9 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.flowable.app.domain.editor.ModelHistory">
+<mapper namespace="org.flowable.ui.modeler.domain.ModelHistory">
 
-    <resultMap id="modelHistoryResultMap" type="org.flowable.app.domain.editor.ModelHistory">
+    <resultMap id="modelHistoryResultMap" type="org.flowable.ui.modeler.domain.ModelHistory">
         <id property="id" column="id" jdbcType="VARCHAR" />
         <result property="name" column="name" jdbcType="VARCHAR" />
         <result property="key" column="model_key" jdbcType="VARCHAR" />
@@ -22,7 +22,7 @@
         <result property="tenantId" column="tenant_id" jdbcType="VARCHAR" />
     </resultMap>
 
-    <insert id="insertModelHistory" parameterType="org.flowable.app.domain.editor.ModelHistory">
+    <insert id="insertModelHistory" parameterType="org.flowable.ui.modeler.domain.ModelHistory">
         insert into ${prefix}ACT_DE_MODEL_HISTORY (
             id,
             name,
@@ -58,7 +58,7 @@
           )
     </insert>
     
-    <update id="updateModelHistory" parameterType="org.flowable.app.domain.editor.Model">
+    <update id="updateModelHistory" parameterType="org.flowable.ui.modeler.domain.Model">
         update ${prefix}ACT_DE_MODEL_HISTORY
         <set>
             name = #{name, jdbcType=VARCHAR},
@@ -98,7 +98,7 @@
        and removal_date is null
     </select>
     
-    <delete id="deleteModelHistory" parameterType="org.flowable.app.domain.editor.ModelHistory">
+    <delete id="deleteModelHistory" parameterType="org.flowable.ui.modeler.domain.ModelHistory">
         delete from ${prefix}ACT_DE_MODEL_HISTORY where id = #{id, jdbcType=VARCHAR}
     </delete>
     

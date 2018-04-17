@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.variable.api.types.VariableType;
 
 /**

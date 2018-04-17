@@ -22,8 +22,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.impl.ModelQueryProperty;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;

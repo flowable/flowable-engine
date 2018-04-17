@@ -15,9 +15,9 @@ package org.flowable.cmmn.engine.impl.el;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.el.VariableContainerELResolver;
-import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.VariableContainerELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
 
 /**
  * @author Joram Barrez

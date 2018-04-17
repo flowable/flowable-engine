@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;

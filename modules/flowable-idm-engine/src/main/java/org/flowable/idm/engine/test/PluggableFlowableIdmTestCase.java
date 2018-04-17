@@ -15,7 +15,7 @@ package org.flowable.idm.engine.test;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;

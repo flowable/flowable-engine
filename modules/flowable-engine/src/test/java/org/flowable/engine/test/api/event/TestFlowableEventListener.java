@@ -15,7 +15,7 @@ package org.flowable.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 
 public class TestFlowableEventListener extends AbstractFlowableEngineEventListener {

@@ -18,8 +18,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.EngineInfo;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngines;
 import org.springframework.web.bind.annotation.GetMapping;

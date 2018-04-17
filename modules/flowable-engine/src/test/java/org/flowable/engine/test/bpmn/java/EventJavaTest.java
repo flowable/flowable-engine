@@ -25,7 +25,7 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 

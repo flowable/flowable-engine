@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;

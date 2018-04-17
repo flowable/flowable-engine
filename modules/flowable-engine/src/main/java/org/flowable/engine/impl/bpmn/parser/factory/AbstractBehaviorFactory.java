@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FieldExtension;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.ExpressionManager;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.el.FixedValue;
 

@@ -12,7 +12,7 @@
  */
 package org.flowable.variable.service;
 
-import org.flowable.engine.common.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.HistoricVariableServiceImpl;

@@ -15,7 +15,7 @@ package org.flowable.idm.engine.test.api.identity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.PrivilegeMapping;

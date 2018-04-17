@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.junit.Before;
 import org.junit.Test;

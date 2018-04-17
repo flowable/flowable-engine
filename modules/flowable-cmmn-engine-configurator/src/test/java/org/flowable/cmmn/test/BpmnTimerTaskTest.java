@@ -20,8 +20,8 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;

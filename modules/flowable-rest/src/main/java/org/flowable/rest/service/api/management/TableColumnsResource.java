@@ -13,9 +13,9 @@
 
 package org.flowable.rest.service.api.management;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.management.TableMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

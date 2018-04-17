@@ -65,7 +65,7 @@ public interface HistoryService {
     HistoricDetailQuery createHistoricDetailQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeHistoricDetailQuery createNativeHistoricDetailQuery();
 
@@ -75,7 +75,7 @@ public interface HistoryService {
     HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeHistoricVariableInstanceQuery createNativeHistoricVariableInstanceQuery();
 

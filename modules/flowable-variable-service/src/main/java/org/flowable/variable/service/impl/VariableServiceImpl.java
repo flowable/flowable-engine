@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.impl.service.CommonServiceImpl;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;

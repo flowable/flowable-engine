@@ -14,9 +14,9 @@ package org.flowable.engine.test.cfg.executioncount;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;

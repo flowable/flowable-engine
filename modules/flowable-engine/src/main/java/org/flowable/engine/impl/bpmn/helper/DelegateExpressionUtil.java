@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.helper;
 
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.engine.impl.util.CommandContextUtil;

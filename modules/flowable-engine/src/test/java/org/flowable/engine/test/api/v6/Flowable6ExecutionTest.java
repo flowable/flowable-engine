@@ -15,8 +15,8 @@ package org.flowable.engine.test.api.v6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;

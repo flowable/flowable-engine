@@ -39,13 +39,13 @@
         select * from ${prefix}ACT_RU_DEADLETTER_JOB where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectDeadLetterJobsByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectDeadLetterJobsByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_DEADLETTER_JOB J
         where J.EXECUTION_ID_ = #{parameter}
     </select>
 
-    <select id="selectDeadLetterJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectDeadLetterJobsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_DEADLETTER_JOB J
         where J.PROCESS_INSTANCE_ID_ = #{parameter}

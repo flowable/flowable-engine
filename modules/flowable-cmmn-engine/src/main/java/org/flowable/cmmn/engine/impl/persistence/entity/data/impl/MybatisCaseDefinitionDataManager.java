@@ -23,7 +23,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez

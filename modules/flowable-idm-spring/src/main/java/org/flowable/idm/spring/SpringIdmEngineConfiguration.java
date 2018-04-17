@@ -15,9 +15,9 @@ package org.flowable.idm.spring;
 
 import javax.sql.DataSource;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.IdmEngines;

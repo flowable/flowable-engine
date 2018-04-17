@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**

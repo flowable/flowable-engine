@@ -23,10 +23,10 @@ import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * This class has been modified to be consistent with the changes to CamelBehavior and its implementations. The set of changes significantly increases the flexibility of our Camel integration, as you

@@ -24,7 +24,7 @@ import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryImpl;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;

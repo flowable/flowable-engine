@@ -20,7 +20,7 @@ import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.Task;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Tom Baeyens

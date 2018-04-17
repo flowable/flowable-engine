@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.query.NativeQuery;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.query.NativeQuery;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
@@ -160,7 +160,7 @@ public interface TaskService {
      *            user that claims the task. When userId is null the task is unclaimed, assigned to no one.
      * @throws FlowableObjectNotFoundException
      *             when the task doesn't exist.
-     * @throws org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException
+     * @throws org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException
      *             when the task is already claimed by another user
      */
     void claim(String taskId, String userId);

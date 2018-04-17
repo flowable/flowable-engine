@@ -17,7 +17,7 @@ import java.io.InputStream;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.util.ReflectUtil;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
 
 /**
  * @author Tom Baeyens

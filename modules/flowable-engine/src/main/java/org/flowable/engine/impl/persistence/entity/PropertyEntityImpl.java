@@ -14,8 +14,8 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tom Baeyens

@@ -21,7 +21,7 @@ import org.activiti.engine.impl.db.BulkDeleteable;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;

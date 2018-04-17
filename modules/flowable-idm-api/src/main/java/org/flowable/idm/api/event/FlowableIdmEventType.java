@@ -15,7 +15,7 @@ package org.flowable.idm.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventType;
 
 /**
  * Enumeration containing all possible types of {@link FlowableIdmEvent}s.

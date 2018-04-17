@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.util.Collection;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**

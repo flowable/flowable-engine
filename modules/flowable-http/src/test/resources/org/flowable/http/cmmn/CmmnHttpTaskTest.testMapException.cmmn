@@ -25,7 +25,7 @@
                     <flowable:field name="requestUrl">
                         <flowable:string><![CDATA[http://nohost:9798/api]]></flowable:string>
                     </flowable:field>
-                    <flowable:mapException errorCode="errorCode">org.flowable.engine.common.api.FlowableException
+                    <flowable:mapException errorCode="errorCode">org.flowable.common.engine.api.FlowableException
                     </flowable:mapException>
                 </extensionElements>
             </task>

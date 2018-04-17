@@ -19,8 +19,8 @@ import static org.junit.Assert.fail;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.content.api.ContentItem;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.junit.Test;
 
 public class ContentItemTest extends AbstractFlowableContentTest {

@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

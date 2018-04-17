@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.bpmn.helper;
 
-import org.flowable.engine.common.api.delegate.event.AbstractFlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 
 /**
  * Base implementation of a {@link FlowableEventListener}, used when creating event-listeners that are part of a BPMN definition.

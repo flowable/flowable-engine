@@ -12,9 +12,9 @@
  */
 package org.flowable.ldap;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.EngineConfigurator;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.engine.impl.util.EngineServiceUtil;
 

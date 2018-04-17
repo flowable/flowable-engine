@@ -16,13 +16,13 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers

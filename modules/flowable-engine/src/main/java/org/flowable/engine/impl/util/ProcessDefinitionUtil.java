@@ -14,9 +14,9 @@ package org.flowable.engine.impl.util;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.context.Context;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;

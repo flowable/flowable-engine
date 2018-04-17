@@ -14,11 +14,11 @@ package org.flowable.content.engine.impl.db;
 
 import java.sql.Connection;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,12 +18,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.app.AppModel;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.AddEditorSourceExtraForModelCmd;

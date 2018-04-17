@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,14 +13,24 @@
 
 package org.flowable.engine.test.api.task;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricVariableUpdate;
@@ -363,7 +373,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.deleteTask(taskId, true);
         }
     }
-
+    
     public void testUpdateTaskComments() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = taskService.newTask();
@@ -377,14 +387,14 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
             assertEquals(CommentEntity.TYPE_COMMENT, comment.getType());
             assertNotNull(taskService.getComment(comment.getId()));
-
+            
             List<Comment> regularComments = taskService.getTaskComments(taskId);
             assertEquals(1, regularComments.size());
             assertEquals("This is a regular comment", regularComments.get(0).getFullMessage());
 
             comment.setFullMessage("Updated comment");
             taskService.saveComment(comment);
-
+            
             regularComments = taskService.getTaskComments(taskId);
             assertEquals(1, regularComments.size());
             assertEquals("Updated comment", regularComments.get(0).getFullMessage());
@@ -416,7 +426,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.deleteTask(taskId);
 
             assertEquals(0, taskService.getTaskComments(taskId).size());
-
+            
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
             assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).list().size());
 
@@ -446,9 +456,9 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.deleteTask(taskId);
 
             assertEquals(0, taskService.getTaskComments(taskId).size());
-
+            
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
-
+            
             assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).list().size());
 
             taskService.deleteTask(taskId, true);
@@ -1520,7 +1530,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         processEngineConfiguration.setEnableTaskRelationshipCounts(true);
         TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
         taskServiceConfiguration.setEnableTaskRelationshipCounts(true);
-
+        
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         org.flowable.task.api.Task currentTask = taskService.createTaskQuery().singleResult();
 
@@ -1630,7 +1640,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             taskService.setVariable(task.getId(), "variable1", "value1");
             Thread.sleep(50L); // to make sure the times for ordering below are different.
             taskService.setVariable(task.getId(), "variable1", "value2");
-
+            
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             HistoricActivityInstance historicActivitiInstance = historyService.createHistoricActivityInstanceQuery()
@@ -1695,7 +1705,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             assertNotNull(task.getId());
 
             taskService.deleteTask(task.getId(), "deleted for testing purposes");
-
+            
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();

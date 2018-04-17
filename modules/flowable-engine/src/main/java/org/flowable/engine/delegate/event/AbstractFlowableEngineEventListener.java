@@ -15,12 +15,12 @@ package org.flowable.engine.delegate.event;
 
 import java.util.Set;
 
-import org.flowable.engine.common.api.delegate.event.AbstractFlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.event.FlowableVariableEvent;

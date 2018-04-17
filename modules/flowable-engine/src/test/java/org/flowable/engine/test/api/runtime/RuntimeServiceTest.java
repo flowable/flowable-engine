@@ -13,11 +13,11 @@
 
 package org.flowable.engine.test.api.runtime;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricProcessInstance;

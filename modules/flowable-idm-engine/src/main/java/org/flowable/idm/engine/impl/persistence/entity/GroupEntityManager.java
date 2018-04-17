@@ -16,7 +16,7 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.engine.impl.GroupQueryImpl;

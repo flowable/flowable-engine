@@ -15,7 +15,7 @@ package org.flowable.spring.boot.actuate.info;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.FlowableVersions;
+import org.flowable.common.engine.impl.FlowableVersions;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 

@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.query.Query;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 
 /**

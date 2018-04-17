@@ -16,7 +16,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 

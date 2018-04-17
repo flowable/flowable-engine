@@ -38,7 +38,7 @@
         select * from ${prefix}ACT_RU_JOB where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectJobsToExecute" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
@@ -56,7 +56,7 @@
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
-    <select id="selectExpiredJobs" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectExpiredJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
@@ -74,25 +74,25 @@
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
-    <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_JOB
         where HANDLER_TYPE_ = #{parameter.handlerType}
         and PROC_DEF_ID_ = #{parameter.processDefinitionId}
     </select>
 
-    <select id="selectJobsByConfiguration" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsByConfiguration" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_JOB
         where HANDLER_TYPE_ = #{parameter.handlerType}
         and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
     </select>
 
-    <select id="selectJobsByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_JOB J
         where J.EXECUTION_ID_ = #{parameter}
     </select>
 
-    <select id="selectJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_JOB J
         where J.PROCESS_INSTANCE_ID_ = #{parameter}
@@ -422,13 +422,13 @@
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
-    <update id="resetExpiredJob" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+    <update id="resetExpiredJob" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
         update ${prefix}ACT_RU_JOB
         set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null, CREATE_TIME_ = #{parameter.now, jdbcType=TIMESTAMP}
         where ID_ = #{parameter.id,jdbcType=VARCHAR}
     </update>
 
-    <select id="selectTimersByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectTimersByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_JOB
         where (RETRIES_ &gt; 0)

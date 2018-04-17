@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.variable.api.types.VariableType;
 
 /**

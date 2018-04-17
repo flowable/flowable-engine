@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.persistence.entity.data;
 
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**

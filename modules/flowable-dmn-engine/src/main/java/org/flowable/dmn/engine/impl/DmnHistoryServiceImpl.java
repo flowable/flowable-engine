@@ -12,11 +12,11 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.NativeHistoricDecisionExecutionQuery;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Tijs Rademakers

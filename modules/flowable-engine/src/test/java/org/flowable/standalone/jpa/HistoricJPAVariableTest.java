@@ -19,9 +19,9 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.flowable.common.engine.api.history.HistoricData;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.history.HistoricData;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;

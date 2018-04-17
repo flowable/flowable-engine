@@ -14,6 +14,7 @@ package org.flowable.content.engine.impl;
 
 import java.io.InputStream;
 
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentItemQuery;
 import org.flowable.content.api.ContentService;
@@ -24,7 +25,6 @@ import org.flowable.content.engine.impl.cmd.DeleteContentItemsByScopeCmd;
 import org.flowable.content.engine.impl.cmd.DeleteContentItemsCmd;
 import org.flowable.content.engine.impl.cmd.GetContentItemStreamCmd;
 import org.flowable.content.engine.impl.cmd.SaveContentItemCmd;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
 
 /**
  * @author Tijs Rademakers

@@ -25,11 +25,11 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.*;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

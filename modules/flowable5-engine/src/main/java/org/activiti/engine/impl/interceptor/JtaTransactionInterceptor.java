@@ -25,7 +25,7 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.flowable.engine.common.impl.cfg.TransactionPropagation;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

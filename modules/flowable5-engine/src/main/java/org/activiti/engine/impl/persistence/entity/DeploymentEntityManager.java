@@ -29,7 +29,7 @@ import org.activiti.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.api.Job;
 

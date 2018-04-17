@@ -18,9 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.identity.Authentication;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.event.logger.handler.Fields;

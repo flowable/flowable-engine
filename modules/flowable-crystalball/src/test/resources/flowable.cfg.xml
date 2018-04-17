@@ -17,7 +17,7 @@
 
     <property name="enableEventDispatcher" value="true"/>
     <property name="eventDispatcher">
-      <bean class="org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl"/>
+      <bean class="org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl"/>
     </property>
     <!-- mail server configurations -->
     <property name="mailServerPort" value="5025" />

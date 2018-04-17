@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.context.Context;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 

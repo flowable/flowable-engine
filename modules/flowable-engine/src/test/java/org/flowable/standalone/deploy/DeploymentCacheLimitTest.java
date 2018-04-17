@@ -14,7 +14,7 @@ package org.flowable.standalone.deploy;
 
 import java.text.MessageFormat;
 
-import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;

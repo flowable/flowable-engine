@@ -12,8 +12,8 @@
  */
 package org.flowable.task.service.impl.util;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;

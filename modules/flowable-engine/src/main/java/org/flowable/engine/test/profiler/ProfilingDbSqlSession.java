@@ -16,11 +16,11 @@ import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.impl.db.BulkDeleteOperation;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.BulkDeleteOperation;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

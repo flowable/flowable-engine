@@ -13,8 +13,8 @@
 package org.activiti.engine.test.api.event;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.event.FlowableIdmEventType;

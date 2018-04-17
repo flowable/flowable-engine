@@ -15,9 +15,9 @@ package org.flowable.form.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.AbstractNativeQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.AbstractNativeQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.NativeFormDeploymentQuery;
 import org.flowable.form.engine.impl.util.CommandContextUtil;

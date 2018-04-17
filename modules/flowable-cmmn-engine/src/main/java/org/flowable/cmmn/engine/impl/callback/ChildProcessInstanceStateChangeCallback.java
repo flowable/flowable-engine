@@ -13,8 +13,8 @@
 package org.flowable.cmmn.engine.impl.callback;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.engine.common.impl.callback.CallbackData;
-import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.common.engine.impl.callback.CallbackData;
+import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 
 /**
  * @author Joram Barrez

@@ -16,9 +16,9 @@ package org.flowable.engine.impl.rules;
 import java.util.Map;
 
 import org.drools.core.marshalling.impl.ProtobufMessages.KnowledgeBase;
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.EngineDeployer;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.kie.api.KieBase;

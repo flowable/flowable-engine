@@ -16,8 +16,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;

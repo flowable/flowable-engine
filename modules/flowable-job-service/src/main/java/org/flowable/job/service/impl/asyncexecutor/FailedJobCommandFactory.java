@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.Command;
 
 public interface FailedJobCommandFactory {
 

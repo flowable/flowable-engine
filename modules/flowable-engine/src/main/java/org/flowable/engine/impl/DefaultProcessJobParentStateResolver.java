@@ -2,7 +2,7 @@ package org.flowable.engine.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;

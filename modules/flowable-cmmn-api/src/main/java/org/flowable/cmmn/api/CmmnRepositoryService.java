@@ -20,8 +20,8 @@ import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDefinition;
 
 public interface CmmnRepositoryService {

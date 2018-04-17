@@ -14,7 +14,7 @@ package org.flowable.cmmn.test.delegate;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 
 /**
  * @author Tijs Rademakers

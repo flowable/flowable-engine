@@ -12,7 +12,7 @@
  */
 package org.flowable.idm.api;
 
-import org.flowable.engine.common.api.query.NativeQuery;
+import org.flowable.common.engine.api.query.NativeQuery;
 
 /**
  * Allows querying of {@link org.flowable.idm.api.Group}s via native (SQL) queries

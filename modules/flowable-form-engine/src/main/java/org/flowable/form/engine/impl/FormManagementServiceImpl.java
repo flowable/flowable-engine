@@ -14,10 +14,10 @@ package org.flowable.form.engine.impl;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePageQuery;
-import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
-import org.flowable.engine.common.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.cmd.ExecuteCustomSqlCmd;

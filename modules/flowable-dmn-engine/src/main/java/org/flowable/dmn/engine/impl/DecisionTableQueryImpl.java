@@ -16,13 +16,13 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 /**
  * @author Tijs Rademakers

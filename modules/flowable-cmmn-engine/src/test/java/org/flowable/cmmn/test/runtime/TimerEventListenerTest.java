@@ -29,7 +29,7 @@ import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.TimerEventListener;
-import org.flowable.engine.common.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.Test;

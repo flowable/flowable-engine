@@ -13,10 +13,10 @@
 
 package org.flowable.engine.impl.context;
 
+import org.flowable.common.engine.impl.cfg.TransactionContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.transaction.TransactionContextHolder;
 import org.flowable.engine.FlowableEngineAgenda;
-import org.flowable.engine.common.impl.cfg.TransactionContext;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.transaction.TransactionContextHolder;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -24,12 +24,12 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 /**
  * Quick access methods (only useable when within a command execution) to the current 
  * 
- * - {@link org.flowable.engine.common.impl.interceptor.CommandContext},
+ * - {@link org.flowable.common.engine.impl.interceptor.CommandContext},
  * - {@link ProcessEngineConfigurationImpl}
- * - {@link org.flowable.engine.common.impl.cfg.TransactionContext}
+ * - {@link org.flowable.common.engine.impl.cfg.TransactionContext}
  * 
  * Note that this class is here for backwards compatibility.
- * Use the engine-independent {@link org.flowable.engine.common.impl.context.Context} and {@link CommandContextUtil} when possible.
+ * Use the engine-independent {@link org.flowable.common.engine.impl.context.Context} and {@link CommandContextUtil} when possible.
  */
 public class Context {
 

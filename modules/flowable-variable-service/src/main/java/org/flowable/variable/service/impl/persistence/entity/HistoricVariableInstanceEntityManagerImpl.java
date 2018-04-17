@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;

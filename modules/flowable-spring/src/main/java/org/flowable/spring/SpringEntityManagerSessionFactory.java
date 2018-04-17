@@ -16,9 +16,9 @@ package org.flowable.spring;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Session;
+import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionImpl;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;

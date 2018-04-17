@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;

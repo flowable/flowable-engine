@@ -12,12 +12,12 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import org.flowable.engine.common.impl.cfg.TransactionListener;
-import org.flowable.engine.common.impl.cfg.TransactionPropagation;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.cfg.TransactionListener;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

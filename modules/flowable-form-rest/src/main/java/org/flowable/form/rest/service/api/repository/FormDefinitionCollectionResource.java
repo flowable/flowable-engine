@@ -21,8 +21,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.impl.FormQueryProperty;

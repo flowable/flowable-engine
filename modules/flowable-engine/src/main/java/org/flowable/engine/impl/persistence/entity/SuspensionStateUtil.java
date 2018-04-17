@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.SuspensionState;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;

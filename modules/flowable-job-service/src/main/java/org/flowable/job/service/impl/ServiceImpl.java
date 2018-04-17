@@ -12,8 +12,8 @@
  */
 package org.flowable.job.service.impl;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.service.CommonServiceImpl;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;

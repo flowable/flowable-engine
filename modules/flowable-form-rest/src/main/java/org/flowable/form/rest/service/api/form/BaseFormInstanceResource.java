@@ -15,8 +15,8 @@ package org.flowable.form.rest.service.api.form;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.impl.FormInstanceQueryProperty;

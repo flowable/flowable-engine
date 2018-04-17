@@ -14,10 +14,10 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.history.HistoricData;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.history.HistoricData;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;

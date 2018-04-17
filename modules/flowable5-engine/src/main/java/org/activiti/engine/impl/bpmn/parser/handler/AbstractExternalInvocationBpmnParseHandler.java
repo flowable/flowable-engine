@@ -16,13 +16,13 @@ import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.impl.bpmn.data.Assignment;
 import org.flowable.engine.impl.bpmn.data.SimpleDataInputAssociation;
 import org.flowable.engine.impl.bpmn.data.TransformationDataOutputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataInputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez

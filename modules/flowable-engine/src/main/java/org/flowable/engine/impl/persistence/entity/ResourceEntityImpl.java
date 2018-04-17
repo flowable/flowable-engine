@@ -15,7 +15,7 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tom Baeyens

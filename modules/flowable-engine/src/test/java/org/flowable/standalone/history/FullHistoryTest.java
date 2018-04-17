@@ -25,8 +25,8 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricFormProperty;
