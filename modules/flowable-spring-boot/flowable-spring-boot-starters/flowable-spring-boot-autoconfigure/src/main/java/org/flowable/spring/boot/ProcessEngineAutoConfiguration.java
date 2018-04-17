@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
@@ -151,6 +152,8 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
+
+        conf.setIdGenerator(new StrongUuidGenerator());
 
         processEngineConfigurationConfigurers.forEach(configurator -> configurator.configure(conf));
 

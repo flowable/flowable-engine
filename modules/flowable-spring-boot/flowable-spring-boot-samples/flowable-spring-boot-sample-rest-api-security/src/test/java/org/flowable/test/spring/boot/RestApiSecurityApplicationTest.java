@@ -140,11 +140,9 @@ public class RestApiSecurityApplicationTest {
         DataResponse<ProcessDefinitionResponse> processDefinitions = response.getBody();
         assertThat(processDefinitions).isNotNull();
         assertThat(processDefinitions.getTotal()).isEqualTo(1);
-        assertThat(processDefinitions.getData())
-            .extracting(ProcessDefinitionResponse::getKey, ProcessDefinitionResponse::getUrl)
-            .containsExactlyInAnyOrder(
-                tuple("dogeProcess", "http://localhost:" + serverPort + "/process-api/repository/process-definitions/dogeProcess:1:7")
-            );
+        ProcessDefinitionResponse defResponse = processDefinitions.getData().get(0);
+        assertThat(defResponse.getKey()).isEqualTo("dogeProcess");
+        assertThat(defResponse.getUrl()).startsWith("http://localhost:" + serverPort + "/process-api/repository/process-definitions/dogeProcess:1:");
 
     }
 
@@ -162,12 +160,9 @@ public class RestApiSecurityApplicationTest {
             .isEqualTo(HttpStatus.OK);
         DataResponse<CaseDefinitionResponse> caseDefinitions = response.getBody();
         assertThat(caseDefinitions).isNotNull();
-        assertThat(caseDefinitions.getData())
-            .extracting(CaseDefinitionResponse::getKey, CaseDefinitionResponse::getUrl)
-            .containsExactlyInAnyOrder(
-                tuple("case1", "http://localhost:" + serverPort + "/cmmn-api/cmmn-repository/case-definitions/3")
-            );
-        assertThat(caseDefinitions.getTotal()).isEqualTo(1);
+        CaseDefinitionResponse defResponse = caseDefinitions.getData().get(0);
+        assertThat(defResponse.getKey()).isEqualTo("case1");
+        assertThat(defResponse.getUrl()).startsWith("http://localhost:" + serverPort + "/cmmn-api/cmmn-repository/case-definitions/");
     }
 
     @Test
