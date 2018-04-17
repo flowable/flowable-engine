@@ -1,7 +1,7 @@
 package org.flowable.cmmn.engine.impl;
 
 import org.flowable.cmmn.engine.impl.cmd.CreateCmmnTaskCmd;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.service.impl.BaseTaskBuilderImpl;

@@ -1,6 +1,6 @@
 package org.flowable.engine.impl;
 
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cmd.CreateTaskCmd;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;

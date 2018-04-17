@@ -2,8 +2,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
