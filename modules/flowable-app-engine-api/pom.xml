@@ -16,7 +16,7 @@
 
     <properties>
         <flowable.artifact>
-            org.flowable.appengine.api
+            org.flowable.app.api
         </flowable.artifact>
     </properties>
 

@@ -108,10 +108,10 @@
 
     <properties>
         <flowable.artifact>
-            org.flowable.appengine.engine
+            org.flowable.app.engine
         </flowable.artifact>
         <flowable.osgi.export.additional>
-            org.flowable.appengine.db.mapping.entity
+            org.flowable.app.db.mapping.entity
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             junit*;resolution:=optional,
