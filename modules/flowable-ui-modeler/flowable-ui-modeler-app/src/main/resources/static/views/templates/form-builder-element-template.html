@@ -100,6 +100,14 @@
     <label class="control-label form-field-label">{{formElement.name}}<span class="marker" ng-if="formElement.required">*</span></label>
     <div class="message" ng-show="formElement.params.hyperlinkUrl">{{formElement.params.hyperlinkUrl}}</div>
   </div>
+  
+  <div ng-switch-when="spacer" class="form-group">
+	<br />
+  </div>
+  
+  <div ng-switch-when="horizontal-line" class="form-group">
+	<hr>
+  </div>
 
   <div ng-switch-when="expression" class="form-group">
     <div class="message" ng-style="{'font-size': formElement.params.size + 'em'}">

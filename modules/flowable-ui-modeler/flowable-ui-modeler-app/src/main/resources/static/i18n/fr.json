@@ -549,7 +549,9 @@
             "UPLOAD": "Téléchargement",
             "EXPRESSION": "Expression",
             "DECIMAL": "Décimal",
-	    "HYPERLINK": "Lien Hypertexte"
+	    	"HYPERLINK": "Lien Hypertexte",
+	    	"SPACER": "Spacer",
+			"HORIZONTAL-LINE": "Horizontal line"
         },
         "TABS": {
             "GENERAL": "Général",

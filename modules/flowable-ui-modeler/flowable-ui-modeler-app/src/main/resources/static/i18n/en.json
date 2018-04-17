@@ -556,7 +556,9 @@
             "UPLOAD": "Upload",
             "EXPRESSION": "Expression",
             "DECIMAL": "Decimal",
-	    "HYPERLINK": "Hyperlink" 
+	    	"HYPERLINK": "Hyperlink",
+	    	"SPACER": "Spacer",
+			"HORIZONTAL-LINE": "Horizontal line" 
         },
         "TABS": {
             "GENERAL": "General",
