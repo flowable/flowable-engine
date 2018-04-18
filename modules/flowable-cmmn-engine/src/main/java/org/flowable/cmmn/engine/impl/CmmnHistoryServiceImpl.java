@@ -56,7 +56,7 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery() {
-        return cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager().createHistoricPlanItemInstanceQuery();
+        return configuration.getHistoricPlanItemInstanceEntityManager().createHistoricPlanItemInstanceQuery();
     }
 
     @Override

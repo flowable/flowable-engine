@@ -13,7 +13,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 import java.util.Date;
 import java.util.HashMap;

@@ -13,7 +13,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 import java.util.Date;
 
