@@ -18,9 +18,9 @@ import org.flowable.cmmn.engine.impl.behavior.impl.*;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.*;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.ExpressionManager;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 
 /**
  * @author Joram Barrez
@@ -31,7 +31,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     protected ExpressionManager expressionManager;
 
     @Override
-    public StageActivityBehavior createStageActivityBehavoir(PlanItem planItem, Stage stage) {
+    public StageActivityBehavior createStageActivityBehavior(PlanItem planItem, Stage stage) {
         return new StageActivityBehavior(stage);
     }
 

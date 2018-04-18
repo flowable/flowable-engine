@@ -16,22 +16,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class VariableServiceImpl extends ServiceImpl implements VariableService {
-
-    public VariableServiceImpl() {
-
-    }
+public class VariableServiceImpl extends CommonServiceImpl<VariableServiceConfiguration> implements VariableService {
 
     public VariableServiceImpl(VariableServiceConfiguration variableServiceConfiguration) {
         super(variableServiceConfiguration);
@@ -140,6 +136,10 @@ public class VariableServiceImpl extends ServiceImpl implements VariableService 
     @Override
     public void deleteVariablesByTaskId(String taskId) {
         getVariableInstanceEntityManager().deleteVariablesByTaskId(taskId);
+    }
+
+    public VariableInstanceEntityManager getVariableInstanceEntityManager() {
+        return configuration.getVariableInstanceEntityManager();
     }
 
 }

@@ -28,7 +28,7 @@
     </property>
     </bean>
     
-    <bean id="idGenerator" class="org.flowable.engine.common.impl.persistence.StrongUuidGenerator"/>
+    <bean id="idGenerator" class="org.flowable.common.engine.impl.persistence.StrongUuidGenerator"/>
 
     <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration">
         <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE"/>

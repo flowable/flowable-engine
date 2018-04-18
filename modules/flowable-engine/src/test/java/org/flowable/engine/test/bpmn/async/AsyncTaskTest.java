@@ -15,7 +15,7 @@ package org.flowable.engine.test.bpmn.async;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.HistoryTestHelper;

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.repository.ProcessDefinition;

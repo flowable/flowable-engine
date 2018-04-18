@@ -15,12 +15,12 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.AbstractNativeQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.NativeDmnDeploymentQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.AbstractNativeQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 public class NativeDmnDeploymentQueryImpl extends AbstractNativeQuery<NativeDmnDeploymentQuery, DmnDeployment> implements NativeDmnDeploymentQuery {
 

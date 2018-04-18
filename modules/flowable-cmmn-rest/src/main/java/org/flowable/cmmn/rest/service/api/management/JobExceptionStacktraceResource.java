@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.management;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnManagementService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

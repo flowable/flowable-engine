@@ -12,7 +12,7 @@
  */
 package org.flowable.content.api;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Frederik Heremans

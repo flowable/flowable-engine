@@ -20,8 +20,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;

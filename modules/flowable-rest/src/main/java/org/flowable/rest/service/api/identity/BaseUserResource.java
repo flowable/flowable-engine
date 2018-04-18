@@ -13,8 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.IdentityService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -15,9 +15,9 @@ package org.flowable.dmn.engine.impl.el;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.VariableContainerWrapper;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 
 /**
  * Resolves an boolean EL expression at runtime.

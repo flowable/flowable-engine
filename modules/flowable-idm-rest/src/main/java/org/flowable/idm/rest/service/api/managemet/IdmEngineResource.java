@@ -12,8 +12,8 @@
  */
 package org.flowable.idm.rest.service.api.managemet;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.EngineInfo;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
 import org.springframework.web.bind.annotation.GetMapping;

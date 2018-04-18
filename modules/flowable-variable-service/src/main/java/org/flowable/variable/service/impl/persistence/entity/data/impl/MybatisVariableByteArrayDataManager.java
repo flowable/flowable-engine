@@ -14,7 +14,7 @@ package org.flowable.variable.service.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableByteArrayDataManager;

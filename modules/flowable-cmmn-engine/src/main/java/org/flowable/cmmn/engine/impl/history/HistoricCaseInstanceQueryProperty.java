@@ -16,7 +16,7 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Joram Barrez

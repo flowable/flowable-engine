@@ -1,6 +1,6 @@
 package org.flowable.engine.delegate.event.impl;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
 import org.flowable.job.api.Job;
 

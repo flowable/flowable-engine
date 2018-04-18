@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.repository.CmmnDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Tijs Rademakers

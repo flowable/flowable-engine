@@ -58,7 +58,7 @@
   
   <!-- RESOURCE SELECT -->
 
-  <select id="selectFormResourceNamesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectFormResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select NAME_ from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   
@@ -68,7 +68,7 @@
           AND NAME_ = #{resourceName}
   </select>
 
-  <select id="selectFormResourcesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="formResourceResultMap">
+  <select id="selectFormResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="formResourceResultMap">
     select * from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   

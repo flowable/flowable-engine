@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.data;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * A transformation based data output association

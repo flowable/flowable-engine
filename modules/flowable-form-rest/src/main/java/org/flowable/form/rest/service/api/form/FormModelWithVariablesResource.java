@@ -14,8 +14,8 @@ package org.flowable.form.rest.service.api.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormService;
 import org.flowable.form.rest.FormRestResponseFactory;

@@ -14,8 +14,8 @@ package org.flowable.dmn.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez

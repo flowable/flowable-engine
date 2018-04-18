@@ -18,12 +18,12 @@ import java.util.Map;
 import org.activiti.engine.impl.test.PvmTestCase;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableWrongDbException;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableWrongDbException;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.ProcessEngineImpl;
 
 /**

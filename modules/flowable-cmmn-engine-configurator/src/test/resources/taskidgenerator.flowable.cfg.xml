@@ -26,6 +26,6 @@
     </property>
     </bean>
     
-    <bean id="idGenerator" class="org.flowable.engine.common.impl.persistence.StrongUuidGenerator"/>
+    <bean id="idGenerator" class="org.flowable.common.engine.impl.persistence.StrongUuidGenerator"/>
 
 </beans>

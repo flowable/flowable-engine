@@ -14,8 +14,8 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 
 import java.util.Date;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Tijs Rademakers

@@ -22,7 +22,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.Test;

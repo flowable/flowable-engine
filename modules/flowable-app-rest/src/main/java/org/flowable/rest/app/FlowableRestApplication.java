@@ -14,6 +14,7 @@ package org.flowable.rest.app;
 
 import org.flowable.rest.app.properties.RestAppProperties;
 import org.flowable.rest.conf.BootstrapConfiguration;
+import org.flowable.rest.conf.DevelopmentConfiguration;
 import org.flowable.rest.conf.SecurityConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,8 +22,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -30,19 +29,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * @author Filip Hrisafov
  */
-@PropertySources({
-    // For backwards compatibility (pre 6.3.0)
-    @PropertySource(value = "classpath:db.properties", ignoreResourceNotFound = true),
-    @PropertySource(value = "classpath:engine.properties", ignoreResourceNotFound = true)
-
-})
 @EnableConfigurationProperties({
     RestAppProperties.class
 })
 @Import({
     BootstrapConfiguration.class,
-    SecurityConfiguration.class
-
+    SecurityConfiguration.class,
+    DevelopmentConfiguration.class
 })
 @SpringBootApplication
 public class FlowableRestApplication extends SpringBootServletInitializer {

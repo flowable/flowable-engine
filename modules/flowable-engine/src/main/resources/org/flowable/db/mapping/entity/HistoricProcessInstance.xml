@@ -272,13 +272,13 @@
     select * from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </select>
 
-  <select id="selectHistoricProcessInstanceIdsByProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectHistoricProcessInstanceIdsByProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_HI_PROCINST 
     where PROC_DEF_ID_ = #{parameter}
   </select>
   
-    <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicProcessInstanceResultMap">
+    <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicProcessInstanceResultMap">
     select *
     from ${prefix}ACT_HI_PROCINST 
     where SUPER_PROCESS_INSTANCE_ID_ = #{parameter}

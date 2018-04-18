@@ -15,11 +15,11 @@ package org.flowable.content.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers

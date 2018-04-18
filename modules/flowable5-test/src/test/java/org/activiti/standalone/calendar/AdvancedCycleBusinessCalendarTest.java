@@ -6,9 +6,9 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.activiti.engine.impl.test.PvmTestCase;
-import org.flowable.engine.common.impl.calendar.AdvancedCycleBusinessCalendar;
-import org.flowable.engine.common.impl.runtime.Clock;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
+import org.flowable.common.engine.impl.calendar.AdvancedCycleBusinessCalendar;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
 
 public class AdvancedCycleBusinessCalendarTest extends PvmTestCase {
 

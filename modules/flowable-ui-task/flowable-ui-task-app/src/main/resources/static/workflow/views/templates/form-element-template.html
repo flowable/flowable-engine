@@ -143,6 +143,14 @@
         </div>
     </div>
 
+	<div ng-switch-when="spacer" class="form-group" ng-show="field.isVisible" >
+        <br id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" />
+    </div>
+	
+	<div ng-switch-when="horizontal-line" class="row,form-group" ng-show="field.isVisible" >
+		<hr id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" >
+    </div>
+
     <div ng-switch-when="expression" class="form-group" ng-show="field.isVisible">
     	<div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
     		<div ng-show="!field.value && !field.expression">
@@ -213,6 +221,14 @@
     <div ng-switch-when="multi-line-text" class="form-group" ng-show="field.isVisible">
         <label class="control-label">{{field.name}}</label>
         <textarea class="form-control" readonly>{{field.value && field.value || ('FORM.MESSAGE.EMPTY' | translate)}}</textarea>
+    </div>
+    
+   	<div ng-switch-when="spacer" class="form-group" ng-show="field.isVisible" >
+        <br id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" />
+    </div>
+	
+	<div ng-switch-when="horizontal-line" class="row,form-group" ng-show="field.isVisible" >
+		<hr id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" >
     </div>
     
     <div ng-switch-when="expression" ng-show="field.isVisible">

@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.exclusive;
 import java.util.Date;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.TimerJobQuery;

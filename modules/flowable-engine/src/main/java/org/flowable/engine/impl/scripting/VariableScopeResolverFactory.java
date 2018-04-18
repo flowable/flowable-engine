@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.scripting;
 
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.scripting.Resolver;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.scripting.Resolver;
+import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.common.impl.scripting.ResolverFactory;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**

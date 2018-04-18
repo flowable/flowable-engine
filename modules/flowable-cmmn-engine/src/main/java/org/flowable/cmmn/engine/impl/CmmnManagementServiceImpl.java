@@ -16,10 +16,12 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -45,7 +47,11 @@ import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
 /**
  * @author Joram Barrez
  */
-public class CmmnManagementServiceImpl extends ServiceImpl implements CmmnManagementService {
+public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfiguration> implements CmmnManagementService {
+
+    public CmmnManagementServiceImpl(CmmnEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     @Override
     public Map<String, Long> getTableCounts() {

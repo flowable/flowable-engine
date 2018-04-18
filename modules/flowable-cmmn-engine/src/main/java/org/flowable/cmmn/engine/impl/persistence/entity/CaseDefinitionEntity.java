@@ -14,7 +14,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 public interface CaseDefinitionEntity extends Entity, CaseDefinition {
     

@@ -13,8 +13,8 @@
 package org.flowable.http.bpmn.impl;
 
 import org.flowable.bpmn.model.MapExceptionEntry;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;

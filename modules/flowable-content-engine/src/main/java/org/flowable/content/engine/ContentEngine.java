@@ -12,9 +12,9 @@
  */
 package org.flowable.content.engine;
 
+import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.content.api.ContentManagementService;
 import org.flowable.content.api.ContentService;
-import org.flowable.engine.common.impl.FlowableVersions;
 
 public interface ContentEngine {
 

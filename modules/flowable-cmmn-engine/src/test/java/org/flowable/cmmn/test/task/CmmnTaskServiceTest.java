@@ -12,19 +12,34 @@
  */
 package org.flowable.cmmn.test.task;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.engine.common.api.scope.ScopeTypes;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.TaskPostProcessor;
+import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.junit.After;
 import org.junit.Test;
+
+import java.util.Date;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Joram Barrez
@@ -40,16 +55,16 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertEquals("The Task", task.getName());
         assertEquals("This is a test documentation", task.getDescription());
         assertEquals("johnDoe", task.getAssignee());
-        
+
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertNotNull(historicTaskInstance);
             assertNull(historicTaskInstance.getEndTime());
         }
-        
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
-        
+
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertNotNull(historicTaskInstance);
@@ -58,7 +73,7 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             assertNotNull(historicTaskInstance.getEndTime());
         }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testOneHumanTaskExpressionCase() {
@@ -100,6 +115,20 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertEquals(0, cmmnTaskService.createTaskQuery().count());
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
+        IdentityLinkEntityImpl identityLinkEntityCandidateUser = new IdentityLinkEntityImpl();
+        identityLinkEntityCandidateUser.setUserId("testUserFromBuilder");
+        identityLinkEntityCandidateUser.setType(IdentityLinkType.CANDIDATE);
+        IdentityLinkEntityImpl identityLinkEntityCandidateGroup = new IdentityLinkEntityImpl();
+        identityLinkEntityCandidateGroup.setGroupId("testGroupFromBuilder");
+        identityLinkEntityCandidateGroup.setType(IdentityLinkType.CANDIDATE);
+
+        return Stream.of(
+                identityLinkEntityCandidateUser,
+                identityLinkEntityCandidateGroup
+        ).collect(toSet());
     }
 
 }

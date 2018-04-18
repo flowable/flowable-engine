@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * Scans class and creates {@link EntityMetaData} based on it.

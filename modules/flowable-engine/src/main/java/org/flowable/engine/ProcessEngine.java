@@ -12,7 +12,7 @@
  */
 package org.flowable.engine;
 
-import org.flowable.engine.common.impl.FlowableVersions;
+import org.flowable.common.engine.impl.FlowableVersions;
 
 /**
  * Provides access to all the services that expose the BPM and workflow operations.

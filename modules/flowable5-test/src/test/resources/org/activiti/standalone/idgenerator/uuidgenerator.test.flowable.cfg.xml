@@ -14,7 +14,7 @@
 		<property name="flowable5CompatibilityEnabled" value="true" />
 		
 		<property name="idGenerator">
-			<bean class="org.flowable.engine.common.impl.persistence.StrongUuidGenerator" />
+			<bean class="org.flowable.common.engine.impl.persistence.StrongUuidGenerator" />
 		</property>
 
 	</bean>

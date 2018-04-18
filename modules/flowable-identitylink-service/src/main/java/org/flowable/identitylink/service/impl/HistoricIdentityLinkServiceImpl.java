@@ -14,19 +14,17 @@ package org.flowable.identitylink.service.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricIdentityLinkServiceImpl extends ServiceImpl implements HistoricIdentityLinkService {
-
-    public HistoricIdentityLinkServiceImpl() {
-
-    }
+public class HistoricIdentityLinkServiceImpl extends CommonServiceImpl<IdentityLinkServiceConfiguration> implements HistoricIdentityLinkService {
 
     public HistoricIdentityLinkServiceImpl(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
         super(identityLinkServiceConfiguration);
@@ -85,5 +83,9 @@ public class HistoricIdentityLinkServiceImpl extends ServiceImpl implements Hist
     @Override
     public void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
         getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
+    }
+
+    public HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
+        return configuration.getHistoricIdentityLinkEntityManager();
     }
 }

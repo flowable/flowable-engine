@@ -15,6 +15,7 @@ package org.flowable.task.service.impl;
 import java.util.List;
 import java.util.Objects;
 
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
@@ -30,11 +31,7 @@ import org.flowable.task.service.impl.util.CommandContextUtil;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricTaskServiceImpl extends ServiceImpl implements HistoricTaskService {
-
-    public HistoricTaskServiceImpl() {
-
-    }
+public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration> implements HistoricTaskService {
 
     public HistoricTaskServiceImpl(TaskServiceConfiguration taskServiceConfiguration) {
         super(taskServiceConfiguration);
@@ -116,7 +113,7 @@ public class HistoricTaskServiceImpl extends ServiceImpl implements HistoricTask
             historicTaskInstance.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
             historicTaskInstance.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
             historicTaskInstance.setClaimTime(taskEntity.getClaimTime());
-            historicTaskInstance.setLastUpdateTime(taskServiceConfiguration.getClock().getCurrentTime());
+            historicTaskInstance.setLastUpdateTime(configuration.getClock().getCurrentTime());
 
             if (!Objects.equals(historicTaskInstance.getAssignee(), taskEntity.getAssignee())) {
                 historicTaskInstance.setAssignee(taskEntity.getAssignee());
@@ -137,8 +134,12 @@ public class HistoricTaskServiceImpl extends ServiceImpl implements HistoricTask
         historicIdentityLinkEntity.setTaskId(taskId);
         historicIdentityLinkEntity.setType(type);
         historicIdentityLinkEntity.setUserId(userId);
-        historicIdentityLinkEntity.setCreateTime(taskServiceConfiguration.getClock().getCurrentTime());
+        historicIdentityLinkEntity.setCreateTime(configuration.getClock().getCurrentTime());
         historicIdentityLinkService.insertHistoricIdentityLink(historicIdentityLinkEntity, false);
+    }
+
+    public HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
+        return configuration.getHistoricTaskInstanceEntityManager();
     }
 
 }

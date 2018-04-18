@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 /**
  * @author Tijs Rademakers

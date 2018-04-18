@@ -23,7 +23,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
-import org.flowable.cmmn.engine.impl.ServiceImpl;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
@@ -50,12 +50,17 @@ import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeService {
+public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfiguration> implements CmmnRuntimeService {
+
+    public CmmnRuntimeServiceImpl(CmmnEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     @Override
     public CaseInstanceBuilder createCaseInstanceBuilder() {
@@ -181,22 +186,22 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
 
     @Override
     public CaseInstanceQuery createCaseInstanceQuery() {
-        return cmmnEngineConfiguration.getCaseInstanceEntityManager().createCaseInstanceQuery();
+        return configuration.getCaseInstanceEntityManager().createCaseInstanceQuery();
     }
 
     @Override
     public PlanItemInstanceQuery createPlanItemInstanceQuery() {
-        return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceQuery();
+        return configuration.getPlanItemInstanceEntityManager().createPlanItemInstanceQuery();
     }
 
     @Override
     public MilestoneInstanceQuery createMilestoneInstanceQuery() {
-        return cmmnEngineConfiguration.getMilestoneInstanceEntityManager().createMilestoneInstanceQuery();
+        return configuration.getMilestoneInstanceEntityManager().createMilestoneInstanceQuery();
     }
 
     @Override
     public UserEventListenerInstanceQuery createUserEventListenerInstanceQuery() {
-        return new UserEventListenerInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new UserEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
     }
 
     @Override

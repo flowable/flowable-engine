@@ -111,13 +111,13 @@
 
   <!-- COMMENT SELECT -->
 
-  <select id="selectComment" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
+  <select id="selectComment" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
     select * 
     from ${prefix}ACT_HI_COMMENT 
     where ID_ = #{parameter,jdbcType=VARCHAR}
   </select>
   
-  <select id="selectCommentsByTaskId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
+  <select id="selectCommentsByTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
     select * 
     from ${prefix}ACT_HI_COMMENT 
     where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
@@ -133,35 +133,35 @@
   	order by TIME_ desc
   </select>
   
-  <select id="selectCommentsByType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
+  <select id="selectCommentsByType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
   	select *
   	from ${prefix}ACT_HI_COMMENT
   	where TYPE_ = #{parameter,jdbcType=VARCHAR}
   	order by TIME_ desc
   </select>
   
-  <select id="selectEventsByTaskId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
+  <select id="selectEventsByTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
     select * 
     from ${prefix}ACT_HI_COMMENT 
     where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
     order by TIME_ desc
   </select>
   
-  <select id="selectEventsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
+  <select id="selectEventsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
     select * 
     from ${prefix}ACT_HI_COMMENT 
     where PROC_INST_ID_ = #{parameter,jdbcType=VARCHAR}
     order by TIME_ desc
   </select>
 
-  <select id="selectCommentsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
+  <select id="selectCommentsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
     select * 
     from ${prefix}ACT_HI_COMMENT 
     where PROC_INST_ID_ = #{parameter,jdbcType=VARCHAR}
     order by TIME_ desc
   </select>
 
-  <select id="selectCommentsByProcessInstanceIdAndType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
+  <select id="selectCommentsByProcessInstanceIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="commentResultMap">
     select *
     from ${prefix}ACT_HI_COMMENT
     where PROC_INST_ID_ = #{processInstanceId,jdbcType=VARCHAR}

@@ -14,7 +14,7 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * An event log entry can only be inserted (and maybe deleted).

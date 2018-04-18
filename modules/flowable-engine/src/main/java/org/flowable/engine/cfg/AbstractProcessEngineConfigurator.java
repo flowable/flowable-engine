@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.cfg;
 
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.EngineConfigurator;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.EngineConfigurator;
 
 /**
  * @author jbarrez

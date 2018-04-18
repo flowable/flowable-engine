@@ -13,7 +13,7 @@
 package org.flowable.scripting.secure.behavior;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;

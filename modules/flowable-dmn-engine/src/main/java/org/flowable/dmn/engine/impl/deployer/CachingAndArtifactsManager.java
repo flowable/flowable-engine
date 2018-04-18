@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.impl.deployer;
 
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
@@ -19,7 +20,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 
 /**
  * Updates caches and artifacts for a deployment and its decision tables

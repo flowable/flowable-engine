@@ -15,7 +15,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.bpmn.model.Signal;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.runtime.EventSubscription;
 

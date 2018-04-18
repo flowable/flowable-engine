@@ -15,13 +15,15 @@ package org.flowable.idm.engine.impl;
 import java.sql.Connection;
 import java.util.Map;
 
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePageQuery;
-import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.idm.api.IdmManagementService;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.idm.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableCountCmd;
@@ -32,7 +34,7 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
 /**
  * @author Tijs Rademakers
  */
-public class IdmManagementServiceImpl extends ServiceImpl implements IdmManagementService {
+public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineConfiguration> implements IdmManagementService {
 
     @Override
     public Map<String, Long> getTableCount() {

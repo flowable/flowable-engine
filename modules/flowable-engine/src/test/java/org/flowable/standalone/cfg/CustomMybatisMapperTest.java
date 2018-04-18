@@ -15,7 +15,7 @@ package org.flowable.standalone.cfg;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.engine.impl.cmd.AbstractCustomSqlExecution;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 

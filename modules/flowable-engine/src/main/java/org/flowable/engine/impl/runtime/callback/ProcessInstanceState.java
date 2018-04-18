@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.runtime.callback;
 
-import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 
 /**
  * Used for passing the state to the {@link RuntimeInstanceStateChangeCallback} instances. 

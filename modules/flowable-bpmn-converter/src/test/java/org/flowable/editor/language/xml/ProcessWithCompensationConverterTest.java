@@ -20,7 +20,7 @@ import java.io.InputStream;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.api.io.InputStreamProvider;
+import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.junit.Test;
 
 /**

@@ -14,8 +14,9 @@ package org.flowable.variable.service.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -27,11 +28,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricVariableServiceImpl extends ServiceImpl implements HistoricVariableService {
-
-    public HistoricVariableServiceImpl() {
-
-    }
+public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServiceConfiguration> implements HistoricVariableService {
 
     public HistoricVariableServiceImpl(VariableServiceConfiguration variableServiceConfiguration) {
         super(variableServiceConfiguration);
@@ -107,5 +104,9 @@ public class HistoricVariableServiceImpl extends ServiceImpl implements Historic
     @Override
     public void deleteHistoricVariableInstancesByTaskId(String taskId) {
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByTaskId(taskId);
+    }
+
+    public HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
+        return configuration.getHistoricVariableInstanceEntityManager();
     }
 }

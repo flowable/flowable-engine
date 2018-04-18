@@ -1,71 +1,87 @@
 ﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <name>Flowable IDM UI</name>
-  <artifactId>flowable-ui-idm</artifactId>
-  <packaging>pom</packaging>
-  
-  <parent>
-    <groupId>org.flowable</groupId>
-    <artifactId>flowable-spring-boot</artifactId>
-    <relativePath>../flowable-spring-boot/pom.xml</relativePath>
-    <version>6.3.0-SNAPSHOT</version>
-  </parent>
-  
-  <properties>
-		<tomcat.version>7.0.53</tomcat.version>
-  </properties>
+    <name>Flowable IDM UI</name>
+    <artifactId>flowable-ui-idm</artifactId>
+    <packaging>pom</packaging>
 
-	<prerequisites>
-		<maven>3.0.0</maven>
-	</prerequisites>
-	
-	<modules>
-		<module>flowable-ui-idm-logic</module>
-		<module>flowable-ui-idm-rest</module>
-		<module>flowable-ui-idm-conf</module>
-		<module>flowable-ui-idm-app</module>
-	</modules>
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-spring-boot</artifactId>
+        <relativePath>../flowable-spring-boot/pom.xml</relativePath>
+        <version>6.3.1-SNAPSHOT</version>
+    </parent>
 
-	<dependencyManagement>
-	  <dependencies>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-idm-logic</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-idm-rest</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-ui-idm-conf</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-	 </dependencies>
-	</dependencyManagement>
+    <properties>
+        <tomcat.version>7.0.53</tomcat.version>
+    </properties>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-			<argLine>-Xmx256m</argLine>
-			<forkCount>1</forkCount>
-			<reuseForks>true</reuseForks>
-			<!-- Force alphabetical order to have a reproducible build -->
-			<runOrder>alphabetical</runOrder>
-		</configuration>
-      </plugin>
-    </plugins>
-  </build>
+    <prerequisites>
+        <maven>3.0.0</maven>
+    </prerequisites>
+
+    <modules>
+        <module>flowable-ui-idm-logic</module>
+        <module>flowable-ui-idm-rest</module>
+        <module>flowable-ui-idm-conf</module>
+        <module>flowable-ui-idm-app</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-ui-idm-logic</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-ui-idm-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-ui-idm-conf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xmx256m</argLine>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <!-- Force alphabetical order to have a reproducible build -->
+                    <runOrder>alphabetical</runOrder>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

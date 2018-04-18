@@ -235,14 +235,14 @@
       and TENANT_ID_ = #{tenantId}
   </select>
   
-  <select id="selectDecisionTablesByKeyAndVersion" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="decisionTableResultMap">
+  <select id="selectDecisionTablesByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="decisionTableResultMap">
     select *
     from ${prefix}ACT_DMN_DECISION_TABLE 
     where KEY_ = #{parameter.decisionTableKey} and VERSION_ = #{parameter.decisionTableVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
     
   
-  <select id="selectDecisionTablesByKeyAndVersionAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="decisionTableResultMap">
+  <select id="selectDecisionTablesByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="decisionTableResultMap">
     select *
     from ${prefix}ACT_DMN_DECISION_TABLE 
     where KEY_ = #{parameter.decisionTableKey} and VERSION_ = #{parameter.decisionTableVersion} and TENANT_ID_ = #{parameter.tenantId}

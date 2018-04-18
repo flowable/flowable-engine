@@ -13,13 +13,13 @@
 
 package org.flowable.engine.test.mock;
 
-import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
-import org.flowable.engine.common.impl.javax.el.BeanELResolver;
-import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
-import org.flowable.engine.common.impl.javax.el.ListELResolver;
-import org.flowable.engine.common.impl.javax.el.MapELResolver;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
+import org.flowable.common.engine.impl.javax.el.BeanELResolver;
+import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ListELResolver;
+import org.flowable.common.engine.impl.javax.el.MapELResolver;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.el.ProcessVariableScopeELResolver;
 

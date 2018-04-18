@@ -46,4 +46,8 @@ public interface FormFieldTypes {
     String CONTAINER = "container";
     
     String HYPERLINK = "hyperlink";
+    
+    String SPACER = "spacer";
+    
+    String HORIZONTAL_LINE = "horizontal-line";
 }

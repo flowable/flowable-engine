@@ -13,7 +13,7 @@
 
 package org.flowable.idm.rest.service.api.group;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;

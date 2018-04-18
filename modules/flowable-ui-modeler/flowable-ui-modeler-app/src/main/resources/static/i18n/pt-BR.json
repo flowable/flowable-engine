@@ -420,7 +420,9 @@
       "UPLOAD":"Carregar",
       "EXPRESSION":"Expressão",
       "DECIMAL":"Decimal",
-      "HYPERLINK":"Hiperlink"
+      "HYPERLINK":"Hiperlink",
+      "SPACER": "Spacer",
+	  "HORIZONTAL-LINE": "Horizontal line"
     },
     "TABS":{
       "GENERAL":"Geral",

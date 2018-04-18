@@ -15,8 +15,9 @@ package org.flowable.form.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormDeployment;
@@ -26,6 +27,7 @@ import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.NativeFormDefinitionQuery;
 import org.flowable.form.api.NativeFormDeploymentQuery;
+import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.form.engine.impl.cmd.DeployCmd;
 import org.flowable.form.engine.impl.cmd.GetDeploymentResourceCmd;
@@ -41,7 +43,11 @@ import org.flowable.form.engine.impl.repository.FormDeploymentBuilderImpl;
 /**
  * @author Tijs Rademakers
  */
-public class FormRepositoryServiceImpl extends ServiceImpl implements FormRepositoryService {
+public class FormRepositoryServiceImpl extends CommonEngineServiceImpl<FormEngineConfiguration> implements FormRepositoryService {
+
+    public FormRepositoryServiceImpl(FormEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     @Override
     public FormDeploymentBuilder createDeployment() {

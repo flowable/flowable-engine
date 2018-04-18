@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.RuleExecutionAuditContainer;
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Yvo Swillens

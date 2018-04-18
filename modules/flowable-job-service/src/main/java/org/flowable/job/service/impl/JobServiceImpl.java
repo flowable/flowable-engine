@@ -15,8 +15,8 @@ package org.flowable.job.service.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -33,10 +33,6 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManage
  * @author Tijs Rademakers
  */
 public class JobServiceImpl extends ServiceImpl implements JobService {
-
-    public JobServiceImpl() {
-
-    }
 
     public JobServiceImpl(JobServiceConfiguration jobServiceConfiguration) {
         super(jobServiceConfiguration);
@@ -92,7 +88,7 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     
     @Override
     public AbstractRuntimeJobEntity activateSuspendedJob(SuspendedJobEntity job) {
-        if (jobServiceConfiguration.getJobParentStateResolver().isSuspended(job)) {
+        if (configuration.getJobParentStateResolver().isSuspended(job)) {
             throw new FlowableIllegalArgumentException("Can not activate job "+ job.getId() +". Parent is suspended.");
         }
         return getJobManager().activateSuspendedJob(job);

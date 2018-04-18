@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.runtime.Clock;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;

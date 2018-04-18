@@ -12,13 +12,13 @@
  */
 package org.flowable.dmn.engine.impl.util;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * A utility class that hides the complexity of {@link DecisionTableEntity} and {@link Decision} lookup. Use this class rather than accessing the decision table cache or {@link DeploymentManager}

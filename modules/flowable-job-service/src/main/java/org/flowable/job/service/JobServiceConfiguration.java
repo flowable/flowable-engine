@@ -12,13 +12,15 @@
  */
 package org.flowable.job.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import org.flowable.engine.common.impl.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.HistoryJobServiceImpl;
 import org.flowable.job.service.impl.JobServiceImpl;
 import org.flowable.job.service.impl.TimerJobServiceImpl;
@@ -54,9 +56,7 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisTimerJo
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -64,6 +64,9 @@ import java.util.Map;
 public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(JobServiceConfiguration.class);
+    
+    public static String JOB_EXECUTION_SCOPE_ALL = "all";
+    public static String JOB_EXECUTION_SCOPE_CMMN = "cmmn";
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////
@@ -103,6 +106,8 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected InternalJobCompatibilityManager internalJobCompatibilityManager;
 
     protected AsyncExecutor asyncExecutor;
+    
+    protected String jobExecutionScope;
 
     protected Map<String, JobHandler> jobHandlers;
     protected FailedJobCommandFactory failedJobCommandFactory;
@@ -391,6 +396,15 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setAsyncExecutor(AsyncExecutor asyncExecutor) {
         this.asyncExecutor = asyncExecutor;
+        return this;
+    }
+
+    public String getJobExecutionScope() {
+        return jobExecutionScope;
+    }
+
+    public JobServiceConfiguration setJobExecutionScope(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
         return this;
     }
 

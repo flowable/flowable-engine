@@ -100,4 +100,22 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
+    public void queryByCaseInstanceIdIncludeIdentityLinks() {
+        List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
+        assertEquals(5, caseInstances.size());
+        for (CaseInstance caseInstance : caseInstances) {
+            assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).includeIdentityLinks().list().size());
+        }
+    }
+
+    @Test
+    public void queryHistoricTaskQueryByCaseInstanceIdIncludeIdentityLinks() {
+        List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
+        assertEquals(5, caseInstances.size());
+        for (CaseInstance caseInstance : caseInstances) {
+            assertEquals(1, cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).includeIdentityLinks().list().size());
+        }
+    }
+
 }

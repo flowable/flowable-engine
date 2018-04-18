@@ -13,7 +13,7 @@
 package org.activiti.spring.test.taskassignment;
 
 import org.activiti.spring.impl.test.SpringFlowableTestCase;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
 

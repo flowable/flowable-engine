@@ -12,11 +12,11 @@
  */
 package org.flowable.content.rest.conf.engine;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.cfg.StandaloneInMemContentEngineConfiguration;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

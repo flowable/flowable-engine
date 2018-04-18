@@ -465,7 +465,7 @@
 
   <!-- EXECUTION SELECT -->
 
-  <select id="selectExecutionsWithSameRootProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+  <select id="selectExecutionsWithSameRootProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
     where ROOT_PROC_INST_ID_ = (select ROOT_PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{parameter})
   </select>
@@ -474,40 +474,40 @@
     select * from ${prefix}ACT_RU_EXECUTION where ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
-  <select id="selectExecutionsByParentExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+  <select id="selectExecutionsByParentExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
     where PARENT_ID_ = #{parameter}
   </select>
 
-  <select id="selectExecutionsByRootProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+  <select id="selectExecutionsByRootProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
     where ROOT_PROC_INST_ID_ = #{parameter}
   </select>
 
-  <select id="selectChildExecutionsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+  <select id="selectChildExecutionsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
     where PROC_INST_ID_ = #{parameter} and PARENT_ID_ is not null
   </select>
 
-  <select id="selectExecutionsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+  <select id="selectExecutionsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
     where PROC_INST_ID_ = #{parameter}
   </select>
 
-  <select id="selectProcessInstanceIdsByProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectProcessInstanceIdsByProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_RU_EXECUTION
     where PROC_DEF_ID_ = #{parameter} and PARENT_ID_ is null
   </select>
 
-  <select id="selectInactiveExecutionsForProcessInstance" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+  <select id="selectInactiveExecutionsForProcessInstance" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
   	select *
   	from ${prefix}ACT_RU_EXECUTION
   	where PROC_INST_ID_ = #{parameter.processInstanceId}
   	and IS_ACTIVE_ = #{parameter.isActive}
   </select>
 
-  <select id="selectInactiveExecutionsInActivityAndProcessInstance" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+  <select id="selectInactiveExecutionsInActivityAndProcessInstance" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
   	select *
   	from ${prefix}ACT_RU_EXECUTION
   	where ACT_ID_ = #{parameter.activityId}
@@ -515,7 +515,7 @@
   	and IS_ACTIVE_ = #{parameter.isActive}
   </select>
 
-  <select id="selectExecutionsByParentExecutionAndActivityIds" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+  <select id="selectExecutionsByParentExecutionAndActivityIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select *
     from ${prefix}ACT_RU_EXECUTION
     where PARENT_ID_ = #{parameter.parentExecutionId}

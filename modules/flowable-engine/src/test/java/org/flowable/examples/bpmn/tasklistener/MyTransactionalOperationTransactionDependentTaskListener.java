@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.Task;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;

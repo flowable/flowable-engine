@@ -21,8 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.AddCommentCmd;
 import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
@@ -76,6 +77,7 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
@@ -85,11 +87,7 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class TaskServiceImpl extends ServiceImpl implements TaskService {
-
-    public TaskServiceImpl() {
-
-    }
+public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements TaskService {
 
     public TaskServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -281,7 +279,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
     @Override
     public TaskQuery createTaskQuery() {
-        return new TaskQueryImpl(commandExecutor, processEngineConfiguration.getDatabaseType());
+        return new TaskQueryImpl(commandExecutor, configuration.getDatabaseType());
     }
 
     @Override
@@ -570,4 +568,8 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
         return commandExecutor.execute(new GetTaskDataObjectCmd(taskId, dataObjectName, locale, withLocalizationFallback));
     }
 
+    @Override
+    public TaskBuilder createTaskBuilder() {
+        return new TaskBuilderImpl(commandExecutor);
+    }
 }

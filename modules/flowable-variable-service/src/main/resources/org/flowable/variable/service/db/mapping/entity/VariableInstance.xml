@@ -165,13 +165,13 @@
         select * from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectVariablesByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+    <select id="selectVariablesByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
         where EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
         and TASK_ID_ is null
     </select>
 
-    <select id="selectVariablesByExecutionIds" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+    <select id="selectVariablesByExecutionIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
         where TASK_ID_ is null
         and EXECUTION_ID_ in
@@ -197,12 +197,12 @@
         </if>
     </select>
 
-    <select id="selectVariablesByTaskId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+    <select id="selectVariablesByTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE where
         TASK_ID_ = #{parameter, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectVariablesByTaskIds" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+    <select id="selectVariablesByTaskIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
         where TASK_ID_ in
         <foreach item="item" index="index" collection="parameter" open="(" separator="," close=")">

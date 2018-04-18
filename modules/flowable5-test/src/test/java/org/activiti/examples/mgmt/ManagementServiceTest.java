@@ -16,8 +16,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.management.TableMetaData;
 
 /**
  * Test case for the various operations of the {@link ManagementService}

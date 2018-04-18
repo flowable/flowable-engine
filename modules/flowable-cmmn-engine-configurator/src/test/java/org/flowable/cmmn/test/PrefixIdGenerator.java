@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.test;
 
-import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 
 /**
  * author martin.grofcik

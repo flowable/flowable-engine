@@ -71,14 +71,14 @@
     select * from ${prefix}ACT_ID_GROUP where ID_ = #{id, jdbcType=VARCHAR}
   </select>
     
-  <select id="selectGroupsByUserId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
+  <select id="selectGroupsByUserId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
     select g.*
     from ${prefix}ACT_ID_GROUP g, ${prefix}ACT_ID_MEMBERSHIP membership
     where g.ID_ = membership.GROUP_ID_
       and membership.USER_ID_ = #{parameter}
   </select>
 
-  <select id="selectGroupsByUserIdAndGroupType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
+  <select id="selectGroupsByUserIdAndGroupType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
     select g.*
     from ${prefix}ACT_ID_GROUP g, ${prefix}ACT_ID_MEMBERSHIP membership
     where g.ID_ = membership.GROUP_ID_

@@ -30,7 +30,7 @@ import javax.management.modelmbean.ModelMBeanInfoSupport;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.management.jmx.annotations.ManagedAttribute;
 import org.flowable.management.jmx.annotations.ManagedNotification;
 import org.flowable.management.jmx.annotations.ManagedNotifications;

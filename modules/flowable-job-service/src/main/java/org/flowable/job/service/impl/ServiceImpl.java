@@ -12,7 +12,8 @@
  */
 package org.flowable.job.service.impl;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
@@ -24,43 +25,41 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 /**
  * @author Tijs Rademakers
  */
-public class ServiceImpl {
-
-    protected JobServiceConfiguration jobServiceConfiguration;
+public class ServiceImpl extends CommonServiceImpl<JobServiceConfiguration> {
 
     public ServiceImpl() {
 
     }
 
-    public ServiceImpl(JobServiceConfiguration jobServiceConfiguration) {
-        this.jobServiceConfiguration = jobServiceConfiguration;
+    public ServiceImpl(JobServiceConfiguration configuration) {
+        super(configuration);
     }
     
     public FlowableEventDispatcher getEventDispatcher() {
-        return jobServiceConfiguration.getEventDispatcher();
+        return configuration.getEventDispatcher();
     }
     
     public JobManager getJobManager() {
-        return jobServiceConfiguration.getJobManager();
+        return configuration.getJobManager();
     }
 
     public JobEntityManager getJobEntityManager() {
-        return jobServiceConfiguration.getJobEntityManager();
+        return configuration.getJobEntityManager();
     }
     
     public DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-        return jobServiceConfiguration.getDeadLetterJobEntityManager();
+        return configuration.getDeadLetterJobEntityManager();
     }
     
     public SuspendedJobEntityManager getSuspendedJobEntityManager() {
-        return jobServiceConfiguration.getSuspendedJobEntityManager();
+        return configuration.getSuspendedJobEntityManager();
     }
     
     public TimerJobEntityManager getTimerJobEntityManager() {
-        return jobServiceConfiguration.getTimerJobEntityManager();
+        return configuration.getTimerJobEntityManager();
     }
     
     public HistoryJobEntityManager getHistoryJobEntityManager() {
-        return jobServiceConfiguration.getHistoryJobEntityManager();
+        return configuration.getHistoryJobEntityManager();
     }
 }

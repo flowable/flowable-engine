@@ -13,7 +13,7 @@
 package org.flowable.engine.impl.bpmn.parser.factory;
 
 import org.flowable.bpmn.model.Import;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.XMLImporter;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;

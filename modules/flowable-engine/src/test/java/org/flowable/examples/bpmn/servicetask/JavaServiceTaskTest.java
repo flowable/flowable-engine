@@ -15,9 +15,9 @@ package org.flowable.examples.bpmn.servicetask;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableClassLoadingException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableClassLoadingException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
