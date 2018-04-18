@@ -194,6 +194,9 @@ angular.module('flowableApp')
                 async: false
             }).success(function (data) {
                 $scope.model.isDebuggerEnabled = data;
+                $scope.getExecutions();
+                $scope.getEventLog();
+                $scope.getProcessVariables();
             });
 
             $scope.model.variables = [];
@@ -287,18 +290,18 @@ angular.module('flowableApp')
                 }
             }
 
-            $scope.getExecutions();
-
-            if ($scope.model.isDebuggerEnabled) {
-                $http({
-                    method: 'GET',
-                    url: '../app/rest/debugger/variables/' + $scope.model.processInstance.id
-                }).success(function (data) {
-                    $scope.gridVariables.data = data;
-                    if ($scope.gridVariablesApi) {
-                        $scope.gridVariablesApi.core.refresh();
-                    }
-                });
+            $scope.getProcessVariables = function () {
+                if ($scope.model.isDebuggerEnabled) {
+                    $http({
+                        method: 'GET',
+                        url: '../app/rest/debugger/variables/' + $scope.model.processInstance.id
+                    }).success(function (data) {
+                        $scope.gridVariables.data = data;
+                        if ($scope.gridVariablesApi) {
+                            $scope.gridVariablesApi.core.refresh();
+                        }
+                    });
+                }
             }
 
             $scope.getEventLog = function () {
@@ -314,7 +317,6 @@ angular.module('flowableApp')
                     });
                 }
             }
-            $scope.getEventLog();
 
             $scope.tabData = {
                 tabs: [
