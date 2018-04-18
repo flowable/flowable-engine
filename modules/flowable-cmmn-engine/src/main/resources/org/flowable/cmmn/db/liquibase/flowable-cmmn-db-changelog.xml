@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext 
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
@@ -287,8 +287,7 @@
         </createTable>
 
     </changeSet>
-    
-    <!-- Version 6.2.1 -->
+
     <changeSet id="2" author="flowable">
     
         <addColumn tableName="ACT_CMMN_CASEDEF">
@@ -311,7 +310,6 @@
     
     </changeSet>
     
-    <!-- Version 6.3.1-SNAPSHOT -->
     <changeSet id="3" author="flowable">
     
         <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
@@ -337,7 +335,35 @@
         <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
             <column name="SENTRY_PART_INST_COUNT_" type="integer" />
         </addColumn>
-    
+    </changeSet>
+
+    <changeSet id="4" author="flowable">
+
+        <createTable tableName="ACT_CMMN_HI_PLAN_ITEM_INST">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="REV_" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="STATE_" type="varchar(255)" />
+            <column name="CASE_DEF_ID_" type="varchar(255)" />
+            <column name="CASE_INST_ID_" type="varchar(255)" />
+            <column name="STAGE_INST_ID_" type="varchar(255)" />
+            <column name="IS_STAGE_" type="boolean" />
+            <column name="ELEMENT_ID_" type="varchar(255)" />
+            <column name="ITEM_DEFINITION_ID_" type="varchar(255)" />
+            <column name="ITEM_DEFINITION_TYPE_" type="varchar(255)" />
+            <column name="START_TIME_" type="datetime" />
+            <column name="ACTIVATION_TIME_" type="datetime" />
+            <column name="END_TIME_" type="datetime" />
+            <column name="START_USER_ID_" type="varchar(255)" />
+            <column name="REFERENCE_ID_" type="varchar(255)" />
+            <column name="REFERENCE_TYPE_" type="varchar(255)" />
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+        </createTable>
+
     </changeSet>
 
 </databaseChangeLog>

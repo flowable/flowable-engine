@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -29,14 +29,13 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     
     @Override
     protected void internalExecute() {
-        PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        if (planItem != null
-                && planItem.getItemControl() != null
-                && planItem.getItemControl().getRepetitionRule() != null
-                && !planItem.getEntryCriteria().isEmpty()) {
-            int counter = getRepetitionCounter(planItemInstanceEntity);
-            setRepetitionCounter(planItemInstanceEntity, ++counter);
+        if (hasRepetitionRule(planItemInstanceEntity)) {
+            //Increase repetition counter, value is kept from the previous instance of the repetition
+            //@see CmmOpertion.copyAndInsertPlanItemInstance used by @see EvaluateCriteriaOperation and @see AbstractDeletePlanItemInstanceOperation
+            //Or if its the first instance of the repetition, this call sets the counter to 1
+            setRepetitionCounter(planItemInstanceEntity, getRepetitionCounter(planItemInstanceEntity) + 1);
         }
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCreated(planItemInstanceEntity);
     }
     
     @Override

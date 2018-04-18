@@ -107,7 +107,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         
         // Need to store new child plan item instances in a list until the loop is done, to avoid concurrentmodifications
         List<PlanItemInstanceEntity> newChildPlanItemInstances = null;
-        
+
         for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstances) {
 
             PlanItem planItem = planItemInstanceEntity.getPlanItem();
@@ -118,23 +118,24 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
                 if (evaluationResult.equals(CriteriaEvaluationResult.SENTRY_SATISFIED)) {
                     boolean activatePlanItemInstance = true;
-                    if (!planItem.getEntryCriteria().isEmpty() && planItem.getItemControl() != null && planItem.getItemControl().getRepetitionRule() != null) {
+                    if (!planItem.getEntryCriteria().isEmpty() && hasRepetitionRule(planItemInstanceEntity)) {
                         boolean isRepeating = evaluateRepetitionRule(planItemInstanceEntity);
                         if (isRepeating) {
+
+                            PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
+                            childPlanItemInstanceEntity.setState(PlanItemInstanceState.WAITING_FOR_REPETITION);
                             if (newChildPlanItemInstances == null) {
                                 newChildPlanItemInstances = new ArrayList<>(1);
                             }
-                            
-                            PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
-                            childPlanItemInstanceEntity.setState(PlanItemInstanceState.WAITING_FOR_REPETITION); // Special state indicating 'before creation', but allowing variable persistence
-                            int counter = getRepetitionCounter(childPlanItemInstanceEntity);
-                            setRepetitionCounter(childPlanItemInstanceEntity, ++counter);
                             newChildPlanItemInstances.add(childPlanItemInstanceEntity);
-                            
+                            // createPlanItemInstance operations will also sync planItemInstance history
+                            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
+
                         } else {
                             activatePlanItemInstance = false;
                         }
-                    } else if (planItem.getPlanItemDefinition() instanceof EventListener) {
+                    }
+                    if (planItem.getPlanItemDefinition() instanceof EventListener) {
                         activatePlanItemInstance = false; // event listeners occur, they don't become active
                     }
                     if (activatePlanItemInstance) {

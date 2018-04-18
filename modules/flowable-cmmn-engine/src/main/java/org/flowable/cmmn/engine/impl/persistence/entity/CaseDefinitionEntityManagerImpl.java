@@ -112,7 +112,11 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
                 historicTaskInstanceEntityManager.delete((HistoricTaskInstanceEntity) historicTaskInstance);
             }
-            
+
+            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = getHistoricPlanItemInstanceEntityManager();
+            historicPlanItemInstanceEntityManager.findByCaseDefinitionId(caseDefinitionId)
+                    .forEach(p -> historicPlanItemInstanceEntityManager.delete(p.getId()));
+
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = getHistoricCaseInstanceEntityManager();
             List<HistoricCaseInstance> historicCaseInstanceEntities = historicCaseInstanceEntityManager
                     .findByCriteria(new HistoricCaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
