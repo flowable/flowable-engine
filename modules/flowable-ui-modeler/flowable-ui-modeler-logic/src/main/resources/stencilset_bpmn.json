@@ -3,6 +3,16 @@
   "namespace" : "http://b3mn.org/stencilset/bpmn2.0#",
   "description" : "BPMN process editor",
   "propertyPackages" : [ {
+    "name" : "rds_searchprocessformspackage",
+    "properties" : [ {
+      "id" : "rds_searchprocessforms",
+      "type" : "rds-processforms",
+      "title" : "Forms to search process",
+      "value" : [],
+      "description" : "Forms to search process instance",
+      "popular" : true
+    } ]
+  }, {
     "name" : "rds_viewprocessformspackage",
     "properties" : [ {
       "id" : "rds_viewprocessforms",
@@ -981,7 +991,7 @@
     "groups" : [ "Diagram" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "rds_viewprocessformspackage", "rds_editprocessformspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
+    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "rds_viewprocessformspackage", "rds_editprocessformspackage", "rds_searchprocessformspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {

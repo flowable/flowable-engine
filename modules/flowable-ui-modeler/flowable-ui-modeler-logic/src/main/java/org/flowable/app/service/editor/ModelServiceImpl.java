@@ -823,6 +823,7 @@ public class ModelServiceImpl implements ModelService {
 
         handleProcessForm(process,"viewprocessforms", processedForms );
         handleProcessForm(process,"editprocessforms", processedForms );
+        handleProcessForm(process,"searchprocessforms", processedForms );
   
         for (FlowElement flowElement : process.getFlowElements())
         {
