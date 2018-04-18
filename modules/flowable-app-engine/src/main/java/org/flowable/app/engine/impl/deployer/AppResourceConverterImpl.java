@@ -29,14 +29,19 @@ public class AppResourceConverterImpl implements AppResourceConverter {
 
     @Override
     public AppModel convertAppResourceToModel(byte[] appResourceBytes) {
-        AppModel appModel;
         try {
-            appModel = objectMapper.readValue(appResourceBytes, BaseAppModel.class);
+            return objectMapper.readValue(appResourceBytes, BaseAppModel.class);
         } catch (Exception e) {
             throw new FlowableException("Error reading app resource", e);
         }
-
-        return appModel;
     }
 
+    @Override
+    public String convertAppModelToJson(AppModel appModel) {
+        try {
+            return objectMapper.writeValueAsString(appModel);
+        } catch (Exception e) {
+            throw new FlowableException("Error writing app model to json", e);
+        }
+    }
 }

@@ -26,6 +26,7 @@ import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.app.engine.impl.cmd.DeployCmd;
 import org.flowable.app.engine.impl.cmd.GetAppModelCmd;
+import org.flowable.app.engine.impl.cmd.GetAppModelJsonCmd;
 import org.flowable.app.engine.impl.cmd.GetDeploymentAppDefinitionCmd;
 import org.flowable.app.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.app.engine.impl.cmd.GetDeploymentResourceNamesCmd;
@@ -79,6 +80,11 @@ public class AppRepositoryServiceImpl extends CommonEngineServiceImpl<AppEngineC
         return commandExecutor.execute(new GetAppModelCmd(appDefinitionId));
     }
     
+    @Override
+    public String convertAppModelToJson(String appDefinitionId) {
+        return commandExecutor.execute(new GetAppModelJsonCmd(appDefinitionId));
+    }
+
     @Override
     public void deleteDeployment(String deploymentId, boolean cascade) {
         commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade));

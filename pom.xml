@@ -467,6 +467,11 @@
             </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
+                <artifactId>flowable-app-engine-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
                 <artifactId>flowable-variable-service-api</artifactId>
                 <version>${project.version}</version>
             </dependency>

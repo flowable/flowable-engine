@@ -256,7 +256,7 @@
                                         <echo
                                             message="updating flowable configuration to db ${database}" />
                                         <copy
-                                            file="${basedir}/../../qa/db/flowable.appengine.cfg.xml"
+                                            file="${basedir}/../../qa/db/flowable.app.cfg.xml"
                                             todir="target/test-classes"
                                             overwrite="true">
                                             <filterset
@@ -276,7 +276,7 @@
                                         <echo
                                             message="dropping schema in ${database}" />
                                         <java
-                                            classname="org.flowable.appengine.engine.impl.db.DbSchemaDrop"
+                                            classname="org.flowable.app.engine.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
@@ -313,7 +313,7 @@
                                         <echo
                                             message="updating flowable configuration to db ${databasewithschema}" />
                                         <copy
-                                            file="${basedir}/../../qa/db/schema/flowable.appengine.cfg.xml"
+                                            file="${basedir}/../../qa/db/schema/flowable.app.cfg.xml"
                                             todir="target/test-classes"
                                             overwrite="true">
                                             <filterset
@@ -333,7 +333,7 @@
                                         <echo
                                             message="dropping schema in ${databasewithschema}" />
                                         <java
-                                            classname="org.flowable.appengine.engine.impl.db.DbSchemaDrop"
+                                            classname="org.flowable.app.engine.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>

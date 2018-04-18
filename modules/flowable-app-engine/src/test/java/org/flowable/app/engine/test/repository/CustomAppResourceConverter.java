@@ -37,5 +37,14 @@ public class CustomAppResourceConverter implements AppResourceConverter {
 
         return appModel;
     }
+    
+    @Override
+    public String convertAppModelToJson(AppModel appModel) {
+        try {
+            return objectMapper.writeValueAsString(appModel);
+        } catch (Exception e) {
+            throw new FlowableException("Error writing app model to json", e);
+        }
+    }
 
 }
