@@ -3,7 +3,7 @@ package org.flowable.rest.service.api.management;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.engine.common.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;

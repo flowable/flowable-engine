@@ -3,24 +3,24 @@ echo "Building all Java artifacts"
 cd ..
 mvn -Pdistro clean install -DskipTests
 
-echo "Building REST app image"
+echo "Building and pushing REST app image"
 cd modules/flowable-app-rest
-mvn -PbuildDockerImage,pushDockerImage,swagger clean package
+mvn -Pdocker,swagger clean deploy
 
-echo "Building ADMIN app image"
+echo "Building and pushing ADMIN app image"
 cd ../flowable-ui-admin
-mvn -PbuildDockerImage,pushDockerImage clean package
+mvn -Pdocker clean deploy
 
-echo "Building IDM app image"
+echo "Building and pushing IDM app image"
 cd ../flowable-ui-idm
-mvn -PbuildDockerImage,pushDockerImage clean package
+mvn -Pdocker clean deploy
 
-echo "Building MODELER app image"
+echo "Building and pushing MODELER app image"
 cd ../flowable-ui-modeler
-mvn -PbuildDockerImage,pushDockerImage clean package
+mvn -Pdocker clean deploy
 
-echo "Building TASK app image"
+echo "Building and pushing TASK app image"
 cd ../flowable-ui-task
-mvn -PbuildDockerImage,pushDockerImage clean package
+mvn -Pdocker clean deploy
 
 echo "Done..."

@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tom Baeyens

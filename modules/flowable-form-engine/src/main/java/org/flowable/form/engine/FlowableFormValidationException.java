@@ -13,7 +13,7 @@
 
 package org.flowable.form.engine;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * An exception indicating that a validation of a form field value resulted in an error.

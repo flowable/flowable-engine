@@ -15,7 +15,7 @@ package org.flowable.engine.test.api.event;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.impl.event.FlowableEventSupport;
+import org.flowable.common.engine.impl.event.FlowableEventSupport;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;

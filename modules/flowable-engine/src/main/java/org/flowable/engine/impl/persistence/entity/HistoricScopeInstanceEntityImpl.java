@@ -17,7 +17,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**

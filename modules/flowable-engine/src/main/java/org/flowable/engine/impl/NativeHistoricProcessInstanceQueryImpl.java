@@ -15,9 +15,9 @@ package org.flowable.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.AbstractNativeQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.AbstractNativeQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
 import org.flowable.engine.impl.util.CommandContextUtil;

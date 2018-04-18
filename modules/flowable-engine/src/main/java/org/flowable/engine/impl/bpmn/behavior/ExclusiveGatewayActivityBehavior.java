@@ -16,9 +16,9 @@ import java.util.Iterator;
 
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.context.Context;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;

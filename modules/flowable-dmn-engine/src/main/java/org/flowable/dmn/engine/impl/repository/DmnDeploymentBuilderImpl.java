@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -27,7 +28,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Tijs Rademakers

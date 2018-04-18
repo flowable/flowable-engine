@@ -13,7 +13,11 @@
 
 package org.flowable.engine.test.api.task;
 
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.notNullValue;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -22,15 +26,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricVariableUpdate;
@@ -46,10 +52,13 @@ import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 
@@ -59,6 +68,166 @@ import org.flowable.task.service.impl.persistence.CountingTaskEntity;
  * @author Falko Menge
  */
 public class TaskServiceTest extends PluggableFlowableTestCase {
+
+    private Task task = null;
+
+    public void tearDown() throws Exception {
+        super.tearDown();
+        if (task != null) {
+            taskService.deleteTask(task.getId(), true);
+        };
+    }
+
+    public void testCreateTaskWithBuilder() {
+        task = taskService.createTaskBuilder().
+                        name("testName").
+                        description("testDescription").
+                        priority(35).
+                        owner("testOwner").
+                        assignee("testAssignee").
+                        dueDate(new Date(0)).
+                        category("testCategory").
+                        parentTaskId("testParentTaskId").
+                        tenantId("testTenantId").
+                        formKey("testFormKey").
+                        taskDefinitionId("testDefintionId").
+                        taskDefinitionKey("testDefinitionKey").
+                        create();
+        Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedTask, notNullValue());
+        assertThat(updatedTask.getName(), is("testName"));
+        assertThat(updatedTask.getDescription(), is("testDescription"));
+        assertThat(updatedTask.getPriority(), is(35));
+        assertThat(updatedTask.getOwner(), is("testOwner"));
+        assertThat(updatedTask.getAssignee(), is("testAssignee"));
+        assertThat(updatedTask.getDueDate(), is(new Date(0)));
+        assertThat(updatedTask.getCategory(), is("testCategory"));
+        assertThat(updatedTask.getParentTaskId(), is("testParentTaskId"));
+        assertThat(updatedTask.getTenantId(), is("testTenantId"));
+        assertThat(updatedTask.getFormKey(), is("testFormKey"));
+        assertThat(updatedTask.getTaskDefinitionId(), is("testDefintionId"));
+        assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
+    }
+
+    public void testBuilderCreateTaskWithParent() {
+        Task parentTask = taskService.newTask();
+        taskService.saveTask(parentTask);
+        try {
+            task = taskService.createTaskBuilder().
+                    name("testName").
+                    parentTaskId(parentTask.getId()).
+                    identityLinks(getDefaultIdentityLinks()).
+                    create();
+            Task updatedParentTask = taskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
+            assertThat(((CountingTaskEntity) updatedParentTask).getSubTaskCount(), is(1));
+            Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(((CountingTaskEntity) updatedTask).getIdentityLinkCount(), is(2));
+        } finally {
+            this.taskService.deleteTask(parentTask.getId(), true);
+        }
+    }
+
+    public void testCreateTaskWithOwnerAssigneeAndIdentityLinks() {
+        task = taskService.createTaskBuilder().
+                        name("testName").
+                        owner("testOwner").
+                        assignee("testAssignee").
+                        identityLinks(getDefaultIdentityLinks()).
+                        create();
+        Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+        assertThat(updatedTask, notNullValue());
+        assertThat(updatedTask.getName(), is("testName"));
+        assertThat(updatedTask.getAssignee(), is("testAssignee"));
+        assertThat(updatedTask.getOwner(), is("testOwner"));
+        assertThat(updatedTask.getIdentityLinks().size(), is(2));
+        assertThat(updatedTask.getPriority(), is(Task.DEFAULT_PRIORITY));
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(historicTaskInstance, notNullValue());
+            assertThat(historicTaskInstance.getName(), is("testName"));
+            assertThat(historicTaskInstance.getPriority(), is(Task.DEFAULT_PRIORITY));
+            assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
+        }
+
+        taskService.deleteUserIdentityLink(updatedTask.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
+        taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
+    }
+
+    public void testCreateTaskWithBuilderAndPostprocessor() {
+        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
+        try {
+            taskServiceConfiguration.setTaskPostProcessor(
+                    taskEntity -> {
+                        taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
+                        taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
+                        return taskEntity;
+                    }
+            );
+            task = taskService.createTaskBuilder().
+                    name("testName").
+                    create();
+            Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(updatedTask, notNullValue());
+            assertThat(updatedTask.getName(), is("testName"));
+            assertThat(updatedTask.getIdentityLinks().size(), is(2));
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+                assertThat(historicTaskInstance, notNullValue());
+                assertThat(historicTaskInstance.getName(), is("testName"));
+                assertThat(historicTaskInstance.getIdentityLinks().size(), is(2));
+            }
+
+            taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
+            taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        } finally {
+            taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
+        }
+    }
+
+    public void testCreateTaskWithOwnerAssigneeAndIdentityLinksAndPostProcessor() {
+        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) this.processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        TaskPostProcessor previousTaskPostProcessor = taskServiceConfiguration.getTaskPostProcessor();
+        try {
+            taskServiceConfiguration.setTaskPostProcessor(
+                    taskEntity -> {
+                        taskEntity.setName("testNameFromPostProcessor");
+                        taskEntity.addUserIdentityLink("testUser", IdentityLinkType.CANDIDATE);
+                        taskEntity.addGroupIdentityLink("testGroup", IdentityLinkType.CANDIDATE);
+                        return taskEntity;
+                    }
+            );
+
+            task = taskService.createTaskBuilder().
+                    name("testName").
+                    owner("testOwner").
+                    assignee("testAssignee").
+                    identityLinks(getDefaultIdentityLinks()).
+                    create();
+            Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+            assertThat(updatedTask, notNullValue());
+            assertThat(updatedTask.getName(), is("testNameFromPostProcessor"));
+            assertThat(updatedTask.getAssignee(), is("testAssignee"));
+            assertThat(updatedTask.getOwner(), is("testOwner"));
+            assertThat(updatedTask.getIdentityLinks().size(), is(4));
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
+                assertThat(historicTaskInstance, notNullValue());
+                assertThat(historicTaskInstance.getName(), is("testNameFromPostProcessor"));
+                assertThat(historicTaskInstance.getIdentityLinks().size(), is(4));
+            }
+
+            taskService.deleteUserIdentityLink(updatedTask.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
+            taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
+            taskService.deleteUserIdentityLink(updatedTask.getId(), "testUser", IdentityLinkType.CANDIDATE);
+            taskService.deleteGroupIdentityLink(updatedTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        } finally {
+            taskServiceConfiguration.setTaskPostProcessor(previousTaskPostProcessor);
+        }
+    }
 
     public void testSaveTaskUpdate() throws Exception {
 
@@ -1792,6 +1961,20 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.deleteTask(task.getId(), true);
         identityService.deleteUser(user.getId());
+    }
+
+    private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
+        IdentityLinkEntityImpl identityLinkEntityCandidateUser = new IdentityLinkEntityImpl();
+        identityLinkEntityCandidateUser.setUserId("testUserBuilder");
+        identityLinkEntityCandidateUser.setType(IdentityLinkType.CANDIDATE);
+        IdentityLinkEntityImpl identityLinkEntityCandidateGroup = new IdentityLinkEntityImpl();
+        identityLinkEntityCandidateGroup.setGroupId("testGroupBuilder");
+        identityLinkEntityCandidateGroup.setType(IdentityLinkType.CANDIDATE);
+
+        return Stream.of(
+                identityLinkEntityCandidateUser,
+                identityLinkEntityCandidateGroup
+        ).collect(toSet());
     }
 
 }

@@ -16,8 +16,8 @@ package org.flowable.dmn.spring;
 import java.net.URL;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;

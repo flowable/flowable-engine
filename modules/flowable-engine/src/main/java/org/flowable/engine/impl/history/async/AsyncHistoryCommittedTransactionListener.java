@@ -15,8 +15,8 @@ package org.flowable.engine.impl.history.async;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.impl.cfg.TransactionListener;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.cfg.TransactionListener;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez

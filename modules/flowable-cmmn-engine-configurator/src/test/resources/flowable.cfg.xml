@@ -11,11 +11,41 @@
         <property name="jdbcPassword" value="" />
         <property name="databaseSchemaUpdate" value="true" />
         
+        <property name="asyncExecutor" ref="processAsyncExecutor" />
+        <property name="asyncExecutorActivate" value="false" />
+        
+        <property name="asyncFailedJobWaitTime" value="1" />
+        
         <property name="configurators">
-        <list>
-            <bean class="org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator" />
-        </list>
-    </property>
+            <list>
+                <bean class="org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator">
+                    <property name="cmmnEngineConfiguration" ref="cmmnEngineConfiguration" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
+        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+        <property name="jdbcDriver" value="org.h2.Driver" />
+        <property name="jdbcUsername" value="sa" />
+        <property name="jdbcPassword" value="" />
+        <property name="databaseSchemaUpdate" value="true" />
+        
+        <property name="asyncExecutor" ref="asyncExecutor" />
+        <property name="asyncExecutorActivate" value="false" />
+    
+        <property name="asyncFailedJobWaitTime" value="1" />
+    </bean>
+    
+    <bean id="processAsyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
+        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
+        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
+    </bean>
+    
+    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
+        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
+        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
     </bean>
   
 </beans>

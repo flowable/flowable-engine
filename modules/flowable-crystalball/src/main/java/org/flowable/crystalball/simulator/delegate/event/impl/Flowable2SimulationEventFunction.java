@@ -12,9 +12,9 @@
  */
 package org.flowable.crystalball.simulator.delegate.event.impl;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.crystalball.simulator.delegate.event.Function;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
 /**
  * This class provides abstract base for engine event -> SimulationEvent transformation

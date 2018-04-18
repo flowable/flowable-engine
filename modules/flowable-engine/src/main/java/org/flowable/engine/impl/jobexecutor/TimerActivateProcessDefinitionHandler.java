@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.flowable.engine.impl.util.CommandContextUtil;

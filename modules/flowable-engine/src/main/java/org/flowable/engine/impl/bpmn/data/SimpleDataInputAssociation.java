@@ -15,8 +15,8 @@ package org.flowable.engine.impl.bpmn.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * A simple data input association between a source and a target with assignments

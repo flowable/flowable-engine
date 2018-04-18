@@ -16,7 +16,7 @@ package org.flowable.engine.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 
 /**
  * Represents one execution of an activity and it's stored permanent for statistics, audit and other business intelligence purposes.

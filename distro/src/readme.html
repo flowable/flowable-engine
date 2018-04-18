@@ -28,6 +28,21 @@
 
 <h3>Release Notes - Flowable - 6.3.0</h3>
 
+<h4>GENERAL</h4>
+
+<p>The Spring Boot process auto configuration now uses the StrongUuidGenerator. In case you were overwriting the default one you can remove that.
+In case you want to keep using the DbIdGenerator, then just add the following bean to your configuration:
+<pre><code>
+    @Bean
+    public EngineConfigurationConfigurer&lt;SpringProcessEngineConfiguration&gt; processEngineDbIdGeneratorConfigurer() {
+        return engineConfiguration -> engineConfiguration.setIdGenerator(new DbIdGenerator());
+    }
+</code></pre>
+The default values of the DbIdGenerator would be filled in during the creation of the Process Engine.
+</p>
+
+<h3>Release Notes - Flowable - 6.3.0</h3>
+
 <p>Flowable 6.3.0 has turned out to be a big release with many new features (and even more fixes). Many thanks to all the community contributers that participated in the release
 and a special shout-out to Pascal Schumacher, Zach Visagie, Robert Hafner, Christophe Deneux and Seif El Deen Khaled</p>
 

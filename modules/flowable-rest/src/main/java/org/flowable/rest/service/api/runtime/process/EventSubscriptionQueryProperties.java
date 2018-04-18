@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.runtime.process;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.engine.impl.EventSubscriptionQueryProperty;
 
 /**

@@ -15,7 +15,7 @@ package org.flowable.variable.api.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 
 /**
  * A single process variable containing the last value when its process instance has finished.

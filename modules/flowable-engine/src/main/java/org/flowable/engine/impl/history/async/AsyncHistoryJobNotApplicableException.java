@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.history.async;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 public class AsyncHistoryJobNotApplicableException extends FlowableException {
 

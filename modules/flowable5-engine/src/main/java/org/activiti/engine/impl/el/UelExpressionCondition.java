@@ -16,9 +16,9 @@ package org.activiti.engine.impl.el;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.Condition;
 import org.activiti.engine.impl.context.Context;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

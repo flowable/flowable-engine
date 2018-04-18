@@ -17,10 +17,10 @@ package org.flowable.cmmn.engine.impl.process;
  */
 public interface ProcessInstanceService {
     
-    String startProcessInstanceByKey(String processDefinitionKey);
-    
-    String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId);
-    
+    String startProcessInstanceByKey(String processDefinitionKey, String tenantId);
+
+    String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId, String tenantId);
+
     void deleteProcessInstance(String processInstanceId);
 
 }

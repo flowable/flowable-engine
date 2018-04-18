@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.runtime.process;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.Execution;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

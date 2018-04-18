@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkCmd;
 import org.flowable.cmmn.engine.impl.cmd.ClaimTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
@@ -44,11 +45,13 @@ import org.flowable.cmmn.engine.impl.cmd.SaveTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetTaskDueDateCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetTaskPriorityCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetTaskVariablesCmd;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -56,8 +59,12 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 /**
  * @author Joram Barrez
  */
-public class CmmnTaskServiceImpl extends ServiceImpl implements CmmnTaskService {
-    
+public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfiguration> implements CmmnTaskService {
+
+    public CmmnTaskServiceImpl(CmmnEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
+
     @Override
     public Task newTask() {
         return newTask(null);
@@ -364,6 +371,11 @@ public class CmmnTaskServiceImpl extends ServiceImpl implements CmmnTaskService 
     @Override
     public List<IdentityLink> getIdentityLinksForTask(String taskId) {
         return commandExecutor.execute(new GetIdentityLinksForTaskCmd(taskId));
+    }
+
+    @Override
+    public TaskBuilder createTaskBuilder() {
+        return new CmmnTaskBuilderImpl(commandExecutor);
     }
 
 }

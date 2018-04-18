@@ -15,7 +15,7 @@ package org.activiti.standalone.event;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.test.api.event.TestFlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.

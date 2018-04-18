@@ -14,7 +14,7 @@ package org.flowable.cmmn.api.runtime;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Joram Barrez

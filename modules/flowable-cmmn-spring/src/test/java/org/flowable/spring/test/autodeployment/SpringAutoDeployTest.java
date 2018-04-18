@@ -25,7 +25,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
-import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;

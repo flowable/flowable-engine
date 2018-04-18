@@ -15,18 +15,16 @@ package org.flowable.identitylink.service.impl;
 import java.util.Collection;
 import java.util.List;
 
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLinkService {
-
-    public IdentityLinkServiceImpl() {
-
-    }
+public class IdentityLinkServiceImpl extends CommonServiceImpl<IdentityLinkServiceConfiguration> implements IdentityLinkService {
 
     public IdentityLinkServiceImpl(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
         super(identityLinkServiceConfiguration);
@@ -160,5 +158,9 @@ public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLink
     @Override
     public void deleteIdentityLinksByProcessInstanceId(String processInstanceId) {
         getIdentityLinkEntityManager().deleteIdentityLinksByProcessInstanceId(processInstanceId);
+    }
+
+    public IdentityLinkEntityManager getIdentityLinkEntityManager() {
+        return configuration.getIdentityLinkEntityManager();
     }
 }

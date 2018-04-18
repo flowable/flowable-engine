@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 

@@ -32,14 +32,17 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
     
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey) {
-        return startProcessInstanceByKey(processDefinitionKey, null);
+    public String startProcessInstanceByKey(String processDefinitionKey, String tenantId) {
+        return startProcessInstanceByKey(processDefinitionKey, null, tenantId);
     }
     
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId) {
+    public String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId, String tenantId) {
         ProcessInstanceBuilder processInstanceBuilder = processEngineRuntimeService.createProcessInstanceBuilder();
         processInstanceBuilder.processDefinitionKey(processDefinitionKey);
+        if (tenantId != null) {
+            processInstanceBuilder.tenantId(tenantId);
+        }
         
         if (planItemInstanceId != null) {
             processInstanceBuilder.callbackId(planItemInstanceId);

@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.app;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.app.AppResourceConverter;
-import org.flowable.engine.common.api.FlowableException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

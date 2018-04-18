@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.management;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.job.service.impl.JobQueryProperty;
 
 /**

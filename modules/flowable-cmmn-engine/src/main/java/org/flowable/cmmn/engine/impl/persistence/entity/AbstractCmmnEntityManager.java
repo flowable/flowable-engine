@@ -14,9 +14,9 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.AbstractCmmnManager;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 public abstract class AbstractCmmnEntityManager<EntityImpl extends Entity> extends AbstractCmmnManager implements EntityManager<EntityImpl> {
 

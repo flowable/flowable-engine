@@ -123,12 +123,19 @@
         </where>
     </sql>
 
-    <select id="selectTimerJobsToExecute" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectTimerJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_TIMER_JOB RES
-        where DUEDATE_ &lt;= #{parameter, jdbcType=TIMESTAMP}
+        where 
+        <if test="parameter.jobExecutionScope == null">
+            SCOPE_TYPE_ is null
+        </if>
+        <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
+            SCOPE_TYPE_ = #{parameter.jobExecutionScope}
+        </if>
+        and DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP}
         and LOCK_OWNER_ is null
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
@@ -313,26 +320,26 @@
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
-    <select id="selectTimerJobByTypeAndProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectTimerJobByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select J.*
         from ${prefix}ACT_RU_TIMER_JOB J
         where J.HANDLER_TYPE_ = #{parameter.handlerType}
         and J.PROC_DEF_ID_ = #{parameter.processDefinitionId}
     </select>
 
-    <select id="selectTimerJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectTimerJobsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_TIMER_JOB J
         where J.PROCESS_INSTANCE_ID_ = #{parameter}
     </select>
 
-    <select id="selectTimerJobsByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectTimerJobsByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_TIMER_JOB J
         where J.EXECUTION_ID_ = #{parameter}
     </select>
 
-    <select id="selectTimerJobByTypeAndProcessDefinitionKeyNoTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject"
+    <select id="selectTimerJobByTypeAndProcessDefinitionKeyNoTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject"
         resultMap="jobResultMap">
         select J.*
         from ${prefix}ACT_RU_TIMER_JOB J
@@ -342,7 +349,7 @@
         and (P.TENANT_ID_ = '' or P.TENANT_ID_ is null)
     </select>
 
-    <select id="selectTimerJobByTypeAndProcessDefinitionKeyAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject"
+    <select id="selectTimerJobByTypeAndProcessDefinitionKeyAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject"
         resultMap="jobResultMap">
         select J.*
         from ${prefix}ACT_RU_TIMER_JOB J

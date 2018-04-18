@@ -16,9 +16,9 @@ package org.flowable.common.rest.api;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.Query;
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.Query;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Tijs Rademakers

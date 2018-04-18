@@ -13,7 +13,7 @@
 
 package org.flowable.engine.test.transactions;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;

@@ -12,8 +12,8 @@
  */
 package org.flowable.form.engine.impl.deployer;
 
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.editor.form.converter.FormJsonConverter;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;

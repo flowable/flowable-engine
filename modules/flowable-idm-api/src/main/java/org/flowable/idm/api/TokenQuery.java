@@ -16,7 +16,7 @@ package org.flowable.idm.api;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link Token}

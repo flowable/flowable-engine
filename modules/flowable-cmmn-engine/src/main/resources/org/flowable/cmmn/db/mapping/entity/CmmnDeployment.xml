@@ -57,7 +57,7 @@
 
   <!-- DEPLOYMENT SELECT -->
 
-  <select id="selectCmmnDeploymentsByName" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="cmmnDeploymentResultMap">
+  <select id="selectCmmnDeploymentsByName" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnDeploymentResultMap">
     select * from ${prefix}ACT_CMMN_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
   </select>
   

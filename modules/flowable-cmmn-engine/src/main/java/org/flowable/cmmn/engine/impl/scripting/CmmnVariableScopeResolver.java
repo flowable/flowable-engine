@@ -15,9 +15,8 @@ package org.flowable.cmmn.engine.impl.scripting;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-
-import org.flowable.engine.common.impl.scripting.Resolver;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.scripting.Resolver;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**

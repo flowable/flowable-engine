@@ -14,9 +14,9 @@
 
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 
 public enum TimerDeclarationType {
     DATE(DueDateBusinessCalendar.NAME), DURATION(DurationBusinessCalendar.NAME), CYCLE(CycleBusinessCalendar.NAME);

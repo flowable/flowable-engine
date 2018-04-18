@@ -15,7 +15,7 @@ package org.activiti.engine.delegate.event.impl;
 import java.util.Map;
 
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 
 /**

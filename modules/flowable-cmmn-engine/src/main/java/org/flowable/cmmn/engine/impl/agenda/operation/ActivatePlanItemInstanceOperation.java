@@ -20,7 +20,12 @@ import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.Task;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
@@ -30,7 +35,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
     public ActivatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
-
+    
     @Override
     public void run() {
         // When it's an asynchronous task, a new activate operation is planned asynchronously.
@@ -63,7 +68,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         }
         return false;
     }
-
+    
     protected boolean isAsync() {
         if (planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Task) {
             Task task = (Task) planItemInstanceEntity.getPlanItem().getPlanItemDefinition();

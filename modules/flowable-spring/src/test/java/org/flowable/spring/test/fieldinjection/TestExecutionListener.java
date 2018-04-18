@@ -14,7 +14,7 @@ package org.flowable.spring.test.fieldinjection;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateHelper;
 import org.flowable.engine.delegate.ExecutionListener;

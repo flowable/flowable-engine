@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl">
+  
+  <insert id="insertAppDefinition" parameterType="org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl">
+    insert into ${prefix}ACT_APP_APPDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    values (#{id, jdbcType=VARCHAR},
+    		1,
+            #{category, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{key, jdbcType=VARCHAR}, 
+            #{version, jdbcType=INTEGER},
+            #{deploymentId, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=VARCHAR},
+            #{description, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="bulkInsertAppDefinition" parameterType="java.util.List">
+    INSERT INTO ${prefix}ACT_APP_APPDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    VALUES 
+      <foreach collection="list" item="appDefinition" index="index" separator=","> 
+        (#{appDefinition.id, jdbcType=VARCHAR},
+         1,
+         #{appDefinition.category, jdbcType=VARCHAR},
+         #{appDefinition.name, jdbcType=VARCHAR},
+         #{appDefinition.key, jdbcType=VARCHAR}, 
+         #{appDefinition.version, jdbcType=INTEGER},
+         #{appDefinition.deploymentId, jdbcType=VARCHAR},
+         #{appDefinition.resourceName, jdbcType=VARCHAR},
+         #{appDefinition.description, jdbcType=VARCHAR},
+         #{appDefinition.tenantId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+
+  <insert id="bulkInsertAppDefinition" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+    <foreach collection="list" item="appDefinition" index="index"> 
+      INTO ${prefix}ACT_APP_APPDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
+      DESCRIPTION_, TENANT_ID_) VALUES 
+        (#{appDefinition.id, jdbcType=VARCHAR},
+         1,
+         #{appDefinition.category, jdbcType=VARCHAR},
+         #{appDefinition.name, jdbcType=VARCHAR},
+         #{appDefinition.key, jdbcType=VARCHAR}, 
+         #{appDefinition.version, jdbcType=INTEGER},
+         #{appDefinition.deploymentId, jdbcType=VARCHAR},
+         #{appDefinition.resourceName, jdbcType=VARCHAR},
+         #{appDefinition.description, jdbcType=VARCHAR},
+         #{appDefinition.tenantId, jdbcType=VARCHAR})
+    </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <update id="updateAppDefinition" parameterType="org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl">
+    update ${prefix}ACT_APP_APPDEF set
+      REV_ = #{revisionNext, jdbcType=INTEGER},    
+      CATEGORY_ = #{category, jdbcType=VARCHAR}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+  
+  <delete id="deleteAppDefinition" parameterType="org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl">
+    delete from ${prefix}ACT_APP_APPDEF where ID_ = #{id}
+  </delete>  
+
+  <delete id="deleteAppDefinitionsByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_APP_APPDEF where DEPLOYMENT_ID_ = #{deploymenId} 
+  </delete>
+  
+  <resultMap id="appDefinitionResultMap" type="org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" />
+    <result property="category" column="CATEGORY_" />
+    <result property="name" column="NAME_" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!-- CASDEFINITION SELECT -->
+
+  <select id="selectAppDefinition" parameterType="string" resultMap="appDefinitionResultMap">
+    select * from ${prefix}ACT_APP_APPDEF where ID_ = #{appDefinitionId, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectAppDefinitionById" parameterType="string" resultMap="appDefinitionResultMap">
+    select * from ${prefix}ACT_APP_APPDEF where ID_ = #{appDefinitionId}
+  </select>
+
+  <select id="selectAppDefinitionByDeploymentAndKey" parameterType="map" resultMap="appDefinitionResultMap">
+    select * 
+    from ${prefix}ACT_APP_APPDEF 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{appDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+  
+   <select id="selectAppDefinitionByDeploymentAndKeyAndTenantId" parameterType="map" resultMap="appDefinitionResultMap">
+    select * 
+    from ${prefix}ACT_APP_APPDEF 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{appDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
+  
+  <select id="selectAppDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appDefinitionResultMap">
+    select *
+    from ${prefix}ACT_APP_APPDEF 
+    where KEY_ = #{parameter.appDefinitionKey} and VERSION_ = #{parameter.appDefinitionVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+  
+  <select id="selectAppDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appDefinitionResultMap">
+    select *
+    from ${prefix}ACT_APP_APPDEF 
+    where KEY_ = #{parameter.appDefinitionKey} and VERSION_ = #{parameter.appDefinitionVersion} and TENANT_ID_ = #{parameter.tenantId}
+  </select>
+    
+  <select id="selectLatestAppDefinitionByKey" parameterType="string" resultMap="appDefinitionResultMap">
+    select *
+    from ${prefix}ACT_APP_APPDEF 
+    where KEY_ = #{key} and
+          (TENANT_ID_ = ''  or TENANT_ID_ is null) and
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = #{appDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
+  </select>
+  
+  <select id="selectLatestAppDefinitionByKeyAndTenantId" parameterType="map" resultMap="appDefinitionResultMap">
+    select *
+    from ${prefix}ACT_APP_APPDEF 
+    where KEY_ = #{caseDefinitionKey} and
+          TENANT_ID_ = #{tenantId} and
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = #{appDefinitionKey} and TENANT_ID_ = #{tenantId})
+  </select>
+  
+  <select id="selectAppDefinitionsByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl" resultMap="appDefinitionResultMap">
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectAppDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+
+  <select id="selectAppDefinitionCountByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectAppDefinitionsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectAppDefinitionsByQueryCriteriaSql">  
+    from ${prefix}ACT_APP_APPDEF RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null and ids">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryLike != null">
+        and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
+      </if>
+      <if test="categoryNotEquals != null">
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+      </if>
+      <if test="key != null">
+        and RES.KEY_ = #{key}
+      </if>
+      <if test="keyLike != null">
+        and RES.KEY_ like #{keyLike}${wildcardEscapeClause}
+      </if>
+      <if test="resourceName != null">
+        and RES.RESOURCE_NAME_ = #{resourceName}
+      </if>
+      <if test="resourceNameLike != null">
+        and RES.RESOURCE_NAME_ like #{resourceNameLike}${wildcardEscapeClause}
+      </if>
+      <if test="version != null">
+        and RES.VERSION_ = #{version}
+      </if>
+      <if test="versionGt != null">
+        and RES.VERSION_ &gt; #{versionGt}
+      </if>
+      <if test="versionGte != null">
+        and RES.VERSION_ &gt;= #{versionGte}
+      </if>
+      <if test="versionLt != null">
+        and RES.VERSION_ &lt; #{versionLt}
+      </if>
+      <if test="versionLte != null">
+        and RES.VERSION_ &lt;= #{versionLte}
+      </if>
+      <if test="deploymentId != null">
+        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
+      <if test="deploymentIds != null and !deploymentIds.isEmpty()">
+        and RES.DEPLOYMENT_ID_ in
+        <foreach item="item" index="index" collection="deploymentIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="latest">
+        and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = RES.KEY_ 
+             <if test="tenantId != null">
+               and TENANT_ID_ = #{tenantId}
+             </if>
+             <if test="tenantIdLike != null">
+               and TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+             </if>
+             <if test="withoutTenantId">
+               and (TENANT_ID_ = '' or TENANT_ID_ is null)
+             </if>
+             <if test="tenantId == null and tenantIdLike == null and !withoutTenantId">
+               and ( (TENANT_ID_ IS NOT NULL and TENANT_ID_ = RES.TENANT_ID_) or (TENANT_ID_ IS NULL and RES.TENANT_ID_ IS NULL) )
+             </if>
+        )
+      </if>
+       <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+      </if>
+      <if test="withoutTenantId">
+        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+    </where>
+  </sql>
+  
+</mapper>

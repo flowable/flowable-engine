@@ -12,8 +12,8 @@
  */
 package org.flowable.identitylink.service;
 
-import org.flowable.engine.common.impl.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;

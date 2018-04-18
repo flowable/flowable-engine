@@ -17,11 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
@@ -50,7 +51,12 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     @Override
     @SuppressWarnings("unchecked")
     public List<JobEntity> findJobsToExecute(Page page) {
-        return getDbSqlSession().selectList("selectJobsToExecute", null, page);
+        String jobExecutionScope = CommandContextUtil.getJobServiceConfiguration().getJobExecutionScope();
+        
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("jobExecutionScope", jobExecutionScope);
+        
+        return getDbSqlSession().selectList("selectJobsToExecute", params, page);
     }
 
     @Override
@@ -75,7 +81,11 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     @SuppressWarnings("unchecked")
     public List<JobEntity> findExpiredJobs(Page page) {
         Map<String, Object> params = new HashMap<>();
-        Date now = CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        
+        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration();
+        String jobExecutionScope = jobServiceConfiguration.getJobExecutionScope();
+        params.put("jobExecutionScope", jobExecutionScope);
+        Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
         Date maxTimeout = new Date(now.getTime() - CommandContextUtil.getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
         params.put("maxTimeout", maxTimeout);

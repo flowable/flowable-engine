@@ -15,9 +15,9 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez

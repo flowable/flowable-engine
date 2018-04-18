@@ -16,7 +16,7 @@ package org.flowable.form.spring;
 import java.net.URL;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.engine.FormEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

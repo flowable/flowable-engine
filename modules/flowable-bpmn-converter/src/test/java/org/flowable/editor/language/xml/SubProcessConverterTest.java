@@ -40,7 +40,6 @@ public class SubProcessConverterTest extends AbstractConverterTest {
         BpmnModel bpmnModel = readXMLFile();
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         validateModel(parsedModel);
-        deployProcess(parsedModel);
     }
 
     @Override

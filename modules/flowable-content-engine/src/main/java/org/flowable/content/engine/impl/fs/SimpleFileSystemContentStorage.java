@@ -17,11 +17,11 @@ import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedGenerator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.content.api.ContentMetaDataKeys;
 import org.flowable.content.api.ContentObject;
 import org.flowable.content.api.ContentStorage;
 import org.flowable.content.api.ContentStorageException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

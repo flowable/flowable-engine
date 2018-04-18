@@ -13,7 +13,7 @@
 package org.flowable.engine.delegate.event;
 
 /**
- * An {@link org.flowable.engine.common.api.delegate.event.FlowableEvent} related to cancel event being sent to an activity.
+ * An {@link org.flowable.common.engine.api.delegate.event.FlowableEvent} related to cancel event being sent to an activity.
  * 
  * @author martin.grofcik
  */

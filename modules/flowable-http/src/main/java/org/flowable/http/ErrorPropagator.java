@@ -13,7 +13,7 @@
 package org.flowable.http;
 
 import org.flowable.bpmn.model.MapExceptionEntry;
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 import java.util.List;
 

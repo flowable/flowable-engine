@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.management.TablePage;
+import org.flowable.common.engine.api.management.TablePage;
 
 /**
  * @author Joram Barrez

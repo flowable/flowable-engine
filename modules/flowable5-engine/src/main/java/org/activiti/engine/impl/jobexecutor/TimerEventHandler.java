@@ -15,7 +15,7 @@ package org.activiti.engine.impl.jobexecutor;
 import java.io.IOException;
 
 import org.activiti.engine.impl.context.Context;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

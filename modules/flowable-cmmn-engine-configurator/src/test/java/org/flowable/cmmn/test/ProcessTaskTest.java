@@ -22,14 +22,18 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -107,7 +111,42 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals("Task Two", planItemInstances.get(0).getName());
         assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
     }
-    
+
+    @Test
+    @CmmnDeployment(tenantId = "flowable",
+    resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
+    public void testOneTaskProcessBlockingWithTenant() {
+        try {
+            if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
+                Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
+                processEngineRepositoryService.deleteDeployment(deployment.getId());
+            }
+            processEngineRepositoryService.createDeployment().
+                    addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
+                    tenantId("flowable").
+                    deploy();
+
+            CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess("flowable");
+
+            ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().singleResult();
+            assertEquals("flowable", processInstance.getTenantId());
+
+            Task task = processEngine.getTaskService().createTaskQuery().singleResult();
+            assertEquals("flowable", task.getTenantId());
+
+            this.cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        } finally {
+            if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
+                Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
+                processEngineRepositoryService.deleteDeployment(deployment.getId());
+            }
+            if (processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().count() == 1) {
+                HistoricTaskInstance historicTaskInstance = processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().singleResult();
+                processEngine.getProcessEngineConfiguration().getHistoryService().deleteHistoricTaskInstance(historicTaskInstance.getId());
+            }
+        }
+    }
+
     @Test
     @CmmnDeployment
     public void testProcessRefExpression() {
@@ -133,11 +172,26 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     }
     
     protected CaseInstance startCaseInstanceWithOneTaskProcess() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId()).start();
-        
+        return startCaseInstanceWithOneTaskProcess(null);
+    }
+    
+    protected CaseInstance startCaseInstanceWithOneTaskProcess(String tenantId) {
+        CaseDefinitionQuery caseDefinitionQuery = cmmnRepositoryService.createCaseDefinitionQuery();
+        if (tenantId != null) {
+            caseDefinitionQuery.caseDefinitionTenantId(tenantId);
+        }
+        String caseDefinitionId = caseDefinitionQuery.singleResult().getId();
+        CaseInstanceBuilder caseInstanceBuilder = cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionId(caseDefinitionId);
+        if (tenantId != null) {
+            caseInstanceBuilder.tenantId(tenantId);
+        }
+        CaseInstance caseInstance = caseInstanceBuilder.
+                start();
+
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
         assertEquals(0L, processEngineRuntimeService.createProcessInstanceQuery().count());
-        
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
@@ -147,7 +201,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals("No process instance started", 1L, processEngineRuntimeService.createProcessInstanceQuery().count());
         return caseInstance;
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTransactionRollback() {

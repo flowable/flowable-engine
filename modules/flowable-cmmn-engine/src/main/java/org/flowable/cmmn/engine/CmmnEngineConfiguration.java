@@ -40,12 +40,12 @@ import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnTaskServiceImpl;
-import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.callback.DefaultInternalCmmnJobManager;
+import org.flowable.cmmn.engine.impl.cfg.DefaultTaskAssignmentManager;
 import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
@@ -121,38 +121,34 @@ import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
-import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
-import org.flowable.engine.common.impl.AbstractEngineConfiguration;
-import org.flowable.engine.common.impl.EngineConfigurator;
-import org.flowable.engine.common.impl.EngineDeployer;
-import org.flowable.engine.common.impl.HasTaskIdGeneratorEngineConfiguration;
-import org.flowable.engine.common.impl.ScriptingEngineAwareEngineConfiguration;
-import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
-import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
-import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
-import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
-import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.scripting.BeansResolverFactory;
-import org.flowable.engine.common.impl.scripting.ResolverFactory;
-import org.flowable.engine.common.impl.scripting.ScriptBindingsFactory;
-import org.flowable.engine.common.impl.scripting.ScriptingEngines;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.EngineConfigurator;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.HasTaskIdGeneratorEngineConfiguration;
+import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
+import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
+import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
+import org.flowable.common.engine.impl.scripting.ResolverFactory;
+import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
@@ -170,9 +166,12 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
+import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
+import org.flowable.task.service.impl.DefaultTaskPostProcessor;
 import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
@@ -202,7 +201,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi, 
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
         HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
@@ -213,11 +212,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 
-    protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl();
-    protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl();
-    protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl();
-    protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl();
-    protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl();
+    protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl(this);
+    protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl(this);
+    protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl(this);
+    protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl(this);
+    protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl(this);
 
     protected TableDataManager tableDataManager;
     protected CmmnDeploymentDataManager deploymentDataManager;
@@ -309,6 +308,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
+    protected InternalTaskAssignmentManager internalTaskAssignmentManager;
     protected boolean isEnableTaskRelationshipCounts = true;
     protected int taskQueryLimit = 20000;
     protected int historicTaskQueryLimit = 20000;
@@ -340,6 +340,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean addDefaultExceptionHandler = true;
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected InternalJobParentStateResolver internalJobParentStateResolver;
+    protected String jobExecutionScope = JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN;
 
     protected FormFieldHandler formFieldHandler;
 
@@ -552,6 +553,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected IdGenerator taskIdGenerator;
 
+    /**
+     * postprocessor for a task builder
+     */
+    protected TaskPostProcessor taskPostProcessor;
+
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -715,25 +721,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    @Override
     public void initSessionFactories() {
-        if (sessionFactories == null) {
-            sessionFactories = new HashMap<>();
-
-            if (usingRelationalDatabase) {
-                initDbSqlSessionFactory();
-            }
-
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-            commandContextFactory.setSessionFactories(sessionFactories);
-        }
-
+        super.initSessionFactories();
         addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
-
-        if (customSessionFactories != null) {
-            for (SessionFactory sessionFactory : customSessionFactories) {
-                addSessionFactory(sessionFactory);
-            }
-        }
     }
 
     protected void initServices() {
@@ -742,13 +733,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setEngineConfig(this);
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     public void initDataManagers() {
@@ -942,7 +926,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             resolverFactories.add(new BeansResolverFactory());
         }
         if (scriptingEngines == null) {
-            
+
             scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
         }
     }
@@ -1110,6 +1094,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.taskServiceConfiguration.setIdGenerator(taskIdGenerator);
 
+        if (this.taskPostProcessor != null) {
+            this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
+        } else {
+            this.taskServiceConfiguration.setTaskPostProcessor(new DefaultTaskPostProcessor());
+        }
+
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
         } else {
@@ -1122,12 +1112,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultCmmnTaskVariableScopeResolver(this));
         }
 
+        if (this.internalTaskAssignmentManager != null) {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
+        } else {
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
+        }
+
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.isEnableTaskRelationshipCounts);
         this.taskServiceConfiguration.setTaskQueryLimit(this.taskQueryLimit);
         this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
 
         this.taskServiceConfiguration.init();
-        
+
         if (dbSqlSessionFactory != null && taskServiceConfiguration.getTaskDataManager() instanceof AbstractDataManager) {
             dbSqlSessionFactory.addLogicalEntityClassMapping("task", ((AbstractDataManager) taskServiceConfiguration.getTaskDataManager()).getManagedEntityClass());
         }
@@ -1199,7 +1195,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (customAsyncRunnableExecutionExceptionHandlers != null) {
             exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
         }
-        
+
         if (this.internalJobParentStateResolver != null) {
             this.jobServiceConfiguration.setJobParentStateResolver(this.internalJobParentStateResolver);
         } else {
@@ -1223,6 +1219,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         } else {
             this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalCmmnJobManager(this));
         }
+        
+        this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
 
         this.jobServiceConfiguration.init();
 
@@ -1341,7 +1339,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.cmmnHistoryService = cmmnHistoryService;
         return this;
     }
-    
+
     public IdmIdentityService getIdmIdentityService() {
         return ((IdmEngineConfiguration) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
@@ -2287,6 +2285,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public String getJobExecutionScope() {
+        return jobExecutionScope;
+    }
+
+    public CmmnEngineConfiguration setJobExecutionScope(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
+        return this;
+    }
+
     public HttpClientConfig getHttpClientConfig() {
         return httpClientConfig;
     }
@@ -2309,6 +2316,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             taskIdGenerator = idGenerator;
         }
     }
+    
+    public void resetClock() {
+        if (this.clock != null) {
+            clock.reset();
+        }
+    }
 
     @Override
     public IdGenerator getTaskIdGenerator() {
@@ -2319,7 +2332,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
         this.taskIdGenerator = taskIdGenerator;
     }
-    
+
+    public TaskPostProcessor getTaskPostProcessor() {
+        return taskPostProcessor;
+    }
+
+    public void setTaskPostProcessor(TaskPostProcessor processor) {
+        this.taskPostProcessor = processor;
+    }
+
     @Override
     public ScriptingEngines getScriptingEngines() {
         return scriptingEngines;

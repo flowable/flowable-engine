@@ -15,12 +15,12 @@ package org.flowable.dmn.engine.impl.deployer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

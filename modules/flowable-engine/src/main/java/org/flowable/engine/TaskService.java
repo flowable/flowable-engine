@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.query.NativeQuery;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.query.NativeQuery;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
@@ -32,6 +32,7 @@ import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -53,6 +54,13 @@ public interface TaskService {
     /** create a new task with a user defined task id */
     Task newTask(String taskId);
 
+    /**
+     * Create a builder for the task
+     * 
+     * @return task builder
+     */
+    TaskBuilder createTaskBuilder();
+    
     /**
      * Saves the given task to the persistent data store. If the task is already present in the persistent store, it is updated. After a new task has been saved, the task instance passed into this
      * method is updated with the id of the newly created task.
@@ -152,7 +160,7 @@ public interface TaskService {
      *            user that claims the task. When userId is null the task is unclaimed, assigned to no one.
      * @throws FlowableObjectNotFoundException
      *             when the task doesn't exist.
-     * @throws org.flowable.engine.common.api.FlowableTaskAlreadyClaimedException
+     * @throws org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException
      *             when the task is already claimed by another user
      */
     void claim(String taskId, String userId);

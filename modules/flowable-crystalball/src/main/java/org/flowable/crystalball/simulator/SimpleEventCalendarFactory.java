@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.flowable.engine.common.impl.runtime.ClockReader;
+import org.flowable.common.engine.impl.runtime.ClockReader;
 import org.springframework.beans.factory.FactoryBean;
 
 /**

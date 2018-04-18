@@ -16,6 +16,7 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricDetailQuery;
@@ -43,11 +44,7 @@ import org.flowable.variable.service.impl.NativeHistoricVariableInstanceQueryImp
  * @author Bernd Ruecker (camunda)
  * @author Christian Stettler
  */
-public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
-
-    public HistoryServiceImpl() {
-
-    }
+public class HistoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements HistoryService {
 
     public HistoryServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -65,7 +62,7 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
     @Override
     public HistoricTaskInstanceQuery createHistoricTaskInstanceQuery() {
-        return new HistoricTaskInstanceQueryImpl(commandExecutor, processEngineConfiguration.getDatabaseType());
+        return new HistoricTaskInstanceQueryImpl(commandExecutor, configuration.getDatabaseType());
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
@@ -222,4 +223,31 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(timerJob);
     }
+
+    @Deployment
+    public void testParallelTimerEvents() throws Exception {
+        // Set the clock fixed
+        Date startTime = new Date();
+
+        // After process start, there should be timer created
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("parallelIntermediateTimers");
+        TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
+        assertEquals(2, jobQuery.count());
+
+        // After setting the clock to time '50minutes and 5 seconds', the bouth timers should fire in parralel
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
+        try {
+            JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(
+                    this.processEngineConfiguration, this.managementService, 5000L, 250L
+            );
+
+            assertEquals(0, jobQuery.count());
+            assertProcessEnded(pi.getProcessInstanceId());
+            assertEquals("Timer paths must be executed exactly 2 times without failure repetition",
+                    2, IntermediateTimerEventTestCounter.getCount());
+        } finally {
+            processEngineConfiguration.getClock().reset();
+        }
+    }
+
 }

@@ -28,7 +28,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer;
 import org.hamcrest.core.AnyOf;
 import org.hamcrest.core.IsInstanceOf;

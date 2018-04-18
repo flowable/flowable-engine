@@ -15,6 +15,9 @@ package org.flowable.dmn.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.dmn.api.DmnDeployment;
@@ -23,6 +26,7 @@ import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.NativeDecisionTableQuery;
 import org.flowable.dmn.api.NativeDmnDeploymentQuery;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.dmn.engine.impl.cmd.DeployCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentDecisionTableCmd;
@@ -35,13 +39,11 @@ import org.flowable.dmn.engine.impl.cmd.SetDeploymentCategoryCmd;
 import org.flowable.dmn.engine.impl.cmd.SetDeploymentTenantIdCmd;
 import org.flowable.dmn.engine.impl.repository.DmnDeploymentBuilderImpl;
 import org.flowable.dmn.model.DmnDefinition;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
  */
-public class DmnRepositoryServiceImpl extends ServiceImpl implements DmnRepositoryService {
+public class DmnRepositoryServiceImpl extends CommonEngineServiceImpl<DmnEngineConfiguration> implements DmnRepositoryService {
 
     @Override
     public DmnDeploymentBuilder createDeployment() {

@@ -19,10 +19,10 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;

@@ -14,7 +14,7 @@ package org.flowable.identitylink.service.impl.persistence.entity.data.impl.cach
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**

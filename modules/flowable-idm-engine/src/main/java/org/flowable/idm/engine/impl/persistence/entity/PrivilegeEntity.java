@@ -12,7 +12,7 @@
  */
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Privilege;
 
 /**

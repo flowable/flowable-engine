@@ -21,7 +21,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
 
 /**
@@ -68,7 +68,7 @@ public interface CmmnRuntimeService {
     
     void setLocalVariables(String planItemInstanceId, Map<String, Object> variables);
     
-    void setLocalVariable(String caseInstanceId, String variableName, Object variableValue);
+    void setLocalVariable(String planItemInstanceId, String variableName, Object variableValue);
     
     void removeVariable(String caseInstanceId, String variableName);
     

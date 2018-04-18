@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.api.runtime;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Dennis Federico

@@ -28,7 +28,7 @@
         select * from ${prefix}ACT_RU_HISTORY_JOB where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectHistoryJobsToExecute" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+    <select id="selectHistoryJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
@@ -38,7 +38,7 @@
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
-    <select id="selectExpiredHistoryJobs" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+    <select id="selectExpiredHistoryJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
@@ -48,7 +48,7 @@
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
-    <select id="selectHistoryJobsByConfiguration" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+    <select id="selectHistoryJobsByConfiguration" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
         select * from ${prefix}ACT_RU_HISTORY_JOB
         where HANDLER_TYPE_ = #{parameter.handlerType}
         and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
@@ -244,7 +244,7 @@
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
-    <update id="resetExpiredHistoryJob" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+    <update id="resetExpiredHistoryJob" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
         update ${prefix}ACT_RU_HISTORY_JOB
         set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null
         where ID_ = #{id,jdbcType=VARCHAR}

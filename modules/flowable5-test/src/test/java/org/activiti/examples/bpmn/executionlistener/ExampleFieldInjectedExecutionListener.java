@@ -13,9 +13,9 @@
 
 package org.activiti.examples.bpmn.executionlistener;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * Example {@link ExecutionListener} which gets 2 fields injected.

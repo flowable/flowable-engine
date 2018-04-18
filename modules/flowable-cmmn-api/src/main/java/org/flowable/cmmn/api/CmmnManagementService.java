@@ -15,7 +15,7 @@ package org.flowable.cmmn.api;
 import java.util.Collection;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;

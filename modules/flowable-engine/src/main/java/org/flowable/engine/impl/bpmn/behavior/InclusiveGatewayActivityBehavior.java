@@ -15,8 +15,8 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.InactiveActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;

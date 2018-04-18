@@ -6,6 +6,7 @@
     
     <case id="scriptCase">
         <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
+            <planItem id="blockerPlanItem" definitionRef="blockerEvent"/>
             <planItem id="returnValueScript" definitionRef="returnValueScriptTask" />
                 <task id="returnValueScriptTask" name="Script with value" flowable:type="script" flowable:scriptFormat="JavaScript" flowable:resultVariableName="scriptResult">
                 <extensionElements>
@@ -17,6 +18,7 @@
                     </flowable:field>
                 </extensionElements>                
             </task>
+            <userEventListener id="blockerEvent"/>
         </casePlanModel>
     </case>
 </definitions>

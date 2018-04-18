@@ -14,7 +14,7 @@ package org.flowable.identitylink.service.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 
 /**

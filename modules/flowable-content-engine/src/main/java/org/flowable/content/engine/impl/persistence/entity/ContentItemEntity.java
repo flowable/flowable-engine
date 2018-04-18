@@ -14,8 +14,8 @@ package org.flowable.content.engine.impl.persistence.entity;
 
 import java.util.Date;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.content.api.ContentItem;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

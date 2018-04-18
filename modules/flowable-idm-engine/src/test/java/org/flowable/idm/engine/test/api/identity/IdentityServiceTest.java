@@ -17,9 +17,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.Token;

@@ -32,8 +32,8 @@ import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.TerminateEventDefinition;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 
 /**

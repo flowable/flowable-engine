@@ -14,11 +14,13 @@ package org.flowable.form.engine.impl;
 
 import java.util.Map;
 
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.api.FormService;
+import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.cmd.CreateFormInstanceCmd;
 import org.flowable.form.engine.impl.cmd.GetFormInstanceModelCmd;
 import org.flowable.form.engine.impl.cmd.GetFormModelWithVariablesCmd;
@@ -28,7 +30,11 @@ import org.flowable.form.engine.impl.cmd.SaveFormInstanceCmd;
 /**
  * @author Tijs Rademakers
  */
-public class FormServiceImpl extends ServiceImpl implements FormService {
+public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfiguration> implements FormService {
+
+    public FormServiceImpl(FormEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     public Map<String, Object> getVariablesFromFormSubmission(FormInfo formInfo, Map<String, Object> values) {
         return commandExecutor.execute(new GetVariablesFromFormSubmissionCmd(formInfo, values));

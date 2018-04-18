@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.event.logger;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.event.logger.handler.EventLoggerEventHandler;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;

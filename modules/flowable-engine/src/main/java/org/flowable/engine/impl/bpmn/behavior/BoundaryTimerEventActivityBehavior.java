@@ -14,7 +14,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;

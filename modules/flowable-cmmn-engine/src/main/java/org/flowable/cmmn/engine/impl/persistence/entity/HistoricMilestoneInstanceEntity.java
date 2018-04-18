@@ -16,7 +16,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.Date;
 
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez

@@ -278,17 +278,17 @@
     ${sql}
   </select>
   
-  <select id="selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+  <select id="selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR} and END_TIME_ is null
   </select>
   
-  <select id="selectHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+  <select id="selectHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR}
   </select>
   
-   <select id="selectUnfinishedHistoricActivityInstanceByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+   <select id="selectUnfinishedHistoricActivityInstanceByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null
   </select>

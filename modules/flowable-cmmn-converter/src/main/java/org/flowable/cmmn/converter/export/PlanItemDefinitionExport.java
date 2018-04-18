@@ -14,7 +14,7 @@ package org.flowable.cmmn.converter.export;
 
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 import javax.xml.stream.XMLStreamWriter;
 import java.util.HashMap;

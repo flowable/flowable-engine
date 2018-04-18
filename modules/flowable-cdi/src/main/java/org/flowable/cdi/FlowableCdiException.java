@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * Represents an exception in cdi.

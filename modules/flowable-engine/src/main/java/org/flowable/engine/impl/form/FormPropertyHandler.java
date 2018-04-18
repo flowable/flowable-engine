@@ -16,11 +16,11 @@ package org.flowable.engine.impl.form;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**

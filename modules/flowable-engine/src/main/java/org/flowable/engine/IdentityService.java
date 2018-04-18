@@ -14,7 +14,7 @@ package org.flowable.engine;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.NativeGroupQuery;
@@ -64,7 +64,7 @@ public interface IdentityService {
     UserQuery createUserQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for tasks.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for tasks.
      */
     NativeUserQuery createNativeUserQuery();
 
@@ -88,7 +88,7 @@ public interface IdentityService {
     GroupQuery createGroupQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for tasks.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for tasks.
      */
     NativeGroupQuery createNativeGroupQuery();
 

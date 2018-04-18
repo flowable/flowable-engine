@@ -18,8 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;

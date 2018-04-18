@@ -12,11 +12,11 @@
  */
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.delegate.event.impl.FlowableIdmEventBuilder;
