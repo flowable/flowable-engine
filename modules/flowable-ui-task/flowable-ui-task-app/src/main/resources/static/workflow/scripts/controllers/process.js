@@ -264,49 +264,55 @@ angular.module('flowableApp')
             };
 
             $scope.getExecutions = function () {
-                $http({
-                    method: 'GET',
-                    url: '../app/rest/debugger/executions/' + $scope.model.processInstance.id
-                }).success(function (data) {
-                    $scope.model.executions = data;
-                    $scope.gridExecutions.data = data;
-                    if ($scope.gridExecutionsApi) {
-                        $scope.gridExecutionsApi.grid.modifyRows($scope.gridExecutions.data);
-                        for (var i = 0; i < $scope.gridExecutions.data.length; i++) {
-                            if ($scope.model.selectedExecution == $scope.gridExecutions.data[i].id) {
-                                $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[i]);
-                                i = $scope.gridExecutions.data.length;
+                if ($scope.model.isDebuggerEnabled) {
+                    $http({
+                        method: 'GET',
+                        url: '../app/rest/debugger/executions/' + $scope.model.processInstance.id
+                    }).success(function (data) {
+                        $scope.model.executions = data;
+                        $scope.gridExecutions.data = data;
+                        if ($scope.gridExecutionsApi) {
+                            $scope.gridExecutionsApi.grid.modifyRows($scope.gridExecutions.data);
+                            for (var i = 0; i < $scope.gridExecutions.data.length; i++) {
+                                if ($scope.model.selectedExecution == $scope.gridExecutions.data[i].id) {
+                                    $scope.gridExecutionsApi.selection.selectRow($scope.gridExecutions.data[i]);
+                                    i = $scope.gridExecutions.data.length;
+                                }
                             }
                         }
-                    }
-                    jQuery("#bpmnModel").data($scope.model.executions);
-                }).error(function (data, status, headers, config) {
-                    $scope.model.errorMessage = data;
-                });
+                        jQuery("#bpmnModel").data($scope.model.executions);
+                    }).error(function (data, status, headers, config) {
+                        $scope.model.errorMessage = data;
+                    });
+                }
             }
 
             $scope.getExecutions();
 
-            $http({
-                method: 'GET',
-                url: '../app/rest/debugger/variables/' + $scope.model.processInstance.id 
-            }).success(function (data) {
-                $scope.gridVariables.data = data;
-                if ($scope.gridVariablesApi) {
-                    $scope.gridVariablesApi.core.refresh();
-                }
-            });
-
-            $scope.getEventLog = function () {
+            if ($scope.model.isDebuggerEnabled) {
                 $http({
                     method: 'GET',
-                    url: '../app/rest/debugger/eventlog/' + $scope.model.processInstance.id
+                    url: '../app/rest/debugger/variables/' + $scope.model.processInstance.id
                 }).success(function (data) {
-                    $scope.gridLog.data = data;
-                    if ($scope.gridLogApi) {
-                        $scope.gridLogApi.core.refresh();
+                    $scope.gridVariables.data = data;
+                    if ($scope.gridVariablesApi) {
+                        $scope.gridVariablesApi.core.refresh();
                     }
                 });
+            }
+
+            $scope.getEventLog = function () {
+                if ($scope.model.isDebuggerEnabled) {
+                    $http({
+                        method: 'GET',
+                        url: '../app/rest/debugger/eventlog/' + $scope.model.processInstance.id
+                    }).success(function (data) {
+                        $scope.gridLog.data = data;
+                        if ($scope.gridLogApi) {
+                            $scope.gridLogApi.core.refresh();
+                        }
+                    });
+                }
             }
             $scope.getEventLog();
 
@@ -329,16 +335,18 @@ angular.module('flowableApp')
             }
 
             $scope.loadVariables = function () {
-                $http({
-                    method: 'GET',
-                    url: '../app/rest/debugger/variables/' + jQuery("#bpmnModel").attr("selected-execution")
-                }).success(function (data, status, headers, config) {
-                    $scope.model.variables = data;
-                    $scope.gridVariables.data = data;
-                    if ($scope.gridVariablesApi) {
-                        $scope.gridVariablesApi.core.refresh();
-                    }
-                });
+                if ($scope.model.isDebuggerEnabled) {
+                    $http({
+                        method: 'GET',
+                        url: '../app/rest/debugger/variables/' + jQuery("#bpmnModel").attr("selected-execution")
+                    }).success(function (data, status, headers, config) {
+                        $scope.model.variables = data;
+                        $scope.gridVariables.data = data;
+                        if ($scope.gridVariablesApi) {
+                            $scope.gridVariablesApi.core.refresh();
+                        }
+                    });
+                }
             };
 
             $scope.executionSelected = function () {
@@ -384,40 +392,44 @@ angular.module('flowableApp')
             };
 
             $scope.evaluateExpression = function () {
-                $scope.model.errorMessage = '';
-                $scope.model.result = '';
+                if ($scope.model.isDebuggerEnabled) {
+                    $scope.model.errorMessage = '';
+                    $scope.model.result = '';
 
-                var selExecution = jQuery("#bpmnModel").attr("selected-execution");
-                if (!selExecution) {
-                    selExecution = $scope.model.processInstance.id;
+                    var selExecution = jQuery("#bpmnModel").attr("selected-execution");
+                    if (!selExecution) {
+                        selExecution = $scope.model.processInstance.id;
+                    }
+                    $http({
+                        method: 'POST',
+                        url: '../app/rest/debugger/evaluate/expression/' + selExecution,
+                        data: $scope.model.expression
+                    }).success(function (data) {
+                        $scope.model.result = data;
+                    }).error(function (data, status, headers, config) {
+                        $rootScope.addAlert("Execution evaluation failed :" + data, 'error');
+                    });
                 }
-                $http({
-                    method: 'POST',
-                    url: '../app/rest/debugger/evaluate/expression/' + selExecution,
-                    data: $scope.model.expression
-                }).success(function (data) {
-                    $scope.model.result = data;
-                }).error(function (data, status, headers, config) {
-                    $rootScope.addAlert("Execution evaluation failed :" + data , 'error');
-                });
             }
 
             $scope.evaluateScript = function () {
-                $scope.model.errorMessage = '';
+                if ($scope.model.isDebuggerEnabled) {
+                    $scope.model.errorMessage = '';
 
-                var selExecution = jQuery("#bpmnModel").attr("selected-execution");
-                if (!selExecution) {
-                    selExecution = $scope.model.processInstance.id;
+                    var selExecution = jQuery("#bpmnModel").attr("selected-execution");
+                    if (!selExecution) {
+                        selExecution = $scope.model.processInstance.id;
+                    }
+                    $http({
+                        method: 'POST',
+                        url: '../app/rest/debugger/evaluate/' + $scope.model.scriptLanguage + '/' + selExecution,
+                        data: $scope.model.scriptText
+                    }).success(function (data) {
+                        $rootScope.addAlert("script executed", 'info')
+                    }).error(function (data, status, headers, config) {
+                        $rootScope.addAlert(data, 'error');
+                    });
                 }
-                $http({
-                    method: 'POST',
-                    url: '../app/rest/debugger/evaluate/'+ $scope.model.scriptLanguage+ '/' + selExecution,
-                    data: $scope.model.scriptText
-                }).success(function (data) {
-                    $rootScope.addAlert( "script executed", 'info')
-                }).error(function (data, status, headers, config) {
-                    $rootScope.addAlert(data, 'error');
-                });
             }
 
             $timeout(function () {
