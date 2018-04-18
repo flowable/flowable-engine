@@ -80,7 +80,10 @@ public class DebuggerResource {
 
     @RequestMapping(value = "/rest/debugger/evaluate/expression/{executionId}", method = RequestMethod.POST, produces = "application/json")
     public Object evaluateExpression(@PathVariable String executionId, @RequestBody String expression) {
-        return debuggerService.evaluateExpression(executionId, expression);
+        if (environment.getProperty("flowable.experimental.debugger.enabled", Boolean.class, false)) {
+            return debuggerService.evaluateExpression(executionId, expression);
+        }
+        throw new RuntimeException("property flowable.experimental.debugger.enabled is not enabled");
     }
 
     @RequestMapping(value = "/rest/debugger/evaluate/{scriptLanguage}/{executionId}", method = RequestMethod.POST)
