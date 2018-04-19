@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
@@ -44,7 +45,11 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
 
         CaseInstanceHelper caseInstanceHelper = CommandContextUtil.getCaseInstanceHelper(commandContext);
-        CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().caseDefinitionKey(caseRefExpression.getValue(planItemInstanceEntity).toString());
+        CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().
+                caseDefinitionKey(caseRefExpression.getValue(planItemInstanceEntity).toString());
+        if (StringUtils.isNotEmpty(planItemInstanceEntity.getTenantId())) {
+            caseInstanceBuilder.tenantId(planItemInstanceEntity.getTenantId());
+        }
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
         caseInstanceEntity.setParentId(planItemInstanceEntity.getCaseInstanceId());
 
