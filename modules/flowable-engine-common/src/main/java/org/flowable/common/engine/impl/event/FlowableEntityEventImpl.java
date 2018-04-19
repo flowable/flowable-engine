@@ -22,7 +22,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
  * 
  * @author Frederik Heremans
  */
-public class FlowableEntityEventImpl extends FlowableEventImpl implements FlowableEngineEntityEvent {
+public class FlowableEntityEventImpl extends FlowableEngineEventImpl implements FlowableEngineEntityEvent {
 
     protected Object entity;
 

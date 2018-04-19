@@ -16,7 +16,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
-import org.flowable.common.engine.impl.event.FlowableEventImpl;
+import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
 import org.flowable.task.api.Task;
 
 /**
@@ -39,7 +39,7 @@ public class FlowableTaskEventBuilder {
         return newEvent;
     }
     
-    protected static void populateEventWithCurrentContext(FlowableEventImpl event) {
+    protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
             if (persistedObject instanceof Task) {

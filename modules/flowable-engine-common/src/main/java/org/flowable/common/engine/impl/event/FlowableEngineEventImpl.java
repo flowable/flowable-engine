@@ -1,7 +1,7 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
@@ -15,14 +15,13 @@ package org.flowable.common.engine.impl.event;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 /**
- * Base class for all {@link FlowableEvent} implementations.
- * 
+ * Base class for all {@link FlowableEngineEvent} implementations.
+ *
  * @author Frederik Heremans
  */
-public class FlowableEventImpl implements FlowableEngineEvent {
+public class FlowableEngineEventImpl implements FlowableEngineEvent {
 
     protected FlowableEngineEventType type;
     protected String executionId;
@@ -32,14 +31,14 @@ public class FlowableEventImpl implements FlowableEngineEvent {
     /**
      * Creates a new event implementation, not part of an execution context.
      */
-    public FlowableEventImpl(FlowableEngineEventType type) {
+    public FlowableEngineEventImpl(FlowableEngineEventType type) {
         this(type, null, null, null);
     }
 
     /**
      * Creates a new event implementation, part of an execution context.
      */
-    public FlowableEventImpl(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
+    public FlowableEngineEventImpl(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
         if (type == null) {
             throw new FlowableIllegalArgumentException("type is null");
         }
