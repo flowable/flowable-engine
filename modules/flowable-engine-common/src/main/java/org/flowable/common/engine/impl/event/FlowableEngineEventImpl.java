@@ -12,7 +12,6 @@
  */
 package org.flowable.common.engine.impl.event;
 
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 
@@ -21,9 +20,8 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
  *
  * @author Frederik Heremans
  */
-public class FlowableEngineEventImpl implements FlowableEngineEvent {
+public class FlowableEngineEventImpl extends FlowableEventImpl implements FlowableEngineEvent {
 
-    protected FlowableEngineEventType type;
     protected String executionId;
     protected String processInstanceId;
     protected String processDefinitionId;
@@ -39,10 +37,7 @@ public class FlowableEngineEventImpl implements FlowableEngineEvent {
      * Creates a new event implementation, part of an execution context.
      */
     public FlowableEngineEventImpl(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
-        if (type == null) {
-            throw new FlowableIllegalArgumentException("type is null");
-        }
-        this.type = type;
+        super(type);
         this.executionId = executionId;
         this.processInstanceId = processInstanceId;
         this.processDefinitionId = processDefinitionId;
@@ -50,7 +45,7 @@ public class FlowableEngineEventImpl implements FlowableEngineEvent {
 
     @Override
     public FlowableEngineEventType getType() {
-        return type;
+        return (FlowableEngineEventType) super.getType();
     }
 
     public void setType(FlowableEngineEventType type) {
@@ -83,10 +78,4 @@ public class FlowableEngineEventImpl implements FlowableEngineEvent {
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
-
-    @Override
-    public String toString() {
-        return getClass() + " - " + type;
-    }
-
 }
