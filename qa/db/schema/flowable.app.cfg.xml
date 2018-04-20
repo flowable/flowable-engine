@@ -4,7 +4,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="appEngineConfiguration" class="org.flowable.app.engine.AppEngineConfiguration">
+    <bean id="appEngineConfiguration" class="org.flowable.app.engine.impl.cfg.StandaloneInMemAppEngineConfiguration">
         <property name="jdbcUrl" value="@jdbc.url@" />
         <property name="jdbcDriver" value="@jdbc.driver@" />
         <property name="jdbcUsername" value="@jdbc.username@" />
