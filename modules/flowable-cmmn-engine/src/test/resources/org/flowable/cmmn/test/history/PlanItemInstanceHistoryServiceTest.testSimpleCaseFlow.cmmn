@@ -2,7 +2,7 @@
 <definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
              targetNamespace="http://flowable.org/cmmn">
 
-    <case id="testSimplePlanItem">
+    <case id="testSimpleCaseFlow">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
             <planItem id="planItemStageOne" name="PlanItem Stage One" definitionRef="stageOne">
                 <entryCriterion id="stageOneCriterion" sentryRef="sentryStageOne"/>

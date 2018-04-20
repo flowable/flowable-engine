@@ -451,11 +451,18 @@ Task completed: New starter training
 Task completed: Fill in paperwork
 ----
 
+Historic data related to the case execution is collected for special constructs like Tasks (as seen above), milestones, cases, variables and plan items in general.
+This data is persisted while the case definition is deployed, surviving long after its instances have executed.
+Access to the historic data is provided as query api's by the _CmmnHistoryService_
+
 Of course, this is but a small part of the available API's and constructs available in the Flowable CMMN Engine. Please check the other sections for more detailed information
 
 === CMMN 1.1 Constructs
 
 This chapter covers the CMMN 1.1 constructs supported by Flowable, as well as extensions to the CMMN 1.1 standard.
+
+The following constructs, with the exception of sentries and item control, as for the CMMN specification are considered plan items.
+Historic data of their instances execution can be queried through the _CmmnHistoryService_ using _org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery_.
 
 ==== Stage
 
