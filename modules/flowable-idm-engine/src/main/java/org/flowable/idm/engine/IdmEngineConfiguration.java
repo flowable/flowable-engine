@@ -33,6 +33,7 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.api.PasswordEncoder;
@@ -88,7 +89,7 @@ import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisUserData
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IdmEngineConfiguration extends AbstractEngineConfiguration {
+public class IdmEngineConfiguration extends AbstractEngineConfiguration implements IdmEngineConfigurationApi {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(IdmEngineConfiguration.class);
 
@@ -497,6 +498,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public IdmIdentityService getIdmIdentityService() {
         return idmIdentityService;
     }
@@ -506,6 +508,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public IdmManagementService getIdmManagementService() {
         return idmManagementService;
     }
