@@ -66,7 +66,7 @@ public abstract class FlowableCmmnTestCase {
 
     protected static void initCmmnEngine() {
         try (InputStream inputStream = FlowableCmmnTestCase.class.getClassLoader().getResourceAsStream(FLOWABLE_CMMN_CFG_XML)) {
-            CmmnEngine cmmnEngine = null;
+            CmmnEngine cmmnEngine;
             if (inputStream != null) {
                 cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine();
             } else {
@@ -119,6 +119,13 @@ public abstract class FlowableCmmnTestCase {
     
     protected void setClockTo(Date date) {
         cmmnEngineConfiguration.getClock().setCurrentTime(date);
+    }
+
+    protected Date forwardClock(long milliseconds) {
+        long currentMillis = cmmnEngineConfiguration.getClock().getCurrentTime().getTime();
+        Date date = new Date(currentMillis + milliseconds);
+        cmmnEngineConfiguration.getClock().setCurrentTime(date);
+        return date;
     }
 
     protected void assertCaseInstanceEnded(CaseInstance caseInstance) {

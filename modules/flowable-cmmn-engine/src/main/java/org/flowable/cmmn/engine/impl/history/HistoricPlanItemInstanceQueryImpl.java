@@ -13,9 +13,8 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
-import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
+import org.flowable.cmmn.api.history. HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryProperty;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -40,12 +39,28 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String elementId;
     protected String planItemDefinitionId;
     protected String planItemDefinitionType;
-    protected Date startedAfter;
-    protected Date startedBefore;
-    protected Date activatedAfter;
-    protected Date activatedBefore;
-    protected Date endedAfter;
+    protected Date createdBefore;
+    protected Date createdAfter;
+    protected Date lastAvailableBefore;
+    protected Date lastAvailableAfter;
+    protected Date lastEnabledBefore;
+    protected Date lastEnabledAfter;
+    protected Date lastDisabledBefore;
+    protected Date lastDisabledAfter;
+    protected Date lastStartedBefore;
+    protected Date lastStartedAfter;
+    protected Date lastSuspendedBefore;
+    protected Date lastSuspendedAfter;
+    protected Date completedBefore;
+    protected Date completedAfter;
+    protected Date terminatedBefore;
+    protected Date terminatedAfter;
+    protected Date occurredBefore;
+    protected Date occurredAfter;
+    protected Date exitBefore;
+    protected Date exitAfter;
     protected Date endedBefore;
+    protected Date endedAfter;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
@@ -144,50 +159,152 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery startedBefore(Date startedBefore) {
-        this.startedBefore = startedBefore;
+    public HistoricPlanItemInstanceQuery createdBefore(Date createdBefore) {
+        this.createdBefore = createdBefore;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery startedAfter(Date startedAfter) {
-        this.startedAfter = startedAfter;
+    public HistoricPlanItemInstanceQuery createdAfter(Date createdAfter) {
+        this.createdAfter = createdAfter;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery activatedBefore(Date beforeTime) {
-        this.activatedBefore = beforeTime;
+    public HistoricPlanItemInstanceQuery lastAvailableBefore(Date lastAvailableBefore) {
+        this.lastAvailableBefore = lastAvailableBefore;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery activatedAfter(Date afterTime) {
-        this.activatedAfter = afterTime;
+    public HistoricPlanItemInstanceQuery lastAvailableAfter(Date lastAvailableAfter) {
+        this.lastAvailableAfter = lastAvailableAfter;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery endedBefore(Date beforeTime) {
-        this.endedBefore = beforeTime;
+    public HistoricPlanItemInstanceQuery lastEnabledBefore(Date lastEnabledBefore) {
+        this.lastEnabledBefore = lastEnabledBefore;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery endedAfter(Date afterTime) {
-        this.endedAfter = afterTime;
+    public HistoricPlanItemInstanceQuery lastEnabledAfter(Date lastEnabledAfter) {
+        this.lastEnabledAfter = lastEnabledAfter;
         return this;
     }
 
     @Override
-    public HistoricPlanItemInstanceQuery orderByStartTime() {
-        return orderBy(PlanItemInstanceQueryProperty.START_TIME);
+    public HistoricPlanItemInstanceQuery lastDisabledBefore(Date lastDisabledBefore) {
+        this.lastDisabledBefore = lastDisabledBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastDisabledAfter(Date lastDisabledAfter) {
+        this.lastDisabledAfter = lastDisabledAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastStartedBefore(Date lastStartedBefore) {
+        this.lastStartedBefore = lastStartedBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastStartedAfter(Date lastStartedAfter) {
+        this.lastStartedAfter = lastStartedAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastSuspendedBefore(Date lastSuspendedBefore) {
+        this.lastSuspendedBefore = lastSuspendedBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastSuspendedAfter(Date lastSuspendedAfter) {
+        this.lastSuspendedAfter = lastSuspendedAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery completedBefore(Date completedBefore) {
+        this.completedBefore = completedBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery completedAfter(Date completedAfter) {
+        this.completedAfter = completedAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery occurredBefore(Date occurredBefore) {
+        this.occurredBefore = occurredBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery occurredAfter(Date occurredAfter) {
+        this.occurredAfter = occurredAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery terminatedBefore(Date terminatedBefore) {
+        this.terminatedBefore = terminatedBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery terminatedAfter(Date terminatedAfter) {
+        this.terminatedAfter = terminatedAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery exitBefore(Date exitBefore) {
+        this.exitBefore = exitBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery exitAfter(Date exitAfter) {
+        this.exitAfter = exitAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery endedBefore(Date endedBefore) {
+        this.endedBefore = endedBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery endedAfter(Date endedAfter) {
+        this.endedAfter = endedAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByCreatedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.CREATED_TIME);
+
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByEndedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.ENDED_TIME);
 
     }
 
     @Override
     public HistoricPlanItemInstanceQuery orderByName() {
-        return orderBy(PlanItemInstanceQueryProperty.NAME);
+        return orderBy(HistoricPlanItemInstanceQueryProperty.NAME);
     }
 
     @Override
@@ -198,5 +315,13 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public List<HistoricPlanItemInstance> executeList(CommandContext commandContext) {
         return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
+    }
+
+    public Date getCreatedBefore() {
+        return createdBefore;
+    }
+
+    public Date getCreatedAfter() {
+        return createdAfter;
     }
 }

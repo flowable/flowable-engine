@@ -33,9 +33,17 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractEntity implement
     protected String elementId;
     protected String planItemDefinitionId;
     protected String planItemDefinitionType;
-    protected Date startTime;
-    protected Date activationTime;
-    protected Date endTime;
+    protected Date createdTime;
+    protected Date lastAvailableTime;
+    protected Date lastEnabledTime;
+    protected Date lastDisabledTime;
+    protected Date lastStartedTime;
+    protected Date lastSuspendedTime;
+    protected Date completedTime;
+    protected Date occurredTime;
+    protected Date terminatedTime;
+    protected Date exitTime;
+    protected Date endedTime;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
@@ -50,9 +58,17 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractEntity implement
         persistentState.put("elementId", elementId);
         persistentState.put("name", name);
         persistentState.put("state", state);
-        persistentState.put("startTime", startTime);
-        persistentState.put("activationTime", endTime);
-        persistentState.put("endTime", endTime);
+        persistentState.put("createdTime", createdTime);
+        persistentState.put("lastAvailableTime", lastAvailableTime);
+        persistentState.put("lastEnabledTime", lastEnabledTime);
+        persistentState.put("lastDisabledTime", lastDisabledTime);
+        persistentState.put("lastStartedTime", lastStartedTime);
+        persistentState.put("lastSuspendedTime", lastSuspendedTime);
+        persistentState.put("completedTime", completedTime);
+        persistentState.put("occurredTime", occurredTime);
+        persistentState.put("terminatedTime", terminatedTime);
+        persistentState.put("exitTime", exitTime);
+        persistentState.put("endedTime", endedTime);
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
@@ -153,33 +169,113 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractEntity implement
     }
 
     @Override
-    public Date getStartTime() {
-        return startTime;
+    public Date getCreatedTime() {
+        return createdTime;
     }
 
     @Override
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
     }
 
     @Override
-    public Date getActivationTime() {
-        return activationTime;
+    public Date getLastAvailableTime() {
+        return lastAvailableTime;
     }
 
     @Override
-    public void setActivationTime(Date activationTime) {
-        this.activationTime = activationTime;
+    public void setLastAvailableTime(Date lastAvailableTime) {
+        this.lastAvailableTime = lastAvailableTime;
     }
 
     @Override
-    public Date getEndTime() {
-        return endTime;
+    public Date getLastEnabledTime() {
+        return lastEnabledTime;
     }
 
     @Override
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setLastEnabledTime(Date lastEnabledTime) {
+        this.lastEnabledTime = lastEnabledTime;
+    }
+
+    @Override
+    public Date getLastDisabledTime() {
+        return lastDisabledTime;
+    }
+
+    @Override
+    public void setLastDisabledTime(Date lastDisabledTime) {
+        this.lastDisabledTime = lastDisabledTime;
+    }
+
+    @Override
+    public Date getLastStartedTime() {
+        return lastStartedTime;
+    }
+
+    @Override
+    public void setLastStartedTime(Date lastStartedTime) {
+        this.lastStartedTime = lastStartedTime;
+    }
+
+    @Override
+    public Date getLastSuspendedTime() {
+        return lastSuspendedTime;
+    }
+
+    @Override
+    public void setLastSuspendedTime(Date lastSuspendedTime) {
+        this.lastSuspendedTime = lastSuspendedTime;
+    }
+
+    @Override
+    public Date getCompletedTime() {
+        return completedTime;
+    }
+
+    @Override
+    public void setCompletedTime(Date completedTime) {
+        this.completedTime = completedTime;
+    }
+
+    @Override
+    public Date getOccurredTime() {
+        return occurredTime;
+    }
+
+    @Override
+    public void setOccurredTime(Date occurredTime) {
+        this.occurredTime = occurredTime;
+    }
+
+    @Override
+    public Date getTerminatedTime() {
+        return terminatedTime;
+    }
+
+    @Override
+    public void setTerminatedTime(Date terminatedTime) {
+        this.terminatedTime = terminatedTime;
+    }
+
+    @Override
+    public Date getExitTime() {
+        return exitTime;
+    }
+
+    @Override
+    public void setExitTime(Date exitTime) {
+        this.exitTime = exitTime;
+    }
+
+    @Override
+    public Date getEndedTime() {
+        return endedTime;
+    }
+
+    @Override
+    public void setEndedTime(Date endedTime) {
+        this.endedTime = endedTime;
     }
 
     @Override

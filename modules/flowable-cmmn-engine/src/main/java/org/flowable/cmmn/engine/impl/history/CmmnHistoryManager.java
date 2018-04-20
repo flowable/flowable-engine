@@ -50,7 +50,22 @@ public interface CmmnHistoryManager {
 
     void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void recordPlanItemInstanceActivated(PlanItemInstanceEntity planItemInstanceEntity);
+    void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void recordPlanItemIntanceEnded(PlanItemInstanceEntity planItemInstanceEntity);
+    void recordPlanItemInstanceEnabled(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void recordPlanItemInstanceDisabled(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void recordPlanItemInstanceStarted(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void recordPlanItemInstanceSuspended(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void recordPlanItemInstanceCompleted(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void recordPlanItemInstanceOccurred(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void recordPlanItemInstanceTerminated(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity);
+
 }
