@@ -21,7 +21,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableExceptionEvent;
-import org.flowable.common.engine.impl.event.FlowableEventImpl;
+import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
@@ -59,12 +59,12 @@ public class FlowableEventBuilder {
      * @return an {@link FlowableEvent} that doesn't have it's execution context-fields filled, as the event is a global event, independent of any running execution.
      */
     public static FlowableEvent createGlobalEvent(FlowableEngineEventType type) {
-        FlowableEventImpl newEvent = new FlowableProcessEventImpl(type);
+        FlowableEngineEventImpl newEvent = new FlowableProcessEventImpl(type);
         return newEvent;
     }
 
     public static FlowableEvent createEvent(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
-        FlowableEventImpl newEvent = new FlowableProcessEventImpl(type);
+        FlowableEngineEventImpl newEvent = new FlowableProcessEventImpl(type);
         newEvent.setExecutionId(executionId);
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
@@ -391,7 +391,7 @@ public class FlowableEventBuilder {
         return newEvent;
     }
 
-    protected static void populateEventWithCurrentContext(FlowableEventImpl event) {
+    protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
             if (persistedObject instanceof Job) {

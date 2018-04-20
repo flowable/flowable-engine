@@ -18,7 +18,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableExceptionEvent;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.event.FlowableEntityExceptionEventImpl;
-import org.flowable.common.engine.impl.event.FlowableEventImpl;
+import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
 import org.flowable.job.api.Job;
 
 /**
@@ -61,7 +61,7 @@ public class FlowableJobEventBuilder {
         return newEvent;
     }
     
-    protected static void populateEventWithCurrentContext(FlowableEventImpl event) {
+    protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
             if (persistedObject instanceof Job) {
