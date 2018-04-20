@@ -18,7 +18,7 @@ services:
             - 9977:9977
         depends_on:
             - flowable-db
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.war"]
     flowable-admin-app:
         image: flowable/flowable-admin
         depends_on:
@@ -57,7 +57,7 @@ services:
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_CONTENT_REST-ROOT=content-api
         ports:
             - 9988:9988
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-admin.war"]
     flowable-idm-app:
         image: flowable/flowable-idm
         depends_on:
@@ -70,7 +70,7 @@ services:
             - SPRING_DATASOURCE_PASSWORD=flowable
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.war"]
     flowable-db:
         image: postgres:9.6-alpine
         container_name: flowable-postgres
