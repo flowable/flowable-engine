@@ -18,34 +18,22 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
- * @author Joram Barrez
+ * @author Dennis Federico
  */
-public class CompletePlanItemInstanceOperation extends AbstractDeletePlanItemInstanceOperation {
-    
-    public CompletePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+public class CreatePlanItemInstanceForRepetitionOperation extends CreatePlanItemInstanceOperation {
+
+    public CreatePlanItemInstanceForRepetitionOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
 
     @Override
     protected String getNewState() {
-        return PlanItemInstanceState.COMPLETED;
-    }
-    
-    @Override
-    protected String getLifeCycleTransition() {
-        return PlanItemTransition.COMPLETE;
-    }
-    
-    @Override
-    protected boolean isEvaluateRepetitionRule() {
-        return true;
+        return PlanItemInstanceState.WAITING_FOR_REPETITION;
     }
 
     @Override
-    protected void internalExecute() {
-        if (isStage(planItemInstanceEntity)) {
-            exitChildPlanItemInstances();
-        }
+    protected String getLifeCycleTransition() {
+        return PlanItemTransition.CREATE;
     }
-    
+
 }

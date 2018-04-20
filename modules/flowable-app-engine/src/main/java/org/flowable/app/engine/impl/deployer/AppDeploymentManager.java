@@ -90,7 +90,7 @@ public class AppDeploymentManager {
         AppDefinition appDefinition = (AppDefinitionEntity) appDefinitionEntityManager
                 .findAppDefinitionByKeyAndVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
         if (appDefinition == null) {
-            throw new FlowableObjectNotFoundException("no casees deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", AppDefinition.class);
+            throw new FlowableObjectNotFoundException("no cases deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", AppDefinition.class);
         }
         appDefinition = resolveAppDefinition(appDefinition).getAppDefinition();
         return appDefinition;

@@ -29,6 +29,7 @@
     <mapper resource="org/flowable/cmmn/db/mapping/entity/MilestoneInstance.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricCaseInstance.xml"/>
     <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricMilestoneInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricPlanItemInstance.xml" />
     
     <!-- Variable support -->
     <mapper resource="org/flowable/variable/service/db/mapping/common.xml" />

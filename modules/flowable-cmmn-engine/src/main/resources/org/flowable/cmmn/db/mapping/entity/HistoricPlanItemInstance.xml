@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
+
+    <insert id="insertHistoricPlanItemInstance"
+            parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
+        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, START_TIME_, ACTIVATION_TIME_, END_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
+        values (
+            #{id ,jdbcType=VARCHAR},
+            1,
+            #{name ,jdbcType=VARCHAR},
+            #{state ,jdbcType=VARCHAR},
+            #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{caseInstanceId ,jdbcType=VARCHAR},
+            #{stageInstanceId ,jdbcType=VARCHAR},
+            #{isStage ,jdbcType=BOOLEAN},
+            #{elementId ,jdbcType=VARCHAR},
+            #{planItemDefinitionId ,jdbcType=VARCHAR},
+            #{planItemDefinitionType ,jdbcType=VARCHAR},
+            #{startTime ,jdbcType=TIMESTAMP},
+            #{activationTime ,jdbcType=TIMESTAMP},
+            #{endTime ,jdbcType=TIMESTAMP},
+            #{startUserId ,jdbcType=VARCHAR},
+            #{referenceId ,jdbcType=VARCHAR},
+            #{referenceType ,jdbcType=VARCHAR},
+            #{tenantId ,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="bulkInsertHistoricPlanItemInstance" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+        ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, START_TIME_, ACTIVATION_TIME_, END_TIME_, START_USER_ID_, REFERENCE_ID_,
+        REFERENCE_TYPE_, TENANT_ID_)
+        values
+        <foreach collection="list" item="historicPlanItemInstance" index="index" separator=",">
+            (
+            #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
+            1,
+            #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.caseInstanceId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.stageInstanceId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.isStage ,jdbcType=BOOLEAN},
+            #{historicPlanItemInstance.elementId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.planItemDefinitionId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.planItemDefinitionType ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.startTime ,jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.activationTime ,jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.endTime ,jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.startUserId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.referenceId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.referenceType ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.tenantId ,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertHistoricPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+        ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, START_TIME_, ACTIVATION_TIME_, END_TIME_, START_USER_ID_, REFERENCE_ID_,
+        REFERENCE_TYPE_, TENANT_ID_)
+        values
+        <foreach collection="list" item="historicPlanItemInstance" index="index">
+            (
+            #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
+            1,
+            #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.caseInstanceId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.stageInstanceId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.isStage ,jdbcType=BOOLEAN},
+            #{historicPlanItemInstance.elementId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.planItemDefinitionId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.planItemDefinitionType ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.startTime ,jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.activationTime ,jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.endTime ,jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.startUserId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.referenceId ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.referenceType ,jdbcType=VARCHAR},
+            #{historicPlanItemInstance.tenantId ,jdbcType=VARCHAR}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <update id="updateHistoricPlanItemInstance"
+            parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
+        update ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.name != name">
+                NAME_ = #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.state != state">
+                STATE_ = #{state, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
+                CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.caseInstanceId != caseInstanceId">
+                CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.stageInstanceId != stageInstanceId">
+                STAGE_INST_ID_ = #{stageInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.isStage != isStage">
+                IS_STAGE_ = #{isStage, jdbcType=BOOLEAN},
+            </if>
+            <if test="originalPersistentState.elementId != elementId">
+                ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.planItemDefinitionId != planItemDefinitionId">
+                ITEM_DEFINITION_ID_ = #{planItemDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.planItemDefinitionType != planItemDefinitionType">
+                ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.startTime != startTime">
+                START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.activationTime != activationTime">
+                ACTIVATION_TIME_ = #{activationTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.endTime != endTime">
+                END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.startUserId != startUserId">
+                START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.referenceId != referenceId">
+                REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.referenceType != referenceType">
+                REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.tenantId != tenantId">
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+            </if>
+        </set>
+        where ID_ = #{id, jdbcType=VARCHAR}
+    </update>
+
+    <delete id="deleteHistoricPlanItemInstance"
+            parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
+        delete from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST where ID_ = #{id} and REV_ = #{revision}
+    </delete>
+
+    <delete id="deleteHistoricPlanItemInstanceByCaseDefinitionId" parameterType="string">
+        delete from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST where CASE_DEF_ID_ = #{value}
+    </delete>
+
+    <resultMap id="historicPlanItemInstanceResultMap"
+               type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="revision" column="REV_" jdbcType="INTEGER"/>
+        <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+        <result property="state" column="STATE_" jdbcType="VARCHAR"/>
+        <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR"/>
+        <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR"/>
+        <result property="stageInstanceId" column="STAGE_INST_ID_" jdbcType="VARCHAR"/>
+        <result property="isStage" column="IS_STAGE_" jdbcType="BOOLEAN"/>
+        <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR"/>
+        <result property="planItemDefinitionId" column="ITEM_DEFINITION_ID_" jdbcType="VARCHAR"/>
+        <result property="planItemDefinitionType" column="ITEM_DEFINITION_TYPE_" jdbcType="VARCHAR"/>
+        <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="activationTime" column="ACTIVATION_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR"/>
+        <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR"/>
+        <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR"/>
+        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectHistoricPlanItemInstance" parameterType="string" resultMap="historicPlanItemInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectHistoricPlanItemInstancesByQueryCriteria"
+            parameterType="org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl"
+            resultMap="historicPlanItemInstanceResultMap">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.*
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <include refid="selectHistoricPlanItemInstancesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
+    <select id="selectHistoricPlanItemInstancesCountByQueryCriteria"
+            parameterType="org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl" resultType="long">
+        select count(RES.ID_)
+        <include refid="selectHistoricPlanItemInstancesByQueryCriteriaSql"/>
+    </select>
+
+    <select id="selectHistoricPlanItemInstancesByCaseDefinitionId" resultMap="historicPlanItemInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST where CASE_DEF_ID_ = #{parameter}
+    </select>
+
+    <sql id="selectHistoricPlanItemInstancesByQueryCriteriaSql">
+        from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST RES
+        <where>
+            <if test="planItemInstanceId != null">
+                RES.ID_ = #{planItemInstanceId}
+            </if>
+            <if test="planItemInstanceName != null">
+                RES.NAME_ = #{planItemInstanceName}
+            </if>
+            <if test="state != null">
+                and RES.STATE_ = #{state}
+            </if>
+            <if test="caseDefinitionId != null">
+                and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+            </if>
+            <if test="caseInstanceId != null">
+                and RES.CASE_INST_ID_ = #{caseInstanceId}
+            </if>
+            <if test="stageInstanceId != null">
+                and RES.STAGE_INST_ID_ = #{stageInstanceId}
+            </if>
+            <if test="elementId != null">
+                and RES.ELEMENT_ID_ = #{elementId}
+            </if>
+            <if test="planItemDefinitionId != null">
+                and RES.ITEM_DEFINITION_ID_ = #{planItemDefinitionId}
+            </if>
+            <if test="planItemDefinitionType != null">
+                and RES.ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType}
+            </if>
+            <if test="startedBefore != null">
+                and RES.START_TIME_ &lt;= #{startedBefore}
+            </if>
+            <if test="startedAfter != null">
+                and RES.START_TIME_ &gt;= #{"startedAfter != null"}
+            </if>
+            <if test="activatedBefore != null">
+                and RES.ACTIVATION_TIME_ &lt;= #{activatedBefore}
+            </if>
+            <if test="activatedAfter != null">
+                and RES.ACTIVATION_TIME_ &gt;= #{"activatedAfter != null"}
+            </if>
+            <if test="endedBefore != null">
+                and RES.END_TIME_ &lt;= #{endedBefore}
+            </if>
+            <if test="endedAfter != null">
+                and RES.END_TIME_ &gt;= #{"endedAfter != null"}
+            </if>
+            <if test="startUserId != null">
+                and RES.START_USER_ID_ = #{startUserId}
+            </if>
+            <if test="referenceId != null">
+                and RES.REFERENCE_ID_ = #{referenceId}
+            </if>
+            <if test="referenceType != null">
+                and RES.REFERENCE_TYPE_ = #{referenceType}
+            </if>
+            <if test="tenantId != null">
+                and RES.TENANT_ID_ = #{tenantId}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

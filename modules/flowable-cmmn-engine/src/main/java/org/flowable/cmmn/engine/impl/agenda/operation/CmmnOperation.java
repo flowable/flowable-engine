@@ -14,13 +14,16 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
@@ -86,19 +89,21 @@ public abstract class CmmnOperation implements Runnable {
         }
         return planItemInstances;
     }
-    
-    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy) {
-        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntityToCopy, true);
-    }
-    
+
     protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance( 
-                planItemInstanceEntityToCopy.getPlanItem(), 
-                planItemInstanceEntityToCopy.getCaseDefinitionId(), 
-                planItemInstanceEntityToCopy.getCaseInstanceId(), 
-                planItemInstanceEntityToCopy.getStageInstanceId(), 
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance(
+                planItemInstanceEntityToCopy.getPlanItem(),
+                planItemInstanceEntityToCopy.getCaseDefinitionId(),
+                planItemInstanceEntityToCopy.getCaseInstanceId(),
+                planItemInstanceEntityToCopy.getStageInstanceId(),
                 planItemInstanceEntityToCopy.getTenantId(),
                 addToParent);
+
+        if (hasRepetitionRule(planItemInstanceEntityToCopy)) {
+            int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
+            setRepetitionCounter(planItemInstanceEntity, counter);
+        }
+
         return planItemInstanceEntity;
     }
     
@@ -119,19 +124,23 @@ public abstract class CmmnOperation implements Runnable {
         String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
         return repetitionCounterVariableName;
     }
-    
+
+    protected boolean hasRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
+        return Optional.ofNullable(planItemInstanceEntity)
+                .map(DelegatePlanItemInstance::getPlanItem)
+                .map(PlanItem::getItemControl)
+                .map(PlanItemControl::getRepetitionRule)
+                .isPresent();
+
+    }
+
     protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (planItemInstanceEntity.getPlanItem() != null) {
-            PlanItem planItem = planItemInstanceEntity.getPlanItem();
-            if (planItem.getItemControl() != null && planItem.getItemControl().getRepetitionRule() != null) {
-                String repetitionCondition = planItem.getItemControl().getRepetitionRule().getCondition();
-                boolean isRepeating = false;
-                if (StringUtils.isNotEmpty(repetitionCondition)) {
-                    isRepeating = evaluateBooleanExpression(commandContext, planItemInstanceEntity, repetitionCondition);
-                } else {
-                    isRepeating = true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
-                }
-                return isRepeating;
+        if (hasRepetitionRule(planItemInstanceEntity)) {
+            String repetitionCondition = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getCondition();
+            if (StringUtils.isNotEmpty(repetitionCondition)) {
+                return evaluateBooleanExpression(commandContext, planItemInstanceEntity, repetitionCondition);
+            } else {
+                return true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
             }
         }
         return false;

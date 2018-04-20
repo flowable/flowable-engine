@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl;
@@ -38,7 +39,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class EntityDependencyOrder {
 
     public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<>();
-    public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<>();
+    public static List<Class<? extends Entity>> INSERT_ORDER;
 
     static {
 
@@ -52,6 +53,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(MilestoneInstanceEntityImpl.class);
         DELETE_ORDER.add(SentryPartInstanceEntityImpl.class);
         DELETE_ORDER.add(PlanItemInstanceEntityImpl.class);
+        DELETE_ORDER.add(HistoricPlanItemInstanceEntityImpl.class);
         DELETE_ORDER.add(CaseInstanceEntityImpl.class);
         DELETE_ORDER.add(CaseDefinitionEntityImpl.class);
         DELETE_ORDER.add(CmmnResourceEntityImpl.class);
