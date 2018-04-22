@@ -111,8 +111,8 @@ commons-validator               commons-validator           1.4.0           The 
 de.odysseus.juel                juel-api                    2.2.7           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-impl                   2.2.7           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-spi                    2.2.7           The Apache Software License, Version 2.0
-io.swagger                      swagger-annotations         1.5.10          Apache License 2.0
-io.swagger                      swagger-models              1.5.10          Apache License 2.0
+io.swagger                      swagger-annotations         1.5.19          Apache License 2.0
+io.swagger                      swagger-models              1.5.19          Apache License 2.0
 javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 joda-time                       joda-time                   2.9.9           Apache 2
