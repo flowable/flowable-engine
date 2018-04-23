@@ -899,7 +899,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             assertEquals("new properties are not resolved", e.getCause().getMessage(),
-                    "Could not find property myParam in class org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl");
+                    "Cannot write property: myParam");
         }
     }
 
