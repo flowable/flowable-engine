@@ -73,6 +73,7 @@
     <result property="timeStamp" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
   <select id="selectHistoricMilestone" parameterType="string" resultMap="historicMileStoneInstanceResultMap">
@@ -108,7 +109,7 @@
             and RES.TIME_STAMP_ &lt;= #{reachedBefore}
         </if>
         <if test="reachedAfter != null">
-            and RES.TIME_STAMP_ &gt;= #{"reachedAfter != null"}
+            and RES.TIME_STAMP_ &gt;= #{reachedAfter}
         </if>
     </where>
   </sql>
