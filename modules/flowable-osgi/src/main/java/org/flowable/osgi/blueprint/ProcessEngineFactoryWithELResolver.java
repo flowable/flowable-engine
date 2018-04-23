@@ -8,6 +8,7 @@ import org.flowable.common.engine.impl.de.odysseus.el.ExpressionFactoryImpl;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
 import org.flowable.common.engine.impl.javax.el.BeanELResolver;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.CouldNotResolvePropertyELResolver;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
@@ -60,6 +61,7 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
             compositeElResolver.add(new ArrayELResolver());
             compositeElResolver.add(new ListELResolver());
             compositeElResolver.add(new MapELResolver());
+            compositeElResolver.add(new CouldNotResolvePropertyELResolver());
             return compositeElResolver;
         }
 

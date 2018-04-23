@@ -22,6 +22,7 @@ import org.flowable.common.engine.impl.el.ReadOnlyMapELResolver;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
 import org.flowable.common.engine.impl.javax.el.BeanELResolver;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.CouldNotResolvePropertyELResolver;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
@@ -60,6 +61,7 @@ public class SpringExpressionManager extends ProcessExpressionManager {
         compositeElResolver.add(new MapELResolver());
         compositeElResolver.add(new JsonNodeELResolver());
         compositeElResolver.add(new BeanELResolver());
+        compositeElResolver.add(new CouldNotResolvePropertyELResolver());
         return compositeElResolver;
     }
     
