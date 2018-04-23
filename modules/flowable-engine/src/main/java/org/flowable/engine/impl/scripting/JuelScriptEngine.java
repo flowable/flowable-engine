@@ -36,6 +36,7 @@ import org.flowable.common.engine.impl.el.JsonNodeELResolver;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
 import org.flowable.common.engine.impl.javax.el.BeanELResolver;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.CouldNotResolvePropertyELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
@@ -126,6 +127,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
         compositeResolver.add(new ResourceBundleELResolver());
         compositeResolver.add(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue"));
         compositeResolver.add(new BeanELResolver());
+        compositeResolver.add(new CouldNotResolvePropertyELResolver());
         return new SimpleResolver(compositeResolver);
     }
 
