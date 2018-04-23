@@ -917,9 +917,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         try {
             taskService.complete(task.getId(), taskParams);
         } catch (PersistenceException e) {
-            assertThat("We can update id (bean EL resolver), but we must keep all references",
-                    e.getMessage(), containsString("Referential integrity constraint violation")
-            );
+            // expected exception.
         }
     }
 
