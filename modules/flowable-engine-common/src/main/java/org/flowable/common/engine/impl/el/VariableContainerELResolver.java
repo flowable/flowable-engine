@@ -56,6 +56,7 @@ public class VariableContainerELResolver extends ELResolver {
         if (base == null) {
             String variable = (String) property;
             if (variableContainer.hasVariable(variable)) {
+                context.setPropertyResolved(true);
                 variableContainer.setVariable(variable, value);
             }
         }
