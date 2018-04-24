@@ -322,16 +322,19 @@ public class BeanELResolver extends ELResolver {
 		}
 		Object result = null;
 		if (isResolvable(base)) {
-			Method method = toBeanProperty(base, property).getReadMethod();
-			if (method != null) {
-				try {
-					result = method.invoke(base);
-				} catch (InvocationTargetException e) {
-					throw new ELException(e.getCause());
-				} catch (Exception e) {
-					throw new ELException(e);
+			BeanProperty beanProperty = toBeanProperty(base, property);
+			if (beanProperty != null) {
+				Method method = beanProperty.getReadMethod();
+				if (method != null) {
+					try {
+						result = method.invoke(base);
+					} catch (InvocationTargetException e) {
+						throw new ELException(e.getCause());
+					} catch (Exception e) {
+						throw new ELException(e);
+					}
+					context.setPropertyResolved(true);
 				}
-				context.setPropertyResolved(true);
 			}
 		}
 		return result;
