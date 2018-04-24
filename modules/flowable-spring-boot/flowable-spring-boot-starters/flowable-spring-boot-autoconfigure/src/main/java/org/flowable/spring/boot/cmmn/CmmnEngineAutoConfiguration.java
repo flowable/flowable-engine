@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
@@ -30,6 +31,8 @@ import org.flowable.spring.boot.FlowableJobConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.condition.ConditionalNoAppEngine;
+import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
@@ -146,6 +149,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
     @Configuration
     @ConditionalOnProcessEngine
+    @ConditionalNoAppEngine
     public static class CmmnEngineProcessConfiguration {
 
         @Bean
@@ -153,6 +157,25 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> cmmnProcessEngineConfigurationConfigurer(
             CmmnEngineConfigurator cmmnEngineConfigurator) {
             return processEngineConfiguration -> processEngineConfiguration.addConfigurator(cmmnEngineConfigurator);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public CmmnEngineConfigurator cmmnEngineConfigurator(CmmnEngineConfiguration cmmnEngineConfiguration) {
+            SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
+            cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
+            return cmmnEngineConfigurator;
+        }
+    }
+    
+    @Configuration
+    @ConditionalOnAppEngine
+    public static class CmmnEngineAppConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean(name = "cmmnAppEngineConfigurationConfigurer")
+        public EngineConfigurationConfigurer<SpringAppEngineConfiguration> cmmnAppEngineConfigurationConfigurer(CmmnEngineConfigurator cmmnEngineConfigurator) {
+            return appEngineConfiguration -> appEngineConfiguration.addConfigurator(cmmnEngineConfigurator);
         }
 
         @Bean

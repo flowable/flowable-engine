@@ -80,6 +80,11 @@ public class Flowable5DeploymentWrapper implements Deployment {
     public String getDerivedFromRoot() {
         return null;
     }
+    
+    @Override
+    public String getParentDeploymentId() {
+        return null;
+    }
 
     @Override
     public String getEngineVersion() {

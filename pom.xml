@@ -235,6 +235,16 @@
 				<artifactId>flowable-json-converter</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-engine-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-spring-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-engine-common-api</artifactId>
@@ -286,10 +296,10 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-                	<groupId>org.flowable</groupId>
-                	<artifactId>flowable-idm-spring</artifactId>
-                	<version>${project.version}</version>
-        	    </dependency>
+            	<groupId>org.flowable</groupId>
+            	<artifactId>flowable-idm-spring</artifactId>
+            	<version>${project.version}</version>
+    	    </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-idm-rest</artifactId>
@@ -468,6 +478,11 @@
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-app-engine-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-app-engine-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

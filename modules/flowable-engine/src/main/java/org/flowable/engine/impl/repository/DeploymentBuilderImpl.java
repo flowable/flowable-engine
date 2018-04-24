@@ -161,6 +161,12 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         deployment.setKey(key);
         return this;
     }
+    
+    @Override
+    public DeploymentBuilder parentDeploymentId(String parentDeploymentId) {
+        deployment.setParentDeploymentId(parentDeploymentId);
+        return this;
+    }
 
     @Override
     public DeploymentBuilder disableBpmnValidation() {

@@ -52,6 +52,8 @@ public interface DeploymentEntity extends Deployment, Entity {
     void setDerivedFrom(String derivedFrom);
 
     void setDerivedFromRoot(String derivedFromRoot);
+    
+    void setParentDeploymentId(String parentDeploymentId);
 
     void setEngineVersion(String engineVersion);
 

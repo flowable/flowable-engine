@@ -32,6 +32,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-configurator</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-form-spring-configurator</artifactId>
             <optional>true</optional>
         </dependency>
@@ -110,6 +115,17 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-form-rest</artifactId>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-app-engine-rest</artifactId>
             <optional>true</optional>
             <exclusions>
                 <exclusion>

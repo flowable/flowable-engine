@@ -18,19 +18,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
-import org.flowable.engine.DynamicBpmnService;
-import org.flowable.engine.FormService;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.IdentityService;
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.configurator.ProcessEngineConfigurator;
+import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
@@ -159,59 +154,23 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         return conf;
     }
-
-    @Bean
-    public ProcessEngineFactoryBean processEngine(SpringProcessEngineConfiguration configuration) throws Exception {
-        ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
-        processEngineFactoryBean.setProcessEngineConfiguration(configuration);
-        return processEngineFactoryBean;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public RuntimeService runtimeServiceBean(ProcessEngine processEngine) {
-        return processEngine.getRuntimeService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public RepositoryService repositoryServiceBean(ProcessEngine processEngine) {
-        return processEngine.getRepositoryService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public TaskService taskServiceBean(ProcessEngine processEngine) {
-        return processEngine.getTaskService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public HistoryService historyServiceBean(ProcessEngine processEngine) {
-        return processEngine.getHistoryService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ManagementService managementServiceBean(ProcessEngine processEngine) {
-        return processEngine.getManagementService();
-    }
     
-    @Bean
-    @ConditionalOnMissingBean
-    public DynamicBpmnService dynamicBpmnServiceBean(ProcessEngine processEngine) {
-        return processEngine.getDynamicBpmnService();
-    }
+    @Configuration
+    @ConditionalOnAppEngine
+    public static class ProcessEngineAppConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public FormService formServiceBean(ProcessEngine processEngine) {
-        return processEngine.getFormService();
-    }
+        @Bean
+        @ConditionalOnMissingBean(name = "processAppEngineConfigurationConfigurer")
+        public EngineConfigurationConfigurer<SpringAppEngineConfiguration> processAppEngineConfigurationConfigurer(ProcessEngineConfigurator processEngineConfigurator) {
+            return appEngineConfiguration -> appEngineConfiguration.addConfigurator(processEngineConfigurator);
+        }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public IdentityService identityServiceBean(ProcessEngine processEngine) {
-        return processEngine.getIdentityService();
+        @Bean
+        @ConditionalOnMissingBean
+        public ProcessEngineConfigurator processEngineConfigurator(ProcessEngineConfiguration processEngineConfiguration) {
+            SpringProcessEngineConfigurator processEngineConfigurator = new SpringProcessEngineConfigurator();
+            processEngineConfigurator.setProcessEngineConfiguration(processEngineConfiguration);
+            return processEngineConfigurator;
+        }
     }
 }

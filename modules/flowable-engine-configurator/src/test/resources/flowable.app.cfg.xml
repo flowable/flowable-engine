@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+  
+    <bean id="appEngineConfiguration" class="org.flowable.app.engine.AppEngineConfiguration">
+        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+        <property name="jdbcDriver" value="org.h2.Driver" />
+        <property name="jdbcUsername" value="sa" />
+        <property name="jdbcPassword" value="" />
+        <property name="databaseSchemaUpdate" value="true" />
+        
+        <property name="configurators">
+            <list>
+                <bean class="org.flowable.engine.configurator.ProcessEngineConfigurator" />
+                <bean class="org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator" />
+            </list>
+        </property>
+    </bean>
+    
+</beans>

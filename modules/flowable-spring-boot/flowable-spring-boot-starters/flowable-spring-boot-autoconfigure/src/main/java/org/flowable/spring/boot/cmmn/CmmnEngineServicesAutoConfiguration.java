@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.cmmn;
 
+import org.flowable.app.engine.AppEngine;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -50,12 +51,13 @@ import org.springframework.context.annotation.Configuration;
 public class CmmnEngineServicesAutoConfiguration {
 
     /**
-     * If a process engine is present that means that the CmmnEngine was created as part of it.
+     * If a process engine is present and no app engine that means that the CmmnEngine was created as part of the process engine.
      * Therefore extract it from the CmmnEngines.
      */
     @Configuration
     @ConditionalOnMissingBean(type = {
-        "org.flowable.cmmn.engine.CmmnEngine"
+        "org.flowable.cmmn.engine.CmmnEngine",
+        "org.flowable.app.engine.AppEngine"
     })
     @ConditionalOnBean(type = {
         "org.flowable.engine.ProcessEngine"
@@ -65,6 +67,29 @@ public class CmmnEngineServicesAutoConfiguration {
         @Bean
         public CmmnEngine cmmnEngine(@SuppressWarnings("unused") ProcessEngine processEngine) {
             // The process engine needs to be injected, as otherwise it won't be initialized, which means that the CmmnEngine is not initialized yet
+            if (!CmmnEngines.isInitialized()) {
+                throw new IllegalStateException("CMMN engine has not been initialized");
+            }
+            return CmmnEngines.getDefaultCmmnEngine();
+        }
+    }
+    
+    /**
+     * If an app engine is present that means that the CmmnEngine was created as part of the app engine.
+     * Therefore extract it from the CmmnEngines.
+     */
+    @Configuration
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.cmmn.engine.CmmnEngine"
+    })
+    @ConditionalOnBean(type = {
+        "org.flowable.app.engine.AppEngine"
+    })
+    static class AlreadyInitializedAppEngineConfiguration {
+
+        @Bean
+        public CmmnEngine cmmnEngine(@SuppressWarnings("unused") AppEngine appEngine) {
+            // The app engine needs to be injected, as otherwise it won't be initialized, which means that the CmmnEngine is not initialized yet
             if (!CmmnEngines.isInitialized()) {
                 throw new IllegalStateException("CMMN engine has not been initialized");
             }

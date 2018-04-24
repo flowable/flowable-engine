@@ -13,18 +13,12 @@
 package org.flowable.form.engine.configurator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeAliasRegistry;
-import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
-import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
-import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.form.engine.FormEngine;
@@ -32,8 +26,6 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.deployer.FormDeployer;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.flowable.form.engine.impl.db.EntityDependencyOrder;
-import org.flowable.form.engine.impl.persistence.ResourceRefTypeHandler;
-import org.flowable.form.engine.impl.persistence.entity.ResourceRef;
 
 /**
  * @author Tijs Rademakers
@@ -58,28 +50,6 @@ public class FormEngineConfigurator extends AbstractEngineConfigurator {
     @Override
     protected String getMybatisCfgPath() {
         return FormEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE;
-    }
-
-    @Override
-    protected List<MybatisTypeAliasConfigurator> getMybatisTypeAliases() {
-        return Collections.<MybatisTypeAliasConfigurator>singletonList(new MybatisTypeAliasConfigurator() {
-            @Override
-            public void configure(TypeAliasRegistry typeAliasRegistry) {
-                typeAliasRegistry.registerAlias("ResourceRefTypeHandler", ResourceRefTypeHandler.class);
-            }
-        });
-    }
-
-    @Override
-    protected List<MybatisTypeHandlerConfigurator> getMybatisTypeHandlers() {
-        return Collections.<MybatisTypeHandlerConfigurator>singletonList(new MybatisTypeHandlerConfigurator() {
-            @Override
-            public void configure(TypeHandlerRegistry typeHandlerRegistry) {
-                typeHandlerRegistry.register(ResourceRef.class,
-                        JdbcType.VARCHAR,
-                        ResourceRefTypeHandler.class);
-            }
-        });
     }
 
     @Override
