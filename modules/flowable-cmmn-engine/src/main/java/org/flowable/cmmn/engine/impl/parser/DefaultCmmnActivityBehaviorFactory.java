@@ -60,13 +60,13 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     @Override
     public MilestoneActivityBehavior createMilestoneActivityBehavior(PlanItem planItem, Milestone milestone) {
-        Expression nameExpression = null;
-        if (StringUtils.isNotEmpty(planItem.getName())) {
-            nameExpression = expressionManager.createExpression(planItem.getName());
+        String name = null;
+        if (!StringUtils.isEmpty(planItem.getName())) {
+            name = planItem.getName();
         } else if (StringUtils.isNotEmpty(milestone.getName())) {
-            nameExpression = expressionManager.createExpression(milestone.getName());
+            name = milestone.getName();
         }
-        return new MilestoneActivityBehavior(nameExpression);
+        return new MilestoneActivityBehavior(expressionManager.createExpression(name));
     }
 
     @Override

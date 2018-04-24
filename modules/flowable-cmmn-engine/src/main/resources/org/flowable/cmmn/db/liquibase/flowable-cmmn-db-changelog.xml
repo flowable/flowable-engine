@@ -364,9 +364,6 @@
             <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
         </createTable>
 
-        <dropNotNullConstraint tableName="ACT_CMMN_HI_MIL_INST" columnName="NAME_" columnDataType="varchar(255)"/>
-        <dropNotNullConstraint tableName="ACT_CMMN_RU_MIL_INST" columnName="NAME_" columnDataType="varchar(255)"/>
-
     </changeSet>
 
 </databaseChangeLog>

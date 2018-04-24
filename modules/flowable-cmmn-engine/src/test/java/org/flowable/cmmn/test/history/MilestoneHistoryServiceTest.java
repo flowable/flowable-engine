@@ -94,12 +94,16 @@ public class MilestoneHistoryServiceTest extends FlowableCmmnTestCase {
         assertNotNull(xyzMilestone);
         assertEquals("xyzMilestone", xyzMilestone.getName());
 
-        //One Milestone has no name
+        HistoricMilestoneInstance one = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").singleResult();
+        assertNotNull(one);
+        assertEquals("1", one.getName());
+
         List<HistoricMilestoneInstance> list = cmmnHistoryService.createHistoricMilestoneInstanceQuery().orderByMilestoneName().asc().list();
         assertEquals(3, list.size());
-        assertNull(list.get(0).getName());
+        //assertNull(list.get(0).getName());
+        assertEquals("1", list.get(0).getName());
         assertEquals("abcMilestone", list.get(1).getName());
-        assertNotNull("xyzMilestone", list.get(2).getName());
+        assertEquals("xyzMilestone", list.get(2).getName());
 
         //Query timestamps
         HistoricMilestoneInstance milestone1 = cmmnHistoryService.createHistoricMilestoneInstanceQuery()

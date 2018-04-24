@@ -82,12 +82,17 @@ public class MilestoneQueryTest extends FlowableCmmnTestCase {
         assertNotNull(xyzMilestone);
         assertEquals("xyzMilestone", xyzMilestone.getName());
 
+        MilestoneInstance one = cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("1").singleResult();
+        assertNotNull(one);
+        assertEquals("1", one.getName());
+
         //One Milestone has no name
         List<MilestoneInstance> list = cmmnRuntimeService.createMilestoneInstanceQuery().orderByMilestoneName().asc().list();
         assertEquals(3, list.size());
-        assertNull(list.get(0).getName());
+        //assertNull(list.get(0).getName());
+        assertEquals("1", list.get(0).getName());
         assertEquals("abcMilestone", list.get(1).getName());
-        assertNotNull("xyzMilestone", list.get(2).getName());
+        assertEquals("xyzMilestone", list.get(2).getName());
 
         //Query timestamps
         MilestoneInstance milestone1 = cmmnRuntimeService.createMilestoneInstanceQuery()

@@ -34,7 +34,7 @@
             </sentry>
             <milestone id="milestone1" name="xyzMilestone"/>
             <milestone id="milestone2"/>
-            <milestone id="milestone3"/>
+            <milestone id="milestone3" name="1"/>
             <userEventListener id="event1"/>
             <userEventListener id="event2"/>
             <userEventListener id="event3"/>
