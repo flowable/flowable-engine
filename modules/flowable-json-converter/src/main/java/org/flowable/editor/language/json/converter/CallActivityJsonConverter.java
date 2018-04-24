@@ -64,6 +64,10 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
             propertiesNode.put(PROPERTY_CALLACTIVITY_SAME_DEPLOYMENT, callActivity.isSameDeployment());
         }
         
+        if (StringUtils.isNotEmpty(callActivity.getProcessInstanceName())) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_PROCESS_INSTANCE_NAME, callActivity.getProcessInstanceName());
+        }
+        
         if (StringUtils.isNotEmpty(callActivity.getBusinessKey())) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_BUSINESS_KEY, callActivity.getBusinessKey());
         }
@@ -123,11 +127,16 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
             callActivity.setSameDeployment(true);
         }
         
+        String processInstanceName = getPropertyValueAsString(PROPERTY_CALLACTIVITY_PROCESS_INSTANCE_NAME, elementNode);
+        if (StringUtils.isNotEmpty(processInstanceName)) {
+            callActivity.setProcessInstanceName(processInstanceName);
+        }
+        
         String businessKey = getPropertyValueAsString(PROPERTY_CALLACTIVITY_BUSINESS_KEY, elementNode);
         if (StringUtils.isNotEmpty(businessKey)) {
             callActivity.setBusinessKey(businessKey);
         }
-
+        
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_INHERIT_BUSINESS_KEY, elementNode)) {
             callActivity.setInheritBusinessKey(true);
         }

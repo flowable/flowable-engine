@@ -1,12 +1,15 @@
 package org.flowable.engine.test.api.event;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
@@ -555,6 +558,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
     public void testDeleteParentProcessWithCallActivity() throws Exception {
+        
         CallActivityEventListener mylistener = new CallActivityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(mylistener);
 
@@ -590,6 +594,26 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), processCancelledEvent.getProcessInstanceId());
         
         System.out.println("the end");
+    }
+    
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityProcessInstanceName.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml"
+    })
+    public void testCallActivityProcessInstanceName() {
+        runtimeService.startProcessInstanceByKey("testCallActivityProcessInstanceName", 
+                CollectionUtil.singletonMap("theCollection", Arrays.asList("A", "B", "C", "D")));
+        
+        List<ProcessInstance> childProcessInstances = runtimeService.createProcessInstanceQuery().list().stream()
+            .filter(processInstance -> (processInstance.getSuperExecutionId() != null))
+            .sorted((p1, p2) -> p1.getName().compareTo(p2.getName()))
+            .collect(Collectors.toList());
+        
+        assertEquals(4, childProcessInstances.size());
+        assertEquals("Process instance A", childProcessInstances.get(0).getName());
+        assertEquals("Process instance B", childProcessInstances.get(1).getName());
+        assertEquals("Process instance C", childProcessInstances.get(2).getName());
+        assertEquals("Process instance D", childProcessInstances.get(3).getName());
     }
 
     class CallActivityEventListener extends AbstractFlowableEngineEventListener {

@@ -277,8 +277,13 @@ public class BeanELResolver extends ELResolver {
 		}
 		Class<?> result = null;
 		if (isResolvable(base)) {
-			result = toBeanProperty(base, property).getPropertyType();
-			context.setPropertyResolved(true);
+			BeanProperty beanProperty = toBeanProperty(base, property);
+			if (beanProperty != null) {
+				result = beanProperty.getPropertyType();
+				if (result != null) {
+					context.setPropertyResolved(true);
+				}
+			}
 		}
 		return result;
 	}
@@ -317,18 +322,20 @@ public class BeanELResolver extends ELResolver {
 		}
 		Object result = null;
 		if (isResolvable(base)) {
-			Method method = toBeanProperty(base, property).getReadMethod();
-			if (method == null) {
-				throw new PropertyNotFoundException("Cannot read property " + property);
+			BeanProperty beanProperty = toBeanProperty(base, property);
+			if (beanProperty != null) {
+				Method method = beanProperty.getReadMethod();
+				if (method != null) {
+					try {
+						result = method.invoke(base);
+					} catch (InvocationTargetException e) {
+						throw new ELException(e.getCause());
+					} catch (Exception e) {
+						throw new ELException(e);
+					}
+					context.setPropertyResolved(true);
+				}
 			}
-			try {
-				result = method.invoke(base);
-			} catch (InvocationTargetException e) {
-				throw new ELException(e.getCause());
-			} catch (Exception e) {
-				throw new ELException(e);
-			}
-			context.setPropertyResolved(true);
 		}
 		return result;
 	}
@@ -365,8 +372,11 @@ public class BeanELResolver extends ELResolver {
 		}
 		boolean result = readOnly;
 		if (isResolvable(base)) {
-			result |= toBeanProperty(base, property).isReadOnly();
-			context.setPropertyResolved(true);
+			BeanProperty beanProperty = toBeanProperty(base, property);
+			if (beanProperty != null) {
+				result |= beanProperty.isReadOnly();
+				context.setPropertyResolved(true);
+			}
 		}
 		return result;
 	}
@@ -411,20 +421,23 @@ public class BeanELResolver extends ELResolver {
 			if (readOnly) {
 				throw new PropertyNotWritableException("resolver is read-only");
 			}
-			Method method = toBeanProperty(base, property).getWriteMethod();
-			if (method == null) {
-				throw new PropertyNotWritableException("Cannot write property: " + property);
-			}
-			try {
-				method.invoke(base, value);
-			} catch (InvocationTargetException e) {
-				throw new ELException("Cannot write property: " + property, e.getCause());
-			} catch (IllegalArgumentException e) {
-				throw new ELException("Cannot write property: " + property, e);
-			} catch (IllegalAccessException e) {
-				throw new PropertyNotWritableException("Cannot write property: " + property, e);
-			}
-			context.setPropertyResolved(true);
+			BeanProperty beanProperty = toBeanProperty(base, property);
+			if (beanProperty != null) {
+				Method method = beanProperty.getWriteMethod();
+				if (method == null) {
+					throw new PropertyNotWritableException("Cannot write property: " + property);
+				}
+				try {
+					method.invoke(base, value);
+				} catch (InvocationTargetException e) {
+					throw new ELException("Cannot write property: " + property, e.getCause());
+				} catch (IllegalArgumentException e) {
+					throw new ELException("Cannot write property: " + property, e);
+				} catch (IllegalAccessException e) {
+					throw new PropertyNotWritableException("Cannot write property: " + property, e);
+				}
+				context.setPropertyResolved(true);
+ 			}
 		}
 	}
 
@@ -641,9 +654,6 @@ public class BeanELResolver extends ELResolver {
 			}
 		}
 		BeanProperty beanProperty = property == null ? null : beanProperties.getBeanProperty(property.toString());
-		if (beanProperty == null) {
-			throw new PropertyNotFoundException("Could not find property " + property + " in " + base.getClass());
-		}
 		return beanProperty;
 	}
 

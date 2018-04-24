@@ -21,6 +21,7 @@ import java.util.Iterator;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
 import org.flowable.common.engine.impl.javax.el.BeanELResolver;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.CouldNotResolvePropertyELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
@@ -42,6 +43,7 @@ public class SimpleResolver extends ELResolver {
 			add(new MapELResolver(true));
 			add(new ResourceBundleELResolver());
 			add(new BeanELResolver(true));
+			add(new CouldNotResolvePropertyELResolver());
 		}
 	};
 	private static final ELResolver DEFAULT_RESOLVER_READ_WRITE = new CompositeELResolver() {
@@ -51,6 +53,7 @@ public class SimpleResolver extends ELResolver {
 			add(new MapELResolver(false));
 			add(new ResourceBundleELResolver());
 			add(new BeanELResolver(false));
+			add(new CouldNotResolvePropertyELResolver());
 		}
 	};
 

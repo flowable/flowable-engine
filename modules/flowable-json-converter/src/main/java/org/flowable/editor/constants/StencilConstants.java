@@ -223,6 +223,7 @@ public interface StencilConstants {
     final String PROPERTY_CALLACTIVITY_OUT = "callactivityoutparameters";
     final String PROPERTY_CALLACTIVITY_INHERIT_VARIABLES = "callactivityinheritvariables";
     final String PROPERTY_CALLACTIVITY_SAME_DEPLOYMENT = "callactivitysamedeployment";
+    final String PROPERTY_CALLACTIVITY_PROCESS_INSTANCE_NAME = "callactivityprocessinstancename";
     final String PROPERTY_CALLACTIVITY_BUSINESS_KEY = "callactivitybusinesskey";
     final String PROPERTY_CALLACTIVITY_INHERIT_BUSINESS_KEY = "callactivityinheritbusinesskey";
     final String PROPERTY_CALLACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS = "callactivityuselocalscopeforoutparameters";

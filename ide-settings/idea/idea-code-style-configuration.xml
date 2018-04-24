@@ -34,7 +34,6 @@
       <option name="BLANK_LINES_AROUND_METHOD" value="0" />
       <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
       <option name="BLANK_LINES_AFTER_ANONYMOUS_CLASS_HEADER" value="1" />
-      <option name="INDENT_CASE_FROM_SWITCH" value="false" />
       <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
       <option name="SPACE_WITHIN_ARRAY_INITIALIZER_BRACES" value="true" />
       <option name="SPACE_BEFORE_ARRAY_INITIALIZER_LBRACE" value="true" />
