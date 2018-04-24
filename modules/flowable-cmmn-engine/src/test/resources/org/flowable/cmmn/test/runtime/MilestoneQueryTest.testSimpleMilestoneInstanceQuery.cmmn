@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="testSimpleMilestoneInstanceQuery">
+        <casePlanModel id="myCasePlanModel">
+            <planItem id="milestonePlanItem1" definitionRef="milestone1">
+                <entryCriterion sentryRef="sentry1"/>
+            </planItem>
+            <planItem id="milestonePlanItem2" name="abcMilestone" definitionRef="milestone2">
+                <entryCriterion sentryRef="sentry2"/>
+            </planItem>
+            <planItem id="milestonePlanItem3" definitionRef="milestone3">
+                <entryCriterion sentryRef="sentry3"/>
+            </planItem>
+            <planItem id="eventPlanItem1" definitionRef="event1"/>
+            <planItem id="eventPlanItem2" definitionRef="event2"/>
+            <planItem id="eventPlanItem3" definitionRef="event3"/>
+            <planItem id="eventPlanItem4" definitionRef="event4"/>
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="eventPlanItem1">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentry2">
+                <planItemOnPart sourceRef="eventPlanItem2">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentry3">
+                <planItemOnPart sourceRef="eventPlanItem3">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <milestone id="milestone1" name="xyzMilestone"/>
+            <milestone id="milestone2"/>
+            <milestone id="milestone3" name="1"/>
+            <userEventListener id="event1"/>
+            <userEventListener id="event2"/>
+            <userEventListener id="event3"/>
+            <userEventListener id="event4"/>
+        </casePlanModel>
+    </case>
+
+</definitions>
