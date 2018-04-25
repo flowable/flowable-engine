@@ -81,7 +81,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-public class BaseSpringRestTestCase extends TestCase {
+public abstract class BaseSpringRestTestCase extends TestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
     

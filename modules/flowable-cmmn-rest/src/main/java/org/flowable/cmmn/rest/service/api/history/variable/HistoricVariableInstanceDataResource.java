@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.cmmn.rest.service.api.history;
+package org.flowable.cmmn.rest.service.api.history.variable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
-import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
@@ -46,8 +44,8 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricCaseInstanceVariableDataResource {
+@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+public class HistoricVariableInstanceDataResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -55,18 +53,17 @@ public class HistoricCaseInstanceVariableDataResource {
     @Autowired
     protected CmmnHistoryService historyService;
 
+    @GetMapping(value = "/cmmn-history/historic-variable-instances/{varInstanceId}/data")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the case instance was found and the requested variable data is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the process instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })
-    @ApiOperation(value = "Get the binary data for a historic case instance variable", tags = {"History Process" }, nickname = "getHistoricCaseInstanceVariableData",
-            notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
-    @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/variables/{variableName}/data")
+            @ApiResponse(code = 200, message = "Indicates the variable instance was found and the requested variable data is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested variable instance was not found or the variable instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })
+    @ApiOperation(value = "Get the binary data for a historic task instance variable", tags = {
+            "History" }, nickname = "getHistoricInstanceVariableData", notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @ResponseBody
-    public byte[] getVariableData(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, 
-                    @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request, HttpServletResponse response) {
+    public byte[] getVariableData(@ApiParam(name = "varInstanceId") @PathVariable("varInstanceId") String varInstanceId, HttpServletRequest request, HttpServletResponse response) {
         try {
             byte[] result = null;
-            RestVariable variable = getVariableFromRequest(true, caseInstanceId, variableName, request);
+            RestVariable variable = getVariableFromRequest(true, varInstanceId, request);
             if (CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
@@ -90,20 +87,13 @@ public class HistoricCaseInstanceVariableDataResource {
         }
     }
 
-    public RestVariable getVariableFromRequest(boolean includeBinary, String caseInstanceId, String variableName, HttpServletRequest request) {
+    public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId, HttpServletRequest request) {
+        HistoricVariableInstance varObject = historyService.createHistoricVariableInstanceQuery().id(varInstanceId).singleResult();
 
-        HistoricCaseInstance caseObject = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-
-        if (caseObject == null) {
-            throw new FlowableObjectNotFoundException("Historic case instance '" + caseInstanceId + "' couldn't be found.", HistoricCaseInstanceEntity.class);
-        }
-
-        HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).variableName(variableName).singleResult();
-
-        if (variable == null || variable.getValue() == null) {
-            throw new FlowableObjectNotFoundException("Historic case instance '" + caseInstanceId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
+        if (varObject == null) {
+            throw new FlowableObjectNotFoundException("Historic variable instance '" + varInstanceId + "' couldn't be found.", VariableInstanceEntity.class);
         } else {
-            return restResponseFactory.createRestVariable(variableName, variable.getValue(), null, caseInstanceId, CmmnRestResponseFactory.VARIABLE_HISTORY_CASE, includeBinary);
+            return restResponseFactory.createRestVariable(varObject.getVariableName(), varObject.getValue(), null, varInstanceId, CmmnRestResponseFactory.VARIABLE_HISTORY_VARINSTANCE, includeBinary);
         }
     }
 }

@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.cmmn.rest.service.api.history;
+package org.flowable.cmmn.rest.service.api.history.task;
 
 import java.util.ArrayList;
 import java.util.Date;

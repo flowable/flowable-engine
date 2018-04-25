@@ -11,27 +11,29 @@
  * limitations under the License.
  */
 
-package org.flowable.cmmn.rest.service.api.history;
+package org.flowable.cmmn.rest.service.api.history.task;
 
 import java.util.List;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.rest.api.AbstractPaginateList;
-import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Tijs Rademakers
  */
-public class HistoricVariableInstancePaginateList extends AbstractPaginateList<HistoricVariableInstanceResponse, HistoricVariableInstance> {
+public class HistoricTaskInstancePaginateList extends AbstractPaginateList<HistoricTaskInstanceResponse, HistoricTaskInstance> {
 
     protected CmmnRestResponseFactory restResponseFactory;
+    protected String serverRootUrl;
 
-    public HistoricVariableInstancePaginateList(CmmnRestResponseFactory restResponseFactory) {
+    public HistoricTaskInstancePaginateList(CmmnRestResponseFactory restResponseFactory, String serverRootUrl) {
         this.restResponseFactory = restResponseFactory;
+        this.serverRootUrl = serverRootUrl;
     }
 
     @Override
-    protected List<HistoricVariableInstanceResponse> processList(List<HistoricVariableInstance> list) {
-        return restResponseFactory.createHistoricVariableInstanceResponseList(list);
+    protected List<HistoricTaskInstanceResponse> processList(List<HistoricTaskInstance> list) {
+        return restResponseFactory.createHistoricTaskInstanceResponseList(list);
     }
 }

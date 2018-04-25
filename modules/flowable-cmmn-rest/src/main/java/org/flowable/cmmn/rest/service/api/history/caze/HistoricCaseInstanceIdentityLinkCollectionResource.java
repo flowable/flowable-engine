@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.cmmn.rest.service.api.history;
+package org.flowable.cmmn.rest.service.api.history.caze;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
+import org.flowable.cmmn.rest.service.api.history.task.HistoricIdentityLinkResponse;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
