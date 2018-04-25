@@ -96,6 +96,9 @@
   <sql id="selectHistoricMilestoneInstancesByQueryCriteriaSql">
     from ${prefix}ACT_CMMN_HI_MIL_INST RES
     <where>
+        <if test="id != null">
+            RES.ID_ = #{id}
+        </if>
         <if test="name != null">
             RES.NAME_ = #{name}
         </if>
