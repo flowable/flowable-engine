@@ -452,7 +452,7 @@ Task completed: Fill in paperwork
 ----
 
 Historic data related to the case execution is collected for special constructs like Tasks (as seen above), milestones, cases, variables and plan items in general.
-This data is persisted while the case definition is deployed, surviving long after its instances have executed.
+This data is persisted at the same time as the runtime data, but it is not deleted when case instances end.
 Access to the historic data is provided as query api's by the _CmmnHistoryService_
 
 Of course, this is but a small part of the available API's and constructs available in the Flowable CMMN Engine. Please check the other sections for more detailed information
