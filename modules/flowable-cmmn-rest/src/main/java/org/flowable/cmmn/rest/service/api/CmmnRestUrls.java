@@ -50,6 +50,8 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_HISTORIC_TASK_INSTANCE_RESOURCE = "historic-task-instances";
     public static final String SEGMENT_HISTORIC_ACTIVITY_INSTANCE_RESOURCE = "historic-activity-instances";
     public static final String SEGMENT_HISTORIC_VARIABLE_INSTANCE_RESOURCE = "historic-variable-instances";
+    public static final String SEGMENT_HISTORIC_MILESTONE_INSTANCE_RESOURCE = "historic-milestone-instances";
+    public static final String SEGMENT_HISTORIC_PLANITEM_INSTANCE_RESOURCE = "historic-planitem-instances";
     public static final String SEGMENT_HISTORIC_DETAIL_RESOURCE = "historic-detail";
     public static final String SEGMENT_FORM_DATA = "form-data";
     public static final String SEGMENT_TABLES = "tables";
@@ -374,6 +376,23 @@ public final class CmmnRestUrls {
      * URL template for a single historic variable instance data: <i>history/historic-variable-instances/{0:varInstanceId}/data</i>
      */
     public static final String[] URL_HISTORIC_VARIABLE_INSTANCE_DATA = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_VARIABLE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLE_DATA };
+
+    /**
+     * URL template for a single historic milestone instance: <i>cmmn-history/historic-milestone-instances/{0:milestoneId}</i>
+     */
+    public static final String[] URL_HISTORIC_MILESTONE_INSTANCE = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_MILESTONE_INSTANCE_RESOURCE, "{0}" };
+
+    /**
+     * URL template for a single historic plan item instance: <i>cmmn-history/historic-planitem-instances/{0:planItemId}</i>
+     */
+    public static final String[] URL_HISTORIC_PLANITEM_INSTANCE = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_PLANITEM_INSTANCE_RESOURCE, "{0}" };
+
+
+
+
+
+
+
 
    /**
      * URL template for historic case instance query: <i>query/historic-case-instances</i>

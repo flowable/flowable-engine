@@ -317,11 +317,4 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
     }
 
-    public Date getCreatedBefore() {
-        return createdBefore;
-    }
-
-    public Date getCreatedAfter() {
-        return createdAfter;
-    }
 }
