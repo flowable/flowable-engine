@@ -126,11 +126,11 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that historic planItem instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.")})
-    @GetMapping(value = "/cmmn-history/historic-planItem-instances", produces = "application/json")
+    @GetMapping(value = "/cmmn-history/historic-planitem-instances", produces = "application/json")
     public DataResponse<HistoricPlanItemInstanceResponse> getHistoricPlanItemInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         // Populate query based on request
         HistoricPlanItemInstanceQueryRequest queryRequest = new HistoricPlanItemInstanceQueryRequest();
-        allRequestParams.entrySet().forEach((Map.Entry<String, String> entry) -> Optional.ofNullable(entry.getValue()).ifPresent(v -> mapping.getOrDefault(entry.getKey(), voidConsumer).accept(queryRequest, v)));
+        allRequestParams.forEach((key, value) -> Optional.ofNullable(value).ifPresent(v -> mapping.getOrDefault(key, voidConsumer).accept(queryRequest, v)));
         return getQueryResponse(queryRequest, allRequestParams);
     }
 }

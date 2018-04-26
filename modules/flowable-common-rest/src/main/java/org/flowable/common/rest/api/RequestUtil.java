@@ -45,7 +45,7 @@ public class RequestUtil {
 
     public static Date getDate(Map<String, String> requestParams, String name) {
         if (requestParams != null && name != null) {
-            parseLongDate(requestParams.get(name));
+            return parseLongDate(requestParams.get(name));
         }
         return null;
     }
