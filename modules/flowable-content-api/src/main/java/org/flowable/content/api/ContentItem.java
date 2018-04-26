@@ -80,4 +80,8 @@ public interface ContentItem {
     String getLastModifiedBy();
 
     void setLastModifiedBy(String lastModifiedBy);
+
+    boolean isProvisional();
+
+    void setProvisional(boolean provisional);
 }
