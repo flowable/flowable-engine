@@ -54,7 +54,7 @@ public abstract class HistoricMilestoneInstanceBaseResource {
         Optional.ofNullable(queryRequest.getReachedBefore()).ifPresent(query::milestoneInstanceReachedBefore);
         Optional.ofNullable(queryRequest.getReachedAfter()).ifPresent(query::milestoneInstanceReachedAfter);
 
-        return new HistoricMilestoneInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "milestoneName", allowedSortProperties);
+        return new HistoricMilestoneInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "timestamp", allowedSortProperties);
     }
 
 }

@@ -81,6 +81,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
             HistoricMilestoneInstanceEntity historicMilestoneInstanceEntity = historicMilestoneInstanceEntityManager.create();
+            historicMilestoneInstanceEntity.setId(milestoneInstance.getId());
             historicMilestoneInstanceEntity.setName(milestoneInstance.getName());
             historicMilestoneInstanceEntity.setCaseInstanceId(milestoneInstance.getCaseInstanceId());
             historicMilestoneInstanceEntity.setCaseDefinitionId(milestoneInstance.getCaseDefinitionId());

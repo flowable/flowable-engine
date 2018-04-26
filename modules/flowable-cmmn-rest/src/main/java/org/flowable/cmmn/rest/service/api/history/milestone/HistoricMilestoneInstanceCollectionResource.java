@@ -68,7 +68,7 @@ public class HistoricMilestoneInstanceCollectionResource extends HistoricMilesto
     @GetMapping(value = "/cmmn-history/historic-milestone-instances", produces = "application/json")
     public DataResponse<HistoricMilestoneInstanceResponse> getHistoricMilestoneInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         HistoricMilestoneInstanceQueryRequest queryRequest = new HistoricMilestoneInstanceQueryRequest();
-        allRequestParams.entrySet().forEach((Map.Entry<String, String> entry) -> Optional.ofNullable(entry.getValue()).ifPresent(v -> mapping.getOrDefault(entry.getKey(), voidConsumer).accept(queryRequest, v)));
+        allRequestParams.forEach((key, value) -> Optional.ofNullable(value).ifPresent(v -> mapping.getOrDefault(key, voidConsumer).accept(queryRequest, v)));
         return getQueryResponse(queryRequest, allRequestParams);
     }
 }
