@@ -104,25 +104,23 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     protected InternalJobManager internalJobManager;
     protected InternalJobCompatibilityManager internalJobCompatibilityManager;
+    protected InternalJobParentStateResolver jobParentStateResolver;
 
     protected AsyncExecutor asyncExecutor;
     
+    protected int asyncExecutorNumberOfRetries;
+    protected int asyncExecutorResetExpiredJobsMaxTimeout;
+    
     protected String jobExecutionScope;
-
     protected Map<String, JobHandler> jobHandlers;
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers;
-
-    protected Map<String, HistoryJobHandler> historyJobHandlers;
-
-    protected int asyncExecutorNumberOfRetries;
-    protected int asyncExecutorResetExpiredJobsMaxTimeout;
-
-    protected ObjectMapper objectMapper;
-
     protected List<JobProcessor> jobProcessors;
+    
+    protected AsyncExecutor asyncHistoryExecutor;
+    
+    protected Map<String, HistoryJobHandler> historyJobHandlers;
     protected List<HistoryJobProcessor> historyJobProcessors;
-    protected InternalJobParentStateResolver jobParentStateResolver;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -396,6 +394,15 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setAsyncExecutor(AsyncExecutor asyncExecutor) {
         this.asyncExecutor = asyncExecutor;
+        return this;
+    }
+    
+    public AsyncExecutor getAsyncHistoryExecutor() {
+        return asyncHistoryExecutor;
+    }
+
+    public JobServiceConfiguration setAsyncHistoryExecutor(AsyncExecutor asyncHistoryExecutor) {
+        this.asyncHistoryExecutor = asyncHistoryExecutor;
         return this;
     }
 

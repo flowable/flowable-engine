@@ -45,6 +45,7 @@ import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobByteArrayRef;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
@@ -391,12 +392,21 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void hintAsyncExecutor(JobEntity job) {
-        
         // Verify that correct properties have been set when the async executor will be hinted
         if (job.getLockOwner() == null || job.getLockExpirationTime() == null) {
             createAsyncJob(job, job.isExclusive());
         }
-        
+        createHintListeners(getAsyncExecutor(), job);
+    }
+
+    protected void hintAsyncHistoryExecutor(HistoryJobEntity historyJobEntity) {
+        if (historyJobEntity.getLockOwner() == null || historyJobEntity.getLockExpirationTime() == null) {
+            setLockTimeAndOwner(getAsyncHistoryExecutor(), historyJobEntity);
+        }
+        createHintListeners(getAsyncHistoryExecutor(), historyJobEntity);
+    }
+    
+    protected void createHintListeners(AsyncExecutor asyncExecutor, JobInfoEntity job) {
         if (Context.getTransactionContext() != null) {
             JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, getAsyncExecutor(),
                             CommandContextUtil.getJobServiceConfiguration().getCommandExecutor());
@@ -439,7 +449,15 @@ public class DefaultJobManager implements JobManager {
     public HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity) {
         callHistoryJobProcessors(HistoryJobProcessorContext.Phase.BEFORE_CREATE, historyJobEntity);
         jobServiceConfiguration.getHistoryJobEntityManager().insert(historyJobEntity);
+        triggerAsyncHistoryExecutorIfNeeded(historyJobEntity);
         return historyJobEntity;
+    }
+    
+    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity jobEntity) {
+        // When the async executor is activated, the job is directly passed on to the async executor thread
+        if (isAsyncHistoryExecutorActive()) {
+            hintAsyncHistoryExecutor(jobEntity);
+        }
     }
 
     protected void internalCreateAsyncJob(JobEntity jobEntity, boolean exclusive) {
@@ -448,12 +466,15 @@ public class DefaultJobManager implements JobManager {
 
     protected void internalCreateLockedAsyncJob(JobEntity jobEntity, boolean exclusive) {
         fillDefaultAsyncJobInfo(jobEntity, exclusive);
+        setLockTimeAndOwner(getAsyncExecutor(), jobEntity);
+    }
 
+    protected void setLockTimeAndOwner(AsyncExecutor asyncExecutor , JobInfoEntity jobInfoEntity) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
-        gregorianCalendar.add(Calendar.MILLISECOND, getAsyncExecutor().getAsyncJobLockTimeInMillis());
-        jobEntity.setLockExpirationTime(gregorianCalendar.getTime());
-        jobEntity.setLockOwner(getAsyncExecutor().getLockOwner());
+        gregorianCalendar.add(Calendar.MILLISECOND, asyncExecutor.getAsyncJobLockTimeInMillis());
+        jobInfoEntity.setLockExpirationTime(gregorianCalendar.getTime());
+        jobInfoEntity.setLockOwner(asyncExecutor.getLockOwner());
     }
 
     protected void fillDefaultAsyncJobInfo(JobEntity jobEntity, boolean exclusive) {
@@ -559,8 +580,15 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected boolean isAsyncExecutorActive() {
-        return jobServiceConfiguration.getAsyncExecutor() != null
-                && jobServiceConfiguration.getAsyncExecutor().isActive();
+        return isExecutorActive(jobServiceConfiguration.getAsyncExecutor());
+    }
+    
+    protected boolean isAsyncHistoryExecutorActive() {
+        return isExecutorActive(jobServiceConfiguration.getAsyncHistoryExecutor());
+    }
+    
+    protected boolean isExecutorActive(AsyncExecutor asyncExecutor) {
+        return asyncExecutor != null && asyncExecutor.isActive();
     }
 
     protected CommandContext getCommandContext() {
@@ -569,6 +597,10 @@ public class DefaultJobManager implements JobManager {
 
     protected AsyncExecutor getAsyncExecutor() {
         return jobServiceConfiguration.getAsyncExecutor();
+    }
+    
+    protected AsyncExecutor getAsyncHistoryExecutor() {
+        return jobServiceConfiguration.getAsyncHistoryExecutor();
     }
 
     protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity) {
