@@ -26,7 +26,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     public CreatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
-    
+
     @Override
     protected void internalExecute() {
         if (hasRepetitionRule(planItemInstanceEntity)) {
@@ -36,16 +36,20 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
             setRepetitionCounter(planItemInstanceEntity, getRepetitionCounter(planItemInstanceEntity) + 1);
         }
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCreated(planItemInstanceEntity);
+        //Extending classes might override getNewState
+        if (getNewState().equals(PlanItemInstanceState.AVAILABLE)) {
+            CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceAvailable(planItemInstanceEntity);
+        }
     }
-    
+
     @Override
     protected String getNewState() {
         return PlanItemInstanceState.AVAILABLE;
     }
-    
+
     @Override
     protected String getLifeCycleTransition() {
         return PlanItemTransition.CREATE;
     }
-    
+
 }

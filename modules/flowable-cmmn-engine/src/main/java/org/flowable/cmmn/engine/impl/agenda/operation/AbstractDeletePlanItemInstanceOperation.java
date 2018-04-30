@@ -47,7 +47,6 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
         
         deleteSentryPartInstances();
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).delete(planItemInstanceEntity);
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemIntanceEnded(planItemInstanceEntity);
     }
 
     /**
