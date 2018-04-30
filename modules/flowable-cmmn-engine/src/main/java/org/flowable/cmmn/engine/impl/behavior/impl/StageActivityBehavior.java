@@ -55,7 +55,7 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
                 }
             }
         }
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
     }
     
     @Override

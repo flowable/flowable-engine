@@ -355,9 +355,17 @@
             <column name="ELEMENT_ID_" type="varchar(255)" />
             <column name="ITEM_DEFINITION_ID_" type="varchar(255)" />
             <column name="ITEM_DEFINITION_TYPE_" type="varchar(255)" />
-            <column name="START_TIME_" type="datetime" />
-            <column name="ACTIVATION_TIME_" type="datetime" />
-            <column name="END_TIME_" type="datetime" />
+            <column name="CREATED_TIME_" type="datetime" />
+            <column name="LAST_AVAILABLE_TIME_" type="datetime" />
+            <column name="LAST_ENABLED_TIME_" type="datetime" />
+            <column name="LAST_DISABLED_TIME_" type="datetime" />
+            <column name="LAST_STARTED_TIME_" type="datetime" />
+            <column name="LAST_SUSPENDED_TIME_" type="datetime" />
+            <column name="COMPLETED_TIME_" type="datetime" />
+            <column name="OCCURRED_TIME_" type="datetime" />
+            <column name="TERMINATED_TIME_" type="datetime" />
+            <column name="EXIT_TIME_" type="datetime" />
+            <column name="ENDED_TIME_" type="datetime" />
             <column name="START_USER_ID_" type="varchar(255)" />
             <column name="REFERENCE_ID_" type="varchar(255)" />
             <column name="REFERENCE_TYPE_" type="varchar(255)" />

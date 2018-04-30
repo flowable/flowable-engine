@@ -39,11 +39,27 @@ public interface HistoricPlanItemInstance {
 
     String getPlanItemDefinitionType();
 
-    Date getStartTime();
+    Date getCreatedTime();
 
-    Date getActivationTime();
+    Date getLastAvailableTime();
 
-    Date getEndTime();
+    Date getLastEnabledTime();
+
+    Date getLastDisabledTime();
+
+    Date getLastStartedTime();
+
+    Date getLastSuspendedTime();
+
+    Date getCompletedTime();
+
+    Date getOccurredTime();
+
+    Date getTerminatedTime();
+
+    Date getExitTime();
+
+    Date getEndedTime();
 
     String getStartUserId();
 

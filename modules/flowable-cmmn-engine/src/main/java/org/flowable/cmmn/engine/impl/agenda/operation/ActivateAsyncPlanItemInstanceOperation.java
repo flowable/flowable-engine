@@ -44,7 +44,7 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
 
     @Override
     protected void internalExecute() {
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceActivated(planItemInstanceEntity);
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceStarted(planItemInstanceEntity);
         createAsyncJob((Task) planItemInstanceEntity.getPlanItem().getPlanItemDefinition());
     }
 

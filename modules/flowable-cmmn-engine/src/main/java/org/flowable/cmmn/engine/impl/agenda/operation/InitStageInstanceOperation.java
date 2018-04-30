@@ -41,7 +41,7 @@ public class InitStageInstanceOperation extends AbstractPlanItemInstanceOperatio
                 planItemInstanceEntity.getId(), 
                 planItemInstanceEntity.getTenantId());
 
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceActivated(planItemInstanceEntity);
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceStarted(planItemInstanceEntity);
     }
 
     @Override

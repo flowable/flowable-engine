@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -43,19 +44,22 @@ import static org.junit.Assert.assertTrue;
  */
 public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
-    private static Consumer<HistoricPlanItemInstance> assertStartTimeHistoricPlanItemInstance = h -> {
-        assertNotNull(h.getStartTime());
-        assertTrue(h.getStartTime().getTime() >= 0L);
+    private static Consumer<HistoricPlanItemInstance> assertCreatedTimeHistoricPlanItemInstance = h -> {
+        assertNotNull(h.getCreatedTime());
+        assertTrue(h.getCreatedTime().getTime() >= 0L);
+//        if (!PlanItemInstanceState.WAITING_FOR_REPETITION.equalsIgnoreCase(h.getState())) {
+//            assertNotNull(h.getLastAvailableTime());
+//        }
     };
 
-    private static Consumer<HistoricPlanItemInstance> assertActivationTimeHistoricPlanItemInstance = h -> {
-        assertNotNull(h.getActivationTime());
-        assertTrue(h.getActivationTime().getTime() >= h.getStartTime().getTime());
+    private static Consumer<HistoricPlanItemInstance> assertStartedTimeHistoricPlanItemInstance = h -> {
+        assertNotNull(h.getLastStartedTime());
+        assertTrue(h.getLastStartedTime().getTime() >= h.getCreatedTime().getTime());
     };
 
-    private static Consumer<HistoricPlanItemInstance> assertEndTimeHistoricPlanItemInstance = h -> {
-        assertNotNull(h.getEndTime());
-        assertTrue(h.getEndTime().getTime() >= h.getActivationTime().getTime());
+    private static Consumer<HistoricPlanItemInstance> assertEndedTimeHistoricPlanItemInstance = h -> {
+        assertNotNull(h.getEndedTime());
+        assertTrue(h.getEndedTime().getTime() >= h.getLastStartedTime().getTime());
     };
 
     private static Consumer<HistoricPlanItemInstance> assertEndStateHistoricPlanItemInstance = h -> {
@@ -63,7 +67,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertTrue(PlanItemInstanceState.END_STATES.contains(h.getState()));
     };
 
-    private static Consumer<HistoricPlanItemInstance> assertActiveStateHistoricPlanItemInstance = h -> {
+    private static Consumer<HistoricPlanItemInstance> assertStartedStateHistoricPlanItemInstance = h -> {
         assertNotNull(h.getState());
         assertTrue(PlanItemInstanceState.ACTIVE.contains(h.getState()) ||
                 PlanItemInstanceState.ENABLED.contains(h.getState()) ||
@@ -73,7 +77,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSimpleCaseFlow() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimplePlanItem").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleCaseFlow").start();
 
         //one Task, one Stage, one Milestone
         List<PlanItemInstance> currentPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
@@ -92,21 +96,21 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertTrue(historicPlanItems.stream().anyMatch(h -> "task".equalsIgnoreCase(h.getPlanItemDefinitionType()) && "planItemTaskA".equalsIgnoreCase(h.getElementId())));
 
         //Check Start timeStamp within the second of its original creation
-        historicPlanItems.forEach(assertStartTimeHistoricPlanItemInstance);
-        checkHistoryStartTimestamp(currentPlanItems, historicPlanItems, 1000L);
+        historicPlanItems.forEach(assertCreatedTimeHistoricPlanItemInstance);
+        checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
 
         //Check activation timestamp... for those "live" instances not in "Waiting" state (i.e. AVAILABLE)
-        List<String> nonWaitingPlanIntanceIds = getIdsOfNonWaitingPlanItemInstances(currentPlanItems);
-        assertFalse(nonWaitingPlanIntanceIds.isEmpty());
-        List<HistoricPlanItemInstance> filteredHistoricPlanItemInstances = historicPlanItems.stream().filter(h -> nonWaitingPlanIntanceIds.contains(h.getId())).collect(Collectors.toList());
+        List<String> nonWaitingPlanInstanceIds = getIdsOfNonWaitingPlanItemInstances(currentPlanItems);
+        assertFalse(nonWaitingPlanInstanceIds.isEmpty());
+        List<HistoricPlanItemInstance> filteredHistoricPlanItemInstances = historicPlanItems.stream().filter(h -> nonWaitingPlanInstanceIds.contains(h.getId())).collect(Collectors.toList());
         assertFalse(filteredHistoricPlanItemInstances.isEmpty());
-        filteredHistoricPlanItemInstances.forEach(assertStartTimeHistoricPlanItemInstance
-                .andThen(assertActivationTimeHistoricPlanItemInstance)
-                .andThen(assertActiveStateHistoricPlanItemInstance)
-                .andThen(assertActiveStateHistoricPlanItemInstance));
+        filteredHistoricPlanItemInstances.forEach(assertCreatedTimeHistoricPlanItemInstance
+                .andThen(assertStartedTimeHistoricPlanItemInstance)
+                .andThen(assertStartedTimeHistoricPlanItemInstance)
+                .andThen(assertStartedStateHistoricPlanItemInstance));
 
         //No planItemInstance has "ended" yet, so no historicPlanItemInstance should have endTime timestamp
-        historicPlanItems.forEach(h -> assertNull(h.getEndTime()));
+        historicPlanItems.forEach(h -> assertNull(h.getEndedTime()));
 
         //Milestone history is only filled when the milestone occurs
         List<HistoricMilestoneInstance> historicMilestones = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).list();
@@ -132,15 +136,15 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         assertNotNull(historicPlanItems);
         assertEquals(4, historicPlanItems.size());
         //Check start timestamps of newly added timeStamp within the second of its original creation
-        checkHistoryStartTimestamp(currentPlanItems, historicPlanItems, 1000L);
+        checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
 
         //Check activationTime if applies and the endTime for not "live" instances
         List<String> livePlanItemInstanceIds = currentPlanItems.stream().map(PlanItemInstance::getId).collect(Collectors.toList());
         assertFalse(livePlanItemInstanceIds.isEmpty());
         filteredHistoricPlanItemInstances = historicPlanItems.stream().filter(h -> !livePlanItemInstanceIds.contains(h.getId())).collect(Collectors.toList());
-        filteredHistoricPlanItemInstances.forEach(assertStartTimeHistoricPlanItemInstance
-                .andThen(assertActivationTimeHistoricPlanItemInstance)
-                .andThen(assertEndTimeHistoricPlanItemInstance)
+        filteredHistoricPlanItemInstances.forEach(assertCreatedTimeHistoricPlanItemInstance
+                .andThen(assertStartedTimeHistoricPlanItemInstance)
+                .andThen(assertEndedTimeHistoricPlanItemInstance)
                 .andThen(assertEndStateHistoricPlanItemInstance));
 
         //Milestone appears now in the MilestoneHistory
@@ -160,9 +164,9 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
         assertNotNull(historicPlanItems);
         assertEquals(4, historicPlanItems.size());
-        historicPlanItems.forEach(assertStartTimeHistoricPlanItemInstance
-                .andThen(assertActivationTimeHistoricPlanItemInstance)
-                .andThen(assertEndTimeHistoricPlanItemInstance)
+        historicPlanItems.forEach(assertCreatedTimeHistoricPlanItemInstance
+                .andThen(assertStartedTimeHistoricPlanItemInstance)
+                .andThen(assertEndedTimeHistoricPlanItemInstance)
                 .andThen(assertEndStateHistoricPlanItemInstance)
         );
 
@@ -173,6 +177,237 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testSimpleStage() {
+        Date beforeCaseInstance = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleStage").start();
+        Date afterCaseInstance = cmmnEngineConfiguration.getClock().getCurrentTime();
+
+        //Basic case setup check
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().list();
+        assertEquals(2, historicPlanItemInstances.size());
+        assertEquals(1, historicPlanItemInstances.stream().filter(h -> PlanItemDefinitionType.STAGE.equals(h.getPlanItemDefinitionType())).count());
+        assertEquals(1, historicPlanItemInstances.stream().filter(h -> PlanItemDefinitionType.HUMAN_TASK.equals(h.getPlanItemDefinitionType())).count());
+
+        //Check by different criteria
+        assertEquals(2, cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId())
+                .createdBefore(afterCaseInstance)
+                .createdAfter(beforeCaseInstance)
+                .lastAvailableBefore(afterCaseInstance)
+                .lastAvailableAfter(beforeCaseInstance)
+                .lastStartedBefore(afterCaseInstance)
+                .lastStartedAfter(beforeCaseInstance)
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .count());
+
+        Date beforeComplete = cmmnEngineConfiguration.getClock().getCurrentTime();
+        PlanItemInstance planItemTask = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemTaskA").singleResult();
+        Task task = cmmnTaskService.createTaskQuery().subScopeId(planItemTask.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        Date afterComplete = forwardClock(60_000L);
+
+        historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId())
+                .completedBefore(afterComplete)
+                .completedAfter(beforeComplete)
+                .list();
+        assertEquals(2, historicPlanItemInstances.size());
+        historicPlanItemInstances.forEach(h -> {
+            assertNull(h.getExitTime());
+            assertNull(h.getTerminatedTime());
+            assertNull(h.getOccurredTime());
+            assertNull(h.getLastDisabledTime());
+            assertNull(h.getLastEnabledTime());
+            assertNull(h.getLastSuspendedTime());
+            assertNotNull(h.getCreatedTime());
+            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getLastAvailableTime().getTime() <= h.getCompletedTime().getTime());
+            assertTrue(h.getCompletedTime().getTime() <= h.getEndedTime().getTime());
+        });
+
+
+        assertCaseInstanceEnded(caseInstance);
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testEntryAndExitPropagate() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testEntryAndExitPropagate").start();
+
+        List<PlanItemInstance> currentPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertNotNull(currentPlanItems);
+        assertEquals(3, currentPlanItems.size());
+        assertEquals(1, currentPlanItems.stream()
+                .filter(p -> PlanItemDefinitionType.STAGE.equalsIgnoreCase(p.getPlanItemDefinitionType()))
+                .filter(p -> PlanItemInstanceState.AVAILABLE.equalsIgnoreCase(p.getState()))
+                .count());
+        assertEquals(2, currentPlanItems.stream()
+                .filter(p -> PlanItemDefinitionType.USER_EVENT_LISTENER.equalsIgnoreCase(p.getPlanItemDefinitionType()))
+                .filter(p -> PlanItemInstanceState.AVAILABLE.equalsIgnoreCase(p.getState()))
+                .count());
+
+        List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+        assertNotNull(historicPlanItems);
+        assertEquals(3, historicPlanItems.size());
+        checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
+        assertEquals(1, historicPlanItems.stream().filter(h -> PlanItemDefinitionType.STAGE.equalsIgnoreCase(h.getPlanItemDefinitionType()))
+                .filter(h -> PlanItemInstanceState.AVAILABLE.equalsIgnoreCase(h.getState()))
+                .filter(h -> h.getLastAvailableTime() != null && h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime())
+                .count());
+
+        //QUERY FOR STAGES
+        historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
+                .list();
+        assertEquals(1, historicPlanItems.size());
+        historicPlanItems.forEach(h -> {
+            assertNotNull(h.getLastAvailableTime());
+            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+        });
+
+        //QUERY FOR USER_EVENT_LISTENERS
+        historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
+                .list();
+        assertEquals(2, historicPlanItems.size());
+        historicPlanItems.forEach(h -> {
+            assertNotNull(h.getLastAvailableTime());
+            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+        });
+
+        //Fulfill stages entryCriteria - keep date marks for query criteria
+
+        Date occurredAfter = setClockFixedToCurrentTime();
+        forwardClock(TimeUnit.MINUTES.toMillis(1));
+        PlanItemInstance event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemStartStageOneEvent").singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(event.getId());
+        assertCaseInstanceNotEnded(caseInstance);
+        Date occurredBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
+        forwardClock(TimeUnit.MINUTES.toMillis(1));
+
+        //A userEventListeners is removed and two human task are instanced
+        currentPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertNotNull(currentPlanItems);
+        assertEquals(4, currentPlanItems.size());
+
+        //Two more planItemInstances in the history
+        historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+        assertNotNull(historicPlanItems);
+        assertEquals(5, historicPlanItems.size());
+        checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
+
+        //Both stages should be active now
+        historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .list();
+        assertEquals(1, historicPlanItems.size());
+        historicPlanItems.forEach(h -> {
+            assertNotNull(h.getLastStartedTime());
+            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getLastAvailableTime().getTime() <= h.getLastStartedTime().getTime());
+        });
+
+        //3 new Human Tasks
+        historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list();
+        assertEquals(2, historicPlanItems.size());
+        historicPlanItems.forEach(h -> {
+            //These are already started/active, but before that should also have available timestamp
+            assertEquals(PlanItemInstanceState.ACTIVE, h.getState());
+            assertNotNull(h.getLastAvailableTime());
+            assertNotNull(h.getLastStartedTime());
+            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getLastAvailableTime().getTime() <= h.getLastStartedTime().getTime());
+        });
+
+        //There should be 3 eventListeners the history, two of them "occurred" and one should still be available
+        assertEquals(2, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count());
+        assertEquals(1, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).planItemInstanceState(PlanItemInstanceState.AVAILABLE).count());
+        historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .occurredAfter(occurredAfter)
+                .occurredBefore(occurredBefore)
+                .list();
+        assertEquals(1, historicPlanItems.size());
+        historicPlanItems.forEach(h -> {
+            //These are "completed" planItemInstance with occurred timestamp and ended timestamp
+            assertEquals(PlanItemInstanceState.COMPLETED, h.getState());
+            assertNotNull(h.getLastAvailableTime());
+            assertNotNull(h.getOccurredTime());
+            assertNotNull(h.getEndedTime());
+            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getLastAvailableTime().getTime() <= h.getOccurredTime().getTime());
+            assertTrue(h.getOccurredTime().getTime() <= h.getEndedTime().getTime());
+        });
+
+        //Complete one of the Tasks on stageOne
+        Date completedAfter = cmmnEngineConfiguration.getClock().getCurrentTime();
+        forwardClock(TimeUnit.MINUTES.toMillis(1));
+        PlanItemInstance planItemTask = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemTaskA").singleResult();
+        Task task = cmmnTaskService.createTaskQuery().subScopeId(planItemTask.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        Date completedBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
+        forwardClock(TimeUnit.MINUTES.toMillis(1));
+
+        //one completed task, fetched with completeTime queryCriteria
+        HistoricPlanItemInstance historicPlanItem = cmmnHistoryService.createHistoricPlanItemInstanceQuery().completedBefore(completedBefore).completedAfter(completedAfter).singleResult();
+        assertNotNull(historicPlanItem);
+        assertEquals("planItemTaskA", historicPlanItem.getElementId());
+        assertEquals(PlanItemInstanceState.COMPLETED, historicPlanItem.getState());
+        assertNotNull(historicPlanItem.getLastAvailableTime());
+        assertNotNull(historicPlanItem.getCompletedTime());
+        assertNotNull(historicPlanItem.getEndedTime());
+        assertTrue(historicPlanItem.getCreatedTime().getTime() <= historicPlanItem.getLastAvailableTime().getTime());
+        assertTrue(historicPlanItem.getLastAvailableTime().getTime() <= historicPlanItem.getCompletedTime().getTime());
+        assertTrue(historicPlanItem.getCompletedTime().getTime() <= historicPlanItem.getEndedTime().getTime());
+
+        // one task still active
+        historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list();
+        assertEquals(1, historicPlanItems.size());
+
+        //Trigger exit criteria of stage one
+        Date endedAfter = cmmnEngineConfiguration.getClock().getCurrentTime();
+        forwardClock(TimeUnit.MINUTES.toMillis(1));
+        event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemExitStageOneEvent").singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(event.getId());
+        Date endedBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
+        forwardClock(TimeUnit.MINUTES.toMillis(1));
+
+        //Exit condition should have propagated to the remaining task
+        historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .exitBefore(endedBefore)
+                .exitAfter(endedAfter)
+                .list();
+        //The stage and the remaining containing task
+        assertEquals(2, historicPlanItems.size());
+        assertTrue(historicPlanItems.stream().anyMatch(h -> PlanItemDefinitionType.STAGE.equalsIgnoreCase(h.getPlanItemDefinitionType())));
+        assertTrue(historicPlanItems.stream().anyMatch(h -> PlanItemDefinitionType.HUMAN_TASK.equalsIgnoreCase(h.getPlanItemDefinitionType())));
+
+        historicPlanItems.forEach(h -> {
+            assertEquals(PlanItemInstanceState.TERMINATED, h.getState());
+            assertNotNull(h.getLastAvailableTime());
+            assertNotNull(h.getExitTime());
+            assertNotNull(h.getEndedTime());
+            assertTrue(h.getCreatedTime().getTime() <= h.getLastAvailableTime().getTime());
+            assertTrue(h.getLastAvailableTime().getTime() <= h.getExitTime().getTime());
+            assertTrue(h.getExitTime().getTime() <= h.getEndedTime().getTime());
+        });
+
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    @SuppressWarnings("unchecked")
     public void testSimpleRepetitionHistory() {
         int totalRepetitions = 5;
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
@@ -222,17 +457,17 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         long previousActivateTime = 0L;
         long previousEndTime = 0L;
         for (HistoricPlanItemInstance h : history) {
-            assertStartTimeHistoricPlanItemInstance
-                    .andThen(assertActivationTimeHistoricPlanItemInstance)
-                    .andThen(assertEndTimeHistoricPlanItemInstance)
+            assertCreatedTimeHistoricPlanItemInstance
+                    .andThen(assertStartedTimeHistoricPlanItemInstance)
+                    .andThen(assertEndedTimeHistoricPlanItemInstance)
                     .andThen(assertEndStateHistoricPlanItemInstance)
                     .accept(h);
-            assertTrue(previousStartTime <= h.getStartTime().getTime());
-            assertTrue(previousActivateTime <= h.getActivationTime().getTime());
-            assertTrue(previousEndTime <= h.getEndTime().getTime());
-            previousStartTime = h.getStartTime().getTime();
-            previousActivateTime = h.getActivationTime().getTime();
-            previousEndTime = h.getEndTime().getTime();
+            assertTrue(previousStartTime <= h.getCreatedTime().getTime());
+            assertTrue(previousActivateTime <= h.getLastStartedTime().getTime());
+            assertTrue(previousEndTime <= h.getEndedTime().getTime());
+            previousStartTime = h.getCreatedTime().getTime();
+            previousActivateTime = h.getLastStartedTime().getTime();
+            previousEndTime = h.getEndedTime().getTime();
         }
 
         assertCaseInstanceEnded(caseInstance);
@@ -245,13 +480,12 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
                 .collect(Collectors.toList());
     }
 
-    private void checkHistoryStartTimestamp(final List<PlanItemInstance> currentPlanItems, final List<HistoricPlanItemInstance> historicPlanItems1, long threshold) {
+    private void checkHistoryCreateTimestamp(final List<PlanItemInstance> currentPlanItems, final List<HistoricPlanItemInstance> historicPlanItems1, long threshold) {
         currentPlanItems.forEach(p -> {
-            Optional<Long> startTimestamp = historicPlanItems1.stream().filter(h -> h.getId().equals(p.getId())).findFirst().map(HistoricPlanItemInstance::getStartTime).map(Date::getTime);
-            assertTrue(startTimestamp.isPresent());
-            long delta = startTimestamp.orElse(Long.MAX_VALUE) - p.getStartTime().getTime();
+            Optional<Long> createTimestamp = historicPlanItems1.stream().filter(h -> h.getId().equals(p.getId())).findFirst().map(HistoricPlanItemInstance::getCreatedTime).map(Date::getTime);
+            assertTrue(createTimestamp.isPresent());
+            long delta = createTimestamp.orElse(Long.MAX_VALUE) - p.getStartTime().getTime();
             assertTrue(delta <= threshold);
         });
     }
-
 }

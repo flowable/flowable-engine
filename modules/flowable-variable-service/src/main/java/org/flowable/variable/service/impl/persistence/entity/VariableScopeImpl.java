@@ -653,7 +653,13 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public void setVariable(String variableName, Object value) {
-        setVariable(variableName, value, true);
+        if (isExpression(variableName)) {
+            CommandContextUtil.getExpressionManager().
+                    createExpression(variableName).
+                    setValue(value, this);
+        } else {
+            setVariable(variableName, value, true);
+        }
     }
 
     /**
@@ -1055,4 +1061,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     public <T> T getVariableLocal(String variableName, Class<T> variableClass) {
         return variableClass.cast(getVariableLocal(variableName));
     }
+
+    protected boolean isExpression(String variableName) {
+        return variableName.startsWith("${") || variableName.startsWith("#{");
+    }
+
 }
