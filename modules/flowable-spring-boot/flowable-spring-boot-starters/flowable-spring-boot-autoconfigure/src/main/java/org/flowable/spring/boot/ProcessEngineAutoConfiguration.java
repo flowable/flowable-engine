@@ -116,7 +116,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @ProcessAsyncHistory
     @ConfigurationProperties(prefix = "flowable.process.async-history.executor")
     @ConditionalOnMissingBean(name = "asyncHistoryExecutor")
-    @ConditionalOnProperty("flowable.process.async-history.enable")
+    @ConditionalOnProperty(prefix = "flowable.process", name = "async-history.enable")
     public SpringAsyncHistoryExecutor asyncHistoryExecutor(
         ObjectProvider<TaskExecutor> taskExecutor,
         @Process ObjectProvider<TaskExecutor> processTaskExecutor,
