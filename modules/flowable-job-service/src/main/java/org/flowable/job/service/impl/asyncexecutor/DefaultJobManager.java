@@ -407,13 +407,16 @@ public class DefaultJobManager implements JobManager {
     }
     
     protected void createHintListeners(AsyncExecutor asyncExecutor, JobInfoEntity job) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
         if (Context.getTransactionContext() != null) {
-            JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, getAsyncExecutor(),
-                            CommandContextUtil.getJobServiceConfiguration().getCommandExecutor());
+            JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, asyncExecutor,
+                            CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor());
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
+            
         } else {
-            AsyncJobAddedNotification jobAddedNotification = new AsyncJobAddedNotification(job, getAsyncExecutor());
-            getCommandContext().addCloseListener(jobAddedNotification);
+            AsyncJobAddedNotification jobAddedNotification = new AsyncJobAddedNotification(job, asyncExecutor);
+            commandContext.addCloseListener(jobAddedNotification);
+            
         }
     }
 
@@ -453,13 +456,11 @@ public class DefaultJobManager implements JobManager {
         return historyJobEntity;
     }
     
-    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity jobEntity) {
-        // When the async executor is activated, the job is directly passed on to the async executor thread
-        if (isAsyncHistoryExecutorActive()) {
-            hintAsyncHistoryExecutor(jobEntity);
-        }
+    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity historyJobEntity) {
+        // No default implementation: the asyncHistoryExecutor will be triggered 
+        // by the AsyncHistorySessionCommandContextCloseListener logic
     }
-
+    
     protected void internalCreateAsyncJob(JobEntity jobEntity, boolean exclusive) {
         fillDefaultAsyncJobInfo(jobEntity, exclusive);
     }

@@ -21,6 +21,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.asyncexecutor.AsyncJobAddedNotification;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -65,6 +67,10 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
     
     @Override
     public void closing(CommandContext commandContext) {
+        
+        // This logic needs to be done before the dbSqlSession is flushed 
+        // which means it can't be done in the transaction pre-commit
+        
         Map<String, List<Map<String, String>>> jobData = asyncHistorySession.getJobData();
         if (!jobData.isEmpty()) {
             List<ObjectNode> objectNodes = new ArrayList<>();
@@ -79,7 +85,19 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
                     generateJson(commandContext, jobData, objectNodes, type);
                 }
             }
-            asyncHistoryListener.historyDataGenerated(objectNodes);
+            List<HistoryJobEntity> historyJobEntities = asyncHistoryListener.historyDataGenerated(objectNodes);
+            if (historyJobEntities != null) {
+                for (HistoryJobEntity historyJobEntity : historyJobEntities) {
+                    asyncHistorySession.addAsyncHistoryRunnableAfterCommit(new Runnable() {
+                        @Override
+                        public void run() {
+                            AsyncJobAddedNotification addedNotification = new AsyncJobAddedNotification(historyJobEntity, 
+                                    CommandContextUtil.getJobServiceConfiguration(commandContext).getAsyncHistoryExecutor());
+                            addedNotification.execute(commandContext);
+                        }
+                    });
+                }
+            }
         }
     }
 
