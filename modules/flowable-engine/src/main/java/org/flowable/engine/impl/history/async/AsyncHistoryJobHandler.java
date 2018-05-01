@@ -107,8 +107,8 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
         String type = historyNode.get(HistoryJsonConstants.TYPE).asText();
         ObjectNode historicalJsonData = (ObjectNode) historyNode.get(HistoryJsonConstants.DATA);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Handling async history job (id={}, type={})", job.getId(), type);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Handling async history job (id={}, type={})", job.getId(), type);
         }
 
         List<HistoryJsonTransformer> transformers = historyJsonTransformers.get(type);

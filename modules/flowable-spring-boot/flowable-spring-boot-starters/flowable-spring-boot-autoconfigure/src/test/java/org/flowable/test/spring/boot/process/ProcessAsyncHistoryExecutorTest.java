@@ -22,8 +22,6 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
-import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
-import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -52,7 +50,6 @@ public class ProcessAsyncHistoryExecutorTest {
         contextRunner.run((context -> {
             assertThat(context).hasSingleBean(ProcessEngine.class);
             assertThat(context).hasBean("taskExecutor");
-            assertThat(context).hasBean("springRejectedJobsHandler");
             assertThat(context).hasBean("processAsyncExecutor");
             assertThat(context).hasBean("asyncHistoryExecutor");
             
@@ -64,10 +61,6 @@ public class ProcessAsyncHistoryExecutorTest {
             assertThat(processAsyncExecutor).isNotSameAs(processAsyncHistoryExecutor);
 
             TaskExecutor taskExecutorBean = context.getBean("taskExecutor", TaskExecutor.class);
-            SpringRejectedJobsHandler rejectedJobsHandlerBean = context.getBean("springRejectedJobsHandler", SpringRejectedJobsHandler.class);
-
-            assertThat(((SpringAsyncExecutor) processAsyncExecutor).getRejectedJobsHandler()).isSameAs(rejectedJobsHandlerBean);
-            assertThat(((SpringAsyncHistoryExecutor) processAsyncHistoryExecutor).getRejectedJobsHandler()).isSameAs(rejectedJobsHandlerBean);
 
             assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor()).isSameAs(taskExecutorBean);
             assertThat(((SpringAsyncExecutor) processAsyncHistoryExecutor).getTaskExecutor()).isSameAs(taskExecutorBean);
