@@ -45,6 +45,9 @@ angular.module('flowableModeler')
             }
           });
           delete $http.defaults.headers.common['Authorization'];
+        }, function(errorResposne) {
+            vm.deploying = false;
+            vm.errorMsg = "Cannot generate bpmn file for deployment! Please ask system administrator for help!";
         });
 
       } else {
