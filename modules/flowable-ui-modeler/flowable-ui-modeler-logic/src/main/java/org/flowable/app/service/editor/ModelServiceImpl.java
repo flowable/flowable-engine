@@ -13,8 +13,8 @@
 package org.flowable.app.service.editor;
 
 import static au.com.rds.activiti.RDSActivitiConstants.ARROW_FORM_KEY;
-import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_EXTENSION_ATTRIBUTE_FORM_KEY;
-import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_EXTENSION_ELEMENT_FORM_DEFINITION;
+import static au.com.rds.activiti.RDSActivitiConstants.FORMKEY;
+import static au.com.rds.activiti.RDSActivitiConstants.FORM;
 import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_NAMESPACE;
 import static au.com.rds.activiti.RDSActivitiConstants.BPMN_RDS_NAMESPACE_PREFIX;
 import static au.com.rds.activiti.RDSActivitiConstants.PROCESS_FORMKEY;
@@ -899,11 +899,11 @@ public class ModelServiceImpl implements ModelService {
       ExtensionElement extensionElement = new ExtensionElement();
       extensionElement.setNamespace(BPMN_RDS_NAMESPACE);
       extensionElement.setNamespacePrefix(BPMN_RDS_NAMESPACE_PREFIX);
-      extensionElement.setName(BPMN_RDS_EXTENSION_ELEMENT_FORM_DEFINITION);
+      extensionElement.setName(FORM);
       extensionElement.setElementText(formContent);
   
       ExtensionAttribute attribute = new ExtensionAttribute();
-      attribute.setName(BPMN_RDS_EXTENSION_ATTRIBUTE_FORM_KEY);
+      attribute.setName(FORMKEY);
       attribute.setValue(formKey);
       extensionElement.addAttribute(attribute);
 
