@@ -79,6 +79,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -163,6 +164,11 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public byte[] getBpmnXML(AbstractModel model) {
         BpmnModel bpmnModel = getBpmnModel(model);
+        return getBpmnXML(bpmnModel);
+    }
+
+    public byte[] getBpmnXML(AbstractModel model, boolean resolveFormReference) {
+        BpmnModel bpmnModel = getBpmnModel(model, resolveFormReference);
         return getBpmnXML(bpmnModel);
     }
 
@@ -594,6 +600,11 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public BpmnModel getBpmnModel(AbstractModel model) {
+        return getBpmnModel(model, true);
+    }
+
+    @Override
+    public BpmnModel getBpmnModel(AbstractModel model, boolean resolveFormReferene) {
         BpmnModel bpmnModel = null;
         try {
             Map<String, Model> formMap = new HashMap<String, Model>();
@@ -609,7 +620,7 @@ public class ModelServiceImpl implements ModelService {
                 }
             }
 
-            bpmnModel = getBpmnModel(model, formMap, decisionTableMap);
+            bpmnModel = getBpmnModel(model, formMap, decisionTableMap, resolveFormReferene);
 
         } catch (Exception e) {
             LOGGER.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
@@ -620,7 +631,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
+    public BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap, boolean resolveFormReference) {
         try {
             ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
             Map<String, String> formKeyMap = new HashMap<String, String>();
@@ -634,7 +645,7 @@ public class ModelServiceImpl implements ModelService {
             }
 
             BpmnModel bpmnModel = bpmnJsonConverter.convertToBpmnModel(editorJsonNode, formKeyMap, decisionTableKeyMap);
-            formsAsExtension(bpmnModel);
+            formsAsExtension(bpmnModel, resolveFormReference);
             return bpmnModel;
 
         } catch (Exception e) {
@@ -809,7 +820,7 @@ public class ModelServiceImpl implements ModelService {
         model.setComment(basedOn.getComment());
     }
     
-    private void formsAsExtension(BpmnModel bpmnModel)
+    private void formsAsExtension(BpmnModel bpmnModel, boolean resolveFormReference)
     {
       Map<String, String> processedForms = new HashMap<String, String>();
       List<Process> processes = bpmnModel.getProcesses();
@@ -818,12 +829,12 @@ public class ModelServiceImpl implements ModelService {
         String processFormAttribute = process.getAttributeValue(BPMN_RDS_NAMESPACE, PROCESS_FORMKEY);
         if (StringUtils.isNotBlank(processFormAttribute) && !processedForms.containsKey(processFormAttribute))
         {
-          addFormToProcess(process, processFormAttribute, processedForms);
+          addFormToProcess(process, processFormAttribute, processedForms, resolveFormReference);
         }
 
-        handleProcessForm(process,"viewprocessforms", processedForms );
-        handleProcessForm(process,"editprocessforms", processedForms );
-        handleProcessForm(process,"searchprocessforms", processedForms );
+        handleProcessForm(process,"viewprocessforms", processedForms, resolveFormReference);
+        handleProcessForm(process,"editprocessforms", processedForms, resolveFormReference);
+        handleProcessForm(process,"searchprocessforms", processedForms, resolveFormReference);
   
         for (FlowElement flowElement : process.getFlowElements())
         {
@@ -833,7 +844,7 @@ public class ModelServiceImpl implements ModelService {
                     : ((StartEvent) flowElement).getFormKey();
             if (StringUtils.isNotBlank(formKey) && !processedForms.containsKey(formKey))
             {
-              addFormToProcess(process, formKey, processedForms);
+              addFormToProcess(process, formKey, processedForms, resolveFormReference);
             }
           }
           else if (flowElement instanceof SequenceFlow)
@@ -841,14 +852,14 @@ public class ModelServiceImpl implements ModelService {
             String arrowFormKey = flowElement.getAttributeValue(BPMN_RDS_NAMESPACE, ARROW_FORM_KEY);
             if (StringUtils.isNotBlank(arrowFormKey) && !processedForms.containsKey(arrowFormKey))
             {
-              addFormToProcess(process, arrowFormKey, processedForms);
+              addFormToProcess(process, arrowFormKey, processedForms, resolveFormReference);
             }
           }
         }
       }
     }
 
-    private void handleProcessForm(Process process, String elementName, Map processedForms) {
+    private void handleProcessForm(Process process, String elementName, Map processedForms, boolean resolveFormReference) {
         if(process.getExtensionElements().get(elementName) != null && process.getExtensionElements().get(elementName).size() > 0) {
             List<ExtensionElement> viewProcessFormList = process.getExtensionElements().get(elementName).get(0)
                 .getChildElements().get("processform");
@@ -861,7 +872,7 @@ public class ModelServiceImpl implements ModelService {
 
                 if (StringUtils.isNotBlank(formkey) && !processedForms.containsKey(formkey))
                 {
-                    addFormToProcess(process, formkey, processedForms);
+                    addFormToProcess(process, formkey, processedForms, resolveFormReference);
                 }
             }
         }
@@ -869,9 +880,21 @@ public class ModelServiceImpl implements ModelService {
 
 
   
-    private void addFormToProcess(Process process, String formKey, Map<String, String> processedForms)
-    { 
-      String formContent = this.formDesignJsonService.getFormDesignJsonByKeyAndResolveReferenceIfAny(formKey);
+    private void addFormToProcess(Process process, String formKey, Map<String, String> processedForms, boolean resolveFormReference)
+    {
+      String formContent;
+      List<String> refKeys = new ArrayList();
+      if(resolveFormReference)
+      {
+          formContent = this.formDesignJsonService.getFormDesignJsonByKeyAndResolveReferenceIfAny(formKey);
+      } else {
+          formContent = this.formDesignJsonService.getFormDesignJsonByKey(formKey);
+          refKeys = this.formDesignJsonService.extractFormReferenceKeys(formContent);
+      }
+      //Need to get formModel for name and description
+      List<Model> formModels = this.modelRepository.findByKeyAndType(formKey, AbstractModel.MODEL_TYPE_FORM_RDS);
+      Assert.isTrue(formModels.size()==1, "Only 1 form with same key should exist");
+      Model formModel = formModels.get(0);
   
       ExtensionElement extensionElement = new ExtensionElement();
       extensionElement.setNamespace(BPMN_RDS_NAMESPACE);
@@ -883,6 +906,17 @@ public class ModelServiceImpl implements ModelService {
       attribute.setName(BPMN_RDS_EXTENSION_ATTRIBUTE_FORM_KEY);
       attribute.setValue(formKey);
       extensionElement.addAttribute(attribute);
+
+      ExtensionAttribute nameAttr = new ExtensionAttribute();
+      nameAttr.setName("name");
+      nameAttr.setValue(formModel.getName());
+      extensionElement.addAttribute(nameAttr);
+
+      ExtensionAttribute descAttr = new ExtensionAttribute();
+      nameAttr.setName("description");
+      nameAttr.setValue(formModel.getDescription());
+      extensionElement.addAttribute(descAttr);
+
       process.addExtensionElement(extensionElement);
   
       processedForms.put(formKey, formKey);
@@ -900,10 +934,18 @@ public class ModelServiceImpl implements ModelService {
               String formId = parent.get("formId").asText();
               if (StringUtils.isNotBlank(formId) && !processedForms.containsKey(formId))
               {
-                addFormToProcess(process, formId, processedForms);
+                addFormToProcess(process, formId, processedForms, resolveFormReference);
               }
             }
           }
+        }
+
+        if(!resolveFormReference)
+        {
+            for (String refKey : refKeys)
+            {
+                addFormToProcess(process, refKey, processedForms, resolveFormReference);
+            }
         }
       }
       catch (Exception e)

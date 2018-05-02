@@ -15,12 +15,15 @@ package org.flowable.app.service.editor;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import org.activiti.editor.language.json.converter.RDSBpmnJsonConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -40,8 +43,10 @@ import org.flowable.app.util.XmlUtil;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
+import org.flowable.editor.language.json.model.ModelInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +82,7 @@ public class FlowableModelQueryService {
     protected ObjectMapper objectMapper;
 
     protected BpmnXMLConverter bpmnXmlConverter = new BpmnXMLConverter();
-    protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+    protected RDSBpmnJsonConverter bpmnJsonConverter = new RDSBpmnJsonConverter();
 
     public ResultListDataRepresentation getModels(String filter, String sort, Integer modelType, HttpServletRequest request) {
 
@@ -145,7 +150,7 @@ public class FlowableModelQueryService {
         return result;
     }
 
-    public ModelRepresentation importProcessModel(HttpServletRequest request, MultipartFile file) {
+    public Object importProcessModel(HttpServletRequest request, MultipartFile file, boolean overwrite) {
 
         String fileName = file.getOriginalFilename();
         if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
@@ -163,9 +168,67 @@ public class FlowableModelQueryService {
                     bpmnLayout.execute();
                 }
 
-                ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
-
                 org.flowable.bpmn.model.Process process = bpmnModel.getMainProcess();
+
+                List existingProcessModels = modelRepository.findByKeyAndType(process.getId(), AbstractModel.MODEL_TYPE_BPMN);
+                Map validationResult = new HashMap();
+                if(!overwrite && existingProcessModels.size() > 0) {
+                    validationResult.put("message", "Process with same key already exists");
+                    validationResult.put("existingProcess", process.getId());
+                }
+
+                Map formKeyMap = new HashMap();
+                List existingForms = new ArrayList();
+
+                //First find any existing form with same key
+                for(ExtensionElement eeForm: process.getExtensionElements().get("form")) {
+                    String formkey = eeForm.getAttributeValue(null, "formkey");
+                    List existingFormModels = modelRepository.findByKeyAndType(formkey, AbstractModel.MODEL_TYPE_FORM_RDS);
+                    if(existingFormModels.size() > 0)
+                    {
+                        existingForms.add(formkey);
+                    }
+                }
+
+                // Return validation result if process with same key or any form with same form key exists if overwrite is false
+                if(!overwrite && (validationResult.size() > 0 || existingForms.size() > 0)) {
+                    validationResult.put("existingForms", existingForms);
+                    return validationResult;
+                }
+
+                for(ExtensionElement eeForm: process.getExtensionElements().get("form")) {
+                    String formkey = eeForm.getAttributeValue(null, "formkey");
+                    String formName = eeForm.getAttributeValue(null, "name");
+                    if(formName == null) {
+                        formName = formkey;
+                    }
+                    String formDesc = eeForm.getAttributeValue(null, "description");
+                    String formDefinition = eeForm.getElementText();
+                    ModelRepresentation model = new ModelRepresentation();
+                    model.setKey(formkey);
+                    model.setName(formName);
+                    model.setDescription(formDesc);
+                    model.setModelType(AbstractModel.MODEL_TYPE_FORM_RDS);
+
+                    List existingFormModels = modelRepository.findByKeyAndType(formkey, AbstractModel.MODEL_TYPE_FORM_RDS);
+                    if(existingFormModels.size() > 0) {
+                        Model existFormModel = (Model) existingFormModels.get(0);
+                        modelService.saveModel(existFormModel, formDefinition, null,true, "imported", SecurityUtils.getCurrentUserObject());
+                        ModelInfo modelInfo = new ModelInfo(existFormModel.getId(), existFormModel.getName(), formkey);
+                        formKeyMap.put(formkey, modelInfo);
+
+                    } else {
+                        Model formModel = modelService
+                            .createModel(model, formDefinition, SecurityUtils.getCurrentUserObject());
+                        ModelInfo modelInfo = new ModelInfo(formModel.getId(), formModel.getName(), formModel.getKey());
+                        formKeyMap.put(formkey, modelInfo);
+                    }
+
+                }
+
+                ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel, formKeyMap, null);
+
+
                 String name = process.getId();
                 if (StringUtils.isNotEmpty(process.getName())) {
                     name = process.getName();
@@ -177,9 +240,16 @@ public class FlowableModelQueryService {
                 model.setName(name);
                 model.setDescription(description);
                 model.setModelType(AbstractModel.MODEL_TYPE_BPMN);
-                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
-                return new ModelRepresentation(newModel);
-
+                if(existingProcessModels.size() > 0) {
+                    Model existProcessModel = (Model) existingProcessModels.get(0);
+                    modelService.saveModel(existProcessModel, modelNode.toString(), null, true, "imported", SecurityUtils.getCurrentUserObject());
+                    return new ModelRepresentation(existProcessModel);
+                } else
+                {
+                    Model newModel = modelService
+                        .createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
+                    return new ModelRepresentation(newModel);
+                }
             } catch (BadRequestException e) {
                 throw e;
 

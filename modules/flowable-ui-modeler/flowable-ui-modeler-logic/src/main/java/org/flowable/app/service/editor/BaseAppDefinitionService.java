@@ -149,7 +149,7 @@ public class BaseAppDefinitionService {
                     }
                 }
 
-                BpmnModel bpmnModel = modelService.getBpmnModel(processModel, formMap, decisionTableMap);
+                BpmnModel bpmnModel = modelService.getBpmnModel(processModel, formMap, decisionTableMap, true);
                 Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
 
                 for (Process process : bpmnModel.getProcesses()) {

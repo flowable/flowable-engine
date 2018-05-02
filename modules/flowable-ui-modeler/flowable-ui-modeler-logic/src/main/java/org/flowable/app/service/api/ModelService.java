@@ -42,6 +42,8 @@ public interface ModelService {
     Long getModelCountForUser(User user, int modelTypeApp);
 
     BpmnModel getBpmnModel(AbstractModel model);
+
+    BpmnModel getBpmnModel(AbstractModel model, boolean resolveFormReference);
     
     BpmnModel convertToBpmnModelForValidation(JsonNode jsonNode);
 
@@ -51,7 +53,7 @@ public interface ModelService {
     
     Map<String,byte[]> getDecisionTableDefinitionsForProcess(String modelId);
 
-    BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
+    BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap, boolean resolveFormReference);
     
     String createModelJson(ModelRepresentation model);
 

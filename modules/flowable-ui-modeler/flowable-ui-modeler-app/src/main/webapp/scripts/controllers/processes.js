@@ -278,7 +278,7 @@ angular.module('flowableModeler')
 }]);
 
 angular.module('flowableModeler')
-.controller('ImportProcessModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
+.controller('ImportProcessModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', '$window', function ($rootScope, $scope, $http, Upload, $location, $window) {
 
   $scope.model = {
        loading: false
@@ -307,9 +307,44 @@ angular.module('flowableModeler')
 
           }).success(function(data) {
               $scope.model.loading = false;
+              if(data.id) {
+                  $location.path("/editor/" + data.id);
+                  $scope.$hide();
+              } else if (data.message) {
+                  var message = "";
+                  if(data.existingProcess) {
+                      message += "Process " + data.existingProcess + "\n";
+                  }
+                  if(data.existingForms && data.existingForms.length) {
+                      data.existingForms.forEach(function(form) {
+                          message += "Form " + form + "\n";
+                      })
+                  }
+                  message += "\n already exist(s) Do you want to overwrite? \n "
+                  if($window.confirm(message)) {
+                      Upload.upload({
+                          url: url + "?overwrite=true",
+                          method: 'POST',
+                          file: file
+                      }).success(function(data) {
+                          $scope.model.loading = false;
+                          $location.path("/editor/" + data.id);
+                          $scope.$hide();
 
-              $location.path("/editor/" + data.id);
-              $scope.$hide();
+                      }).error(function(data) {
+
+                          if (data && data.message) {
+                              $scope.model.errorMessage = data.message;
+                          }
+
+                          $scope.model.error = true;
+                          $scope.model.loading = false;
+                      });
+                  } else {
+                      $scope.model.loading = false;
+                      $scope.$hide();
+                  }
+              }
 
           }).error(function(data) {
 
