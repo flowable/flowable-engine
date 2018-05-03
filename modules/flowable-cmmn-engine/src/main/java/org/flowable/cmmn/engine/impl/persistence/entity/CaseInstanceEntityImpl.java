@@ -173,9 +173,6 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     @Override
     protected VariableScopeImpl getParentVariableScope() {
-        if (parentId != null) {
-            return (VariableScopeImpl) CommandContextUtil.getCaseInstanceEntityManager().findById(parentId);
-        }
         return null;
     }
 
