@@ -520,21 +520,21 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
-        assertEquals("${collection:notContains(collection1, \"testValue\")}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, \"testValue\")}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, 'testVar1,testVar2')}",  decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, '\"testValue1\",\"testValue2\"')}",  decisionTable.getRules().get(3).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, '10,20')}",  decisionTable.getRules().get(4).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, 10)}",  decisionTable.getRules().get(5).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:notContains(\"testValue\", collection1)}",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains(\"testValue\", collection1)}",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains('testVar1,testVar2', collection1)}",  decisionTable.getRules().get(2).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains('\"testValue1\",\"testValue2\"', collection1)}",  decisionTable.getRules().get(3).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains('10,20', collection1)}",  decisionTable.getRules().get(4).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains(10, collection1)}",  decisionTable.getRules().get(5).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(6).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:notContains(collection1, \"testValue\")}",  decisionTable.getRules().get(7).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:notContains(\"testValue\", collection1)}",  decisionTable.getRules().get(7).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(8).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:containsAny(collection1, \"testValue\")}",  decisionTable.getRules().get(9).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:containsAny(\"testValue\", collection1)}",  decisionTable.getRules().get(9).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("-",  decisionTable.getRules().get(10).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("== \"testValue\"",  decisionTable.getRules().get(11).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("== testCollection",  decisionTable.getRules().get(12).getInputEntries().get(0).getInputEntry().getText());
         assertEquals("!= \"testValue\"",  decisionTable.getRules().get(13).getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("${collection:contains(collection1, '\"test,Value1\",\"test,Value2\"')}",  decisionTable.getRules().get(14).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("${collection:contains('\"test,Value1\",\"test,Value2\"', collection1)}",  decisionTable.getRules().get(14).getInputEntries().get(0).getInputEntry().getText());
 
         // extension elements
         assertEquals("NOT IN",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
