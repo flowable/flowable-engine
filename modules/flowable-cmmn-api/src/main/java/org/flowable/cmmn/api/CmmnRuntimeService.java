@@ -69,7 +69,24 @@ public interface CmmnRuntimeService {
     void setLocalVariables(String planItemInstanceId, Map<String, Object> variables);
     
     void setLocalVariable(String planItemInstanceId, String variableName, Object variableValue);
-    
+
+    /**
+     * Set variables on the defined case scope. {@link #setVariables(String, Map)} sets the variable on the parent scope if exists.
+     *
+     * @param caseInstanceId case instance identifier to set variables on.
+     * @param variables variables to be set
+     */
+    void setCaseInstanceLocalVariables(String caseInstanceId, Map<String, Object> variables);
+
+    /**
+     * Set variable on the defined case scope. {@link #setVariable(String, String, Object)} sets the variable on the parent scope if exists.
+     *
+     * @param caseInstanceId case instance identifier to set variables on.
+     * @param variableName      variable name
+     * @param variableValue     variable value to be set
+     */
+    void setCaseInstanceLocalVariable(String caseInstanceId, String variableName, Object variableValue);
+
     void removeVariable(String caseInstanceId, String variableName);
     
     void removeVariables(String caseInstanceId, Collection<String> variableNames);

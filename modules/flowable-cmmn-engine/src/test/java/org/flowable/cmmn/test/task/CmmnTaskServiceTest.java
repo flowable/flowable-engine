@@ -12,12 +12,16 @@
  */
 package org.flowable.cmmn.test.task;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.IdentityLinkType;
@@ -29,9 +33,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -180,6 +186,177 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                 includeCaseVariables().
                 singleResult();
         assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setCaseInstanceLocalVariableOnRootCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        cmmnRuntimeService.setCaseInstanceLocalVariable(caseInstance.getId(), "varToUpdate", "newValue");
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(caseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setCaseInstanceLocalVariableOnNonExistingCase() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("No case instance found for id NON-EXISTING-CASE");
+
+        cmmnRuntimeService.setCaseInstanceLocalVariable("NON-EXISTING-CASE", "varToUpdate", "newValue");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setCaseInstanceLocalVariableWithoutName() {
+        this.expectedException.expect(FlowableIllegalArgumentException.class);
+        this.expectedException.expectMessage("variable name is null");
+
+        cmmnRuntimeService.setCaseInstanceLocalVariable("NON-EXISTING-CASE", null, "newValue");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setCaseInstanceLocalVariableOnRootCaseWithExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        cmmnRuntimeService.setCaseInstanceLocalVariable(caseInstance.getId(), "${varToUpdate}", "newValue");
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(caseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat("resolving variable name expressions does not make sense when it is set locally",
+                updatedCaseInstance.getCaseVariables().get("${varToUpdate}"), is("newValue"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn",
+            "org/flowable/cmmn/test/task/CmmnTaskServiceTest.rootProcess.cmmn"
+    })
+    public void setCaseInstanceLocalVariableOnSubCase() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("rootCase")
+                .start();
+        CaseInstance subCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
+
+        cmmnRuntimeService.setCaseInstanceLocalVariable(subCaseInstance.getId(), "varToUpdate", "newValue");
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(subCaseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setCaseInstanceLocalVariablesOnRootCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+        Map<String, Object> variables = Stream.of( new ImmutablePair<String, Object>("varToUpdate", "newValue")).collect(
+                toMap(Pair::getKey, Pair::getValue)
+        );
+        cmmnRuntimeService.setCaseInstanceLocalVariables(caseInstance.getId(), variables);
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(caseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat(updatedCaseInstance.getCaseVariables(), is(variables));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setCaseInstanceLocalVariablesOnNonExistingCase() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("No case  instance found for id NON-EXISTING-CASE");
+        Map<String, Object> variables = Stream.of(new ImmutablePair<String, Object>("varToUpdate", "newValue")).collect(
+                toMap(Pair::getKey, Pair::getValue)
+        );
+
+        cmmnRuntimeService.setCaseInstanceLocalVariables("NON-EXISTING-CASE", variables);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setCaseInstanceLocalVariablesWithEmptyMap() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        this.expectedException.expect(FlowableIllegalArgumentException.class);
+        this.expectedException.expectMessage("variables are empty");
+
+        cmmnRuntimeService.setCaseInstanceLocalVariables(caseInstance.getId(), Collections.EMPTY_MAP);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setCaseInstanceLocalVariablesOnRootCaseWithExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+        Map<String, Object> variables = Stream.of(new ImmutablePair<String, Object>("${varToUpdate}", "newValue")).collect(
+                toMap(Pair::getKey, Pair::getValue)
+        );
+
+        cmmnRuntimeService.setCaseInstanceLocalVariables(caseInstance.getId(), variables);
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(caseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat("resolving variable name expressions does not make sense when it is set locally",
+                updatedCaseInstance.getCaseVariables(), is(
+                        Stream.of(
+                                new ImmutablePair<String, Object>("${varToUpdate}", "newValue"),
+                                new ImmutablePair<String, Object>("varToUpdate", "initialValue")
+                        ).collect(
+                                toMap(Pair::getKey, Pair::getValue)
+                        )
+                ));
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn",
+            "org/flowable/cmmn/test/task/CmmnTaskServiceTest.rootProcess.cmmn"
+    })
+    public void setCaseInstanceLocalVariablesOnSubCase() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("rootCase")
+                .start();
+        CaseInstance subCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
+        Map<String, Object> variables = Stream.of(new ImmutablePair<String, Object>("${varToUpdate}", "newValue")).collect(
+                toMap(Pair::getKey, Pair::getValue)
+        );
+
+        cmmnRuntimeService.setCaseInstanceLocalVariables(subCaseInstance.getId(), variables);
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(subCaseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat(updatedCaseInstance.getCaseVariables(), is(variables));
     }
 
     @Test
