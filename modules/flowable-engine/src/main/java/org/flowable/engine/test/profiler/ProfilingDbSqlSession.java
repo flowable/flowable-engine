@@ -142,15 +142,14 @@ public class ProfilingDbSqlSession extends DbSqlSession {
     }
 
     @Override
-    protected void flushBulkDeletes(Class<? extends Entity> entityClass) {
-        if (getCurrentCommandExecution() != null) {
-            if (bulkDeleteOperations.containsKey(entityClass)) {
-                for (BulkDeleteOperation bulkDeleteOperation : bulkDeleteOperations.get(entityClass)) {
-                    getCurrentCommandExecution().addDbDelete("Bulk-delete-" + bulkDeleteOperation.getStatement());
-                }
+    protected void flushBulkDeletes(Class<? extends Entity> entityClass, List<BulkDeleteOperation> deleteOperations) {
+        // Bulk deletes
+        if (getCurrentCommandExecution() != null && deleteOperations != null) {
+            for (BulkDeleteOperation bulkDeleteOperation : deleteOperations) {
+                getCurrentCommandExecution().addDbDelete("Bulk-delete-" + bulkDeleteOperation.getStatement());
             }
         }
-        super.flushBulkDeletes(entityClass);
+        super.flushBulkDeletes(entityClass, deleteOperations);
     }
 
     public CommandExecutionResult getCurrentCommandExecution() {
