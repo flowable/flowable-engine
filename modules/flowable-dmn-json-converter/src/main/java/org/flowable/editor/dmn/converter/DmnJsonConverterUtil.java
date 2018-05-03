@@ -224,7 +224,7 @@ public class DmnJsonConverterUtil {
     }
 
     public static boolean isCollectionOperator(String operator) {
-        return "IN".equals(operator) || "NOT IN".equals(operator) || "ANY".equals(operator) || "NOT ANY".equals(operator);
+        return "IN".equals(operator) || "NOT IN".equals(operator) || "ANY".equals(operator) || "NOT ANY".equals(operator) || "CONTAINS".equals(operator) || "NOT CONTAINS".equals(operator) || "CONTAINS ANY".equals(operator) || "NOT CONTAINS ANY".equals(operator);
     }
 
     protected static String getDMNContainsExpressionMethod(String containsOperator) {
@@ -236,15 +236,27 @@ public class DmnJsonConverterUtil {
 
         switch (containsOperator) {
             case "IN":
-                containsPrefixAndMethod = "collection:contains";
+                containsPrefixAndMethod = "collection:in";
                 break;
             case "NOT IN":
-                containsPrefixAndMethod = "collection:notContains";
+                containsPrefixAndMethod = "collection:notIn";
                 break;
             case "ANY":
-                containsPrefixAndMethod = "collection:containsAny";
+                containsPrefixAndMethod = "collection:any";
                 break;
             case "NOT ANY":
+                containsPrefixAndMethod = "collection:notAny";
+                break;
+            case "CONTAINS":
+                containsPrefixAndMethod = "collection:contains";
+                break;
+            case "NOT CONTAINS":
+                containsPrefixAndMethod = "collection:notContains";
+                break;
+            case "CONTAINS ANY":
+                containsPrefixAndMethod = "collection:containsAny";
+                break;
+            case "NOT CONTAINS ANY":
                 containsPrefixAndMethod = "collection:notContainsAny";
                 break;
             default:
