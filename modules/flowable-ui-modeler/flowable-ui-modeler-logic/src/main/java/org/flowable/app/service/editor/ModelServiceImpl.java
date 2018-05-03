@@ -631,6 +631,11 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    public BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
+        return getBpmnModel(model, formMap, decisionTableMap, true);
+    }
+
+    @Override
     public BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap, boolean resolveFormReference) {
         try {
             ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
