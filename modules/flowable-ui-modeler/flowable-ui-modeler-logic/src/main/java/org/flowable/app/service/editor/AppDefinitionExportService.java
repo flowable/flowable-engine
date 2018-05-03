@@ -94,7 +94,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
                         }
                     }
 
-                    BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap);
+                    BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap, true);
                     Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
 
                     for (Process process : bpmnModel.getProcesses()) {

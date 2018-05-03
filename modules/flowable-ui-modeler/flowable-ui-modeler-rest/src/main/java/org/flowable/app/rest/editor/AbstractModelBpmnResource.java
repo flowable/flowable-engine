@@ -69,7 +69,7 @@ public class AbstractModelBpmnResource {
                 ServletOutputStream servletOutputStream = response.getOutputStream();
                 response.setContentType("application/xml");
 
-                BpmnModel bpmnModel = modelService.getBpmnModel(model);
+                BpmnModel bpmnModel = modelService.getBpmnModel(model, false);
                 byte[] xmlBytes = modelService.getBpmnXML(bpmnModel);
                 BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(xmlBytes));
 

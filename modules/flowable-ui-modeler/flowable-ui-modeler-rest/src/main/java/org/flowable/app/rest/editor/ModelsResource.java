@@ -70,17 +70,17 @@ public class ModelsResource {
     }
 
     @RequestMapping(value = "/rest/import-process-model", method = RequestMethod.POST, produces = "application/json")
-    public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
-        return modelQueryService.importProcessModel(request, file);
+    public Object importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file, @RequestParam(value = "overwrite", required = false, defaultValue = "false") boolean overwrite) {
+        return modelQueryService.importProcessModel(request, file, overwrite);
     }
 
     /*
      * specific endpoint for IE9 flash upload component
      */
     @RequestMapping(value = "/rest/import-process-model/text", method = RequestMethod.POST)
-    public String importProcessModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+    public String importProcessModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file, @RequestParam(value = "overwrite", required = false, defaultValue = "false") boolean overwrite) {
 
-        ModelRepresentation modelRepresentation = modelQueryService.importProcessModel(request, file);
+        Object modelRepresentation = modelQueryService.importProcessModel(request, file, overwrite);
         String modelRepresentationJson = null;
         try {
             modelRepresentationJson = objectMapper.writeValueAsString(modelRepresentation);

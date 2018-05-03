@@ -56,8 +56,8 @@ public class ApiModelsResource {
     }
 
     @RequestMapping(value = "/editor/import-process-model", method = RequestMethod.POST, produces = "application/json")
-    public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
-        return modelQueryService.importProcessModel(request, file);
+    public Object importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        return modelQueryService.importProcessModel(request, file, false);
     }
 
     @RequestMapping(value = "/editor/models", method = RequestMethod.POST, produces = "application/json")
