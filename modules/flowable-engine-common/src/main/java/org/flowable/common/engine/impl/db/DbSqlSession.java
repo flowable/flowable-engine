@@ -523,24 +523,30 @@ public class DbSqlSession implements Session {
                 flushDeleteEntities(entityClass, deletedObjects.get(entityClass).values());
                 deletedObjects.remove(entityClass);
             }
-            flushBulkDeletes(entityClass);
+            flushBulkDeletes(entityClass, this.bulkDeleteOperations.remove(entityClass));
         }
 
         // Next, in case of custom entities or we've screwed up and forgotten some entity
         if (deletedObjects.size() > 0) {
             for (Class<? extends Entity> entityClass : deletedObjects.keySet()) {
                 flushDeleteEntities(entityClass, deletedObjects.get(entityClass).values());
-                flushBulkDeletes(entityClass);
+                flushBulkDeletes(entityClass, this.bulkDeleteOperations.remove(entityClass));
             }
         }
 
+        // Last, in case there are still some pending entities or we have forgotten an entity for the bulk operations
+        if (!bulkDeleteOperations.isEmpty()) {
+            bulkDeleteOperations.forEach(this::flushBulkDeletes);
+        }
+
         deletedObjects.clear();
+        bulkDeleteOperations.clear();
     }
 
-    protected void flushBulkDeletes(Class<? extends Entity> entityClass) {
+    protected void flushBulkDeletes(Class<? extends Entity> entityClass, List<BulkDeleteOperation> deleteOperations) {
         // Bulk deletes
-        if (bulkDeleteOperations.containsKey(entityClass)) {
-            for (BulkDeleteOperation bulkDeleteOperation : bulkDeleteOperations.get(entityClass)) {
+        if (deleteOperations != null) {
+            for (BulkDeleteOperation bulkDeleteOperation : deleteOperations) {
                 bulkDeleteOperation.execute(sqlSession, entityClass);
             }
         }
