@@ -12,7 +12,8 @@
       "variableType": null,
       "type": "string",
       "label": "",
-      "entries": []
+      "entries": [],
+      "newVariable": false
     }
   ],
   "outputExpressions": [
@@ -22,19 +23,16 @@
       "variableType": null,
       "type": "string",
       "label": "",
-      "entries": []
+      "entries": [],
+      "newVariable": false,
+      "complexExpression": true
     }
   ],
   "rules": [
     {
-      "2": "${refVar1 * refVar2}",
+      "2": "refVar1 * refVar2",
       "1_operator": "==",
       "1_expression": "TEST"
-    },
-    {
-      "2": "#{refVar1 * refVar2}",
-      "1_operator": "==",
-      "1_expression": "TEST2"
     }
   ]
 }
