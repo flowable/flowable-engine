@@ -31,6 +31,7 @@ public class GetAppModelJsonCmd implements Command<String> {
         this.appDefinitionId = appDefinitionId;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
         if (appDefinitionId == null) {
             throw new FlowableIllegalArgumentException("appDefinitionId is null");

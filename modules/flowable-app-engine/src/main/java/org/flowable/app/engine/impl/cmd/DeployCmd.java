@@ -38,6 +38,7 @@ public class DeployCmd implements Command<AppDeployment> {
         this.deploymentBuilder = deploymentBuilder;
     }
 
+    @Override
     public AppDeployment execute(CommandContext commandContext) {
         AppEngineConfiguration appEngineConfiguration = CommandContextUtil.getAppEngineConfiguration(commandContext);
         AppDeploymentEntity deployment = deploymentBuilder.getDeployment();
