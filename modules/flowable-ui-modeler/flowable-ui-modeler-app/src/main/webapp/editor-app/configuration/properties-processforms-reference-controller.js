@@ -200,13 +200,36 @@ angular.module('flowableModeler').controller('FlowableProcessFormsReferencePopup
             }
         };
 
+        function trimAll(toTrim) {
+            return toTrim.trim().split(",").map(function(role) {
+                return role.trim();
+            }).filter(function(role) {
+                return role;
+            }).join(",");
+
+        }
+
+        function trimAndCheckUsersOrRoles(form) {
+            var hasRoleOrUser = false;
+            if(form.users && form.users.trim()) {
+                hasRoleOrUser = true;
+                form.users = trimAll(form.users);
+            }
+
+            if(form.roles && form.roles.trim()) {
+                hasRoleOrUser = true;
+                form.roles = trimAll(form.roles);
+            }
+            return hasRoleOrUser;
+        }
+
         // Click handler for save button
         $scope.save = function () {
 
             if ($scope.viewProcessForms.length > 0) {
                 var valid = true;
                 $scope.viewProcessForms.forEach(function(form) {
-                   if(!((form.users||form.roles)&&form.formreference))  {
+                   if(!(trimAndCheckUsersOrRoles(form) && form.formreference))  {
                        alert("Please define at least users or roles and form");
                        valid = false;
                    }
