@@ -12,16 +12,23 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static java.util.stream.Collectors.toMap;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -29,14 +36,22 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Joram Barrez
  */
 public class VariablesTest extends FlowableCmmnTestCase {
+    
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     @CmmnDeployment
@@ -209,6 +224,145 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertEquals(1, planItemInstances.size());
         assertEquals("Second Task", planItemInstances.get(0).getName());
     }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setVariableOnRootCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "varToUpdate", "newValue");
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(caseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setVariableOnNonExistingCase() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("No case instance found for id NON-EXISTING-CASE");
+
+        cmmnRuntimeService.setVariable("NON-EXISTING-CASE", "varToUpdate", "newValue");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setVariableWithoutName() {
+        this.expectedException.expect(FlowableIllegalArgumentException.class);
+        this.expectedException.expectMessage("variable name is null");
+
+        cmmnRuntimeService.setVariable("NON-EXISTING-CASE", null, "newValue");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setVariableOnRootCaseWithExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "${varToUpdate}", "newValue");
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(caseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat("resolving variable name expressions does not make sense when it is set locally",
+                updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/VariablesTest.rootProcess.cmmn"
+    })
+    public void setVariableOnSubCase() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("rootCase")
+                .start();
+        CaseInstance subCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
+
+        cmmnRuntimeService.setVariable(subCaseInstance.getId(), "varToUpdate", "newValue");
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(subCaseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat(updatedCaseInstance.getCaseVariables().get("varToUpdate"), is("newValue"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setVariablesOnRootCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+        Map<String, Object> variables = Stream.of( new ImmutablePair<String, Object>("varToUpdate", "newValue")).collect(
+                toMap(Pair::getKey, Pair::getValue)
+        );
+        cmmnRuntimeService.setVariables(caseInstance.getId(), variables);
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(caseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat(updatedCaseInstance.getCaseVariables(), is(variables));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setVariablesOnNonExistingCase() {
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("No case instance found for id NON-EXISTING-CASE");
+        Map<String, Object> variables = Stream.of(new ImmutablePair<String, Object>("varToUpdate", "newValue")).collect(
+                toMap(Pair::getKey, Pair::getValue)
+        );
+
+        cmmnRuntimeService.setVariables("NON-EXISTING-CASE", variables);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void setVariablesWithEmptyMap() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("varToUpdate", "initialValue")
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        this.expectedException.expect(FlowableIllegalArgumentException.class);
+        this.expectedException.expectMessage("variables is empty");
+
+        cmmnRuntimeService.setVariables(caseInstance.getId(), Collections.EMPTY_MAP);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/VariablesTest.rootProcess.cmmn"
+    })
+    public void setVariablesOnSubCase() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("rootCase")
+                .start();
+        CaseInstance subCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
+        Map<String, Object> variables = CollectionUtil.singletonMap("varToUpdate", "newValue");
+        cmmnRuntimeService.setVariables(subCaseInstance.getId(), variables);
+
+        CaseInstance updatedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().
+                caseInstanceId(subCaseInstance.getId()).
+                includeCaseVariables().
+                singleResult();
+        assertThat(updatedCaseInstance.getCaseVariables(), is(variables));
+}
 
     // Test helper classes
 
