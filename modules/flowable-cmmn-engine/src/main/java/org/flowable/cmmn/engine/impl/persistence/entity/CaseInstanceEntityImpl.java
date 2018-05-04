@@ -173,6 +173,8 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     @Override
     protected VariableScopeImpl getParentVariableScope() {
+        // A case instance is the root of variables.
+        // In case of parent-child case instances, the variables needs to be defined explictely in input/outpur vars 
         return null;
     }
 
