@@ -3,10 +3,27 @@ language: java
 dist: trusty
 sudo: required
 
-jdk:
-  - oraclejdk9
-  - oraclejdk8
-  - openjdk8
+# Get latest install-jdk.sh script
+before_install:
+  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+
+matrix:
+  include:
+    - env: JDK_RELEASE='OracleJDK 9'
+      jdk: oraclejdk9
+    - env: JDK_RELEASE='OpenJDK 8'
+      jdk: openjdk8
+    - env: JDK_RELEASE='OracleJDK 8'
+      jdk: oraclejdk8
+# Java 10 "Oracle JDK" (not yet provided by Travis CI)
+    - env: JDK='Oracle JDK 10'
+      install: . ./install-jdk.sh -F 10 -L BCL
+# Java 10 "OpenJDK" (not yet provided by Travis CI)
+    - env: JDK='OpenJDK 10'
+      install: . ./install-jdk.sh -F 10 -L GPL
+# Java 11 "Oracle JDK" (not yet provided by Travis CI)
+    - env: JDK='Oracle JDK 11'
+      install: . ./install-jdk.sh -F 11 -L BCL
 
 cache:
   directories:
