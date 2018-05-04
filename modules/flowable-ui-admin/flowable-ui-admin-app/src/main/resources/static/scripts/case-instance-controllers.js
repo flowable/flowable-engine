@@ -381,12 +381,12 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 var selectedVariable = $scope.selectedVariables[0];
                 var modalInstance = $modal.open({
                     templateUrl: 'views/update-variable-popup.html',
-                    controller: 'UpdateVariableCtrl',
+                    controller: 'UpdateCaseInstanceVariableCtrl',
                     resolve: {
                         variable: function () {
                             return selectedVariable.variable;
                         },
-                        processInstanceId: function () {
+                        caseInstanceId: function () {
                             return $scope.caseInstance.id;
                         }
                     }
@@ -406,7 +406,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 var selectedVariable = $scope.selectedVariables[0];
                 var modalInstance = $modal.open({
                     templateUrl: 'views/variable-delete-popup.html',
-                    controller: 'DeleteVariableCtrl',
+                    controller: 'DeleteCaseInstanceVariableCtrl',
                     resolve: {
                         variable: function () {
                             return selectedVariable.variable;
@@ -429,7 +429,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
         $scope.addVariable = function () {
             var modalInstance = $modal.open({
                 templateUrl: 'views/variable-add-popup.html',
-                controller: 'AddVariableCtrl',
+                controller: 'AddCaseInstanceVariableCtrl',
                 resolve: {
                     caseInstanceId: function () {
                         return $scope.caseInstance.id;
@@ -513,7 +513,7 @@ flowableAdminApp.controller('ShowCaseInstanceDiagramPopupCtrl',
 
     }]);
 
-flowableAdminApp.controller('UpdateVariableCtrl',
+flowableAdminApp.controller('UpdateCaseInstanceVariableCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'variable', 'caseInstanceId', function ($rootScope, $scope, $modalInstance, $http, variable, caseInstanceId) {
 
         $scope.status = {loading: false};
@@ -587,7 +587,7 @@ flowableAdminApp.controller('UpdateVariableCtrl',
 
     }]);
 
-flowableAdminApp.controller('DeleteVariableCtrl',
+flowableAdminApp.controller('DeleteCaseInstanceVariableCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'variable', 'caseInstanceId',
         function ($rootScope, $scope, $modalInstance, $http, variable, caseInstanceId) {
 
@@ -613,7 +613,7 @@ flowableAdminApp.controller('DeleteVariableCtrl',
 
         }]);
 
-flowableAdminApp.controller('AddVariableCtrl',
+flowableAdminApp.controller('AddCaseInstanceVariableCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'caseInstanceId',
         function ($rootScope, $scope, $modalInstance, $http, caseInstanceId) {
 

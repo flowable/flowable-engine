@@ -62,7 +62,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
@@ -1847,6 +1846,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
             asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
         }
+        jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
     }
 
     // history

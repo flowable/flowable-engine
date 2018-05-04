@@ -42,6 +42,8 @@ public class AsyncHistorySession implements Session {
     public AsyncHistorySession(CommandContext commandContext, AsyncHistoryListener asyncHistoryJobListener) {
         this.commandContext = commandContext;
         this.asyncHistoryListener = asyncHistoryJobListener;
+        
+        // A command context close listener is registered to avoid creating the async history data if it wouldn't be needed 
         initCommandContextCloseListener();
         
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isAsyncHistoryExecutorIsMessageQueueMode()) {

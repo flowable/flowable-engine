@@ -40,6 +40,10 @@ public class AsyncJobAddedNotification implements CommandContextCloseListener {
 
     @Override
     public void closed(CommandContext commandContext) {
+        execute(commandContext);
+    }
+
+    public void execute(CommandContext commandContext) {
         CommandExecutor commandExecutor = CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor();
         CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         commandExecutor.execute(commandConfig, new Command<Void>() {

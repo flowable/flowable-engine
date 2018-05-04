@@ -39,9 +39,10 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
     protected int asyncHistoryJsonGroupingThreshold;
     
     @Override
-    public void historyDataGenerated(List<ObjectNode> historyObjectNodes) {
+    public List<HistoryJobEntity> historyDataGenerated(List<ObjectNode> historyObjectNodes) {
         List<HistoryJobEntity> historyJobEntities = createJobsWithHistoricalData(historyObjectNodes, Context.getCommandContext());
         processHistoryJobEntities(historyJobEntities);
+        return historyJobEntities;
     }
 
     protected List<HistoryJobEntity> createJobsWithHistoricalData(List<ObjectNode> historyObjectNodes, CommandContext commandContext) {
