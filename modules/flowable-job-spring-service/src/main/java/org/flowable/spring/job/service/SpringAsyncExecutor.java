@@ -24,11 +24,13 @@ import org.springframework.core.task.TaskExecutor;
  * This is a spring based implementation of the {@link JobExecutor} using spring abstraction {@link TaskExecutor} for performing background task execution.
  * </p>
  * <p>
- * The idea behind this implementation is to externalize the configuration of the task executor, so it can leverage to Application servers controller thread pools, for example using the commonj API.
+ * The idea behind this implementation is to externalize the configuration of the task executor, 
+ * so it can leverage to Application servers controller thread pools, for example using the commonj API.
  * The use of unmanaged thread in application servers is discouraged by the Java EE spec.
  * </p>
  * 
  * @author Pablo Ganga
+ * @author Joram Barrez
  */
 public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
 
@@ -36,6 +38,10 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
     protected SpringRejectedJobsHandler rejectedJobsHandler;
 
     public SpringAsyncExecutor() {
+    }
+    
+    public SpringAsyncExecutor(TaskExecutor taskExecutor) {
+        this(taskExecutor, null);
     }
 
     public SpringAsyncExecutor(TaskExecutor taskExecutor, SpringRejectedJobsHandler rejectedJobsHandler) {
@@ -61,7 +67,7 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
     }
 
     /**
-     * Required spring injected {@link RejectedJobsHandler} implementation that will be used when jobs were rejected by the task executor.
+     * {@link RejectedJobsHandler} implementation that will be used when jobs were rejected by the task executor.
      * 
      * @param rejectedJobsHandler
      */
@@ -75,7 +81,11 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
             taskExecutor.execute(new ExecuteAsyncRunnable(job, jobServiceConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler));
             return true;
         } catch (RejectedExecutionException e) {
-            rejectedJobsHandler.jobRejected(this, job);
+            if (rejectedJobsHandler == null) {
+                unacquireJobAfterRejection(job);
+            } else {
+                rejectedJobsHandler.jobRejected(this, job);
+            }
             return false;
         }
     }

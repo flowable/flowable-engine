@@ -45,6 +45,7 @@ public interface AppDeploymentEntity extends AppDeployment, Entity {
 
     void setDeploymentTime(Date deploymentTime);
 
+    @Override
     boolean isNew();
 
     void setNew(boolean isNew);

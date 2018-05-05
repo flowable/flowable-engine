@@ -29,38 +29,47 @@ public class AppResourceEntityImpl extends AbstractEntityNoRevision implements A
 
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public byte[] getBytes() {
         return bytes;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public Object getPersistentState() {
         return AppResourceEntityImpl.class;
     }
 
+    @Override
     public boolean isGenerated() {
         return false;
     }
 
+    @Override
     public void setGenerated(boolean generated) {
         this.generated = generated;
     }

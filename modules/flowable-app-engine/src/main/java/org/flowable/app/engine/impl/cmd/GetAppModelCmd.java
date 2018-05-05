@@ -31,6 +31,7 @@ public class GetAppModelCmd implements Command<AppModel> {
         this.appDefinitionId = appDefinitionId;
     }
 
+    @Override
     public AppModel execute(CommandContext commandContext) {
         if (appDefinitionId == null) {
             throw new FlowableIllegalArgumentException("appDefinitionId is null");

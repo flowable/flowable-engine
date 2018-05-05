@@ -63,7 +63,6 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
             assertThat(context).hasSingleBean(ProcessEngine.class);
             assertThat(context).hasSingleBean(CmmnEngine.class);
             assertThat(context).hasBean("taskExecutor");
-            assertThat(context).hasBean("springRejectedJobsHandler");
             assertThat(context).hasBean("cmmnAsyncExecutor");
             assertThat(context).hasBean("processAsyncExecutor");
             AsyncExecutor processAsyncExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncExecutor();
@@ -80,14 +79,6 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
                 .isInstanceOf(SpringAsyncExecutor.class);
 
             TaskExecutor taskExecutorBean = context.getBean("taskExecutor", TaskExecutor.class);
-            SpringRejectedJobsHandler rejectedJobsHandlerBean = context.getBean("springRejectedJobsHandler", SpringRejectedJobsHandler.class);
-
-            assertThat(((SpringAsyncExecutor) processAsyncExecutor).getRejectedJobsHandler())
-                .as("Process Async Rejected Jobs Handler")
-                .isSameAs(rejectedJobsHandlerBean);
-            assertThat(((SpringAsyncExecutor) cmmnAsyncExecutor).getRejectedJobsHandler())
-                .as("Cmmn Async Rejected Jobs Handler")
-                .isSameAs(rejectedJobsHandlerBean);
 
             assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor())
                 .as("Process Async Task Executor")

@@ -22,6 +22,7 @@ public class BaseAppModel implements AppModel {
     protected String usersAccess;
     protected String groupsAccess;
 
+    @Override
     public String getKey() {
         return key;
     }
@@ -30,6 +31,7 @@ public class BaseAppModel implements AppModel {
         this.key = key;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -38,6 +40,7 @@ public class BaseAppModel implements AppModel {
         this.name = name;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }

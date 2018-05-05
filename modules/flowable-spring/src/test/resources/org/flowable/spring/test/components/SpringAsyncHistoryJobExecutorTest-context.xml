@@ -1,36 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
         <property name="targetDataSource">
             <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-                <property name="driverClass" value="org.h2.Driver"/>
-                <property name="url" value="jdbc:h2:mem:flowable-spring-async-history-executor-test;DB_CLOSE_DELAY=1000;mvcc=true;"/>
-                <property name="username" value="sa"/>
-                <property name="password" value=""/>
+                <property name="driverClass" value="org.h2.Driver" />
+                <property name="url" value="jdbc:h2:mem:flowable-spring-async-history-executor-test;DB_CLOSE_DELAY=1000;mvcc=true;" />
+                <property name="username" value="sa" />
+                <property name="password" value="" />
             </bean>
         </property>
     </bean>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
+        <property name="dataSource" ref="dataSource" />
     </bean>
 
     <bean id="processEngineConfiguration" class="org.flowable.spring.SpringProcessEngineConfiguration">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="transactionManager" ref="transactionManager"/>
-        <property name="databaseSchemaUpdate" value="true"/>
-        <property name="asyncExecutor" ref="springAsyncExecutor"/>
-        <property name="asyncExecutorActivate" value="false"/>
-        
-       <property name="asyncHistoryEnabled" value="true" />
-        <property name="asyncHistoryExecutor" ref="springAsyncHistoryExecutor"/>
-        <property name="asyncHistoryExecutorActivate" value="false"/>
-        
+        <property name="dataSource" ref="dataSource" />
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="databaseSchemaUpdate" value="true" />
+        <property name="asyncExecutor" ref="springAsyncExecutor" />
+        <property name="asyncExecutorActivate" value="false" />
+
+        <property name="asyncHistoryEnabled" value="true" />
+        <property name="asyncHistoryExecutor" ref="springAsyncHistoryExecutor" />
+        <property name="asyncHistoryExecutorActivate" value="true" />
+        <property name="asyncHistoryJsonGroupingEnabled" value="true" />
+        <property name="asyncHistoryJsonGroupingThreshold" value="1" />
+
         <property name="deploymentResources">
             <list>
                 <value>classpath:/org/flowable/spring/test/components/SpringAsyncHistory.testUsersTasks.bpmn20.xml</value>
@@ -39,14 +40,14 @@
     </bean>
 
     <bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
-        <property name="processEngineConfiguration" ref="processEngineConfiguration"/>
+        <property name="processEngineConfiguration" ref="processEngineConfiguration" />
     </bean>
 
-    <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService"/>
-    <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService"/>
-    <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService"/>
-    <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
-    <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
+    <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+    <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+    <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+    <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+    <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
 
     <bean id="springAsyncExecutor" class="org.flowable.spring.job.service.SpringAsyncExecutor">
         <property name="taskExecutor">
@@ -55,13 +56,12 @@
         <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
         <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
     </bean>
-    
+
     <bean id="springAsyncHistoryExecutor" class="org.flowable.spring.job.service.SpringAsyncHistoryExecutor">
         <property name="taskExecutor">
             <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
         </property>
-        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
-        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
+        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="100" />
     </bean>
 
 </beans>

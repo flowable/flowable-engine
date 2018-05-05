@@ -46,6 +46,7 @@ public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
         this.resourceEntityManager = appEngineConfiguration.getAppResourceEntityManager();
     }
 
+    @Override
     public AppDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
         if (inputStream == null) {
             throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
@@ -69,6 +70,7 @@ public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
         return this;
     }
 
+    @Override
     public AppDeploymentBuilder addClasspathResource(String resource) {
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
         if (inputStream == null) {
@@ -77,6 +79,7 @@ public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
         return addInputStream(resource, inputStream);
     }
 
+    @Override
     public AppDeploymentBuilder addString(String resourceName, String text) {
         if (text == null) {
             throw new FlowableException("text is null");
@@ -127,26 +130,31 @@ public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
         return this;
     }
 
+    @Override
     public AppDeploymentBuilder name(String name) {
         deployment.setName(name);
         return this;
     }
 
+    @Override
     public AppDeploymentBuilder category(String category) {
         deployment.setCategory(category);
         return this;
     }
     
+    @Override
     public AppDeploymentBuilder key(String key) {
         deployment.setKey(key);
         return this;
     }
 
+    @Override
     public AppDeploymentBuilder disableSchemaValidation() {
         this.isXsdValidationEnabled = false;
         return this;
     }
 
+    @Override
     public AppDeploymentBuilder tenantId(String tenantId) {
         deployment.setTenantId(tenantId);
         return this;
@@ -158,6 +166,7 @@ public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
         return this;
     }
 
+    @Override
     public AppDeployment deploy() {
         return repositoryService.deploy(this);
     }

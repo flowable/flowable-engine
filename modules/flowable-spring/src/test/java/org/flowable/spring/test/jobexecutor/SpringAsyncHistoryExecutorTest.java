@@ -61,8 +61,7 @@ public class SpringAsyncHistoryExecutorTest extends SpringFlowableTestCase {
             tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         }
         
-        assertTrue(managementService.createHistoryJobQuery().count() > 0);
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 10000L, 200L);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 20000L, 200L, false);
         
         List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstance.getId()).orderByTaskName().asc().list();

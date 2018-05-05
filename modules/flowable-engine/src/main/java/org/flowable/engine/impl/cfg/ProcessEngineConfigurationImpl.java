@@ -1860,6 +1860,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
             asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
         }
+        jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
     }
 
     // history

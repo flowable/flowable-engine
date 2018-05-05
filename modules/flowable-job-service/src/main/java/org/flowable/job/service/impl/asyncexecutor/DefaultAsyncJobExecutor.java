@@ -79,33 +79,36 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             executorService.execute(runnable);
             return true;
         } catch (RejectedExecutionException e) {
+            unacquireJobAfterRejection(job);
 
-            // When a RejectedExecutionException is caught, this means that the queue for holding the jobs
-            // that are to be executed is full and can't store more.
-            // The job is now 'unlocked', meaning that the lock owner/time is set to null,
-            // so other executors can pick the job up (or this async executor, the next time the
-            // acquire query is executed.
-
-            // This can happen while already in a command context (for example in a transaction listener
-            // after the async executor has been hinted that a new async job is created)
-            // or not (when executed in the acquire thread runnable)
-
-            CommandContext commandContext = Context.getCommandContext();
-            if (commandContext != null) {
-                CommandContextUtil.getJobManager(commandContext).unacquire(job);
-
-            } else {
-                jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        CommandContextUtil.getJobManager(commandContext).unacquire(job);
-                        return null;
-                    }
-                });
-            }
-
-            // Job queue full, returning true so (if wanted) the acquiring can be throttled
+            // Job queue full, returning false so (if wanted) the acquiring can be throttled
             return false;
+        }
+    }
+
+    protected void unacquireJobAfterRejection(final JobInfo job) {
+        // When a RejectedExecutionException is caught, this means that the queue for holding the jobs
+        // that are to be executed is full and can't store more.
+        // The job is now 'unlocked', meaning that the lock owner/time is set to null,
+        // so other executors can pick the job up (or this async executor, the next time the
+        // acquire query is executed.
+
+        // This can happen while already in a command context (for example in a transaction listener
+        // after the async executor has been hinted that a new async job is created)
+        // or not (when executed in the acquire thread runnable)
+
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null) {
+            CommandContextUtil.getJobManager(commandContext).unacquire(job);
+
+        } else {
+            jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    CommandContextUtil.getJobManager(commandContext).unacquire(job);
+                    return null;
+                }
+            });
         }
     }
 
