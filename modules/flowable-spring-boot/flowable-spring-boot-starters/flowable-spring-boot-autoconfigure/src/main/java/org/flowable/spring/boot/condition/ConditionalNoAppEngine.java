@@ -19,7 +19,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * A meta {@link org.springframework.context.annotation.Conditional} annotation that checks if the Process engine
@@ -39,7 +38,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
     "org.flowable.app.engine.AppEngine",
     "org.flowable.app.spring.SpringAppEngineConfiguration"
 })
-@ConditionalOnProperty(prefix = "flowable.app", name = "enabled", havingValue = "false", matchIfMissing = true)
 public @interface ConditionalNoAppEngine {
 
 }

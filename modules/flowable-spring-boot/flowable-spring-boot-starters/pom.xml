@@ -25,6 +25,8 @@
         <module>flowable-spring-boot-starter-dmn-rest</module>
         <module>flowable-spring-boot-starter-process</module>
         <module>flowable-spring-boot-starter-process-rest</module>
+        <module>flowable-spring-boot-starter-app</module>
+        <module>flowable-spring-boot-starter-app-rest</module>
         <module>flowable-spring-boot-starter-rest-api</module>
         <module>flowable-spring-boot-starter-rest</module>
     </modules>
@@ -32,7 +34,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring.boot.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

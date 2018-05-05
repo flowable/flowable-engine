@@ -21,6 +21,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.cmmn.Cmmn;
 import org.flowable.spring.boot.cmmn.CmmnEngineAutoConfiguration;
 import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
@@ -47,6 +48,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withConfiguration(AutoConfigurations.of(
             ProcessEngineAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
             CmmnEngineAutoConfiguration.class,
             CmmnEngineServicesAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,

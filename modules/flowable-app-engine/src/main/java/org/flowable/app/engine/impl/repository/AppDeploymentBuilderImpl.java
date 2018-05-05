@@ -14,6 +14,8 @@ package org.flowable.app.engine.impl.repository;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
@@ -101,6 +103,27 @@ public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
         resource.setName(resourceName);
         resource.setBytes(bytes);
         deployment.addResource(resource);
+        return this;
+    }
+    
+    @Override
+    public AppDeploymentBuilder addZipInputStream(ZipInputStream zipInputStream) {
+        try {
+            ZipEntry entry = zipInputStream.getNextEntry();
+            while (entry != null) {
+                if (!entry.isDirectory()) {
+                    String entryName = entry.getName();
+                    byte[] bytes = IoUtil.readInputStream(zipInputStream, entryName);
+                    AppResourceEntity resource = resourceEntityManager.create();
+                    resource.setName(entryName);
+                    resource.setBytes(bytes);
+                    deployment.addResource(resource);
+                }
+                entry = zipInputStream.getNextEntry();
+            }
+        } catch (Exception e) {
+            throw new FlowableException("problem reading zip input stream", e);
+        }
         return this;
     }
 

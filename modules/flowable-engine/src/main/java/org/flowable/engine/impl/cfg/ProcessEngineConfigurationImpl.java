@@ -431,7 +431,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Dynamic state manager
     
     protected DynamicStateManager dynamicStateManager;
-
+    
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)

@@ -46,7 +46,7 @@ public class DmnDeployer implements EngineDeployer {
                 LOGGER.info("DmnDeployer: processing resource {}", resourceName);
                 if (dmnDeploymentBuilder == null) {
                     DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
-                    dmnDeploymentBuilder = dmnRepositoryService.createDeployment();
+                    dmnDeploymentBuilder = dmnRepositoryService.createDeployment().name(deployment.getName());
                 }
 
                 dmnDeploymentBuilder.addDmnBytes(resourceName, resources.get(resourceName).getBytes());

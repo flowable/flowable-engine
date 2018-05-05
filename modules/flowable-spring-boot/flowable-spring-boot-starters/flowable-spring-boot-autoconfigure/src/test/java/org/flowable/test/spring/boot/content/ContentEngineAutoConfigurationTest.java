@@ -21,13 +21,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.content.ContentEngineAutoConfiguration;
 import org.flowable.spring.boot.content.ContentEngineServicesAutoConfiguration;
 import org.junit.Test;
@@ -60,10 +67,11 @@ public class ContentEngineAutoConfigurationTest {
         AnnotationConfigApplicationContext context = this.context(
             DataSourceAutoConfiguration.class,
             DataSourceTransactionManagerAutoConfiguration.class,
-            ContentEngineAutoConfiguration.class,
             HibernateJpaAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
+            ContentEngineAutoConfiguration.class,
             ContentEngineServicesAutoConfiguration.class
         );
 
@@ -77,6 +85,44 @@ public class ContentEngineAutoConfigurationTest {
         assertThat(contentEngine.getContentEngineConfiguration()).as("Content Engine Configuration").isEqualTo(contentProcessConfigurationApi);
 
         assertAllServicesPresent(context, contentEngine);
+    }
+    
+    @Test
+    public void contentEngineWithBasicDataSourceAndAppEngine() {
+        AnnotationConfigApplicationContext context = this.context(
+            DataSourceAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
+            HibernateJpaAutoConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            AppEngineServicesAutoConfiguration.class,
+            AppEngineAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class,
+            ContentEngineAutoConfiguration.class,
+            ContentEngineServicesAutoConfiguration.class
+        );
+
+        AppEngine appEngine = context.getBean(AppEngine.class);
+        assertThat(appEngine).as("App engine").isNotNull();
+        ContentEngineConfigurationApi contentProcessConfigurationApi = contentEngine(appEngine);
+
+        ContentEngine contentEngine = context.getBean(ContentEngine.class);
+        assertThat(contentEngine).as("Content engine").isNotNull();
+
+        assertThat(contentEngine.getContentEngineConfiguration()).as("Content Engine Configuration").isEqualTo(contentProcessConfigurationApi);
+
+        assertAllServicesPresent(context, contentEngine);
+        
+        List<AppDeployment> appDeployments = appEngine.getAppRepositoryService().createDeploymentQuery().list();
+        for (AppDeployment appDeployment : appDeployments) {
+            appEngine.getAppRepositoryService().deleteDeployment(appDeployment.getId(), true);
+        }
+        
+        ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+        List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
+        for (Deployment deployment : deployments) {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
     }
 
     private void assertAllServicesPresent(AnnotationConfigApplicationContext context, ContentEngine contentEngine) {
@@ -105,5 +151,10 @@ public class ContentEngineAutoConfigurationTest {
     private static ContentEngineConfigurationApi contentEngine(ProcessEngine processEngine) {
         ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
         return EngineServiceUtil.getContentEngineConfiguration(processEngineConfiguration);
+    }
+    
+    private static ContentEngineConfigurationApi contentEngine(AppEngine appEngine) {
+        AppEngineConfiguration appEngineConfiguration = appEngine.getAppEngineConfiguration();
+        return EngineServiceUtil.getContentEngineConfiguration(appEngineConfiguration);
     }
 }

@@ -46,7 +46,7 @@ public class BpmnDeployer implements EngineDeployer {
                 LOGGER.info("BpmnDeployer: processing resource {}", resourceName);
                 if (bpmnDeploymentBuilder == null) {
                     RepositoryService repositoryService = CommandContextUtil.getProcessEngineConfiguration().getRepositoryService();
-                    bpmnDeploymentBuilder = repositoryService.createDeployment();
+                    bpmnDeploymentBuilder = repositoryService.createDeployment().name(deployment.getName());
                 }
                 bpmnDeploymentBuilder.addBytes(resourceName, resources.get(resourceName).getBytes());
             }

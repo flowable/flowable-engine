@@ -1141,6 +1141,10 @@
 				<module>modules/flowable-bpmn-layout</module>
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
+                <module>modules/flowable-engine-configurator</module>
+                <module>modules/flowable-spring-configurator</module>
+                <module>modules/flowable-app-engine-spring</module>
+                <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-json-converter</module>
 				<module>modules/flowable-dmn-xml-converter</module>
@@ -1263,6 +1267,10 @@
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-form-json-converter</module>
+                <module>modules/flowable-engine-configurator</module>
+                <module>modules/flowable-spring-configurator</module>
+                <module>modules/flowable-app-engine-spring</module>
+                <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-form-engine</module>
 				<module>modules/flowable-form-engine-configurator</module>
 				<module>modules/flowable-form-spring</module>
@@ -1346,8 +1354,12 @@
 				<module>modules/flowable-bpmn-layout</module>
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
+                <module>modules/flowable-engine-configurator</module>
+                <module>modules/flowable-spring-configurator</module>
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
+                <module>modules/flowable-app-engine-spring</module>
+                <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-json-converter</module>
 				<module>modules/flowable-dmn-xml-converter</module>

@@ -12,6 +12,9 @@
  */
 package org.flowable.spring.boot.cmmn;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.flowable.app.engine.AppEngine;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
@@ -19,13 +22,16 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
+import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
-import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -46,7 +52,8 @@ import org.springframework.context.annotation.Configuration;
 })
 @AutoConfigureAfter({
     CmmnEngineAutoConfiguration.class,
-    ProcessEngineAutoConfiguration.class
+    AppEngineServicesAutoConfiguration.class,
+    ProcessEngineServicesAutoConfiguration.class
 })
 public class CmmnEngineServicesAutoConfiguration {
 
@@ -103,15 +110,26 @@ public class CmmnEngineServicesAutoConfiguration {
     @Configuration
     @ConditionalOnMissingBean(type = {
         "org.flowable.cmmn.engine.CmmnEngine",
-        "org.flowable.engine.ProcessEngine"
+        "org.flowable.engine.ProcessEngine",
+        "org.flowable.app.engine.AppEngine",
     })
     static class StandaloneEngineConfiguration {
+        
+        protected List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
         @Bean
-        public CmmnEngineFactoryBean cmmnEngine(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        public CmmnEngineFactoryBean cmmnEngine(SpringCmmnEngineConfiguration cmmnEngineConfiguration) {
             CmmnEngineFactoryBean factory = new CmmnEngineFactoryBean();
             factory.setCmmnEngineConfiguration(cmmnEngineConfiguration);
+            
+            engineConfigurers.forEach(configurer -> configurer.configure(cmmnEngineConfiguration));
+            
             return factory;
+        }
+        
+        @Autowired(required = false)
+        public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers) {
+            this.engineConfigurers = engineConfigurers;
         }
     }
 

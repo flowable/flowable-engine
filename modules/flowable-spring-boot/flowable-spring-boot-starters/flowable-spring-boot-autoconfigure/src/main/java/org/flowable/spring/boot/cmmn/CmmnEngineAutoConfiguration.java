@@ -19,7 +19,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
@@ -31,7 +30,8 @@ import org.flowable.spring.boot.FlowableJobConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.condition.ConditionalNoAppEngine;
+import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
+import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
@@ -41,7 +41,7 @@ import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -62,13 +62,13 @@ import org.springframework.transaction.PlatformTransactionManager;
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableIdmProperties.class,
-    FlowableCmmnProperties.class
+    FlowableCmmnProperties.class,
+    FlowableAppProperties.class
 })
 @AutoConfigureAfter({
     FlowableTransactionAutoConfiguration.class,
-})
-@AutoConfigureBefore({
-    ProcessEngineAutoConfiguration.class
+    AppEngineAutoConfiguration.class,
+    ProcessEngineAutoConfiguration.class,
 })
 @Import({
     FlowableJobConfiguration.class
@@ -77,7 +77,6 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
-    protected List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties) {
         super(flowableProperties);
@@ -110,6 +109,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
         @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider)
         throws IOException {
+        
         SpringCmmnEngineConfiguration configuration = new SpringCmmnEngineConfiguration();
 
         List<Resource> resources = this.discoverDeploymentResources(
@@ -142,15 +142,18 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
 
-        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
-
         return configuration;
     }
 
     @Configuration
     @ConditionalOnProcessEngine
-    @ConditionalNoAppEngine
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.app.spring.SpringAppEngineConfiguration"
+    })
     public static class CmmnEngineProcessConfiguration {
+        
+        @Autowired(required = false)
+        private List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
         @Bean
         @ConditionalOnMissingBean(name = "cmmnProcessEngineConfigurationConfigurer")
@@ -161,16 +164,25 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         @Bean
         @ConditionalOnMissingBean
-        public CmmnEngineConfigurator cmmnEngineConfigurator(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        public CmmnEngineConfigurator cmmnEngineConfigurator(SpringCmmnEngineConfiguration cmmnEngineConfiguration) {
             SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
+            
+            engineConfigurers.forEach(configurer -> configurer.configure(cmmnEngineConfiguration));
+            
             return cmmnEngineConfigurator;
         }
     }
     
     @Configuration
     @ConditionalOnAppEngine
+    @ConditionalOnBean(type = {
+        "org.flowable.app.spring.SpringAppEngineConfiguration"
+    })
     public static class CmmnEngineAppConfiguration {
+        
+        @Autowired(required = false)
+        private List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
         @Bean
         @ConditionalOnMissingBean(name = "cmmnAppEngineConfigurationConfigurer")
@@ -180,15 +192,13 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         @Bean
         @ConditionalOnMissingBean
-        public CmmnEngineConfigurator cmmnEngineConfigurator(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        public CmmnEngineConfigurator cmmnEngineConfigurator(SpringCmmnEngineConfiguration cmmnEngineConfiguration) {
             SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
+            
+            engineConfigurers.forEach(configurer -> configurer.configure(cmmnEngineConfiguration));
+            
             return cmmnEngineConfigurator;
         }
-    }
-
-    @Autowired(required = false)
-    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers) {
-        this.engineConfigurers = engineConfigurers;
     }
 }

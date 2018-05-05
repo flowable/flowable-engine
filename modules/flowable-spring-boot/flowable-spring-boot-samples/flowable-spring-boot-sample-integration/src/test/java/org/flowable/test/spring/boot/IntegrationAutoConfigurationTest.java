@@ -13,6 +13,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.integration.FlowableInboundGateway;
 import org.flowable.spring.integration.IntegrationActivityBehavior;
 import org.junit.Assert;
@@ -120,6 +121,7 @@ public class IntegrationAutoConfigurationTest {
     @Configuration
     @Import({ DataSourceAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
             IntegrationAutoConfiguration.class })
     public static class BaseConfiguration {

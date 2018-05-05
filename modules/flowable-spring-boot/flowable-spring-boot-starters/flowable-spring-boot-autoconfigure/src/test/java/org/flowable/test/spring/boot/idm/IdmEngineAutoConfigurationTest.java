@@ -21,13 +21,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.junit.Test;
@@ -63,6 +70,7 @@ public class IdmEngineAutoConfigurationTest {
             IdmEngineAutoConfiguration.class,
             HibernateJpaAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
             IdmEngineServicesAutoConfiguration.class
         );
@@ -77,6 +85,44 @@ public class IdmEngineAutoConfigurationTest {
         assertThat(idmEngine.getIdmEngineConfiguration()).as("Idm Engine Configuration").isEqualTo(idmProcessConfiguration);
 
         assertAllServicesPresent(context, idmEngine);
+    }
+    
+    @Test
+    public void idmEngineWithBasicDataSourceAndAppEngine() {
+        AnnotationConfigApplicationContext context = this.context(
+            DataSourceAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
+            HibernateJpaAutoConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            AppEngineServicesAutoConfiguration.class,
+            AppEngineAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class,
+            IdmEngineAutoConfiguration.class,
+            IdmEngineServicesAutoConfiguration.class
+        );
+
+        AppEngine appEngine = context.getBean(AppEngine.class);
+        assertThat(appEngine).as("App engine").isNotNull();
+        IdmEngineConfiguration idmProcessConfiguration = idmEngine(appEngine);
+
+        IdmEngine idmEngine = context.getBean(IdmEngine.class);
+        assertThat(idmEngine).as("Idm engine").isNotNull();
+
+        assertThat(idmEngine.getIdmEngineConfiguration()).as("Idm Engine Configuration").isEqualTo(idmProcessConfiguration);
+
+        assertAllServicesPresent(context, idmEngine);
+        
+        List<AppDeployment> appDeployments = appEngine.getAppRepositoryService().createDeploymentQuery().list();
+        for (AppDeployment appDeployment : appDeployments) {
+            appEngine.getAppRepositoryService().deleteDeployment(appDeployment.getId(), true);
+        }
+        
+        ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+        List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
+        for (Deployment deployment : deployments) {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
     }
 
     private void assertAllServicesPresent(AnnotationConfigApplicationContext context, IdmEngine idmEngine) {
@@ -105,5 +151,10 @@ public class IdmEngineAutoConfigurationTest {
     private static IdmEngineConfiguration idmEngine(ProcessEngine processEngine) {
         ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
         return EngineServiceUtil.getIdmEngineConfiguration(processEngineConfiguration);
+    }
+    
+    private static IdmEngineConfiguration idmEngine(AppEngine appEngine) {
+        AppEngineConfiguration appEngineConfiguration = appEngine.getAppEngineConfiguration();
+        return EngineServiceUtil.getIdmEngineConfiguration(appEngineConfiguration);
     }
 }

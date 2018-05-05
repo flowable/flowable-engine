@@ -6,6 +6,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -22,6 +23,7 @@ public class ProcessEngineAutoConfigurationTest {
         AnnotationConfigApplicationContext context = this.context(DataSourceAutoConfiguration.class,
                 HibernateJpaAutoConfiguration.class,
                 FlowableTransactionAutoConfiguration.class,
+                ProcessEngineServicesAutoConfiguration.class,
                 ProcessEngineAutoConfiguration.class
         );
         Assert.assertNotNull("entityManagerFactory should not be null", context.getBean(EntityManagerFactory.class));

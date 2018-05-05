@@ -12,18 +12,25 @@
  */
 package org.flowable.spring.boot.dmn;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.app.engine.AppEngine;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.spring.DmnEngineFactoryBean;
+import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
-import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -44,7 +51,8 @@ import org.springframework.context.annotation.Configuration;
 })
 @AutoConfigureAfter({
     DmnEngineAutoConfiguration.class,
-    ProcessEngineAutoConfiguration.class
+    AppEngineServicesAutoConfiguration.class,
+    ProcessEngineServicesAutoConfiguration.class
 })
 public class DmnEngineServicesAutoConfiguration {
 
@@ -54,7 +62,8 @@ public class DmnEngineServicesAutoConfiguration {
      */
     @Configuration
     @ConditionalOnMissingBean(type = {
-        "org.flowable.dmn.engine.DmnEngine"
+        "org.flowable.dmn.engine.DmnEngine",
+        "org.flowable.app.engine.AppEngine"
     })
     @ConditionalOnBean(type = {
         "org.flowable.engine.ProcessEngine"
@@ -69,6 +78,29 @@ public class DmnEngineServicesAutoConfiguration {
             return DmnEngines.getDefaultDmnEngine();
         }
     }
+    
+    /**
+     * If an app engine is present that means that the DmnEngine was created as part of the app engine.
+     * Therefore extract it from the DmnEngines.
+     */
+    @Configuration
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.dmn.engine.DmnEngine"
+    })
+    @ConditionalOnBean(type = {
+        "org.flowable.app.engine.AppEngine"
+    })
+    static class AlreadyInitializedAppEngineConfiguration {
+
+        @Bean
+        public DmnEngine dmnEngine(@SuppressWarnings("unused") AppEngine appEngine) {
+            // The app engine needs to be injected, as otherwise it won't be initialized, which means that the DmnEngine is not initialized yet
+            if (!DmnEngines.isInitialized()) {
+                throw new IllegalStateException("DMN engine has not been initialized");
+            }
+            return DmnEngines.getDefaultDmnEngine();
+        }
+    }
 
     /**
      * If there is no process engine configuration, then trigger a creation of the dmn engine.
@@ -76,15 +108,26 @@ public class DmnEngineServicesAutoConfiguration {
     @Configuration
     @ConditionalOnMissingBean(type = {
         "org.flowable.dmn.engine.DmnEngine",
-        "org.flowable.engine.ProcessEngine"
+        "org.flowable.engine.ProcessEngine",
+        "org.flowable.app.engine.AppEngine"
     })
     static class StandaloneEngineConfiguration {
+        
+        protected List<EngineConfigurationConfigurer<SpringDmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
         @Bean
-        public DmnEngineFactoryBean dmnEngine(DmnEngineConfiguration dmnEngineConfiguration) {
+        public DmnEngineFactoryBean dmnEngine(SpringDmnEngineConfiguration dmnEngineConfiguration) {
             DmnEngineFactoryBean factory = new DmnEngineFactoryBean();
             factory.setDmnEngineConfiguration(dmnEngineConfiguration);
+            
+            engineConfigurers.forEach(configurer -> configurer.configure(dmnEngineConfiguration));
+            
             return factory;
+        }
+        
+        @Autowired(required = false)
+        public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringDmnEngineConfiguration>> engineConfigurers) {
+            this.engineConfigurers = engineConfigurers;
         }
     }
 

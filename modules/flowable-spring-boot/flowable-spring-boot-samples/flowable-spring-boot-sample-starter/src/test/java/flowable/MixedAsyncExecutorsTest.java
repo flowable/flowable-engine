@@ -16,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.engine.test.FlowableAppRule;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -48,13 +50,20 @@ public class MixedAsyncExecutorsTest {
     @Rule
     @Autowired
     public FlowableCmmnRule cmmnRule;
+    
+    @Rule
+    @Autowired
+    public FlowableAppRule appRule;
+    
     private CmmnRuntimeService cmmnRuntimeService;
     private CmmnTaskService cmmnTaskService;
+    private AppRepositoryService appRepositoryService;
 
     @Before
     public void setUp() {
         cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
         cmmnTaskService = cmmnRule.getCmmnEngine().getCmmnTaskService();
+        appRepositoryService = appRule.getAppRepositoryService();
     }
 
     @CmmnDeployment(resources = "stageAfterTimer.cmmn")
@@ -84,6 +93,11 @@ public class MixedAsyncExecutorsTest {
         // User task should be active after the timer has triggered
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
         assertThat(processRule.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+    }
+    
+    @Test
+    public void testAppDefinitions() {
+        assertThat(appRepositoryService.createAppDefinitionQuery().count()).isEqualTo(0);
     }
 
     protected void setClockTo(Date time) {

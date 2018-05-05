@@ -12,16 +12,23 @@
  */
 package org.flowable.spring.boot.content;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.app.engine.AppEngine;
 import org.flowable.content.api.ContentManagementService;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.ContentEngine;
-import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.ContentEngines;
 import org.flowable.content.spring.ContentEngineFactoryBean;
+import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
-import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnContentEngine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -42,7 +49,8 @@ import org.springframework.context.annotation.Configuration;
 })
 @AutoConfigureAfter({
     ContentEngineAutoConfiguration.class,
-    ProcessEngineAutoConfiguration.class
+    AppEngineServicesAutoConfiguration.class,
+    ProcessEngineServicesAutoConfiguration.class
 })
 public class ContentEngineServicesAutoConfiguration {
 
@@ -52,16 +60,40 @@ public class ContentEngineServicesAutoConfiguration {
      */
     @Configuration
     @ConditionalOnMissingBean(type = {
-        "org.flowable.content.engine.ContentEngine"
+        "org.flowable.content.engine.ContentEngine",
+        "org.flowable.app.engine.AppEngine"
     })
     @ConditionalOnBean(type = {
         "org.flowable.engine.ProcessEngine"
     })
-    static class AlreadyInitializedConfiguration {
+    static class AlreadyInitializedEngineConfiguration {
 
         @Bean
         public ContentEngine contentEngine(@SuppressWarnings("unused") ProcessEngine processEngine) {
             // The process engine needs to be injected, as otherwise it won't be initialized, which means that the ContentEngine is not initialized yet
+            if (!ContentEngines.isInitialized()) {
+                throw new IllegalStateException("Content engine has not been initialized");
+            }
+            return ContentEngines.getDefaultContentEngine();
+        }
+    }
+    
+    /**
+     * If an app engine is present that means that the ContentEngine was created as part of it.
+     * Therefore extract it from the ContentEngines.
+     */
+    @Configuration
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.content.engine.ContentEngine",
+    })
+    @ConditionalOnBean(type = {
+        "org.flowable.app.engine.AppEngine"
+    })
+    static class AlreadyInitializedAppEngineConfiguration {
+
+        @Bean
+        public ContentEngine contentEngine(@SuppressWarnings("unused") AppEngine appEngine) {
+            // The app engine needs to be injected, as otherwise it won't be initialized, which means that the ContentEngine is not initialized yet
             if (!ContentEngines.isInitialized()) {
                 throw new IllegalStateException("Content engine has not been initialized");
             }
@@ -75,15 +107,26 @@ public class ContentEngineServicesAutoConfiguration {
     @Configuration
     @ConditionalOnMissingBean(type = {
         "org.flowable.content.engine.ContentEngine",
-        "org.flowable.engine.ProcessEngine"
+        "org.flowable.engine.ProcessEngine",
+        "org.flowable.app.engine.AppEngine"
     })
     static class StandaloneConfiguration {
+        
+        protected List<EngineConfigurationConfigurer<SpringContentEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
         @Bean
-        public ContentEngineFactoryBean contentEngine(ContentEngineConfiguration contentEngineConfiguration) {
+        public ContentEngineFactoryBean contentEngine(SpringContentEngineConfiguration contentEngineConfiguration) {
             ContentEngineFactoryBean factory = new ContentEngineFactoryBean();
             factory.setContentEngineConfiguration(contentEngineConfiguration);
+            
+            engineConfigurers.forEach(configurer -> configurer.configure(contentEngineConfiguration));
+            
             return factory;
+        }
+        
+        @Autowired(required = false)
+        public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringContentEngineConfiguration>> engineConfigurers) {
+            this.engineConfigurers = engineConfigurers;
         }
     }
 

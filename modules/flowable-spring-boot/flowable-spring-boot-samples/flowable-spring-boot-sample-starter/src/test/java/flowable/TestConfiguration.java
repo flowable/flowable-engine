@@ -12,6 +12,8 @@
  */
 package flowable;
 
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.test.FlowableAppRule;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.flowable.engine.ProcessEngine;
@@ -33,5 +35,10 @@ public class TestConfiguration {
     @Bean
     public FlowableCmmnRule flowableCmmnRule(CmmnEngine cmmnEngine) {
         return new FlowableCmmnRule(cmmnEngine);
+    }
+    
+    @Bean
+    public FlowableAppRule flowableAppRule(AppEngine appEngine) {
+        return new FlowableAppRule(appEngine);
     }
 }

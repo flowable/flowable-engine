@@ -12,6 +12,8 @@
  */
 package org.flowable.spring.boot;
 
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.rest.AppRestUrls;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
@@ -26,6 +28,9 @@ import org.flowable.form.rest.FormRestUrls;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.spring.boot.app.AppEngineRestConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.cmmn.CmmnEngineRestConfiguration;
 import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.cmmn.FlowableCmmnProperties;
@@ -48,7 +53,6 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -69,7 +73,8 @@ import org.springframework.context.annotation.Configuration;
     //FIXME in order to support both 1.5.x and 2.0 we can't use MultipartAutoConfiguration (the package is changed)
     //MultipartAutoConfiguration.class,
     SecurityAutoConfiguration.class,
-    ProcessEngineAutoConfiguration.class,
+    AppEngineServicesAutoConfiguration.class,
+    ProcessEngineServicesAutoConfiguration.class,
     CmmnEngineServicesAutoConfiguration.class,
     ContentEngineServicesAutoConfiguration.class,
     DmnEngineServicesAutoConfiguration.class,
@@ -94,6 +99,17 @@ public class RestApiAutoConfiguration {
     public ContentTypeResolver contentTypeResolver() {
         ContentTypeResolver resolver = new DefaultContentTypeResolver();
         return resolver;
+    }
+    
+    @Configuration
+    @ConditionalOnClass(AppRestUrls.class)
+    @ConditionalOnBean(AppEngine.class)
+    public static class AppEngineRestApiConfiguration extends BaseRestApiConfiguration {
+
+        @Bean
+        public ServletRegistrationBean appServlet(FlowableAppProperties properties) {
+            return registerServlet(properties.getServlet(), AppEngineRestConfiguration.class);
+        }
     }
 
     @Configuration

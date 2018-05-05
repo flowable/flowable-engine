@@ -1,1 +1,1 @@
-provides: flowable-cmmn-spring-configurator,flowable-dmn-spring-configurator,flowable-form-spring-configurator,flowable-content-spring-configurator
+provides: flowable-spring-configurator,flowable-cmmn-spring-configurator,flowable-dmn-spring-configurator,flowable-form-spring-configurator,flowable-content-spring-configurator

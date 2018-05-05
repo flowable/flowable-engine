@@ -12,6 +12,9 @@
  */
 package org.flowable.spring.boot.app;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -21,6 +24,23 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
  */
 @ConfigurationProperties(prefix = "flowable.app")
 public class FlowableAppProperties {
+    
+    /**
+     * The location where the App resources are located.
+     * Default is {@code classpath*:/apps/}
+     */
+    private String resourceLocation = "classpath*:/apps/";
+
+    /**
+     * The suffixes for the resources that need to be scanned.
+     * Default is {@code **.zip, **.bar}
+     */
+    private List<String> resourceSuffixes = Arrays.asList("**.zip", "**.bar");
+
+    /**
+     * Whether to perform deployment of resources, default is {@code true}.
+     */
+    private boolean deployResources = true;
 
     /**
      * The servlet configuration for the Process Rest API.
@@ -30,5 +50,42 @@ public class FlowableAppProperties {
     
     public FlowableServlet getServlet() {
         return servlet;
+    }
+    
+    /**
+     * Whether the App engine needs to be started.
+     */
+    private boolean enabled = true;
+    
+    public String getResourceLocation() {
+        return resourceLocation;
+    }
+
+    public void setResourceLocation(String resourceLocation) {
+        this.resourceLocation = resourceLocation;
+    }
+
+    public List<String> getResourceSuffixes() {
+        return resourceSuffixes;
+    }
+
+    public void setResourceSuffixes(List<String> resourceSuffixes) {
+        this.resourceSuffixes = resourceSuffixes;
+    }
+
+    public boolean isDeployResources() {
+        return deployResources;
+    }
+
+    public void setDeployResources(boolean deployResources) {
+        this.deployResources = deployResources;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -14,6 +14,7 @@ package org.flowable.app.rest.service.api.repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -117,10 +118,10 @@ public class AppDeploymentCollectionResource {
     }
 
     @ApiOperation(value = "Create a new app deployment", tags = {
-            "App Deployments" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. Make sure the file-name ends with .form or .xml.")
+            "App Deployments" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. Make sure the file-name ends with .app, .zip or .bar.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the app deployment was created."),
-            @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for form deployment. The status-description contains additional information.")
+            @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for app deployment. The status-description contains additional information.")
     })
     @ApiImplicitParams({
         @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
@@ -143,12 +144,14 @@ public class AppDeploymentCollectionResource {
         try {
             AppDeploymentBuilder deploymentBuilder = appRepositoryService.createDeployment();
             String fileName = file.getOriginalFilename();
-            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".form"))) {
+            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".app") || fileName.toLowerCase().endsWith(".bar") || fileName.toLowerCase().endsWith(".zip"))) {
                 fileName = file.getName();
             }
 
             if (fileName.endsWith(".app")) {
                 deploymentBuilder.addInputStream(fileName, file.getInputStream());
+            } else if (fileName.toLowerCase().endsWith(".bar") || fileName.toLowerCase().endsWith(".zip")) {
+                deploymentBuilder.addZipInputStream(new ZipInputStream(file.getInputStream()));
             } else {
                 throw new FlowableIllegalArgumentException("File must be of type .app");
             }

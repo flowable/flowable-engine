@@ -20,11 +20,12 @@ import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
+import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
@@ -35,6 +36,7 @@ import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -58,26 +60,29 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableProperties.class,
     FlowableMailProperties.class,
     FlowableProcessProperties.class,
+    FlowableAppProperties.class,
     FlowableIdmProperties.class
 })
 @AutoConfigureAfter({
-    FlowableTransactionAutoConfiguration.class
+    FlowableTransactionAutoConfiguration.class,
+    AppEngineAutoConfiguration.class,
 })
 @Import({
     FlowableJobConfiguration.class
 })
 public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
-    @Autowired(required = false)
-    private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> processEngineConfigurationConfigurers = new ArrayList<>();
     protected final FlowableProcessProperties processProperties;
+    protected final FlowableAppProperties appProperties;
     protected final FlowableIdmProperties idmProperties;
     protected final FlowableMailProperties mailProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
-        FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties) {
+                    FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties) {
+        
         super(flowableProperties);
         this.processProperties = processProperties;
+        this.appProperties = appProperties;
         this.idmProperties = idmProperties;
         this.mailProperties = mailProperties;
     }
@@ -150,14 +155,18 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setIdGenerator(new StrongUuidGenerator());
 
-        processEngineConfigurationConfigurers.forEach(configurator -> configurator.configure(conf));
-
         return conf;
     }
     
     @Configuration
     @ConditionalOnAppEngine
+    @ConditionalOnBean(type = {
+        "org.flowable.app.spring.SpringAppEngineConfiguration"
+    })
     public static class ProcessEngineAppConfiguration {
+        
+        @Autowired(required = false)
+        private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
         @Bean
         @ConditionalOnMissingBean(name = "processAppEngineConfigurationConfigurer")
@@ -167,9 +176,14 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         @Bean
         @ConditionalOnMissingBean
-        public ProcessEngineConfigurator processEngineConfigurator(ProcessEngineConfiguration processEngineConfiguration) {
+        public ProcessEngineConfigurator processEngineConfigurator(SpringProcessEngineConfiguration processEngineConfiguration) {
             SpringProcessEngineConfigurator processEngineConfigurator = new SpringProcessEngineConfigurator();
             processEngineConfigurator.setProcessEngineConfiguration(processEngineConfiguration);
+            
+            processEngineConfiguration.setDisableIdmEngine(true);
+            
+            engineConfigurers.forEach(configurer -> configurer.configure(processEngineConfiguration));
+            
             return processEngineConfigurator;
         }
     }
