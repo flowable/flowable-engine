@@ -14,6 +14,7 @@ package org.flowable.test.spring.boot.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDeployments;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,6 +29,7 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.ProcessEngine;
@@ -36,6 +38,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
@@ -45,16 +48,15 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
+import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -71,12 +73,16 @@ public class ProcessEngineAutoConfigurationTest {
             DataSourceAutoConfiguration.class,
             TransactionAutoConfiguration.class
         ))
+        .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class)
         .withClassLoader(new FilteredClassLoader(EntityManagerFactory.class));
 
     @Test
     public void standaloneProcessEngineWithBasicDatasource() {
         contextRunner.run(context -> {
             assertThat(context).as("Process engine").hasSingleBean(ProcessEngine.class);
+            assertThat(context)
+                .doesNotHaveBean(AppEngine.class)
+                .doesNotHaveBean("processAppEngineConfigurationConfigurer");
 
             ProcessEngine processEngine = context.getBean(ProcessEngine.class);
 
@@ -84,49 +90,56 @@ public class ProcessEngineAutoConfigurationTest {
 
             assertAllServicesPresent(context, processEngine);
             assertAutoDeployment(context);
-            
-            List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
-            for (Deployment deployment : deployments) {
-                processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-            }
+
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringProcessEngineConfiguration.class
+                        );
+                });
+
+            deleteDeployments(processEngine);
         });
     }
     
     @Test
     public void processEngineWithBasicDataSourceAndAppEngine() {
-        AnnotationConfigApplicationContext context = this.context(
-            DataSourceAutoConfiguration.class,
+        contextRunner.withConfiguration(AutoConfigurations.of(
             DataSourceTransactionManagerAutoConfiguration.class,
-            HibernateJpaAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,
             AppEngineServicesAutoConfiguration.class,
             AppEngineAutoConfiguration.class,
-            ProcessEngineServicesAutoConfiguration.class,
-            ProcessEngineAutoConfiguration.class,
             IdmEngineAutoConfiguration.class,
             IdmEngineServicesAutoConfiguration.class
-        );
+        )).run(context -> {
+            assertThat(context).hasBean("processAppEngineConfigurationConfigurer");
+            AppEngine appEngine = context.getBean(AppEngine.class);
+            assertThat(appEngine).as("App engine").isNotNull();
+            ProcessEngineConfiguration processConfiguration = processEngine(appEngine);
 
-        AppEngine appEngine = context.getBean(AppEngine.class);
-        assertThat(appEngine).as("App engine").isNotNull();
-        ProcessEngineConfiguration processConfiguration = processEngine(appEngine);
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+            assertThat(processEngine.getProcessEngineConfiguration()).as("Proccess Engine Configuration").isEqualTo(processConfiguration);
+            assertThat(processEngine).as("Process engine").isNotNull();
 
-        ProcessEngine processEngine = context.getBean(ProcessEngine.class);
-        assertThat(processEngine.getProcessEngineConfiguration()).as("Proccess Engine Configuration").isEqualTo(processConfiguration);
-        assertThat(processEngine).as("Process engine").isNotNull();
+            assertAllServicesPresent(context, processEngine);
+            assertAutoDeploymentWithAppEngine(context);
 
-        assertAllServicesPresent(context, processEngine);
-        assertAutoDeploymentWithAppEngine(context);
-        
-        List<AppDeployment> appDeployments = appEngine.getAppRepositoryService().createDeploymentQuery().list();
-        for (AppDeployment appDeployment : appDeployments) {
-            appEngine.getAppRepositoryService().deleteDeployment(appDeployment.getId(), true);
-        }
-        
-        List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
-        for (Deployment deployment : deployments) {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-        }
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringProcessEngineConfiguration.class,
+                            SpringIdmEngineConfiguration.class,
+                            SpringAppEngineConfiguration.class
+                        );
+                });
+
+            deleteDeployments(appEngine);
+            deleteDeployments(processEngine);
+        });
     }
 
     @Test
@@ -227,12 +240,5 @@ public class ProcessEngineAutoConfigurationTest {
         public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> customIdGeneratorConfigurer() {
             return engineConfiguration -> engineConfiguration.setIdGenerator(new DbIdGenerator());
         }
-    }
-    
-    private AnnotationConfigApplicationContext context(Class<?>... clazz) {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext();
-        annotationConfigApplicationContext.register(clazz);
-        annotationConfigApplicationContext.refresh();
-        return annotationConfigApplicationContext;
     }
 }

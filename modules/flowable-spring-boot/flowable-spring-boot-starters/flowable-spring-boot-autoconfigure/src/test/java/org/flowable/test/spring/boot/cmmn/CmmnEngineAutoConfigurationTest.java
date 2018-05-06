@@ -14,6 +14,7 @@ package org.flowable.test.spring.boot.cmmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDeployments;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,15 +27,18 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
-import org.flowable.engine.repository.Deployment;
+import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -44,133 +48,143 @@ import org.flowable.spring.boot.cmmn.CmmnEngineAutoConfiguration;
 import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
-import org.junit.After;
+import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.Test;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.test.context.FilteredClassLoader;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Filip Hrisafov
  */
 public class CmmnEngineAutoConfigurationTest {
-    
-    protected AnnotationConfigApplicationContext context;
-    
-    @After
-    public void deleteDeployments() {
-        CmmnRepositoryService repositoryService = context.getBean(CmmnRepositoryService.class);
-        List<CmmnDeployment> cmmnDeployments = repositoryService.createDeploymentQuery().list();
-        for (CmmnDeployment cmmnDeployment : cmmnDeployments) {
-            repositoryService.deleteDeployment(cmmnDeployment.getId(), true);
-        }
-    }
 
-    @Test
-    public void standaloneCmmnEngineWithBasicDataSource() {
-        context = this.context(
+    private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+        .withConfiguration(AutoConfigurations.of(
             DataSourceAutoConfiguration.class,
             DataSourceTransactionManagerAutoConfiguration.class,
             IdmEngineAutoConfiguration.class,
+            IdmEngineServicesAutoConfiguration.class,
             CmmnEngineServicesAutoConfiguration.class,
-            CmmnEngineAutoConfiguration.class,
-            IdmEngineServicesAutoConfiguration.class
-        );
+            CmmnEngineAutoConfiguration.class
+        ))
+        .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class);
 
-        CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
-        assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
+    @Test
+    public void standaloneCmmnEngineWithBasicDataSource() {
+        contextRunner.run(context -> {
+            assertThat(context)
+                .doesNotHaveBean(AppEngine.class)
+                .doesNotHaveBean(ProcessEngine.class)
+                .doesNotHaveBean("cmmnProcessEngineConfigurationConfigurer")
+                .doesNotHaveBean("cmmnAppEngineConfigurationConfigurer");
+            CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+            assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
 
-        assertAllServicesPresent(context, cmmnEngine);
+            assertAllServicesPresent(context, cmmnEngine);
 
-        assertAutoDeployment(context);
+            assertAutoDeployment(context);
+
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringCmmnEngineConfiguration.class,
+                            SpringIdmEngineConfiguration.class
+                        );
+                });
+
+            deleteDeployments(cmmnEngine);
+        });
     }
 
     @Test
     public void cmmnEngineWithBasicDataSourceAndProcessEngine() {
-        context = this
-            .context(
-                DataSourceAutoConfiguration.class,
-                DataSourceTransactionManagerAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class,
-                FlowableTransactionAutoConfiguration.class,
-                CmmnEngineAutoConfiguration.class,
-                IdmEngineAutoConfiguration.class,
-                ProcessEngineServicesAutoConfiguration.class,
-                ProcessEngineAutoConfiguration.class,
-                IdmEngineServicesAutoConfiguration.class,
-                CmmnEngineServicesAutoConfiguration.class
-            );
+        contextRunner.withConfiguration(AutoConfigurations.of(
+            HibernateJpaAutoConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class
+        )).run(context -> {
+            assertThat(context)
+                .doesNotHaveBean(AppEngine.class)
+                .hasBean("cmmnProcessEngineConfigurationConfigurer")
+                .doesNotHaveBean("cmmnAppEngineConfigurationConfigurer");
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+            assertThat(processEngine).as("Process engine").isNotNull();
+            CmmnEngineConfigurationApi cmmnProcessConfigurationApi = cmmnEngine(processEngine);
 
-        ProcessEngine processEngine = context.getBean(ProcessEngine.class);
-        assertThat(processEngine).as("Process engine").isNotNull();
-        CmmnEngineConfigurationApi cmmnProcessConfigurationApi = cmmnEngine(processEngine);
+            CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+            assertThat(cmmnEngine.getCmmnEngineConfiguration()).as("Cmmn Engine Configuration").isEqualTo(cmmnProcessConfigurationApi);
+            assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
 
-        CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
-        assertThat(cmmnEngine.getCmmnEngineConfiguration()).as("Cmmn Engine Configuration").isEqualTo(cmmnProcessConfigurationApi);
-        assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
+            assertAllServicesPresent(context, cmmnEngine);
+            assertAutoDeployment(context);
 
-        assertAllServicesPresent(context, cmmnEngine);
-        assertAutoDeployment(context);
-        
-        List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
-        for (Deployment deployment : deployments) {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-        }
-        
-        List<CmmnDeployment> cmmnDeployments = cmmnEngine.getCmmnRepositoryService().createDeploymentQuery().list();
-        for (CmmnDeployment cmmnDeployment : cmmnDeployments) {
-            cmmnEngine.getCmmnRepositoryService().deleteDeployment(cmmnDeployment.getId(), true);
-        }
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringCmmnEngineConfiguration.class,
+                            SpringIdmEngineConfiguration.class,
+                            SpringProcessEngineConfiguration.class
+                        );
+                });
+
+            deleteDeployments(processEngine);
+            deleteDeployments(cmmnEngine);
+        });
     }
     
     @Test
     public void cmmnEngineWithBasicDataSourceAndAppEngine() {
-        context = this
-            .context(
-                DataSourceAutoConfiguration.class,
-                DataSourceTransactionManagerAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class,
-                FlowableTransactionAutoConfiguration.class,
-                AppEngineServicesAutoConfiguration.class,
-                AppEngineAutoConfiguration.class,
-                ProcessEngineServicesAutoConfiguration.class,
-                ProcessEngineAutoConfiguration.class,
-                CmmnEngineAutoConfiguration.class,
-                IdmEngineAutoConfiguration.class,
-                IdmEngineServicesAutoConfiguration.class,
-                CmmnEngineServicesAutoConfiguration.class
-            );
+        contextRunner.withConfiguration(AutoConfigurations.of(
+            HibernateJpaAutoConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            AppEngineServicesAutoConfiguration.class,
+            AppEngineAutoConfiguration.class,
+            ProcessEngineServicesAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class
+        )).run(context -> {
+            assertThat(context)
+                .doesNotHaveBean("cmmnProcessEngineConfigurationConfigurer")
+                .hasBean("cmmnAppEngineConfigurationConfigurer");
+            AppEngine appEngine = context.getBean(AppEngine.class);
+            assertThat(appEngine).as("App engine").isNotNull();
+            CmmnEngineConfigurationApi cmmnProcessConfigurationApi = cmmnEngine(appEngine);
 
-        AppEngine appEngine = context.getBean(AppEngine.class);
-        assertThat(appEngine).as("App engine").isNotNull();
-        CmmnEngineConfigurationApi cmmnProcessConfigurationApi = cmmnEngine(appEngine);
+            CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+            assertThat(cmmnEngine.getCmmnEngineConfiguration()).as("Cmmn Engine Configuration").isEqualTo(cmmnProcessConfigurationApi);
+            assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
 
-        CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
-        assertThat(cmmnEngine.getCmmnEngineConfiguration()).as("Cmmn Engine Configuration").isEqualTo(cmmnProcessConfigurationApi);
-        assertThat(cmmnEngine).as("Cmmn engine").isNotNull();
+            assertAllServicesPresent(context, cmmnEngine);
+            assertAutoDeploymentWithAppEngine(context);
 
-        assertAllServicesPresent(context, cmmnEngine);
-        assertAutoDeploymentWithAppEngine(context);
-        
-        List<AppDeployment> appDeployments = appEngine.getAppRepositoryService().createDeploymentQuery().list();
-        for (AppDeployment appDeployment : appDeployments) {
-            appEngine.getAppRepositoryService().deleteDeployment(appDeployment.getId(), true);
-        }
-        
-        ProcessEngine processEngine = context.getBean(ProcessEngine.class);
-        List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
-        for (Deployment deployment : deployments) {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-        }
-        
-        List<CmmnDeployment> cmmnDeployments = cmmnEngine.getCmmnRepositoryService().createDeploymentQuery().list();
-        for (CmmnDeployment cmmnDeployment : cmmnDeployments) {
-            cmmnEngine.getCmmnRepositoryService().deleteDeployment(cmmnDeployment.getId(), true);
-        }
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringProcessEngineConfiguration.class,
+                            SpringCmmnEngineConfiguration.class,
+                            SpringIdmEngineConfiguration.class,
+                            SpringAppEngineConfiguration.class
+                        );
+                });
+
+            deleteDeployments(appEngine);
+            deleteDeployments(context.getBean(ProcessEngine.class));
+            deleteDeployments(cmmnEngine);
+        });
     }
-    
-    private void assertAllServicesPresent(AnnotationConfigApplicationContext context, CmmnEngine cmmnEngine) {
+
+    private void assertAllServicesPresent(ApplicationContext context, CmmnEngine cmmnEngine) {
         List<Method> methods = Stream.of(CmmnEngine.class.getDeclaredMethods())
             .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
 
@@ -182,8 +196,8 @@ public class CmmnEngineAutoConfigurationTest {
             }
         });
     }
-    
-    private void assertAutoDeployment(AnnotationConfigApplicationContext context) {
+
+    private void assertAutoDeployment(ApplicationContext context) {
         CmmnRepositoryService repositoryService = context.getBean(CmmnRepositoryService.class);
 
         List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().list();
@@ -197,8 +211,8 @@ public class CmmnEngineAutoConfigurationTest {
             .first()
             .satisfies(deployment -> assertThat(deployment.getName()).isEqualTo("SpringBootAutoDeployment"));
     }
-    
-    private void assertAutoDeploymentWithAppEngine(AnnotationConfigApplicationContext context) {
+
+    private void assertAutoDeploymentWithAppEngine(ApplicationContext context) {
         CmmnRepositoryService repositoryService = context.getBean(CmmnRepositoryService.class);
 
         List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().list();
@@ -235,13 +249,6 @@ public class CmmnEngineAutoConfigurationTest {
         assertThat(appDeployments).hasSize(2)
             .extracting(AppDeployment::getName)
             .contains("simple.bar", "vacationRequest.zip");
-    }
-
-    private AnnotationConfigApplicationContext context(Class<?>... clazz) {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext();
-        annotationConfigApplicationContext.register(clazz);
-        annotationConfigApplicationContext.refresh();
-        return annotationConfigApplicationContext;
     }
 
     private static CmmnEngineConfigurationApi cmmnEngine(ProcessEngine processEngine) {
