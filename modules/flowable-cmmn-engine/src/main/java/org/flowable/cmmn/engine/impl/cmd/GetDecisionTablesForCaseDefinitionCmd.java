@@ -95,18 +95,25 @@ public class GetDecisionTablesForCaseDefinitionCmd implements Command<List<DmnDe
     }
 
     protected void addDecisionTableToCollection(List<DmnDecisionTable> decisionTables, String decisionTableKey, CaseDefinition caseDefinition) {
+        DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery().decisionTableKey(decisionTableKey);
         CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
         if (deployment.getParentDeploymentId() != null) {
             List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
             
             if (dmnDeployments != null && dmnDeployments.size() > 0) {
-                DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
-                DmnDecisionTable decisionTable = decisionTableQuery.decisionTableKey(decisionTableKey).deploymentId(dmnDeployments.get(0).getId()).singleResult();
-        
-                if (decisionTable != null) {
-                    decisionTables.add(decisionTable);
-                }
+                decisionTableQuery.deploymentId(dmnDeployments.get(0).getId());
+            } else {
+                decisionTableQuery.latestVersion();
             }
+            
+        } else {
+            decisionTableQuery.latestVersion();
+        }
+        
+        DmnDecisionTable decisionTable = decisionTableQuery.singleResult();
+        
+        if (decisionTable != null) {
+            decisionTables.add(decisionTable);
         }
     }
 }

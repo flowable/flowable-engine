@@ -93,18 +93,25 @@ public class GetFormDefinitionsForCaseDefinitionCmd implements Command<List<Form
     }
 
     protected void addFormDefinitionToCollection(List<FormDefinition> formDefinitions, String formKey, CaseDefinition caseDefinition) {
+        FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery().formDefinitionKey(formKey);
         CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
         if (deployment.getParentDeploymentId() != null) {
             List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
             
             if (formDeployments != null && formDeployments.size() > 0) {
-                FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
-                FormDefinition formDefinition = formDefinitionQuery.formDefinitionKey(formKey).deploymentId(formDeployments.get(0).getId()).singleResult();
-        
-                if (formDefinition != null) {
-                    formDefinitions.add(formDefinition);
-                }
+                formDefinitionQuery.deploymentId(formDeployments.get(0).getId());
+            } else {
+                formDefinitionQuery.latestVersion();
             }
+            
+        } else {
+            formDefinitionQuery.latestVersion();
+        }
+        
+        FormDefinition formDefinition = formDefinitionQuery.singleResult();
+        
+        if (formDefinition != null) {
+            formDefinitions.add(formDefinition);
         }
     }
 }
