@@ -12,9 +12,6 @@
  */
 package org.flowable.spring.boot.idm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.app.engine.AppEngine;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.idm.api.IdmIdentityService;
@@ -23,12 +20,11 @@ import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
 import org.flowable.idm.spring.IdmEngineFactoryBean;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
-import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -110,23 +106,16 @@ public class IdmEngineServicesAutoConfiguration {
         "org.flowable.engine.ProcessEngine",
         "org.flowable.app.engine.AppEngine"
     })
-    static class StandaloneEngineConfiguration {
-        
-        protected List<EngineConfigurationConfigurer<SpringIdmEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    static class StandaloneEngineConfiguration extends BaseEngineConfigurationWithConfigurers<SpringIdmEngineConfiguration> {
 
         @Bean
         public IdmEngineFactoryBean idmEngine(SpringIdmEngineConfiguration idmEngineConfiguration) {
             IdmEngineFactoryBean factory = new IdmEngineFactoryBean();
             factory.setIdmEngineConfiguration(idmEngineConfiguration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(idmEngineConfiguration));
+            invokeConfigurers(idmEngineConfiguration);
             
             return factory;
-        }
-        
-        @Autowired(required = false)
-        public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringIdmEngineConfiguration>> engineConfigurers) {
-            this.engineConfigurers = engineConfigurers;
         }
     }
 

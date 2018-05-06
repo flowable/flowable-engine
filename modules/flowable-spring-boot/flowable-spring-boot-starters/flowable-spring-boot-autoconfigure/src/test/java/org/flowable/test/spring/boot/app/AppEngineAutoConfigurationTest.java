@@ -14,6 +14,7 @@ package org.flowable.test.spring.boot.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDeployments;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,10 +27,12 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.repository.Deployment;
+import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -39,86 +42,95 @@ import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.task.api.Task;
+import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.Test;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class AppEngineAutoConfigurationTest {
 
+    private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+        .withConfiguration(AutoConfigurations.of(
+            DataSourceAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
+            HibernateJpaAutoConfiguration.class,
+            FlowableTransactionAutoConfiguration.class,
+            AppEngineServicesAutoConfiguration.class,
+            AppEngineAutoConfiguration.class,
+            IdmEngineAutoConfiguration.class,
+            IdmEngineServicesAutoConfiguration.class
+        ))
+        .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class);
+
     @Test
     public void standaloneAppEngineWithBasicDatasource() {
-        AnnotationConfigApplicationContext context = this
-            .context(
-                DataSourceAutoConfiguration.class,
-                DataSourceTransactionManagerAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class,
-                FlowableTransactionAutoConfiguration.class,
-                AppEngineServicesAutoConfiguration.class,
-                AppEngineAutoConfiguration.class,
-                IdmEngineAutoConfiguration.class,
-                IdmEngineServicesAutoConfiguration.class
-            );
-        
-        AppEngine appEngine = context.getBean(AppEngine.class);
-        assertThat(appEngine).as("App engine").isNotNull();
+        contextRunner
+            .run(context -> {
+                AppEngine appEngine = context.getBean(AppEngine.class);
+                assertThat(appEngine).as("App engine").isNotNull();
 
-        assertAllServicesPresent(context, appEngine);
-        assertAutoDeployment(context);
-        
-        List<AppDeployment> appDeployments = appEngine.getAppRepositoryService().createDeploymentQuery().list();
-        for (AppDeployment appDeployment : appDeployments) {
-            appEngine.getAppRepositoryService().deleteDeployment(appDeployment.getId(), true);
-        }
+                assertAllServicesPresent(context, appEngine);
+                assertAutoDeployment(context);
+
+                deleteDeployments(appEngine);
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactly(
+                                SpringIdmEngineConfiguration.class,
+                                SpringAppEngineConfiguration.class
+                            );
+                    });
+            });
     }
     
     @Test
     public void appEngineWithBasicDataSourceAndProcessEngine() {
-        AnnotationConfigApplicationContext context = this
-            .context(
-                DataSourceAutoConfiguration.class,
-                DataSourceTransactionManagerAutoConfiguration.class,
-                HibernateJpaAutoConfiguration.class,
-                FlowableTransactionAutoConfiguration.class,
-                AppEngineServicesAutoConfiguration.class,
-                AppEngineAutoConfiguration.class,
-                ProcessEngineServicesAutoConfiguration.class,
-                ProcessEngineAutoConfiguration.class,
-                IdmEngineAutoConfiguration.class,
-                IdmEngineServicesAutoConfiguration.class
-            );
-
-        AppEngine appEngine = context.getBean(AppEngine.class);
-        assertThat(appEngine).as("App engine").isNotNull();
-        ProcessEngineConfiguration processConfiguration = processEngine(appEngine);
+        contextRunner.withConfiguration(AutoConfigurations.of(
+            ProcessEngineServicesAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class
+        )).run(context -> {
+            AppEngine appEngine = context.getBean(AppEngine.class);
+            assertThat(appEngine).as("App engine").isNotNull();
+            ProcessEngineConfiguration processConfiguration = processEngine(appEngine);
 
         ProcessEngine processEngine = context.getBean(ProcessEngine.class);
-        ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+        ProcessEngineConfiguration processEngineConfiguration =processEngine.getProcessEngineConfiguration();
         assertThat(processEngineConfiguration).as("Proccess Engine Configuration").isEqualTo(processConfiguration);
         assertThat(processEngine).as("Process engine").isNotNull();
 
-        assertAllServicesPresent(context, appEngine);
-        assertAutoDeployment(context);
-        
-        processEngineConfiguration.getIdentityService().setAuthenticatedUserId("test");
-        ProcessInstance processInstance = processEngineConfiguration.getRuntimeService().startProcessInstanceByKey("vacationRequest");
-        Task task = processEngineConfiguration.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(task).isNotNull();
-        
-        List<AppDeployment> appDeployments = appEngine.getAppRepositoryService().createDeploymentQuery().list();
-        for (AppDeployment appDeployment : appDeployments) {
-            appEngine.getAppRepositoryService().deleteDeployment(appDeployment.getId(), true);
-        }
-        
-        List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
-        for (Deployment deployment : deployments) {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-        }
+            assertAllServicesPresent(context, appEngine);
+            assertAutoDeployment(context);
+
+            processEngineConfiguration.getIdentityService().setAuthenticatedUserId("test");
+            ProcessInstance processInstance = processEngineConfiguration.getRuntimeService().startProcessInstanceByKey("vacationRequest");
+            Task task = processEngineConfiguration.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            deleteDeployments(appEngine);
+            deleteDeployments(processEngine);
+
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringProcessEngineConfiguration.class,
+                            SpringIdmEngineConfiguration.class,
+                            SpringAppEngineConfiguration.class
+                        );
+                });
+        });
     }
 
     private void assertAllServicesPresent(ApplicationContext context, AppEngine appEngine) {
@@ -154,10 +166,4 @@ public class AppEngineAutoConfigurationTest {
         return (ProcessEngineConfiguration) appEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
     }
 
-    private AnnotationConfigApplicationContext context(Class<?>... clazz) {
-        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext();
-        annotationConfigApplicationContext.register(clazz);
-        annotationConfigApplicationContext.refresh();
-        return annotationConfigApplicationContext;
-    }
 }

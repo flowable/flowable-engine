@@ -13,7 +13,6 @@
 package org.flowable.spring.boot.form;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -24,16 +23,17 @@ import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
-import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
-import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -58,6 +58,10 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableTransactionAutoConfiguration.class,
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
+})
+@AutoConfigureBefore({
+    AppEngineServicesAutoConfiguration.class,
+    ProcessEngineServicesAutoConfiguration.class,
 })
 public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
@@ -95,14 +99,13 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     }
 
     @Configuration
-    @ConditionalOnProcessEngine
+    @ConditionalOnBean(type = {
+        "org.flowable.spring.SpringProcessEngineConfiguration"
+    })
     @ConditionalOnMissingBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class FormEngineProcessConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringFormEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    public static class FormEngineProcessConfiguration extends BaseEngineConfigurationWithConfigurers<SpringFormEngineConfiguration> {
 
         @Bean
         @ConditionalOnMissingBean(name = "formProcessEngineConfigurationConfigurer")
@@ -118,21 +121,17 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             SpringFormEngineConfigurator formEngineConfigurator = new SpringFormEngineConfigurator();
             formEngineConfigurator.setFormEngineConfiguration(configuration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+            invokeConfigurers(configuration);
             
             return formEngineConfigurator;
         }
     }
     
     @Configuration
-    @ConditionalOnAppEngine
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class FormEngineAppEngineConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringFormEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    public static class FormEngineAppEngineConfiguration extends BaseEngineConfigurationWithConfigurers<SpringFormEngineConfiguration> {
 
         @Bean
         @ConditionalOnMissingBean(name = "formAppEngineConfigurationConfigurer")
@@ -148,7 +147,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             SpringFormEngineConfigurator formEngineConfigurator = new SpringFormEngineConfigurator();
             formEngineConfigurator.setFormEngineConfiguration(configuration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+            invokeConfigurers(configuration);
             
             return formEngineConfigurator;
         }

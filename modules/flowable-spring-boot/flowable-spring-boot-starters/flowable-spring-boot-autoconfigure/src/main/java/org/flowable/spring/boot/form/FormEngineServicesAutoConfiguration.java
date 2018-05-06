@@ -12,9 +12,6 @@
  */
 package org.flowable.spring.boot.form;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.app.engine.AppEngine;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.form.api.FormManagementService;
@@ -24,12 +21,11 @@ import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngines;
 import org.flowable.form.spring.FormEngineFactoryBean;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
-import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -112,23 +108,16 @@ public class FormEngineServicesAutoConfiguration {
         "org.flowable.engine.ProcessEngine",
         "org.flowable.app.engine.AppEngine"
     })
-    static class StandaloneFormEngineConfiguration {
-        
-        protected List<EngineConfigurationConfigurer<SpringFormEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    static class StandaloneFormEngineConfiguration extends BaseEngineConfigurationWithConfigurers<SpringFormEngineConfiguration> {
 
         @Bean
         public FormEngineFactoryBean formEngine(SpringFormEngineConfiguration formEngineConfiguration) {
             FormEngineFactoryBean factory = new FormEngineFactoryBean();
             factory.setFormEngineConfiguration(formEngineConfiguration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(formEngineConfiguration));
+            invokeConfigurers(formEngineConfiguration);
             
             return factory;
-        }
-        
-        @Autowired(required = false)
-        public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringFormEngineConfiguration>> engineConfigurers) {
-            this.engineConfigurers = engineConfigurers;
         }
     }
 
