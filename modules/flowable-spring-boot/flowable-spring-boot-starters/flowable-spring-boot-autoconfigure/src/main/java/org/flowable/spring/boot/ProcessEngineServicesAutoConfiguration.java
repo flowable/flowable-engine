@@ -12,9 +12,6 @@
  */
 package org.flowable.spring.boot;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.app.engine.AppEngine;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
@@ -89,17 +86,14 @@ public class ProcessEngineServicesAutoConfiguration {
         "org.flowable.engine.ProcessEngine",
         "org.flowable.app.engine.AppEngine",
     })
-    static class StandaloneEngineConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> processEngineConfigurationConfigurers = new ArrayList<>();
+    static class StandaloneEngineConfiguration extends BaseEngineConfigurationWithConfigurers<SpringProcessEngineConfiguration> {
         
         @Bean
         public ProcessEngineFactoryBean processEngine(SpringProcessEngineConfiguration configuration) throws Exception {
             ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
             processEngineFactoryBean.setProcessEngineConfiguration(configuration);
             
-            processEngineConfigurationConfigurers.forEach(configurator -> configurator.configure(configuration));
+            invokeConfigurers(configuration);
             
             return processEngineFactoryBean;
         }

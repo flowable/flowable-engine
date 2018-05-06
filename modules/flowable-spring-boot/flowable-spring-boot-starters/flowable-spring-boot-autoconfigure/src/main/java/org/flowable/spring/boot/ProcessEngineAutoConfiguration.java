@@ -13,7 +13,6 @@
 package org.flowable.spring.boot;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -37,7 +36,6 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -196,10 +194,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class ProcessEngineAppConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    public static class ProcessEngineAppConfiguration extends BaseEngineConfigurationWithConfigurers<SpringProcessEngineConfiguration> {
 
         @Bean
         @ConditionalOnMissingBean(name = "processAppEngineConfigurationConfigurer")
@@ -215,7 +210,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             
             processEngineConfiguration.setDisableIdmEngine(true);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(processEngineConfiguration));
+            invokeConfigurers(processEngineConfiguration);
             
             return processEngineConfigurator;
         }

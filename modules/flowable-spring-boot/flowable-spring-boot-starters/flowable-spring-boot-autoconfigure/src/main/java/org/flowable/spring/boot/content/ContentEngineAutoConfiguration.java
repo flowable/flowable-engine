@@ -12,9 +12,6 @@
  */
 package org.flowable.spring.boot.content;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
@@ -23,6 +20,7 @@ import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
@@ -32,7 +30,6 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.condition.ConditionalOnContentEngine;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -93,11 +90,8 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
     @ConditionalOnMissingBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class ContentEngineProcessConfiguration {
+    public static class ContentEngineProcessConfiguration extends BaseEngineConfigurationWithConfigurers<SpringContentEngineConfiguration> {
         
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringContentEngineConfiguration>> engineConfigurers = new ArrayList<>();
-
         @Bean
         @ConditionalOnMissingBean(name = "contentProcessEngineConfigurationConfigurer")
         public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> contentProcessEngineConfigurationConfigurer(
@@ -111,7 +105,7 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
             SpringContentEngineConfigurator contentEngineConfigurator = new SpringContentEngineConfigurator();
             contentEngineConfigurator.setContentEngineConfiguration(configuration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+            invokeConfigurers(configuration);
             
             return contentEngineConfigurator;
         }
@@ -122,10 +116,7 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class ContentEngineAppConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringContentEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    public static class ContentEngineAppConfiguration extends BaseEngineConfigurationWithConfigurers<SpringContentEngineConfiguration> {
         
         @Bean
         @ConditionalOnMissingBean(name = "contentAppEngineConfigurationConfigurer")
@@ -141,7 +132,7 @@ public class ContentEngineAutoConfiguration extends AbstractEngineAutoConfigurat
             SpringContentEngineConfigurator contentEngineConfigurator = new SpringContentEngineConfigurator();
             contentEngineConfigurator.setContentEngineConfiguration(configuration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+            invokeConfigurers(configuration);
             
             return contentEngineConfigurator;
         }

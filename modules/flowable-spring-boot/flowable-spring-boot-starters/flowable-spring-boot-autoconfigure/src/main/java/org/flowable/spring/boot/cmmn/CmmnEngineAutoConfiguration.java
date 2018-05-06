@@ -13,7 +13,6 @@
 package org.flowable.spring.boot.cmmn;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -25,6 +24,7 @@ import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableJobConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
@@ -39,7 +39,6 @@ import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -157,10 +156,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @ConditionalOnMissingBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class CmmnEngineProcessConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    public static class CmmnEngineProcessConfiguration extends BaseEngineConfigurationWithConfigurers<SpringCmmnEngineConfiguration> {
 
         @Bean
         @ConditionalOnMissingBean(name = "cmmnProcessEngineConfigurationConfigurer")
@@ -175,7 +171,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(cmmnEngineConfiguration));
+            invokeConfigurers(cmmnEngineConfiguration);
             
             return cmmnEngineConfigurator;
         }
@@ -185,10 +181,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class CmmnEngineAppConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringCmmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    public static class CmmnEngineAppConfiguration extends BaseEngineConfigurationWithConfigurers<SpringCmmnEngineConfiguration> {
 
         @Bean
         @ConditionalOnMissingBean(name = "cmmnAppEngineConfigurationConfigurer")
@@ -202,7 +195,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(cmmnEngineConfiguration));
+            invokeConfigurers(cmmnEngineConfiguration);
             
             return cmmnEngineConfigurator;
         }

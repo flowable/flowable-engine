@@ -13,7 +13,6 @@
 package org.flowable.spring.boot.dmn;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -24,6 +23,7 @@ import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
@@ -32,7 +32,6 @@ import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnDmnEngine;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -106,10 +105,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
     @ConditionalOnMissingBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class DmnEngineProcessConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringDmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    public static class DmnEngineProcessConfiguration extends BaseEngineConfigurationWithConfigurers<SpringDmnEngineConfiguration> {
 
         @Bean
         @ConditionalOnMissingBean(name = "dmnProcessEngineConfigurationConfigurer")
@@ -125,7 +121,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
             SpringDmnEngineConfigurator dmnEngineConfigurator = new SpringDmnEngineConfigurator();
             dmnEngineConfigurator.setDmnEngineConfiguration(configuration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+            invokeConfigurers(configuration);
             
             return dmnEngineConfigurator;
         }
@@ -135,10 +131,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
     @ConditionalOnBean(type = {
         "org.flowable.app.spring.SpringAppEngineConfiguration"
     })
-    public static class DmnEngineAppConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringDmnEngineConfiguration>> engineConfigurers = new ArrayList<>();
+    public static class DmnEngineAppConfiguration extends BaseEngineConfigurationWithConfigurers<SpringDmnEngineConfiguration> {
 
         @Bean
         @ConditionalOnMissingBean(name = "dmnAppEngineConfigurationConfigurer")
@@ -154,7 +147,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
             SpringDmnEngineConfigurator dmnEngineConfigurator = new SpringDmnEngineConfigurator();
             dmnEngineConfigurator.setDmnEngineConfiguration(configuration);
             
-            engineConfigurers.forEach(configurer -> configurer.configure(configuration));
+            invokeConfigurers(configuration);
             
             return dmnEngineConfigurator;
         }
