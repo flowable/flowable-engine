@@ -38,7 +38,6 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
     protected String category;
     protected String key;
     protected String tenantId = AppEngineConfiguration.NO_TENANT_ID;
-    protected String parentDeploymentId;
     protected Map<String, EngineResource> resources;
     protected Date deploymentTime;
     protected boolean isNew;
@@ -149,14 +148,6 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
-    }
-
-    public String getParentDeploymentId() {
-        return parentDeploymentId;
-    }
-
-    public void setParentDeploymentId(String parentDeploymentId) {
-        this.parentDeploymentId = parentDeploymentId;
     }
 
     @Override

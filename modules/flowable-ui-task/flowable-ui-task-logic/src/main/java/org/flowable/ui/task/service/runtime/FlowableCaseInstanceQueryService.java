@@ -15,6 +15,8 @@ package org.flowable.ui.task.service.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -50,6 +52,9 @@ public class FlowableCaseInstanceQueryService {
 
     @Autowired
     protected CmmnRepositoryService cmmnRepositoryService;
+    
+    @Autowired
+    protected AppRepositoryService appRepositoryService;
 
     @Autowired
     protected CmmnHistoryService cmmnHistoryService;
@@ -67,17 +72,27 @@ public class FlowableCaseInstanceQueryService {
             instanceQuery.caseDefinitionId(caseDefinitionIdNode.asText());
         }
 
-        JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
-        if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
+        JsonNode appDefinitionKeyNode = requestNode.get("appDefinitionKey");
+        if (appDefinitionKeyNode != null && !appDefinitionKeyNode.isNull()) {
             // Results need to be filtered in an app-context. We need to fetch the deployment id for this app and use that in the query
-            List<CmmnDeployment> deployments = cmmnRepositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
+            List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().appDefinitionKey(appDefinitionKeyNode.asText()).list();
+            List<String> parentDeploymentIds = new ArrayList<>();
+            for (AppDefinition appDefinition : appDefinitions) {
+                parentDeploymentIds.add(appDefinition.getDeploymentId());
+            }
+            
+            List<CmmnDeployment> deployments = cmmnRepositoryService.createDeploymentQuery().parentDeploymentIds(parentDeploymentIds).list();
 
             List<String> deploymentIds = new ArrayList<>();
             for (CmmnDeployment deployment : deployments) {
                 deploymentIds.add(deployment.getId());
             }
 
-            instanceQuery.deploymentIds(deploymentIds);
+            if (deploymentIds.size() > 0) {
+                instanceQuery.deploymentIds(deploymentIds);
+            } else {
+                return new ResultListDataRepresentation(new ArrayList<CaseInstanceRepresentation>());
+            }
         }
 
         // State filtering

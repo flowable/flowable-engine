@@ -43,6 +43,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
     protected boolean withoutTenantId;
     protected String parentDeploymentId;
     protected String parentDeploymentIdLike;
+    protected List<String> parentDeploymentIds;
     protected boolean latest;
 
     public CmmnDeploymentQueryImpl() {
@@ -147,6 +148,15 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
             throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
         }
         this.parentDeploymentIdLike = parentDeploymentIdLike;
+        return this;
+    }
+    
+    @Override
+    public CmmnDeploymentQueryImpl parentDeploymentIds(List<String> parentDeploymentIds) {
+        if (parentDeploymentIds == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentIds is null");
+        }
+        this.parentDeploymentIds = parentDeploymentIds;
         return this;
     }
     

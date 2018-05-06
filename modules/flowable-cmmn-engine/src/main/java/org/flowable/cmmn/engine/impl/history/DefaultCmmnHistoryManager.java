@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Date;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
@@ -32,10 +36,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentit
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-
-import java.util.Date;
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @author Joram Barrez
@@ -71,8 +71,10 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceId);
-            historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
-            historicCaseInstanceEntity.setState(state);
+            if (historicCaseInstanceEntity != null) {
+                historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+                historicCaseInstanceEntity.setState(state);
+            }
         }
     }
 
@@ -272,8 +274,10 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
             HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.findById(planItemInstanceEntity.getId());
-            historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
-            changes.accept(historicPlanItemInstanceEntity);
+            if (historicPlanItemInstanceEntity != null) {
+                historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
+                changes.accept(historicPlanItemInstanceEntity);
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ angular.module('flowableApp')
 
             $scope.selectedTask = { id: $routeParams.taskId };
 
-            $scope.deploymentKey = $routeParams.deploymentKey;
+            $scope.appDefinitionKey = $routeParams.appDefinitionKey;
 
             $scope.$on('task-completed', function (event, data) {
                 $rootScope.addAlertPromise($translate('TASK.ALERT.COMPLETED', data));

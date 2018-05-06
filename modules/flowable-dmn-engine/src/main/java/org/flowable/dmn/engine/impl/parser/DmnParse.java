@@ -89,7 +89,6 @@ public class DmnParse implements DmnXMLConstants {
                     decisionTableEntity.setName(decision.getName());
                     decisionTableEntity.setResourceName(name);
                     decisionTableEntity.setDeploymentId(deployment.getId());
-                    decisionTableEntity.setParentDeploymentId(deployment.getParentDeploymentId());
                     decisionTableEntity.setDescription(decision.getDescription());
                     decisionTables.add(decisionTableEntity);
                 }

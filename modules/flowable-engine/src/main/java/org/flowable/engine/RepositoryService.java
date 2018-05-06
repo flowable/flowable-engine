@@ -130,6 +130,16 @@ public interface RepositoryService {
      *            The new tenant identifier.
      */
     void changeDeploymentTenantId(String deploymentId, String newTenantId);
+    
+    /**
+     * Changes the parent deployment id of a deployment. This is used to move deployments to a different app deployment parent.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the parent deployment identifier will be changed.
+     * @param newParentDeploymentId
+     *              The new parent deployment identifier.
+     */
+    void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId);
 
     /** Query process definitions. */
     ProcessDefinitionQuery createProcessDefinitionQuery();

@@ -55,6 +55,7 @@ import org.flowable.engine.impl.cmd.IsProcessDefinitionSuspendedCmd;
 import org.flowable.engine.impl.cmd.SaveModelCmd;
 import org.flowable.engine.impl.cmd.SetDeploymentCategoryCmd;
 import org.flowable.engine.impl.cmd.SetDeploymentKeyCmd;
+import org.flowable.engine.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.engine.impl.cmd.SetProcessDefinitionCategoryCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.ValidateBpmnModelCmd;
@@ -118,6 +119,11 @@ public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public void setDeploymentKey(String deploymentId, String key) {
         commandExecutor.execute(new SetDeploymentKeyCmd(deploymentId, key));
+    }
+    
+    @Override
+    public void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId) {
+        commandExecutor.execute(new SetDeploymentParentDeploymentIdCmd(deploymentId, newParentDeploymentId));
     }
 
     @Override

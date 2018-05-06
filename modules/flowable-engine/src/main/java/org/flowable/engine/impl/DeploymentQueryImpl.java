@@ -46,6 +46,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     protected String engineVersion;
     protected String derivedFrom;
     protected String parentDeploymentId;
+    protected List<String> parentDeploymentIds;
     protected String processDefinitionKey;
     protected String processDefinitionKeyLike;
     protected boolean latest;
@@ -181,6 +182,15 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     @Override
     public DeploymentQuery parentDeploymentId(String parentDeploymentId) {
         this.parentDeploymentId = parentDeploymentId;
+        return this;
+    }
+    
+    @Override
+    public DeploymentQuery parentDeploymentIds(List<String> parentDeploymentIds) {
+        if (parentDeploymentIds == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentIds is null");
+        }
+        this.parentDeploymentIds = parentDeploymentIds;
         return this;
     }
 

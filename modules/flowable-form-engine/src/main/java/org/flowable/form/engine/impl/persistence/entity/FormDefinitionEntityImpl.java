@@ -33,7 +33,6 @@ public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implement
     protected int version;
     protected String category;
     protected String deploymentId;
-    protected String parentDeploymentId;
     protected String resourceName;
     protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
 
@@ -85,16 +84,6 @@ public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implement
     @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
-    }
-
-    @Override
-    public String getParentDeploymentId() {
-        return parentDeploymentId;
-    }
-
-    @Override
-    public void setParentDeploymentId(String parentDeploymentId) {
-        this.parentDeploymentId = parentDeploymentId;
     }
 
     @Override

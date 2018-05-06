@@ -31,7 +31,10 @@
         KEY_ = #{key, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
-        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.parentDeploymentId != parentDeploymentId">
+        PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
       </if>
     </set>  
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -115,7 +118,14 @@
       <if test="parentDeploymentIdLike != null">
         and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
       </if>
-       <if test="tenantId != null">
+      <if test="parentDeploymentIds != null &amp;&amp; parentDeploymentIds.size() &gt; 0">
+        and RES.PARENT_DEPLOYMENT_ID_ IN
+        <foreach item="parentDeploymentId" index="index" collection="parentDeploymentIds" 
+                 open="(" separator="," close=")">
+          #{parentDeploymentId}
+        </foreach>
+      </if>
+      <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
       <if test="tenantIdLike != null">

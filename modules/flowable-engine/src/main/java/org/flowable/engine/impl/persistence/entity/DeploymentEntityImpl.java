@@ -84,6 +84,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
         persistentState.put("category", this.category);
         persistentState.put("key", this.key);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("parentDeploymentId", parentDeploymentId);
         return persistentState;
     }
 

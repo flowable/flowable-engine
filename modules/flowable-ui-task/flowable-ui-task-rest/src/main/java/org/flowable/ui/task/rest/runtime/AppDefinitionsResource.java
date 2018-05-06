@@ -40,9 +40,9 @@ public class AppDefinitionsResource {
         return appDefinitionService.getAppDefinitions();
     }
 
-    @RequestMapping(value = "/rest/runtime/app-definitions/{deploymentKey}", method = RequestMethod.GET)
-    public AppDefinitionRepresentation getAppDefinition(@PathVariable("deploymentKey") String deploymentKey) {
-        return appDefinitionService.getAppDefinition(deploymentKey);
+    @RequestMapping(value = "/rest/runtime/app-definitions/{appDefinitionKey}", method = RequestMethod.GET)
+    public AppDefinitionRepresentation getAppDefinition(@PathVariable("appDefinitionKey") String appDefinitionKey) {
+        return appDefinitionService.getAppDefinition(appDefinitionKey);
     }
 
 }

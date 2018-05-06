@@ -28,10 +28,10 @@ angular.module('flowableApp').service('CaseService', ['$http', '$q', '$rootScope
             return deferred.promise;
         };
 
-        this.getCaseDefinitions = function(deploymentKey) {
+        this.getCaseDefinitions = function(appDefinitionKey) {
             var url = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-definitions?latest=true';
-            if (deploymentKey) {
-                url += '&deploymentKey=' + deploymentKey;
+            if (appDefinitionKey) {
+                url += '&appDefinitionKey=' + appDefinitionKey;
             }
             return httpAsPromise(
                 {

@@ -30,6 +30,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -37,6 +38,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -96,11 +98,17 @@ public class AppEngineAutoConfigurationTest {
         ProcessEngineConfiguration processConfiguration = processEngine(appEngine);
 
         ProcessEngine processEngine = context.getBean(ProcessEngine.class);
-        assertThat(processEngine.getProcessEngineConfiguration()).as("Proccess Engine Configuration").isEqualTo(processConfiguration);
+        ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+        assertThat(processEngineConfiguration).as("Proccess Engine Configuration").isEqualTo(processConfiguration);
         assertThat(processEngine).as("Process engine").isNotNull();
 
         assertAllServicesPresent(context, appEngine);
         assertAutoDeployment(context);
+        
+        processEngineConfiguration.getIdentityService().setAuthenticatedUserId("test");
+        ProcessInstance processInstance = processEngineConfiguration.getRuntimeService().startProcessInstanceByKey("vacationRequest");
+        Task task = processEngineConfiguration.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
         
         List<AppDeployment> appDeployments = appEngine.getAppRepositoryService().createDeploymentQuery().list();
         for (AppDeployment appDeployment : appDeployments) {

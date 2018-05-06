@@ -33,9 +33,35 @@ public interface DmnRepositoryService {
 
     NativeDecisionTableQuery createNativeDecisionTableQuery();
 
+    /**
+     * Changes the category of a deployment.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the category will be changed.
+     * @param newTenantId
+     *              The new category.
+     */
     void setDeploymentCategory(String deploymentId, String category);
 
+    /**
+     * Changes the tenant id of a deployment.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the tenant identifier will be changed.
+     * @param newTenantId
+     *              The new tenant identifier.
+     */
     void setDeploymentTenantId(String deploymentId, String newTenantId);
+    
+    /**
+     * Changes the parent deployment id of a deployment. This is used to move deployments to a different app deployment parent.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the parent deployment identifier will be changed.
+     * @param newParentDeploymentId
+     *              The new parent deployment identifier.
+     */
+    void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId);
 
     List<String> getDeploymentResourceNames(String deploymentId);
 

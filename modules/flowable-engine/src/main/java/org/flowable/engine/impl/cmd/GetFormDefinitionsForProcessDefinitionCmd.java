@@ -28,9 +28,11 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
+import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
 
 /**
@@ -100,11 +102,18 @@ public class GetFormDefinitionsForProcessDefinitionCmd implements Command<List<F
     }
 
     protected void addFormDefinitionToCollection(List<FormDefinition> formDefinitions, String formKey, ProcessDefinition processDefinition) {
-        FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
-        FormDefinition formDefinition = formDefinitionQuery.formDefinitionKey(formKey).parentDeploymentId(processDefinition.getDeploymentId()).singleResult();
-
-        if (formDefinition != null) {
-            formDefinitions.add(formDefinition);
+        Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
+        if (deployment.getParentDeploymentId() != null) {
+            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
+            
+            if (formDeployments != null && formDeployments.size() > 0) {
+                FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
+                FormDefinition formDefinition = formDefinitionQuery.formDefinitionKey(formKey).deploymentId(formDeployments.get(0).getId()).singleResult();
+        
+                if (formDefinition != null) {
+                    formDefinitions.add(formDefinition);
+                }
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasTaskIdGeneratorEngineConfiguration;
+import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.ProcessEngine;
@@ -28,6 +29,9 @@ import org.flowable.engine.configurator.impl.deployer.BpmnDeployer;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 /**
  * @author Tijs Rademakers
@@ -62,6 +66,33 @@ public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
         initProcessEngine();
 
         initServiceConfigurations(engineConfiguration, processEngineConfiguration);
+    }
+    
+    @Override
+    protected void initDbSqlSessionFactory(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        DbSqlSessionFactory dbSqlSessionFactory = engineConfiguration.getDbSqlSessionFactory();
+        targetEngineConfiguration.setDbSqlSessionFactory(engineConfiguration.getDbSqlSessionFactory());
+        targetEngineConfiguration.setSqlSessionFactory(engineConfiguration.getSqlSessionFactory());
+
+        if (getEntityInsertionOrder() != null) {
+            // remove identity link and variable entity classes due to foreign key handling
+            dbSqlSessionFactory.getInsertionOrder().remove(IdentityLinkEntityImpl.class);
+            dbSqlSessionFactory.getInsertionOrder().remove(VariableInstanceEntityImpl.class);
+            dbSqlSessionFactory.getInsertionOrder().remove(VariableByteArrayEntityImpl.class);
+            for (Class<? extends Entity> clazz : getEntityInsertionOrder()) {
+                dbSqlSessionFactory.getInsertionOrder().add(clazz);
+            }
+        }
+
+        if (getEntityDeletionOrder() != null) {
+            // remove identity link and variable entity classes due to foreign key handling
+            dbSqlSessionFactory.getDeletionOrder().remove(IdentityLinkEntityImpl.class);
+            dbSqlSessionFactory.getDeletionOrder().remove(VariableInstanceEntityImpl.class);
+            dbSqlSessionFactory.getDeletionOrder().remove(VariableByteArrayEntityImpl.class);
+            for (Class<? extends Entity> clazz : getEntityDeletionOrder()) {
+                dbSqlSessionFactory.getDeletionOrder().add(clazz);
+            }
+        }
     }
 
     @Override

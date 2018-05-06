@@ -10,31 +10,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.task.rest.runtime;
+package org.flowable.ui.task.rest.migrate;
 
-import org.flowable.ui.common.model.ResultListDataRepresentation;
-import org.flowable.ui.task.service.runtime.FlowableCaseDefinitionService;
+import org.flowable.ui.task.service.runtime.FlowableAppDefinitionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for managing the Engine case definitions.
+ * REST controller for managing the app definitions.
  */
 @RestController
 @RequestMapping("/app")
-public class CaseDefinitionsResource {
+public class MigrateAppDefinitionsResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MigrateAppDefinitionsResource.class);
 
     @Autowired
-    protected FlowableCaseDefinitionService caseDefinitionService;
+    protected FlowableAppDefinitionService appDefinitionService;
 
-    @RequestMapping(value = "/rest/case-definitions", method = RequestMethod.GET)
-    public ResultListDataRepresentation getCaseDefinitions(@RequestParam(value = "latest", required = false) Boolean latest,
-            @RequestParam(value = "appDefinitionKey", required = false) String appDefinitionKey) {
-
-        return caseDefinitionService.getCaseDefinitions(latest, appDefinitionKey);
+    @RequestMapping(value = "/rest/migrate/app-definitions", method = RequestMethod.GET)
+    public String migrateAppDefinitions() {
+        return appDefinitionService.migrateAppDefinitions();
     }
-
 }

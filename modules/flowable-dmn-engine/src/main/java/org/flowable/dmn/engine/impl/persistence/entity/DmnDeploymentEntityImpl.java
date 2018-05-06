@@ -67,6 +67,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("parentDeploymentId", parentDeploymentId);
         return persistentState;
     }
 

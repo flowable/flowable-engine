@@ -21,7 +21,7 @@ angular.module('flowableApp')
 
       $scope.selectedProcessInstance = { id: $routeParams.processId };
 
-        $scope.deploymentKey = $routeParams.deploymentKey;
+        $scope.appDefinitionKey = $routeParams.appDefinitionKey;
 
         $scope.$on('processinstance-deleted', function (event, data) {
             $scope.openProcesses();
