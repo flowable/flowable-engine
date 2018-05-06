@@ -37,6 +37,7 @@
         <flowable.osgi.import.additional>
             org.springframework*;resolution:=optional,
             javax.transaction;resolution:=optional,
+            org.flowable.idm.engine.impl.persistence;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>
 
