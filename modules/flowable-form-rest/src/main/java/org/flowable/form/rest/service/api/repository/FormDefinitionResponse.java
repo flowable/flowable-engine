@@ -12,8 +12,9 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
-import io.swagger.annotations.ApiModelProperty;
 import org.flowable.form.api.FormDefinition;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Yvo Swillens
@@ -29,7 +30,6 @@ public class FormDefinitionResponse {
     protected int version;
     protected String resourceName;
     protected String deploymentId;
-    protected String parentDeploymentId;
     protected String tenantId;
 
     public FormDefinitionResponse(FormDefinition formDefinition) {
@@ -41,7 +41,6 @@ public class FormDefinitionResponse {
         setVersion(formDefinition.getVersion());
         setResourceName(formDefinition.getResourceName());
         setDeploymentId(formDefinition.getDeploymentId());
-        setParentDeploymentId(formDefinition.getParentDeploymentId());
         setTenantId(formDefinition.getTenantId());
     }
 
@@ -124,15 +123,6 @@ public class FormDefinitionResponse {
 
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
-    }
-
-    @ApiModelProperty(example = "2")
-    public String getParentDeploymentId() {
-        return parentDeploymentId;
-    }
-
-    public void setParentDeploymentId(String parentDeploymentId) {
-        this.parentDeploymentId = parentDeploymentId;
     }
 
     @ApiModelProperty(example = "null")

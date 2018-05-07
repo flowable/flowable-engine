@@ -27,9 +27,11 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDecisionTableQuery;
+import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -95,9 +97,23 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<Dm
     }
 
     protected void addDecisionTableToCollection(List<DmnDecisionTable> decisionTables, String decisionTableKey, ProcessDefinition processDefinition) {
-        DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
-        DmnDecisionTable decisionTable = decisionTableQuery.decisionTableKey(decisionTableKey).parentDeploymentId(processDefinition.getDeploymentId()).singleResult();
-
+        DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery().decisionTableKey(decisionTableKey);
+        Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
+        if (deployment.getParentDeploymentId() != null) {
+            List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
+            
+            if (dmnDeployments != null && dmnDeployments.size() > 0) {
+                decisionTableQuery.deploymentId(dmnDeployments.get(0).getId());
+            } else {
+                decisionTableQuery.latestVersion();
+            }
+            
+        } else {
+            decisionTableQuery.latestVersion();
+        }
+        
+        DmnDecisionTable decisionTable = decisionTableQuery.singleResult();
+        
         if (decisionTable != null) {
             decisionTables.add(decisionTable);
         }

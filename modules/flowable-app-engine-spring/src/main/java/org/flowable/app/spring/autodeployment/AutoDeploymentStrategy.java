@@ -37,14 +37,12 @@ public interface AutoDeploymentStrategy {
 
     /**
      * Performs deployment for the provided resources, using the provided name as a hint and the provided {@link AppRepositoryService} to perform deployment(s).
-     * 
-     * @param deploymentNameHint
-     *            the hint for the name of deployment(s) performed
+     *
      * @param resources
      *            the resources to be deployed
      * @param repositoryService
      *            the repository service to use for deployment(s)
      */
-    void deployResources(final String deploymentNameHint, final Resource[] resources, final AppRepositoryService repositoryService);
+    void deployResources(final Resource[] resources, final AppRepositoryService repositoryService);
 
 }

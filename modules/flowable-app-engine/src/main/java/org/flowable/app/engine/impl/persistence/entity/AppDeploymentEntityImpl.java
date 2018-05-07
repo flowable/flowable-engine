@@ -38,7 +38,6 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
     protected String category;
     protected String key;
     protected String tenantId = AppEngineConfiguration.NO_TENANT_ID;
-    protected String parentDeploymentId;
     protected Map<String, EngineResource> resources;
     protected Date deploymentTime;
     protected boolean isNew;
@@ -52,6 +51,7 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
 
     }
 
+    @Override
     public void addResource(AppResourceEntity resource) {
         if (resources == null) {
             resources = new LinkedHashMap<>();
@@ -59,6 +59,7 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
         resources.put(resource.getName(), resource);
     }
 
+    @Override
     public Map<String, EngineResource> getResources() {
         if (resources == null && id != null) {
             List<AppResourceEntity> resourcesList = CommandContextUtil.getAppResourceEntityManager().findResourcesByDeploymentId(id);
@@ -70,6 +71,7 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
         return resources;
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
@@ -79,6 +81,7 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
 
     // Deployed artifacts manipulation ////////////////////////////////////////////
 
+    @Override
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
             deployedArtifacts = new HashMap<>();
@@ -94,6 +97,7 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
         artifacts.add(deployedArtifact);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
         for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
@@ -106,62 +110,67 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public void setKey(String key) {
         this.key = key;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
-    public String getParentDeploymentId() {
-        return parentDeploymentId;
-    }
-
-    public void setParentDeploymentId(String parentDeploymentId) {
-        this.parentDeploymentId = parentDeploymentId;
-    }
-
+    @Override
     public void setResources(Map<String, EngineResource> resources) {
         this.resources = resources;
     }
 
+    @Override
     public Date getDeploymentTime() {
         return deploymentTime;
     }
 
+    @Override
     public void setDeploymentTime(Date deploymentTime) {
         this.deploymentTime = deploymentTime;
     }
 
+    @Override
     public boolean isNew() {
         return isNew;
     }
 
+    @Override
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
@@ -176,6 +185,7 @@ public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements
         return null;
     }
 
+    @Override
     public String getEngineVersion() {
         return null;
     }

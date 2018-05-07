@@ -29,8 +29,6 @@ public interface FormDefinitionEntity extends FormDefinition, Entity {
 
     void setDeploymentId(String deploymentId);
 
-    void setParentDeploymentId(String parentDeploymentId);
-
     void setVersion(int version);
 
     void setResourceName(String resourceName);

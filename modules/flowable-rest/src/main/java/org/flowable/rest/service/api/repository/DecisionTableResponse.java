@@ -27,7 +27,6 @@ public class DecisionTableResponse {
     private int version;
     private String resourceName;
     private String deploymentId;
-    private String parentDeploymentId;
     private String tenantId;
     private String url;
 
@@ -40,7 +39,6 @@ public class DecisionTableResponse {
         this.version = decisionTable.getVersion();
         this.resourceName = decisionTable.getResourceName();
         this.deploymentId = decisionTable.getDeploymentId();
-        this.parentDeploymentId = decisionTable.getParentDeploymentId();
         this.tenantId = decisionTable.getTenantId();
     }
 
@@ -106,14 +104,6 @@ public class DecisionTableResponse {
 
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
-    }
-
-    public String getParentDeploymentId() {
-        return parentDeploymentId;
-    }
-
-    public void setParentDeploymentId(String parentDeploymentId) {
-        this.parentDeploymentId = parentDeploymentId;
     }
 
     public String getTenantId() {

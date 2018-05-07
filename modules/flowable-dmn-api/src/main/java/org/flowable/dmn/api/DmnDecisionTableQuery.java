@@ -74,16 +74,6 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
     DmnDecisionTableQuery deploymentIds(Set<String> deploymentIds);
 
     /**
-     * Only select decision tables that are deployed in a deployment with the given parent deployment id
-     */
-    DmnDecisionTableQuery parentDeploymentId(String parentDeploymentId);
-
-    /**
-     * Only select decision tables that are deployed in a deployment like the given parent deployment id
-     */
-    DmnDecisionTableQuery parentDeploymentIdLike(String parentDeploymentIdLike);
-
-    /**
      * Only select decision table with the given key.
      */
     DmnDecisionTableQuery decisionTableKey(String decisionTableKey);

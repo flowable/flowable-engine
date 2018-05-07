@@ -53,13 +53,13 @@ public class EngineServiceUtil {
     
     // CMMN ENGINE
     
-    public static CmmnEngineConfigurationApi getCmmnEngineConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        return (CmmnEngineConfigurationApi) processEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+    public static CmmnEngineConfigurationApi getCmmnEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (CmmnEngineConfigurationApi) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
     }
     
-    public static CmmnRepositoryService getCmmnRepositoryService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static CmmnRepositoryService getCmmnRepositoryService(AbstractEngineConfiguration engineConfiguration) {
         CmmnRepositoryService cmmnRepositoryService = null;
-        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(processEngineConfiguration);
+        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(engineConfiguration);
         if (cmmnEngineConfiguration != null) {
             cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         }
@@ -67,9 +67,9 @@ public class EngineServiceUtil {
         return cmmnRepositoryService;
     }
     
-    public static CmmnRuntimeService getCmmnRuntimeService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static CmmnRuntimeService getCmmnRuntimeService(AbstractEngineConfiguration engineConfiguration) {
         CmmnRuntimeService cmmnRuntimeService = null;
-        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(processEngineConfiguration);
+        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(engineConfiguration);
         if (cmmnEngineConfiguration != null) {
             cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         }
@@ -77,9 +77,9 @@ public class EngineServiceUtil {
         return cmmnRuntimeService;
     }
     
-    public static CmmnHistoryService getCmmnHistoryService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static CmmnHistoryService getCmmnHistoryService(AbstractEngineConfiguration engineConfiguration) {
         CmmnHistoryService cmmnHistoryService = null;
-        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(processEngineConfiguration);
+        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(engineConfiguration);
         if (cmmnEngineConfiguration != null) {
             cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
         }
@@ -87,9 +87,9 @@ public class EngineServiceUtil {
         return cmmnHistoryService;
     }
     
-    public static CmmnManagementService getCmmnManagementService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static CmmnManagementService getCmmnManagementService(AbstractEngineConfiguration engineConfiguration) {
         CmmnManagementService cmmnManagementService = null;
-        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(processEngineConfiguration);
+        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(engineConfiguration);
         if (cmmnEngineConfiguration != null) {
             cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         }
@@ -99,13 +99,13 @@ public class EngineServiceUtil {
     
     // DMN ENGINE
     
-    public static DmnEngineConfigurationApi getDmnEngineConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        return (DmnEngineConfigurationApi) processEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+    public static DmnEngineConfigurationApi getDmnEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (DmnEngineConfigurationApi) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
     }
     
-    public static DmnRepositoryService getDmnRepositoryService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static DmnRepositoryService getDmnRepositoryService(AbstractEngineConfiguration engineConfiguration) {
         DmnRepositoryService dmnRepositoryService = null;
-        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(processEngineConfiguration);
+        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(engineConfiguration);
         if (dmnEngineConfiguration != null) {
             dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
         }
@@ -113,9 +113,9 @@ public class EngineServiceUtil {
         return dmnRepositoryService;
     }
     
-    public static DmnRuleService getDmnRuleService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static DmnRuleService getDmnRuleService(AbstractEngineConfiguration engineConfiguration) {
         DmnRuleService dmnRuleService = null;
-        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(processEngineConfiguration);
+        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(engineConfiguration);
         if (dmnEngineConfiguration != null) {
             dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
         }
@@ -123,9 +123,9 @@ public class EngineServiceUtil {
         return dmnRuleService;
     }
     
-    public static DmnManagementService getDmnManagementService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static DmnManagementService getDmnManagementService(AbstractEngineConfiguration engineConfiguration) {
         DmnManagementService dmnManagementService = null;
-        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(processEngineConfiguration);
+        DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration(engineConfiguration);
         if (dmnEngineConfiguration != null) {
             dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
         }
@@ -135,8 +135,8 @@ public class EngineServiceUtil {
     
     // FORM ENGINE
     
-    public static FormEngineConfigurationApi getFormEngineConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        return (FormEngineConfigurationApi) processEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    public static FormEngineConfigurationApi getFormEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (FormEngineConfigurationApi) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
     }
     
     public static FormRepositoryService getFormRepositoryService(ProcessEngineConfiguration processEngineConfiguration) {
@@ -149,9 +149,9 @@ public class EngineServiceUtil {
         return formRepositoryService;
     }
     
-    public static FormService getFormService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static FormService getFormService(AbstractEngineConfiguration engineConfiguration) {
         FormService formService = null;
-        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(processEngineConfiguration);
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(engineConfiguration);
         if (formEngineConfiguration != null) {
             formService = formEngineConfiguration.getFormService();
         }
@@ -159,9 +159,9 @@ public class EngineServiceUtil {
         return formService;
     }
     
-    public static FormManagementService getFormManagementService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static FormManagementService getFormManagementService(AbstractEngineConfiguration engineConfiguration) {
         FormManagementService formManagementService = null;
-        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(processEngineConfiguration);
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration(engineConfiguration);
         if (formEngineConfiguration != null) {
             formManagementService = formEngineConfiguration.getFormManagementService();
         }
@@ -171,13 +171,13 @@ public class EngineServiceUtil {
     
     // CONTENT ENGINE
     
-    public static ContentEngineConfigurationApi getContentEngineConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        return (ContentEngineConfigurationApi) processEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
+    public static ContentEngineConfigurationApi getContentEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (ContentEngineConfigurationApi) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
     }
     
-    public static ContentService getContentService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static ContentService getContentService(AbstractEngineConfiguration engineConfiguration) {
         ContentService contentService = null;
-        ContentEngineConfigurationApi contentEngineConfiguration = getContentEngineConfiguration(processEngineConfiguration);
+        ContentEngineConfigurationApi contentEngineConfiguration = getContentEngineConfiguration(engineConfiguration);
         if (contentEngineConfiguration != null) {
             contentService = contentEngineConfiguration.getContentService();
         }

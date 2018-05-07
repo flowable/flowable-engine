@@ -13,12 +13,15 @@
 package org.flowable.dmn.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
@@ -55,8 +58,15 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
         if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId()) && StringUtils.isNotEmpty(getTenantId())) {
             try {
-                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(
-                        getDecisionKey(), getParentDeploymentId(), getTenantId());
+                List<DmnDeployment> dmnDeployments = deploymentManager.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
+                                new DmnDeploymentQueryImpl().parentDeploymentId(getParentDeploymentId()));
+                
+                if (dmnDeployments == null || dmnDeployments.size() == 0) {
+                    throw new FlowableObjectNotFoundException("no deployment found");
+                }
+                
+                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyDeploymentIdAndTenantId(
+                                getDecisionKey(), dmnDeployments.get(0).getId(), getTenantId());
                 
             } catch (FlowableObjectNotFoundException e) {
                 // Fall back
@@ -73,7 +83,14 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
             
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId())) {
             try {
-                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndParentDeploymentId(getDecisionKey(), getParentDeploymentId());
+                List<DmnDeployment> dmnDeployments = deploymentManager.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
+                                new DmnDeploymentQueryImpl().parentDeploymentId(getParentDeploymentId()));
+                
+                if (dmnDeployments == null || dmnDeployments.size() == 0) {
+                    throw new FlowableObjectNotFoundException("no deployment found");
+                }
+                
+                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndDeploymentId(getDecisionKey(), dmnDeployments.get(0).getId());
                 
             } catch (FlowableObjectNotFoundException e) {
 

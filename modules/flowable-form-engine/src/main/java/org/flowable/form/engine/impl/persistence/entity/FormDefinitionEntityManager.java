@@ -28,10 +28,6 @@ public interface FormDefinitionEntityManager extends EntityManager<FormDefinitio
 
     FormDefinitionEntity findLatestFormDefinitionByKeyAndTenantId(String formDefinitionKey, String tenantId);
 
-    FormDefinitionEntity findLatestFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
-
-    FormDefinitionEntity findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId);
-
     List<FormDefinition> findFormDefinitionsByQueryCriteria(FormDefinitionQueryImpl formQuery);
 
     long findFormDefinitionCountByQueryCriteria(FormDefinitionQueryImpl formQuery);

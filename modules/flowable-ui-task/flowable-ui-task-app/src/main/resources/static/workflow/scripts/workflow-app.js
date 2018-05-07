@@ -60,7 +60,7 @@ flowableApp
             templateUrl: appResourceRoot + 'views/start-process.html',
             controller: 'StartProcessController'
         })
-        .when('/apps/:deploymentKey/start-process', {
+        .when('/apps/:appDefinitionKey/start-process', {
             templateUrl: appResourceRoot + 'views/start-process.html',
             controller: 'StartProcessController'
         })
@@ -68,7 +68,7 @@ flowableApp
             templateUrl: appResourceRoot + 'views/tasks.html',
             controller: 'TasksController'
         })
-        .when('/apps/:deploymentKey/tasks', {
+        .when('/apps/:appDefinitionKey/tasks', {
             templateUrl: appResourceRoot + 'views/tasks.html',
             controller: 'TasksController'
         })
@@ -76,7 +76,7 @@ flowableApp
             templateUrl: appResourceRoot + 'views/task.html',
             controller: 'TaskController'
         })
-        .when('/apps/:deploymentKey/task/:taskId', {
+        .when('/apps/:appDefinitionKey/task/:taskId', {
             templateUrl: appResourceRoot + 'views/task.html',
             controller: 'TaskController'
         })
@@ -84,7 +84,7 @@ flowableApp
             templateUrl: appResourceRoot + 'views/processes.html',
             controller: 'ProcessesController'
         })
-        .when('/apps/:deploymentKey/processes', {
+        .when('/apps/:appDefinitionKey/processes', {
             templateUrl: appResourceRoot + 'views/processes.html',
             controller: 'ProcessesController'
         })
@@ -92,7 +92,7 @@ flowableApp
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessController'
         })
-        .when('/apps/:deploymentKey/process/:processId', {
+        .when('/apps/:appDefinitionKey/process/:processId', {
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessController'
         })
@@ -100,11 +100,11 @@ flowableApp
             templateUrl: appResourceRoot + 'views/cases.html',
             controller: 'CasesController'
         })
-        .when('/apps/:deploymentKey/cases', {
+        .when('/apps/:appDefinitionKey/cases', {
             templateUrl: appResourceRoot + 'views/cases.html',
             controller: 'CasesController'
         })
-        .when('/apps/:deploymentKey/case/:caseId', {
+        .when('/apps/:appDefinitionKey/case/:caseId', {
             templateUrl: appResourceRoot + 'views/case.html',
             controller: 'CaseController'
         })
@@ -289,14 +289,14 @@ flowableApp
         // TODO: remove proc-def from rootscope or make smarter
         $rootScope.root = {};
 
-        $rootScope.loadProcessDefinitions = function(deploymentKey) {
-        	ProcessService.getProcessDefinitions(deploymentKey).then(function(response) {
+        $rootScope.loadProcessDefinitions = function(appDefinitionKey) {
+        	ProcessService.getProcessDefinitions(appDefinitionKey).then(function(response) {
         		$rootScope.root.processDefinitions = response.data;
         	});
         };
         
-        $rootScope.loadCaseDefinitions = function(deploymentKey) {
-            CaseService.getCaseDefinitions(deploymentKey).then(function(response) {
+        $rootScope.loadCaseDefinitions = function(appDefinitionKey) {
+            CaseService.getCaseDefinitions(appDefinitionKey).then(function(response) {
                 $rootScope.root.caseDefinitions = response.data;
             });
         };

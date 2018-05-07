@@ -21,7 +21,7 @@ angular.module('flowableApp')
 
       $scope.selectedCaseInstance = { id: $routeParams.caseId };
 
-      $scope.deploymentKey = $routeParams.deploymentKey;
+      $scope.appDefinitionKey = $routeParams.appDefinitionKey;
 
       $scope.$on('caseinstance-deleted', function (event, data) {
         $scope.openCases();

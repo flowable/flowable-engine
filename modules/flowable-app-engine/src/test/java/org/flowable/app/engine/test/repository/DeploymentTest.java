@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.zip.ZipInputStream;
 
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppModel;
@@ -81,5 +82,57 @@ public class DeploymentTest extends FlowableAppTestCase {
         
         assertEquals("testApp", appModel.getKey());
         assertEquals("Test app", appModel.getName());
+    }
+    
+    @Test
+    public void testAppDefinitionZipDeployed() throws Exception {
+        appRepositoryService.createDeployment().addZipInputStream(new ZipInputStream(this.getClass().getClassLoader().getResourceAsStream(
+                        "org/flowable/app/engine/test/vacationRequest.zip"))).deploy();
+        org.flowable.app.api.repository.AppDeployment appDeployment = appRepositoryService.createDeploymentQuery().singleResult();
+        assertNotNull(appDeployment);
+        
+        List<String> resourceNames = appRepositoryService.getDeploymentResourceNames(appDeployment.getId());
+        assertEquals(4, resourceNames.size());
+        
+        boolean vacationRequestAppFound = false;
+        for (String resourceName : resourceNames) {
+            if ("vacationRequestApp.app".equals(resourceName)) {
+                vacationRequestAppFound = true;
+            }
+        }
+        assertTrue(vacationRequestAppFound);
+        
+        InputStream inputStream = appRepositoryService.getResourceAsStream(appDeployment.getId(), "vacationRequestApp.app");
+        assertNotNull(inputStream);
+        inputStream.close();
+        
+        DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache = appEngineConfiguration.getAppDefinitionCache();
+        assertEquals(1, ((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().size());
+        
+        AppDefinitionCacheEntry cachedAppDefinition = ((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().iterator().next();
+        assertNotNull(cachedAppDefinition.getAppModel());
+        assertNotNull(cachedAppDefinition.getAppDefinition());
+        
+        AppDefinition appDefinition = cachedAppDefinition.getAppDefinition();
+        assertNotNull(appDefinition.getId());
+        assertNotNull(appDefinition.getDeploymentId());
+        assertNotNull(appDefinition.getKey());
+        assertNotNull(appDefinition.getResourceName());
+        assertTrue(appDefinition.getVersion() > 0);
+        
+        appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(appDeployment.getId()).singleResult();
+        assertNotNull(appDefinition.getId());
+        assertNotNull(appDefinition.getDeploymentId());
+        assertNotNull(appDefinition.getKey());
+        assertNotNull(appDefinition.getResourceName());
+        assertEquals(1, appDefinition.getVersion());
+        
+        AppModel appModel = appRepositoryService.getAppModel(appDefinition.getId());
+        assertNotNull(appModel);
+        
+        assertEquals("vacationRequestApp", appModel.getKey());
+        assertEquals("Vacation request app", appModel.getName());
+        
+        appRepositoryService.deleteDeployment(appDeployment.getId(), true);
     }
 }

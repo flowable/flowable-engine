@@ -18,7 +18,7 @@
 		<flowable.artifact>
 			org.flowable.idm.engine
 		</flowable.artifact>
-		<flowable.osgi.import.additional>
+        <flowable.osgi.import.additional>
             junit*;resolution:=optional,
             org.junit*;resolution:=optional,
 			org.springframework*;resolution:=optional,

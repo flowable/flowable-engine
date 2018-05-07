@@ -13,6 +13,7 @@
 package org.flowable.app.api.repository;
 
 import java.io.InputStream;
+import java.util.zip.ZipInputStream;
 
 import org.flowable.app.api.AppRepositoryService;
 
@@ -35,6 +36,8 @@ public interface AppDeploymentBuilder {
     AppDeploymentBuilder addString(String resourceName, String text);
     
     AppDeploymentBuilder addBytes(String resourceName, byte[] bytes);
+    
+    AppDeploymentBuilder addZipInputStream(ZipInputStream zipInputStream);
 
     /**
      * If called, no XML schema validation against the XSD.

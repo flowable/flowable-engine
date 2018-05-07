@@ -56,11 +56,11 @@ angular.module('flowableApp')
             }
         };
 
-        $scope.deploymentKey = $routeParams.deploymentKey;
-        $scope.missingAppdefinition = $scope.deploymentKey === false;
+        $scope.appDefinitionKey = $routeParams.appDefinitionKey;
+        $scope.missingAppdefinition = $scope.appDefinitionKey === false;
 
         // In case of viewing process instances in an app-context, need to make filter aware of this
-        $scope.model.filter.param.deploymentKey = $scope.deploymentKey;
+        $scope.model.filter.param.appDefinitionKey = $scope.appDefinitionKey;
 
         // The filter is stored on the rootScope, which allows the user to switch back and forth without losing the filter.
         if ($rootScope.processFilter !== null && $rootScope.processFilter !== undefined) {
@@ -70,7 +70,7 @@ angular.module('flowableApp')
         }
 
         // Update app on rootScope. If app id present, it will fetch definition if not already fetched to update view and navigation accordingly
-        AppDefinitionService.setActiveDeploymentKey($scope.deploymentKey);
+        AppDefinitionService.setActiveAppDefinitionKey($scope.appDefinitionKey);
 
         $scope.selectProcessInstance = function (processInstance) {
             $scope.selectedProcessInstance = processInstance;
@@ -124,8 +124,8 @@ angular.module('flowableApp')
                 page: $scope.model.page
             };
 
-            if (params.deploymentKey) {
-                instanceQueryData.deploymentKey = params.deploymentKey;
+            if (params.appDefinitionKey) {
+                instanceQueryData.appDefinitionKey = params.appDefinitionKey;
             }
 
             if (params.state) {
@@ -221,7 +221,7 @@ angular.module('flowableApp')
 
         $scope.selectDefaultDefinition = function() {
             // Select first non-default definition, if any
-            ProcessService.getProcessDefinitions($scope.deploymentKey).then(function(response) {
+            ProcessService.getProcessDefinitions($scope.appDefinitionKey).then(function(response) {
             	$rootScope.root.processDefinitions = response.data;
 	            if ($scope.root.processDefinitions && $scope.root.processDefinitions.length > 0) {
 	                for (var i=0; i< $scope.root.processDefinitions.length; i++) {
@@ -302,7 +302,7 @@ angular.module('flowableApp')
                 });
         };
 
-        $rootScope.loadProcessDefinitions($scope.deploymentKey);
+        $rootScope.loadProcessDefinitions($scope.appDefinitionKey);
 
         // If 'createProcessInstance' is set (eg from the task page)
         if ($rootScope.createProcessInstance) {

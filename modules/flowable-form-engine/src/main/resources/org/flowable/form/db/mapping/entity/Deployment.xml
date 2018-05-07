@@ -49,7 +49,8 @@
   <update id="updateFormDeployment" parameterType="org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityImpl">
     update ${prefix}ACT_FO_FORM_DEPLOYMENT set
       CATEGORY_ = #{category, jdbcType=VARCHAR},
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+      PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   

@@ -54,10 +54,8 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
     }
     
     @Override
-    public HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity) {
-        HistoryJobEntity returnValue = super.scheduleHistoryJob(historyJobEntity);
-        prepareAndSendMessage(returnValue);
-        return returnValue;
+    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity jobEntity) {
+        prepareAndSendMessage(jobEntity);
     }
 
     @Override

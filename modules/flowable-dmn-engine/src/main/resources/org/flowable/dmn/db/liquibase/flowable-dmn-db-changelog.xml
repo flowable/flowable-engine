@@ -132,6 +132,12 @@
         </addColumn>
     
     </changeSet>
+    
+    <changeSet id="4" author="flowable">
+    
+        <dropColumn columnName="PARENT_DEPLOYMENT_ID_" tableName="ACT_DMN_DECISION_TABLE" />
+        
+    </changeSet>
 
 
 </databaseChangeLog>

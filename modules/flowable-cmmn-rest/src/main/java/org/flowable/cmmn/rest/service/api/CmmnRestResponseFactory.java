@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,15 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -31,10 +27,12 @@ import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
-import org.flowable.cmmn.rest.service.api.history.HistoricCaseInstanceResponse;
-import org.flowable.cmmn.rest.service.api.history.HistoricIdentityLinkResponse;
-import org.flowable.cmmn.rest.service.api.history.HistoricTaskInstanceResponse;
-import org.flowable.cmmn.rest.service.api.history.HistoricVariableInstanceResponse;
+import org.flowable.cmmn.rest.service.api.history.caze.HistoricCaseInstanceResponse;
+import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneInstanceResponse;
+import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInstanceResponse;
+import org.flowable.cmmn.rest.service.api.history.task.HistoricIdentityLinkResponse;
+import org.flowable.cmmn.rest.service.api.history.task.HistoricTaskInstanceResponse;
+import org.flowable.cmmn.rest.service.api.history.variable.HistoricVariableInstanceResponse;
 import org.flowable.cmmn.rest.service.api.management.JobResponse;
 import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.cmmn.rest.service.api.repository.CmmnDeploymentResponse;
@@ -65,13 +63,20 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 /**
  * Default implementation of a {@link CmmnRestResponseFactory}.
- * 
+ * <p>
  * Added a new "createProcessInstanceResponse" method (with a different signature) to conditionally return the process variables that exist within the process instance when the first wait state is
  * encountered (or when the process instance completes). Also added the population of a "completed" flag - within both the original "createProcessInstanceResponse" method and the new one with the
  * different signature - to let the caller know whether the process instance has completed or not.
- * 
+ *
  * @author Frederik Heremans
  * @author Ryan Johnston (@rjfsu)
  */
@@ -225,7 +230,7 @@ public class CmmnRestResponseFactory {
         }
         return response;
     }
-    
+
     public List<RestVariable> createRestVariables(Map<String, Object> variables, String id, int variableType) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<RestVariable> result = new ArrayList<>();
@@ -402,7 +407,7 @@ public class CmmnRestResponseFactory {
         } else {
             family = CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS;
         }
-        
+
         if (caseInstanceId != null) {
             result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstanceId, (userId != null ? userId : groupId), type));
         } else if (taskId != null) {
@@ -463,7 +468,7 @@ public class CmmnRestResponseFactory {
 
         return result;
     }
-    
+
     public List<PlanItemInstanceResponse> createPlanItemInstanceResponseList(List<PlanItemInstance> planItemInstances) {
         List<PlanItemInstanceResponse> responseList = new ArrayList<>();
         for (PlanItemInstance planItemInstance : planItemInstances) {
@@ -471,7 +476,7 @@ public class CmmnRestResponseFactory {
         }
         return responseList;
     }
-    
+
     public PlanItemInstanceResponse createPlanItemInstanceResponse(PlanItemInstance planItemInstance) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         PlanItemInstanceResponse result = new PlanItemInstanceResponse();
@@ -494,7 +499,7 @@ public class CmmnRestResponseFactory {
         result.setStage(planItemInstance.isStage());
         result.setCompleteable(planItemInstance.isCompleteable());
         result.setTenantId(planItemInstance.getTenantId());
-        
+
         return result;
     }
 
@@ -559,7 +564,7 @@ public class CmmnRestResponseFactory {
             result.setCaseDefinitionId(taskInstance.getScopeDefinitionId());
             result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, taskInstance.getScopeDefinitionId()));
         }
-        
+
         if (taskInstance.getScopeId() != null && ScopeTypes.CMMN.equals(taskInstance.getScopeType())) {
             result.setCaseInstanceId(taskInstance.getScopeId());
             result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, taskInstance.getScopeId()));
@@ -630,11 +635,82 @@ public class CmmnRestResponseFactory {
         if (StringUtils.isNotEmpty(identityLink.getTaskId())) {
             result.setTaskUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, identityLink.getTaskId()));
         }
-        
+
         if (StringUtils.isNotEmpty(identityLink.getScopeId()) && ScopeTypes.CMMN.equals(identityLink.getScopeType())) {
             result.setCaseInstanceId(identityLink.getScopeId());
             result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, identityLink.getScopeId()));
         }
+        return result;
+    }
+
+    public List<HistoricMilestoneInstanceResponse> createHistoricMilestoneInstanceResponseList(List<HistoricMilestoneInstance> historicMilestoneInstances) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        return historicMilestoneInstances
+                .stream()
+                .map(m -> createHistoricMilestoneInstanceResponse(m, urlBuilder))
+                .collect(Collectors.toList());
+    }
+
+    public HistoricMilestoneInstanceResponse createHistoricMilestoneInstanceResponse(HistoricMilestoneInstance historicMilestoneInstance) {
+        return createHistoricMilestoneInstanceResponse(historicMilestoneInstance, createUrlBuilder());
+    }
+
+    public HistoricMilestoneInstanceResponse createHistoricMilestoneInstanceResponse(HistoricMilestoneInstance historicMilestoneInstance, RestUrlBuilder urlBuilder) {
+        HistoricMilestoneInstanceResponse result = new HistoricMilestoneInstanceResponse();
+        result.setId(historicMilestoneInstance.getId());
+        result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, historicMilestoneInstance.getId()));
+        result.setName(historicMilestoneInstance.getName());
+        result.setElementId(historicMilestoneInstance.getElementId());
+        result.setTimestamp(historicMilestoneInstance.getTimeStamp());
+        result.setCaseInstanceId(historicMilestoneInstance.getCaseInstanceId());
+        result.setHistoricCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, historicMilestoneInstance.getCaseInstanceId()));
+        result.setCaseDefinitionId(historicMilestoneInstance.getCaseDefinitionId());
+        result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, historicMilestoneInstance.getCaseDefinitionId()));
+        return result;
+    }
+
+    public List<HistoricPlanItemInstanceResponse> createHistoricPlanItemInstanceResponseList(List<HistoricPlanItemInstance> historicPlanItemInstances) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        return historicPlanItemInstances
+                .stream()
+                .map(m -> createHistoricPlanItemInstanceResponse(m, urlBuilder))
+                .collect(Collectors.toList());
+    }
+
+    public HistoricPlanItemInstanceResponse createHistoricPlanItemInstanceResponse(HistoricPlanItemInstance historicPlanItemInstance) {
+        return createHistoricPlanItemInstanceResponse(historicPlanItemInstance, createUrlBuilder());
+    }
+
+    public HistoricPlanItemInstanceResponse createHistoricPlanItemInstanceResponse(HistoricPlanItemInstance historicPlanItemInstance, RestUrlBuilder urlBuilder) {
+        HistoricPlanItemInstanceResponse result = new HistoricPlanItemInstanceResponse();
+        result.setId(historicPlanItemInstance.getId());
+        result.setName(historicPlanItemInstance.getName());
+        result.setState(historicPlanItemInstance.getState());
+        result.setCaseDefinitionId(historicPlanItemInstance.getCaseDefinitionId());
+        result.setCaseInstanceId(historicPlanItemInstance.getCaseInstanceId());
+        result.setStageInstanceId(historicPlanItemInstance.getStageInstanceId());
+        result.setStage(historicPlanItemInstance.isStage());
+        result.setElementId(historicPlanItemInstance.getElementId());
+        result.setPlanItemDefinitionId(historicPlanItemInstance.getPlanItemDefinitionId());
+        result.setPlanItemDefinitionType(historicPlanItemInstance.getPlanItemDefinitionType());
+        result.setCreatedTime(historicPlanItemInstance.getCreatedTime());
+        result.setLastAvailableTime(historicPlanItemInstance.getLastAvailableTime());
+        result.setLastEnabledTime(historicPlanItemInstance.getLastEnabledTime());
+        result.setLastDisabledTime(historicPlanItemInstance.getLastDisabledTime());
+        result.setLastStartedTime(historicPlanItemInstance.getLastStartedTime());
+        result.setLastSuspendedTime(historicPlanItemInstance.getLastSuspendedTime());
+        result.setCompletedTime(historicPlanItemInstance.getCompletedTime());
+        result.setOccurredTime(historicPlanItemInstance.getOccurredTime());
+        result.setTerminatedTime(historicPlanItemInstance.getTerminatedTime());
+        result.setExitTime(historicPlanItemInstance.getExitTime());
+        result.setEndedTime(historicPlanItemInstance.getEndedTime());
+        result.setStartUserId(historicPlanItemInstance.getStartUserId());
+        result.setReferenceId(historicPlanItemInstance.getReferenceId());
+        result.setReferenceType(historicPlanItemInstance.getReferenceType());
+        result.setTenantId(historicPlanItemInstance.getTenantId());
+        result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, historicPlanItemInstance.getId()));
+        result.setHistoricCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, historicPlanItemInstance.getCaseInstanceId()));
+        result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, historicPlanItemInstance.getCaseDefinitionId()));
         return result;
     }
 
@@ -677,7 +753,7 @@ public class CmmnRestResponseFactory {
 
         return formDefinitionResponse;
     }
-    
+
     public List<JobResponse> createJobResponseList(List<Job> jobs) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<JobResponse> responseList = new ArrayList<>();
@@ -707,12 +783,12 @@ public class CmmnRestResponseFactory {
                 response.setCaseDefinitionId(job.getScopeDefinitionId());
                 response.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, job.getScopeDefinitionId()));
             }
-    
+
             if (job.getScopeId() != null) {
                 response.setCaseInstanceId(job.getScopeId());
                 response.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, job.getScopeId()));
             }
-    
+
             if (job.getSubScopeId() != null) {
                 response.setPlanItemInstanceId(job.getSubScopeId());
             }

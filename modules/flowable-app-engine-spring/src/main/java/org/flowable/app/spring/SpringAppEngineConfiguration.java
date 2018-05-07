@@ -24,8 +24,6 @@ import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.AppEngines;
 import org.flowable.app.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
-import org.flowable.app.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
-import org.flowable.app.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -44,7 +42,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class SpringAppEngineConfiguration extends AppEngineConfiguration implements SpringEngineConfiguration {
 
     protected PlatformTransactionManager transactionManager;
-    protected String deploymentName = "SpringAutoDeployment";
     protected Resource[] deploymentResources = new Resource[0];
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
@@ -57,8 +54,6 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
     public SpringAppEngineConfiguration() {
         this.transactionsExternallyManaged = true;
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
-        deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
-        deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
     }
 
     @Override
@@ -99,7 +94,7 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
     protected void autoDeployResources(AppEngine appEngine) {
         if (deploymentResources != null && deploymentResources.length > 0) {
             final AutoDeploymentStrategy strategy = getAutoDeploymentStrategy(deploymentMode);
-            strategy.deployResources(deploymentName, deploymentResources, appEngine.getAppRepositoryService());
+            strategy.deployResources(deploymentResources, appEngine.getAppRepositoryService());
         }
     }
 
@@ -122,16 +117,6 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
     @Override
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
-    }
-
-    @Override
-    public String getDeploymentName() {
-        return deploymentName;
-    }
-
-    @Override
-    public void setDeploymentName(String deploymentName) {
-        this.deploymentName = deploymentName;
     }
 
     @Override
@@ -203,5 +188,16 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    @Override
+    public String getDeploymentName() {
+        return null;
+    }
+
+    @Override
+    public void setDeploymentName(String deploymentName) {
+        // not supported
+        throw new FlowableException("Setting a deployment name is not supported for apps");
     }
 }

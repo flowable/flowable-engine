@@ -28,6 +28,10 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-app-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-cmmn-rest</artifactId>
         </dependency>
         <dependency>

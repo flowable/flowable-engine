@@ -51,16 +51,6 @@ public class FormDefinitionEntityManagerImpl extends AbstractEntityManager<FormD
     }
 
     @Override
-    public FormDefinitionEntity findLatestFormDefinitionByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId) {
-        return formDefinitionDataManager.findLatestFormDefinitionByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
-    }
-
-    @Override
-    public FormDefinitionEntity findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(String formDefinitionKey, String parentDeploymentId, String tenantId) {
-        return formDefinitionDataManager.findLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
-    }
-
-    @Override
     public void deleteFormDefinitionsByDeploymentId(String deploymentId) {
         formDefinitionDataManager.deleteFormDefinitionsByDeploymentId(deploymentId);
     }

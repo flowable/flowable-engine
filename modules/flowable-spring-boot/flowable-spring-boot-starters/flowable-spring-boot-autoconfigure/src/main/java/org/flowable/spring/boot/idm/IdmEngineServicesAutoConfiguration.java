@@ -12,15 +12,18 @@
  */
 package org.flowable.spring.boot.idm;
 
+import org.flowable.app.engine.AppEngine;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
-import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.IdmEngines;
 import org.flowable.idm.spring.IdmEngineFactoryBean;
+import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.FlowableProperties;
-import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -42,7 +45,8 @@ import org.springframework.context.annotation.Configuration;
 })
 @AutoConfigureAfter({
     IdmEngineAutoConfiguration.class,
-    ProcessEngineAutoConfiguration.class
+    AppEngineServicesAutoConfiguration.class,
+    ProcessEngineServicesAutoConfiguration.class,
 })
 public class IdmEngineServicesAutoConfiguration {
 
@@ -52,7 +56,8 @@ public class IdmEngineServicesAutoConfiguration {
      */
     @Configuration
     @ConditionalOnMissingBean(type = {
-        "org.flowable.idm.engine.IdmEngine"
+        "org.flowable.idm.engine.IdmEngine",
+        "org.flowable.app.engine.AppEngine"
     })
     @ConditionalOnBean(type = {
         "org.flowable.engine.ProcessEngine"
@@ -68,6 +73,29 @@ public class IdmEngineServicesAutoConfiguration {
             return IdmEngines.getDefaultIdmEngine();
         }
     }
+    
+    /**
+     * If an app engine is present that means that the IdmEngine was created as part of it.
+     * Therefore extract it from the IdmEngines.
+     */
+    @Configuration
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.idm.engine.IdmEngine",
+    })
+    @ConditionalOnBean(type = {
+        "org.flowable.app.engine.AppEngine"
+    })
+    static class AlreadyInitializedAppEngineConfiguration {
+
+        @Bean
+        public IdmEngine idmEngine(@SuppressWarnings("unused") AppEngine appEngine) {
+            // The process engine needs to be injected, as otherwise it won't be initialized, which means that the IdmEngine is not initialized yet
+            if (!IdmEngines.isInitialized()) {
+                throw new IllegalStateException("Idm engine has not been initialized");
+            }
+            return IdmEngines.getDefaultIdmEngine();
+        }
+    }
 
     /**
      * If there is no process engine configuration, then trigger a creation of the idm engine.
@@ -75,14 +103,18 @@ public class IdmEngineServicesAutoConfiguration {
     @Configuration
     @ConditionalOnMissingBean(type = {
         "org.flowable.idm.engine.IdmEngine",
-        "org.flowable.engine.ProcessEngine"
+        "org.flowable.engine.ProcessEngine",
+        "org.flowable.app.engine.AppEngine"
     })
-    static class StandaloneEngineConfiguration {
+    static class StandaloneEngineConfiguration extends BaseEngineConfigurationWithConfigurers<SpringIdmEngineConfiguration> {
 
         @Bean
-        public IdmEngineFactoryBean idmEngine(IdmEngineConfiguration idmEngineConfiguration) {
+        public IdmEngineFactoryBean idmEngine(SpringIdmEngineConfiguration idmEngineConfiguration) {
             IdmEngineFactoryBean factory = new IdmEngineFactoryBean();
             factory.setIdmEngineConfiguration(idmEngineConfiguration);
+            
+            invokeConfigurers(idmEngineConfiguration);
+            
             return factory;
         }
     }

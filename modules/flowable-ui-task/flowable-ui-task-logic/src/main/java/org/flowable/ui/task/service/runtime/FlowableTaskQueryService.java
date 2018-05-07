@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -78,6 +80,9 @@ public class FlowableTaskQueryService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected AppRepositoryService appRepositoryService;
 
     @Autowired
     protected CmmnRepositoryService cmmnRepositoryService;
@@ -119,25 +124,31 @@ public class FlowableTaskQueryService {
             taskInfoQueryWrapper = new TaskInfoQueryWrapper(taskService.createTaskQuery());
         }
 
-        JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
-        if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
-            List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
+        JsonNode appDefinitionKeyNode = requestNode.get("appDefinitionKey");
+        if (appDefinitionKeyNode != null && !appDefinitionKeyNode.isNull()) {
+            List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().appDefinitionKey(appDefinitionKeyNode.asText()).list();
+            List<String> parentDeploymentIds = new ArrayList<>();
+            for (AppDefinition appDefinition : appDefinitions) {
+                parentDeploymentIds.add(appDefinition.getDeploymentId());
+            }
+            
+            List<Deployment> deployments = repositoryService.createDeploymentQuery().parentDeploymentIds(parentDeploymentIds).list();
             List<String> deploymentIds = new ArrayList<>();
             for (Deployment deployment : deployments) {
                 deploymentIds.add(deployment.getId());
             }
 
-            List<CmmnDeployment> cmmnDeployments = cmmnRepositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
+            List<CmmnDeployment> cmmnDeployments = cmmnRepositoryService.createDeploymentQuery().parentDeploymentIds(parentDeploymentIds).list();
             List<String> cmmnDeploymentIds = new ArrayList<>();
             for (CmmnDeployment deployment : cmmnDeployments) {
                 cmmnDeploymentIds.add(deployment.getId());
             }
 
             taskInfoQueryWrapper.getTaskInfoQuery().or()
-                    .deploymentIdIn(deploymentIds)
-                    .cmmnDeploymentIdIn(cmmnDeploymentIds)
-                    .taskCategory(deploymentKeyNode.asText())
-                    .endOr();
+                .deploymentIdIn(deploymentIds)
+                .cmmnDeploymentIdIn(cmmnDeploymentIds)
+                .taskCategory(appDefinitionKeyNode.asText())
+                .endOr();
         }
 
         JsonNode processInstanceIdNode = requestNode.get("processInstanceId");

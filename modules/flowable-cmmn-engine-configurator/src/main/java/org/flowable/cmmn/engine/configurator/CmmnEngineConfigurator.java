@@ -12,6 +12,12 @@
  */
 package org.flowable.cmmn.engine.configurator;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -28,12 +34,6 @@ import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallba
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -65,17 +65,21 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
         initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
 
-        ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engineConfiguration;
-        initProcessInstanceService(processEngineConfiguration);
-        initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
+        if (engineConfiguration.getEngineConfigurations().containsKey(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG)) {
+            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engineConfiguration.getEngineConfigurations()
+                            .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            initProcessInstanceService(processEngineConfiguration);
+            initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
+            
+            cmmnEngineConfiguration.setEnableTaskRelationshipCounts(processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
+            cmmnEngineConfiguration.setTaskQueryLimit(processEngineConfiguration.getTaskQueryLimit());
+            cmmnEngineConfiguration.setHistoricTaskQueryLimit(processEngineConfiguration.getHistoricTaskQueryLimit());
+            // use the same query limit for executions/processes and cases
+            cmmnEngineConfiguration.setCaseQueryLimit(processEngineConfiguration.getExecutionQueryLimit());
+            cmmnEngineConfiguration.setHistoricCaseQueryLimit(processEngineConfiguration.getHistoricProcessInstancesQueryLimit());
+        }
 
         cmmnEngineConfiguration.setExecuteServiceDbSchemaManagers(false);
-        cmmnEngineConfiguration.setEnableTaskRelationshipCounts(processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
-        cmmnEngineConfiguration.setTaskQueryLimit(processEngineConfiguration.getTaskQueryLimit());
-        cmmnEngineConfiguration.setHistoricTaskQueryLimit(processEngineConfiguration.getHistoricTaskQueryLimit());
-        // use the same query limit for executions/processes and cases
-        cmmnEngineConfiguration.setCaseQueryLimit(processEngineConfiguration.getExecutionQueryLimit());
-        cmmnEngineConfiguration.setHistoricCaseQueryLimit(processEngineConfiguration.getHistoricProcessInstancesQueryLimit());
 
         initCmmnEngine();
 

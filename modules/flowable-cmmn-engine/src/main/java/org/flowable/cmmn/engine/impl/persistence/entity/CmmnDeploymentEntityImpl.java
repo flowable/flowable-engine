@@ -73,6 +73,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("parentDeploymentId", parentDeploymentId);
         return persistentState;
     }
 

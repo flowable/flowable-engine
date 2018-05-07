@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Date;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
@@ -32,10 +36,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentit
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-
-import java.util.Date;
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @author Joram Barrez
@@ -71,8 +71,10 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceId);
-            historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
-            historicCaseInstanceEntity.setState(state);
+            if (historicCaseInstanceEntity != null) {
+                historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+                historicCaseInstanceEntity.setState(state);
+            }
         }
     }
 
@@ -81,6 +83,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
             HistoricMilestoneInstanceEntity historicMilestoneInstanceEntity = historicMilestoneInstanceEntityManager.create();
+            historicMilestoneInstanceEntity.setId(milestoneInstance.getId());
             historicMilestoneInstanceEntity.setName(milestoneInstance.getName());
             historicMilestoneInstanceEntity.setCaseInstanceId(milestoneInstance.getCaseInstanceId());
             historicMilestoneInstanceEntity.setCaseDefinitionId(milestoneInstance.getCaseDefinitionId());
@@ -97,21 +100,20 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricCaseInstanceEntity historicCaseInstance = historicCaseInstanceEntityManager.findById(caseInstanceId);
 
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
-            List<HistoricMilestoneInstance> historicMilestoneInstances = historicMilestoneInstanceEntityManager
-                    .findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseInstanceId(historicCaseInstance.getId()));
-            for (HistoricMilestoneInstance historicMilestoneInstance : historicMilestoneInstances) {
-                historicMilestoneInstanceEntityManager.delete(historicMilestoneInstance.getId());
-            }
+            historicMilestoneInstanceEntityManager.findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseInstanceId(historicCaseInstance.getId()))
+                    .forEach(m -> historicMilestoneInstanceEntityManager.delete(m.getId()));
+
+            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
+            historicPlanItemInstanceEntityManager.findByCriteria(new HistoricPlanItemInstanceQueryImpl().planItemInstanceCaseInstanceId(historicCaseInstance.getId()))
+                    .forEach(p -> historicPlanItemInstanceEntityManager.delete(p.getId()));
 
             CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
 
             historicCaseInstanceEntityManager.delete(historicCaseInstance);
 
             // Also delete any sub cases that may be active
-            List<HistoricCaseInstance> selectList = historicCaseInstanceEntityManager.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstanceId).list();
-            for (HistoricCaseInstance child : selectList) {
-                recordCaseInstanceDeleted(child.getId());
-            }
+            historicCaseInstanceEntityManager.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstanceId).list()
+                    .forEach(c -> recordCaseInstanceDeleted(c.getId()));
         }
     }
 
@@ -272,8 +274,10 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
             HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.findById(planItemInstanceEntity.getId());
-            historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
-            changes.accept(historicPlanItemInstanceEntity);
+            if (historicPlanItemInstanceEntity != null) {
+                historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
+                changes.accept(historicPlanItemInstanceEntity);
+            }
         }
     }
 }

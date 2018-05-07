@@ -56,18 +56,6 @@ public class DecisionTableEntityManagerImpl extends AbstractEntityManager<Decisi
     }
 
     @Override
-    public DecisionTableEntity findLatestDecisionTableByKeyAndParentDeploymentId(String decisionTableKey, String parentDeploymentId) {
-        return decisionTableDataManager.findLatestDecisionTableByKeyAndParentDeploymentId(decisionTableKey, parentDeploymentId);
-    }
-
-    @Override
-    public DecisionTableEntity findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(String decisionTableKey,
-            String parentDeploymentId, String tenantId) {
-
-        return decisionTableDataManager.findLatestDecisionTableByKeyParentDeploymentIdAndTenantId(decisionTableKey, parentDeploymentId, tenantId);
-    }
-
-    @Override
     public List<DmnDecisionTable> findDecisionTablesByQueryCriteria(DecisionTableQueryImpl decisionTableQuery) {
         return decisionTableDataManager.findDecisionTablesByQueryCriteria(decisionTableQuery);
     }

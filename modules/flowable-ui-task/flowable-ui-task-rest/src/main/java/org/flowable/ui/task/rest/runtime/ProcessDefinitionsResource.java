@@ -32,9 +32,9 @@ public class ProcessDefinitionsResource {
 
     @RequestMapping(value = "/rest/process-definitions", method = RequestMethod.GET)
     public ResultListDataRepresentation getProcessDefinitions(@RequestParam(value = "latest", required = false) Boolean latest,
-            @RequestParam(value = "deploymentKey", required = false) String deploymentKey) {
+            @RequestParam(value = "appDefinitionKey", required = false) String appDefinitionKey) {
 
-        return processDefinitionService.getProcessDefinitions(latest, deploymentKey);
+        return processDefinitionService.getProcessDefinitions(latest, appDefinitionKey);
     }
 
 }

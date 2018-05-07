@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="caseWithTwoMilestones">
+        <casePlanModel id="myCasePlanModel">
+            <planItem id="milestonePlanItem1" definitionRef="milestone1">
+                <entryCriterion sentryRef="sentry1"/>
+            </planItem>
+            <planItem id="milestonePlanItem2" definitionRef="milestone2">
+                <entryCriterion sentryRef="sentry2"/>
+            </planItem>
+            <planItem id="activateMilestone1" definitionRef="event1"/>
+            <planItem id="activateMilestone2" definitionRef="event2"/>
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="activateMilestone1">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentry2">
+                <planItemOnPart sourceRef="activateMilestone2">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <milestone id="milestone1" name="abcMilestone"/>
+            <milestone id="milestone2" name="xyzMilestone"/>
+            <userEventListener id="event1"/>
+            <userEventListener id="event2"/>
+        </casePlanModel>
+    </case>
+
+</definitions>

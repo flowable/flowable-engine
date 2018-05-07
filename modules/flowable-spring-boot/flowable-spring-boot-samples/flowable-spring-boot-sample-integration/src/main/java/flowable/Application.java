@@ -32,7 +32,7 @@ public class Application {
 
     @Bean
     FlowableInboundGateway inboundGateway(ProcessEngine processEngine) {
-        return new FlowableInboundGateway(processEngine, "customerId", "projectId");
+        return new FlowableInboundGateway(processEngine, "customerId", "projectId", "orderId");
     }
 
     @Bean
@@ -61,7 +61,8 @@ public class Application {
                     @Override
                     public Object handle(DelegateExecution execution, Map<String, Object> headers) {
                         return MessageBuilder.withPayload(execution)
-                                .setHeader("projectId", "3243549")
+                                .setHeader("projectId", "2143243")
+                                .setHeader("orderId", "246")
                                 .copyHeaders(headers).build();
                     }
                 })

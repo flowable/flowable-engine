@@ -12,16 +12,19 @@
  */
 package org.flowable.spring.boot.form;
 
+import org.flowable.app.engine.AppEngine;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
-import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.FormEngines;
 import org.flowable.form.spring.FormEngineFactoryBean;
+import org.flowable.form.spring.SpringFormEngineConfiguration;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.FlowableProperties;
-import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -44,7 +47,8 @@ import org.springframework.context.annotation.Configuration;
 })
 @AutoConfigureAfter({
     FormEngineAutoConfiguration.class,
-    ProcessEngineAutoConfiguration.class
+    AppEngineServicesAutoConfiguration.class,
+    ProcessEngineServicesAutoConfiguration.class
 })
 public class FormEngineServicesAutoConfiguration {
 
@@ -55,7 +59,8 @@ public class FormEngineServicesAutoConfiguration {
      */
     @Configuration
     @ConditionalOnMissingBean(type = {
-        "org.flowable.form.engine.FormEngine"
+        "org.flowable.form.engine.FormEngine",
+        "org.flowable.app.engine.AppEngine"
     })
     @ConditionalOnBean(type = {
         "org.flowable.engine.ProcessEngine"
@@ -70,20 +75,48 @@ public class FormEngineServicesAutoConfiguration {
             return FormEngines.getDefaultFormEngine();
         }
     }
+    
+    /**
+     * If an app engine is present that means that the FormEngine was created as part of the app engine.
+     * Therefore extract it from the FormEngines.
+     */
+    @Configuration
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.form.engine.FormEngine"
+    })
+    @ConditionalOnBean(type = {
+        "org.flowable.app.engine.AppEngine"
+    })
+    static class AlreadyInitializedAppEngineConfiguration {
+
+        @Bean
+        public FormEngine formEngine(@SuppressWarnings("unused") AppEngine appEngine) {
+            // The app engine needs to be injected, as otherwise it won't be initialized, which means that the FormEngine is not initialized yet
+            if (!FormEngines.isInitialized()) {
+                throw new IllegalStateException("Form engine has not been initialized");
+            }
+            return FormEngines.getDefaultFormEngine();
+        }
+    }
+    
     /**
      * If there is no process engine configuration, then trigger a creation of the form engine.
      */
     @Configuration
     @ConditionalOnMissingBean(type = {
         "org.flowable.form.engine.FormEngine",
-        "org.flowable.engine.ProcessEngine"
+        "org.flowable.engine.ProcessEngine",
+        "org.flowable.app.engine.AppEngine"
     })
-    static class StandaloneFormEngineConfiguration {
+    static class StandaloneFormEngineConfiguration extends BaseEngineConfigurationWithConfigurers<SpringFormEngineConfiguration> {
 
         @Bean
-        public FormEngineFactoryBean formEngine(FormEngineConfiguration formEngineConfiguration) {
+        public FormEngineFactoryBean formEngine(SpringFormEngineConfiguration formEngineConfiguration) {
             FormEngineFactoryBean factory = new FormEngineFactoryBean();
             factory.setFormEngineConfiguration(formEngineConfiguration);
+            
+            invokeConfigurers(formEngineConfiguration);
+            
             return factory;
         }
     }

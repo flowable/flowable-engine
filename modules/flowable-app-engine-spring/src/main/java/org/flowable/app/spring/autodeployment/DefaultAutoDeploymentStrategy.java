@@ -14,6 +14,7 @@
 package org.flowable.app.spring.autodeployment;
 
 import java.io.IOException;
+import java.util.zip.ZipInputStream;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
@@ -21,9 +22,9 @@ import org.flowable.common.engine.api.FlowableException;
 import org.springframework.core.io.Resource;
 
 /**
- * Default implementation of {@link AutoDeploymentStrategy} that groups all {@link Resource}s into a single deployment. This implementation is equivalent to the previously used implementation.
+ * Default Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each resource by name.
  * 
- * @author Tiese Barrell
+ * @author Tijs Rademakers
  */
 public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
 
@@ -38,24 +39,35 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final AppRepositoryService repositoryService) {
-
-        // Create a single deployment for all resources using the name hint as the literal name
-        final AppDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
+    public void deployResources(final Resource[] resources, final AppRepositoryService repositoryService) {
+        
+        // Create a separate deployment for each resource using the resource name
 
         for (final Resource resource : resources) {
-            final String resourceName = determineResourceName(resource);
+
+            String resourceName = determineResourceName(resource);
+            if (resourceName.contains("/")) {
+                resourceName = resourceName.substring(resourceName.lastIndexOf("/") + 1);
+                
+            } else if (resourceName.contains("\\")) {
+                resourceName = resourceName.substring(resourceName.lastIndexOf("\\") + 1);
+            }
+            
+            final AppDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
 
             try {
-                deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
+                if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip")) {
+                    deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
+                } else {
+                    deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
+                }
 
             } catch (IOException e) {
                 throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
             }
+
+            deploymentBuilder.deploy();
         }
-
-        deploymentBuilder.deploy();
-
     }
 
 }

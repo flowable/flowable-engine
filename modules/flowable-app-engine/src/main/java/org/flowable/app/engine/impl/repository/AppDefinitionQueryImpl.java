@@ -63,6 +63,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         super(commandExecutor);
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionId(String appDefinitionId) {
         this.id = appDefinitionId;
         return this;
@@ -79,6 +80,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionCategory(String category) {
         if (category == null) {
             throw new FlowableIllegalArgumentException("category is null");
@@ -87,6 +89,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionCategoryLike(String categoryLike) {
         if (categoryLike == null) {
             throw new FlowableIllegalArgumentException("categoryLike is null");
@@ -95,6 +98,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionCategoryNotEquals(String categoryNotEquals) {
         if (categoryNotEquals == null) {
             throw new FlowableIllegalArgumentException("categoryNotEquals is null");
@@ -103,6 +107,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionName(String name) {
         if (name == null) {
             throw new FlowableIllegalArgumentException("name is null");
@@ -111,6 +116,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionNameLike(String nameLike) {
         if (nameLike == null) {
             throw new FlowableIllegalArgumentException("nameLike is null");
@@ -119,6 +125,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("id is null");
@@ -127,6 +134,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl deploymentIds(Set<String> deploymentIds) {
         if (deploymentIds == null) {
             throw new FlowableIllegalArgumentException("ids are null");
@@ -137,6 +145,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionKey(String key) {
         if (key == null) {
             throw new FlowableIllegalArgumentException("key is null");
@@ -145,6 +154,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionKeyLike(String keyLike) {
         if (keyLike == null) {
             throw new FlowableIllegalArgumentException("keyLike is null");
@@ -153,6 +163,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionResourceName(String resourceName) {
         if (resourceName == null) {
             throw new FlowableIllegalArgumentException("resourceName is null");
@@ -161,6 +172,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionResourceNameLike(String resourceNameLike) {
         if (resourceNameLike == null) {
             throw new FlowableIllegalArgumentException("resourceNameLike is null");
@@ -169,30 +181,35 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQueryImpl appDefinitionVersion(Integer version) {
         checkVersion(version);
         this.version = version;
         return this;
     }
 
+    @Override
     public AppDefinitionQuery appDefinitionVersionGreaterThan(Integer appDefinitionVersion) {
         checkVersion(appDefinitionVersion);
         this.versionGt = appDefinitionVersion;
         return this;
     }
 
+    @Override
     public AppDefinitionQuery appDefinitionVersionGreaterThanOrEquals(Integer appDefinitionVersion) {
         checkVersion(appDefinitionVersion);
         this.versionGte = appDefinitionVersion;
         return this;
     }
 
+    @Override
     public AppDefinitionQuery appDefinitionVersionLowerThan(Integer appDefinitionVersion) {
         checkVersion(appDefinitionVersion);
         this.versionLt = appDefinitionVersion;
         return this;
     }
 
+    @Override
     public AppDefinitionQuery appDefinitionVersionLowerThanOrEquals(Integer appDefinitionVersion) {
         checkVersion(appDefinitionVersion);
         this.versionLte = appDefinitionVersion;
@@ -207,11 +224,13 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         }
     }
 
+    @Override
     public AppDefinitionQueryImpl latestVersion() {
         this.latest = true;
         return this;
     }
 
+    @Override
     public AppDefinitionQuery appDefinitionTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("app definition tenantId is null");
@@ -220,6 +239,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQuery appDefinitionTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("app definition tenantId is null");
@@ -228,6 +248,7 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return this;
     }
 
+    @Override
     public AppDefinitionQuery appDefinitionWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -235,46 +256,56 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
 
     // sorting ////////////////////////////////////////////
 
+    @Override
     public AppDefinitionQuery orderByDeploymentId() {
         return orderBy(AppDefinitionQueryProperty.APP_DEFINITION_DEPLOYMENT_ID);
     }
 
+    @Override
     public AppDefinitionQuery orderByAppDefinitionKey() {
         return orderBy(AppDefinitionQueryProperty.APP_DEFINITION_KEY);
     }
 
+    @Override
     public AppDefinitionQuery orderByAppDefinitionCategory() {
         return orderBy(AppDefinitionQueryProperty.APP_DEFINITION_CATEGORY);
     }
 
+    @Override
     public AppDefinitionQuery orderByAppDefinitionId() {
         return orderBy(AppDefinitionQueryProperty.APP_DEFINITION_ID);
     }
 
+    @Override
     public AppDefinitionQuery orderByAppDefinitionVersion() {
         return orderBy(AppDefinitionQueryProperty.APP_DEFINITION_VERSION);
     }
 
+    @Override
     public AppDefinitionQuery orderByAppDefinitionName() {
         return orderBy(AppDefinitionQueryProperty.APP_DEFINITION_NAME);
     }
 
+    @Override
     public AppDefinitionQuery orderByTenantId() {
         return orderBy(AppDefinitionQueryProperty.APP_DEFINITION_TENANT_ID);
     }
 
     // results ////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getAppDefinitionEntityManager(commandContext).findAppDefinitionCountByQueryCriteria(this);
     }
 
+    @Override
     public List<AppDefinition> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getAppDefinitionEntityManager(commandContext).findAppDefinitionsByQueryCriteria(this);
     }
 
+    @Override
     public void checkQueryOk() {
         super.checkQueryOk();
     }
