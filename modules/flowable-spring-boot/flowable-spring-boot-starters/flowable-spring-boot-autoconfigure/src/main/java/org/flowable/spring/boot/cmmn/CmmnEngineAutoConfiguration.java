@@ -170,6 +170,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         public CmmnEngineConfigurator cmmnEngineConfigurator(SpringCmmnEngineConfiguration cmmnEngineConfiguration) {
             SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
+
+            cmmnEngineConfiguration.setDisableIdmEngine(true);
             
             invokeConfigurers(cmmnEngineConfiguration);
             
@@ -194,6 +196,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         public CmmnEngineConfigurator cmmnEngineConfigurator(SpringCmmnEngineConfiguration cmmnEngineConfiguration) {
             SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
             cmmnEngineConfigurator.setCmmnEngineConfiguration(cmmnEngineConfiguration);
+
+            cmmnEngineConfiguration.setDisableIdmEngine(true);
             
             invokeConfigurers(cmmnEngineConfiguration);
             
