@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.engine.impl.cfg;
+package org.flowable.idm.engine.configurator;
 
 import java.util.List;
 

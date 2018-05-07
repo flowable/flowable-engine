@@ -92,19 +92,19 @@ o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'requestContextFilter
 uration$$EnhancerBySpringCGLIB$$3d0c70ac : No deployment resources were found for autodeployment
 uration$$EnhancerBySpringCGLIB$$8131eb1a : No deployment resources were found for autodeployment
 o.f.e.i.c.ProcessEngineConfigurationImpl : Found 5 Engine Configurators in total:
-o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
-o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
 com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
 com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
+o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
 .d.AbstractSqlScriptBasedDbSchemaManager : performing create on identity with resource org/flowable/idm/db/create/flowable.h2.create.identity.sql
 o.f.idm.engine.impl.IdmEngineImpl        : IdmEngine default created
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
@@ -116,9 +116,9 @@ o.f.c.engine.ContentEngineConfiguration  : Content file system root : ...
 o.f.c.engine.impl.ContentEngineImpl      : ContentEngine default created
 o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
 o.f.cmmn.engine.CmmnEngineConfiguration  : Found 1 Engine Configurators in total:
-o.f.cmmn.engine.CmmnEngineConfiguration  : class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
-o.f.cmmn.engine.CmmnEngineConfiguration  : Executing beforeInit() of class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
-o.f.cmmn.engine.CmmnEngineConfiguration  : Executing configure() of class org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator (priority:100000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : class org.flowable.idm.engine.configurator.IdmEngineConfigurator (priority:100000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : Executing beforeInit() of class org.flowable.idm.engine.configurator.IdmEngineConfigurator (priority:100000)
+o.f.cmmn.engine.CmmnEngineConfiguration  : Executing configure() of class org.flowable.idm.engine.configurator.IdmEngineConfigurator (priority:100000)
 o.f.idm.engine.impl.IdmEngineImpl        : IdmEngine default created
 o.f.cmmn.engine.impl.CmmnEngineImpl      : CmmnEngine default created
 o.f.engine.impl.ProcessEngineImpl        : ProcessEngine default created
