@@ -558,7 +558,9 @@
             "DECIMAL": "Decimal",
 	    	"HYPERLINK": "Hyperlink",
 	    	"SPACER": "Spacer",
-			"HORIZONTAL-LINE": "Horizontal line" 
+			"HORIZONTAL-LINE": "Horizontal line",
+			"HEADLINE": "Headline",
+			"HEADLINE-WITH-LINE":"Headline"
         },
         "TABS": {
             "GENERAL": "General",

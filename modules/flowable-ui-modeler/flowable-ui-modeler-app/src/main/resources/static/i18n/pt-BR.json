@@ -422,7 +422,9 @@
       "DECIMAL":"Decimal",
       "HYPERLINK":"Hiperlink",
       "SPACER": "Spacer",
-	  "HORIZONTAL-LINE": "Horizontal line"
+	  "HORIZONTAL-LINE": "Horizontal line",
+	  "HEADLINE": "Headline",
+	  "HEADLINE-WITH-LINE":"Headline"
     },
     "TABS":{
       "GENERAL":"Geral",
