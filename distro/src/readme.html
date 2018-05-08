@@ -26,7 +26,7 @@
 
 <h1>Flowable Release Notes</h1>
 
-<h3>Release Notes - Flowable - 6.3.0</h3>
+<h3>Release Notes - Flowable - 6.3.1</h3>
 
 <h4>GENERAL</h4>
 
@@ -39,6 +39,11 @@ In case you want to keep using the DbIdGenerator, then just add the following be
     }
 </code></pre>
 The default values of the DbIdGenerator would be filled in during the creation of the Process Engine.
+
+<p>
+    The default <code>IdmEngineConfigurator</code> and <code>SpringIdmEngineConfigurator</code> have been moved from <code>org.flowable.app.engine.impl.cfg</code>
+    and <code>org.flowable.spring.configurator</code> to <code>org.flowable.idm.engine.configurator</code> and <code>org.flowable.idm.spring.configurator</code>
+    respectively. In case you have used them please replace your imports.
 </p>
 
 <h3>Release Notes - Flowable - 6.3.0</h3>
