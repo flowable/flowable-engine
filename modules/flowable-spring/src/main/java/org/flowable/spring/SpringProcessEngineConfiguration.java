@@ -30,11 +30,11 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.idm.spring.SpringTransactionContextFactory;
 import org.flowable.idm.spring.SpringTransactionInterceptor;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.spring.configurator.AutoDeploymentStrategy;
 import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
 import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
-import org.flowable.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -66,7 +66,14 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
-        setIdmEngineConfigurator(new SpringIdmEngineConfigurator());
+    }
+
+    @Override
+    public void initConfigurators() {
+        if (!disableIdmEngine && idmEngineConfigurator == null) {
+            setIdmEngineConfigurator(new SpringIdmEngineConfigurator());
+        }
+        super.initConfigurators();
     }
 
     @Override

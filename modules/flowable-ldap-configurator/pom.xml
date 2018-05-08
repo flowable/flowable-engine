@@ -23,6 +23,7 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
@@ -35,6 +36,10 @@
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-idm-engine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-idm-engine-configurator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>

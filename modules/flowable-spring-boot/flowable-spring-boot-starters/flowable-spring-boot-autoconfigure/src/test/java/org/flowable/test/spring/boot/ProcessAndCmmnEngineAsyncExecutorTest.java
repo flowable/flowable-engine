@@ -55,6 +55,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
             DataSourceAutoConfiguration.class,
             TransactionAutoConfiguration.class
         ))
+        .withPropertyValues("flowable.cmmn.deploy-resources=false", "flowable.check-process-definitions=false")
         .withClassLoader(new FilteredClassLoader(EntityManagerFactory.class));
 
     @Test
