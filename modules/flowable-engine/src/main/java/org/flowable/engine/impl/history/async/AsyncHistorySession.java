@@ -18,12 +18,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.TransactionContext;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.Session;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,17 +52,21 @@ public class AsyncHistorySession implements Session {
         
         // A command context close listener is registered to avoid creating the async history data if it wouldn't be needed 
         initCommandContextCloseListener();
-        
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isAsyncHistoryExecutorIsMessageQueueMode()) {
-            intitTransactionListener();
+        if (isAsyncHistoryExecutorEnabled()) {
+            initTransactionListener();
         }
+    }
+    
+    protected boolean isAsyncHistoryExecutorEnabled() {
+        AsyncExecutor asyncHistoryExecutor = CommandContextUtil.getJobServiceConfiguration(commandContext).getAsyncHistoryExecutor();
+        return asyncHistoryExecutor != null && asyncHistoryExecutor.isActive();
     }
 
     protected void initCommandContextCloseListener() {
         this.commandContextCloseListener = new AsyncHistorySessionCommandContextCloseListener(this, asyncHistoryListener); 
     }
     
-    protected void intitTransactionListener() {
+    protected void initTransactionListener() {
         
         /* 
          * The transaction listener needed to send a message to a message queue on state committed
@@ -128,6 +139,32 @@ public class AsyncHistorySession implements Session {
             asyncHistoryCommittedTransactionListener.addRunnable(runnable);
         } else {
             LOGGER.warn("Cannot register a Runnable instance when no transaction listener is active");
+        }
+    }
+    
+    public void addExecuteAsyncHistoryJobPostCommitTrigger(List<HistoryJobEntity> historyJobEntities) {
+        
+        if (isAsyncHistoryExecutorEnabled()) {
+        
+            final JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+            final AsyncExecutor asyncHistoryExecutor = jobServiceConfiguration.getAsyncHistoryExecutor();
+            final CommandExecutor commandExecutor = jobServiceConfiguration.getCommandExecutor();
+            
+            for (HistoryJobEntity historyJobEntity : historyJobEntities) {
+                addAsyncHistoryRunnableAfterCommit(new Runnable() {
+                    @Override
+                    public void run() {
+                        commandExecutor.execute(new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), new Command<Void>() {
+                            @Override
+                            public Void execute(CommandContext commandContext) {
+                                asyncHistoryExecutor.executeAsyncJob(historyJobEntity);
+                                return null;
+                            }
+                        });
+                    }
+                });
+            }
+            
         }
     }
     

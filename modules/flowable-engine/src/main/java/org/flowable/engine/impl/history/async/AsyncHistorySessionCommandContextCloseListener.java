@@ -21,7 +21,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.job.service.impl.asyncexecutor.AsyncJobAddedNotification;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -85,18 +84,10 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
                     generateJson(commandContext, jobData, objectNodes, type);
                 }
             }
+            
             List<HistoryJobEntity> historyJobEntities = asyncHistoryListener.historyDataGenerated(objectNodes);
-            if (historyJobEntities != null) {
-                for (HistoryJobEntity historyJobEntity : historyJobEntities) {
-                    asyncHistorySession.addAsyncHistoryRunnableAfterCommit(new Runnable() {
-                        @Override
-                        public void run() {
-                            AsyncJobAddedNotification addedNotification = new AsyncJobAddedNotification(historyJobEntity, 
-                                    CommandContextUtil.getJobServiceConfiguration(commandContext).getAsyncHistoryExecutor());
-                            addedNotification.execute(commandContext);
-                        }
-                    });
-                }
+            if (historyJobEntities != null && !historyJobEntities.isEmpty()) {
+                asyncHistorySession.addExecuteAsyncHistoryJobPostCommitTrigger(historyJobEntities);
             }
         }
     }
