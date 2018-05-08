@@ -2888,12 +2888,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    @Override
-    public ProcessEngineConfigurationImpl setBeans(Map<Object, Object> beans) {
-        this.beans = beans;
-        return this;
-    }
-
     public List<ResolverFactory> getResolverFactories() {
         return resolverFactories;
     }

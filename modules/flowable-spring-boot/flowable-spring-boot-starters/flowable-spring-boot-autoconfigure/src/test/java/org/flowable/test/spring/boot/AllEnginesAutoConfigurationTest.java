@@ -18,24 +18,30 @@ import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDep
 
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.app.spring.SpringAppExpressionManager;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
+import org.flowable.cmmn.spring.SpringCmmnExpressionManager;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
+import org.flowable.dmn.spring.SpringDmnExpressionManager;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
+import org.flowable.form.spring.SpringFormExpressionManager;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
+import org.flowable.spring.SpringExpressionManager;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -164,6 +170,17 @@ public class AllEnginesAutoConfigurationTest {
             assertThat(appEngineConfiguration.getIdmEngineConfigurator())
                 .as("AppEngineConfiguration idmEngineConfigurator")
                 .isSameAs(idmConfigurator);
+            
+            assertThat(appEngineConfiguration.getExpressionManager()).isInstanceOf(SpringAppExpressionManager.class);
+            assertThat(appEngineConfiguration.getExpressionManager().getBeans()).isNull();
+            assertThat(processEngineConfiguration.getExpressionManager()).isInstanceOf(SpringExpressionManager.class);
+            assertThat(processEngineConfiguration.getExpressionManager().getBeans()).isInstanceOf(SpringBeanFactoryProxyMap.class);
+            assertThat(cmmnEngineConfiguration.getExpressionManager()).isInstanceOf(SpringCmmnExpressionManager.class);
+            assertThat(cmmnEngineConfiguration.getExpressionManager().getBeans()).isInstanceOf(SpringBeanFactoryProxyMap.class);
+            assertThat(dmnEngineConfiguration.getExpressionManager()).isInstanceOf(SpringDmnExpressionManager.class);
+            assertThat(dmnEngineConfiguration.getExpressionManager().getBeans()).isInstanceOf(SpringBeanFactoryProxyMap.class);
+            assertThat(formEngineConfiguration.getExpressionManager()).isInstanceOf(SpringFormExpressionManager.class);
+            assertThat(formEngineConfiguration.getExpressionManager().getBeans()).isInstanceOf(SpringBeanFactoryProxyMap.class);
 
             deleteDeployments(context.getBean(AppEngine.class));
             deleteDeployments(context.getBean(CmmnEngine.class));
