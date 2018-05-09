@@ -40,9 +40,9 @@ public class CaseDefinitionFormDefinitionCollectionResource extends BaseCaseDefi
             @ApiResponse(code = 200, message = "Indicates the case definition was found and the form definitions are returned.", response = FormDefinition.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
-    @GetMapping(value = "/cmm-repository/case-definitions/{caseDefinitionId}/form-definitions", produces = "application/json")
-    public List<FormDefinitionResponse> getFormDefinitionsForProcessDefinition(
-            @ApiParam(name = "processDefinitionId") @PathVariable String caseDefinitionId,
+    @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/form-definitions", produces = "application/json")
+    public List<FormDefinitionResponse> getFormDefinitionsForCaseDefinition(
+            @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
             HttpServletRequest request) {
 
         List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForCaseDefinition(caseDefinitionId);

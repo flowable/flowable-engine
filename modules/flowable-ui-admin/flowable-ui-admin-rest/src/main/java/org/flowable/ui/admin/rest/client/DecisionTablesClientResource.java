@@ -55,4 +55,12 @@ public class DecisionTablesClientResource extends AbstractClientResource {
     public JsonNode getProcessDefinitionDecisionTables(@PathVariable String processDefinitionId, HttpServletRequest request) {
         return clientService.getProcessDefinitionDecisionTables(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
     }
+    
+    /**
+     * GET case definition's list of deployed decision tables.
+     */
+    @RequestMapping(value = "/rest/admin/case-definition-decision-tables/{caseDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getCaseDefinitionDecisionTables(@PathVariable String caseDefinitionId, HttpServletRequest request) {
+        return clientService.getCaseDefinitionDecisionTables(retrieveServerConfig(EndpointType.CMMN), caseDefinitionId);
+    }
 }

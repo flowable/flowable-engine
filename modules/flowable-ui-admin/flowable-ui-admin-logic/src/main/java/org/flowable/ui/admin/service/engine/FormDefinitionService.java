@@ -50,4 +50,9 @@ public class FormDefinitionService {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "repository/process-definitions/" + processDefinitionId + "/form-definitions"));
         return clientUtil.executeRequest(get, serverConfig);
     }
+    
+    public JsonNode getCaseDefinitionForms(ServerConfig serverConfig, String caseDefinitionId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "cmmn-repository/case-definitions/" + caseDefinitionId + "/form-definitions"));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
 }

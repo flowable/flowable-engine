@@ -46,6 +46,9 @@ public class MinimalDataGenerator implements ApplicationListener<ContextRefreshe
             
             } else if (serverConfigs.size() == 4) {
                 serverConfigService.createCmmnDefaultServerConfig();
+                
+            } else if (serverConfigs.size() == 5) {
+                serverConfigService.createAppDefaultServerConfig();
             }
         }
     }

@@ -24,8 +24,6 @@
  */
 package org.flowable.ui.admin.service.engine;
 
-import static org.flowable.ui.admin.domain.EndpointType.CMMN;
-
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.flowable.ui.admin.domain.EndpointType;
@@ -44,6 +42,7 @@ public class ProcessEngineInfoService {
     public static final String FORM_ENGINE_INFO_URL = "form-management/engine";
     public static final String CONTENT_ENGINE_INFO_URL = "content-management/engine";
     public static final String CMMN_ENGINE_INFO_URL = "cmmn-management/engine";
+    public static final String APP_ENGINE_INFO_URL = "app-management/engine";
 
     @Autowired
     protected FlowableClientService clientUtil;
@@ -77,6 +76,10 @@ public class ProcessEngineInfoService {
 
         case CMMN:
             builder = clientUtil.createUriBuilder(CMMN_ENGINE_INFO_URL);
+            break;
+            
+        case APP:
+            builder = clientUtil.createUriBuilder(APP_ENGINE_INFO_URL);
             break;
         }
 
