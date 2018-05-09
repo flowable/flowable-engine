@@ -14,6 +14,7 @@ package org.flowable.test.spring.boot;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDeployments;
 
 import java.util.List;
 
@@ -22,10 +23,10 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormEngineConfigurationApi;
@@ -34,6 +35,8 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.spring.SpringFormEngineConfiguration;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -41,143 +44,157 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.form.FormEngineAutoConfiguration;
 import org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration;
-import org.junit.After;
+import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.Test;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class FormEngineAutoConfigurationTest {
-    
-    protected AnnotationConfigApplicationContext context;
-    
-    @After
-    public void deleteDeployments() {
-        FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
-        List<FormDeployment> formDeployments = repositoryService.createDeploymentQuery().list();
-        for (FormDeployment formDeployment : formDeployments) {
-            repositoryService.deleteDeployment(formDeployment.getId());
-        }
-    }
 
-    @Test
-    public void standaloneFormEngineWithBasicDataSource() {
-        context = this.context(
+    private ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+        .withConfiguration(AutoConfigurations.of(
             DataSourceAutoConfiguration.class,
             DataSourceTransactionManagerAutoConfiguration.class,
             FormEngineServicesAutoConfiguration.class,
             FormEngineAutoConfiguration.class
-        );
+        ))
+        .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class);
 
-        FormEngine formEngine = context.getBean(FormEngine.class);
-        assertThat(formEngine).as("Form engine").isNotNull();
-        assertThat(context.getBean(FormService.class)).as("Form service")
-            .isEqualTo(formEngine.getFormService());
+    @Test
+    public void standaloneFormEngineWithBasicDataSource() {
+        contextRunner.run(context -> {
+            assertThat(context)
+                .doesNotHaveBean(AppEngine.class)
+                .doesNotHaveBean(ProcessEngine.class)
+                .doesNotHaveBean("formProcessEngineConfigurationConfigurer")
+                .doesNotHaveBean("formAppEngineConfigurationConfigurer");
+            FormEngine formEngine = context.getBean(FormEngine.class);
+            assertThat(formEngine).as("Form engine").isNotNull();
+            assertThat(context.getBean(FormService.class)).as("Form service")
+                .isEqualTo(formEngine.getFormService());
 
-        FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
-        assertThat(repositoryService).as("Form repository service")
-            .isEqualTo(formEngine.getFormRepositoryService());
+            FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
+            assertThat(repositoryService).as("Form repository service")
+                .isEqualTo(formEngine.getFormRepositoryService());
 
-        assertThat(context.getBean(FormManagementService.class)).as("Form management service")
-            .isEqualTo(formEngine.getFormManagementService());
+            assertThat(context.getBean(FormManagementService.class)).as("Form management service")
+                .isEqualTo(formEngine.getFormManagementService());
 
-        assertThat(context.getBean(FormEngineConfiguration.class)).as("Form engine configuration")
-            .isEqualTo(formEngine.getFormEngineConfiguration());
+            assertThat(context.getBean(FormEngineConfiguration.class)).as("Form engine configuration")
+                .isEqualTo(formEngine.getFormEngineConfiguration());
 
-        assertAutoDeployment(repositoryService);
+            assertAutoDeployment(repositoryService);
+
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringFormEngineConfiguration.class
+                        );
+                });
+
+            deleteDeployments(formEngine);
+        });
+
     }
 
     @Test
     public void formEngineWithBasicDataSourceAndProcessEngine() {
-        context = this.context(
-            DataSourceAutoConfiguration.class,
-            DataSourceTransactionManagerAutoConfiguration.class,
-            FormEngineAutoConfiguration.class,
+        contextRunner.withConfiguration(AutoConfigurations.of(
             HibernateJpaAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,
             ProcessEngineServicesAutoConfiguration.class,
-            ProcessEngineAutoConfiguration.class,
-            FormEngineServicesAutoConfiguration.class
-        );
+            ProcessEngineAutoConfiguration.class
+        )).run(context -> {
+            assertThat(context)
+                .doesNotHaveBean(AppEngine.class)
+                .hasBean("formProcessEngineConfigurationConfigurer")
+                .doesNotHaveBean("formAppEngineConfigurationConfigurer");
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+            assertThat(processEngine).as("Process engine").isNotNull();
+            FormEngineConfigurationApi formProcessConfigurationApi = formEngine(processEngine);
 
-        ProcessEngine processEngine = context.getBean(ProcessEngine.class);
-        assertThat(processEngine).as("Process engine").isNotNull();
-        FormEngineConfigurationApi formProcessConfigurationApi = formEngine(processEngine);
+            FormEngineConfigurationApi formEngine = context.getBean(FormEngineConfigurationApi.class);
+            assertThat(formEngine).isEqualTo(formProcessConfigurationApi);
+            assertThat(formEngine).as("Form engine").isNotNull();
+            assertThat(context.getBean(FormService.class)).as("Form service")
+                .isEqualTo(formEngine.getFormService());
 
-        FormEngineConfigurationApi formEngine = context.getBean(FormEngineConfigurationApi.class);
-        assertThat(formEngine).isEqualTo(formProcessConfigurationApi);
-        assertThat(formEngine).as("Form engine").isNotNull();
-        assertThat(context.getBean(FormService.class)).as("Form service")
-            .isEqualTo(formEngine.getFormService());
+            FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
+            assertThat(repositoryService).as("Form repository service")
+                .isEqualTo(formEngine.getFormRepositoryService());
 
-        FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
-        assertThat(repositoryService).as("Form repository service")
-            .isEqualTo(formEngine.getFormRepositoryService());
+            assertThat(context.getBean(FormManagementService.class)).as("Form management service")
+                .isEqualTo(formEngine.getFormManagementService());
+            assertAutoDeployment(repositoryService);
 
-        assertThat(context.getBean(FormManagementService.class)).as("Form management service")
-            .isEqualTo(formEngine.getFormManagementService());
-        assertAutoDeployment(repositoryService);
-        
-        List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
-        for (Deployment deployment : deployments) {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-        }
-        
-        List<FormDeployment> formDeployments = formEngine.getFormRepositoryService().createDeploymentQuery().list();
-        for (FormDeployment formDeployment : formDeployments) {
-            formEngine.getFormRepositoryService().deleteDeployment(formDeployment.getId());
-        }
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringFormEngineConfiguration.class,
+                            SpringProcessEngineConfiguration.class
+                        );
+                });
+
+            deleteDeployments(processEngine);
+            deleteDeployments(context.getBean(FormEngine.class));
+        });
     }
     
     @Test
     public void formEngineWithBasicDataSourceAndAppEngine() {
-        context = this.context(
-            DataSourceAutoConfiguration.class,
-            DataSourceTransactionManagerAutoConfiguration.class,
+        contextRunner.withConfiguration(AutoConfigurations.of(
             HibernateJpaAutoConfiguration.class,
             FlowableTransactionAutoConfiguration.class,
             AppEngineServicesAutoConfiguration.class,
             AppEngineAutoConfiguration.class,
             ProcessEngineServicesAutoConfiguration.class,
-            ProcessEngineAutoConfiguration.class,
-            FormEngineAutoConfiguration.class,
-            FormEngineServicesAutoConfiguration.class
-        );
+            ProcessEngineAutoConfiguration.class
+        )).run(context -> {
+            assertThat(context)
+                .doesNotHaveBean("formProcessEngineConfigurationConfigurer")
+                .hasBean("formAppEngineConfigurationConfigurer");
+            AppEngine appEngine = context.getBean(AppEngine.class);
+            assertThat(appEngine).as("App engine").isNotNull();
+            FormEngineConfigurationApi formProcessConfigurationApi = formEngine(appEngine);
 
-        AppEngine appEngine = context.getBean(AppEngine.class);
-        assertThat(appEngine).as("App engine").isNotNull();
-        FormEngineConfigurationApi formProcessConfigurationApi = formEngine(appEngine);
+            FormEngineConfigurationApi formEngine = context.getBean(FormEngineConfigurationApi.class);
+            assertThat(formEngine).isEqualTo(formProcessConfigurationApi);
+            assertThat(formEngine).as("Form engine").isNotNull();
+            assertThat(context.getBean(FormService.class)).as("Form service")
+                .isEqualTo(formEngine.getFormService());
 
-        FormEngineConfigurationApi formEngine = context.getBean(FormEngineConfigurationApi.class);
-        assertThat(formEngine).isEqualTo(formProcessConfigurationApi);
-        assertThat(formEngine).as("Form engine").isNotNull();
-        assertThat(context.getBean(FormService.class)).as("Form service")
-            .isEqualTo(formEngine.getFormService());
+            FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
+            assertThat(repositoryService).as("Form repository service")
+                .isEqualTo(formEngine.getFormRepositoryService());
 
-        FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
-        assertThat(repositoryService).as("Form repository service")
-            .isEqualTo(formEngine.getFormRepositoryService());
+            assertThat(context.getBean(FormManagementService.class)).as("Form management service")
+                .isEqualTo(formEngine.getFormManagementService());
+            assertAutoDeploymentWithAppEngine(context);
 
-        assertThat(context.getBean(FormManagementService.class)).as("Form management service")
-            .isEqualTo(formEngine.getFormManagementService());
-        assertAutoDeploymentWithAppEngine(repositoryService);
-        
-        List<AppDeployment> appDeployments = appEngine.getAppRepositoryService().createDeploymentQuery().list();
-        for (AppDeployment appDeployment : appDeployments) {
-            appEngine.getAppRepositoryService().deleteDeployment(appDeployment.getId(), true);
-        }
-        
-        ProcessEngine processEngine = context.getBean(ProcessEngine.class);
-        List<Deployment> deployments = processEngine.getRepositoryService().createDeploymentQuery().list();
-        for (Deployment deployment : deployments) {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
-        }
-        
-        List<FormDeployment> formDeployments = formEngine.getFormRepositoryService().createDeploymentQuery().list();
-        for (FormDeployment formDeployment : formDeployments) {
-            formEngine.getFormRepositoryService().deleteDeployment(formDeployment.getId());
-        }
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringProcessEngineConfiguration.class,
+                            SpringFormEngineConfiguration.class,
+                            SpringAppEngineConfiguration.class
+                        );
+                });
+
+            deleteDeployments(appEngine);
+            deleteDeployments(context.getBean(ProcessEngine.class));
+            deleteDeployments(context.getBean(FormEngine.class));
+        });
     }
 
     protected void assertAutoDeployment(FormRepositoryService repositoryService) {
@@ -188,8 +205,9 @@ public class FormEngineAutoConfigurationTest {
                 tuple("form1", "My first form")
             );
     }
-    
-    protected void assertAutoDeploymentWithAppEngine(FormRepositoryService repositoryService) {
+
+    protected void assertAutoDeploymentWithAppEngine(ApplicationContext context) {
+        FormRepositoryService repositoryService = context.getBean(FormRepositoryService.class);
         List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().list();
         assertThat(formDefinitions)
             .extracting(FormDefinition::getKey, FormDefinition::getName)

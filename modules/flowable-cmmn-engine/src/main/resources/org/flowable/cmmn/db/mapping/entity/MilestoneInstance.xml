@@ -63,7 +63,7 @@
     <resultMap id="mileStoneInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="name" column="NAME_" jdbcType="VARCHAR" />
-        <result property="timeStamp" column="START_TIME_" jdbcType="TIMESTAMP" />
+        <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP" />
         <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
         <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
         <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />

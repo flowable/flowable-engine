@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,30 +44,31 @@ public class RequestUtil {
     }
 
     public static Date getDate(Map<String, String> requestParams, String name) {
-        Date value = null;
-        if (requestParams.get(name) != null) {
+        if (requestParams != null && name != null) {
+            return parseLongDate(requestParams.get(name));
+        }
+        return null;
+    }
 
-            String input = requestParams.get(name).trim();
-
+    public static Date parseLongDate(String aDate) {
+        if (aDate != null) {
+            String input = aDate.trim();
             // this is zero time so we need to add that TZ indicator for
             if (input.endsWith("Z")) {
                 input = input.substring(0, input.length() - 1) + "GMT-00:00";
             } else {
                 int inset = 6;
-
                 String s0 = input.substring(0, input.length() - inset);
                 String s1 = input.substring(input.length() - inset, input.length());
-
                 input = s0 + "GMT" + s1;
             }
-
             try {
-                value = longDateFormat.parse(input);
+                return longDateFormat.parse(input);
             } catch (Exception e) {
                 throw new FlowableIllegalArgumentException("Failed to parse date " + input);
             }
         }
-        return value;
+        return null;
     }
 
     public static String dateToString(Date date) {

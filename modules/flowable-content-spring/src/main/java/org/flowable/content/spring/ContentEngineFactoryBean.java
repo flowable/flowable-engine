@@ -13,6 +13,7 @@
 
 package org.flowable.content.spring;
 
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.springframework.beans.BeansException;
@@ -49,6 +50,10 @@ public class ContentEngineFactoryBean implements FactoryBean<ContentEngine>, Dis
     @Override
     public ContentEngine getObject() throws Exception {
         configureExternallyManagedTransactions();
+        
+        if (contentEngineConfiguration.getBeans() == null) {
+            contentEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.contentEngine = contentEngineConfiguration.buildContentEngine();
         return this.contentEngine;

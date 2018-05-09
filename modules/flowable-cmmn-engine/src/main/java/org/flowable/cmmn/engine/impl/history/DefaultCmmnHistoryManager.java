@@ -83,6 +83,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
             HistoricMilestoneInstanceEntity historicMilestoneInstanceEntity = historicMilestoneInstanceEntityManager.create();
+            historicMilestoneInstanceEntity.setId(milestoneInstance.getId());
             historicMilestoneInstanceEntity.setName(milestoneInstance.getName());
             historicMilestoneInstanceEntity.setCaseInstanceId(milestoneInstance.getCaseInstanceId());
             historicMilestoneInstanceEntity.setCaseDefinitionId(milestoneInstance.getCaseDefinitionId());
@@ -99,21 +100,20 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricCaseInstanceEntity historicCaseInstance = historicCaseInstanceEntityManager.findById(caseInstanceId);
 
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
-            List<HistoricMilestoneInstance> historicMilestoneInstances = historicMilestoneInstanceEntityManager
-                    .findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseInstanceId(historicCaseInstance.getId()));
-            for (HistoricMilestoneInstance historicMilestoneInstance : historicMilestoneInstances) {
-                historicMilestoneInstanceEntityManager.delete(historicMilestoneInstance.getId());
-            }
+            historicMilestoneInstanceEntityManager.findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseInstanceId(historicCaseInstance.getId()))
+                    .forEach(m -> historicMilestoneInstanceEntityManager.delete(m.getId()));
+
+            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
+            historicPlanItemInstanceEntityManager.findByCriteria(new HistoricPlanItemInstanceQueryImpl().planItemInstanceCaseInstanceId(historicCaseInstance.getId()))
+                    .forEach(p -> historicPlanItemInstanceEntityManager.delete(p.getId()));
 
             CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
 
             historicCaseInstanceEntityManager.delete(historicCaseInstance);
 
             // Also delete any sub cases that may be active
-            List<HistoricCaseInstance> selectList = historicCaseInstanceEntityManager.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstanceId).list();
-            for (HistoricCaseInstance child : selectList) {
-                recordCaseInstanceDeleted(child.getId());
-            }
+            historicCaseInstanceEntityManager.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstanceId).list()
+                    .forEach(c -> recordCaseInstanceDeleted(c.getId()));
         }
     }
 

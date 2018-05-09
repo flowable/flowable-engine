@@ -15,6 +15,7 @@ package org.flowable.app.spring;
 
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
@@ -50,6 +51,10 @@ public class AppEngineFactoryBean implements FactoryBean<AppEngine>, DisposableB
     public AppEngine getObject() throws Exception {
         configureExpressionManager();
         configureExternallyManagedTransactions();
+        
+        if (appEngineConfiguration.getBeans() == null) {
+            appEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.appEngine = appEngineConfiguration.buildAppEngine();
         return this.appEngine;

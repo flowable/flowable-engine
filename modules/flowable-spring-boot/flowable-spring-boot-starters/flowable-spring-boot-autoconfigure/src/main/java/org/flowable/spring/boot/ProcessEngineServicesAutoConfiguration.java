@@ -12,9 +12,7 @@
  */
 package org.flowable.spring.boot;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.flowable.app.engine.AppEngine;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
@@ -31,7 +29,6 @@ import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -72,7 +69,7 @@ public class ProcessEngineServicesAutoConfiguration {
     static class AlreadyInitializedAppEngineConfiguration {
 
         @Bean
-        public ProcessEngine processEngine(@SuppressWarnings("unused") @Autowired @Qualifier("flowableAppEngine") Object appEngine) {
+        public ProcessEngine processEngine(@SuppressWarnings("unused") @Autowired AppEngine appEngine) {
             // The app engine needs to be injected, as otherwise it won't be initialized, which means that the ProcessEngine is not initialized yet
             if (!ProcessEngines.isInitialized()) {
                 throw new IllegalStateException("BPMN engine has not been initialized");
@@ -89,17 +86,14 @@ public class ProcessEngineServicesAutoConfiguration {
         "org.flowable.engine.ProcessEngine",
         "org.flowable.app.engine.AppEngine",
     })
-    static class StandaloneEngineConfiguration {
-        
-        @Autowired(required = false)
-        private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> processEngineConfigurationConfigurers = new ArrayList<>();
+    static class StandaloneEngineConfiguration extends BaseEngineConfigurationWithConfigurers<SpringProcessEngineConfiguration> {
         
         @Bean
         public ProcessEngineFactoryBean processEngine(SpringProcessEngineConfiguration configuration) throws Exception {
             ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
             processEngineFactoryBean.setProcessEngineConfiguration(configuration);
             
-            processEngineConfigurationConfigurers.forEach(configurator -> configurator.configure(configuration));
+            invokeConfigurers(configuration);
             
             return processEngineFactoryBean;
         }

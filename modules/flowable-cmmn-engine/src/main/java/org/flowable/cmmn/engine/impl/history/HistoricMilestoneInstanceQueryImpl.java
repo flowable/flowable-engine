@@ -27,7 +27,8 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
  * @author Joram Barrez
  */
 public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMilestoneInstanceQuery, HistoricMilestoneInstance> implements HistoricMilestoneInstanceQuery {
-    
+
+    protected String id;
     protected String name;
     protected String caseInstanceId;
     protected String caseDefinitionId;
@@ -40,6 +41,12 @@ public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMi
     
     public HistoricMilestoneInstanceQueryImpl(CommandExecutor commandExecutor) {
         super(commandExecutor);
+    }
+
+    @Override
+    public HistoricMilestoneInstanceQuery milestoneInstanceId(String id) {
+        this.id = id;
+        return this;
     }
 
     @Override
@@ -92,6 +99,10 @@ public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMi
         return CommandContextUtil.getHistoricMilestoneInstanceEntityManager(commandContext).findHistoricMilestoneInstancesByQueryCriteria(this);
     }
 
+    public String getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -111,5 +122,4 @@ public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMi
     public Date getReachedAfter() {
         return reachedAfter;
     }
-    
 }

@@ -13,6 +13,7 @@
 
 package org.flowable.dmn.spring;
 
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.springframework.beans.BeansException;
@@ -50,6 +51,10 @@ public class DmnEngineFactoryBean implements FactoryBean<DmnEngine>, DisposableB
     public DmnEngine getObject() throws Exception {
         configureExpressionManager();
         configureExternallyManagedTransactions();
+        
+        if (dmnEngineConfiguration.getBeans() == null) {
+            dmnEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.dmnEngine = dmnEngineConfiguration.buildDmnEngine();
         return this.dmnEngine;
