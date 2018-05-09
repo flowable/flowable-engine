@@ -58,6 +58,12 @@ public class ServerConfigService extends AbstractEncryptingService {
         ServerConfig serverConfig = getDefaultServerConfig(EndpointType.CMMN);
         save(serverConfig, true);
     }
+    
+    @Transactional
+    public void createAppDefaultServerConfig() {
+        ServerConfig serverConfig = getDefaultServerConfig(EndpointType.APP);
+        save(serverConfig, true);
+    }
 
     @Transactional
     public ServerConfig findOne(String id) {
@@ -159,6 +165,7 @@ public class ServerConfigService extends AbstractEncryptingService {
 
         serverConfigs.add(getDefaultServerConfig(EndpointType.PROCESS));
         serverConfigs.add(getDefaultServerConfig(EndpointType.CMMN));
+        serverConfigs.add(getDefaultServerConfig(EndpointType.APP));
         serverConfigs.add(getDefaultServerConfig(EndpointType.DMN));
         serverConfigs.add(getDefaultServerConfig(EndpointType.FORM));
         serverConfigs.add(getDefaultServerConfig(EndpointType.CONTENT));

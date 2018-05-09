@@ -111,6 +111,11 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
     DeploymentQuery parentDeploymentId(String parentDeploymentId);
     
     /**
+     * Only select deployments that have a parent deployment id like the given value.
+     */
+    DeploymentQuery parentDeploymentIdLike(String parentDeploymentIdLike);
+    
+    /**
      * Only select deployments with a parent deployment id that is the same as one of the given deployment identifiers.
      */
     DeploymentQuery parentDeploymentIds(List<String> parentDeploymentIds);

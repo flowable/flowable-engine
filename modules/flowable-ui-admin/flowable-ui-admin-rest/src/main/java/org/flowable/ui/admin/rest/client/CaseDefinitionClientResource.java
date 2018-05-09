@@ -18,7 +18,7 @@ import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.CaseDefinitionService;
 import org.flowable.ui.admin.service.engine.CaseInstanceService;
-import org.flowable.ui.admin.service.engine.JobService;
+import org.flowable.ui.admin.service.engine.CmmnJobService;
 import org.flowable.ui.admin.service.engine.exception.FlowableServiceException;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class CaseDefinitionClientResource extends AbstractClientResource {
     protected CaseInstanceService caseInstanceService;
 
     @Autowired
-    protected JobService jobService;
+    protected CmmnJobService jobService;
 
     @Autowired
     protected ObjectMapper objectMapper;

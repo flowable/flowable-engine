@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.admin.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +26,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Bassam Al-Sarori
@@ -58,5 +58,13 @@ public class FormDefinitionsClientResource extends AbstractClientResource {
     @RequestMapping(value = "/rest/admin/process-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getProcessDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
         return clientService.getProcessDefinitionForms(retrieveServerConfig(EndpointType.PROCESS), processDefinitionId);
+    }
+    
+    /**
+     * GET case definition's list of deployed form definitions.
+     */
+    @RequestMapping(value = "/rest/admin/case-definition-form-definitions/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getCaseDefinitionForms(@PathVariable String processDefinitionId, HttpServletRequest request) {
+        return clientService.getCaseDefinitionForms(retrieveServerConfig(EndpointType.CMMN), processDefinitionId);
     }
 }

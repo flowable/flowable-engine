@@ -12,13 +12,13 @@
  */
 package org.flowable.ui.admin.conf;
 
+import javax.annotation.PostConstruct;
+
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Development @Profile specific datasource override
@@ -31,6 +31,7 @@ public class ApplicationDevelopmentConfiguration {
 
     protected static final Integer FLOWABLE_ADMIN_APP_SERVER_CONFIG_PROCESS_PORT = 9999;
     protected static final Integer FLOWABLE_ADMIN_APP_SERVER_CONFIG_CMMN_PORT = 9999;
+    protected static final Integer FLOWABLE_ADMIN_APP_SERVER_CONFIG_APP_PORT = 9999;
     protected static final Integer FLOWABLE_ADMIN_APP_SERVER_CONFIG_DMN_PORT = 9999;
     protected static final Integer FLOWABLE_ADMIN_APP_SERVER_CONFIG_FORM_PORT = 9999;
     protected static final Integer FLOWABLE_ADMIN_APP_SERVER_CONFIG_CONTENT_PORT = 9999;
@@ -48,6 +49,9 @@ public class ApplicationDevelopmentConfiguration {
         }
         if (flowableAdminAppProperties.getServerConfig().get(EndpointType.CMMN) != null) {
             flowableAdminAppProperties.getServerConfig().get(EndpointType.CMMN).setPort(FLOWABLE_ADMIN_APP_SERVER_CONFIG_CMMN_PORT);
+        }
+        if (flowableAdminAppProperties.getServerConfig().get(EndpointType.APP) != null) {
+            flowableAdminAppProperties.getServerConfig().get(EndpointType.APP).setPort(FLOWABLE_ADMIN_APP_SERVER_CONFIG_APP_PORT);
         }
         if (flowableAdminAppProperties.getServerConfig().get(EndpointType.DMN) != null) {
             flowableAdminAppProperties.getServerConfig().get(EndpointType.DMN).setPort(FLOWABLE_ADMIN_APP_SERVER_CONFIG_DMN_PORT);

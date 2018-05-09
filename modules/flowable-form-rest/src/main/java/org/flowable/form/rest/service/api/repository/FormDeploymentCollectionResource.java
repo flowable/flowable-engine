@@ -12,14 +12,12 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -40,10 +38,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -73,6 +75,8 @@ public class FormDeploymentCollectionResource {
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return form deployments with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return form deployments with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return form deployments which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return form deployments with the given parent deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentIdLike", dataType = "string", value = "Only return form deployments with a parent deployment id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return form deployments with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns form deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -97,6 +101,12 @@ public class FormDeploymentCollectionResource {
         }
         if (allRequestParams.containsKey("categoryNotEquals")) {
             deploymentQuery.deploymentCategoryNotEquals(allRequestParams.get("categoryNotEquals"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            deploymentQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentIdLike")) {
+            deploymentQuery.parentDeploymentIdLike(allRequestParams.get("parentDeploymentIdLike"));
         }
         if (allRequestParams.containsKey("tenantId")) {
             deploymentQuery.deploymentTenantId(allRequestParams.get("tenantId"));

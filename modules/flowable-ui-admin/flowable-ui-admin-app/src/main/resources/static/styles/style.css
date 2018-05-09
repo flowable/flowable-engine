@@ -131,6 +131,11 @@ body {
     color: #ffffff;
 }
 
+.navbar-inverse .navbar-nav > .active-app > a, .navbar-inverse .navbar-nav > .active-app > a:hover, .navbar-inverse .navbar-nav > .active-app > a:focus {
+    background: rgb(227,58,58);
+    color: #ffffff;
+}
+
 .navbar-inverse .navbar-nav > .active-form > a, .navbar-inverse .navbar-nav > .active-form > a:hover, .navbar-inverse .navbar-nav > .active-form > a:focus {
     background: rgb(0,102,153);
 	color: #ffffff;
@@ -184,6 +189,11 @@ body {
 .sub-navbar.active-cmmn {
     background: rgb(253,229,65);
     background: linear-gradient(to right, rgba(253,229,65,1.0), rgba(253,229,65,1.0), rgba(253,229,65,1.0), rgba(253,229,65,0), rgba(253,229,65,0));
+}
+
+.sub-navbar.active-app {
+    background: rgb(227,58,58);
+    background: linear-gradient(to right, rgba(227,58,58,1.0), rgba(227,58,58,1.0), rgba(227,58,58,1.0), rgba(227,58,58,0), rgba(227,58,58,0));
 }
 
 .sub-navbar.active-form {
