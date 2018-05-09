@@ -15,6 +15,7 @@ package org.flowable.cmmn.spring;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
@@ -50,6 +51,10 @@ public class CmmnEngineFactoryBean implements FactoryBean<CmmnEngine>, Disposabl
     public CmmnEngine getObject() throws Exception {
         configureExpressionManager();
         configureExternallyManagedTransactions();
+        
+        if (cmmnEngineConfiguration.getBeans() == null) {
+            cmmnEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.cmmnEngine = cmmnEngineConfiguration.buildCmmnEngine();
         return this.cmmnEngine;
