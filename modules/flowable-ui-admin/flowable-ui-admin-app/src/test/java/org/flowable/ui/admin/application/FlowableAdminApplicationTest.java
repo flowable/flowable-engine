@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.ui.idm.application;
+package org.flowable.ui.admin.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class FlowableIdmApplicationTest {
+public class FlowableAdminApplicationTest {
 
     @Autowired
     private ConfigurableEnvironment environment;
@@ -42,11 +42,8 @@ public class FlowableIdmApplicationTest {
                 "systemProperties",
                 "systemEnvironment",
                 "random",
-                "class path resource [META-INF/flowable-ui-app/flowable-ui-app.properties]",
-                "class path resource [flowable-ui-app.properties]",
                 "applicationConfig: [classpath:/application.properties]",
                 "flowableDefaultConfig: [classpath:/flowable-default.properties]",
-                "flowable-liquibase-override",
                 "Management Server"
             );
     }
