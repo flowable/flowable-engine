@@ -50,7 +50,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
 
             assertNotNull(name);
-            assertEquals("oneApp.app", name);
+            assertEquals("oneApp", name);
 
             assertNotNull(url);
             assertTrue(url.endsWith(AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, deploymentId)));
@@ -102,7 +102,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             assertEquals(1L, repositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
 
             assertNotNull(name);
-            assertEquals("vacationRequest.zip", name);
+            assertEquals("vacationRequest", name);
 
             assertNotNull(url);
             assertTrue(url.endsWith(AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, deploymentId)));
