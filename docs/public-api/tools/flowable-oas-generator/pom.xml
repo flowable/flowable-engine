@@ -89,7 +89,7 @@
                         <apiSource>
                             <springmvc>true</springmvc>
                             <locations>
-                                <location>org.flowable.rest.dmn.service.api</location>
+                                <location>org.flowable.dmn.rest.service.api</location>
                             </locations>
                             <schemes>
                                 <scheme>http</scheme>
@@ -128,7 +128,7 @@
                         <apiSource>
                             <springmvc>true</springmvc>
                             <locations>
-                                <location>org.flowable.rest.form.service.api</location>
+                                <location>org.flowable.form.rest.service.api</location>
                             </locations>
                             <schemes>
                                 <scheme>http</scheme>
@@ -167,7 +167,7 @@
                         <apiSource>
                             <springmvc>true</springmvc>
                             <locations>
-                                <location>org.flowable.rest.content.service.api</location>
+                                <location>org.flowable.content.rest.service.api</location>
                             </locations>
                             <schemes>
                                 <scheme>http</scheme>
