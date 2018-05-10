@@ -149,7 +149,9 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
                 return tables.next();
             } finally {
                 try {
-                    tables.close();
+                    if (tables != null) {
+                        tables.close();
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Error closing meta data tables", e);
                 }

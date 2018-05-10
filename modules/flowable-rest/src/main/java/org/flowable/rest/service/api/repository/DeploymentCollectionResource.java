@@ -191,7 +191,7 @@ public class DeploymentCollectionResource {
                 deploymentBuilder.name(decodedQueryStrings.get("deploymentName"));
             }
 
-            if (decodedQueryStrings.containsKey("deploymentKey") || StringUtils.isNotEmpty(decodedQueryStrings.get("deploymentKey"))) {
+            if (decodedQueryStrings.containsKey("deploymentKey") && StringUtils.isNotEmpty(decodedQueryStrings.get("deploymentKey"))) {
                 deploymentBuilder.key(decodedQueryStrings.get("deploymentKey"));
             }
 
