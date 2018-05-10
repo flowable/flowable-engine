@@ -131,8 +131,8 @@ public class CmmnEngineAutoConfigurationTest {
                 .satisfies(configuration -> {
                     assertThat(configuration.getInvokedConfigurations())
                         .containsExactly(
-                            SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class,
+                            SpringCmmnEngineConfiguration.class,
                             SpringProcessEngineConfiguration.class
                         );
                 });
@@ -172,8 +172,8 @@ public class CmmnEngineAutoConfigurationTest {
                     assertThat(configuration.getInvokedConfigurations())
                         .containsExactly(
                             SpringProcessEngineConfiguration.class,
-                            SpringCmmnEngineConfiguration.class,
                             SpringIdmEngineConfiguration.class,
+                            SpringCmmnEngineConfiguration.class,
                             SpringAppEngineConfiguration.class
                         );
                 });
