@@ -18,37 +18,26 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.TransactionContext;
-import org.flowable.common.engine.impl.cfg.TransactionPropagation;
-import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.common.engine.impl.context.Context;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.Session;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.util.CommandContextUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AsyncHistorySession implements Session {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncHistorySession.class);
-
     public static final String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
     
     protected CommandContext commandContext;
     protected AsyncHistoryListener asyncHistoryListener;
     protected CommandContextCloseListener commandContextCloseListener;
-    protected AsyncHistoryCommittedTransactionListener asyncHistoryCommittedTransactionListener;
 
     // A list of the different types of history for which jobs will be created
     // Note that the ordering of the types is important, as it will define the order of job creation.
     protected List<String> jobDataTypes;
     
+    protected TransactionContext transactionContext;
     protected String tenantId;
     protected Map<String, List<Map<String, String>>> jobData;
 
@@ -58,8 +47,11 @@ public class AsyncHistorySession implements Session {
         
         // A command context close listener is registered to avoid creating the async history data if it wouldn't be needed 
         initCommandContextCloseListener();
+        
         if (isAsyncHistoryExecutorEnabled()) {
-            initTransactionListener();
+            // The transaction context is captured now, as it might be gone by the time 
+            // the history job entities are created in the command context close listener
+            this.transactionContext = Context.getTransactionContext();
         }
     }
     
@@ -77,26 +69,6 @@ public class AsyncHistorySession implements Session {
         this.commandContextCloseListener = new AsyncHistorySessionCommandContextCloseListener(this, asyncHistoryListener); 
     }
     
-    protected void initTransactionListener() {
-        
-        /* 
-         * The transaction listener needed to send a message to a message queue on state committed
-         * needs to be registered here, as in the MessageBasedJobManager#sendMessage (where it would make more sense),
-         * the TransactionContext has already been removed.
-         * 
-         * The message does need to be sent after commit, otherwise there can be race conditions between
-         * the db commit and the message handling. 
-         */
-        
-        TransactionContext transactionContext = Context.getTransactionContext();
-        if (transactionContext != null) {
-            this.asyncHistoryCommittedTransactionListener = new AsyncHistoryCommittedTransactionListener();
-            transactionContext.addTransactionListener(TransactionState.COMMITTED, asyncHistoryCommittedTransactionListener);
-        } else {
-            LOGGER.warn("No transaction context active, but one is required for proper message queue based async history.");
-        }
-    }
-
     public void addHistoricData(String type, Map<String, String> data) {
         addHistoricData(type, data, null);
     }
@@ -129,40 +101,6 @@ public class AsyncHistorySession implements Session {
 
     }
 
-    public void addAsyncHistoryRunnableAfterCommit(Runnable runnable) {
-        if (asyncHistoryCommittedTransactionListener != null) {
-            asyncHistoryCommittedTransactionListener.addRunnable(runnable);
-        } else {
-            LOGGER.warn("Cannot register a Runnable instance when no transaction listener is active");
-        }
-    }
-    
-    public void addExecuteAsyncHistoryJobPostCommitTrigger(List<HistoryJobEntity> historyJobEntities) {
-        
-        if (isAsyncHistoryExecutorEnabled()) {
-        
-            final JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-            final AsyncExecutor asyncHistoryExecutor = jobServiceConfiguration.getAsyncHistoryExecutor();
-            final CommandExecutor commandExecutor = jobServiceConfiguration.getCommandExecutor();
-            
-            for (HistoryJobEntity historyJobEntity : historyJobEntities) {
-                addAsyncHistoryRunnableAfterCommit(new Runnable() {
-                    @Override
-                    public void run() {
-                        commandExecutor.execute(new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), new Command<Void>() {
-                            @Override
-                            public Void execute(CommandContext commandContext) {
-                                asyncHistoryExecutor.executeAsyncJob(historyJobEntity);
-                                return null;
-                            }
-                        });
-                    }
-                });
-            }
-            
-        }
-    }
-    
     public String getTenantId() {
         return tenantId;
     }
@@ -187,4 +125,12 @@ public class AsyncHistorySession implements Session {
         this.jobDataTypes = jobDataTypes;
     }
 
+    public TransactionContext getTransactionContext() {
+        return transactionContext;
+    }
+
+    public void setTransactionContext(TransactionContext transactionContext) {
+        this.transactionContext = transactionContext;
+    }
+    
 }

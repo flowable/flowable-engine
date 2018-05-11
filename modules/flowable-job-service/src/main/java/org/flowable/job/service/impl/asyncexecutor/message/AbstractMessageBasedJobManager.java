@@ -88,28 +88,33 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
     }
 
     protected void prepareAndSendMessage(final JobInfo job) {
+        
+        // If it's an async job, the transaction context is still active
+        // If it's an async history job, the transaction context might be gone (due to the command context
+        // already being closing), but the asyncHistorySession still has it stored.
+        
         TransactionContext transactionContext = Context.getTransactionContext();
+        if (transactionContext == null) {
+            if (job instanceof HistoryJobEntity) {
+                CommandContext commandContext = Context.getCommandContext();
+                AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
+                transactionContext = asyncHistorySession.getTransactionContext();
+            }
+        }
+        
         if (transactionContext != null) {
-            Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
+            transactionContext.addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
                 @Override
                 public void execute(CommandContext commandContext) {
                     sendMessage(job);
                 }
             });
             
-        } else if (job instanceof HistoryJobEntity) {
-            CommandContext commandContext = Context.getCommandContext();
-            AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
-            asyncHistorySession.addAsyncHistoryRunnableAfterCommit(new Runnable() {
-                @Override
-                public void run() {
-                    sendMessage(job);
-                }
-            });
-            
         } else {
             LOGGER.warn("Could not send message for job {}: no transaction context active nor is it a history job", job.getId());
+        
         }
+
     }
     
     /**

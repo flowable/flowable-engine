@@ -77,10 +77,7 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
                 }
             }
             
-            List<HistoryJobEntity> historyJobEntities = asyncHistoryListener.historyDataGenerated(objectNodes);
-            if (historyJobEntities != null && !historyJobEntities.isEmpty()) {
-                asyncHistorySession.addExecuteAsyncHistoryJobPostCommitTrigger(historyJobEntities);
-            }
+            asyncHistoryListener.historyDataGenerated(objectNodes);
         }
     }
 

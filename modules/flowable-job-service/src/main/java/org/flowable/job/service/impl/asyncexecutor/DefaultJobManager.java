@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -39,6 +40,8 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.HistoryJobProcessorContextImpl;
 import org.flowable.job.service.impl.JobProcessorContextImpl;
+import org.flowable.job.service.impl.history.async.AsyncHistorySession;
+import org.flowable.job.service.impl.history.async.TriggerAsyncExecutorTransactionListener;
 import org.flowable.job.service.impl.persistence.entity.AbstractJobEntity;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
@@ -457,8 +460,14 @@ public class DefaultJobManager implements JobManager {
     }
     
     protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity historyJobEntity) {
-        // No default implementation: the asyncHistoryExecutor will be triggered 
-        // by the AsyncHistorySessionCommandContextCloseListener logic
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
+        if (asyncHistorySession != null) {
+            TransactionContext transactionContext = asyncHistorySession.getTransactionContext();
+            if (transactionContext != null) {
+                transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncExecutorTransactionListener(commandContext, historyJobEntity)); 
+            }
+        }
     }
     
     protected void internalCreateAsyncJob(JobEntity jobEntity, boolean exclusive) {
