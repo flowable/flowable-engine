@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.asyncexecutor.message;
+package org.flowable.job.service.impl.asyncexecutor.message;
 
 import java.util.Date;
 
@@ -19,11 +19,11 @@ import org.flowable.common.engine.impl.cfg.TransactionListener;
 import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.history.async.AsyncHistorySession;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.DefaultJobManager;
+import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;

@@ -10,50 +10,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.history.async;
+package org.flowable.job.service.impl.history.async;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * A listener for command context lifecycle close events that generates JSON
+ * (using Jackson) and corresponding {@link HistoryJobEntity} when the
+ * {@link CommandContext} closes and adds them to the list of entities that will
+ * be inserted to the database. 
+ * 
+ * The reason why this is done at the very end, is because that way the historical data 
+ * can be optimized (some events cancel others, can be grouped, etc.)
+ * 
+ * @author Joram Barrez
+ */
 public class AsyncHistorySessionCommandContextCloseListener implements CommandContextCloseListener {
-    
-    public static List<String> TYPE_ORDER = Arrays.asList(
-                HistoryJsonConstants.TYPE_PROCESS_INSTANCE_START,
-                HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED,
-                HistoryJsonConstants.TYPE_ACTIVITY_START,
-                HistoryJsonConstants.TYPE_ACTIVITY_END,
-                HistoryJsonConstants.TYPE_ACTIVITY_FULL,
-                HistoryJsonConstants.TYPE_TASK_CREATED,
-                HistoryJsonConstants.TYPE_TASK_ASSIGNEE_CHANGED,
-                HistoryJsonConstants.TYPE_TASK_OWNER_CHANGED,
-                HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED,
-                HistoryJsonConstants.TYPE_TASK_ENDED,
-                HistoryJsonConstants.TYPE_VARIABLE_CREATED,
-                HistoryJsonConstants.TYPE_VARIABLE_UPDATED,
-                HistoryJsonConstants.TYPE_VARIABLE_REMOVED,
-                HistoryJsonConstants.TYPE_HISTORIC_DETAIL_VARIABLE_UPDATE,
-                HistoryJsonConstants.TYPE_FORM_PROPERTIES_SUBMITTED,
-                HistoryJsonConstants.TYPE_SET_PROCESS_DEFINITION,
-                HistoryJsonConstants.TYPE_SUBPROCESS_INSTANCE_START,
-                HistoryJsonConstants.TYPE_IDENTITY_LINK_CREATED,
-                HistoryJsonConstants.TYPE_IDENTITY_LINK_DELETED,
-                HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID,
-                HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED,
-                HistoryJsonConstants.TYPE_PROCESS_INSTANCE_END
-            );
     
     protected AsyncHistorySession asyncHistorySession;
     protected AsyncHistoryListener asyncHistoryListener;
+    
+    // The field name under which the type and actual will be stored
+    protected String typeFieldName = HistoryJsonTransformer.FIELD_NAME_TYPE;
+    protected String dataFieldName = HistoryJsonTransformer.FIELD_NAME_DATA;
     
     public AsyncHistorySessionCommandContextCloseListener() {
         
@@ -73,12 +62,15 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
         Map<String, List<Map<String, String>>> jobData = asyncHistorySession.getJobData();
         if (!jobData.isEmpty()) {
             List<ObjectNode> objectNodes = new ArrayList<>();
-            for (String type : TYPE_ORDER) {
+            
+            // First, the registered types
+            for (String type : asyncHistorySession.getJobDataTypes()) {
                 if (jobData.containsKey(type)) {
                     generateJson(commandContext, jobData, objectNodes, type);
                 }
             }
             
+            // Additional data for which the type is not registered
             if (!jobData.isEmpty()) {
                 for (String type : jobData.keySet()) {
                     generateJson(commandContext, jobData, objectNodes, type);
@@ -102,11 +94,10 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
     }
     
     protected ObjectNode generateJson(CommandContext commandContext, String type, Map<String, String> historicData) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        ObjectNode elementObjectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
-        elementObjectNode.put(HistoryJsonConstants.TYPE, type);
+        ObjectNode elementObjectNode = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper().createObjectNode();
+        elementObjectNode.put(typeFieldName, type);
 
-        ObjectNode dataNode = elementObjectNode.putObject(HistoryJsonConstants.DATA);
+        ObjectNode dataNode = elementObjectNode.putObject(dataFieldName);
         for (String key : historicData.keySet()) {
             dataNode.put(key, historicData.get(key));
         }
@@ -139,6 +130,22 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
 
     public void setAsyncHistoryListener(AsyncHistoryListener asyncHistoryListener) {
         this.asyncHistoryListener = asyncHistoryListener;
+    }
+
+    public String getTypeFieldName() {
+        return typeFieldName;
+    }
+
+    public void setTypeFieldName(String typeFieldName) {
+        this.typeFieldName = typeFieldName;
+    }
+
+    public String getDataFieldName() {
+        return dataFieldName;
+    }
+
+    public void setDataFieldName(String dataFieldName) {
+        this.dataFieldName = dataFieldName;
     }
 
 }

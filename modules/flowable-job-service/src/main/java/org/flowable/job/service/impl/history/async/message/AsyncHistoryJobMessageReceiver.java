@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.history.async.message;
+package org.flowable.job.service.impl.history.async.message;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,13 +18,12 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.asyncexecutor.message.AsyncJobMessageReceiver;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.HistoryJob;
-import org.flowable.job.service.HistoryJobService;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManager;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,21 +37,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class AsyncHistoryJobMessageReceiver {
 
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected CommandExecutor commandExecutor;
     protected AsyncHistoryJobMessageHandler asyncHistoryJobMessageHandler;
     
     public AsyncHistoryJobMessageReceiver() {
         
     }
     
-    public AsyncHistoryJobMessageReceiver(ProcessEngineConfigurationImpl processEngineConfiguration, AsyncHistoryJobMessageHandler asyncHistoryJobMessageHandler) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public AsyncHistoryJobMessageReceiver(CommandExecutor commandExecutor, AsyncHistoryJobMessageHandler asyncHistoryJobMessageHandler) {
+        this.commandExecutor = commandExecutor;
         this.asyncHistoryJobMessageHandler = asyncHistoryJobMessageHandler;
     }
     
     public void messageForJobReceived(final String jobId) {
-        if (processEngineConfiguration == null) {
-            throw new FlowableException("Programmatic error: this class needs a ProcessEngineConfigurationImpl instance");
+        if (commandExecutor == null) {
+            throw new FlowableException("Programmatic error: this class needs a CommandExecutor instance");
         }
         if (asyncHistoryJobMessageHandler == null) {
             throw new FlowableException("Programmatic error: this class needs an AsyncHistoryJobMessageHandler instance.");
@@ -60,16 +59,17 @@ public class AsyncHistoryJobMessageReceiver {
         
         // Wrapping it in a command, as we want it all to be done in the same transaction
         // Furthermore, when accessing the configuration bytes, this needs to be done within a command context.
-        processEngineConfiguration.getManagementService().executeCommand(new Command<Void>() {
+        commandExecutor.execute(new Command<Void>() {
             
             @Override
             public Void execute(CommandContext commandContext) {
-                HistoryJobService historyJobService = CommandContextUtil.getHistoryJobService(commandContext);
+                
+                HistoryJobEntityManager historyJobEntityManager = CommandContextUtil.getHistoryJobEntityManager(commandContext);
                 
                 HistoryJobQueryImpl query = new HistoryJobQueryImpl();
                 query.jobId(jobId);
                 
-                List<HistoryJob> jobs = historyJobService.findHistoryJobsByQueryCriteria(query);
+                List<HistoryJob> jobs = historyJobEntityManager.findHistoryJobsByQueryCriteria(query);
                 if (jobs == null || jobs.isEmpty()) {
                     throw new FlowableException("No history job found for id " + jobId);
                 }
@@ -81,8 +81,8 @@ public class AsyncHistoryJobMessageReceiver {
                 }
                 
                 HistoryJobEntity historyJobEntity = (HistoryJobEntity) jobs.get(0);
-                if (asyncHistoryJobMessageHandler.handleJob(historyJobEntity, getHistoryJobData(historyJobEntity))) {
-                    historyJobService.deleteHistoryJob(historyJobEntity);
+                if (asyncHistoryJobMessageHandler.handleJob(historyJobEntity, getHistoryJobData(commandContext, historyJobEntity))) {
+                    historyJobEntityManager.delete(historyJobEntity);
                 }
                 
                 return null;
@@ -91,8 +91,8 @@ public class AsyncHistoryJobMessageReceiver {
         });
     }
     
-    protected JsonNode getHistoryJobData(HistoryJobEntity job) {
-        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+    protected JsonNode getHistoryJobData(CommandContext commandContext, HistoryJobEntity job) {
+        ObjectMapper objectMapper = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper();
         if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             try {
                 return objectMapper.readTree(job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes());
@@ -103,12 +103,12 @@ public class AsyncHistoryJobMessageReceiver {
         return null;
     }
     
-    public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-        return processEngineConfiguration;
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
     }
 
-    public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public void setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
     }
 
     public AsyncHistoryJobMessageHandler getAsyncHistoryJobMessageHandler() {

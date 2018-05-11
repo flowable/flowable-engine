@@ -10,7 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.history.async;
+package org.flowable.job.service.impl.history.async;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.Session;
@@ -19,6 +22,7 @@ import org.flowable.common.engine.impl.interceptor.SessionFactory;
 public class AsyncHistorySessionFactory implements SessionFactory {
 
     protected AsyncHistoryListener asyncHistoryListener;
+    protected List<String> registeredJobDataTypes = new ArrayList<>();
 
     @Override
     public Class<?> getSessionType() {
@@ -27,7 +31,11 @@ public class AsyncHistorySessionFactory implements SessionFactory {
 
     @Override
     public Session openSession(CommandContext commandContext) {
-        return new AsyncHistorySession(commandContext, asyncHistoryListener);
+        return new AsyncHistorySession(commandContext, asyncHistoryListener, registeredJobDataTypes);
+    }
+    
+    public void registerJobDataTypes(List<String> registeredJobDataTypes) {
+        this.registeredJobDataTypes.addAll(registeredJobDataTypes);
     }
     
     public AsyncHistoryListener getAsyncHistoryListener() {
@@ -38,4 +46,12 @@ public class AsyncHistorySessionFactory implements SessionFactory {
         this.asyncHistoryListener = asyncHistoryListener;
     }
 
+    public List<String> getRegisteredJobDataTypes() {
+        return registeredJobDataTypes;
+    }
+
+    public void setRegisteredJobDataTypes(List<String> registeredJobDataTypes) {
+        this.registeredJobDataTypes = registeredJobDataTypes;
+    }
+    
 }

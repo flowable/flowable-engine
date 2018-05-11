@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.history.async.message;
+package org.flowable.job.service.impl.history.async.message;
 
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 

@@ -10,11 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.asyncexecutor.message;
+package org.flowable.job.service.impl.asyncexecutor.message;
 
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
+ * Experimental.
+ * 
  * An implementation of this interface needs to be injected into an {@link AsyncJobMessageReceiver} instance.
  * The helper will receive the information from a message and the implementation of this class should execute the actual logic.
  * 

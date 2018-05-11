@@ -107,7 +107,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected InternalJobParentStateResolver jobParentStateResolver;
 
     protected AsyncExecutor asyncExecutor;
-    
     protected int asyncExecutorNumberOfRetries;
     protected int asyncExecutorResetExpiredJobsMaxTimeout;
     
@@ -118,6 +117,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected List<JobProcessor> jobProcessors;
     
     protected AsyncExecutor asyncHistoryExecutor;
+    protected int asyncHistoryExecutorNumberOfRetries;
     
     protected Map<String, HistoryJobHandler> historyJobHandlers;
     protected List<HistoryJobProcessor> historyJobProcessors;
@@ -403,6 +403,15 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setAsyncHistoryExecutor(AsyncExecutor asyncHistoryExecutor) {
         this.asyncHistoryExecutor = asyncHistoryExecutor;
+        return this;
+    }
+    
+    public int getAsyncHistoryExecutorNumberOfRetries() {
+        return asyncHistoryExecutorNumberOfRetries;
+    }
+
+    public JobServiceConfiguration setAsyncHistoryExecutorNumberOfRetries(int asyncHistoryExecutorNumberOfRetries) {
+        this.asyncHistoryExecutorNumberOfRetries = asyncHistoryExecutorNumberOfRetries;
         return this;
     }
 

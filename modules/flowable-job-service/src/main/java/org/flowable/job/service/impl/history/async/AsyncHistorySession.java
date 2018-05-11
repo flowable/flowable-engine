@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.history.async;
+package org.flowable.job.service.impl.history.async;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,10 +27,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.Session;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +38,17 @@ public class AsyncHistorySession implements Session {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncHistorySession.class);
 
+    public static final String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
+    
     protected CommandContext commandContext;
     protected AsyncHistoryListener asyncHistoryListener;
     protected CommandContextCloseListener commandContextCloseListener;
     protected AsyncHistoryCommittedTransactionListener asyncHistoryCommittedTransactionListener;
 
+    // A list of the different types of history for which jobs will be created
+    // Note that the ordering of the types is important, as it will define the order of job creation.
+    protected List<String> jobDataTypes;
+    
     protected String tenantId;
     protected Map<String, List<Map<String, String>>> jobData;
 
@@ -55,6 +61,11 @@ public class AsyncHistorySession implements Session {
         if (isAsyncHistoryExecutorEnabled()) {
             initTransactionListener();
         }
+    }
+    
+    public AsyncHistorySession(CommandContext commandContext, AsyncHistoryListener asyncHistoryJobListener, List<String> jobDataTypes) {
+        this(commandContext, asyncHistoryJobListener);
+        this.jobDataTypes = jobDataTypes;
     }
     
     protected boolean isAsyncHistoryExecutorEnabled() {
@@ -92,7 +103,7 @@ public class AsyncHistorySession implements Session {
 
     public void addHistoricData(String type, Map<String, String> data, String tenantId) {
         
-        data.put(HistoryJsonConstants.TIMESTAMP, AsyncHistoryDateUtil.formatDate(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime()));
+        data.put(TIMESTAMP, AsyncHistoryDateUtil.formatDate(CommandContextUtil.getJobServiceConfiguration(commandContext).getClock().getCurrentTime()));
         
         if (jobData == null) {
             jobData = new LinkedHashMap<>(); // linked: insertion order is important
@@ -118,22 +129,6 @@ public class AsyncHistorySession implements Session {
 
     }
 
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public Map<String, List<Map<String, String>>> getJobData() {
-        return jobData;
-    }
-
-    public void setJobData(Map<String, List<Map<String, String>>> jobData) {
-        this.jobData = jobData;
-    }
-    
     public void addAsyncHistoryRunnableAfterCommit(Runnable runnable) {
         if (asyncHistoryCommittedTransactionListener != null) {
             asyncHistoryCommittedTransactionListener.addRunnable(runnable);
@@ -168,4 +163,28 @@ public class AsyncHistorySession implements Session {
         }
     }
     
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public Map<String, List<Map<String, String>>> getJobData() {
+        return jobData;
+    }
+
+    public void setJobData(Map<String, List<Map<String, String>>> jobData) {
+        this.jobData = jobData;
+    }
+
+    public List<String> getJobDataTypes() {
+        return jobDataTypes;
+    }
+
+    public void setJobDataTypes(List<String> jobDataTypes) {
+        this.jobDataTypes = jobDataTypes;
+    }
+
 }

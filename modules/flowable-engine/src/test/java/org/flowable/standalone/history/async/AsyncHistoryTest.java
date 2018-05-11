@@ -19,12 +19,12 @@ import java.util.List;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
-import org.flowable.engine.impl.history.async.AsyncHistoryJobZippedHandler;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.history.async.AsyncHistoryJobHandler;
+import org.flowable.job.service.impl.history.async.AsyncHistoryJobZippedHandler;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.history.HistoricTaskInstance;
 

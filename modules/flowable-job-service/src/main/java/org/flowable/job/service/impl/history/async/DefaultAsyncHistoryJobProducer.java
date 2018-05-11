@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.history.async;
+package org.flowable.job.service.impl.history.async;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,10 +22,9 @@ import java.util.zip.GZIPOutputStream;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.job.service.HistoryJobService;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,7 +49,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         if (isAsyncHistoryJsonGroupingEnabled && historyObjectNodes.size() >= asyncHistoryJsonGroupingThreshold) {
             String jobType = isJsonGzipCompressionEnabled ? AsyncHistoryJobZippedHandler.JOB_TYPE : AsyncHistoryJobHandler.JOB_TYPE;
             HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobType);
-            ArrayNode arrayNode = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper().createArrayNode();
+            ArrayNode arrayNode = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper().createArrayNode();
             for (ObjectNode historyJsonNode : historyObjectNodes) {
                 arrayNode.add(historyJsonNode);
             }
@@ -69,20 +68,19 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
     }
     
     protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession, String jobType) {
-        ProcessEngineConfiguration processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        HistoryJobService historyJobService = CommandContextUtil.getHistoryJobService(commandContext);
-        HistoryJobEntity currentJobEntity = historyJobService.createHistoryJob();
+        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+        HistoryJobEntity currentJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().create();
         currentJobEntity.setJobHandlerType(jobType);
-        currentJobEntity.setRetries(CommandContextUtil.getProcessEngineConfiguration(commandContext).getAsyncHistoryExecutorNumberOfRetries());
+        currentJobEntity.setRetries(jobServiceConfiguration.getAsyncHistoryExecutorNumberOfRetries());
         currentJobEntity.setTenantId(asyncHistorySession.getTenantId());
-        currentJobEntity.setCreateTime(processEngineConfiguration.getClock().getCurrentTime());
-        historyJobService.scheduleHistoryJob(currentJobEntity);
+        currentJobEntity.setCreateTime(jobServiceConfiguration.getClock().getCurrentTime());
+        CommandContextUtil.getJobManager(commandContext).scheduleHistoryJob(currentJobEntity);
         return currentJobEntity;
     }
 
     protected void addJsonToJob(CommandContext commandContext, HistoryJobEntity jobEntity, JsonNode rootObjectNode, boolean applyCompression) {
         try {
-            byte[] bytes = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper().writeValueAsBytes(rootObjectNode);
+            byte[] bytes = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper().writeValueAsBytes(rootObjectNode);
             if (applyCompression) {
                 bytes = compress(bytes);
             }

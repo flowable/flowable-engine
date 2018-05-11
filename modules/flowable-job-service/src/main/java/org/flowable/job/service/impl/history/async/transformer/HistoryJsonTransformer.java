@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.history.async.json.transformer;
+package org.flowable.job.service.impl.history.async.transformer;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
@@ -18,6 +18,9 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface HistoryJsonTransformer {
+    
+    String FIELD_NAME_TYPE = "type";
+    String FIELD_NAME_DATA = "data";
 
     String getType();
 
