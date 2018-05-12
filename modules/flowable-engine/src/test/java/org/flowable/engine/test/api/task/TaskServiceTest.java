@@ -80,7 +80,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         super.tearDown();
         if (task != null) {
             taskService.deleteTask(task.getId(), true);
-        };
+        }
     }
 
     public void testCreateTaskWithBuilder() {
