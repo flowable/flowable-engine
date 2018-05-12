@@ -12,7 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
-import org.flowable.cmmn.api.runtime.*;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 

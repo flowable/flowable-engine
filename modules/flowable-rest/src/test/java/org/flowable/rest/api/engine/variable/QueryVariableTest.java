@@ -13,14 +13,13 @@
 
 package org.flowable.rest.api.engine.variable;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class QueryVariableTest extends BaseSpringRestTestCase {
 

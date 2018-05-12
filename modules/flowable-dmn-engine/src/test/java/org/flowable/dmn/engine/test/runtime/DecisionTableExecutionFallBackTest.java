@@ -2,7 +2,6 @@ package org.flowable.dmn.engine.test.runtime;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDeployment;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.junit.After;

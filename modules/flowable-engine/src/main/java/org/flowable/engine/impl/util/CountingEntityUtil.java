@@ -20,7 +20,6 @@ import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
