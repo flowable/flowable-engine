@@ -161,12 +161,14 @@ import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecutionExceptionHandler;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.job.service.impl.history.async.AsyncHistoryListener;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskPostProcessor;
@@ -342,6 +344,30 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected InternalJobParentStateResolver internalJobParentStateResolver;
     protected String jobExecutionScope = JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN;
+    
+    protected AsyncExecutor asyncHistoryExecutor;
+    protected boolean isAsyncHistoryEnabled;
+    protected boolean asyncHistoryExecutorActivate;
+    protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
+    protected boolean isAsyncHistoryJsonGroupingEnabled;
+    protected boolean asyncHistoryExecutorMessageQueueMode;
+    protected int asyncHistoryJsonGroupingThreshold = 10;
+    protected AsyncHistoryListener asyncHistoryListener;
+
+    // More info: see similar async executor properties.
+    protected int asyncHistoryExecutorNumberOfRetries = 3;
+    protected int asyncHistoryExecutorCorePoolSize = 2;
+    protected int asyncHistoryExecutorMaxPoolSize = 10;
+    protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
+    protected int asyncHistoryExecutorThreadPoolQueueSize = 100;
+    protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
+    protected long asyncHistoryExecutorSecondsToWaitOnShutdown = 60L;
+    protected int asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
+    protected int asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+    protected String asyncHistoryExecutorLockOwner;
+    protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncHistoryExecutorResetExpiredJobsInterval = 60 * 1000;
+    protected int asyncHistoryExecutorResetExpiredJobsPageSize = 3;
 
     protected FormFieldHandler formFieldHandler;
 
@@ -639,6 +665,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initFailedJobCommandFactory();
         initJobServiceConfiguration();
         initAsyncExecutor();
+        initAsyncHistoryExecutor();
         initScriptingEngines();
     }
 
@@ -1276,6 +1303,54 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         asyncExecutor.setJobServiceConfiguration(jobServiceConfiguration);
         asyncExecutor.setAutoActivate(asyncExecutorActivate);
         jobServiceConfiguration.setAsyncExecutor(asyncExecutor);
+    }
+    
+    public void initAsyncHistoryExecutor() {
+        if (isAsyncHistoryEnabled && asyncHistoryExecutor == null) {
+            DefaultAsyncJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
+
+            // Message queue mode
+            defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
+
+            // Thread pool config
+            defaultAsyncHistoryExecutor.setCorePoolSize(asyncHistoryExecutorCorePoolSize);
+            defaultAsyncHistoryExecutor.setMaxPoolSize(asyncHistoryExecutorMaxPoolSize);
+            defaultAsyncHistoryExecutor.setKeepAliveTime(asyncHistoryExecutorThreadKeepAliveTime);
+
+            // Threadpool queue
+            if (asyncHistoryExecutorThreadPoolQueue != null) {
+                defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
+            }
+            defaultAsyncHistoryExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
+
+            // Acquisition wait time
+            defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime);
+
+            // Queue full wait time
+            defaultAsyncHistoryExecutor.setDefaultQueueSizeFullWaitTimeInMillis(asyncHistoryExecutorDefaultQueueSizeFullWaitTime);
+
+            // Job locking
+            defaultAsyncHistoryExecutor.setAsyncJobLockTimeInMillis(asyncHistoryExecutorAsyncJobLockTimeInMillis);
+            if (asyncHistoryExecutorLockOwner != null) {
+                defaultAsyncHistoryExecutor.setLockOwner(asyncHistoryExecutorLockOwner);
+            }
+
+            // Reset expired
+            defaultAsyncHistoryExecutor.setResetExpiredJobsInterval(asyncHistoryExecutorResetExpiredJobsInterval);
+            defaultAsyncHistoryExecutor.setResetExpiredJobsPageSize(asyncHistoryExecutorResetExpiredJobsPageSize);
+
+            // Shutdown
+            defaultAsyncHistoryExecutor.setSecondsToWaitOnShutdown(asyncHistoryExecutorSecondsToWaitOnShutdown);
+
+            asyncHistoryExecutor = defaultAsyncHistoryExecutor;
+        }
+
+        if (asyncHistoryExecutor != null) {
+            asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
+            asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
+        }
+        jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
+        jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
     }
 
     @Override
@@ -2286,6 +2361,222 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setAsyncExecutorExecuteAsyncRunnableFactory(
             ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory) {
         this.asyncExecutorExecuteAsyncRunnableFactory = asyncExecutorExecuteAsyncRunnableFactory;
+        return this;
+    }
+    
+    public AsyncExecutor getAsyncHistoryExecutor() {
+        return asyncHistoryExecutor;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutor(AsyncExecutor asyncHistoryExecutor) {
+        this.asyncHistoryExecutor = asyncHistoryExecutor;
+        return this;
+    }
+    
+    public HistoricPlanItemInstanceDataManager getHistoricPlanItemInstanceDataManager() {
+        return historicPlanItemInstanceDataManager;
+    }
+
+    public CmmnEngineConfiguration setHistoricPlanItemInstanceDataManager(HistoricPlanItemInstanceDataManager historicPlanItemInstanceDataManager) {
+        this.historicPlanItemInstanceDataManager = historicPlanItemInstanceDataManager;
+        return this;
+    }
+
+    public InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return internalTaskAssignmentManager;
+    }
+
+    public CmmnEngineConfiguration setInternalTaskAssignmentManager(InternalTaskAssignmentManager internalTaskAssignmentManager) {
+        this.internalTaskAssignmentManager = internalTaskAssignmentManager;
+        return this;
+    }
+
+    public InternalJobParentStateResolver getInternalJobParentStateResolver() {
+        return internalJobParentStateResolver;
+    }
+
+    public CmmnEngineConfiguration setInternalJobParentStateResolver(InternalJobParentStateResolver internalJobParentStateResolver) {
+        this.internalJobParentStateResolver = internalJobParentStateResolver;
+        return this;
+    }
+
+    public boolean isAsyncHistoryEnabled() {
+        return isAsyncHistoryEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryEnabled(boolean isAsyncHistoryEnabled) {
+        this.isAsyncHistoryEnabled = isAsyncHistoryEnabled;
+        return this;
+    }
+    
+    public boolean isAsyncHistoryExecutorActivate() {
+        return asyncHistoryExecutorActivate;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorActivate(boolean asyncHistoryExecutorActivate) {
+        this.asyncHistoryExecutorActivate = asyncHistoryExecutorActivate;
+        return this;
+    }
+
+    public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
+        return isAsyncHistoryJsonGzipCompressionEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryJsonGzipCompressionEnabled(boolean isAsyncHistoryJsonGzipCompressionEnabled) {
+        this.isAsyncHistoryJsonGzipCompressionEnabled = isAsyncHistoryJsonGzipCompressionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncHistoryJsonGroupingEnabled() {
+        return isAsyncHistoryJsonGroupingEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
+        this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
+        return this;
+    }
+
+    public int getAsyncHistoryJsonGroupingThreshold() {
+        return asyncHistoryJsonGroupingThreshold;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryJsonGroupingThreshold(int asyncHistoryJsonGroupingThreshold) {
+        this.asyncHistoryJsonGroupingThreshold = asyncHistoryJsonGroupingThreshold;
+        return this;
+    }
+    
+    public boolean isAsyncHistoryExecutorMessageQueueMode() {
+        return asyncHistoryExecutorMessageQueueMode;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorMessageQueueMode(boolean asyncHistoryExecutorMessageQueueMode) {
+        this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
+        return this;
+    }
+
+    public AsyncHistoryListener getAsyncHistoryListener() {
+        return asyncHistoryListener;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryListener(AsyncHistoryListener asyncHistoryListener) {
+        this.asyncHistoryListener = asyncHistoryListener;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorNumberOfRetries() {
+        return asyncHistoryExecutorNumberOfRetries;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorNumberOfRetries(int asyncHistoryExecutorNumberOfRetries) {
+        this.asyncHistoryExecutorNumberOfRetries = asyncHistoryExecutorNumberOfRetries;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorCorePoolSize() {
+        return asyncHistoryExecutorCorePoolSize;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorCorePoolSize(int asyncHistoryExecutorCorePoolSize) {
+        this.asyncHistoryExecutorCorePoolSize = asyncHistoryExecutorCorePoolSize;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorMaxPoolSize() {
+        return asyncHistoryExecutorMaxPoolSize;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorMaxPoolSize(int asyncHistoryExecutorMaxPoolSize) {
+        this.asyncHistoryExecutorMaxPoolSize = asyncHistoryExecutorMaxPoolSize;
+        return this;
+    }
+
+    public long getAsyncHistoryExecutorThreadKeepAliveTime() {
+        return asyncHistoryExecutorThreadKeepAliveTime;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorThreadKeepAliveTime(long asyncHistoryExecutorThreadKeepAliveTime) {
+        this.asyncHistoryExecutorThreadKeepAliveTime = asyncHistoryExecutorThreadKeepAliveTime;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorThreadPoolQueueSize() {
+        return asyncHistoryExecutorThreadPoolQueueSize;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorThreadPoolQueueSize(int asyncHistoryExecutorThreadPoolQueueSize) {
+        this.asyncHistoryExecutorThreadPoolQueueSize = asyncHistoryExecutorThreadPoolQueueSize;
+        return this;
+    }
+
+    public BlockingQueue<Runnable> getAsyncHistoryExecutorThreadPoolQueue() {
+        return asyncHistoryExecutorThreadPoolQueue;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorThreadPoolQueue(BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue) {
+        this.asyncHistoryExecutorThreadPoolQueue = asyncHistoryExecutorThreadPoolQueue;
+        return this;
+    }
+
+    public long getAsyncHistoryExecutorSecondsToWaitOnShutdown() {
+        return asyncHistoryExecutorSecondsToWaitOnShutdown;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorSecondsToWaitOnShutdown(long asyncHistoryExecutorSecondsToWaitOnShutdown) {
+        this.asyncHistoryExecutorSecondsToWaitOnShutdown = asyncHistoryExecutorSecondsToWaitOnShutdown;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime() {
+        return asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(int asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime) {
+        this.asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime = asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorDefaultQueueSizeFullWaitTime() {
+        return asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorDefaultQueueSizeFullWaitTime(int asyncHistoryExecutorDefaultQueueSizeFullWaitTime) {
+        this.asyncHistoryExecutorDefaultQueueSizeFullWaitTime = asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+        return this;
+    }
+
+    public String getAsyncHistoryExecutorLockOwner() {
+        return asyncHistoryExecutorLockOwner;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorLockOwner(String asyncHistoryExecutorLockOwner) {
+        this.asyncHistoryExecutorLockOwner = asyncHistoryExecutorLockOwner;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorAsyncJobLockTimeInMillis() {
+        return asyncHistoryExecutorAsyncJobLockTimeInMillis;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorAsyncJobLockTimeInMillis(int asyncHistoryExecutorAsyncJobLockTimeInMillis) {
+        this.asyncHistoryExecutorAsyncJobLockTimeInMillis = asyncHistoryExecutorAsyncJobLockTimeInMillis;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorResetExpiredJobsInterval() {
+        return asyncHistoryExecutorResetExpiredJobsInterval;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorResetExpiredJobsInterval(int asyncHistoryExecutorResetExpiredJobsInterval) {
+        this.asyncHistoryExecutorResetExpiredJobsInterval = asyncHistoryExecutorResetExpiredJobsInterval;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorResetExpiredJobsPageSize() {
+        return asyncHistoryExecutorResetExpiredJobsPageSize;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorResetExpiredJobsPageSize(int asyncHistoryExecutorResetExpiredJobsPageSize) {
+        this.asyncHistoryExecutorResetExpiredJobsPageSize = asyncHistoryExecutorResetExpiredJobsPageSize;
         return this;
     }
 
