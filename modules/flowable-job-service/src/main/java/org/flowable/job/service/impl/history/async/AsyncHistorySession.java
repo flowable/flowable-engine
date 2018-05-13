@@ -86,7 +86,7 @@ public class AsyncHistorySession implements Session {
         }
         
         if (!jobData.containsKey(type)) {
-            jobData.put(type, new ArrayList<Map<String, String>>(1));
+            jobData.put(type, new ArrayList<>(1));
         }
         jobData.get(type).add(data);
     }

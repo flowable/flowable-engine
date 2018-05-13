@@ -34,7 +34,7 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
     static {
         names = Collections.unmodifiableList(Collections.singletonList("juel"));
         extensions = names;
-        mimeTypes = Collections.unmodifiableList(new ArrayList<String>(0));
+        mimeTypes = Collections.unmodifiableList(new ArrayList<>(0));
     }
 
     @Override

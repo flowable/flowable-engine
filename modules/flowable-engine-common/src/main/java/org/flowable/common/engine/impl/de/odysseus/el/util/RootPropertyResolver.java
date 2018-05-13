@@ -36,7 +36,7 @@ import org.flowable.common.engine.impl.javax.el.PropertyNotWritableException;
  * @author Christoph Beck
  */
 public class RootPropertyResolver extends ELResolver {
-	private final Map<String, Object> map = Collections.synchronizedMap(new HashMap<String, Object>());
+	private final Map<String, Object> map = Collections.synchronizedMap(new HashMap<>());
 	private final boolean readOnly;
 
 	/**

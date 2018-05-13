@@ -60,7 +60,7 @@ public class ParsedDeploymentTest extends PluggableFlowableTestCase {
     public void setUp() {
         CommandContext commandContext = processEngineConfiguration.getCommandContextFactory().createCommandContext(null);
         if (commandContext.getEngineConfigurations() == null) {
-            commandContext.setEngineConfigurations(new HashMap<String, AbstractEngineConfiguration>());
+            commandContext.setEngineConfigurations(new HashMap<>());
         }
         commandContext.getEngineConfigurations().put(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG, processEngineConfiguration);
         Context.setCommandContext(commandContext);

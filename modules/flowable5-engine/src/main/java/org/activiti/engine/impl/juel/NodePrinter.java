@@ -64,6 +64,6 @@ public class NodePrinter {
     }
 
     public static void dump(PrintWriter writer, Node node) {
-        dump(writer, node, new Stack<Node>());
+        dump(writer, node, new Stack<>());
     }
 }

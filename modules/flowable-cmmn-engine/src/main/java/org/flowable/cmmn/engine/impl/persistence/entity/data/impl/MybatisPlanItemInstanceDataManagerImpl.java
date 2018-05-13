@@ -48,8 +48,8 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         PlanItemInstanceEntityImpl planItemInstanceEntityImpl = new PlanItemInstanceEntityImpl();
         
         // Avoid queries being done for new instance
-        planItemInstanceEntityImpl.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>(1));
-        planItemInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
+        planItemInstanceEntityImpl.setChildPlanItemInstances(new ArrayList<>(1));
+        planItemInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<>(1));
         
         return planItemInstanceEntityImpl;
     }

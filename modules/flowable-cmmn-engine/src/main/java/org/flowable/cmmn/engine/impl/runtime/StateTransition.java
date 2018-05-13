@@ -77,7 +77,7 @@ public class StateTransition {
     }
     
     protected static void addTransition(String state, String...transitions) {
-        TRANSITIONS.put(state, new HashSet<String>(transitions.length));
+        TRANSITIONS.put(state, new HashSet<>(transitions.length));
         for (String transition : transitions) {
             TRANSITIONS.get(state).add(transition);
         }

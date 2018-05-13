@@ -42,7 +42,7 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
     public void addHistoryJsonTransformer(HistoryJsonTransformer historyJsonTransformer) {
         String type = historyJsonTransformer.getType();
         if (!historyJsonTransformers.containsKey(type)) {
-            historyJsonTransformers.put(type, new ArrayList<HistoryJsonTransformer>());
+            historyJsonTransformers.put(type, new ArrayList<>());
         }
         historyJsonTransformers.get(historyJsonTransformer.getType()).add(historyJsonTransformer);
     }

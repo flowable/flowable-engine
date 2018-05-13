@@ -83,7 +83,7 @@ public class DbSqlSession implements Session {
         
         Class<? extends Entity> clazz = entity.getClass();
         if (!insertedObjects.containsKey(clazz)) {
-            insertedObjects.put(clazz, new LinkedHashMap<String, Entity>()); // order of insert is important, hence LinkedHashMap
+            insertedObjects.put(clazz, new LinkedHashMap<>()); // order of insert is important, hence LinkedHashMap
         }
 
         insertedObjects.get(clazz).put(entity.getId(), entity);
@@ -113,7 +113,7 @@ public class DbSqlSession implements Session {
      */
     public void delete(String statement, Object parameter, Class<? extends Entity> entityClass) {
         if (!bulkDeleteOperations.containsKey(entityClass)) {
-            bulkDeleteOperations.put(entityClass, new ArrayList<BulkDeleteOperation>(1));
+            bulkDeleteOperations.put(entityClass, new ArrayList<>(1));
         }
         bulkDeleteOperations.get(entityClass).add(new BulkDeleteOperation(dbSqlSessionFactory.mapStatement(statement), parameter));
     }
@@ -121,7 +121,7 @@ public class DbSqlSession implements Session {
     public void delete(Entity entity) {
         Class<? extends Entity> clazz = entity.getClass();
         if (!deletedObjects.containsKey(clazz)) {
-            deletedObjects.put(clazz, new LinkedHashMap<String, Entity>()); // order of insert is important, hence LinkedHashMap
+            deletedObjects.put(clazz, new LinkedHashMap<>()); // order of insert is important, hence LinkedHashMap
         }
         deletedObjects.get(clazz).put(entity.getId(), entity);
         entity.setDeleted(true);

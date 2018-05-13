@@ -205,7 +205,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
         if (satisfiedSentryPartInstances == null) {
             if (sentryPartInstanceCount == 0) {
-                satisfiedSentryPartInstances = new ArrayList<SentryPartInstanceEntity>(1);
+                satisfiedSentryPartInstances = new ArrayList<>(1);
             } else {
                 satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager().findSentryPartInstancesByPlanItemInstanceId(id);
             }

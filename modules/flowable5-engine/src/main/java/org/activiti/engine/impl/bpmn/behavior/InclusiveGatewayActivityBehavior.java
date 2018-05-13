@@ -126,9 +126,9 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
                     boolean reachable = false;
                     PvmTransition pvmTransition = ((ExecutionEntity) concurrentExecution).getTransitionBeingTaken();
                     if (pvmTransition != null) {
-                        reachable = isReachable(pvmTransition.getDestination(), activity, new HashSet<PvmActivity>());
+                        reachable = isReachable(pvmTransition.getDestination(), activity, new HashSet<>());
                     } else {
-                        reachable = isReachable(concurrentExecution.getActivity(), activity, new HashSet<PvmActivity>());
+                        reachable = isReachable(concurrentExecution.getActivity(), activity, new HashSet<>());
                     }
 
                     if (reachable) {

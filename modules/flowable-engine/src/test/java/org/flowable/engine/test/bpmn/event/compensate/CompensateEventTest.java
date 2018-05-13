@@ -136,7 +136,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         // get task from second subprocess
         task = taskService.createTaskQuery().singleResult();
 
-        formService.submitTaskFormData(task.getId(), new HashMap<String, String>());
+        formService.submitTaskFormData(task.getId(), new HashMap<>());
 
         // get first task from main process
         task = taskService.createTaskQuery().singleResult();
