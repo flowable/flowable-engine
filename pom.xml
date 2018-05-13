@@ -1621,9 +1621,9 @@
             </build>
 		</profile>
         <profile>
-            <id>java9+</id>
+            <id>java9and10</id>
             <activation>
-                <jdk>[9,)</jdk>
+                <jdk>[9,10]</jdk>
             </activation>
             <properties>
                 <argLine>--add-modules java.xml.bind</argLine>
