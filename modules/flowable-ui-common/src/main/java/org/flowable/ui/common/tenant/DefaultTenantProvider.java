@@ -23,7 +23,7 @@ public class DefaultTenantProvider implements TenantProvider {
             configuredTenantId = configuredTenantId.trim();
             
             // quotes can help solve whitespace issues
-            LOGGER.debug("Found configured tenantId: '" + configuredTenantId + "'");
+            LOGGER.debug("Found configured tenantId: '{}'", configuredTenantId);
             
             this.tenantId = configuredTenantId;
         }
@@ -32,7 +32,7 @@ public class DefaultTenantProvider implements TenantProvider {
     @Override
     public String getTenantId() {
         if(tenantId != null) {
-            LOGGER.debug("Using configured tenantId: '" + tenantId + "'");
+            LOGGER.debug("Using configured tenantId: '{}'", tenantId);
             return tenantId;
         }
         
@@ -40,7 +40,7 @@ public class DefaultTenantProvider implements TenantProvider {
         if(appUser != null) {
             // quotes can help solve whitespace issues, trimming here would not 
             // help solve the problem at source which is in user database
-            LOGGER.debug("Using user tenantId: '" + tenantId + "'");
+            LOGGER.debug("Using user tenantId: '{}'", tenantId);
             
             return appUser.getUserObject().getTenantId();
         }

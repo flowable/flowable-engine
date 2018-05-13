@@ -74,7 +74,7 @@ public class BackwardsCompatiblePropertiesLoader implements EnvironmentPostProce
                 // We are always ignoring the deprecated resources. This is done in the same way as in the Spring ConfigurationClassParsers
                 // Placeholders not resolvable or resource not found when trying to open it
                 if (logger.isInfoEnabled()) {
-                    logger.info("Properties location [" + location + "] not resolvable: " + ex.getMessage());
+                    logger.info("Properties location [{}] not resolvable: {}", location, ex.getMessage());
                 }
             } catch (IOException ex) {
                 throw new UncheckedIOException("Failed to creaty property source", ex);

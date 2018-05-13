@@ -35,7 +35,7 @@ public class CounterExecutionListener implements ExecutionListener {
         Object nrOfCompletedInstancesObj = execution.getVariable("nrOfCompletedInstances");
         String nrOfInstances = null == nrOfInstancesObj ? null : nrOfInstancesObj.toString();
         String nrOfCompletedInstances = null == nrOfCompletedInstancesObj ? null : nrOfCompletedInstancesObj.toString();
-        LOGGER.debug("Invoke into executionEnd method and execution is " + execution.getVariables());
+        LOGGER.debug("Invoke into executionEnd method and execution is {}", execution.getVariables());
         
         if (nrOfCompletedInstances != null && nrOfInstances.equals(nrOfCompletedInstances)) {
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
@@ -55,7 +55,7 @@ public class CounterExecutionListener implements ExecutionListener {
                         notPassCount++;
                     }
                 }
-                LOGGER.info("Countersign result: pass" + passCount + " not pass:" + notPassCount);
+                LOGGER.info("Countersign result: pass:{} not pass:{}", passCount, notPassCount);
                 execution.setVariable("approveResult", passCount > notPassCount ? "pass" : "notpass");
                 
             } else {
