@@ -89,7 +89,7 @@ public class AddCommentCmd implements Command<Comment> {
             processDefinitionId = task.getProcessDefinitionId();
         }
 
-        if (processDefinitionId != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
             return compatibilityHandler.addComment(taskId, processInstanceId, type, message);
         }
