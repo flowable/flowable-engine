@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.calendar.BusinessCalendar;
-import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 
 /**
  * @author Tom Baeyens

@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.Session;

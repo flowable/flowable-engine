@@ -14,7 +14,6 @@ package org.flowable.common.engine.impl.calendar;
 
 import java.util.Date;
 
-import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.runtime.ClockReader;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;

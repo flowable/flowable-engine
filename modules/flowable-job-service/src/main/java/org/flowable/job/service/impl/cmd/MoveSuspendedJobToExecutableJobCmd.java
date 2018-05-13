@@ -17,11 +17,8 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
-import org.flowable.job.service.InternalJobParentStateResolver;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.util.CommandContextUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 

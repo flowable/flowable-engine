@@ -38,7 +38,6 @@ import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
-import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;

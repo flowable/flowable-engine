@@ -12,7 +12,9 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import org.flowable.cmmn.model.*;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.UserEventListener;
 import org.junit.Test;
 
 import java.util.List;

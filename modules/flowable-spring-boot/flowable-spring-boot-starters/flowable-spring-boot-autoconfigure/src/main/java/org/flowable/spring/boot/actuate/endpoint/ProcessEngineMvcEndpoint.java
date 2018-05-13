@@ -20,7 +20,6 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
-import org.springframework.boot.actuate.endpoint.web.annotation.ControllerEndpoint;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;

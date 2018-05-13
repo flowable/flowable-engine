@@ -13,11 +13,8 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import java.util.Date;
-import java.util.List;
 import java.util.function.Consumer;
 
-import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
