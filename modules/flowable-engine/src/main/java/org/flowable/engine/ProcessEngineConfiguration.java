@@ -690,6 +690,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    @Override
     public void initIdGenerator() {
         super.initIdGenerator();
         if (taskIdGenerator == null) {

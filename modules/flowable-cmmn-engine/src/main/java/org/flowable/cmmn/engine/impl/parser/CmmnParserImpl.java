@@ -43,6 +43,7 @@ public class CmmnParserImpl implements CmmnParser {
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
     protected ExpressionManager expressionManager;
 
+    @Override
     public CmmnParseResult parse(EngineResource resourceEntity) {
         CmmnParseResult parseResult = new CmmnParseResult();
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(resourceEntity.getBytes())) {

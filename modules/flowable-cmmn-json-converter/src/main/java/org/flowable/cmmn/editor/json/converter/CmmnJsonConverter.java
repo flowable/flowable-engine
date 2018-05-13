@@ -238,8 +238,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         return modelNode;
     }
 
+    @Override
     public void processPlanItems(Stage stage, CmmnModel model, ArrayNode shapesArrayNode,
-            Map<String, CmmnModelInfo> formKeyMap, Map<String, CmmnModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY) {
+                                 Map<String, CmmnModelInfo> formKeyMap, Map<String, CmmnModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY) {
 
         for (PlanItem planItem : stage.getPlanItems()) {
             processPlanItem(planItem, stage, model, shapesArrayNode, formKeyMap, decisionTableKeyMap, subProcessX, subProcessY);
@@ -363,9 +364,10 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         return cmmnModel;
     }
 
+    @Override
     public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap,
-            Map<String, String> formMap, Map<String, String> decisionTableMap, Map<String, String> caseModelKeyMap, Map<String, String> processModelKeyMap,
-            CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+                                    Map<String, String> formMap, Map<String, String> decisionTableMap, Map<String, String> caseModelKeyMap, Map<String, String> processModelKeyMap,
+                                    CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
 
         for (JsonNode shapeNode : shapesArrayNode) {
             String stencilId = CmmnJsonConverterUtil.getStencilId(shapeNode);

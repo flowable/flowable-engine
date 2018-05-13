@@ -62,6 +62,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         return findCaseInstanceEntityEagerFetchPlanItemInstances(caseInstanceId, null);
     }
 
+    @Override
     public CaseInstanceEntity findCaseInstanceEntityEagerFetchPlanItemInstances(String caseInstanceId, String planItemInstanceId) {
 
         // Could have been fetched before

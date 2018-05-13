@@ -1012,6 +1012,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
+    @Override
     public void initMybatisTypeHandlers(Configuration configuration) {
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
@@ -1170,6 +1171,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // session factories ////////////////////////////////////////////////////////
 
+    @Override
     public void initSessionFactories() {
         if (sessionFactories == null) {
             sessionFactories = new HashMap<>();

@@ -194,6 +194,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     // data model ///////////////////////////////////////////////////////////////
 
+    @Override
     public void initDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ContentDbSchemaManager();

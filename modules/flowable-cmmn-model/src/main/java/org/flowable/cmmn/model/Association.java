@@ -63,6 +63,7 @@ public class Association extends BaseElement {
         this.transitionEvent = transitionEvent;
     }
 
+    @Override
     public Association clone() {
         Association clone = new Association();
         clone.setValues(this);

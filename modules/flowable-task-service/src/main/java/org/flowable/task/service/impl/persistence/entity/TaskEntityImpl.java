@@ -816,10 +816,12 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         return identityLinkCount;
     }
 
+    @Override
     public int getSubTaskCount() {
         return subTaskCount;
     }
 
+    @Override
     public void setSubTaskCount(int subTaskCount) {
         this.subTaskCount = subTaskCount;
     }

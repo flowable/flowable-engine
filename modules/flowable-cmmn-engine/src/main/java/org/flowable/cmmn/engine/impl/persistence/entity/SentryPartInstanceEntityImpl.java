@@ -30,6 +30,7 @@ public class SentryPartInstanceEntityImpl extends AbstractEntity implements Sent
     protected String ifPartId;
     protected Date timeStamp;
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("caseDefinitionId", caseDefinitionId);
@@ -41,50 +42,62 @@ public class SentryPartInstanceEntityImpl extends AbstractEntity implements Sent
         return persistentState;
     }
 
+    @Override
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
 
+    @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
     }
 
+    @Override
     public String getCaseInstanceId() {
         return caseInstanceId;
     }
 
+    @Override
     public void setCaseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
     }
 
+    @Override
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
     }
 
+    @Override
     public void setPlanItemInstanceId(String planItemInstanceId) {
         this.planItemInstanceId = planItemInstanceId;
     }
 
+    @Override
     public String getOnPartId() {
         return onPartId;
     }
 
+    @Override
     public void setOnPartId(String onPartId) {
         this.onPartId = onPartId;
     }
 
+    @Override
     public String getIfPartId() {
         return ifPartId;
     }
 
+    @Override
     public void setIfPartId(String ifPartId) {
         this.ifPartId = ifPartId;
     }
 
+    @Override
     public Date getTimeStamp() {
         return timeStamp;
     }
 
+    @Override
     public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
     }

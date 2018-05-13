@@ -46,18 +46,22 @@ public class DynamicBpmnServiceImpl extends CommonEngineServiceImpl<ProcessEngin
         super(processEngineConfiguration);
     }
     
+    @Override
     public void injectUserTaskInProcessInstance(String processInstanceId, DynamicUserTaskBuilder dynamicUserTaskBuilder) {
         commandExecutor.execute(new InjectUserTaskInProcessInstanceCmd(processInstanceId, dynamicUserTaskBuilder));
     }
 
+    @Override
     public void injectParallelUserTask(String taskId, DynamicUserTaskBuilder dynamicUserTaskBuilder) {
         commandExecutor.execute(new InjectParallelUserTaskCmd(taskId, dynamicUserTaskBuilder));
     }
     
+    @Override
     public void injectEmbeddedSubProcessInProcessInstance(String processInstanceId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder) {
         commandExecutor.execute(new InjectEmbeddedSubProcessInProcessInstanceCmd(processInstanceId, dynamicEmbeddedSubProcessBuilder));
     }
 
+    @Override
     public void injectParallelEmbeddedSubProcess(String taskId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder) {
         commandExecutor.execute(new InjectParallelEmbeddedSubProcessCmd(taskId, dynamicEmbeddedSubProcessBuilder));
     }

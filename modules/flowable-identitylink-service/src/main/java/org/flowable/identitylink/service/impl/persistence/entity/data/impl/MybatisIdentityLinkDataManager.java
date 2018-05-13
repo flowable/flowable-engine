@@ -125,6 +125,7 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
     }
 
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<IdentityLinkEntity> findIdentityLinkByScopeIdScopeTypeUserGroupAndType(String scopeId, String scopeType, String userId, String groupId, String type) {
         Map<String, String> parameters = new HashMap<>();

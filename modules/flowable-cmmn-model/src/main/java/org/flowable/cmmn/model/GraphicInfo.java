@@ -74,18 +74,22 @@ public class GraphicInfo extends BaseElement {
         this.element = element;
     }
 
+    @Override
     public int getXmlRowNumber() {
         return xmlRowNumber;
     }
 
+    @Override
     public void setXmlRowNumber(int xmlRowNumber) {
         this.xmlRowNumber = xmlRowNumber;
     }
 
+    @Override
     public int getXmlColumnNumber() {
         return xmlColumnNumber;
     }
 
+    @Override
     public void setXmlColumnNumber(int xmlColumnNumber) {
         this.xmlColumnNumber = xmlColumnNumber;
     }

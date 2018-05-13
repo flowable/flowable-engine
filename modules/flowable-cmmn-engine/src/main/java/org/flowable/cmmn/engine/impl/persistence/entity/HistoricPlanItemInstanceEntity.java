@@ -22,6 +22,7 @@ import java.util.Date;
  */
 public interface HistoricPlanItemInstanceEntity extends Entity, HistoricPlanItemInstance {
 
+    @Override
     void setId(String id);
 
     void setName(String name);

@@ -44,6 +44,7 @@ public interface SpringEngineConfiguration extends ApplicationContextAware, Smar
 
     ApplicationContext getApplicationContext();
 
+    @Override
     void setApplicationContext(ApplicationContext applicationContext);
     
     Map<Object, Object> getBeans();

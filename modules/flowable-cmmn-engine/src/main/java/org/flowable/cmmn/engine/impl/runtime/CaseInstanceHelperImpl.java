@@ -143,6 +143,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         return caseInstanceEntity;
     }
 
+    @Override
     public void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState) {
         if (caseInstance.getCallbackId() != null && caseInstance.getCallbackType() != null) {
             Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceCallbacks = CommandContextUtil
