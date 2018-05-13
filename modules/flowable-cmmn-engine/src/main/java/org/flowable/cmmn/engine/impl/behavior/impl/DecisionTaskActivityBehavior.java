@@ -105,7 +105,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
                 Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(throwErrorFieldValue);
                 Object expressionValue = expression.getValue(planItemInstanceEntity);
                 
-                if (expressionValue != null && expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
+                if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
                     throw new FlowableException("DMN decision table with key " + externalRef + " did not hit any rules for the provided input.");
                 }
             }

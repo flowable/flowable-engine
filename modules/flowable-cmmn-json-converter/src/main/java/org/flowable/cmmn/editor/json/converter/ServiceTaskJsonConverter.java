@@ -65,7 +65,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
         if (baseElement instanceof PlanItem) {
             PlanItem planItem = (PlanItem) baseElement;
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-            if (planItemDefinition != null && planItemDefinition instanceof ServiceTask) {
+            if (planItemDefinition instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
                 String stencilId = TYPE_TO_STENCILSET.get(serviceTask.getType());
                 if (stencilId != null) {

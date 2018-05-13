@@ -129,7 +129,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                     Expression expression = expressionManager.createExpression(throwErrorString);
                     Object expressionValue = expression.getValue(execution);
                     
-                    if (expressionValue != null && expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
+                    if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
                         throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
                     }
                 }
