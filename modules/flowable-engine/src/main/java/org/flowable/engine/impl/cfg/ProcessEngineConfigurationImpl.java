@@ -519,7 +519,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * The number of retries for a job.
      */
     protected int asyncExecutorNumberOfRetries = 3;
-    protected int asyncHistoryExecutorNumberOfRetries = 10;
 
     /**
      * The minimal number of threads that are kept alive in the threadpool for job execution. Default value = 2. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
@@ -665,7 +664,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * Set this to true when using the message queue based job executor.
      */
     protected boolean asyncExecutorMessageQueueMode;
+    
+    // More info: see similar async executor properties.
     protected boolean asyncHistoryExecutorMessageQueueMode;
+    protected int asyncHistoryExecutorNumberOfRetries = 10;
+    protected int asyncHistoryExecutorCorePoolSize = 2;
+    protected int asyncHistoryExecutorMaxPoolSize = 10;
+    protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
+    protected int asyncHistoryExecutorThreadPoolQueueSize = 100;
+    protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
+    protected long asyncHistoryExecutorSecondsToWaitOnShutdown = 60L;
+    protected int asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
+    protected int asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+    protected String asyncHistoryExecutorLockOwner;
+    protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncHistoryExecutorResetExpiredJobsInterval = 60 * 1000;
+    protected int asyncHistoryExecutorResetExpiredJobsPageSize = 3;
     
     protected String jobExecutionScope;
 
@@ -1892,34 +1906,34 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
 
             // Thread pool config
-            defaultAsyncHistoryExecutor.setCorePoolSize(asyncExecutorCorePoolSize);
-            defaultAsyncHistoryExecutor.setMaxPoolSize(asyncExecutorMaxPoolSize);
-            defaultAsyncHistoryExecutor.setKeepAliveTime(asyncExecutorThreadKeepAliveTime);
+            defaultAsyncHistoryExecutor.setCorePoolSize(asyncHistoryExecutorCorePoolSize);
+            defaultAsyncHistoryExecutor.setMaxPoolSize(asyncHistoryExecutorMaxPoolSize);
+            defaultAsyncHistoryExecutor.setKeepAliveTime(asyncHistoryExecutorThreadKeepAliveTime);
 
             // Threadpool queue
-            if (asyncExecutorThreadPoolQueue != null) {
-                defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncExecutorThreadPoolQueue);
+            if (asyncHistoryExecutorThreadPoolQueue != null) {
+                defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
             }
-            defaultAsyncHistoryExecutor.setQueueSize(asyncExecutorThreadPoolQueueSize);
+            defaultAsyncHistoryExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
 
             // Acquisition wait time
-            defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncExecutorDefaultAsyncJobAcquireWaitTime);
+            defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime);
 
             // Queue full wait time
-            defaultAsyncHistoryExecutor.setDefaultQueueSizeFullWaitTimeInMillis(asyncExecutorDefaultQueueSizeFullWaitTime);
+            defaultAsyncHistoryExecutor.setDefaultQueueSizeFullWaitTimeInMillis(asyncHistoryExecutorDefaultQueueSizeFullWaitTime);
 
             // Job locking
-            defaultAsyncHistoryExecutor.setAsyncJobLockTimeInMillis(asyncExecutorAsyncJobLockTimeInMillis);
-            if (asyncExecutorLockOwner != null) {
-                defaultAsyncHistoryExecutor.setLockOwner(asyncExecutorLockOwner);
+            defaultAsyncHistoryExecutor.setAsyncJobLockTimeInMillis(asyncHistoryExecutorAsyncJobLockTimeInMillis);
+            if (asyncHistoryExecutorLockOwner != null) {
+                defaultAsyncHistoryExecutor.setLockOwner(asyncHistoryExecutorLockOwner);
             }
 
             // Reset expired
-            defaultAsyncHistoryExecutor.setResetExpiredJobsInterval(asyncExecutorResetExpiredJobsInterval);
-            defaultAsyncHistoryExecutor.setResetExpiredJobsPageSize(asyncExecutorResetExpiredJobsPageSize);
+            defaultAsyncHistoryExecutor.setResetExpiredJobsInterval(asyncHistoryExecutorResetExpiredJobsInterval);
+            defaultAsyncHistoryExecutor.setResetExpiredJobsPageSize(asyncHistoryExecutorResetExpiredJobsPageSize);
 
             // Shutdown
-            defaultAsyncHistoryExecutor.setSecondsToWaitOnShutdown(asyncExecutorSecondsToWaitOnShutdown);
+            defaultAsyncHistoryExecutor.setSecondsToWaitOnShutdown(asyncHistoryExecutorSecondsToWaitOnShutdown);
 
             asyncHistoryExecutor = defaultAsyncHistoryExecutor;
         }
@@ -4050,6 +4064,122 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setJobExecutionScope(String jobExecutionScope) {
         this.jobExecutionScope = jobExecutionScope;
         return this;
+    }
+
+    public int getAsyncHistoryExecutorCorePoolSize() {
+        return asyncHistoryExecutorCorePoolSize;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorCorePoolSize(int asyncHistoryExecutorCorePoolSize) {
+        this.asyncHistoryExecutorCorePoolSize = asyncHistoryExecutorCorePoolSize;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorMaxPoolSize() {
+        return asyncHistoryExecutorMaxPoolSize;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorMaxPoolSize(int asyncHistoryExecutorMaxPoolSize) {
+        this.asyncHistoryExecutorMaxPoolSize = asyncHistoryExecutorMaxPoolSize;
+        return this;
+    }
+
+    public long getAsyncHistoryExecutorThreadKeepAliveTime() {
+        return asyncHistoryExecutorThreadKeepAliveTime;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorThreadKeepAliveTime(long asyncHistoryExecutorThreadKeepAliveTime) {
+        this.asyncHistoryExecutorThreadKeepAliveTime = asyncHistoryExecutorThreadKeepAliveTime;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorThreadPoolQueueSize() {
+        return asyncHistoryExecutorThreadPoolQueueSize;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorThreadPoolQueueSize(int asyncHistoryExecutorThreadPoolQueueSize) {
+        this.asyncHistoryExecutorThreadPoolQueueSize = asyncHistoryExecutorThreadPoolQueueSize;
+        return this;
+    }
+
+    public BlockingQueue<Runnable> getAsyncHistoryExecutorThreadPoolQueue() {
+        return asyncHistoryExecutorThreadPoolQueue;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorThreadPoolQueue(BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue) {
+        this.asyncHistoryExecutorThreadPoolQueue = asyncHistoryExecutorThreadPoolQueue;
+        return this;
+    }
+
+    public long getAsyncHistoryExecutorSecondsToWaitOnShutdown() {
+        return asyncHistoryExecutorSecondsToWaitOnShutdown;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorSecondsToWaitOnShutdown(long asyncHistoryExecutorSecondsToWaitOnShutdown) {
+        this.asyncHistoryExecutorSecondsToWaitOnShutdown = asyncHistoryExecutorSecondsToWaitOnShutdown;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime() {
+        return asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(int asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime) {
+        this.asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime = asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorDefaultQueueSizeFullWaitTime() {
+        return asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorDefaultQueueSizeFullWaitTime(int asyncHistoryExecutorDefaultQueueSizeFullWaitTime) {
+        this.asyncHistoryExecutorDefaultQueueSizeFullWaitTime = asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+        return this;
+    }
+
+    public String getAsyncHistoryExecutorLockOwner() {
+        return asyncHistoryExecutorLockOwner;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorLockOwner(String asyncHistoryExecutorLockOwner) {
+        this.asyncHistoryExecutorLockOwner = asyncHistoryExecutorLockOwner;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorAsyncJobLockTimeInMillis() {
+        return asyncHistoryExecutorAsyncJobLockTimeInMillis;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorAsyncJobLockTimeInMillis(int asyncHistoryExecutorAsyncJobLockTimeInMillis) {
+        this.asyncHistoryExecutorAsyncJobLockTimeInMillis = asyncHistoryExecutorAsyncJobLockTimeInMillis;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorResetExpiredJobsInterval() {
+        return asyncHistoryExecutorResetExpiredJobsInterval;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorResetExpiredJobsInterval(int asyncHistoryExecutorResetExpiredJobsInterval) {
+        this.asyncHistoryExecutorResetExpiredJobsInterval = asyncHistoryExecutorResetExpiredJobsInterval;
+        return this;
+    }
+
+    public int getAsyncHistoryExecutorResetExpiredJobsPageSize() {
+        return asyncHistoryExecutorResetExpiredJobsPageSize;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorResetExpiredJobsPageSize(int asyncHistoryExecutorResetExpiredJobsPageSize) {
+        this.asyncHistoryExecutorResetExpiredJobsPageSize = asyncHistoryExecutorResetExpiredJobsPageSize;
+        return this;
+    }
+
+    public boolean isAsyncExecutorMessageQueueMode() {
+        return asyncExecutorMessageQueueMode;
+    }
+
+    public boolean isAsyncHistoryExecutorMessageQueueMode() {
+        return asyncHistoryExecutorMessageQueueMode;
     }
     
 }

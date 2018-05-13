@@ -355,7 +355,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected AsyncHistoryListener asyncHistoryListener;
 
     // More info: see similar async executor properties.
-    protected int asyncHistoryExecutorNumberOfRetries = 3;
+    protected int asyncHistoryExecutorNumberOfRetries = 10;
     protected int asyncHistoryExecutorCorePoolSize = 2;
     protected int asyncHistoryExecutorMaxPoolSize = 10;
     protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
