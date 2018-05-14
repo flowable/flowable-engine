@@ -93,6 +93,14 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             caseInstanceEntity.setTenantId(caseInstanceBuilder.getTenantId());
         }
 
+        if (caseInstanceBuilder.getCallbackId() != null) {
+            caseInstanceEntity.setCallbackId(caseInstanceBuilder.getCallbackId());
+        }
+
+        if (caseInstanceBuilder.getCallbackType() != null) {
+            caseInstanceEntity.setCallbackType(caseInstanceBuilder.getCallbackType());
+        }
+
         CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
         CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
         Case caseModel = cmmnModel.getCaseById(caseDefinition.getKey());

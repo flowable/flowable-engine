@@ -21,4 +21,6 @@ public interface PlanItemInstanceCallbackType {
     
     String CHILD_PROCESS = "cmmn-1.1-to-bpmn-2.0-child-process";
 
+    String CASE_ADHOC_CHILD = "cmmn-1.1-child";
+
 }
