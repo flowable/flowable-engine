@@ -35,9 +35,35 @@ import org.slf4j.LoggerFactory;
 public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAsyncJobExecutor.class);
-
-    protected Thread timerJobAcquisitionThread;
+    
+    /**
+     * If true (default), the thread for acquiring async jobs will be started.
+     */
+    protected boolean isAsyncJobAcquisitionEnabled = true;
+    
+    /**
+     * If true (default), the thread for acquiring timer jobs will be started.
+     */
+    protected boolean isTimerJobAcquisitionEnabled = true;
+    
+    /**
+     * If true (default), the thread for acquiring expired jobs will be started.
+     */
+    protected boolean isResetExpiredJobEnabled = true;
+    
+    /**
+     * Thread responsible for async job acquisition.
+     */
     protected Thread asyncJobAcquisitionThread;
+
+    /**
+     * Thread responsible for timer job acquisition.
+     */
+    protected Thread timerJobAcquisitionThread;
+    
+    /**
+     * Thread responsible for resetting the expired jobs.
+     */
     protected Thread resetExpiredJobThread;
 
     /**
@@ -172,17 +198,21 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     /** Starts the acquisition thread */
     protected void startJobAcquisitionThread() {
-        if (asyncJobAcquisitionThread == null) {
-            asyncJobAcquisitionThread = new Thread(asyncJobsDueRunnable);
+        if (isAsyncJobAcquisitionEnabled) {
+            if (asyncJobAcquisitionThread == null) {
+                asyncJobAcquisitionThread = new Thread(asyncJobsDueRunnable);
+            }
+            asyncJobAcquisitionThread.start();
         }
-        asyncJobAcquisitionThread.start();
     }
 
     protected void startTimerAcquisitionThread() {
-        if (timerJobAcquisitionThread == null) {
-            timerJobAcquisitionThread = new Thread(timerJobRunnable);
+        if (isTimerJobAcquisitionEnabled) {
+            if (timerJobAcquisitionThread == null) {
+                timerJobAcquisitionThread = new Thread(timerJobRunnable);
+            }
+            timerJobAcquisitionThread.start();
         }
-        timerJobAcquisitionThread.start();
     }
 
     /** Stops the acquisition thread */
@@ -210,10 +240,12 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     /** Starts the reset expired jobs thread */
     protected void startResetExpiredJobsThread() {
-        if (resetExpiredJobThread == null) {
-            resetExpiredJobThread = new Thread(resetExpiredJobsRunnable);
+        if (isResetExpiredJobEnabled) {
+            if (resetExpiredJobThread == null) {
+                resetExpiredJobThread = new Thread(resetExpiredJobsRunnable);
+            }
+            resetExpiredJobThread.start();
         }
-        resetExpiredJobThread.start();
     }
 
     /** Stops the reset expired jobs thread */
@@ -227,6 +259,30 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
             resetExpiredJobThread = null;
         }
+    }
+    
+    public boolean isAsyncJobAcquisitionEnabled() {
+        return isAsyncJobAcquisitionEnabled;
+    }
+
+    public void setAsyncJobAcquisitionEnabled(boolean isAsyncJobAcquisitionEnabled) {
+        this.isAsyncJobAcquisitionEnabled = isAsyncJobAcquisitionEnabled;
+    }
+
+    public boolean isTimerJobAcquisitionEnabled() {
+        return isTimerJobAcquisitionEnabled;
+    }
+
+    public void setTimerJobAcquisitionEnabled(boolean isTimerJobAcquisitionEnabled) {
+        this.isTimerJobAcquisitionEnabled = isTimerJobAcquisitionEnabled;
+    }
+
+    public boolean isResetExpiredJobEnabled() {
+        return isResetExpiredJobEnabled;
+    }
+
+    public void setResetExpiredJobEnabled(boolean isResetExpiredJobEnabled) {
+        this.isResetExpiredJobEnabled = isResetExpiredJobEnabled;
     }
 
     public Thread getTimerJobAcquisitionThread() {

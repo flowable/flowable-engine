@@ -59,6 +59,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
+ * This service configuration contains all settings and instances around job execution and management.
+ * Note that a {@link JobServiceConfiguration} is not shared between engines and instantiated for each engine.
+ * 
  * @author Tijs Rademakers
  */
 public class JobServiceConfiguration extends AbstractServiceConfiguration {

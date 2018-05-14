@@ -17,6 +17,10 @@ import java.util.List;
 
 public interface HistoryJsonConstants {
     
+    String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY = "async-history"; // Backwards compatibility: process engine used this first before the handler was reused
+    
+    String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED = "async-history-zipped"; // Backwards compatibility: process engine used this first before the handler was reused
+    
     String TYPE = "type";
     
     List<String> ORDERED_TYPES = Arrays.asList(

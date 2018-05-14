@@ -62,6 +62,7 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
+import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
@@ -155,6 +156,7 @@ import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
+import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.InternalJobParentStateResolver;
 import org.flowable.job.service.JobHandler;
@@ -168,7 +170,13 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.job.service.impl.history.async.AsyncHistoryJobHandler;
+import org.flowable.job.service.impl.history.async.AsyncHistoryJobZippedHandler;
 import org.flowable.job.service.impl.history.async.AsyncHistoryListener;
+import org.flowable.job.service.impl.history.async.AsyncHistorySession;
+import org.flowable.job.service.impl.history.async.AsyncHistorySessionFactory;
+import org.flowable.job.service.impl.history.async.DefaultAsyncHistoryJobProducer;
+import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskPostProcessor;
@@ -345,32 +353,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected InternalJobParentStateResolver internalJobParentStateResolver;
     protected String jobExecutionScope = JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN;
     
-    protected AsyncExecutor asyncHistoryExecutor;
-    protected boolean isAsyncHistoryEnabled;
-    protected boolean asyncHistoryExecutorActivate;
-    protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
-    protected boolean isAsyncHistoryJsonGroupingEnabled;
-    protected boolean asyncHistoryExecutorMessageQueueMode;
-    protected int asyncHistoryJsonGroupingThreshold = 10;
-    protected AsyncHistoryListener asyncHistoryListener;
-
-    // More info: see similar async executor properties.
-    protected int asyncHistoryExecutorNumberOfRetries = 10;
-    protected int asyncHistoryExecutorCorePoolSize = 2;
-    protected int asyncHistoryExecutorMaxPoolSize = 10;
-    protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
-    protected int asyncHistoryExecutorThreadPoolQueueSize = 100;
-    protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
-    protected long asyncHistoryExecutorSecondsToWaitOnShutdown = 60L;
-    protected int asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
-    protected int asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
-    protected String asyncHistoryExecutorLockOwner;
-    protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
-    protected int asyncHistoryExecutorResetExpiredJobsInterval = 60 * 1000;
-    protected int asyncHistoryExecutorResetExpiredJobsPageSize = 3;
-
-    protected FormFieldHandler formFieldHandler;
-
     /**
      * Boolean flag to be set to activate the {@link AsyncExecutor} automatically after the engine has booted up.
      */
@@ -566,14 +548,56 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected int asyncExecutorResetExpiredJobsPageSize = 3;
 
-    protected BusinessCalendarManager businessCalendarManager;
-
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
      * <p>
      * This property is only applicable when using the threadpool-based async executor.
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
+    
+    /**
+     * Flags to control which threads (when using the default threadpool-based async executor) are started.
+     * This can be used to boot up engine instances that still execute jobs originating from this instance itself,
+     * but don't fetch new jobs themselves.
+     */
+    protected boolean isAsyncExecutorAsyncJobAcquisitionEnabled = true;
+    protected boolean isAsyncExecutorTimerJobAcquisitionEnabled = true;
+    protected boolean isAsyncExecutorResetExpiredJobsEnabled = true;
+    
+    protected AsyncExecutor asyncHistoryExecutor;
+    protected boolean isAsyncHistoryEnabled;
+    protected boolean asyncHistoryExecutorActivate;
+    protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
+    protected boolean isAsyncHistoryJsonGroupingEnabled;
+    protected boolean asyncHistoryExecutorMessageQueueMode;
+    protected int asyncHistoryJsonGroupingThreshold = 10;
+    protected AsyncHistoryListener asyncHistoryListener;
+
+    // More info: see similar async executor properties.
+    protected int asyncHistoryExecutorNumberOfRetries = 10;
+    protected int asyncHistoryExecutorCorePoolSize = 2;
+    protected int asyncHistoryExecutorMaxPoolSize = 10;
+    protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
+    protected int asyncHistoryExecutorThreadPoolQueueSize = 100;
+    protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
+    protected long asyncHistoryExecutorSecondsToWaitOnShutdown = 60L;
+    protected int asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
+    protected int asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+    protected String asyncHistoryExecutorLockOwner;
+    protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncHistoryExecutorResetExpiredJobsInterval = 60 * 1000;
+    protected int asyncHistoryExecutorResetExpiredJobsPageSize = 3;
+    protected boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled = true;
+    protected boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled = true;
+    protected boolean isAsyncHistoryExecutorResetExpiredJobsEnabled = true;
+    
+    protected Map<String, HistoryJobHandler> historyJobHandlers;
+    protected List<HistoryJobHandler> customHistoryJobHandlers;
+    protected List<HistoryJsonTransformer> customHistoryJsonTransformers;
+
+    protected FormFieldHandler formFieldHandler;
+
+    protected BusinessCalendarManager businessCalendarManager;
 
     /**
      * generator used to generate task ids
@@ -662,6 +686,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initTaskServiceConfiguration();
         initBusinessCalendarManager();
         initJobHandlers();
+        initHistoryJobHandlers();
         initFailedJobCommandFactory();
         initJobServiceConfiguration();
         initAsyncExecutor();
@@ -753,6 +778,28 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initSessionFactories() {
         super.initSessionFactories();
         addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
+        
+        if (isAsyncHistoryEnabled) {
+            initAsyncHistorySessionFactory();
+        }
+    }
+    
+    public void initAsyncHistorySessionFactory() {
+        AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
+        if (asyncHistoryListener == null) {
+            initDefaultAsyncHistoryListener();
+        }
+        asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
+        asyncHistorySessionFactory.registerJobDataTypes(CmmnAsyncHistoryConstants.ORDERED_TYPES);
+        sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
+    }
+
+    protected void initDefaultAsyncHistoryListener() {
+        DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer(
+                CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
+        asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+        asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+        asyncHistoryListener = asyncHistoryJobProducer;
     }
 
     protected void initServices() {
@@ -1194,6 +1241,38 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
         }
     }
+    
+    protected void initHistoryJobHandlers() {
+        if (isAsyncHistoryEnabled) {
+            historyJobHandlers = new HashMap<>();
+            
+            List<HistoryJsonTransformer> allHistoryJsonTransformers = new ArrayList<>(initDefaultHistoryJsonTransformers());
+            if (customHistoryJsonTransformers != null) {
+                allHistoryJsonTransformers.addAll(customHistoryJsonTransformers);
+            }
+
+            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
+            allHistoryJsonTransformers.forEach(asyncHistoryJobHandler::addHistoryJsonTransformer);
+            asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+            historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
+
+            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
+            allHistoryJsonTransformers.forEach(asyncHistoryJobZippedHandler::addHistoryJsonTransformer);
+            asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+            historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
+
+            if (getCustomHistoryJobHandlers() != null) {
+                for (HistoryJobHandler customJobHandler : getCustomHistoryJobHandlers()) {
+                    historyJobHandlers.put(customJobHandler.getType(), customJobHandler);
+                }
+            }
+        }
+    }
+    
+    protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
+        List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
+        return historyJsonTransformers;
+    }
 
     public void initFailedJobCommandFactory() {
         if (this.failedJobCommandFactory == null) {
@@ -1275,6 +1354,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 defaultAsyncExecutor.setThreadPoolQueue(asyncExecutorThreadPoolQueue);
             }
             defaultAsyncExecutor.setQueueSize(asyncExecutorThreadPoolQueueSize);
+            
+            // Thread flags
+            defaultAsyncExecutor.setAsyncJobAcquisitionEnabled(isAsyncExecutorAsyncJobAcquisitionEnabled);
+            defaultAsyncExecutor.setTimerJobAcquisitionEnabled(isAsyncExecutorTimerJobAcquisitionEnabled);
+            defaultAsyncExecutor.setResetExpiredJobEnabled(isAsyncExecutorResetExpiredJobsEnabled);
 
             // Acquisition wait time
             defaultAsyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(asyncExecutorDefaultTimerJobAcquireWaitTime);
@@ -1322,6 +1406,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
             }
             defaultAsyncHistoryExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
+            
+            // Thread flags
+            defaultAsyncHistoryExecutor.setAsyncJobAcquisitionEnabled(isAsyncHistoryExecutorAsyncJobAcquisitionEnabled);
+            defaultAsyncHistoryExecutor.setTimerJobAcquisitionEnabled(isAsyncHistoryExecutorTimerJobAcquisitionEnabled);
+            defaultAsyncHistoryExecutor.setResetExpiredJobEnabled(isAsyncHistoryExecutorResetExpiredJobsEnabled);
 
             // Acquisition wait time
             defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime);
@@ -2577,6 +2666,87 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setAsyncHistoryExecutorResetExpiredJobsPageSize(int asyncHistoryExecutorResetExpiredJobsPageSize) {
         this.asyncHistoryExecutorResetExpiredJobsPageSize = asyncHistoryExecutorResetExpiredJobsPageSize;
+        return this;
+    }
+    
+    public boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled() {
+        return isAsyncHistoryExecutorAsyncJobAcquisitionEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorAsyncJobAcquisitionEnabled(boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled) {
+        this.isAsyncHistoryExecutorAsyncJobAcquisitionEnabled = isAsyncHistoryExecutorAsyncJobAcquisitionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled() {
+        return isAsyncHistoryExecutorTimerJobAcquisitionEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorTimerJobAcquisitionEnabled(boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled) {
+        this.isAsyncHistoryExecutorTimerJobAcquisitionEnabled = isAsyncHistoryExecutorTimerJobAcquisitionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncHistoryExecutorResetExpiredJobsEnabled() {
+        return isAsyncHistoryExecutorResetExpiredJobsEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncHistoryExecutorResetExpiredJobsEnabled(boolean isAsyncHistoryExecutorResetExpiredJobsEnabled) {
+        this.isAsyncHistoryExecutorResetExpiredJobsEnabled = isAsyncHistoryExecutorResetExpiredJobsEnabled;
+        return this;
+    }
+
+    public boolean isAsyncExecutorAsyncJobAcquisitionEnabled() {
+        return isAsyncExecutorAsyncJobAcquisitionEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncExecutorAsyncJobAcquisitionEnabled(boolean isAsyncExecutorAsyncJobAcquisitionEnabled) {
+        this.isAsyncExecutorAsyncJobAcquisitionEnabled = isAsyncExecutorAsyncJobAcquisitionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncExecutorTimerJobAcquisitionEnabled() {
+        return isAsyncExecutorTimerJobAcquisitionEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncExecutorTimerJobAcquisitionEnabled(boolean isAsyncExecutorTimerJobAcquisitionEnabled) {
+        this.isAsyncExecutorTimerJobAcquisitionEnabled = isAsyncExecutorTimerJobAcquisitionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncExecutorResetExpiredJobsEnabled() {
+        return isAsyncExecutorResetExpiredJobsEnabled;
+    }
+
+    public CmmnEngineConfiguration setAsyncExecutorResetExpiredJobsEnabled(boolean isAsyncExecutorResetExpiredJobsEnabled) {
+        this.isAsyncExecutorResetExpiredJobsEnabled = isAsyncExecutorResetExpiredJobsEnabled;
+        return this;
+    }
+
+    public Map<String, HistoryJobHandler> getHistoryJobHandlers() {
+        return historyJobHandlers;
+    }
+
+    public CmmnEngineConfiguration setHistoryJobHandlers(Map<String, HistoryJobHandler> historyJobHandlers) {
+        this.historyJobHandlers = historyJobHandlers;
+        return this;
+    }
+
+    public List<HistoryJobHandler> getCustomHistoryJobHandlers() {
+        return customHistoryJobHandlers;
+    }
+
+    public CmmnEngineConfiguration setCustomHistoryJobHandlers(List<HistoryJobHandler> customHistoryJobHandlers) {
+        this.customHistoryJobHandlers = customHistoryJobHandlers;
+        return this;
+    }
+
+    public List<HistoryJsonTransformer> getCustomHistoryJsonTransformers() {
+        return customHistoryJsonTransformers;
+    }
+
+    public CmmnEngineConfiguration setCustomHistoryJsonTransformers(List<HistoryJsonTransformer> customHistoryJsonTransformers) {
+        this.customHistoryJsonTransformers = customHistoryJsonTransformers;
         return this;
     }
 

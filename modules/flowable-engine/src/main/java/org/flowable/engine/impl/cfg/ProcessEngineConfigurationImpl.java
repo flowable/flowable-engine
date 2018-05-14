@@ -504,8 +504,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers;
     protected boolean addDefaultExceptionHandler = true;
 
-    protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected Map<String, HistoryJobHandler> historyJobHandlers;
+    protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected List<HistoryJsonTransformer> customHistoryJsonTransformers;
 
     // HELPERS //////////////////////////////////////////////////////////////////
@@ -657,6 +657,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * expired jobs.
      */
     protected int asyncExecutorResetExpiredJobsPageSize = 3;
+    
+    /**
+     * Flags to control which threads (when using the default threadpool-based async executor) are started.
+     * This can be used to boot up engine instances that still execute jobs originating from this instance itself,
+     * but don't fetch new jobs themselves.
+     */
+    protected boolean isAsyncExecutorAsyncJobAcquisitionEnabled = true;
+    protected boolean isAsyncExecutorTimerJobAcquisitionEnabled = true;
+    protected boolean isAsyncExecutorResetExpiredJobsEnabled = true;
+    
 
     /**
      * Experimental!
@@ -680,6 +690,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
     protected int asyncHistoryExecutorResetExpiredJobsInterval = 60 * 1000;
     protected int asyncHistoryExecutorResetExpiredJobsPageSize = 3;
+    protected boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled = true;
+    protected boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled = true;
+    protected boolean isAsyncHistoryExecutorResetExpiredJobsEnabled = true;
     
     protected String jobExecutionScope;
 
@@ -1249,7 +1262,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     protected void initDefaultAsyncHistoryListener() {
-        DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer();
+        DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer(
+                HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
         asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
         asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
         asyncHistoryListener = asyncHistoryJobProducer;
@@ -1789,17 +1803,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (isAsyncHistoryEnabled) {
             historyJobHandlers = new HashMap<>();
             
-            List<HistoryJsonTransformer> allHistoryJsonTransformers = new ArrayList<>(initDefaultTransformers());
+            List<HistoryJsonTransformer> allHistoryJsonTransformers = new ArrayList<>(initDefaultHistoryJsonTransformers());
             if (customHistoryJsonTransformers != null) {
                 allHistoryJsonTransformers.addAll(customHistoryJsonTransformers);
             }
 
-            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
+            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
             allHistoryJsonTransformers.forEach(asyncHistoryJobHandler::addHistoryJsonTransformer);
             asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
 
-            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler();
+            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
             allHistoryJsonTransformers.forEach(asyncHistoryJobZippedHandler::addHistoryJsonTransformer);
             asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
@@ -1812,7 +1826,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
     
-    protected List<HistoryJsonTransformer> initDefaultTransformers() {
+    protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
         List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
         historyJsonTransformers.add(new ProcessInstanceStartHistoryJsonTransformer());
         historyJsonTransformers.add(new ProcessInstanceEndHistoryJsonTransformer());
@@ -1868,6 +1882,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 defaultAsyncExecutor.setThreadPoolQueue(asyncExecutorThreadPoolQueue);
             }
             defaultAsyncExecutor.setQueueSize(asyncExecutorThreadPoolQueueSize);
+            
+            // Thread flags
+            defaultAsyncExecutor.setAsyncJobAcquisitionEnabled(isAsyncExecutorAsyncJobAcquisitionEnabled);
+            defaultAsyncExecutor.setTimerJobAcquisitionEnabled(isAsyncExecutorTimerJobAcquisitionEnabled);
+            defaultAsyncExecutor.setResetExpiredJobEnabled(isAsyncExecutorResetExpiredJobsEnabled);
 
             // Acquisition wait time
             defaultAsyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(asyncExecutorDefaultTimerJobAcquireWaitTime);
@@ -1915,6 +1934,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
             }
             defaultAsyncHistoryExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
+            
+            // Thread flags
+            defaultAsyncHistoryExecutor.setAsyncJobAcquisitionEnabled(isAsyncHistoryExecutorAsyncJobAcquisitionEnabled);
+            defaultAsyncHistoryExecutor.setTimerJobAcquisitionEnabled(isAsyncHistoryExecutorTimerJobAcquisitionEnabled);
+            defaultAsyncHistoryExecutor.setResetExpiredJobEnabled(isAsyncHistoryExecutorResetExpiredJobsEnabled);
 
             // Acquisition wait time
             defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime);
@@ -4180,6 +4204,60 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public boolean isAsyncHistoryExecutorMessageQueueMode() {
         return asyncHistoryExecutorMessageQueueMode;
+    }
+
+    public boolean isAsyncExecutorAsyncJobAcquisitionEnabled() {
+        return isAsyncExecutorAsyncJobAcquisitionEnabled;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncExecutorAsyncJobAcquisitionEnabled(boolean isAsyncExecutorAsyncJobAcquisitionEnabled) {
+        this.isAsyncExecutorAsyncJobAcquisitionEnabled = isAsyncExecutorAsyncJobAcquisitionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncExecutorTimerJobAcquisitionEnabled() {
+        return isAsyncExecutorTimerJobAcquisitionEnabled;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncExecutorTimerJobAcquisitionEnabled(boolean isAsyncExecutorTimerJobAcquisitionEnabled) {
+        this.isAsyncExecutorTimerJobAcquisitionEnabled = isAsyncExecutorTimerJobAcquisitionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncExecutorResetExpiredJobsEnabled() {
+        return isAsyncExecutorResetExpiredJobsEnabled;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncExecutorResetExpiredJobsEnabled(boolean isAsyncExecutorResetExpiredJobsEnabled) {
+        this.isAsyncExecutorResetExpiredJobsEnabled = isAsyncExecutorResetExpiredJobsEnabled;
+        return this;
+    }
+
+    public boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled() {
+        return isAsyncHistoryExecutorAsyncJobAcquisitionEnabled;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorAsyncJobAcquisitionEnabled(boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled) {
+        this.isAsyncHistoryExecutorAsyncJobAcquisitionEnabled = isAsyncHistoryExecutorAsyncJobAcquisitionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled() {
+        return isAsyncHistoryExecutorTimerJobAcquisitionEnabled;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorTimerJobAcquisitionEnabled(boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled) {
+        this.isAsyncHistoryExecutorTimerJobAcquisitionEnabled = isAsyncHistoryExecutorTimerJobAcquisitionEnabled;
+        return this;
+    }
+
+    public boolean isAsyncHistoryExecutorResetExpiredJobsEnabled() {
+        return isAsyncHistoryExecutorResetExpiredJobsEnabled;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorResetExpiredJobsEnabled(boolean isAsyncHistoryExecutorResetExpiredJobsEnabled) {
+        this.isAsyncHistoryExecutorResetExpiredJobsEnabled = isAsyncHistoryExecutorResetExpiredJobsEnabled;
+        return this;
     }
     
 }

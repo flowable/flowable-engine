@@ -19,12 +19,11 @@ import java.util.List;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.impl.history.async.AsyncHistoryJobHandler;
-import org.flowable.job.service.impl.history.async.AsyncHistoryJobZippedHandler;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
@@ -34,8 +33,8 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     protected void tearDown() throws Exception {
 
         for (Job job : managementService.createJobQuery().list()) {
-            if (job.getJobHandlerType().equals(AsyncHistoryJobHandler.JOB_TYPE)
-                    || job.getJobHandlerType().equals(AsyncHistoryJobZippedHandler.JOB_TYPE)) {
+            if (job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
+                    || job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {
                 managementService.deleteJob(job.getId());
             }
         }
@@ -64,9 +63,9 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
             assertEquals(expectedNrOfJobs, jobs.size());
             for (HistoryJob job : jobs) {
                 if (processEngineConfiguration.isAsyncHistoryJsonGzipCompressionEnabled()) {
-                    assertEquals(AsyncHistoryJobZippedHandler.JOB_TYPE, job.getJobHandlerType());
+                    assertEquals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED, job.getJobHandlerType());
                 } else {
-                    assertEquals(AsyncHistoryJobHandler.JOB_TYPE, job.getJobHandlerType());
+                    assertEquals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, job.getJobHandlerType());
                 }
                 assertNotNull(((HistoryJobEntity) job).getAdvancedJobHandlerConfigurationByteArrayRef());
             }

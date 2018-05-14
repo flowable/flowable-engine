@@ -33,9 +33,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
+    protected String jobTypeAsyncHistory;
+    protected String jobTypeAsyncHistoryZipped;
+    
     protected boolean isJsonGzipCompressionEnabled;
     protected boolean isAsyncHistoryJsonGroupingEnabled;
     protected int asyncHistoryJsonGroupingThreshold;
+    
+    public DefaultAsyncHistoryJobProducer(String jobTypeAsyncHistory, String jobTypeAsyncHistoryZipped) {
+        this.jobTypeAsyncHistory = jobTypeAsyncHistory;
+        this.jobTypeAsyncHistoryZipped = jobTypeAsyncHistoryZipped;
+    }
     
     @Override
     public List<HistoryJobEntity> historyDataGenerated(List<ObjectNode> historyObjectNodes) {
@@ -47,7 +55,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
     protected List<HistoryJobEntity> createJobsWithHistoricalData(List<ObjectNode> historyObjectNodes, CommandContext commandContext) {
         AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
         if (isAsyncHistoryJsonGroupingEnabled && historyObjectNodes.size() >= asyncHistoryJsonGroupingThreshold) {
-            String jobType = isJsonGzipCompressionEnabled ? AsyncHistoryJobZippedHandler.JOB_TYPE : AsyncHistoryJobHandler.JOB_TYPE;
+            String jobType = isJsonGzipCompressionEnabled ? jobTypeAsyncHistoryZipped : jobTypeAsyncHistory;
             HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobType);
             ArrayNode arrayNode = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper().createArrayNode();
             for (ObjectNode historyJsonNode : historyObjectNodes) {
@@ -58,7 +66,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         } else {
             List<HistoryJobEntity> historyJobEntities = new ArrayList<>(historyObjectNodes.size());
             for (ObjectNode historyJsonNode : historyObjectNodes) {
-                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, AsyncHistoryJobHandler.JOB_TYPE);
+                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobTypeAsyncHistory);
                 addJsonToJob(commandContext, jobEntity, historyJsonNode, false);
                 historyJobEntities.add(jobEntity);
             }

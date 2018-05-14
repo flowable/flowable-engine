@@ -29,6 +29,16 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAsyncHistoryJobHandler.class);
     
     protected boolean isAsyncHistoryJsonGroupingEnabled;
+    protected String jobType;
+    
+    public AbstractAsyncHistoryJobHandler(String jobType) {
+        this.jobType = jobType;
+    }
+    
+    @Override
+    public String getType() {
+        return jobType;
+    }
 
     @Override
     public void execute(HistoryJobEntity job, String configuration, CommandContext commandContext) {

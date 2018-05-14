@@ -24,13 +24,10 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
  */
 public class AsyncHistoryJobZippedHandler extends AsyncHistoryJobHandler {
 
-    public static final String JOB_TYPE = "async-history-zipped";
-
-    @Override
-    public String getType() {
-        return JOB_TYPE;
+    public AsyncHistoryJobZippedHandler(String jobType) {
+        super(jobType);
     }
-    
+
     @Override
     protected byte[] getJobBytes(HistoryJobEntity job) {
         byte[] bytes = job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();

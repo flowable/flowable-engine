@@ -30,13 +30,10 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncHistoryJobHandler.class);
 
-    public static final String JOB_TYPE = "async-history";
-
     protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<>();
-
-    @Override
-    public String getType() {
-        return JOB_TYPE;
+    
+    public AsyncHistoryJobHandler(String jobType) {
+        super(jobType);
     }
 
     public void addHistoryJsonTransformer(HistoryJsonTransformer historyJsonTransformer) {
