@@ -209,7 +209,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
                 }
             }
         }
-        assertEquals(candidateIdentityLinkCount, 2);
+        assertEquals(2, candidateIdentityLinkCount);
     }
 
 }
