@@ -13,7 +13,7 @@
 
 package org.flowable.engine.test.api.runtime;
 
-import org.flowable.cmmn.api.CallbackType;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -34,7 +34,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2138,10 +2137,10 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testAdhocCallbacks() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").
             callbackId("nonExistingCase").
-            callbackType(CallbackType.CASE_ADHOC_CHILD).
+            callbackType(CallbackTypes.CASE_ADHOC_CHILD).
             start();
 
         assertThat(processInstance.getCallbackId(), is("nonExistingCase"));
-        assertThat(processInstance.getCallbackType(), is(CallbackType.CASE_ADHOC_CHILD));
+        assertThat(processInstance.getCallbackType(), is(CallbackTypes.CASE_ADHOC_CHILD));
     }
 }

@@ -15,7 +15,7 @@ package org.flowable.cmmn.api;
 /**
  * @author Joram Barrez
  */
-public interface CallbackType {
+public interface CallbackTypes {
     
     String PLAN_ITEM_CHILD_CASE = "cmmn-1.1-to-cmmn-1.1-child-case";
     
