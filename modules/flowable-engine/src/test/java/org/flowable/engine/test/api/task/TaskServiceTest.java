@@ -113,7 +113,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getTaskDefinitionId(), is("testDefintionId"));
         assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
         assertThat(updatedTask.getScopeId(), is("scopeIdValue"));
-        assertThat(updatedTask.getScopeId(), is(ScopeTypes.CMMN));
+        assertThat(updatedTask.getScopeType(), is(ScopeTypes.CMMN));
     }
 
     public void testBuilderCreateTaskWithParent() {
