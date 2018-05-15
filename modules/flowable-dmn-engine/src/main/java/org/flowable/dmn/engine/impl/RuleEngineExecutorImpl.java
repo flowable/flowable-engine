@@ -362,4 +362,34 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             }
         }
     }
+
+    @Override
+    public Map<String, AbstractHitPolicy> getHitPolicyBehaviors() {
+        return hitPolicyBehaviors;
+    }
+
+    @Override
+    public void setHitPolicyBehaviors(Map<String, AbstractHitPolicy> hitPolicyBehaviors) {
+        this.hitPolicyBehaviors = hitPolicyBehaviors;
+    }
+
+    @Override
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    @Override
+    public void setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+    }
+
+    @Override
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    @Override
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 }
