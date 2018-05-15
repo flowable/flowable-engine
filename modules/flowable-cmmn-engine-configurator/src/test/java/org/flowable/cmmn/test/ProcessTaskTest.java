@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -85,7 +85,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(1, planItemInstances.size());
         assertEquals("The Process", planItemInstances.get(0).getName());
         assertNotNull(planItemInstances.get(0).getReferenceId());
-        assertEquals(PlanItemInstanceCallbackType.CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
+        assertEquals(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
         
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().singleResult();

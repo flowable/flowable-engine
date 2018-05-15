@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.configurator.impl.deployer.CmmnDeployer;
@@ -95,10 +95,10 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             processEngineConfiguration.setProcessInstanceStateChangedCallbacks(new HashMap<>());
         }
         Map<String, List<RuntimeInstanceStateChangeCallback>> callbacks = processEngineConfiguration.getProcessInstanceStateChangedCallbacks();
-        if (!callbacks.containsKey(PlanItemInstanceCallbackType.CHILD_PROCESS)) {
-            callbacks.put(PlanItemInstanceCallbackType.CHILD_PROCESS, new ArrayList<>());
+        if (!callbacks.containsKey(CallbackTypes.PLAN_ITEM_CHILD_PROCESS)) {
+            callbacks.put(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, new ArrayList<>());
         }
-        callbacks.get(PlanItemInstanceCallbackType.CHILD_PROCESS).add(new ChildProcessInstanceStateChangeCallback(cmmnEngineConfiguration));
+        callbacks.get(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).add(new ChildProcessInstanceStateChangeCallback(cmmnEngineConfiguration));
     }
 
     @Override

@@ -35,6 +35,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -95,6 +96,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
                         formKey("testFormKey").
                         taskDefinitionId("testDefintionId").
                         taskDefinitionKey("testDefinitionKey").
+                        scopeType(ScopeTypes.CMMN).
+                        scopeId("scopeIdValue").
                         create();
         Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).singleResult();
         assertThat(updatedTask, notNullValue());
@@ -110,6 +113,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getFormKey(), is("testFormKey"));
         assertThat(updatedTask.getTaskDefinitionId(), is("testDefintionId"));
         assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
+        assertThat(updatedTask.getScopeId(), is("scopeIdValue"));
+        assertThat(updatedTask.getScopeType(), is(ScopeTypes.CMMN));
     }
 
     public void testBuilderCreateTaskWithParent() {
@@ -253,6 +258,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertEquals("taskowner", task.getOwner());
         assertEquals(dueDate, task.getDueDate());
         assertEquals(0, task.getPriority());
+        assertNull(task.getScopeId());
+        assertNull(task.getScopeType());
 
         task.setName("updatedtaskname");
         task.setDescription("updateddescription");

@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.engine.configurator.impl.process;
 
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -46,7 +46,7 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
         
         if (planItemInstanceId != null) {
             processInstanceBuilder.callbackId(planItemInstanceId);
-            processInstanceBuilder.callbackType(PlanItemInstanceCallbackType.CHILD_PROCESS);
+            processInstanceBuilder.callbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
         }
         
         ProcessInstance processInstance = processInstanceBuilder.start();
