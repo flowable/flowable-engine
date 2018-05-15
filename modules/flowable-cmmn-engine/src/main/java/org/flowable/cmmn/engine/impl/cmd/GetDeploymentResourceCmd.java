@@ -36,6 +36,7 @@ public class GetDeploymentResourceCmd implements Command<InputStream> {
         this.resourceName = resourceName;
     }
 
+    @Override
     public InputStream execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");

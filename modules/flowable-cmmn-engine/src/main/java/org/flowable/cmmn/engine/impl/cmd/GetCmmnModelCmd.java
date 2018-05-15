@@ -31,6 +31,7 @@ public class GetCmmnModelCmd implements Command<CmmnModel> {
         this.caseDefinitionId = caseDefinitionId;
     }
 
+    @Override
     public CmmnModel execute(CommandContext commandContext) {
         if (caseDefinitionId == null) {
             throw new FlowableIllegalArgumentException("caseDefinitionId is null");

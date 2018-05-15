@@ -37,7 +37,7 @@ public final class Cache implements TreeCache {
      *            maximum primary cache size
      */
     public Cache(int size) {
-        this(size, new WeakHashMap<String, Tree>());
+        this(size, new WeakHashMap<>());
     }
 
     /**

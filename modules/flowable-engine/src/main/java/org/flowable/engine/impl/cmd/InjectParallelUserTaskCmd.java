@@ -84,8 +84,8 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
         }
         subProcess.setOutgoingFlows(userTask.getOutgoingFlows());
         
-        userTask.setIncomingFlows(new ArrayList<SequenceFlow>());
-        userTask.setOutgoingFlows(new ArrayList<SequenceFlow>());
+        userTask.setIncomingFlows(new ArrayList<>());
+        userTask.setOutgoingFlows(new ArrayList<>());
         
         GraphicInfo elementGraphicInfo = bpmnModel.getGraphicInfo(flowElement.getId());
         if (elementGraphicInfo != null) {

@@ -212,7 +212,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
                 assertEquals(1, subs.size());
                 EventSubscription sub = subs.get(0);
-                assertEquals(sub.getEventName(), "testmessage");
+                assertEquals("testmessage", sub.getEventName());
 
                 return sub.getExecutionId();
             }
@@ -242,7 +242,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
                 assertEquals(1, subs.size());
                 EventSubscription sub = subs.get(0);
-                assertEquals(sub.getEventName(), "testmessage");
+                assertEquals("testmessage", sub.getEventName());
 
                 return sub.getExecutionId();
             }

@@ -741,7 +741,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected String wsSyncFactoryClassName = DEFAULT_WS_SYNC_FACTORY;
     protected XMLImporterFactory wsWsdlImporterFactory;
-    protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<QName, URL>();
+    protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<>();
 
     protected DelegateInterceptor delegateInterceptor;
 
@@ -1012,6 +1012,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
+    @Override
     public void initMybatisTypeHandlers(Configuration configuration) {
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
@@ -1170,6 +1171,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // session factories ////////////////////////////////////////////////////////
 
+    @Override
     public void initSessionFactories() {
         if (sessionFactories == null) {
             sessionFactories = new HashMap<>();

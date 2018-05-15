@@ -86,7 +86,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
             processInstance = (ExecutionEntity) super.createProcessInstanceForInitial(initial);
         }
 
-        processInstance.setExecutions(new ArrayList<ExecutionEntity>());
+        processInstance.setExecutions(new ArrayList<>());
         processInstance.setProcessDefinition(processDefinition);
         // Do not initialize variable map (let it happen lazily)
 
@@ -249,14 +249,17 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     }
     
     // only valid in Flowable 6
+    @Override
     public String getDerivedFrom() {
         return null;
     }
 
+    @Override
     public String getDerivedFromRoot() {
         return null;
     }
 
+    @Override
     public int getDerivedVersion() {
         return 0;
     }

@@ -47,6 +47,7 @@ public interface CmmnDeploymentEntity extends CmmnDeployment, Entity {
 
     void setDeploymentTime(Date deploymentTime);
 
+    @Override
     boolean isNew();
 
     void setNew(boolean isNew);

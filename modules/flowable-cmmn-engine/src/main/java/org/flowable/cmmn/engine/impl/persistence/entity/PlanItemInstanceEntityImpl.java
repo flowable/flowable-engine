@@ -60,6 +60,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     protected PlanItemInstanceEntity stagePlanItemInstance;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
     
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("caseDefinitionId", caseDefinitionId);
@@ -92,93 +93,123 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
         return planItem;
     }
     
+    @Override
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
+    @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
     }
+    @Override
     public String getCaseInstanceId() {
         return caseInstanceId;
     }
+    @Override
     public void setCaseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
     }
+    @Override
     public String getStageInstanceId() {
         return stageInstanceId;
     }
+    @Override
     public void setStageInstanceId(String stageInstanceId) {
         this.stageInstanceId = stageInstanceId;
     }
+    @Override
     public boolean isStage() {
         return isStage;
     }
+    @Override
     public void setStage(boolean isStage) {
         this.isStage = isStage;
     }
+    @Override
     public String getElementId() {
         return elementId;
     }
+    @Override
     public void setElementId(String elementId) {
         this.elementId = elementId;
     }
+    @Override
     public String getPlanItemDefinitionId() {
         return planItemDefinitionId;
     }
+    @Override
     public void setPlanItemDefinitionId(String planItemDefinitionId) {
         this.planItemDefinitionId = planItemDefinitionId;
     }
+    @Override
     public String getPlanItemDefinitionType() {
         return planItemDefinitionType;
     }
+    @Override
     public void setPlanItemDefinitionType(String planItemDefinitionType) {
         this.planItemDefinitionType = planItemDefinitionType;
     }
+    @Override
     public String getName() {
         return name;
     }
+    @Override
     public void setName(String name) {
         this.name = name;
     }
+    @Override
     public String getState() {
         return state;
     }
+    @Override
     public void setState(String state) {
         this.state = state;
     }
+    @Override
     public Date getStartTime() {
         return startTime;
     }
+    @Override
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
+    @Override
     public String getStartUserId() {
         return startUserId;
     }
+    @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
     }
+    @Override
     public String getReferenceId() {
         return referenceId;
     }
+    @Override
     public void setReferenceId(String referenceId) {
         this.referenceId = referenceId;
     }
+    @Override
     public String getReferenceType() {
         return referenceType;
     }
+    @Override
     public void setReferenceType(String referenceType) {
         this.referenceType = referenceType;
     }
+    @Override
     public boolean isCompleteable() {
         return completeable;
     }
+    @Override
     public void setCompleteable(boolean completeable) {
         this.completeable = completeable;
     }
+    @Override
     public String getTenantId() {
         return tenantId;
     }
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
@@ -205,7 +236,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
         if (satisfiedSentryPartInstances == null) {
             if (sentryPartInstanceCount == 0) {
-                satisfiedSentryPartInstances = new ArrayList<SentryPartInstanceEntity>(1);
+                satisfiedSentryPartInstances = new ArrayList<>(1);
             } else {
                 satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager().findSentryPartInstancesByPlanItemInstanceId(id);
             }
@@ -213,6 +244,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
         return satisfiedSentryPartInstances;
     }
     
+    @Override
     public void setSatisfiedSentryPartInstances(List<SentryPartInstanceEntity> satisfiedSentryPartInstances) {
         this.satisfiedSentryPartInstances = satisfiedSentryPartInstances;
     }
@@ -260,26 +292,32 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
         return true;
     }
 
+    @Override
     public boolean isCountEnabled() {
         return countEnabled;
     }
 
+    @Override
     public void setCountEnabled(boolean countEnabled) {
         this.countEnabled = countEnabled;
     }
 
+    @Override
     public int getVariableCount() {
         return variableCount;
     }
 
+    @Override
     public void setVariableCount(int variableCount) {
         this.variableCount = variableCount;
     }
 
+    @Override
     public int getSentryPartInstanceCount() {
         return sentryPartInstanceCount;
     }
 
+    @Override
     public void setSentryPartInstanceCount(int sentryPartInstanceCount) {
         this.sentryPartInstanceCount = sentryPartInstanceCount;
     }

@@ -51,6 +51,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         convertersToJsonMap.put(Criterion.class, CriterionJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         Criterion criterion = (Criterion) baseElement;
         if (criterion.isEntryCriterion()) {
@@ -61,6 +62,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         return STENCIL_ENTRY_CRITERION;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
         Criterion criterion = (Criterion) baseElement;
         ArrayNode dockersArrayNode = objectMapper.createArrayNode();

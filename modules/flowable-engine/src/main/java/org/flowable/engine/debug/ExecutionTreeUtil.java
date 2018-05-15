@@ -74,7 +74,7 @@ public class ExecutionTreeUtil {
 
             if (parentId != null) {
                 if (!parentMapping.containsKey(parentId)) {
-                    parentMapping.put(parentId, new ArrayList<ExecutionEntity>());
+                    parentMapping.put(parentId, new ArrayList<>());
                 }
                 parentMapping.get(parentId).add(executionEntity);
             } else if (executionEntity.getSuperExecutionId() == null) {
@@ -99,7 +99,7 @@ public class ExecutionTreeUtil {
 
             if (parentId != null) {
                 if (!parentMapping.containsKey(parentId)) {
-                    parentMapping.put(parentId, new ArrayList<ExecutionEntity>());
+                    parentMapping.put(parentId, new ArrayList<>());
                 }
                 parentMapping.get(parentId).add(executionEntity);
             } else {

@@ -277,11 +277,13 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
 // results ////////////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         return CommandContextUtil.getCaseInstanceEntityManager(commandContext).countByCriteria(this);
     }
 
+    @Override
     public List<CaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
         if (this.isIncludeCaseVariables()) {

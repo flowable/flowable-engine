@@ -105,8 +105,8 @@ public class Scanner {
         }
     }
 
-    private static final HashMap<String, Token> KEYMAP = new HashMap<String, Token>();
-    private static final HashMap<Symbol, Token> FIXMAP = new HashMap<Symbol, Token>();
+    private static final HashMap<String, Token> KEYMAP = new HashMap<>();
+    private static final HashMap<Symbol, Token> FIXMAP = new HashMap<>();
 
     private static void addFixToken(Token token) {
         FIXMAP.put(token.getSymbol(), token);

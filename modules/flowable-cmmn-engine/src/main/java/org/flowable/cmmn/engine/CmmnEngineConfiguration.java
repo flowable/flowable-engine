@@ -1302,6 +1302,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public CmmnTaskService getCmmnTaskService() {
         return cmmnTaskService;
     }
@@ -1674,10 +1675,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public ExpressionManager getExpressionManager() {
         return expressionManager;
     }
 
+    @Override
     public CmmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
         return this;
@@ -2311,6 +2314,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.formFieldHandler = formFieldHandler;
     }
 
+    @Override
     public void initIdGenerator() {
         super.initIdGenerator();
         if (taskIdGenerator == null) {

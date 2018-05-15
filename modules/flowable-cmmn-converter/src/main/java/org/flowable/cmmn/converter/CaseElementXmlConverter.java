@@ -24,8 +24,10 @@ import org.flowable.common.engine.api.FlowableException;
  */
 public abstract class CaseElementXmlConverter extends BaseCmmnXmlConverter {
     
+    @Override
     public abstract String getXMLElementName();
     
+    @Override
     public BaseElement convertToCmmnModel(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         BaseElement baseElement = super.convertToCmmnModel(xtr, conversionHelper);
         if (baseElement != null && !(baseElement instanceof CaseElement)) {

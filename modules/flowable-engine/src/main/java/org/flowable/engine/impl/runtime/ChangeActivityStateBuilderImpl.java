@@ -123,7 +123,7 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
         if (localVariables.containsKey(startActivityId)) {
             localVariableMap = localVariables.get(startActivityId);
         } else {
-            localVariableMap = new HashMap<String, Object>();
+            localVariableMap = new HashMap<>();
         }
         
         localVariableMap.put(localVariableName, localVariableValue);

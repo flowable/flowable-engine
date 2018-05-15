@@ -49,6 +49,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractEntity implement
     protected String referenceType;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("caseDefinitionId", caseDefinitionId);

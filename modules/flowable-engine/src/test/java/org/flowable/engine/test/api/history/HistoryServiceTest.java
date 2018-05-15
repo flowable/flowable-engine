@@ -205,7 +205,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
     public void testHistoricProcessInstanceQueryByProcessInstanceIdsEmpty() {
         try {
-            historyService.createHistoricProcessInstanceQuery().processInstanceIds(new HashSet<String>());
+            historyService.createHistoricProcessInstanceQuery().processInstanceIds(new HashSet<>());
             fail("ActivitiException expected");
         } catch (FlowableIllegalArgumentException re) {
             assertTextPresent("Set of process instance ids is empty", re.getMessage());

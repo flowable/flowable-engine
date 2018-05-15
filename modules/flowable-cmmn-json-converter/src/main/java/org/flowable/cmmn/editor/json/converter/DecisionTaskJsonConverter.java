@@ -48,6 +48,7 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
         convertersToJsonMap.put(DecisionTask.class, DecisionTaskJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_DECISION;
     }

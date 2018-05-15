@@ -42,33 +42,43 @@ public class HistoricMilestoneInstanceEntityImpl extends AbstractEntity implemen
         return persistentState;
     }
     
+    @Override
     public String getName() {
         return name;
     }
+    @Override
     public void setName(String name) {
         this.name = name;
     }
+    @Override
     public Date getTimeStamp() {
         return timeStamp;
     }
+    @Override
     public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
     }
+    @Override
     public String getCaseInstanceId() {
         return caseInstanceId;
     }
+    @Override
     public void setCaseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
     }
+    @Override
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
+    @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
     }
+    @Override
     public String getElementId() {
         return elementId;
     }
+    @Override
     public void setElementId(String elementId) {
         this.elementId = elementId;
     }

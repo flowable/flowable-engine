@@ -176,7 +176,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
     public void missingInputVariableBoolean() {
         DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
-                .variables(new HashMap<String, Object>())
+                .variables(new HashMap<>())
                 .executeWithAuditTrail();
         Assert.assertEquals(false, result.isFailed());
     }

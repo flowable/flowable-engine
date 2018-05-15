@@ -92,11 +92,11 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
     protected void initProcessInstanceStateChangedCallbacks(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (processEngineConfiguration.getProcessInstanceStateChangedCallbacks() == null) {
-            processEngineConfiguration.setProcessInstanceStateChangedCallbacks(new HashMap<String, List<RuntimeInstanceStateChangeCallback>>());
+            processEngineConfiguration.setProcessInstanceStateChangedCallbacks(new HashMap<>());
         }
         Map<String, List<RuntimeInstanceStateChangeCallback>> callbacks = processEngineConfiguration.getProcessInstanceStateChangedCallbacks();
         if (!callbacks.containsKey(CallbackTypes.PLAN_ITEM_CHILD_PROCESS)) {
-            callbacks.put(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, new ArrayList<RuntimeInstanceStateChangeCallback>());
+            callbacks.put(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, new ArrayList<>());
         }
         callbacks.get(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).add(new ChildProcessInstanceStateChangeCallback(cmmnEngineConfiguration));
     }
