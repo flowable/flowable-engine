@@ -518,6 +518,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     public void initRuleEngineExecutor() {
 	    	if(ruleEngineExecutor == null) {
 	        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, objectMapper);
+	    	}else if(ruleEngineExecutor instanceof RuleEngineExecutorImpl){
+	    		RuleEngineExecutorImpl ruleEngineExecutorImpl = (RuleEngineExecutorImpl) ruleEngineExecutor;
+	    		ruleEngineExecutorImpl.setExpressionManager(expressionManager);
+	    		ruleEngineExecutorImpl.setHitPolicyBehaviors(hitPolicyBehaviors);
+	    		ruleEngineExecutorImpl.setObjectMapper(objectMapper);
 	    	}
     }
 
