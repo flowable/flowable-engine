@@ -118,6 +118,7 @@ public class SecurityConfiguration {
                     .addHeaderWriter(new XXssProtectionHeaderWriter())
                     .and()
                     .authorizeRequests()
+                .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK)
                 .antMatchers("/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
         }
     }
