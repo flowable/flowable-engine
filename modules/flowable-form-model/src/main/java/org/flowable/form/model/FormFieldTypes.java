@@ -50,4 +50,8 @@ public interface FormFieldTypes {
     String SPACER = "spacer";
     
     String HORIZONTAL_LINE = "horizontal-line";
+    
+    String HEADLINE = "headline";
+    
+    String HEADLINE_WITH_LINE = "headline-with-line";
 }

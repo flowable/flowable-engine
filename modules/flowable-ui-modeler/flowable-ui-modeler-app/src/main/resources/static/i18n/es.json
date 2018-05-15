@@ -447,7 +447,9 @@
             "EXPRESSION": "Expresion",
 	    	"HYPERLINK": "Hipervínculo",
 	    	"SPACER": "Spacer",
-			"HORIZONTAL-LINE": "Horizontal line"
+			"HORIZONTAL-LINE": "Horizontal line",
+			"HEADLINE": "Headline",
+			"HEADLINE-WITH-LINE":"Headline"
         },
         "TABS": {
             "GENERAL": "General",
