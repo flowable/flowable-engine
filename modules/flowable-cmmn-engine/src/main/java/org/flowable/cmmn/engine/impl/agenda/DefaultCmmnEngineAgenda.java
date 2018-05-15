@@ -175,6 +175,7 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         addOperation(new EnablePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
+    @Override
     public void planActivateAsyncPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ActivateAsyncPlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }

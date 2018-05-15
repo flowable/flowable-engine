@@ -45,6 +45,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         this.resourceEntityManager = cmmnEngineConfiguration.getCmmnResourceEntityManager();
     }
 
+    @Override
     public CmmnDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
         if (inputStream == null) {
             throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
@@ -68,6 +69,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder addClasspathResource(String resource) {
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
         if (inputStream == null) {
@@ -76,6 +78,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         return addInputStream(resource, inputStream);
     }
 
+    @Override
     public CmmnDeploymentBuilder addString(String resourceName, String text) {
         if (text == null) {
             throw new FlowableException("text is null");
@@ -122,31 +125,37 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         return null;
     }
 
+    @Override
     public CmmnDeploymentBuilder name(String name) {
         deployment.setName(name);
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder category(String category) {
         deployment.setCategory(category);
         return this;
     }
     
+    @Override
     public CmmnDeploymentBuilder key(String key) {
         deployment.setKey(key);
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder disableSchemaValidation() {
         this.isCmmn20XsdValidationEnabled = false;
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder tenantId(String tenantId) {
         deployment.setTenantId(tenantId);
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
         deployment.setParentDeploymentId(parentDeploymentId);
         return this;
@@ -158,6 +167,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         return this;
     }
 
+    @Override
     public CmmnDeployment deploy() {
         return repositoryService.deploy(this);
     }

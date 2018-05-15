@@ -38,6 +38,7 @@ public class HistoricPlanItemInstanceQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

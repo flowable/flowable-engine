@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdap
  */
 public class CaseInstanceByCaseDefinitionIdMatcher extends CachedEntityMatcherAdapter<CaseInstanceEntity> {
 
+    @Override
     public boolean isRetained(CaseInstanceEntity entity, Object param) {
         return entity.getCaseDefinitionId().equals(param);
     }

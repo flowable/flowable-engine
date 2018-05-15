@@ -301,6 +301,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     // data model
     // ///////////////////////////////////////////////////////////////
 
+    @Override
     public void initDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new DmnDbSchemaManager();

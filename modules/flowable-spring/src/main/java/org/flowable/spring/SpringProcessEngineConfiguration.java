@@ -137,30 +137,37 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         }
     }
 
+    @Override
     public PlatformTransactionManager getTransactionManager() {
         return transactionManager;
     }
 
+    @Override
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public String getDeploymentName() {
         return deploymentName;
     }
 
+    @Override
     public void setDeploymentName(String deploymentName) {
         this.deploymentName = deploymentName;
     }
 
+    @Override
     public Resource[] getDeploymentResources() {
         return deploymentResources;
     }
 
+    @Override
     public void setDeploymentResources(Resource[] deploymentResources) {
         this.deploymentResources = deploymentResources;
     }
 
+    @Override
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
@@ -170,10 +177,12 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public String getDeploymentMode() {
         return deploymentMode;
     }
 
+    @Override
     public void setDeploymentMode(String deploymentMode) {
         this.deploymentMode = deploymentMode;
     }

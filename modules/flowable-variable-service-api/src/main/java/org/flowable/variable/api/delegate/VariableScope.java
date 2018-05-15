@@ -283,6 +283,7 @@ public interface VariableScope extends VariableContainer {
      * - no history is kept for the variable - the variable is only available until a waitstate is reached in the process - transient variables 'shadow' persistent variable (when getVariable('abc')
      * where 'abc' is both persistent and transient, the transient value is returned.
      */
+    @Override
     void setTransientVariable(String variableName, Object variableValue);
 
     /**

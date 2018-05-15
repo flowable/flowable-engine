@@ -40,6 +40,7 @@ public class HttpTaskJsonConverter extends BaseCmmnJsonConverter {
         convertersToBpmnMap.put(STENCIL_TASK_HTTP, HttpTaskJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_HTTP;
     }

@@ -73,6 +73,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     private Task task = null;
 
+    @Override
     public void tearDown() throws Exception {
         super.tearDown();
         if (task != null) {

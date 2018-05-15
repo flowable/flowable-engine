@@ -32,14 +32,19 @@ import org.flowable.common.engine.api.repository.EngineDeployment;
  */
 public interface DmnDeployment extends EngineDeployment {
 
+    @Override
     String getId();
 
+    @Override
     String getName();
 
+    @Override
     Date getDeploymentTime();
 
+    @Override
     String getCategory();
 
+    @Override
     String getTenantId();
 
     String getParentDeploymentId();

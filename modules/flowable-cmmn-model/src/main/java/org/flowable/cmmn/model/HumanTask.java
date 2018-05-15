@@ -93,6 +93,7 @@ public class HumanTask extends Task {
         this.candidateGroups = candidateGroups;
     }
 
+    @Override
     public HumanTask clone() {
         HumanTask clone = new HumanTask();
         clone.setValues(this);

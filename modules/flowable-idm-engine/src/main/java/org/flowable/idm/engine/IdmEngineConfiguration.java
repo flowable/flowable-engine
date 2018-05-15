@@ -199,6 +199,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         initEventDispatcher();
     }
 
+    @Override
     public void initDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new IdmDbSchemaManager();

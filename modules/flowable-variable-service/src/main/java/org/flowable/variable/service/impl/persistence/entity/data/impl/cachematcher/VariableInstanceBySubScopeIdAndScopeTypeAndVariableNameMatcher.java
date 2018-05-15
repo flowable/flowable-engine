@@ -22,6 +22,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class VariableInstanceBySubScopeIdAndScopeTypeAndVariableNameMatcher implements SingleCachedEntityMatcher<VariableInstanceEntity> {
 
+    @Override
     public boolean isRetained(VariableInstanceEntity entity, Object param) {
         Map<String, String> params = (Map<String, String>) param;
         return params.get("subScopeId").equals(entity.getSubScopeId())

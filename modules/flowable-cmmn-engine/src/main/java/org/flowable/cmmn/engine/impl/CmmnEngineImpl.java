@@ -82,6 +82,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         }
     }
     
+    @Override
     public CmmnEngineConfiguration getCmmnEngineConfiguration() {
         return cmmnEngineConfiguration;
     }

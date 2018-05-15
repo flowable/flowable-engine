@@ -63,6 +63,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         super(commandExecutor);
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionId(String caseDefinitionId) {
         this.id = caseDefinitionId;
         return this;
@@ -79,6 +80,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionCategory(String category) {
         if (category == null) {
             throw new FlowableIllegalArgumentException("category is null");
@@ -87,6 +89,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionCategoryLike(String categoryLike) {
         if (categoryLike == null) {
             throw new FlowableIllegalArgumentException("categoryLike is null");
@@ -95,6 +98,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionCategoryNotEquals(String categoryNotEquals) {
         if (categoryNotEquals == null) {
             throw new FlowableIllegalArgumentException("categoryNotEquals is null");
@@ -103,6 +107,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionName(String name) {
         if (name == null) {
             throw new FlowableIllegalArgumentException("name is null");
@@ -111,6 +116,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionNameLike(String nameLike) {
         if (nameLike == null) {
             throw new FlowableIllegalArgumentException("nameLike is null");
@@ -119,6 +125,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("id is null");
@@ -127,6 +134,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl deploymentIds(Set<String> deploymentIds) {
         if (deploymentIds == null) {
             throw new FlowableIllegalArgumentException("ids are null");
@@ -137,6 +145,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionKey(String key) {
         if (key == null) {
             throw new FlowableIllegalArgumentException("key is null");
@@ -145,6 +154,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionKeyLike(String keyLike) {
         if (keyLike == null) {
             throw new FlowableIllegalArgumentException("keyLike is null");
@@ -153,6 +163,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionResourceName(String resourceName) {
         if (resourceName == null) {
             throw new FlowableIllegalArgumentException("resourceName is null");
@@ -161,6 +172,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionResourceNameLike(String resourceNameLike) {
         if (resourceNameLike == null) {
             throw new FlowableIllegalArgumentException("resourceNameLike is null");
@@ -169,30 +181,35 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQueryImpl caseDefinitionVersion(Integer version) {
         checkVersion(version);
         this.version = version;
         return this;
     }
 
+    @Override
     public CaseDefinitionQuery caseDefinitionVersionGreaterThan(Integer caseDefinitionVersion) {
         checkVersion(caseDefinitionVersion);
         this.versionGt = caseDefinitionVersion;
         return this;
     }
 
+    @Override
     public CaseDefinitionQuery caseDefinitionVersionGreaterThanOrEquals(Integer caseDefinitionVersion) {
         checkVersion(caseDefinitionVersion);
         this.versionGte = caseDefinitionVersion;
         return this;
     }
 
+    @Override
     public CaseDefinitionQuery caseDefinitionVersionLowerThan(Integer caseDefinitionVersion) {
         checkVersion(caseDefinitionVersion);
         this.versionLt = caseDefinitionVersion;
         return this;
     }
 
+    @Override
     public CaseDefinitionQuery caseDefinitionVersionLowerThanOrEquals(Integer caseDefinitionVersion) {
         checkVersion(caseDefinitionVersion);
         this.versionLte = caseDefinitionVersion;
@@ -207,11 +224,13 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         }
     }
 
+    @Override
     public CaseDefinitionQueryImpl latestVersion() {
         this.latest = true;
         return this;
     }
 
+    @Override
     public CaseDefinitionQuery caseDefinitionTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("caseDefinition tenantId is null");
@@ -220,6 +239,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQuery caseDefinitionTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("case definition tenantId is null");
@@ -228,6 +248,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return this;
     }
 
+    @Override
     public CaseDefinitionQuery caseDefinitionWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -235,46 +256,56 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
     // sorting ////////////////////////////////////////////
 
+    @Override
     public CaseDefinitionQuery orderByDeploymentId() {
         return orderBy(CaseDefinitionQueryProperty.CASE_DEFINITION_DEPLOYMENT_ID);
     }
 
+    @Override
     public CaseDefinitionQuery orderByCaseDefinitionKey() {
         return orderBy(CaseDefinitionQueryProperty.CASE_DEFINITION_KEY);
     }
 
+    @Override
     public CaseDefinitionQuery orderByCaseDefinitionCategory() {
         return orderBy(CaseDefinitionQueryProperty.CASE_DEFINITION_CATEGORY);
     }
 
+    @Override
     public CaseDefinitionQuery orderByCaseDefinitionId() {
         return orderBy(CaseDefinitionQueryProperty.CASE_DEFINITION_ID);
     }
 
+    @Override
     public CaseDefinitionQuery orderByCaseDefinitionVersion() {
         return orderBy(CaseDefinitionQueryProperty.CASE_DEFINITION_VERSION);
     }
 
+    @Override
     public CaseDefinitionQuery orderByCaseDefinitionName() {
         return orderBy(CaseDefinitionQueryProperty.CASE_DEFINITION_NAME);
     }
 
+    @Override
     public CaseDefinitionQuery orderByTenantId() {
         return orderBy(CaseDefinitionQueryProperty.CASE_DEFINITION_TENANT_ID);
     }
 
     // results ////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findCaseDefinitionCountByQueryCriteria(this);
     }
 
+    @Override
     public List<CaseDefinition> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findCaseDefinitionsByQueryCriteria(this);
     }
 
+    @Override
     public void checkQueryOk() {
         super.checkQueryOk();
     }

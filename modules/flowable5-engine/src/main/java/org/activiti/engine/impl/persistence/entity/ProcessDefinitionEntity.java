@@ -249,14 +249,17 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     }
     
     // only valid in Flowable 6
+    @Override
     public String getDerivedFrom() {
         return null;
     }
 
+    @Override
     public String getDerivedFromRoot() {
         return null;
     }
 
+    @Override
     public int getDerivedVersion() {
         return 0;
     }
