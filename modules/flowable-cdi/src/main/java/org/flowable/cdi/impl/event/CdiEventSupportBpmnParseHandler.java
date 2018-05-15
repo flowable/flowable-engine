@@ -70,7 +70,6 @@ public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
         supportedTypes.add(Task.class);
         supportedTypes.add(ManualTask.class);
         supportedTypes.add(UserTask.class);
-        supportedTypes.add(EndEvent.class);
         supportedTypes.add(SubProcess.class);
         supportedTypes.add(EventSubProcess.class);
         supportedTypes.add(CallActivity.class);
