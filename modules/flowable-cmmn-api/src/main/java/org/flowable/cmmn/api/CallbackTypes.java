@@ -15,10 +15,12 @@ package org.flowable.cmmn.api;
 /**
  * @author Joram Barrez
  */
-public interface PlanItemInstanceCallbackType {
+public interface CallbackTypes {
     
-    String CHILD_CASE = "cmmn-1.1-to-cmmn-1.1-child-case";
+    String PLAN_ITEM_CHILD_CASE = "cmmn-1.1-to-cmmn-1.1-child-case";
     
-    String CHILD_PROCESS = "cmmn-1.1-to-bpmn-2.0-child-process";
+    String PLAN_ITEM_CHILD_PROCESS = "cmmn-1.1-to-bpmn-2.0-child-process";
+
+    String CASE_ADHOC_CHILD = "cmmn-1.1-child";
 
 }

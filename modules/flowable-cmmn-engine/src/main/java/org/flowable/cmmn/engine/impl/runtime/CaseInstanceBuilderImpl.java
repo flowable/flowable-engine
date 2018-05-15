@@ -33,7 +33,9 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     protected Map<String, Object> transientVariables;
     protected String tenantId;
     protected String outcome;
-    
+    protected String callbackType;
+    protected String callbackId;
+
     public CaseInstanceBuilderImpl() {
         
     }
@@ -119,6 +121,18 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     }
 
     @Override
+    public CaseInstanceBuilder callbackType(String callbackType) {
+        this.callbackType = callbackType;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceBuilder callbackId(String callbackId) {
+        this.callbackId = callbackId;
+        return this;
+    }
+
+    @Override
     public CaseInstance start() {
         return cmmnRuntimeService.startCaseInstance(this);
     }
@@ -167,4 +181,14 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     public String getOutcome() {
         return outcome;
     }
+
+    @Override
+    public String getCallbackType() {
+        return this.callbackType;
+    }
+    @Override
+    public String getCallbackId() {
+        return this.callbackId;
+    }
+
 }
