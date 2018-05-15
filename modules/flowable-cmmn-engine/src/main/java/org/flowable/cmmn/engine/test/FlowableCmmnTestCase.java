@@ -70,7 +70,7 @@ public abstract class FlowableCmmnTestCase {
             if (inputStream != null) {
                 cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine();
             } else {
-                LOGGER.info("No " + FLOWABLE_CMMN_CFG_XML + " configuration found. Using default in-memory standalone configuration.");
+                LOGGER.info("No {} configuration found. Using default in-memory standalone configuration.", FLOWABLE_CMMN_CFG_XML);
                 cmmnEngine = new StandaloneInMemCmmnEngineConfiguration().buildCmmnEngine();
             }
             CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngine.getCmmnEngineConfiguration());
