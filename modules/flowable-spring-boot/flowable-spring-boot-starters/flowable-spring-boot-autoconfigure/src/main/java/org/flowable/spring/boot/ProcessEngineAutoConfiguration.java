@@ -13,34 +13,34 @@
 package org.flowable.spring.boot;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
-import org.flowable.engine.DynamicBpmnService;
-import org.flowable.engine.FormService;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.IdentityService;
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.configurator.ProcessEngineConfigurator;
+import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.Process;
+import org.flowable.spring.boot.process.ProcessAsync;
+import org.flowable.spring.boot.process.ProcessAsyncHistory;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
+import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -56,6 +56,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Josh Long
  * @author Filip Hrisafov
  * @author Javier Casal
+ * @author Joram Barrez
  */
 @Configuration
 @ConditionalOnProcessEngine
@@ -63,26 +64,32 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableProperties.class,
     FlowableMailProperties.class,
     FlowableProcessProperties.class,
+    FlowableAppProperties.class,
     FlowableIdmProperties.class
 })
 @AutoConfigureAfter({
-    FlowableTransactionAutoConfiguration.class
+    FlowableTransactionAutoConfiguration.class,
+    AppEngineAutoConfiguration.class,
+})
+@AutoConfigureBefore({
+    AppEngineServicesAutoConfiguration.class,
 })
 @Import({
     FlowableJobConfiguration.class
 })
 public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
-    @Autowired(required = false)
-    private List<EngineConfigurationConfigurer<SpringProcessEngineConfiguration>> processEngineConfigurationConfigurers = new ArrayList<>();
     protected final FlowableProcessProperties processProperties;
+    protected final FlowableAppProperties appProperties;
     protected final FlowableIdmProperties idmProperties;
     protected final FlowableMailProperties mailProperties;
 
     public ProcessEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableProcessProperties processProperties,
-        FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties) {
+                    FlowableAppProperties appProperties, FlowableIdmProperties idmProperties, FlowableMailProperties mailProperties) {
+        
         super(flowableProperties);
         this.processProperties = processProperties;
+        this.appProperties = appProperties;
         this.idmProperties = idmProperties;
         this.mailProperties = mailProperties;
     }
@@ -92,7 +99,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
      * Therefore a dedicated one is always created.
      */
     @Bean
-    @Process
+    @ProcessAsync
     @ConfigurationProperties(prefix = "flowable.process.async.executor")
     @ConditionalOnMissingBean(name = "processAsyncExecutor")
     public SpringAsyncExecutor processAsyncExecutor(
@@ -106,11 +113,29 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler)
         );
     }
+    
+    @Bean
+    @ProcessAsyncHistory
+    @ConfigurationProperties(prefix = "flowable.process.async-history.executor")
+    @ConditionalOnMissingBean(name = "asyncHistoryExecutor")
+    @ConditionalOnProperty(prefix = "flowable.process", name = "async-history.enable")
+    public SpringAsyncHistoryExecutor asyncHistoryExecutor(
+        ObjectProvider<TaskExecutor> taskExecutor,
+        @Process ObjectProvider<TaskExecutor> processTaskExecutor,
+        ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
+        @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
+    ) {
+        return new SpringAsyncHistoryExecutor(
+            getIfAvailable(processTaskExecutor, taskExecutor),
+            getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler)
+        );
+    }
 
     @Bean
     @ConditionalOnMissingBean
     public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-        @Process ObjectProvider<AsyncExecutor> asyncExecutorProvider) throws IOException {
+            @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider, 
+            @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
@@ -129,6 +154,12 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         if (springAsyncExecutor != null) {
             conf.setAsyncExecutor(springAsyncExecutor);
         }
+        
+        AsyncExecutor springAsyncHistoryExecutor = asyncHistoryExecutorProvider.getIfUnique();
+        if (springAsyncHistoryExecutor != null) {
+            conf.setAsyncHistoryEnabled(true);
+            conf.setAsyncHistoryExecutor(springAsyncHistoryExecutor);
+        }
 
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
@@ -138,6 +169,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setDisableIdmEngine(!(flowableProperties.isDbIdentityUsed() && idmProperties.isEnabled()));
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
+        conf.setAsyncHistoryExecutorActivate(flowableProperties.isAsyncHistoryExecutorActivate());
 
         conf.setMailServerHost(mailProperties.getHost());
         conf.setMailServerPort(mailProperties.getPort());
@@ -155,63 +187,32 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setIdGenerator(new StrongUuidGenerator());
 
-        processEngineConfigurationConfigurers.forEach(configurator -> configurator.configure(conf));
-
         return conf;
     }
-
-    @Bean
-    public ProcessEngineFactoryBean processEngine(SpringProcessEngineConfiguration configuration) throws Exception {
-        ProcessEngineFactoryBean processEngineFactoryBean = new ProcessEngineFactoryBean();
-        processEngineFactoryBean.setProcessEngineConfiguration(configuration);
-        return processEngineFactoryBean;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public RuntimeService runtimeServiceBean(ProcessEngine processEngine) {
-        return processEngine.getRuntimeService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public RepositoryService repositoryServiceBean(ProcessEngine processEngine) {
-        return processEngine.getRepositoryService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public TaskService taskServiceBean(ProcessEngine processEngine) {
-        return processEngine.getTaskService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public HistoryService historyServiceBean(ProcessEngine processEngine) {
-        return processEngine.getHistoryService();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ManagementService managementServiceBean(ProcessEngine processEngine) {
-        return processEngine.getManagementService();
-    }
     
-    @Bean
-    @ConditionalOnMissingBean
-    public DynamicBpmnService dynamicBpmnServiceBean(ProcessEngine processEngine) {
-        return processEngine.getDynamicBpmnService();
-    }
+    @Configuration
+    @ConditionalOnBean(type = {
+        "org.flowable.app.spring.SpringAppEngineConfiguration"
+    })
+    public static class ProcessEngineAppConfiguration extends BaseEngineConfigurationWithConfigurers<SpringProcessEngineConfiguration> {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public FormService formServiceBean(ProcessEngine processEngine) {
-        return processEngine.getFormService();
-    }
+        @Bean
+        @ConditionalOnMissingBean(name = "processAppEngineConfigurationConfigurer")
+        public EngineConfigurationConfigurer<SpringAppEngineConfiguration> processAppEngineConfigurationConfigurer(ProcessEngineConfigurator processEngineConfigurator) {
+            return appEngineConfiguration -> appEngineConfiguration.addConfigurator(processEngineConfigurator);
+        }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public IdentityService identityServiceBean(ProcessEngine processEngine) {
-        return processEngine.getIdentityService();
+        @Bean
+        @ConditionalOnMissingBean
+        public ProcessEngineConfigurator processEngineConfigurator(SpringProcessEngineConfiguration processEngineConfiguration) {
+            SpringProcessEngineConfigurator processEngineConfigurator = new SpringProcessEngineConfigurator();
+            processEngineConfigurator.setProcessEngineConfiguration(processEngineConfiguration);
+            
+            processEngineConfiguration.setDisableIdmEngine(true);
+            
+            invokeConfigurers(processEngineConfiguration);
+            
+            return processEngineConfigurator;
+        }
     }
 }

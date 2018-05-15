@@ -12,12 +12,11 @@
  */
 package org.flowable.ui.task.service.runtime;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -38,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Tijs Rademakers
  */
@@ -51,6 +53,9 @@ public class FlowableProcessInstanceQueryService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected AppRepositoryService appRepositoryService;
 
     @Autowired
     protected HistoryService historyService;
@@ -71,17 +76,27 @@ public class FlowableProcessInstanceQueryService {
             instanceQuery.processDefinitionId(processDefinitionIdNode.asText());
         }
 
-        JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
-        if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
+        JsonNode appDefinitionKeyNode = requestNode.get("appDefinitionKey");
+        if (appDefinitionKeyNode != null && !appDefinitionKeyNode.isNull()) {
             // Results need to be filtered in an app-context. We need to fetch the deployment id for this app and use that in the query
-            List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
+            List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().appDefinitionKey(appDefinitionKeyNode.asText()).list();
+            List<String> parentDeploymentIds = new ArrayList<>();
+            for (AppDefinition appDefinition : appDefinitions) {
+                parentDeploymentIds.add(appDefinition.getDeploymentId());
+            }
+            
+            List<Deployment> deployments = repositoryService.createDeploymentQuery().parentDeploymentIds(parentDeploymentIds).list();
 
             List<String> deploymentIds = new ArrayList<>();
             for (Deployment deployment : deployments) {
                 deploymentIds.add(deployment.getId());
             }
 
-            instanceQuery.deploymentIdIn(deploymentIds);
+            if (deploymentIds.size() > 0) {
+                instanceQuery.deploymentIdIn(deploymentIds);
+            } else {
+                return new ResultListDataRepresentation(new ArrayList<ProcessInstanceRepresentation>());
+            }
         }
 
         // State filtering

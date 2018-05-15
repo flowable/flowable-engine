@@ -15,7 +15,7 @@ package org.flowable.standalone.history.async;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.flowable.engine.impl.history.async.AsyncHistoryDateUtil;
+import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

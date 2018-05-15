@@ -54,8 +54,9 @@ public class InjectParallelEmbeddedSubProcessCmd extends AbstractDynamicInjectio
                         originalProcessDefinitionEntity, newDeploymentEntity, commandContext);
     }
 
+    @Override
     protected void updateExecutions(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity,
-            ExecutionEntity processInstance, List<ExecutionEntity> childExecutions) {
+                                    ExecutionEntity processInstance, List<ExecutionEntity> childExecutions) {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 

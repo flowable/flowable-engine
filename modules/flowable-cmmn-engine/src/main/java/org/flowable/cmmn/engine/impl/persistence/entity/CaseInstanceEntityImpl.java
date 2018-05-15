@@ -49,6 +49,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     protected List<VariableInstanceEntity> queryVariables;
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("businessKey", businessKey);
@@ -66,69 +67,91 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
         return persistentState;
     }
 
+    @Override
     public String getBusinessKey() {
         return businessKey;
     }
+    @Override
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
     }
+    @Override
     public String getName() {
         return name;
     }
+    @Override
     public void setName(String name) {
         this.name = name;
     }
+    @Override
     public String getParentId() {
         return parentId;
     }
+    @Override
     public void setParentId(String parentId) {
         this.parentId = parentId;
     }
+    @Override
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
+    @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
     }
+    @Override
     public String getState() {
         return state;
     }
+    @Override
     public void setState(String state) {
         this.state = state;
     }
+    @Override
     public Date getStartTime() {
         return startTime;
     }
+    @Override
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
+    @Override
     public String getStartUserId() {
         return startUserId;
     }
+    @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
     }
+    @Override
     public boolean isCompleteable() {
         return completeable;
     }
+    @Override
     public void setCompleteable(boolean completeable) {
         this.completeable = completeable;
     }
+    @Override
     public String getCallbackId() {
         return callbackId;
     }
+    @Override
     public void setCallbackId(String callbackId) {
         this.callbackId = callbackId;
     }
+    @Override
     public String getCallbackType() {
         return callbackType;
     }
+    @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
     }
+    @Override
     public String getTenantId() {
         return tenantId;
     }
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
@@ -173,9 +196,8 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     @Override
     protected VariableScopeImpl getParentVariableScope() {
-        if (parentId != null) {
-            return (VariableScopeImpl) CommandContextUtil.getCaseInstanceEntityManager().findById(parentId);
-        }
+        // A case instance is the root of variables.
+        // In case of parent-child case instances, the variables needs to be defined explictely in input/outpur vars 
         return null;
     }
 

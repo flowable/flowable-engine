@@ -39,6 +39,14 @@
         	<artifactId>flowable-json-converter</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-app-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cmmn-engine</artifactId>
+        </dependency>
+        <dependency>
         	<groupId>org.flowable</groupId>
         	<artifactId>flowable-dmn-xml-converter</artifactId>
         </dependency>
@@ -46,6 +54,10 @@
        	 	<groupId>org.flowable</groupId>
         	<artifactId>flowable-dmn-json-converter</artifactId>
       	</dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-engine</artifactId>
+        </dependency>
       	<dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-form-engine</artifactId>

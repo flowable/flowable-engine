@@ -55,6 +55,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         CallActivity callActivity = new CallActivity();
         BpmnXMLUtil.addXMLLocation(callActivity, xtr);
         callActivity.setCalledElement(xtr.getAttributeValue(null, ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENT));
+        callActivity.setProcessInstanceName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_PROCESS_INSTANCE_NAME, xtr));
         callActivity.setBusinessKey(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY, xtr));
         callActivity.setInheritBusinessKey(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY, xtr)));
         callActivity.setInheritVariables(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, xtr)));
@@ -69,6 +70,9 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         CallActivity callActivity = (CallActivity) element;
         if (StringUtils.isNotEmpty(callActivity.getCalledElement())) {
             xtw.writeAttribute(ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENT, callActivity.getCalledElement());
+        }
+        if (StringUtils.isNotEmpty(callActivity.getProcessInstanceName())) {
+            writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_PROCESS_INSTANCE_NAME, callActivity.getProcessInstanceName(), xtw);
         }
         if (StringUtils.isNotEmpty(callActivity.getBusinessKey())) {
             writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY, callActivity.getBusinessKey(), xtw);

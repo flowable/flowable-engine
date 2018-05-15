@@ -42,7 +42,7 @@ public class ProcessVariableHeaderMapper implements HeaderMapper<Map<String, Obj
         Map<String, Object> matches = sync(
                 this.keysToPreserve,
                 source,
-                new HashMap<String, Object>());
+                new HashMap<>());
         return matches;
     }
 

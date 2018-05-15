@@ -104,6 +104,21 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
      * Only select deployments that are derived from the given deployment.
      */
     DeploymentQuery deploymentDerivedFrom(String deploymentId);
+    
+    /**
+     * Only select deployments that have the given parent deployment id.
+     */
+    DeploymentQuery parentDeploymentId(String parentDeploymentId);
+    
+    /**
+     * Only select deployments that have a parent deployment id like the given value.
+     */
+    DeploymentQuery parentDeploymentIdLike(String parentDeploymentIdLike);
+    
+    /**
+     * Only select deployments with a parent deployment id that is the same as one of the given deployment identifiers.
+     */
+    DeploymentQuery parentDeploymentIds(List<String> parentDeploymentIds);
 
     /**
      * Only select deployments with the given process definition key. 

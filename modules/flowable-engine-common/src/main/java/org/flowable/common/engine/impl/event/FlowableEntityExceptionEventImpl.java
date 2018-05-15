@@ -23,7 +23,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableExceptionEvent;
  * 
  * @author Frederik Heremans
  */
-public class FlowableEntityExceptionEventImpl extends FlowableEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
+public class FlowableEntityExceptionEventImpl extends FlowableEngineEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
 
     protected Object entity;
     protected Throwable cause;

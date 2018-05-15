@@ -45,6 +45,7 @@ public interface DeploymentEntity extends Deployment, Entity {
 
     void setDeploymentTime(Date deploymentTime);
 
+    @Override
     boolean isNew();
 
     void setNew(boolean isNew);
@@ -52,6 +53,8 @@ public interface DeploymentEntity extends Deployment, Entity {
     void setDerivedFrom(String derivedFrom);
 
     void setDerivedFromRoot(String derivedFromRoot);
+    
+    void setParentDeploymentId(String parentDeploymentId);
 
     void setEngineVersion(String engineVersion);
 

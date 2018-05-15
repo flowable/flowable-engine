@@ -56,10 +56,12 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         convertersToJsonMap.put(Stage.class, StageJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_STAGE;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
         PlanItem planItem = (PlanItem) baseElement;
         Stage stage = (Stage) planItem.getPlanItemDefinition();

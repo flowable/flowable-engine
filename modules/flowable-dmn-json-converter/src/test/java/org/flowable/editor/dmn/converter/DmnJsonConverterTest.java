@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.flowable.dmn.model.Decision;
@@ -59,7 +58,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_6 = "org/flowable/editor/dmn/converter/decisiontable_entries.json";
     private static final String JSON_RESOURCE_7 = "org/flowable/editor/dmn/converter/decisiontable_dates.json";
     private static final String JSON_RESOURCE_8 = "org/flowable/editor/dmn/converter/decisiontable_empty_operator.json";
-    private static final String JSON_RESOURCE_9 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression.json";
+    private static final String JSON_RESOURCE_9 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression_regression.json";
     private static final String JSON_RESOURCE_10 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1.json";
     private static final String JSON_RESOURCE_11 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type.json";
     private static final String JSON_RESOURCE_12 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type2.json";
@@ -70,6 +69,8 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_17 = "org/flowable/editor/dmn/converter/decisiontable_custom_input_expression.json";
     private static final String JSON_RESOURCE_18 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_input.json";
     private static final String JSON_RESOURCE_19 = "org/flowable/editor/dmn/converter/decisiontable_collections_collection_compare.json";
+    private static final String JSON_RESOURCE_20 = "org/flowable/editor/dmn/converter/decisiontable_complex_output_expression.json";
+
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -369,12 +370,24 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmnComplexOutputExpression() {
+    public void testConvertJsonToDmnComplexOutputExpressionRegression() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_9);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
         assertEquals("refVar1 * refVar2", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
+
+        ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
+        assertNotNull(modelerJson);
+    }
+
+    @Test
+    public void testConvertJsonToDmnComplexOutputExpression() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_20);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+        assertEquals("${refVar1 * refVar2}", decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText());
 
         ObjectNode modelerJson = new DmnJsonConverter().convertToJson(dmnDefinition);
         assertNotNull(modelerJson);

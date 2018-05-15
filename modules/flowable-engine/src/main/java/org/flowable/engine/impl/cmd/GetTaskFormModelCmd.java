@@ -22,8 +22,10 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
@@ -71,9 +73,10 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
 
         String parentDeploymentId = null;
         if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
-            ProcessDefinition processDefinition = processEngineConfiguration.getRepositoryService()
-                    .getProcessDefinition(task.getProcessDefinitionId());
-            parentDeploymentId = processDefinition.getDeploymentId();
+            RepositoryService repositoryService = processEngineConfiguration.getRepositoryService();
+            ProcessDefinition processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+            Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
+            parentDeploymentId = deployment.getParentDeploymentId();
         }
         
         FormInfo formInfo = null;

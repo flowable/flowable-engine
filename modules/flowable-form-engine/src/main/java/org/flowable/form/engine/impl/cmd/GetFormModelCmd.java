@@ -13,12 +13,15 @@
 package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
@@ -81,7 +84,13 @@ public class GetFormModelCmd implements Command<FormInfo>, Serializable {
 
         } else if (formDefinitionKey != null && (tenantId == null || FormEngineConfiguration.NO_TENANT_ID.equals(tenantId)) && parentDeploymentId != null) {
 
-            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndParentDeploymentId(formDefinitionKey, parentDeploymentId);
+            List<FormDeployment> formDeployments = deploymentManager.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
+                            new FormDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
+            
+            if (formDeployments != null && formDeployments.size() > 0) {
+                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyAndDeploymentId(formDefinitionKey, formDeployments.get(0).getId());
+            }
+            
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
                         "' for parent deployment id " + parentDeploymentId, FormDefinitionEntity.class);
@@ -89,7 +98,14 @@ public class GetFormModelCmd implements Command<FormInfo>, Serializable {
 
         } else if (formDefinitionKey != null && tenantId != null && !FormEngineConfiguration.NO_TENANT_ID.equals(tenantId) && parentDeploymentId != null) {
 
-            formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyParentDeploymentIdAndTenantId(formDefinitionKey, parentDeploymentId, tenantId);
+            List<FormDeployment> formDeployments = deploymentManager.getDeploymentEntityManager().findDeploymentsByQueryCriteria(
+                            new FormDeploymentQueryImpl().parentDeploymentId(parentDeploymentId).deploymentTenantId(tenantId));
+            
+            if (formDeployments != null && formDeployments.size() > 0) {
+                formDefinitionEntity = deploymentManager.findDeployedLatestFormDefinitionByKeyDeploymentIdAndTenantId(
+                                formDefinitionKey, formDeployments.get(0).getId(), tenantId);
+            }
+            
             if (formDefinitionEntity == null) {
                 throw new FlowableObjectNotFoundException("No form definition found for key '" + formDefinitionKey +
                         " for parent deployment id '" + parentDeploymentId + "' and for tenant identifier " + tenantId, FormDefinitionEntity.class);

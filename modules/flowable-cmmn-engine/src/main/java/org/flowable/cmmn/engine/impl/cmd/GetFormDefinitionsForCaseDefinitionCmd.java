@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
@@ -30,6 +31,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
+import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
 
 /**
@@ -91,9 +93,23 @@ public class GetFormDefinitionsForCaseDefinitionCmd implements Command<List<Form
     }
 
     protected void addFormDefinitionToCollection(List<FormDefinition> formDefinitions, String formKey, CaseDefinition caseDefinition) {
-        FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
-        FormDefinition formDefinition = formDefinitionQuery.formDefinitionKey(formKey).parentDeploymentId(caseDefinition.getDeploymentId()).singleResult();
-
+        FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery().formDefinitionKey(formKey);
+        CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
+        if (deployment.getParentDeploymentId() != null) {
+            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
+            
+            if (formDeployments != null && formDeployments.size() > 0) {
+                formDefinitionQuery.deploymentId(formDeployments.get(0).getId());
+            } else {
+                formDefinitionQuery.latestVersion();
+            }
+            
+        } else {
+            formDefinitionQuery.latestVersion();
+        }
+        
+        FormDefinition formDefinition = formDefinitionQuery.singleResult();
+        
         if (formDefinition != null) {
             formDefinitions.add(formDefinition);
         }

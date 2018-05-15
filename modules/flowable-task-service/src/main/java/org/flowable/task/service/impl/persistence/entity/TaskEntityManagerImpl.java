@@ -76,6 +76,8 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         taskEntity.setFormKey(taskBuilder.getFormKey());
         taskEntity.setTaskDefinitionId(taskBuilder.getTaskDefinitionId());
         taskEntity.setTaskDefinitionKey(taskBuilder.getTaskDefinitionKey());
+        taskEntity.setScopeId(taskBuilder.getScopeId());
+        taskEntity.setScopeType(taskBuilder.getScopeType());
         insert(taskEntity);
 
         TaskEntity enrichedTaskEntity = this.taskServiceConfiguration.getTaskPostProcessor().enrich(taskEntity);

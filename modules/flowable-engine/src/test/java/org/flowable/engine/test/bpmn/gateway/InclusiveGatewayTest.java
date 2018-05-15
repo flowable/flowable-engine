@@ -595,7 +595,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
                 assertEquals(1, subs.size());
                 EventSubscription sub = subs.get(0);
-                assertEquals(sub.getEventName(), "test");
+                assertEquals("test", sub.getEventName());
 
                 return sub.getExecutionId();
             }

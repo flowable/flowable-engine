@@ -27,7 +27,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 public class NoOpServiceTask implements JavaDelegate {
 
     public static AtomicInteger CALL_COUNT = new AtomicInteger(0);
-    public static List<String> NAMES = Collections.synchronizedList(new ArrayList<String>());
+    public static List<String> NAMES = Collections.synchronizedList(new ArrayList<>());
 
     protected Expression name;
 

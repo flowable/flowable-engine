@@ -31,6 +31,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -91,12 +92,13 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         }
 
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
+        Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
 
         DmnRuleService ruleService = CommandContextUtil.getDmnRuleService();
 
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = ruleService.createExecuteDecisionBuilder()
                 .decisionKey(finaldecisionTableKeyValue)
-                .parentDeploymentId(processDefinition.getDeploymentId())
+                .parentDeploymentId(deployment.getParentDeploymentId())
                 .instanceId(execution.getProcessInstanceId())
                 .executionId(execution.getId())
                 .activityId(task.getId())

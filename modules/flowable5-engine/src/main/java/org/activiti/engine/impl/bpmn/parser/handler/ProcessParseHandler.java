@@ -66,7 +66,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
         currentProcessDefinition.setCategory(bpmnParse.getBpmnModel().getTargetNamespace());
         currentProcessDefinition.setDescription(process.getDocumentation());
         currentProcessDefinition.setProperty(PROPERTYNAME_DOCUMENTATION, process.getDocumentation()); // Kept for backwards compatibility. See ACT-1020
-        currentProcessDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
+        currentProcessDefinition.setTaskDefinitions(new HashMap<>());
         currentProcessDefinition.setDeploymentId(bpmnParse.getDeployment().getId());
         createEventListeners(bpmnParse, process.getEventListeners());
         createExecutionListenersOnScope(bpmnParse, process.getExecutionListeners(), currentProcessDefinition);

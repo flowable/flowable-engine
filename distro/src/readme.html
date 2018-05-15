@@ -26,9 +26,13 @@
 
 <h1>Flowable Release Notes</h1>
 
-<h3>Release Notes - Flowable - 6.3.0</h3>
+<h3>Release Notes - Flowable - 6.3.1</h3>
 
 <h4>GENERAL</h4>
+
+<h4>Upgrade notes</h4>
+
+<h5>StrongUuidGenerator usage with Spring Boot</h5>
 
 <p>The Spring Boot process auto configuration now uses the StrongUuidGenerator. In case you were overwriting the default one you can remove that.
 In case you want to keep using the DbIdGenerator, then just add the following bean to your configuration:
@@ -39,6 +43,31 @@ In case you want to keep using the DbIdGenerator, then just add the following be
     }
 </code></pre>
 The default values of the DbIdGenerator would be filled in during the creation of the Process Engine.
+
+<h5>IdmEngineConfigurator</h5>
+
+<p>
+    The default <code>IdmEngineConfigurator</code> and <code>SpringIdmEngineConfigurator</code> have been moved from <code>org.flowable.app.engine.impl.cfg</code>
+    and <code>org.flowable.spring.configurator</code> to <code>org.flowable.idm.engine.configurator</code> and <code>org.flowable.idm.spring.configurator</code>
+    respectively. In case you have used them please replace your imports.
+</p>
+
+<h5>Async history classes package change</h5>
+<p>
+    The async history classes have been moved from the process engine module to the job service, to make them available for other components. Generally, the packages now have <code>job.service</code> added to make this clear.
+    <ul>
+      <li>
+          Classes with regards to async history collection and execution (<code>AbstractAsyncHistoryJobHandler, AsyncHistoryJobHandler, AsyncHistoryListener, AsyncHistorySessionFactory, 
+          AsyncHistorySession, DefaultAsyncHistoryJobProducer, HistoryJsonTransformer</code>) in the <code>org.flowable.engine.impl.history.async</code> have been moved to the <code>org.flowable.job.service.impl.history.async</code> package.</li>
+      <li>
+          Classes related to executing async jobs using a message queue (most notably <code>AsyncHistoryJobMessageHandler and AsyncHistoryJobMessageReceiver</code>) have been moved from the 
+          <code>org.flowable.engine.impl.asyncexecutor.message</code> to the <code>org.flowable.job.service.impl.asyncexecutor.message</code> package.     
+      </li>
+      <li>
+          Similarly, for executing async history jobs using a message queue: the classes in the package <code>org.flowable.engine.impl.history.async.message</code> are now found in the <code>org.flowable.job.service.impl.history.async.message</code> package.
+      </li>
+    </ul>  
+    Updating the imports is sufficient when upgrading.
 </p>
 
 <h3>Release Notes - Flowable - 6.3.0</h3>

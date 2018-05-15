@@ -45,7 +45,7 @@ public class CmmnDeployer implements EngineDeployer {
                 LOGGER.info("CmmnDeployer: processing resource {}", resourceName);
                 if (cmmnDeploymentBuilder == null) {
                     CmmnRepositoryService cmmnRepositoryService = CommandContextUtil.getCmmnRepositoryService();
-                    cmmnDeploymentBuilder = cmmnRepositoryService.createDeployment();
+                    cmmnDeploymentBuilder = cmmnRepositoryService.createDeployment().name(deployment.getName());
                 }
                 cmmnDeploymentBuilder.addBytes(resourceName, resources.get(resourceName).getBytes());
             }

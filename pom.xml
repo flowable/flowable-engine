@@ -175,12 +175,12 @@
 			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-annotations</artifactId>
-				<version>1.5.16</version>
+				<version>1.5.19</version>
 			</dependency>
 			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-models</artifactId>
-				<version>1.5.16</version>
+				<version>1.5.19</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -235,6 +235,16 @@
 				<artifactId>flowable-json-converter</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-engine-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-spring-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-engine-common-api</artifactId>
@@ -286,10 +296,20 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-                	<groupId>org.flowable</groupId>
-                	<artifactId>flowable-idm-spring</artifactId>
-                	<version>${project.version}</version>
-        	    </dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-idm-engine-configurator</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+            	<groupId>org.flowable</groupId>
+            	<artifactId>flowable-idm-spring</artifactId>
+            	<version>${project.version}</version>
+    	    </dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-idm-spring-configurator</artifactId>
+				<version>${project.version}</version>
+			</dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-idm-rest</artifactId>
@@ -463,6 +483,16 @@
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-app-engine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-app-engine-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-app-engine-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -848,7 +878,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>24.0-jre</version>
+				<version>25.0-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
@@ -930,6 +960,7 @@
 		<module>modules/flowable-engine-common</module>
 		<module>modules/flowable-idm-api</module>
 		<module>modules/flowable-idm-engine</module>
+		<module>modules/flowable-idm-engine-configurator</module>
 		<module>modules/flowable-form-model</module>
 		<module>modules/flowable-form-api</module>
 		<module>modules/flowable-dmn-model</module>
@@ -969,7 +1000,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.20.1</version>
+				<version>2.21.0</version>
 				<configuration>
 					<failIfNoTests>false</failIfNoTests>
 					<trimStackTrace>false</trimStackTrace>
@@ -1121,6 +1152,10 @@
 				<module>modules/flowable-bpmn-layout</module>
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
+                <module>modules/flowable-engine-configurator</module>
+                <module>modules/flowable-spring-configurator</module>
+                <module>modules/flowable-app-engine-spring</module>
+                <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-json-converter</module>
 				<module>modules/flowable-dmn-xml-converter</module>
@@ -1153,7 +1188,9 @@
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-app-rest</module>
+				<module>modules/flowable-idm-engine-configurator</module>
 				<module>modules/flowable-idm-spring</module>
+				<module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable5-engine</module>
@@ -1233,7 +1270,9 @@
 				<module>modules/flowable-bpmn-layout</module>
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
+				<module>modules/flowable-idm-engine-configurator</module>
 				<module>modules/flowable-idm-spring</module>
+				<module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
                 <module>modules/flowable-ldap</module>
 				<module>modules/flowable-spring</module>
@@ -1243,6 +1282,10 @@
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-form-json-converter</module>
+                <module>modules/flowable-engine-configurator</module>
+                <module>modules/flowable-spring-configurator</module>
+                <module>modules/flowable-app-engine-spring</module>
+                <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-form-engine</module>
 				<module>modules/flowable-form-engine-configurator</module>
 				<module>modules/flowable-form-spring</module>
@@ -1326,8 +1369,12 @@
 				<module>modules/flowable-bpmn-layout</module>
 				<module>modules/flowable-json-converter</module>
                 <module>modules/flowable-spring-common</module>
+                <module>modules/flowable-engine-configurator</module>
+                <module>modules/flowable-spring-configurator</module>
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
+                <module>modules/flowable-app-engine-spring</module>
+                <module>modules/flowable-app-engine-rest</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-json-converter</module>
 				<module>modules/flowable-dmn-xml-converter</module>
@@ -1352,7 +1399,9 @@
 				<module>modules/flowable-form-spring</module>
 				<module>modules/flowable-form-spring-configurator</module>
 				<module>modules/flowable-form-rest</module>
+				<module>modules/flowable-idm-engine-configurator</module>
 				<module>modules/flowable-idm-spring</module>
+				<module>modules/flowable-idm-spring-configurator</module>
                 <module>modules/flowable-idm-rest</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>
@@ -1507,7 +1556,9 @@
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-bpmn-converter</module>
 				<module>modules/flowable-engine</module>
+				<module>modules/flowable-idm-engine-configurator</module>
 				<module>modules/flowable-idm-spring</module>
+				<module>modules/flowable-idm-spring-configurator</module>
 				<module>modules/flowable-spring</module>
 				<module>modules/flowable-common-rest</module>
 				<module>modules/flowable-rest</module>

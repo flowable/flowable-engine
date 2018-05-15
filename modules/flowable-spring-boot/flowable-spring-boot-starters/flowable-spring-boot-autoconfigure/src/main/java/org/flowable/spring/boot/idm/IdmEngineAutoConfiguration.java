@@ -12,25 +12,25 @@
  */
 package org.flowable.spring.boot.idm;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import javax.sql.DataSource;
 
-import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
-import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
+import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
+import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
+import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
-import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
-import org.flowable.spring.configurator.SpringIdmEngineConfigurator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -58,14 +58,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 })
 @AutoConfigureAfter({
     FlowableTransactionAutoConfiguration.class,
+    AppEngineAutoConfiguration.class,
+    ProcessEngineAutoConfiguration.class,
 })
 @AutoConfigureBefore({
-    ProcessEngineAutoConfiguration.class
+    AppEngineServicesAutoConfiguration.class,
+    ProcessEngineServicesAutoConfiguration.class
 })
 public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration {
 
     protected final FlowableIdmProperties idmProperties;
-    protected List<EngineConfigurationConfigurer<SpringIdmEngineConfiguration>> engineConfigurers = new ArrayList<>();
 
     public IdmEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableIdmProperties idmProperties) {
         super(flowableProperties);
@@ -108,14 +110,17 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
         configuration.setTransactionManager(platformTransactionManager);
         configureEngine(configuration, dataSource);
 
-        engineConfigurers.forEach(configurer -> configurer.configure(configuration));
-
         return configuration;
     }
 
     @Configuration
-    @ConditionalOnProcessEngine
-    public static class IdmEngineProcessConfiguration {
+    @ConditionalOnBean(type = {
+        "org.flowable.spring.SpringProcessEngineConfiguration"
+    })
+    @ConditionalOnMissingBean(type = {
+        "org.flowable.app.spring.SpringAppEngineConfiguration"
+    })
+    public static class IdmEngineProcessConfiguration extends BaseEngineConfigurationWithConfigurers<SpringIdmEngineConfiguration> {
 
         @Bean
         @ConditionalOnMissingBean(name = "idmProcessEngineConfigurationConfigurer")
@@ -127,16 +132,40 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
 
         @Bean
         @ConditionalOnMissingBean
-        public IdmEngineConfigurator idmEngineConfigurator(IdmEngineConfiguration configuration) {
+        public IdmEngineConfigurator idmEngineConfigurator(SpringIdmEngineConfiguration configuration) {
             SpringIdmEngineConfigurator idmEngineConfigurator = new SpringIdmEngineConfigurator();
             idmEngineConfigurator.setIdmEngineConfiguration(configuration);
+            
+            invokeConfigurers(configuration);
+            
             return idmEngineConfigurator;
         }
     }
+    
+    @Configuration
+    @ConditionalOnBean(type = {
+        "org.flowable.app.spring.SpringAppEngineConfiguration"
+    })
+    public static class IdmEngineAppConfiguration extends BaseEngineConfigurationWithConfigurers<SpringIdmEngineConfiguration> {
 
-    @Autowired(required = false)
-    public void setEngineConfigurers(List<EngineConfigurationConfigurer<SpringIdmEngineConfiguration>> engineConfigurers) {
-        this.engineConfigurers = engineConfigurers;
+        @Bean
+        @ConditionalOnMissingBean(name = "idmAppEngineConfigurationConfigurer")
+        public EngineConfigurationConfigurer<SpringAppEngineConfiguration> idmAppEngineConfigurationConfigurer(
+            IdmEngineConfigurator idmEngineConfigurator
+        ) {
+            return appEngineConfiguration -> appEngineConfiguration.setIdmEngineConfigurator(idmEngineConfigurator);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public IdmEngineConfigurator idmEngineConfigurator(SpringIdmEngineConfiguration configuration) {
+            SpringIdmEngineConfigurator idmEngineConfigurator = new SpringIdmEngineConfigurator();
+            idmEngineConfigurator.setIdmEngineConfiguration(configuration);
+            
+            invokeConfigurers(configuration);
+            
+            return idmEngineConfigurator;
+        }
     }
 }
 

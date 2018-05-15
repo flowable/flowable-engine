@@ -45,6 +45,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
@@ -61,7 +62,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
@@ -79,6 +79,7 @@ import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DefaultCandidateManager;
 import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
@@ -191,13 +192,31 @@ import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.DefaultHistoryTaskManager;
 import org.flowable.engine.impl.history.DefaultHistoryVariableManager;
 import org.flowable.engine.impl.history.HistoryManager;
-import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
-import org.flowable.engine.impl.history.async.AsyncHistoryJobZippedHandler;
-import org.flowable.engine.impl.history.async.AsyncHistoryListener;
 import org.flowable.engine.impl.history.async.AsyncHistoryManager;
-import org.flowable.engine.impl.history.async.AsyncHistorySession;
-import org.flowable.engine.impl.history.async.AsyncHistorySessionFactory;
-import org.flowable.engine.impl.history.async.DefaultAsyncHistoryJobProducer;
+import org.flowable.engine.impl.history.async.HistoryJsonConstants;
+import org.flowable.engine.impl.history.async.json.transformer.ActivityEndHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ActivityFullHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ActivityStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.FormPropertiesSubmittedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.HistoricDetailVariableUpdateHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceDeleteHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceEndHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePropertyChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.ProcessInstanceStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.SetProcessDefinitionHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.SubProcessInstanceStartHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.TaskOwnerChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChangedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.UpdateProcessDefinitionCascadeHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
 import org.flowable.engine.impl.interceptor.BpmnOverrideContextInterceptor;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
@@ -283,6 +302,7 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.HistoryJobProcessor;
@@ -301,6 +321,13 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.job.service.impl.history.async.AsyncHistoryJobHandler;
+import org.flowable.job.service.impl.history.async.AsyncHistoryJobZippedHandler;
+import org.flowable.job.service.impl.history.async.AsyncHistoryListener;
+import org.flowable.job.service.impl.history.async.AsyncHistorySession;
+import org.flowable.job.service.impl.history.async.AsyncHistorySessionFactory;
+import org.flowable.job.service.impl.history.async.DefaultAsyncHistoryJobProducer;
+import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
@@ -347,7 +374,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration implements ScriptingEngineAwareEngineConfiguration {
+public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration implements
+        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineConfigurationImpl.class);
 
@@ -429,7 +457,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Dynamic state manager
     
     protected DynamicStateManager dynamicStateManager;
-
+    
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
@@ -478,6 +506,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected Map<String, HistoryJobHandler> historyJobHandlers;
+    protected List<HistoryJsonTransformer> customHistoryJsonTransformers;
 
     // HELPERS //////////////////////////////////////////////////////////////////
     protected ProcessInstanceHelper processInstanceHelper;
@@ -712,7 +741,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected String wsSyncFactoryClassName = DEFAULT_WS_SYNC_FACTORY;
     protected XMLImporterFactory wsWsdlImporterFactory;
-    protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<QName, URL>();
+    protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<>();
 
     protected DelegateInterceptor delegateInterceptor;
 
@@ -983,6 +1012,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
+    @Override
     public void initMybatisTypeHandlers(Configuration configuration) {
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
@@ -1141,6 +1171,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // session factories ////////////////////////////////////////////////////////
 
+    @Override
     public void initSessionFactories() {
         if (sessionFactories == null) {
             sessionFactories = new HashMap<>();
@@ -1160,6 +1191,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
 
             commandContextFactory.setSessionFactories(sessionFactories);
+            
+        } else {
+            if (isAsyncHistoryEnabled) {
+                if (!sessionFactories.containsKey(AsyncHistorySession.class)) {
+                    initAsyncHistorySessionFactory();
+                }
+            }
+            
+            if (!sessionFactories.containsKey(FlowableEngineAgenda.class)) {
+                if (agendaFactory != null) {
+                    addSessionFactory(new AgendaSessionFactory(agendaFactory));
+                }
+            }
         }
 
         if (customSessionFactories != null) {
@@ -1186,6 +1230,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             initDefaultAsyncHistoryListener();
         }
         asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
+        asyncHistorySessionFactory.registerJobDataTypes(HistoryJsonConstants.ORDERED_TYPES);
         sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
     }
 
@@ -1729,14 +1774,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initHistoryJobHandlers() {
         if (isAsyncHistoryEnabled) {
             historyJobHandlers = new HashMap<>();
+            
+            List<HistoryJsonTransformer> allHistoryJsonTransformers = new ArrayList<>(initDefaultTransformers());
+            if (customHistoryJsonTransformers != null) {
+                allHistoryJsonTransformers.addAll(customHistoryJsonTransformers);
+            }
 
             AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
-            asyncHistoryJobHandler.initDefaultTransformers();
+            allHistoryJsonTransformers.forEach(asyncHistoryJobHandler::addHistoryJsonTransformer);
             asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
 
             AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler();
-            asyncHistoryJobZippedHandler.initDefaultTransformers();
+            allHistoryJsonTransformers.forEach(asyncHistoryJobZippedHandler::addHistoryJsonTransformer);
             asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
 
@@ -1746,6 +1796,39 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 }
             }
         }
+    }
+    
+    protected List<HistoryJsonTransformer> initDefaultTransformers() {
+        List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
+        historyJsonTransformers.add(new ProcessInstanceStartHistoryJsonTransformer());
+        historyJsonTransformers.add(new ProcessInstanceEndHistoryJsonTransformer());
+        historyJsonTransformers.add(new ProcessInstanceDeleteHistoryJsonTransformer());
+        historyJsonTransformers.add(new ProcessInstanceDeleteHistoryByProcessDefinitionIdJsonTransformer());
+        historyJsonTransformers.add(new ProcessInstancePropertyChangedHistoryJsonTransformer());
+        historyJsonTransformers.add(new SubProcessInstanceStartHistoryJsonTransformer());
+        historyJsonTransformers.add(new SetProcessDefinitionHistoryJsonTransformer());
+        historyJsonTransformers.add(new UpdateProcessDefinitionCascadeHistoryJsonTransformer());
+
+        historyJsonTransformers.add(new ActivityStartHistoryJsonTransformer());
+        historyJsonTransformers.add(new ActivityEndHistoryJsonTransformer());
+        historyJsonTransformers.add(new ActivityFullHistoryJsonTransformer());
+
+        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer());
+
+        historyJsonTransformers.add(new TaskPropertyChangedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskAssigneeChangedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskOwnerChangedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer());
+        historyJsonTransformers.add(new HistoricDetailVariableUpdateHistoryJsonTransformer());
+        historyJsonTransformers.add(new FormPropertiesSubmittedHistoryJsonTransformer());
+        return historyJsonTransformers;
     }
 
     // async executor
@@ -1845,6 +1928,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
             asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
         }
+        jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
+        jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
     }
 
     // history
@@ -2618,10 +2703,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
     }
 
+    @Override
     public ExpressionManager getExpressionManager() {
         return expressionManager;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
         return this;
@@ -2769,6 +2856,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.customHistoryJobHandlers = customHistoryJobHandlers;
         return this;
     }
+    
+    public List<HistoryJsonTransformer> getCustomHistoryJsonTransformers() {
+        return customHistoryJsonTransformers;
+    }
+
+    public ProcessEngineConfigurationImpl setCustomHistoryJsonTransformers(List<HistoryJsonTransformer> customHistoryJsonTransformers) {
+        this.customHistoryJsonTransformers = customHistoryJsonTransformers;
+        return this;
+    }
 
     public List<FormEngine> getCustomFormEngines() {
         return customFormEngines;
@@ -2866,12 +2962,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setBpmnParseFactory(BpmnParseFactory bpmnParseFactory) {
         this.bpmnParseFactory = bpmnParseFactory;
-        return this;
-    }
-
-    @Override
-    public ProcessEngineConfigurationImpl setBeans(Map<Object, Object> beans) {
-        this.beans = beans;
         return this;
     }
 

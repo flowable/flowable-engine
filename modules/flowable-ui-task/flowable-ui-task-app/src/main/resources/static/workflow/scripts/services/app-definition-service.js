@@ -35,15 +35,15 @@ angular.module('flowableApp').service('AppDefinitionService', ['$http', '$q', '$
          *
          * Updating this value will be reflected in the header, to make user aware of a change of context.
          */
-        this.setActiveDeploymentKey = function(deploymentKey) {
-            if (deploymentKey) {
-                if ($rootScope.appDefinitions[deploymentKey]) {
-                    $rootScope.activeAppDefinition = $rootScope.appDefinitions[deploymentKey];
+        this.setActiveAppDefinitionKey = function(appDefinitionKey) {
+            if (appDefinitionKey) {
+                if ($rootScope.appDefinitions[appDefinitionKey]) {
+                    $rootScope.activeAppDefinition = $rootScope.appDefinitions[appDefinitionKey];
                 } else {
                     // Add placeholder with ID only, and fetch the actual object
-                    $rootScope.activeAppDefinition = {id: deploymentKey};
-                    $rootScope.appDefinitions[deploymentKey] = $rootScope.activeAppDefinition
-                    this.getAppDefinition(deploymentKey).then(function(result) {
+                    $rootScope.activeAppDefinition = {id: appDefinitionKey};
+                    $rootScope.appDefinitions[appDefinitionKey] = $rootScope.activeAppDefinition
+                    this.getAppDefinition(appDefinitionKey).then(function(result) {
                         $rootScope.appDefinitions[result.id] = result;
 
                         // Also update the active definition, if the fetched definition id matches the active one
@@ -63,10 +63,10 @@ angular.module('flowableApp').service('AppDefinitionService', ['$http', '$q', '$
             }
         };
 
-        this.getAppDefinition = function (deploymentKey) {
+        this.getAppDefinition = function (appDefinitionKey) {
             return httpAsPromise({
                 method: 'GET',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/runtime/app-definitions/' + deploymentKey
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/runtime/app-definitions/' + appDefinitionKey
             });
         };
 

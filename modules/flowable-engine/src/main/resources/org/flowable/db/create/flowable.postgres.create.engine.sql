@@ -7,6 +7,7 @@ create table ACT_RE_DEPLOYMENT (
     DEPLOY_TIME_ timestamp,
     DERIVED_FROM_ varchar(64),
     DERIVED_FROM_ROOT_ varchar(64),
+    PARENT_DEPLOYMENT_ID_ varchar(255),
     ENGINE_VERSION_ varchar(255),
     primary key (ID_)
 );

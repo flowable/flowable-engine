@@ -15,4 +15,6 @@ package org.flowable.app.api.repository;
 public interface AppResourceConverter {
 
     AppModel convertAppResourceToModel(byte[] appResourceBytes);
+    
+    String convertAppModelToJson(AppModel appModel);
 }

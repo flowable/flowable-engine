@@ -116,7 +116,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryByEmptyDeploymentIds() {
         try {
-            cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<String>()).list();
+            cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>()).list();
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }
@@ -166,7 +166,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryByEmptyCaseDefinitionIds() {
         try {
-            cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<String>()).list();
+            cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionIds(new HashSet<>()).list();
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }

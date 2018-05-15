@@ -48,10 +48,9 @@ public class FormPropertiesSubmittedHistoryJsonTransformer extends AbstractHisto
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         HistoricDetailDataManager historicDetailDataManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricDetailDataManager();
-        
-        boolean hasMoreFormProperties = true;
+
         int counter = 1;
-        while (hasMoreFormProperties) {
+        while (true) {
             
             String propertyId = getStringFromJson(historicalData, HistoryJsonConstants.FORM_PROPERTY_ID + counter);
             if (StringUtils.isEmpty(propertyId)) {

@@ -47,7 +47,7 @@ public class OptionFormFieldTest extends AbstractFlowableFormTest {
         assertNull(optionFormField.getOptions());
         
         String expectedJson = "[{\"id\":\"opt0\",\"name\":\"Opt0\"},{\"id\":\"opt1\",\"name\":\"Opt1\"},{\"id\":\"opt2\",\"name\":\"Opt2\"}]";
-        List<Option> expectedOptions = new ArrayList<Option>();
+        List<Option> expectedOptions = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             Option option = new Option("Opt" + i);
             option.setId("opt" + i);

@@ -104,7 +104,7 @@ public class DbSqlSession implements Session {
 
         Class<? extends PersistentObject> clazz = persistentObject.getClass();
         if (!insertedObjects.containsKey(clazz)) {
-            insertedObjects.put(clazz, new ArrayList<PersistentObject>());
+            insertedObjects.put(clazz, new ArrayList<>());
         }
 
         insertedObjects.get(clazz).add(persistentObject);

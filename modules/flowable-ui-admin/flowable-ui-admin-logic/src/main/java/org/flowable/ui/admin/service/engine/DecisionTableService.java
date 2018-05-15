@@ -56,4 +56,8 @@ public class DecisionTableService {
         return clientUtil.executeRequest(get, serverConfig);
     }
 
+    public JsonNode getCaseDefinitionDecisionTables(ServerConfig serverConfig, String caseDefinitionId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "cmmn-repository/case-definitions/" + caseDefinitionId + "/decision-tables"));
+        return clientUtil.executeRequest(get, serverConfig);
+    }
 }

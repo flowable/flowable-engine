@@ -30,6 +30,7 @@ public class GetDeploymentResourceNamesCmd implements Command<List<String>> {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public List<String> execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");

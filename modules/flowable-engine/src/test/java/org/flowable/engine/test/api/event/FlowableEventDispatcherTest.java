@@ -17,7 +17,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
-import org.flowable.common.engine.impl.event.FlowableEventImpl;
+import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.delegate.event.BaseEntityEventListener;
 import org.flowable.engine.delegate.event.impl.FlowableEntityEventImpl;
@@ -205,7 +205,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         dispatcher.addEventListener(listener);
         dispatcher.addEventListener(secondListener);
 
-        FlowableEventImpl event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_CREATED);
+        FlowableEngineEventImpl event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_CREATED);
         try {
             dispatcher.dispatchEvent(event);
             assertEquals(1, secondListener.getEventsReceived().size());

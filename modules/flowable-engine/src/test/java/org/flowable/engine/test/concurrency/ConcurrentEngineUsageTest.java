@@ -46,7 +46,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
             int numberOfProcessesPerThread = 5;
             int totalNumberOfTasks = 2 * numberOfThreads * numberOfProcessesPerThread;
 
-            ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(numberOfThreads));
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(numberOfThreads));
 
             for (int i = 0; i < numberOfThreads; i++) {
                 executor.execute(new ConcurrentProcessRunnerRunnable(numberOfProcessesPerThread, "kermit" + i));

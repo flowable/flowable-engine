@@ -176,7 +176,7 @@ public class BpmnDeployer implements EngineDeployer {
     protected Map<ProcessDefinitionEntity, ProcessDefinitionEntity> getPreviousDerivedFromVersionsOfProcessDefinitions(
             ParsedDeployment parsedDeployment) {
 
-        Map<ProcessDefinitionEntity, ProcessDefinitionEntity> result = new LinkedHashMap<ProcessDefinitionEntity, ProcessDefinitionEntity>();
+        Map<ProcessDefinitionEntity, ProcessDefinitionEntity> result = new LinkedHashMap<>();
 
         for (ProcessDefinitionEntity newDefinition : parsedDeployment.getAllProcessDefinitions()) {
             ProcessDefinitionEntity existingDefinition = bpmnDeploymentHelper.getMostRecentDerivedVersionOfProcessDefinition(newDefinition);

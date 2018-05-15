@@ -36,6 +36,7 @@ import org.flowable.form.engine.impl.cmd.GetFormDefinitionCmd;
 import org.flowable.form.engine.impl.cmd.GetFormDefinitionResourceCmd;
 import org.flowable.form.engine.impl.cmd.GetFormModelCmd;
 import org.flowable.form.engine.impl.cmd.SetDeploymentCategoryCmd;
+import org.flowable.form.engine.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.form.engine.impl.cmd.SetDeploymentTenantIdCmd;
 import org.flowable.form.engine.impl.cmd.SetFormDefinitionCategoryCmd;
 import org.flowable.form.engine.impl.repository.FormDeploymentBuilderImpl;
@@ -96,6 +97,11 @@ public class FormRepositoryServiceImpl extends CommonEngineServiceImpl<FormEngin
     @Override
     public void setDeploymentTenantId(String deploymentId, String newTenantId) {
         commandExecutor.execute(new SetDeploymentTenantIdCmd(deploymentId, newTenantId));
+    }
+    
+    @Override
+    public void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId) {
+        commandExecutor.execute(new SetDeploymentParentDeploymentIdCmd(deploymentId, newParentDeploymentId));
     }
 
     @Override

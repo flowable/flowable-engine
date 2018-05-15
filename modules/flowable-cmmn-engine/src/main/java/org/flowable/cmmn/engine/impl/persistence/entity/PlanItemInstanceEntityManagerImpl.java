@@ -109,6 +109,7 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
         planItemInstanceDataManager.deleteByCaseInstanceId(caseInstanceId);
     }
     
+    @Override
     public PlanItemInstanceQuery createPlanItemInstanceQuery() {
         return new PlanItemInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }

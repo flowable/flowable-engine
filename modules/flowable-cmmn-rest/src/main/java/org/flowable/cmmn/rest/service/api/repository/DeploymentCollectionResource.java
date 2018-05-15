@@ -81,6 +81,9 @@ public class DeploymentCollectionResource {
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return deployments with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return deployments with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return deployments which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return deployments with the given parent deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentIdLike", dataType = "string", value = "Only return deployments with a parent deployment id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return deployments with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return deployments with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -105,6 +108,12 @@ public class DeploymentCollectionResource {
         }
         if (allRequestParams.containsKey("categoryNotEquals")) {
             deploymentQuery.deploymentCategoryNotEquals(allRequestParams.get("categoryNotEquals"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            deploymentQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentIdLike")) {
+            deploymentQuery.parentDeploymentIdLike(allRequestParams.get("parentDeploymentIdLike"));
         }
         if (allRequestParams.containsKey("tenantId")) {
             deploymentQuery.deploymentTenantId(allRequestParams.get("tenantId"));

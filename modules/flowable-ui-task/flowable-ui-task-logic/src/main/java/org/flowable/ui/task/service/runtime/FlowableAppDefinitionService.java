@@ -19,10 +19,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.api.repository.AppDefinition;
+import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.api.repository.BaseAppModel;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.app.AppModel;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.form.api.FormDeployment;
+import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.RemoteGroup;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
@@ -48,7 +57,19 @@ public class FlowableAppDefinitionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableAppDefinitionService.class);
 
     @Autowired
+    protected AppRepositoryService appRepositoryService;
+    
+    @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected CmmnRepositoryService cmmnRepositoryService;
+    
+    @Autowired
+    protected DmnRepositoryService dmnRepositoryService;
+    
+    @Autowired
+    protected FormRepositoryService formRepositoryService;
 
     @Autowired
     protected RemoteIdmService remoteIdmService;
@@ -65,29 +86,16 @@ public class FlowableAppDefinitionService {
         resultList.add(taskAppDefinitionRepresentation);
 
         // Custom apps
-        Map<String, Deployment> deploymentMap = new HashMap<>();
-        List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
-        for (Deployment deployment : deployments) {
-            if (deployment.getKey() != null) {
-                if (!deploymentMap.containsKey(deployment.getKey())) {
-                    deploymentMap.put(deployment.getKey(), deployment);
-                } else {
-                    Deployment compareDeployment = deploymentMap.get(deployment.getKey());
-                    if (deployment.getDerivedFrom() == null && compareDeployment.getDeploymentTime().before(deployment.getDeploymentTime())) {
-                        deploymentMap.put(deployment.getKey(), deployment);
-                    }
-                }
-            }
-        }
-
+        List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().latestVersion().list();
+        
         boolean appDefinitionHaveAccessControl = false;
-        for (Deployment deployment : deploymentMap.values()) {
-            AppDefinitionRepresentation appDefinition = createRepresentation(deployment);
-            if (CollectionUtils.isNotEmpty(appDefinition.getUsersAccess()) || CollectionUtils.isNotEmpty(appDefinition.getGroupsAccess())) {
+        for (AppDefinition appDefinition : appDefinitions) {
+            BaseAppModel baseAppModel = (BaseAppModel) appRepositoryService.getAppModel(appDefinition.getId());
+            if (StringUtils.isNotEmpty(baseAppModel.getUsersAccess()) || StringUtils.isNotEmpty(baseAppModel.getGroupsAccess())) {
                 appDefinitionHaveAccessControl = true;
             }
 
-            resultList.add(appDefinition);
+            resultList.add(createRepresentation(appDefinition, baseAppModel));
         }
 
         if (appDefinitionHaveAccessControl) {
@@ -109,14 +117,71 @@ public class FlowableAppDefinitionService {
         return result;
     }
 
-    public AppDefinitionRepresentation getAppDefinition(String deploymentKey) {
-        Deployment deployment = repositoryService.createDeploymentQuery().deploymentKey(deploymentKey).latest().singleResult();
+    public AppDefinitionRepresentation getAppDefinition(String appDefinitionKey) {
+        AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().appDefinitionKey(appDefinitionKey).latestVersion().singleResult();
 
-        if (deployment == null) {
-            throw new NotFoundException("No app definition is found with key: " + deploymentKey);
+        if (appDefinition == null) {
+            throw new NotFoundException("No app definition is found with key: " + appDefinitionKey);
         }
+        
+        BaseAppModel appModel = (BaseAppModel) appRepositoryService.getAppModel(appDefinition.getId());
 
-        return createRepresentation(deployment);
+        return createRepresentation(appDefinition, appModel);
+    }
+    
+    public String migrateAppDefinitions() {
+        List<Deployment> deployments = new ArrayList<>();
+        List<Deployment> processDeployments = repositoryService.createDeploymentQuery().orderByDeploymenTime().asc().list();
+        for (Deployment deployment : processDeployments) {
+            if (deployment.getKey() != null && deployment.getParentDeploymentId() == null) {
+                deployments.add(deployment);
+            }
+        }
+        
+        Map<String, String> deploymentIdMap = new HashMap<>();
+        for (Deployment deployment : deployments) {
+            List<String> resourceNames = repositoryService.getDeploymentResourceNames(deployment.getId());
+            String resourceAppName = null;
+            for (String resourceName : resourceNames) {
+                if (resourceName != null && resourceName.endsWith(".app")) {
+                    resourceAppName = resourceName;
+                    break;
+                }
+            }
+            
+            if (resourceAppName != null) {
+                AppDeployment appDeployment = appRepositoryService.createDeployment().addInputStream(resourceAppName, 
+                            repositoryService.getResourceAsStream(deployment.getId(), resourceAppName)).deploy();
+                deploymentIdMap.put(deployment.getId(), appDeployment.getId());
+            }
+        }
+        
+        for (String oldDeploymentId : deploymentIdMap.keySet()) {
+            List<CmmnDeployment> cmmnDeployments = cmmnRepositoryService.createDeploymentQuery().parentDeploymentId(oldDeploymentId).list();
+            if (cmmnDeployments != null) {
+                for (CmmnDeployment cmmnDeployment : cmmnDeployments) {
+                    cmmnRepositoryService.changeDeploymentParentDeploymentId(cmmnDeployment.getId(), deploymentIdMap.get(oldDeploymentId));
+                }
+            }
+            
+            List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(oldDeploymentId).list();
+            if (dmnDeployments != null) {
+                for (DmnDeployment dmnDeployment : dmnDeployments) {
+                    dmnRepositoryService.changeDeploymentParentDeploymentId(dmnDeployment.getId(), deploymentIdMap.get(oldDeploymentId));
+                }
+            }
+            
+            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().parentDeploymentId(oldDeploymentId).list();
+            if (formDeployments != null) {
+                for (FormDeployment formDeployment : formDeployments) {
+                    formRepositoryService.changeDeploymentParentDeploymentId(formDeployment.getId(), deploymentIdMap.get(oldDeploymentId));
+                }
+            }
+            
+            repositoryService.changeDeploymentParentDeploymentId(oldDeploymentId, deploymentIdMap.get(oldDeploymentId));
+        }
+        
+        return "Migrated " + deploymentIdMap.size() + " app deployments";
     }
 
     protected List<RemoteGroup> getUserGroups(String userId) {
@@ -152,21 +217,21 @@ public class FlowableAppDefinitionService {
         return app;
     }
 
-    protected AppDefinitionRepresentation createRepresentation(Deployment deployment) {
+    protected AppDefinitionRepresentation createRepresentation(AppDefinition appDefinition, BaseAppModel baseAppModel) {
         AppDefinitionRepresentation resultAppDef = new AppDefinitionRepresentation();
-        resultAppDef.setDeploymentId(deployment.getId());
-        resultAppDef.setDeploymentKey(deployment.getKey());
-        resultAppDef.setName(deployment.getName());
-        AppModel appModel = repositoryService.getAppResourceModel(deployment.getId());
-        resultAppDef.setTheme(appModel.getTheme());
-        resultAppDef.setIcon(appModel.getIcon());
-        resultAppDef.setDescription(appModel.getDescription());
-        if (StringUtils.isNotEmpty(appModel.getUsersAccess())) {
-            resultAppDef.setUsersAccess(convertToList(appModel.getUsersAccess()));
+        resultAppDef.setAppDefinitionId(appDefinition.getId());
+        resultAppDef.setAppDefinitionKey(appDefinition.getKey());
+        resultAppDef.setName(appDefinition.getName());
+        resultAppDef.setTheme(baseAppModel.getTheme());
+        resultAppDef.setIcon(baseAppModel.getIcon());
+        resultAppDef.setDescription(baseAppModel.getDescription());
+        resultAppDef.setTenantId(appDefinition.getTenantId());
+        if (StringUtils.isNotEmpty(baseAppModel.getUsersAccess())) {
+            resultAppDef.setUsersAccess(convertToList(baseAppModel.getUsersAccess()));
         }
 
-        if (StringUtils.isNotEmpty(appModel.getGroupsAccess())) {
-            resultAppDef.setGroupsAccess(convertToList(appModel.getGroupsAccess()));
+        if (StringUtils.isNotEmpty(baseAppModel.getGroupsAccess())) {
+            resultAppDef.setGroupsAccess(convertToList(baseAppModel.getGroupsAccess()));
         }
 
         return resultAppDef;

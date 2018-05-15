@@ -215,7 +215,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         assertEquals(6, formProperties.size());
 
         try {
-            formService.submitTaskFormData(taskId, new HashMap<String, String>());
+            formService.submitTaskFormData(taskId, new HashMap<>());
             fail("expected exception about required form property 'street'");
         } catch (FlowableException e) {
             // OK

@@ -31,7 +31,6 @@ import org.flowable.app.api.repository.AppResourceConverter;
 import org.flowable.app.engine.impl.AppEngineImpl;
 import org.flowable.app.engine.impl.AppManagementServiceImpl;
 import org.flowable.app.engine.impl.AppRepositoryServiceImpl;
-import org.flowable.app.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.app.engine.impl.cfg.StandaloneInMemAppEngineConfiguration;
 import org.flowable.app.engine.impl.db.AppDbSchemaManager;
 import org.flowable.app.engine.impl.db.EntityDependencyOrder;
@@ -58,6 +57,7 @@ import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCache
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
@@ -75,6 +75,7 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -102,7 +103,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AppEngineConfiguration extends AbstractEngineConfiguration implements AppEngineConfigurationApi {
+public class AppEngineConfiguration extends AbstractEngineConfiguration implements
+        AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(AppEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
@@ -687,10 +689,12 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         this.executeServiceDbSchemaManagers = executeServiceDbSchemaManagers;
     }
 
+    @Override
     public ExpressionManager getExpressionManager() {
         return expressionManager;
     }
 
+    @Override
     public AppEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
         return this;

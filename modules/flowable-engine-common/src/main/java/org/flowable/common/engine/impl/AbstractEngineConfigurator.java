@@ -12,6 +12,19 @@
  */
 package org.flowable.common.engine.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.ibatis.type.TypeAliasRegistry;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
@@ -21,16 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Convenience class for external engines (IDM/DMN/Form/...) to work together with the process engine
@@ -51,7 +54,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (typeAliasConfigs != null) {
             for (MybatisTypeAliasConfigurator customMybatisTypeAliasConfig : typeAliasConfigs) {
                 if (engineConfiguration.getDependentEngineMybatisTypeAliasConfigs() == null) {
-                    engineConfiguration.setDependentEngineMybatisTypeAliasConfigs(new ArrayList<MybatisTypeAliasConfigurator>());
+                    engineConfiguration.setDependentEngineMybatisTypeAliasConfigs(new ArrayList<>());
                 }
                 engineConfiguration.getDependentEngineMybatisTypeAliasConfigs().add(customMybatisTypeAliasConfig);
             }
@@ -61,7 +64,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (typeHandlerConfigs != null) {
             for (MybatisTypeHandlerConfigurator typeHandler : typeHandlerConfigs) {
                 if (engineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() == null) {
-                    engineConfiguration.setDependentEngineMybatisTypeHandlerConfigs(new ArrayList<MybatisTypeHandlerConfigurator>());
+                    engineConfiguration.setDependentEngineMybatisTypeHandlerConfigs(new ArrayList<>());
                 }
                 engineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() .add(typeHandler);
             }
@@ -72,7 +75,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         List<EngineDeployer> deployers = getCustomDeployers();
         if (deployers != null) {
             if (engineConfiguration.getCustomPostDeployers() == null) {
-                engineConfiguration.setCustomPostDeployers(new ArrayList<EngineDeployer>());
+                engineConfiguration.setCustomPostDeployers(new ArrayList<>());
             }
             engineConfiguration.getCustomPostDeployers().addAll(deployers);
         }
@@ -96,19 +99,76 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
                 classLoader = this.getClass().getClassLoader();
             }
 
+            List<MybatisTypeAliasConfigurator> typeAliasConfigurators = new ArrayList<>();
+            List<MybatisTypeHandlerConfigurator> typeHandlerConfigurators = new ArrayList<>();
             try (InputStream inputStream = classLoader.getResourceAsStream(cfgPath)) {
                 DocumentBuilderFactory docBuilderFactory = createDocumentBuilderFactory();
                 DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
                 Document document = docBuilder.parse(inputStream);
+                
+                NodeList typeAliasList = document.getElementsByTagName("typeAlias");
+                for (int i = 0; i < typeAliasList.getLength(); i++) {
+                    Node node = typeAliasList.item(i);
+                    MybatisTypeAliasConfigurator typeAlias = new MybatisTypeAliasConfigurator() {
+                        @Override
+                        public void configure(TypeAliasRegistry typeAliasRegistry) {
+                            try {
+                                typeAliasRegistry.registerAlias(node.getAttributes().getNamedItem("alias").getTextContent(), 
+                                                Class.forName(node.getAttributes().getNamedItem("type").getTextContent()));
+                            } catch (Exception e) {
+                                throw new FlowableException("Failed to load type alias class", e);
+                            }
+                        }
+                    };
+                    typeAliasConfigurators.add(typeAlias);
+                    
+                }
+                
+                NodeList typeHandlerList = document.getElementsByTagName("tagHandler");
+                for (int i = 0; i < typeHandlerList.getLength(); i++) {
+                    Node node = typeHandlerList.item(i);
+                    MybatisTypeHandlerConfigurator typeHandler = new MybatisTypeHandlerConfigurator() {
+                        @Override
+                        public void configure(TypeHandlerRegistry typeHandlerRegistry) {
+                            try {
+                                typeHandlerRegistry.register(node.getAttributes().getNamedItem("javaType").getTextContent(),
+                                                node.getAttributes().getNamedItem("handler").getTextContent());
+                            } catch (Exception e) {
+                                throw new FlowableException("Failed to load type handler class", e);
+                            }
+                        }
+                    };
+                    typeHandlerConfigurators.add(typeHandler);
+                }
+                
                 NodeList nodeList = document.getElementsByTagName("mapper");
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Node node = nodeList.item(i);
                     resources.add(node.getAttributes().getNamedItem("resource").getTextContent());
                 }
+                
             } catch (IOException e) {
                 throw new FlowableException("Could not read IDM Mybatis configuration file", e);
             } catch (ParserConfigurationException | SAXException e) {
                 throw new FlowableException("Could not parse Mybatis configuration file", e);
+            }
+            
+            if (typeAliasConfigurators.size() > 0) {
+                if (engineConfiguration.getDependentEngineMybatisTypeAliasConfigs() == null) {
+                    engineConfiguration.setDependentEngineMybatisTypeAliasConfigs(typeAliasConfigurators);
+                    
+                } else {
+                    engineConfiguration.getDependentEngineMybatisTypeAliasConfigs().addAll(typeAliasConfigurators);
+                }
+            }
+            
+            if (typeHandlerConfigurators.size() > 0) {
+                if (engineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() == null) {
+                    engineConfiguration.setDependentEngineMybatisTypeHandlerConfigs(typeHandlerConfigurators);
+                    
+                } else {
+                    engineConfiguration.getDependentEngineMybatisTypeHandlerConfigs().addAll(typeHandlerConfigurators);
+                }
             }
 
             if (engineConfiguration.getCustomMybatisXMLMappers() == null) {

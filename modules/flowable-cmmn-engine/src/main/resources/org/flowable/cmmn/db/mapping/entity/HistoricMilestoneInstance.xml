@@ -70,9 +70,10 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="timeStamp" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
   <select id="selectHistoricMilestone" parameterType="string" resultMap="historicMileStoneInstanceResultMap">
@@ -95,6 +96,9 @@
   <sql id="selectHistoricMilestoneInstancesByQueryCriteriaSql">
     from ${prefix}ACT_CMMN_HI_MIL_INST RES
     <where>
+        <if test="id != null">
+            RES.ID_ = #{id}
+        </if>
         <if test="name != null">
             RES.NAME_ = #{name}
         </if>
@@ -108,7 +112,7 @@
             and RES.TIME_STAMP_ &lt;= #{reachedBefore}
         </if>
         <if test="reachedAfter != null">
-            and RES.TIME_STAMP_ &gt;= #{"reachedAfter != null"}
+            and RES.TIME_STAMP_ &gt;= #{reachedAfter}
         </if>
     </where>
   </sql>

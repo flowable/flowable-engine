@@ -14,8 +14,8 @@ package org.flowable.ui.task.service.runtime;
 
 import java.util.List;
 
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.repository.Deployment;
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.ui.task.service.api.DeploymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,15 +30,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class DeploymentServiceImpl implements DeploymentService {
 
     @Autowired
-    protected RepositoryService repositoryService;
+    protected AppRepositoryService appRepositoryService;
 
     @Override
-    public void deleteAppDefinition(Long appDefinitionId) {
-        // First test if deployment is still there, otherwise the transaction will be rolled back
-        List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(String.valueOf(appDefinitionId)).list();
-        if (deployments != null) {
-            for (Deployment deployment : deployments) {
-                repositoryService.deleteDeployment(deployment.getId(), true);
+    public void deleteAppDefinition(String appDefinitionKey) {
+        List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().appDefinitionKey(appDefinitionKey).list();
+        if (appDefinitions != null) {
+            for (AppDefinition appDefinition : appDefinitions) {
+                appRepositoryService.deleteDeployment(appDefinition.getDeploymentId(), true);
             }
         }
     }

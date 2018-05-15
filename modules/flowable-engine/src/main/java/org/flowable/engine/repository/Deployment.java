@@ -30,4 +30,5 @@ import org.flowable.common.engine.api.repository.EngineDeployment;
  */
 public interface Deployment extends EngineDeployment {
 
+    String getParentDeploymentId();
 }

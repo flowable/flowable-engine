@@ -36,6 +36,7 @@ import org.flowable.dmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDmnDefinitionCmd;
 import org.flowable.dmn.engine.impl.cmd.SetDecisionTableCategoryCmd;
 import org.flowable.dmn.engine.impl.cmd.SetDeploymentCategoryCmd;
+import org.flowable.dmn.engine.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.dmn.engine.impl.cmd.SetDeploymentTenantIdCmd;
 import org.flowable.dmn.engine.impl.repository.DmnDeploymentBuilderImpl;
 import org.flowable.dmn.model.DmnDefinition;
@@ -92,6 +93,11 @@ public class DmnRepositoryServiceImpl extends CommonEngineServiceImpl<DmnEngineC
     @Override
     public void setDeploymentTenantId(String deploymentId, String newTenantId) {
         commandExecutor.execute(new SetDeploymentTenantIdCmd(deploymentId, newTenantId));
+    }
+    
+    @Override
+    public void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId) {
+        commandExecutor.execute(new SetDeploymentParentDeploymentIdCmd(deploymentId, newParentDeploymentId));
     }
 
     @Override

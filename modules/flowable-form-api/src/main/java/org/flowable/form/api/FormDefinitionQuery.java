@@ -66,16 +66,6 @@ public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefi
     FormDefinitionQuery deploymentIds(Set<String> deploymentIds);
 
     /**
-     * Only select forms that have the given parent deployment id
-     */
-    FormDefinitionQuery parentDeploymentId(String parentDeploymentId);
-
-    /**
-     * Only select forms that have a parent deployment id like the given parameter
-     */
-    FormDefinitionQuery parentDeploymentIdLike(String parentDeploymentIdLike);
-
-    /**
      * Only select form with the given key.
      */
     FormDefinitionQuery formDefinitionKey(String formDefinitionKey);

@@ -25,6 +25,7 @@ public class CallActivity extends Activity {
     protected boolean sameDeployment;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
+    protected String processInstanceName;
     protected String businessKey;
     protected boolean inheritBusinessKey;
     protected boolean useLocalScopeForOutParameters;
@@ -67,6 +68,14 @@ public class CallActivity extends Activity {
 
     public void setOutParameters(List<IOParameter> outParameters) {
         this.outParameters = outParameters;
+    }
+    
+    public String getProcessInstanceName() {
+        return processInstanceName;
+    }
+
+    public void setProcessInstanceName(String processInstanceName) {
+        this.processInstanceName = processInstanceName;
     }
 
     public String getBusinessKey() {

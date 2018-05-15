@@ -60,6 +60,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDynamicStateManager.class);
     
+    @Override
     public ExecutionEntity resolveActiveExecution(String executionId, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity execution = executionEntityManager.findById(executionId);
@@ -75,6 +76,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         return execution;
     }
     
+    @Override
     public ExecutionEntity resolveActiveExecution(String processInstanceId, String activityId, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity processExecution = executionEntityManager.findById(processInstanceId);
@@ -96,8 +98,9 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         return execution;
     }
     
-    public void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, 
-                    Map<String, Map<String, Object>> localVariables, CommandContext commandContext) {
+    @Override
+    public void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables,
+                                   Map<String, Map<String, Object>> localVariables, CommandContext commandContext) {
         
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         

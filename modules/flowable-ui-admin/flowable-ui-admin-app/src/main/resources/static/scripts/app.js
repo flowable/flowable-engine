@@ -39,6 +39,11 @@ flowableAdminApp
                     controller: 'CmmnDeploymentsController',
                     reloadOnSearch: true
                 })
+                .when('/app-engine', {
+                    templateUrl: 'views/app-deployments.html',
+                    controller: 'AppDeploymentsController',
+                    reloadOnSearch: true
+                })
                 .when('/form-engine', {
                     templateUrl: 'views/form-deployments.html',
                     controller: 'FormDeploymentsController',
@@ -183,6 +188,26 @@ flowableAdminApp
                 .when('/cmmn-job/:jobId', {
                     templateUrl: 'views/cmmn-job.html',
                     controller: 'CmmnJobController',
+                    reloadOnSearch: true
+                })
+                .when('/app-deployments', {
+                    templateUrl: 'views/app-deployments.html',
+                    controller: 'AppDeploymentsController',
+                    reloadOnSearch: true
+                })
+                .when('/app-deployment/:deploymentId', {
+                    templateUrl: 'views/app-deployment.html',
+                    controller: 'AppDeploymentController',
+                    reloadOnSearch: true
+                })
+                .when('/app-definitions', {
+                    templateUrl: 'views/app-definitions.html',
+                    controller: 'AppDefinitionsController',
+                    reloadOnSearch: true
+                })
+                .when('/app-definition/:definitionId', {
+                    templateUrl: 'views/app-definition.html',
+                    controller: 'AppDefinitionController',
                     reloadOnSearch: true
                 })
                 .when('/decision-table-deployments', {
@@ -415,6 +440,8 @@ flowableAdminApp
                                     $rootScope.activeServers['content'] = data[i];
                                 } else if (data[i].endpointType === 5) {
                                     $rootScope.activeServers['cmmn'] = data[i];
+                                } else if (data[i].endpointType === 6) {
+                                    $rootScope.activeServers['app'] = data[i];
                                 } else {
                                     console.log('Warning! Invalid endpoint type received: '+data[i].endpointType);
                                 }

@@ -22,6 +22,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
 import org.flowable.common.engine.impl.javax.el.BeanELResolver;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.CouldNotResolvePropertyELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
@@ -102,6 +103,7 @@ public class DefaultExpressionManager implements ExpressionManager {
         for (ELResolver elResolver : elResolvers) {
             compositeELResolver.add(elResolver);
         }
+        compositeELResolver.add(new CouldNotResolvePropertyELResolver());
         return compositeELResolver;
     }
     

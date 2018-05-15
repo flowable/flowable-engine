@@ -14,16 +14,12 @@ package org.flowable.cmmn.test.task;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
 import java.io.Serializable;
-
 import java.util.List;
 import java.util.Map;
 

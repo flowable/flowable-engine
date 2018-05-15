@@ -154,34 +154,42 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         this.processDefinitionId = processDefinitionId;
     }
     
+    @Override
     public String getScopeId() {
         return scopeId;
     }
 
+    @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
     }
 
+    @Override
     public String getSubScopeId() {
         return subScopeId;
     }
 
+    @Override
     public void setSubScopeId(String subScopeId) {
         this.subScopeId = subScopeId;
     }
 
+    @Override
     public String getScopeType() {
         return scopeType;
     }
 
+    @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
     }
 
+    @Override
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
     }
 
+    @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
     }

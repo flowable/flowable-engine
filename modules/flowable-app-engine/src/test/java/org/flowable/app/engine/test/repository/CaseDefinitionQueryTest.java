@@ -131,7 +131,7 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
     @Test
     public void testQueryByEmptyDeploymentIds() {
         try {
-            appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<String>()).list();
+            appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>()).list();
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }
@@ -177,7 +177,7 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
     @Test
     public void testQueryByEmptyAppDefinitionIds() {
         try {
-            appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<String>()).list();
+            appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>()).list();
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }

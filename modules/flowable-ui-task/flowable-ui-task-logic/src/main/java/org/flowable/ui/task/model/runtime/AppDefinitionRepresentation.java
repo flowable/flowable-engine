@@ -21,12 +21,11 @@ public class AppDefinitionRepresentation extends AbstractRepresentation {
     protected String defaultAppId;
     protected String name;
     protected String description;
-    protected Long modelId;
     protected String theme;
     protected String icon;
-    protected String deploymentId;
-    protected String deploymentKey;
-    protected Long tenantId;
+    protected String appDefinitionId;
+    protected String appDefinitionKey;
+    protected String tenantId;
     protected List<String> usersAccess;
     protected List<String> groupsAccess;
 
@@ -60,14 +59,6 @@ public class AppDefinitionRepresentation extends AbstractRepresentation {
         this.description = description;
     }
 
-    public Long getModelId() {
-        return modelId;
-    }
-
-    public void setModelId(Long modelId) {
-        this.modelId = modelId;
-    }
-
     public String getTheme() {
         return theme;
     }
@@ -84,27 +75,27 @@ public class AppDefinitionRepresentation extends AbstractRepresentation {
         this.icon = icon;
     }
 
-    public String getDeploymentId() {
-        return deploymentId;
+    public String getAppDefinitionId() {
+        return appDefinitionId;
     }
 
-    public void setDeploymentId(String deploymentId) {
-        this.deploymentId = deploymentId;
+    public void setAppDefinitionId(String appDefinitionId) {
+        this.appDefinitionId = appDefinitionId;
     }
 
-    public String getDeploymentKey() {
-        return deploymentKey;
+    public String getAppDefinitionKey() {
+        return appDefinitionKey;
     }
 
-    public void setDeploymentKey(String deploymentKey) {
-        this.deploymentKey = deploymentKey;
+    public void setAppDefinitionKey(String appDefinitionKey) {
+        this.appDefinitionKey = appDefinitionKey;
     }
 
-    public Long getTenantId() {
+    public String getTenantId() {
         return tenantId;
     }
 
-    public void setTenantId(Long tenantId) {
+    public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 

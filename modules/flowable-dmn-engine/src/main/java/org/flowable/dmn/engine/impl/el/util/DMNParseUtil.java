@@ -154,7 +154,7 @@ public class DMNParseUtil {
                 returnValue = Double.valueOf(value);
             }
         } catch (NumberFormatException nfe) {
-            LOGGER.warn("Could not parse to Integer, Long, Float or Double from: " + value);
+            LOGGER.warn("Could not parse to Integer, Long, Float or Double from: {}", value);
         }
 
         return returnValue;
@@ -167,7 +167,7 @@ public class DMNParseUtil {
             try {
                 return Double.parseDouble(value);
             } catch (NumberFormatException nfe2) {
-                LOGGER.warn("Could not parse to Long or Double from: " + value);
+                LOGGER.warn("Could not parse to Long or Double from: {}", value);
                 return null;
             }
         }

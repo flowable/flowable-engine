@@ -36,6 +36,12 @@ public class FlowableProperties {
      * Whether the async executor should be activated.
      */
     private boolean asyncExecutorActivate = true;
+    
+    /**
+     * Whether the async history executor should be activated.
+     */
+    private boolean asyncHistoryExecutorActivate = true;
+    
     private boolean restApiEnabled;
 
     /**
@@ -95,6 +101,14 @@ public class FlowableProperties {
 
     public void setAsyncExecutorActivate(boolean asyncExecutorActivate) {
         this.asyncExecutorActivate = asyncExecutorActivate;
+    }
+    
+    public boolean isAsyncHistoryExecutorActivate() {
+        return asyncHistoryExecutorActivate;
+    }
+
+    public void setAsyncHistoryExecutorActivate(boolean asyncHistoryExecutorActivate) {
+        this.asyncHistoryExecutorActivate = asyncHistoryExecutorActivate;
     }
 
     public boolean isRestApiEnabled() {

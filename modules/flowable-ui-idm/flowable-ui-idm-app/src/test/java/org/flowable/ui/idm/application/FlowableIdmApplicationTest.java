@@ -36,10 +36,18 @@ public class FlowableIdmApplicationTest {
     public void contextShouldLoadPropertiesInACorrectOrder() {
         assertThat(environment.getPropertySources())
             .extracting(PropertySource::getName)
-            .containsSubsequence(
+            .containsExactly(
+                "configurationProperties",
+                "Inlined Test Properties",
+                "systemProperties",
+                "systemEnvironment",
+                "random",
                 "class path resource [META-INF/flowable-ui-app/flowable-ui-app.properties]",
                 "class path resource [flowable-ui-app.properties]",
-                "applicationConfig: [classpath:/application.properties]"
+                "applicationConfig: [classpath:/application.properties]",
+                "flowableDefaultConfig: [classpath:/flowable-default.properties]",
+                "flowable-liquibase-override",
+                "Management Server"
             );
     }
 }

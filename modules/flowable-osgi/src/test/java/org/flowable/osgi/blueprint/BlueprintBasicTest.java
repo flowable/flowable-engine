@@ -93,6 +93,7 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.flowable").artifactId("flowable-dmn-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-idm-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-idm-engine").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-idm-engine-configurator").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-content-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-variable-service-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-variable-service").version(FLOWABLE_VERSION),

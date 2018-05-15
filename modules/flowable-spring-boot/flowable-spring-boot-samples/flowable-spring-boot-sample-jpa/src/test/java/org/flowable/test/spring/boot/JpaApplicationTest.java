@@ -34,10 +34,14 @@ public class JpaApplicationTest {
     @Autowired
     private SpringProcessEngineConfiguration processEngineConfiguration;
 
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+
     @Test
     public void usesJpaEntityManager() {
         assertThat(processEngineConfiguration.getJpaEntityManagerFactory())
             .as("Process engine configuration jpa entity manager factory")
+            .isEqualTo(entityManagerFactory)
             .isInstanceOf(EntityManagerFactory.class);
     }
 }

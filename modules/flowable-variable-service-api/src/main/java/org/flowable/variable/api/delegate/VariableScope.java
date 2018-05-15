@@ -164,12 +164,14 @@ public interface VariableScope extends VariableContainer {
     Set<String> getVariableNamesLocal();
 
     /**
-     * Sets the variable with the provided name to the provided value.
+     * Sets the variable with the provided name to the provided value. In the case when variable name is an expression
+     * which is resolved by expression manager, the value is set in the object resolved from the expression.
      * 
      * <p>
      * A variable is set according to the following algorithm:
      * 
      * <p>
+     * <li>If variable name is an expression, resolve expression and set the value on the resolved object.</li>
      * <li>If this scope already contains a variable by the provided name as a <strong>local</strong> variable, its value is overwritten to the provided value.</li>
      * <li>If this scope does <strong>not</strong> contain a variable by the provided name as a local variable, the variable is set to this scope's parent scope, if there is one. If there is no parent
      * scope (meaning this scope is the root scope of the hierarchy it belongs to), this scope is used. This applies recursively up the parent scope chain until, if no scope contains a local variable
@@ -187,6 +189,7 @@ public interface VariableScope extends VariableContainer {
 
     /**
      * Similar to {@link #setVariable(String, Object)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
+     * Variable name expression is not resolved.
      * 
      * The variable will be put on the highest possible scope. For an execution this is the process instance execution. If this is not wanted, use the {@link #setVariableLocal(String, Object)} method
      * instead.
@@ -197,7 +200,8 @@ public interface VariableScope extends VariableContainer {
     void setVariable(String variableName, Object value, boolean fetchAllVariables);
 
     /**
-     * Similar to {@link #setVariable(String, Object)}, but the variable is set to this scope specifically.
+     * Similar to {@link #setVariable(String, Object)}, but the variable is set to this scope specifically. Variable name
+     is handled as a variable name string without resolving an expression.
      */
     Object setVariableLocal(String variableName, Object value);
 
@@ -279,6 +283,7 @@ public interface VariableScope extends VariableContainer {
      * - no history is kept for the variable - the variable is only available until a waitstate is reached in the process - transient variables 'shadow' persistent variable (when getVariable('abc')
      * where 'abc' is both persistent and transient, the transient value is returned.
      */
+    @Override
     void setTransientVariable(String variableName, Object variableValue);
 
     /**

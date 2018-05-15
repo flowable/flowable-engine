@@ -32,6 +32,7 @@ import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetFormDefinitionsForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseDefinitionCategoryCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -107,6 +108,11 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public void setCaseDefinitionCategory(String caseDefinitionId, String category) {
         commandExecutor.execute(new SetCaseDefinitionCategoryCmd(caseDefinitionId, category));
+    }
+    
+    @Override
+    public void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId) {
+        commandExecutor.execute(new SetDeploymentParentDeploymentIdCmd(deploymentId, newParentDeploymentId));
     }
     
     @Override

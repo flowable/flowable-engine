@@ -8,7 +8,7 @@
                         <div class="btn-group btn-group-sm">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                                     translate="GENERAL.ACTION.SHOW-RESULTS" translate-value-size="{{'GENERAL.RESULT-SIZES.' + filter.resultSize | translate}}">
-								&nbsp;
+                                &nbsp;
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu">
@@ -21,7 +21,7 @@
                     </div>
                     <div class="btn-group btn-group-sm pull-right">
                     	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                                translate="GENERAL.ACTION.SORT-BY" translate-value-sort="{{filter.sort.name | translate}}">
+                                translate="GENERAL.ACTION.SHOW-RESULTS" translate-value-size="{{'GENERAL.RESULT-SIZES.' + filter.resultSize | translate}}">
 						    &nbsp;
                             <span class="caret"></span>
                         </button>
@@ -42,20 +42,20 @@
                     <h2 translate="APP-DEPLOYMENTS.TITLE"></h2>
                 </div>
 
-                <div class="grid-wrapper" id="apps">
-                    <div class="grid-message" ng-if="appsData.size > 0">
-                        <span>{{'APP-DEPLOYMENTS.LIST-MESSAGE' | translate:appsData}}</span>
+                <div class="grid-wrapper" id="deployments">
+                    <div class="grid-message" ng-if="appDeploymentsData.size > 0">
+                        <span>{{'APP-DEPLOYMENTS.LIST-MESSAGE' | translate:appDeploymentsData}}</span>
                     </div>
-                     <div class="grid-message" ng-if="appsData.size == 0">
+                     <div class="grid-message" ng-if="deploymentsData.size == 0">
                         <span>{{'APP-DEPLOYMENTS.LIST-MESSAGE-EMPTY' | translate}}</span>
                     </div>
-                    <div ng-grid="gridApps" class="gridStyle" ng-if="gridApps && appsData.data"/>
+                    <div ng-grid="gridAppDeployments" class="gridStyle" ng-if="gridAppDeployments && appDeploymentsData.data"/>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
 
-            <!-- Apps filters -->
+            <!-- Deployment filters -->
             <div class="component tip-left">
                 <div class="title">
                     <div class="pull-right">
@@ -63,22 +63,16 @@
                     </div>
                     <h2 translate="GENERAL.TITLE.FILTERS"></h2>
                 </div>
-                <div class="section" ng-if="filter.properties.latest !== undefined">
-	              <div class="subtitle"><label for="filter-latest" translate="APP-DEPLOYMENTS.FILTER.LATEST"></label> </div>
-               	  <div class="input-group input-group-sm">
-               	  	<input type="checkbox" id="filter-latest" ng-model="filter.properties.latest" ng-change="filter.refresh()" />&nbsp;<span class="check" translate="APP-DEPLOYMENTS.FILTER.LATEST-HELP"></span>
-	              </div>
-	            </div>
                 <div class="section" ng-if="filter.properties.nameLike !== undefined">
                     <div class="subtitle"><label for="filter-nameLike" translate="APP-DEPLOYMENTS.FILTER.NAME"></label> </div>
                     <div class="input-group input-group-sm">
                         <input id="filter-nameLike" type="text" class="form-control" value="" ng-model="filter.properties.nameLike" ng-change="filter.refreshDelayed()">
                     </div>
                 </div>
-                <div class="section" ng-if="filter.properties.tenantId !== undefined">
-                    <div class="subtitle"><label for="filter-tenantId" translate="APP-DEPLOYMENTS.FILTER.TENANTID"></label> </div>
+                <div class="section" ng-if="filter.properties.tenantIdLike !== undefined">
+                    <div class="subtitle"><label for="filter-tenantIdLike" translate="APP-DEPLOYMENTS.FILTER.TENANTID"></label> </div>
                     <div class="input-group input-group-sm">
-                        <input id="filter-tenantId" type="text" class="form-control" value="" number-input-check ng-model="filter.properties.tenantId" ng-change="filter.refreshDelayed()">
+                        <input id="filter-tenantIdLike" type="text" class="form-control" value="" ng-model="filter.properties.tenantIdLike" ng-change="filter.refreshDelayed()">
                     </div>
                 </div>
             </div>
@@ -88,13 +82,6 @@
                 <div class="title">
                     <h2 translate="GENERAL.TITLE.ACTIONS"></h2>
                 </div>
-                <ul class="list-group">
-                    <li>
-                        <button type="button" class="btn btn-sm btn-default" ng-click="uploadApp()">
-                            <i class="glyphicon glyphicon-open"></i>{{'APP-DEPLOYMENTS.ACTION.UPLOAD' | translate}}
-                        </button>
-                    </li>
-                </ul>
             </div>
 
         </div>

@@ -34,7 +34,19 @@ import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
-import org.flowable.cmmn.model.*;
+import org.flowable.cmmn.model.Association;
+import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.HasEntryCriteria;
+import org.flowable.cmmn.model.HasExitCriteria;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.TimerEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,8 +250,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         return modelNode;
     }
 
+    @Override
     public void processPlanItems(Stage stage, CmmnModel model, ArrayNode shapesArrayNode,
-            Map<String, CmmnModelInfo> formKeyMap, Map<String, CmmnModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY) {
+                                 Map<String, CmmnModelInfo> formKeyMap, Map<String, CmmnModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY) {
 
         for (PlanItem planItem : stage.getPlanItems()) {
             processPlanItem(planItem, stage, model, shapesArrayNode, formKeyMap, decisionTableKeyMap, subProcessX, subProcessY);
@@ -363,9 +376,10 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         return cmmnModel;
     }
 
+    @Override
     public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap,
-            Map<String, String> formMap, Map<String, String> decisionTableMap, Map<String, String> caseModelKeyMap, Map<String, String> processModelKeyMap,
-            CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+                                    Map<String, String> formMap, Map<String, String> decisionTableMap, Map<String, String> caseModelKeyMap, Map<String, String> processModelKeyMap,
+                                    CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
 
         for (JsonNode shapeNode : shapesArrayNode) {
             String stencilId = CmmnJsonConverterUtil.getStencilId(shapeNode);

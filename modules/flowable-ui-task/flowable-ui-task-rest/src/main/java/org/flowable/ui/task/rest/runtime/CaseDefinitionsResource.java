@@ -32,9 +32,9 @@ public class CaseDefinitionsResource {
 
     @RequestMapping(value = "/rest/case-definitions", method = RequestMethod.GET)
     public ResultListDataRepresentation getCaseDefinitions(@RequestParam(value = "latest", required = false) Boolean latest,
-            @RequestParam(value = "deploymentKey", required = false) String deploymentKey) {
+            @RequestParam(value = "appDefinitionKey", required = false) String appDefinitionKey) {
 
-        return caseDefinitionService.getCaseDefinitions(latest, deploymentKey);
+        return caseDefinitionService.getCaseDefinitions(latest, appDefinitionKey);
     }
 
 }

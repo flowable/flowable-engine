@@ -93,6 +93,14 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             caseInstanceEntity.setTenantId(caseInstanceBuilder.getTenantId());
         }
 
+        if (caseInstanceBuilder.getCallbackId() != null) {
+            caseInstanceEntity.setCallbackId(caseInstanceBuilder.getCallbackId());
+        }
+
+        if (caseInstanceBuilder.getCallbackType() != null) {
+            caseInstanceEntity.setCallbackType(caseInstanceBuilder.getCallbackType());
+        }
+
         CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
         CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
         Case caseModel = cmmnModel.getCaseById(caseDefinition.getKey());
@@ -138,11 +146,12 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         caseInstanceEntityManager.insert(caseInstanceEntity);
 
-        caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
+        caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<>(1));
 
         return caseInstanceEntity;
     }
 
+    @Override
     public void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState) {
         if (caseInstance.getCallbackId() != null && caseInstance.getCallbackType() != null) {
             Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceCallbacks = CommandContextUtil

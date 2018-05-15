@@ -216,7 +216,9 @@ angular.module('flowableModeler')
                 {'type': 'expression', 'title': $translate.instant('FORM-BUILDER.PALLETTE.EXPRESSION'), 'icon': 'images/form-builder/readonly-icon.png', 'width': 1},
                 {'type': 'hyperlink', 'title': $translate.instant('FORM-BUILDER.PALLETTE.HYPERLINK'), 'icon': 'images/form-builder/hyperlink-icon.png', 'width':1},
 				{'type': 'spacer', 'title': $translate.instant('FORM-BUILDER.PALLETTE.SPACER'), 'icon': 'images/form-builder/spacer-icon.png', 'width':1},
-				{'type': 'horizontal-line', 'title': $translate.instant('FORM-BUILDER.PALLETTE.HORIZONTAL-LINE'), 'icon': 'images/form-builder/horizontal-line-icon.png', 'width':1}
+				{'type': 'horizontal-line', 'title': $translate.instant('FORM-BUILDER.PALLETTE.HORIZONTAL-LINE'), 'icon': 'images/form-builder/horizontal-line-icon.png', 'width':1},
+				{'type': 'headline', 'title': $translate.instant('FORM-BUILDER.PALLETTE.HEADLINE'), 'icon': 'images/form-builder/headline-icon.png', 'width':1},
+				{'type': 'headline-with-line', 'title': $translate.instant('FORM-BUILDER.PALLETTE.HEADLINE-WITH-LINE'), 'icon': 'images/form-builder/headline-with-line-icon.png', 'width':1}
             ];
 
             $scope.$watch('formItems', function () {

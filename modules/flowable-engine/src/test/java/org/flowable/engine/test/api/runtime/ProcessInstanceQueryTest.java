@@ -1783,7 +1783,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
     public void testQueryByProcessInstanceIdsEmpty() {
         try {
-            runtimeService.createProcessInstanceQuery().processInstanceIds(new HashSet<String>());
+            runtimeService.createProcessInstanceQuery().processInstanceIds(new HashSet<>());
             fail("ActivitiException expected");
         } catch (FlowableIllegalArgumentException re) {
             assertTextPresent("Set of process instance ids is empty", re.getMessage());

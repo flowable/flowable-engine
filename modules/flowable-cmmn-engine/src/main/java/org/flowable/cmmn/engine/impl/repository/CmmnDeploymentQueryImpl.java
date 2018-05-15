@@ -43,6 +43,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
     protected boolean withoutTenantId;
     protected String parentDeploymentId;
     protected String parentDeploymentIdLike;
+    protected List<String> parentDeploymentIds;
     protected boolean latest;
 
     public CmmnDeploymentQueryImpl() {
@@ -56,6 +57,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         super(commandExecutor);
     }
 
+    @Override
     public CmmnDeploymentQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("Deployment id is null");
@@ -73,6 +75,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl deploymentName(String deploymentName) {
         if (deploymentName == null) {
             throw new FlowableIllegalArgumentException("deploymentName is null");
@@ -81,6 +84,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl deploymentNameLike(String nameLike) {
         if (nameLike == null) {
             throw new FlowableIllegalArgumentException("deploymentNameLike is null");
@@ -89,6 +93,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl deploymentCategory(String deploymentCategory) {
         if (deploymentCategory == null) {
             throw new FlowableIllegalArgumentException("deploymentCategory is null");
@@ -97,6 +102,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
         if (deploymentCategoryNotEquals == null) {
             throw new FlowableIllegalArgumentException("deploymentCategoryExclude is null");
@@ -105,6 +111,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
     
+    @Override
     public CmmnDeploymentQueryImpl deploymentKey(String deploymentKey) {
         if (deploymentKey == null) {
             throw new FlowableIllegalArgumentException("deploymentKey is null");
@@ -113,6 +120,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl deploymentTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantId is null");
@@ -121,6 +129,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
@@ -129,11 +138,13 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl deploymentWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl parentDeploymentId(String parentDeploymentId) {
         if (parentDeploymentId == null) {
             throw new FlowableIllegalArgumentException("parentDeploymentId is null");
@@ -142,11 +153,21 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return this;
     }
 
+    @Override
     public CmmnDeploymentQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
         if (parentDeploymentIdLike == null) {
             throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
         }
         this.parentDeploymentIdLike = parentDeploymentIdLike;
+        return this;
+    }
+    
+    @Override
+    public CmmnDeploymentQueryImpl parentDeploymentIds(List<String> parentDeploymentIds) {
+        if (parentDeploymentIds == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentIds is null");
+        }
+        this.parentDeploymentIds = parentDeploymentIds;
         return this;
     }
     
@@ -162,18 +183,22 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
 
     // sorting ////////////////////////////////////////////////////////
 
+    @Override
     public CmmnDeploymentQuery orderByDeploymentId() {
         return orderBy(CmmnDeploymentQueryProperty.DEPLOYMENT_ID);
     }
 
+    @Override
     public CmmnDeploymentQuery orderByDeploymenTime() {
         return orderBy(CmmnDeploymentQueryProperty.DEPLOY_TIME);
     }
 
+    @Override
     public CmmnDeploymentQuery orderByDeploymentName() {
         return orderBy(CmmnDeploymentQueryProperty.DEPLOYMENT_NAME);
     }
 
+    @Override
     public CmmnDeploymentQuery orderByTenantId() {
         return orderBy(CmmnDeploymentQueryProperty.DEPLOYMENT_TENANT_ID);
     }

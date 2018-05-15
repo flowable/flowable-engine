@@ -107,7 +107,6 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
 
         String businessKey = null;
-
         if (!StringUtils.isEmpty(callActivity.getBusinessKey())) {
             Expression expression = expressionManager.createExpression(callActivity.getBusinessKey());
             businessKey = expression.getValue(execution).toString();
@@ -138,7 +137,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
                 variables.put(entry.getKey(), entry.getValue());
             }
         }
-
+        
         // copy process variables
         for (IOParameter ioParameter : callActivity.getInParameters()) {
             Object value = null;
@@ -154,6 +153,14 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         if (!variables.isEmpty()) {
             initializeVariables(subProcessInstance, variables);
+        }
+        
+        // Process instance name is resolved after setting the variables on the process instance, so they can be used in the expression
+        String processInstanceName = null;
+        if (StringUtils.isNotEmpty(callActivity.getProcessInstanceName())) {
+            Expression processInstanceNameExpression = expressionManager.createExpression(callActivity.getProcessInstanceName());
+            processInstanceName = processInstanceNameExpression.getValue(subProcessInstance).toString();
+            subProcessInstance.setName(processInstanceName);
         }
 
         if (eventDispatcher.isEnabled()) {

@@ -13,12 +13,6 @@
 
 package org.flowable.engine;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -690,6 +684,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    @Override
     public void initIdGenerator() {
         super.initIdGenerator();
         if (taskIdGenerator == null) {

@@ -225,14 +225,14 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
         try {
-            formService.submitStartFormData(processDefinition.getId(), new HashMap<String, String>());
+            formService.submitStartFormData(processDefinition.getId(), new HashMap<>());
             fail();
         } catch (FlowableException e) {
             // This is expected
         }
 
         try {
-            formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<String, String>());
+            formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<>());
             fail();
         } catch (FlowableException e) {
             e.printStackTrace();

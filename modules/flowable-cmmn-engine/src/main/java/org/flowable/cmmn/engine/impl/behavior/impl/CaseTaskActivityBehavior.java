@@ -12,7 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -44,15 +45,19 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
 
         CaseInstanceHelper caseInstanceHelper = CommandContextUtil.getCaseInstanceHelper(commandContext);
-        CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().caseDefinitionKey(caseRefExpression.getValue(planItemInstanceEntity).toString());
+        CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().
+                caseDefinitionKey(caseRefExpression.getValue(planItemInstanceEntity).toString());
+        if (StringUtils.isNotEmpty(planItemInstanceEntity.getTenantId())) {
+            caseInstanceBuilder.tenantId(planItemInstanceEntity.getTenantId());
+        }
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
         caseInstanceEntity.setParentId(planItemInstanceEntity.getCaseInstanceId());
 
         // Bidirectional storing of reference to avoid queries later on
-        caseInstanceEntity.setCallbackType(PlanItemInstanceCallbackType.CHILD_CASE);
+        caseInstanceEntity.setCallbackType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
         caseInstanceEntity.setCallbackId(planItemInstanceEntity.getId());
 
-        planItemInstanceEntity.setReferenceType(PlanItemInstanceCallbackType.CHILD_CASE);
+        planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
         planItemInstanceEntity.setReferenceId(caseInstanceEntity.getId());
 
         if (!evaluateIsBlocking(planItemInstanceEntity)) {
@@ -68,7 +73,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
         if (planItemInstance.getReferenceId() == null) {
             throw new FlowableException("Cannot trigger case task plan item instance : no reference id set");
         }
-        if (!PlanItemInstanceCallbackType.CHILD_CASE.equals(planItemInstance.getReferenceType())) {
+        if (!CallbackTypes.PLAN_ITEM_CHILD_CASE.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger case task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }

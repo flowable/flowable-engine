@@ -305,11 +305,13 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     // results ////////////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         return CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).countByCriteria(this);
     }
 
+    @Override
     public List<HistoricCaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
         List<HistoricCaseInstance> results;

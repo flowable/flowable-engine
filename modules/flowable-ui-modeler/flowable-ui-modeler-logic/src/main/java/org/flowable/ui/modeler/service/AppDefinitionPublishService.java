@@ -105,7 +105,7 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
         if (!deployApiUrl.endsWith("/")) {
             deployApiUrl = deployApiUrl.concat("/");
         }
-        deployApiUrl = deployApiUrl.concat(String.format("repository/deployments?deploymentKey=%s&deploymentName=%s",
+        deployApiUrl = deployApiUrl.concat(String.format("app-repository/deployments?deploymentKey=%s&deploymentName=%s",
                 encode(deploymentKey), encode(deploymentName)));
 
         if (tenantId != null) {

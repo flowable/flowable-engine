@@ -48,9 +48,6 @@ public interface DmnDecisionTable {
     /** The deployment in which this decision table is contained. */
     String getDeploymentId();
 
-    /** The parent deployment in which this decision table is contained. */
-    String getParentDeploymentId();
-
     /** The tenant identifier of this decision table */
     String getTenantId();
 

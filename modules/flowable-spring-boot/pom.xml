@@ -26,10 +26,10 @@
             org.flowable.spring.boot
         </flowable.artifact>
 
-        <spring.framework.version>5.0.4.RELEASE</spring.framework.version>
-        <spring.security.version>5.0.3.RELEASE</spring.security.version>
-        <jackson.version>2.9.4</jackson.version>
-        <spring.boot.version>2.0.0.RELEASE</spring.boot.version>
+        <spring.framework.version>5.0.6.RELEASE</spring.framework.version>
+        <spring.security.version>5.0.5.RELEASE</spring.security.version>
+        <jackson.version>2.9.5</jackson.version>
+        <spring.boot.version>2.0.2.RELEASE</spring.boot.version>
 
     </properties>
 
@@ -106,6 +106,16 @@
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-spring-boot-starter-process-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-spring-boot-starter-app</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-spring-boot-starter-app-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -32,6 +32,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-configurator</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-form-spring-configurator</artifactId>
             <optional>true</optional>
         </dependency>
@@ -43,6 +48,16 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-cmmn-spring-configurator</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-content-spring-configurator</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-spring-configurator</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -120,7 +135,7 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-idm-rest</artifactId>
+            <artifactId>flowable-app-engine-rest</artifactId>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -129,11 +144,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-content-spring-configurator</artifactId>
+            <artifactId>flowable-idm-rest</artifactId>
             <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- integration -->

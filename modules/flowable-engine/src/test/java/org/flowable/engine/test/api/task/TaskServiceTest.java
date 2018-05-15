@@ -29,11 +29,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -45,6 +47,7 @@ import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
@@ -71,11 +74,12 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     private Task task = null;
 
+    @Override
     public void tearDown() throws Exception {
         super.tearDown();
         if (task != null) {
             taskService.deleteTask(task.getId(), true);
-        };
+        }
     }
 
     public void testCreateTaskWithBuilder() {
@@ -92,6 +96,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
                         formKey("testFormKey").
                         taskDefinitionId("testDefintionId").
                         taskDefinitionKey("testDefinitionKey").
+                        scopeType(ScopeTypes.CMMN).
+                        scopeId("scopeIdValue").
                         create();
         Task updatedTask = taskService.createTaskQuery().taskId(task.getId()).singleResult();
         assertThat(updatedTask, notNullValue());
@@ -107,6 +113,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(updatedTask.getFormKey(), is("testFormKey"));
         assertThat(updatedTask.getTaskDefinitionId(), is("testDefintionId"));
         assertThat(updatedTask.getTaskDefinitionKey(), is("testDefinitionKey"));
+        assertThat(updatedTask.getScopeId(), is("scopeIdValue"));
+        assertThat(updatedTask.getScopeType(), is(ScopeTypes.CMMN));
     }
 
     public void testBuilderCreateTaskWithParent() {
@@ -250,6 +258,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertEquals("taskowner", task.getOwner());
         assertEquals(dueDate, task.getDueDate());
         assertEquals(0, task.getPriority());
+        assertNull(task.getScopeId());
+        assertNull(task.getScopeType());
 
         task.setName("updatedtaskname");
         task.setDescription("updateddescription");
@@ -876,6 +886,62 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
         assertEquals(1, variables.size());
         assertEquals("myValue", variables.get("myParam"));
+    }
+
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExecutionBaseNewPropertyExpressionTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${execution.myParam}", "myValue");
+        try {
+            taskService.complete(task.getId(), taskParams);
+            fail();
+        } catch (FlowableException e) {
+            assertEquals("new properties are not resolved", e.getCause().getMessage(),
+                    "Cannot write property: myParam");
+        }
+    }
+
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExecutionIdParametersTask() {
+        runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${execution.id}", "myValue");
+        try {
+            taskService.complete(task.getId(), taskParams);
+        } catch (PersistenceException e) {
+            // expected exception.
+        }
+    }
+
+    @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
+    public void testCompleteWithExecutionNameParametersTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+
+        // Fetch first task
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("First task", task.getName());
+
+        // Complete first task
+        Map<String, Object> taskParams = new HashMap<>();
+        taskParams.put("${execution.name}", "myUpdatedName");
+        taskService.complete(task.getId(), taskParams);
+
+        // Verify task parameters set on execution
+        Execution subExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
+        assertEquals("myUpdatedName", subExecution.getName());
     }
 
     @Deployment

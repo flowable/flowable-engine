@@ -13,14 +13,11 @@
 
 package org.flowable.rest.service.api.repository;
 
-import java.io.ByteArrayInputStream;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.flowable.engine.repository.Model;
 import org.flowable.rest.service.BaseSpringRestTestCase;
@@ -28,7 +25,9 @@ import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.io.ByteArrayInputStream;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Frederik Heremans

@@ -37,6 +37,7 @@ public class ScriptTaskJsonConverter extends BaseCmmnJsonConverter {
         convertersToBpmnMap.put(STENCIL_TASK_SCRIPT, ScriptTaskJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_SCRIPT;
     }

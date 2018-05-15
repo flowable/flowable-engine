@@ -27,7 +27,7 @@ public class AppResourceConverterImpl implements AppResourceConverter {
     }
 
     @Override
-    public Object convertAppResourceToModel(byte[] appResourceBytes) {
+    public AppModel convertAppResourceToModel(byte[] appResourceBytes) {
         AppModel appModel;
         try {
             appModel = objectMapper.readValue(appResourceBytes, AppModel.class);

@@ -80,7 +80,7 @@ public class CmmnDeploymentManager {
     public CaseDefinition findDeployedLatestCaseDefinitionByKeyAndTenantId(String caseDefinitionKey, String tenantId) {
         CaseDefinition caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
         if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("no casees deployed with key '" + caseDefinitionKey + "' for tenant identifier '" + tenantId + "'", CaseDefinition.class);
+            throw new FlowableObjectNotFoundException("no cases deployed with key '" + caseDefinitionKey + "' for tenant identifier '" + tenantId + "'", CaseDefinition.class);
         }
         caseDefinition = resolveCaseDefinition(caseDefinition).getCaseDefinition();
         return caseDefinition;
@@ -90,7 +90,7 @@ public class CmmnDeploymentManager {
         CaseDefinition caseDefinition = (CaseDefinitionEntity) caseDefinitionEntityManager
                 .findCaseDefinitionByKeyAndVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
         if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("no casees deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", CaseDefinition.class);
+            throw new FlowableObjectNotFoundException("no cases deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", CaseDefinition.class);
         }
         caseDefinition = resolveCaseDefinition(caseDefinition).getCaseDefinition();
         return caseDefinition;

@@ -150,6 +150,15 @@
 	<div ng-switch-when="horizontal-line" class="row,form-group" ng-show="field.isVisible" >
 		<hr id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" >
     </div>
+    
+     <div ng-switch-when="headline" class="form-group" ng-show="field.isVisible">
+		<h4 id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}"><strong>{{field.name}}</strong></h4>
+  	</div>
+
+	 <div ng-switch-when="headline-with-line" class="form-group" ng-show="field.isVisible">
+		<h4 id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}"><strong>{{field.name}}</strong></h4>
+		<hr>
+	 </div>
 
     <div ng-switch-when="expression" class="form-group" ng-show="field.isVisible">
     	<div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">
@@ -230,6 +239,15 @@
 	<div ng-switch-when="horizontal-line" class="row,form-group" ng-show="field.isVisible" >
 		<hr id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}" >
     </div>
+    
+     <div ng-switch-when="headline" class="form-group" ng-show="field.isVisible">
+		<h4 id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}"><strong>{{field.name}}</strong></h4>
+  	</div>
+
+	 <div ng-switch-when="headline-with-line" class="form-group" ng-show="field.isVisible">
+		<h4 id="{{activitiFieldIdPrefix + field.id}}" name="{{field.id}}"><strong>{{field.name}}</strong></h4>
+		<hr>
+	 </div>    
     
     <div ng-switch-when="expression" ng-show="field.isVisible">
         <div class="well well-sm" ng-style="{'font-size': field.params.size + 'em'}">

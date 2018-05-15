@@ -42,6 +42,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     protected boolean isNew;
     protected String derivedFrom;
     protected String derivedFromRoot;
+    protected String parentDeploymentId;
 
     // Backwards compatibility
     protected String engineVersion;
@@ -83,6 +84,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
         persistentState.put("category", this.category);
         persistentState.put("key", this.key);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("parentDeploymentId", parentDeploymentId);
         return persistentState;
     }
 
@@ -210,6 +212,16 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     @Override
     public void setDerivedFromRoot(String derivedFromRoot) {
         this.derivedFromRoot = derivedFromRoot;
+    }
+    
+    @Override
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    @Override
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
     }
 
     // common methods //////////////////////////////////////////////////////////

@@ -96,7 +96,7 @@ com.fasterxml.jackson.core      jackson-databind            2.7.5           The 
 com.fasterxml.jackson.datatype  jackson-datatype-hppc       2.7.5           The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-joda       2.7.5           The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-json-org   2.7.5           The Apache Software License, Version 2.0
-com.google.guava                guava                       23.6-android    The Apache Software License, Version 2.0
+com.google.guava                guava                       25.0-jre        The Apache Software License, Version 2.0
 com.h2database                  h2                          1.4.197         The H2 License, Version 1.0
 com.fasterxml.uuid              java-uuid-generator         3.1.5           The Apache Software License, Version 2.0
 com.sun.mail                    javax.mail                  1.6.1           CDDL/GPLv2+CE
@@ -111,8 +111,8 @@ commons-validator               commons-validator           1.4.0           The 
 de.odysseus.juel                juel-api                    2.2.7           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-impl                   2.2.7           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-spi                    2.2.7           The Apache Software License, Version 2.0
-io.swagger                      swagger-annotations         1.5.10          Apache License 2.0
-io.swagger                      swagger-models              1.5.10          Apache License 2.0
+io.swagger                      swagger-annotations         1.5.19          Apache License 2.0
+io.swagger                      swagger-models              1.5.19          Apache License 2.0
 javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 joda-time                       joda-time                   2.9.9           Apache 2

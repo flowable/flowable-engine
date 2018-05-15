@@ -72,6 +72,7 @@ public class ExtensionAttribute {
         return sb.toString();
     }
 
+    @Override
     public ExtensionAttribute clone() {
         ExtensionAttribute clone = new ExtensionAttribute();
         clone.setValues(this);

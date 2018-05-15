@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
@@ -67,7 +67,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getTenantId());
         }
 
-        planItemInstanceEntity.setReferenceType(PlanItemInstanceCallbackType.CHILD_PROCESS);
+        planItemInstanceEntity.setReferenceType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
         planItemInstanceEntity.setReferenceId(processInstanceId);
 
         if (!blocking) {
@@ -83,7 +83,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         if (planItemInstance.getReferenceId() == null) {
             throw new FlowableException("Cannot trigger process task plan item instance : no reference id set");
         }
-        if (!PlanItemInstanceCallbackType.CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
+        if (!CallbackTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger process task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }

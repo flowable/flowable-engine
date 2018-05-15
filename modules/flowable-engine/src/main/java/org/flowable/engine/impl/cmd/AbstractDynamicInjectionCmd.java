@@ -92,7 +92,7 @@ public abstract class AbstractDynamicInjectionCmd {
     protected ProcessDefinitionEntity deployDerivedDeploymentEntity(CommandContext commandContext, 
             DeploymentEntity deploymentEntity, ProcessDefinitionEntity originalProcessDefinitionEntity) {
 
-        Map<String, Object> deploymentSettings = new HashMap<String, Object>();
+        Map<String, Object> deploymentSettings = new HashMap<>();
         deploymentSettings.put(DeploymentSettings.IS_DERIVED_DEPLOYMENT, true);
         deploymentSettings.put(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ID, originalProcessDefinitionEntity.getId());
         if (originalProcessDefinitionEntity.getDerivedFromRoot() != null) {

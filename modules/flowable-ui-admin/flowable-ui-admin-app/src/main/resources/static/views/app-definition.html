@@ -1,0 +1,115 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="definition">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{definition.name &amp;&amp; definition.name +" - " || ""}}{{definition.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="APP-DEFINITION.ID"></td>
+							<td>{{definition.id}}</td>
+							<td class="property-name" translate="APP-DEFINITION.VERSION"></td>
+							<td>{{definition.version}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="APP-DEFINITION.NAME"></td>
+							<td>{{definition.name | empty}}</td>
+							<td class="property-name" translate="APP-DEFINITION.KEY"></td>
+							<td>{{definition.key}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="APP-DEFINITION.CATEGORY"></td>
+							<td>{{definition.category | empty}}</td>
+							<td class="property-name" translate="APP-DEFINITION.DESCRIPTION"></td>
+							<td>{{definition.description | empty}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="APP-DEFINITION.DEPLOYMENT"></td>
+							<td><a ng-click="openDeployment(definition.deploymentId)"><i class="glyphicon glyphicon-zoom-in"></i> {{definition.deploymentId}}</a></td>
+						</tr>
+						<tr class="property">
+                            <td class="property-name" translate="APP-DEFINITION.TENANT"></td>
+                            <td>{{definition.tenantId | empty}}</td>
+                        </tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+				<ul class="list-group">
+					  
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component">
+				<div class="tabs-wrapper">
+					<div class="tabs clearfix">
+		       			<div class="tab" ng-repeat="tab in tabData.tabs" ng-class="{'active': tabData.activeTab == tab.id}">
+		       				<a ng-click="tabData.activeTab = tab.id">
+		       					{{tab.name | translate:node}}&nbsp;
+		    					<span class="badge" ng-if="tab.info != undefined">{{tab.info}}</span>
+		    				</a>
+		       			</div>
+		       		</div>
+		        	<div class="title"></div>
+
+		        	<div class="grid-wrapper" ng-if="processDefinitions && tabData.activeTab == tabData.tabs[0].id" >
+						<div class="grid-message" ng-if="processDefinitions.size > 0">
+	                        <span>{{'APP-DEFINITION.PROCESS-DEFINITIONS-SIZE' | translate:processDefinitions}}</span>
+	                    </div>
+	                     <div class="grid-message" ng-if="processDefinitions.size == 0">
+	                        <span>{{'APP-DEFINITION.PROCESS-DEFINITIONS-EMPTY' | translate}}</span>
+	                    </div>
+						<div ng-grid="gridProcessDefinitions" class="gridStyle" ng-if="processDefinitions" ng-show="processDefinitions.size > 0"></div>
+					</div>
+
+					<div class="grid-wrapper" ng-if="caseDefinitions && tabData.activeTab == tabData.tabs[1].id" >
+                        <div class="grid-message" ng-if="caseDefinitions.size > 0">
+                            <span>{{'APP-DEFINITION.CASE-DEFINITIONS-SIZE' | translate:caseDefinitions}}</span>
+                        </div>
+                         <div class="grid-message" ng-if="caseDefinitions.size == 0">
+                            <span>{{'APP-DEFINITION.CASE-DEFINITIONS-EMPTY' | translate}}</span>
+                        </div>
+                        <div ng-grid="gridCaseDefinitions" class="gridStyle" ng-if="caseDefinitions" ng-show="caseDefinitions.size > 0"></div>
+                    </div>
+					
+					<div class="grid-wrapper" ng-if="decisionTables && tabData.activeTab == tabData.tabs[2].id">
+						<div class="grid-message" ng-if="decisionTables.size > 0">
+	                        <span>{{'APP-DEFINITION.DECISION-TABLES-SIZE' | translate:decisionTables}}</span>
+	                    </div>
+	                     <div class="grid-message" ng-if="decisionTables.size == 0">
+	                        <span>{{'APP-DEFINITION.DECISION-TABLES-EMPTY' | translate}}</span>
+	                    </div>
+						<div ng-grid="gridDecisionTables" class="gridStyle" ng-if="decisionTables" ng-show="decisionTables.size > 0"></div>
+					</div>
+					
+					<div class="grid-wrapper" ng-if="formDefinitions && tabData.activeTab == tabData.tabs[3].id">
+						<div class="grid-message" ng-if="formDefinitions.size > 0">
+	                        <span>{{'APP-DEFINITION.FORM-DEFINITIONS-SIZE' | translate:formDefinitions}}</span>
+	                    </div>
+	                     <div class="grid-message" ng-if="formDefinitions.size == 0">
+	                        <span>{{'APP-DEFINITION.FORM-DEFINITIONS-EMPTY' | translate}}</span>
+	                    </div>
+						<div ng-grid="gridFormDefinitions" class="gridStyle" ng-if="formDefinitions" ng-show="formDefinitions.size > 0"></div>
+					</div>
+
+	        	</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div>
+</div>

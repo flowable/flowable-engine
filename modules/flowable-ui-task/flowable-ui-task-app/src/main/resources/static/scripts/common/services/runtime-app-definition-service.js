@@ -81,7 +81,7 @@ flowableApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
 
                         // Custom app
                         app.icon = 'glyphicon ' + app.icon;
-                        app.fixedBaseUrl = baseUrl + '/workflow/#/apps/' + app.deploymentKey + '/';
+                        app.fixedBaseUrl = baseUrl + '/workflow/#/apps/' + app.appDefinitionKey + '/';
                         app.fixedUrl = app.fixedBaseUrl + 'tasks';
                         app.pages = [ 'tasks', 'processes' ];
                         app.deletable = true;
@@ -103,10 +103,10 @@ flowableApp.service('RuntimeAppDefinitionService', ['$http', '$q', '$location', 
             });
         };
 
-        this.deleteAppDefinition = function (deploymentKey) {
+        this.deleteAppDefinition = function (appDefinitionKey) {
             var promise = httpAsPromise({
                 method: 'DELETE',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/runtime/app-definitions/' + deploymentKey
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/runtime/app-definitions/' + appDefinitionKey
             });
 
             return promise;

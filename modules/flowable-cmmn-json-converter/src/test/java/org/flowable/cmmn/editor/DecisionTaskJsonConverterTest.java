@@ -18,7 +18,6 @@ import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.hamcrest.core.Is;
 

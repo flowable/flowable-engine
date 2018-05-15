@@ -187,6 +187,6 @@ When working with variables (execute decision), the REST API uses some common pr
 |date|Value is treated as a **java.util.Date**. When writing, the JSON text will be converted using ISO-8601 date format.
 
 
-It's possible to support additional variable-types with a custom JSON representation (either simple value or complex/nested JSON object). By extending the **initializeVariableConverters()** method on *org.flowable.rest.dmn.service.api.DmnRestResponseFactory**, you can add additional **org.flowable.rest.variable.RestVariableConverter* classes to support converting your POJOs to a format suitable for transferring through REST and converting the REST-value back to your POJO. The actual transformation to JSON is done by Jackson.
+It's possible to support additional variable-types with a custom JSON representation (either simple value or complex/nested JSON object). By extending the **initializeVariableConverters()** method on *org.flowable.dmn.rest.service.api.DmnRestResponseFactory**, you can add additional **org.flowable.rest.variable.RestVariableConverter* classes to support converting your POJOs to a format suitable for transferring through REST and converting the REST-value back to your POJO. The actual transformation to JSON is done by Jackson.
 
 

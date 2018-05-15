@@ -44,6 +44,7 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     protected Date lastModified;
     protected String lastModifiedBy;
     protected String tenantId = ContentEngineConfiguration.NO_TENANT_ID;
+    protected boolean provisional;
 
     @Override
     public Object getPersistentState() {
@@ -228,6 +229,16 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    @Override
+    public boolean isProvisional() {
+        return provisional;
+    }
+
+    @Override
+    public void setProvisional(boolean provisional) {
+        this.provisional = provisional;
     }
 
     @Override

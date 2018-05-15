@@ -1118,7 +1118,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             // OK
         }
         try {
-            taskService.createTaskQuery().taskCandidateGroupIn(new ArrayList<String>()).list();
+            taskService.createTaskQuery().taskCandidateGroupIn(new ArrayList<>()).list();
             fail("expected exception");
         } catch (FlowableIllegalArgumentException e) {
             // OK
@@ -1133,7 +1133,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             // OK
         }
         try {
-            taskService.createTaskQuery().or().taskId("invalid").taskCandidateGroupIn(new ArrayList<String>()).list();
+            taskService.createTaskQuery().or().taskId("invalid").taskCandidateGroupIn(new ArrayList<>()).list();
             fail("expected exception");
         } catch (FlowableIllegalArgumentException e) {
             // OK

@@ -493,4 +493,10 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
     public void setQueryIdentityLinks(List<HistoricIdentityLinkEntity> identityLinks) {
         queryIdentityLinks = identityLinks;
     }
+    
+    @Override
+    public String toString() {
+        return "HistoricTaskInstanceEntity[id=" + id + "]";
+    }
+    
 }

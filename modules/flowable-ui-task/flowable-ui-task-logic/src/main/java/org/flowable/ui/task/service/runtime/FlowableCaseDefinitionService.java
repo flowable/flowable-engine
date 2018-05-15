@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
@@ -48,6 +50,9 @@ public class FlowableCaseDefinitionService {
 
     @Autowired
     protected CmmnRepositoryService cmmnRepositoryService;
+    
+    @Autowired
+    protected AppRepositoryService appRepositoryService;
 
     @Autowired
     protected PermissionService permissionService;
@@ -58,12 +63,13 @@ public class FlowableCaseDefinitionService {
     @Autowired
     protected FormRepositoryService formRepositoryService;
 
-    public ResultListDataRepresentation getCaseDefinitions(Boolean latest, String deploymentKey) {
+    public ResultListDataRepresentation getCaseDefinitions(Boolean latest, String appDefinitionKey) {
 
         CaseDefinitionQuery definitionQuery = cmmnRepositoryService.createCaseDefinitionQuery();
 
-        if (deploymentKey != null) {
-            CmmnDeployment deployment = cmmnRepositoryService.createDeploymentQuery().deploymentKey(deploymentKey).latest().singleResult();
+        if (appDefinitionKey != null) {
+            AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().appDefinitionKey(appDefinitionKey).latestVersion().singleResult();
+            CmmnDeployment deployment = cmmnRepositoryService.createDeploymentQuery().parentDeploymentId(appDefinition.getDeploymentId()).singleResult();
 
             if (deployment != null) {
                 definitionQuery.deploymentId(deployment.getId());

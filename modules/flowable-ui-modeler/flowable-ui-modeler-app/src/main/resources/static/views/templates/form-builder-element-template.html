@@ -109,6 +109,15 @@
 	<hr>
   </div>
 
+  <div ng-switch-when="headline" class="form-group">
+	<h4><strong>{{formElement.name}}</strong></h4>
+  </div>
+
+  <div ng-switch-when="headline-with-line" class="form-group">
+	<h4><strong>{{formElement.name}}</strong></h4>
+	<hr>
+  </div>
+
   <div ng-switch-when="expression" class="form-group">
     <div class="message" ng-style="{'font-size': formElement.params.size + 'em'}">
       <div ng-show="formElement.expression && formElement.expression.length > 0">

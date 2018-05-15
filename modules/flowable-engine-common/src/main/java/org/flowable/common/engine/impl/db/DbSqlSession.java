@@ -13,6 +13,17 @@
 
 package org.flowable.common.engine.impl.db;
 
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
@@ -25,17 +36,6 @@ import org.flowable.common.engine.impl.persistence.entity.AlwaysUpdatedPersisten
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Tom Baeyens
@@ -80,10 +80,10 @@ public class DbSqlSession implements Session {
             String id = Context.getCommandContext().getCurrentEngineConfiguration().getIdGenerator().getNextId();
             entity.setId(id);
         }
-
+        
         Class<? extends Entity> clazz = entity.getClass();
         if (!insertedObjects.containsKey(clazz)) {
-            insertedObjects.put(clazz, new LinkedHashMap<String, Entity>()); // order of insert is important, hence LinkedHashMap
+            insertedObjects.put(clazz, new LinkedHashMap<>()); // order of insert is important, hence LinkedHashMap
         }
 
         insertedObjects.get(clazz).put(entity.getId(), entity);
@@ -113,7 +113,7 @@ public class DbSqlSession implements Session {
      */
     public void delete(String statement, Object parameter, Class<? extends Entity> entityClass) {
         if (!bulkDeleteOperations.containsKey(entityClass)) {
-            bulkDeleteOperations.put(entityClass, new ArrayList<BulkDeleteOperation>(1));
+            bulkDeleteOperations.put(entityClass, new ArrayList<>(1));
         }
         bulkDeleteOperations.get(entityClass).add(new BulkDeleteOperation(dbSqlSessionFactory.mapStatement(statement), parameter));
     }
@@ -121,7 +121,7 @@ public class DbSqlSession implements Session {
     public void delete(Entity entity) {
         Class<? extends Entity> clazz = entity.getClass();
         if (!deletedObjects.containsKey(clazz)) {
-            deletedObjects.put(clazz, new LinkedHashMap<String, Entity>()); // order of insert is important, hence LinkedHashMap
+            deletedObjects.put(clazz, new LinkedHashMap<>()); // order of insert is important, hence LinkedHashMap
         }
         deletedObjects.get(clazz).put(entity.getId(), entity);
         entity.setDeleted(true);
@@ -396,7 +396,7 @@ public class DbSqlSession implements Session {
         if (insertedObjects.size() == 0) {
             return;
         }
-
+        
         // Handle in entity dependency order
         for (Class<? extends Entity> entityClass : dbSqlSessionFactory.getInsertionOrder()) {
             if (insertedObjects.containsKey(entityClass)) {
@@ -523,24 +523,30 @@ public class DbSqlSession implements Session {
                 flushDeleteEntities(entityClass, deletedObjects.get(entityClass).values());
                 deletedObjects.remove(entityClass);
             }
-            flushBulkDeletes(entityClass);
+            flushBulkDeletes(entityClass, this.bulkDeleteOperations.remove(entityClass));
         }
 
         // Next, in case of custom entities or we've screwed up and forgotten some entity
         if (deletedObjects.size() > 0) {
             for (Class<? extends Entity> entityClass : deletedObjects.keySet()) {
                 flushDeleteEntities(entityClass, deletedObjects.get(entityClass).values());
-                flushBulkDeletes(entityClass);
+                flushBulkDeletes(entityClass, this.bulkDeleteOperations.remove(entityClass));
             }
         }
 
+        // Last, in case there are still some pending entities or we have forgotten an entity for the bulk operations
+        if (!bulkDeleteOperations.isEmpty()) {
+            bulkDeleteOperations.forEach(this::flushBulkDeletes);
+        }
+
         deletedObjects.clear();
+        bulkDeleteOperations.clear();
     }
 
-    protected void flushBulkDeletes(Class<? extends Entity> entityClass) {
+    protected void flushBulkDeletes(Class<? extends Entity> entityClass, List<BulkDeleteOperation> deleteOperations) {
         // Bulk deletes
-        if (bulkDeleteOperations.containsKey(entityClass)) {
-            for (BulkDeleteOperation bulkDeleteOperation : bulkDeleteOperations.get(entityClass)) {
+        if (deleteOperations != null) {
+            for (BulkDeleteOperation bulkDeleteOperation : deleteOperations) {
                 bulkDeleteOperation.execute(sqlSession, entityClass);
             }
         }

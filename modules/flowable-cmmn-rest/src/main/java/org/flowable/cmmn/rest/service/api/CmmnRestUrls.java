@@ -50,6 +50,8 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_HISTORIC_TASK_INSTANCE_RESOURCE = "historic-task-instances";
     public static final String SEGMENT_HISTORIC_ACTIVITY_INSTANCE_RESOURCE = "historic-activity-instances";
     public static final String SEGMENT_HISTORIC_VARIABLE_INSTANCE_RESOURCE = "historic-variable-instances";
+    public static final String SEGMENT_HISTORIC_MILESTONE_INSTANCE_RESOURCE = "historic-milestone-instances";
+    public static final String SEGMENT_HISTORIC_PLANITEM_INSTANCE_RESOURCE = "historic-planitem-instances";
     public static final String SEGMENT_HISTORIC_DETAIL_RESOURCE = "historic-detail";
     public static final String SEGMENT_FORM_DATA = "form-data";
     public static final String SEGMENT_TABLES = "tables";
@@ -375,6 +377,25 @@ public final class CmmnRestUrls {
      */
     public static final String[] URL_HISTORIC_VARIABLE_INSTANCE_DATA = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_VARIABLE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLE_DATA };
 
+    /**
+     * URL template for a single historic milestone instance: <i>cmmn-history/historic-milestone-instances/{0:milestoneId}</i>
+     */
+    public static final String[] URL_HISTORIC_MILESTONE_INSTANCE = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_MILESTONE_INSTANCE_RESOURCE, "{0}" };
+    /**
+     * URL template for a single historic milestone instance: <i>cmmn-history/historic-milestone-instances</i>
+     */
+    public static final String[] URL_HISTORIC_MILESTONE_INSTANCES = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_MILESTONE_INSTANCE_RESOURCE};
+
+    /**
+     * URL template for a single historic plan item instance: <i>cmmn-history/historic-planitem-instances/{0:planItemId}</i>
+     */
+    public static final String[] URL_HISTORIC_PLANITEM_INSTANCE = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_PLANITEM_INSTANCE_RESOURCE, "{0}" };
+
+    /**
+     * URL template for a single historic plan item instance: <i>cmmn-history/historic-planitem-instances</i>
+     */
+    public static final String[] URL_HISTORIC_PLANITEM_INSTANCES = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_PLANITEM_INSTANCE_RESOURCE};
+
    /**
      * URL template for historic case instance query: <i>query/historic-case-instances</i>
      */
@@ -396,6 +417,16 @@ public final class CmmnRestUrls {
     public static final String[] URL_HISTORIC_VARIABLE_INSTANCE_QUERY = { SEGMENT_QUERY_RESOURCES, SEGMENT_HISTORIC_VARIABLE_INSTANCE_RESOURCE };
 
     /**
+     * URL template for historic milestone instance query: <i>query/historic-milestone-instances</i>
+     */
+    public static final String[] URL_HISTORIC_MILESTONE_INSTANCE_QUERY = { SEGMENT_QUERY_RESOURCES, SEGMENT_HISTORIC_MILESTONE_INSTANCE_RESOURCE };
+
+    /**
+     * URL template for historic plan item instance query: <i>query/historic-planitem-instances</i>
+     */
+    public static final String[] URL_HISTORIC_PLANITEM_INSTANCE_QUERY = { SEGMENT_QUERY_RESOURCES, SEGMENT_HISTORIC_PLANITEM_INSTANCE_RESOURCE };
+
+    /**
      * URL template for the collection of properties: <i>management/properties</i>
      */
     public static final String[] URL_PROPERTIES_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_PROPERTIES };
@@ -409,7 +440,7 @@ public final class CmmnRestUrls {
      * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by
      * first argument value).
      */
-    public static final String createRelativeResourceUrl(String[] segments, Object... arguments) {
+    public static String createRelativeResourceUrl(String[] segments, Object... arguments) {
         return MessageFormat.format(StringUtils.join(segments, '/'), arguments);
     }
 }

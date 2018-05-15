@@ -29,7 +29,7 @@ import javax.annotation.PostConstruct;
 public class ApplicationDevelopmentConfiguration {
 
     protected static final boolean FLOWABLE_MODELER_REST_ENABLED = true;
-    protected static final String FLOWABLE_MODELER_DEPLOYMENT_URL = "http://localhost:9999/flowable-task/process-api";
+    protected static final String FLOWABLE_MODELER_DEPLOYMENT_URL = "http://localhost:9999/flowable-task/app-api";
 
     @Autowired
     private FlowableModelerAppProperties flowableModelerAppProperties;

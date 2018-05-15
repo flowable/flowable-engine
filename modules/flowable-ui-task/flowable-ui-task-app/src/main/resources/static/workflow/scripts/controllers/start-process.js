@@ -16,12 +16,12 @@ angular.module('flowableApp')
       .controller('StartProcessController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$route', '$modal', '$routeParams', '$q', 'AppDefinitionService', 'ProcessService', 'FormService', 'RelatedContentService',
    function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $q, AppDefinitionService, ProcessService, FormService, RelatedContentService) {
 
-       $scope.deploymentKey = $routeParams.deploymentKey;
-       $scope.missingAppdefinition = $scope.deploymentKey === false;
+       $scope.appDefinitionKey = $routeParams.appDefinitionKey;
+       $scope.missingAppdefinition = $scope.appDefinitionKey === false;
 
-       AppDefinitionService.setActiveDeploymentKey($scope.deploymentKey);
+       AppDefinitionService.setActiveAppDefinitionKey($scope.appDefinitionKey);
 
-       ProcessService.getProcessDefinitions($scope.deploymentKey).then(function(response){
+       ProcessService.getProcessDefinitions($scope.appDefinitionKey).then(function(response){
            $scope.processDefinitions = response.data;
        });
 
@@ -158,8 +158,8 @@ angular.module('flowableApp')
       };
 
       $scope.navigateToView = function (view) {
-          if ($scope.deploymentKey && !FLOWABLE.CONFIG.integrationProfile) {
-              $location.path("/apps/" + encodeURIComponent($scope.deploymentKey)+ view);
+          if ($scope.appDefinitionKey && !FLOWABLE.CONFIG.integrationProfile) {
+              $location.path("/apps/" + encodeURIComponent($scope.appDefinitionKey)+ view);
           }
           else {
               $location.path(view);

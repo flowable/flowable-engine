@@ -34,7 +34,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -47,7 +47,6 @@ import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallba
 import org.flowable.cmmn.engine.impl.callback.DefaultInternalCmmnJobManager;
 import org.flowable.cmmn.engine.impl.cfg.DefaultTaskAssignmentManager;
 import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
-import org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.JobRetryCmd;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
@@ -82,6 +81,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
@@ -94,6 +95,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataM
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryPartInstanceDataManager;
@@ -103,6 +105,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseIns
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricMilestoneInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricPlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
@@ -121,6 +124,7 @@ import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
@@ -150,6 +154,7 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.InternalJobParentStateResolver;
 import org.flowable.job.service.JobHandler;
@@ -198,7 +203,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
-        HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration {
+        HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -224,6 +229,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected MilestoneInstanceDataManager milestoneInstanceDataManager;
     protected HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager;
     protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
+    protected HistoricPlanItemInstanceDataManager historicPlanItemInstanceDataManager;
 
     protected CmmnDeploymentEntityManager cmmnDeploymentEntityManager;
     protected CmmnResourceEntityManager cmmnResourceEntityManager;
@@ -234,6 +240,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
+    protected HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager;
 
     protected boolean disableIdmEngine;
 
@@ -763,6 +770,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (historicMilestoneInstanceDataManager == null) {
             historicMilestoneInstanceDataManager = new MybatisHistoricMilestoneInstanceDataManager(this);
         }
+        if (historicPlanItemInstanceDataManager == null) {
+            historicPlanItemInstanceDataManager = new MybatisHistoricPlanItemInstanceDataManager(this);
+        }
     }
 
     public void initEntityManagers() {
@@ -792,6 +802,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
         if (historicMilestoneInstanceEntityManager == null) {
             historicMilestoneInstanceEntityManager = new HistoricMilestoneInstanceEntityManagerImpl(this, historicMilestoneInstanceDataManager);
+        }
+        if (historicPlanItemInstanceEntityManager == null) {
+            historicPlanItemInstanceEntityManager = new HistoricPlanItemInstanceEntityManagerImpl(this, historicPlanItemInstanceDataManager);
         }
     }
 
@@ -903,7 +916,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected void initDefaultCaseInstanceCallbacks() {
-        this.caseInstanceStateChangeCallbacks.put(PlanItemInstanceCallbackType.CHILD_CASE,
+        this.caseInstanceStateChangeCallbacks.put(CallbackTypes.PLAN_ITEM_CHILD_CASE,
                 Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildCaseInstanceStateChangeCallback()));
     }
 
@@ -1289,6 +1302,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public CmmnTaskService getCmmnTaskService() {
         return cmmnTaskService;
     }
@@ -1512,6 +1526,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public HistoricPlanItemInstanceEntityManager getHistoricPlanItemInstanceEntityManager() {
+        return historicPlanItemInstanceEntityManager;
+    }
+
+    public CmmnEngineConfiguration setHistoricPlanItemInstanceEntityManager(HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager) {
+        this.historicPlanItemInstanceEntityManager = historicPlanItemInstanceEntityManager;
+        return this;
+    }
+
     public CaseInstanceHelper getCaseInstanceHelper() {
         return caseInstanceHelper;
     }
@@ -1652,10 +1675,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public ExpressionManager getExpressionManager() {
         return expressionManager;
     }
 
+    @Override
     public CmmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
         return this;
@@ -2289,6 +2314,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.formFieldHandler = formFieldHandler;
     }
 
+    @Override
     public void initIdGenerator() {
         super.initIdGenerator();
         if (taskIdGenerator == null) {

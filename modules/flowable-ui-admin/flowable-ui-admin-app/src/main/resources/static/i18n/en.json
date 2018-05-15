@@ -25,6 +25,7 @@
         "MENU": {
             "PROCESS-ENGINE": "Process Engine",
             "CMMN-ENGINE": "CMMN Engine",
+            "APP-ENGINE": "App Engine",
             "FORM-ENGINE": "Form Engine",
             "CONTENT-ENGINE": "Content Engine",
             "DMN-ENGINE": "DMN Engine",
@@ -1028,6 +1029,113 @@
             }
         }
     },
+    "APP-DEPLOYMENTS": {
+        "TITLE": "Deployments",
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching deployments.",
+        "LIST-MESSAGE-EMPTY": "No matching deployments.",
+        "FILTER": {
+            "NAME": "Name (case sensitive)",
+            "TENANTID": "Tenant identifier (case sensitive)"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Name"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "DEPLOY-TIME": "Deploy time",
+            "CATEGORY": "Category",
+            "TENANT": "Tenant"
+        },
+        "ACTION": {
+            "UPLOAD": "Upload app",
+            "DELETE": "Delete deployment"
+        },
+        "POPUP": {
+            "UPLOAD": {
+                "DESCRIPTION": "Select a .app app definition file to deploy or upload a package of an app with assets contained in a .zip or .bar file.",
+                "DROPZONE": "Or drop a file here",
+                "NO-DROP": "File drop is not supported by your browser",
+                "CANCEL-UPLOAD": "Cancel upload",
+                "ERROR": "Could not upload this file"
+            },
+            "DELETE": {
+                "CONFIRM-MESSAGE": "Delete deployment '{{name}}'?"
+                }
+        }
+    },
+    "APP-DEPLOYMENT": {
+        "ID": "ID:",
+        "NAME": "Name:",
+        "TIME": "Deployment time:",
+        "KEY": "Key:",
+        "CATEGORY": "Category:",
+        "TENANTID": "Tenant identifier:",
+        "DEFINITIONS-MESSAGE": "This deployment has {{total}} app definitions, showing {{size}}.",
+        "DEFINITIONS-MESSAGE-EMPTY": "This deployment has no app definitions.",
+        "TITLE": {
+            "APP-DEFINITIONS": "APp Definitions",
+            "RESOURCES": "Resources"
+        },
+        "ACTION": {
+            "SHOW-ALL-DEFINITIONS": "Show all definitions"
+        }
+    },
+    "APP-DEFINITIONS": {
+        "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching definitions.",
+        "LIST-MESSAGE-EMPTY": "No matching app definitions.",
+        "FILTER": {
+            "NAME": "Name (case sensitive)",
+            "KEY": "Key (case sensitive)",
+            "DEPLOYMENT-ID": "Deployment ID",
+            "TENANT-ID": "Tenant ID",
+            "LATEST": "Latest version",
+            "LATEST-HELP": "Only show latest versions"
+        },
+        "TITLE": {
+            "MAIN": "App Definitions"
+        },
+        "SORT": {
+            "ID": "ID",
+            "NAME": "Name",
+            "VERSION": "Version"
+        },
+        "HEADER": {
+            "ID": "ID",
+            "NAME": "Name",
+            "VERSION": "Version",
+            "KEY": "Key",
+            "TENANT": "Tenant"
+        }
+    },
+    "APP-DEFINITION": {
+        "ID": "ID:",
+        "NAME": "Name:",
+        "VERSION": "Version:",
+        "DESCRIPTION": "Description:",
+        "KEY": "Key:",
+        "CATEGORY": "Category:",
+        "DEPLOYMENT": "Deployment:",
+        "TENANT": "Tenant:",
+        "PROCESS-DEFINITIONS-SIZE": "App has {{total}} process definitions",
+        "PROCESS-DEFINITIONS-EMPTY": "App has no process definitions",
+        "CASE-DEFINITIONS-SIZE": "App has {{total}} case definitions",
+        "CASE-DEFINITIONS-EMPTY": "App has no case definitions",
+        "DECISION-TABLES-SIZE": "App has {{total}} decision tables.",
+        "DECISION-TABLES-EMPTY": "App has no decision tables.",
+        "FORM-DEFINITIONS-SIZE": "App has {{total}} form definitions.",
+        "FORM-DEFINITIONS-EMPTY": "App has no form definitions.",
+        "TITLE": {
+            "PROCESS-DEFINITIONS": "Process definitions",
+            "CASE-DEFINITIONS": "Case definitions",
+            "DECISION-TABLES": "Decision tables",
+            "FORM-DEFINITIONS": "Form definitions"
+        },
+        "ACTION": {
+            "EDIT-CATEGORY": "Edit category"
+        }
+    },
     "DECISION-TABLE-DEPLOYMENTS": {
         "TITLE": "Decision Table Deployments",
         "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching deployments.",
@@ -1095,6 +1203,7 @@
         "NAME": "Name:",
         "VERSION": "Version:",
         "KEY": "Key:",
+        "CATEGORY": "Category:",
         "DEPLOYMENT-ID": "Deployment ID:",
         "PARENT-DEPLOYMENT-ID": "Parent deployment ID",
         "RESOURCE-NAME": "Resource name:",
@@ -1221,6 +1330,8 @@
     "FORM-DEFINITION": {
         "ID": "ID:",
         "NAME": "Name:",
+        "KEY": "Key:",
+        "CATEGORY": "Category:",
         "PARENT-DEPLOYMENT-ID": "Parent Deployment ID:",
         "DEPLOYMENT-ID": "Deployment ID:",
         "DESCRIPTION": "Description:",

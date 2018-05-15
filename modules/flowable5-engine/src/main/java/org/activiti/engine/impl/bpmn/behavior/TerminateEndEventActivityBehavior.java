@@ -162,7 +162,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             rootExecution = rootExecution.getParent() != null ? rootExecution.getParent() : rootExecution.getSuperExecution();
         }
 
-        return orderExecutionsRootToLeaf(rootExecution, new ArrayList<ExecutionEntity>());
+        return orderExecutionsRootToLeaf(rootExecution, new ArrayList<>());
     }
 
     protected List<ExecutionEntity> orderExecutionsRootToLeaf(ExecutionEntity rootExecution, List<ExecutionEntity> orderedExecutions) {

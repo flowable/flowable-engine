@@ -73,11 +73,11 @@ angular.module('flowableApp')
                 $scope.model.filter.param.assignment = $scope.model.assignmentOptions[0].id;
                 $scope.model.filter.param.processDefinitionId = 'default';
 
-                $scope.deploymentKey = $routeParams.deploymentKey;
-                $scope.missingAppdefinition = $scope.deploymentKey === false;
+                $scope.appDefinitionKey = $routeParams.appDefinitionKey;
+                $scope.missingAppdefinition = $scope.appDefinitionKey === false;
 
                 // In case of viewing tasks in an app-context, need to make filter aware of this
-                $scope.model.filter.param.deploymentKey = $scope.deploymentKey;
+                $scope.model.filter.param.appDefinitionKey = $scope.appDefinitionKey;
 
                 // Propagate to root filter
                 if (forcePropagateToRootScope === true || ($rootScope.taskFilter === null && $rootScope.taskFilter === undefined)) {
@@ -96,7 +96,7 @@ angular.module('flowableApp')
             }
 
             // Update app on rootScope. If app id present, it will fetch definition if not already fetched to update view and navigation accordingly
-            AppDefinitionService.setActiveDeploymentKey($scope.deploymentKey);
+            AppDefinitionService.setActiveAppDefinitionKey($scope.appDefinitionKey);
 
             // Callback for state selection widget
             $scope.selectStateFilter = function (state) {
@@ -165,8 +165,8 @@ angular.module('flowableApp')
                 }
 
                 // App definition
-                if (params.deploymentKey) {
-                    data.deploymentKey = params.deploymentKey;
+                if (params.appDefinitionKey) {
+                    data.appDefinitionKey = params.appDefinitionKey;
                 }
 
                 // Sort order
@@ -336,7 +336,7 @@ angular.module('flowableApp')
             });
 
             // Load process definitions for the filter dropdown
-            $rootScope.loadProcessDefinitions($scope.deploymentKey);
+            $rootScope.loadProcessDefinitions($scope.appDefinitionKey);
 
             // Add a watch, so we can
             var unregisterWatch = $scope.$watch('root.processDefinitions', function(data) {

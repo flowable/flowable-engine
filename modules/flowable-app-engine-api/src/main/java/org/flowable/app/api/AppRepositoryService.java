@@ -53,6 +53,11 @@ public interface AppRepositoryService {
     AppModel getAppModel(String appDefinitionId);
     
     /**
+     * Returns the {@link AppModel} as a JSON string.
+     */
+    String convertAppModelToJson(String appDefinitionId);
+    
+    /**
      * Returns the {@link AppDefinition} including all App information like additional Properties (e.g. documentation).
      */
     AppDefinition getAppDefinition(String appDefinitionId);

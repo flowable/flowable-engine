@@ -20,6 +20,10 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-app</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-process</artifactId>
         </dependency>
         <dependency>
@@ -36,6 +40,10 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-cmmn-spring-configurator</artifactId>
         </dependency>
         <dependency>
@@ -49,6 +57,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-content-spring-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-spring-configurator</artifactId>
         </dependency>
     </dependencies>
 </project>

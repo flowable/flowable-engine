@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
@@ -51,6 +53,9 @@ public class FlowableProcessDefinitionService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected AppRepositoryService appRepositoryService;
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
@@ -74,12 +79,13 @@ public class FlowableProcessDefinitionService {
         }
     }
 
-    public ResultListDataRepresentation getProcessDefinitions(Boolean latest, String deploymentKey) {
+    public ResultListDataRepresentation getProcessDefinitions(Boolean latest, String appDefinitionKey) {
 
         ProcessDefinitionQuery definitionQuery = repositoryService.createProcessDefinitionQuery();
 
-        if (deploymentKey != null) {
-            Deployment deployment = repositoryService.createDeploymentQuery().deploymentKey(deploymentKey).latest().singleResult();
+        if (appDefinitionKey != null) {
+            AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().appDefinitionKey(appDefinitionKey).latestVersion().singleResult();
+            Deployment deployment = repositoryService.createDeploymentQuery().parentDeploymentId(appDefinition.getDeploymentId()).singleResult();
 
             if (deployment != null) {
                 definitionQuery.deploymentId(deployment.getId());
@@ -115,8 +121,9 @@ public class FlowableProcessDefinitionService {
         if (startElement instanceof StartEvent) {
             StartEvent startEvent = (StartEvent) startElement;
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
+                Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
                 formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
-                        processDefinition.getDeploymentId(), processDefinition.getTenantId());
+                                deployment.getParentDeploymentId(), processDefinition.getTenantId());
             }
         }
 

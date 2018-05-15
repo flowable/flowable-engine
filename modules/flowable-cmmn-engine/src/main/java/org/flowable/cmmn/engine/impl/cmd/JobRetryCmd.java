@@ -25,8 +25,6 @@ import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Saeid Mirzaei

@@ -46,7 +46,7 @@ public class ProcessDefinitionInfoCache {
     /** Cache with no limit */
     public ProcessDefinitionInfoCache(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
-        this.cache = Collections.synchronizedMap(new HashMap<String, ProcessDefinitionInfoCacheObject>());
+        this.cache = Collections.synchronizedMap(new HashMap<>());
     }
 
     /** Cache which has a hard limit: no more elements will be cached than the limit. */

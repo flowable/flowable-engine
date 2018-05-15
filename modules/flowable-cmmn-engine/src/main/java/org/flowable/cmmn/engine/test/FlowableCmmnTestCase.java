@@ -66,11 +66,11 @@ public abstract class FlowableCmmnTestCase {
 
     protected static void initCmmnEngine() {
         try (InputStream inputStream = FlowableCmmnTestCase.class.getClassLoader().getResourceAsStream(FLOWABLE_CMMN_CFG_XML)) {
-            CmmnEngine cmmnEngine = null;
+            CmmnEngine cmmnEngine;
             if (inputStream != null) {
                 cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine();
             } else {
-                LOGGER.info("No " + FLOWABLE_CMMN_CFG_XML + " configuration found. Using default in-memory standalone configuration.");
+                LOGGER.info("No {} configuration found. Using default in-memory standalone configuration.", FLOWABLE_CMMN_CFG_XML);
                 cmmnEngine = new StandaloneInMemCmmnEngineConfiguration().buildCmmnEngine();
             }
             CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngine.getCmmnEngineConfiguration());
@@ -119,6 +119,13 @@ public abstract class FlowableCmmnTestCase {
     
     protected void setClockTo(Date date) {
         cmmnEngineConfiguration.getClock().setCurrentTime(date);
+    }
+
+    protected Date forwardClock(long milliseconds) {
+        long currentMillis = cmmnEngineConfiguration.getClock().getCurrentTime().getTime();
+        Date date = new Date(currentMillis + milliseconds);
+        cmmnEngineConfiguration.getClock().setCurrentTime(date);
+        return date;
     }
 
     protected void assertCaseInstanceEnded(CaseInstance caseInstance) {

@@ -220,6 +220,12 @@
             <artifactId>spring-security-web</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <!-- BUILD -->
@@ -313,7 +319,7 @@
                                 <argument>--spring.datasource.url=jdbc:postgresql://localhost:5432/flowable</argument>
                                 <argument>--spring.datasource.username=flowable</argument>
                                 <argument>--spring.datasource.password=flowable</argument>
-                                <argument>--flowable.modeler.app.deployment-api-url=http://localhost:9999/flowable-task/process-api</argument>
+                                <argument>--flowable.modeler.app.deployment-api-url=http://localhost:9999/flowable-task/app-api</argument>
                                 <argument>--com.sun.management.jmxremote.port=4000</argument>
                             </arguments>
                         </configuration>
@@ -341,7 +347,7 @@
                                 <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
                                 <argument>--spring.datasource.username=flowable</argument>
                                 <argument>--spring.datasource.password=flowable</argument>
-                                <argument>--flowable.modeler.app.deployment-api-url=http://localhost:9999/flowable-task/process-api</argument>
+                                <argument>--flowable.modeler.app.deployment-api-url=http://localhost:9999/flowable-task/app-api</argument>
                                 <argument>--com.sun.management.jmxremote.port=4000</argument>
                             </arguments>
                         </configuration>

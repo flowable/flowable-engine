@@ -41,8 +41,7 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeployment
     @Override
     public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
 
-        // Create a separate deployment for each resource using the resource
-        // name
+        // Create a separate deployment for each resource using the resource name
 
         for (final Resource resource : resources) {
 
