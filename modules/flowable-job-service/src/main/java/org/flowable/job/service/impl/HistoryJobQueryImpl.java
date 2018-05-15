@@ -37,6 +37,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     protected String handlerType;
     protected boolean withException;
     protected String exceptionMessage;
+    protected String scopeType;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -85,6 +86,15 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
             throw new FlowableIllegalArgumentException("Provided exception message is null");
         }
         this.exceptionMessage = exceptionMessage;
+        return this;
+    }
+    
+    @Override
+    public HistoryJobQuery scopeType(String scopeType) {
+        if (scopeType == null) {
+            throw new FlowableIllegalArgumentException("Provided scope type is null"); 
+        }
+        this.scopeType = scopeType;
         return this;
     }
 
@@ -192,6 +202,10 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     public String getExceptionMessage() {
         return exceptionMessage;
+    }
+    
+    public String getScopeType() {
+        return scopeType;
     }
 
     public String getTenantId() {

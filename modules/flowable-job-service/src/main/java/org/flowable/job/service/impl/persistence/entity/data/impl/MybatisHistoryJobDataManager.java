@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.job.api.HistoryJob;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
@@ -31,6 +32,16 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
  * @author Tijs Rademakers
  */
 public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJobEntity> implements HistoryJobDataManager {
+    
+    protected String jobExecutionScope;
+    
+    public MybatisHistoryJobDataManager() {
+        
+    }
+    
+    public MybatisHistoryJobDataManager(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
+    }
 
     @Override
     public Class<? extends HistoryJobEntity> getManagedEntityClass() {
@@ -45,8 +56,11 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoryJobEntity> findJobsToExecute(Page page) {
-        // Needed for db2/sqlserver (see limitBetween in mssql.properties), otherwise ordering will be incorrect
+        
         ListQueryParameterObject params = new ListQueryParameterObject();
+        params.setParameter(jobExecutionScope);
+        
+        // Needed for db2/sqlserver (see limitBetween in mssql.properties), otherwise ordering will be incorrect
         params.setFirstResult(page.getFirstResult());
         params.setMaxResults(page.getMaxResults());
         params.setOrderByColumns("CREATE_TIME_ ASC");
@@ -68,9 +82,11 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     @SuppressWarnings("unchecked")
     public List<HistoryJobEntity> findExpiredJobs(Page page) {
         Map<String, Object> params = new HashMap<>();
-        Date now = CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration();
+        params.put("jobExecutionScope", jobExecutionScope);
+        Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
-        Date maxTimeout = new Date(now.getTime() - CommandContextUtil.getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
+        Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
         params.put("maxTimeout", maxTimeout);
         return getDbSqlSession().selectList("selectExpiredHistoryJobs", params, page);
     }

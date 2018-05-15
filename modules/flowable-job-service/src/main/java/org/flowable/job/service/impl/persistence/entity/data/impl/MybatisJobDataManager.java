@@ -36,7 +36,17 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
  */
 public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implements JobDataManager {
 
+    protected String jobExecutionScope;
+    
     protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
+    
+    public MybatisJobDataManager() {
+        
+    }
+    
+    public MybatisJobDataManager(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
+    }
 
     @Override
     public Class<? extends JobEntity> getManagedEntityClass() {
@@ -51,8 +61,6 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     @Override
     @SuppressWarnings("unchecked")
     public List<JobEntity> findJobsToExecute(Page page) {
-        String jobExecutionScope = CommandContextUtil.getJobServiceConfiguration().getJobExecutionScope();
-        
         HashMap<String, Object> params = new HashMap<>();
         params.put("jobExecutionScope", jobExecutionScope);
         
@@ -83,11 +91,10 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         Map<String, Object> params = new HashMap<>();
         
         JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration();
-        String jobExecutionScope = jobServiceConfiguration.getJobExecutionScope();
         params.put("jobExecutionScope", jobExecutionScope);
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
-        Date maxTimeout = new Date(now.getTime() - CommandContextUtil.getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
+        Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
         params.put("maxTimeout", maxTimeout);
         return getDbSqlSession().selectList("selectExpiredJobs", params, page);
     }
@@ -128,6 +135,14 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         } else {
             bulkDelete("deleteJobsByExecutionId", jobsByExecutionIdMatcher, executionId);
         }
+    }
+
+    public String getJobExecutionScope() {
+        return jobExecutionScope;
+    }
+
+    public void setJobExecutionScope(String jobExecutionScope) {
+        this.jobExecutionScope = jobExecutionScope;
     }
 
 }

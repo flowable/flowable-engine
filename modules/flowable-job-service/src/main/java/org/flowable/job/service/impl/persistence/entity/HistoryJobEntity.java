@@ -35,5 +35,7 @@ public interface HistoryJobEntity extends JobInfoEntity, HistoryJob, Entity, Has
     void setCustomValuesByteArrayRef(JobByteArrayRef customValuesByteArrayRef);
 
     void setExceptionByteArrayRef(JobByteArrayRef exceptionByteArrayRef);
+    
+    void setScopeType(String scopeType);
 
 }

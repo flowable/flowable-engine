@@ -26,5 +26,10 @@ public interface HistoryJob extends JobInfo {
      * Get the job create time.
      */
     Date getCreateTime();
+    
+    /**
+     * Get the scope type. 
+     */
+    String getScopeType();
 
 }

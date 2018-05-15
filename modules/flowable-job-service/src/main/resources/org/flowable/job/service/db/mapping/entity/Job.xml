@@ -43,16 +43,17 @@
         select
         RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         from ${prefix}ACT_RU_JOB RES
-        where 
-        <if test="parameter.jobExecutionScope == null">
-            SCOPE_TYPE_ is null and LOCK_EXP_TIME_ is null
-        </if>
-        <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
-            SCOPE_TYPE_ = #{parameter.jobExecutionScope, jdbcType=VARCHAR} and LOCK_EXP_TIME_ is null
-        </if>
-        <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope == 'all'">
-            LOCK_EXP_TIME_ is null
-        </if>
+        <where>
+            <if test="parameter.jobExecutionScope == null">
+                SCOPE_TYPE_ is null and LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
+                SCOPE_TYPE_ = #{parameter.jobExecutionScope, jdbcType=VARCHAR} and LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope == 'all'">
+                LOCK_EXP_TIME_ is null
+            </if>
+        </where>
         <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 

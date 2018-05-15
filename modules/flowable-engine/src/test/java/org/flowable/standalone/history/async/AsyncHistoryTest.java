@@ -19,15 +19,35 @@ import java.util.List;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
-public class AsyncHistoryTest extends PluggableFlowableTestCase {
+public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
+
+    @Override
+    protected String getEngineName() {
+        return "asyncHistoryTest";
+    }
+    
+    @Override
+    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        // Enable it, but don't start the executor automatically, it will be started in the tests themselves.
+        processEngineConfiguration.setAsyncHistoryEnabled(true);
+        processEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(true);
+        processEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
+        processEngineConfiguration.setAsyncFailedJobWaitTime(100);
+        processEngineConfiguration.setDefaultFailedJobWaitTime(100);
+        processEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(10);
+        processEngineConfiguration.setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(100);
+        processEngineConfiguration.setAsyncExecutorActivate(false);
+    }
 
     @Override
     protected void tearDown() throws Exception {
@@ -43,10 +63,6 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testOneTaskProcess() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
         deployOneTaskTestProcess();
         for (int i = 0; i < 10; i++) { // Run this multiple times, as order of jobs processing can be different each run
             String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
@@ -109,10 +125,6 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testSimpleStraightThroughProcess() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
         String processInstanceId = runtimeService
                         .startProcessInstanceByKey("testSimpleStraightThroughProcess", CollectionUtil.singletonMap("counter", 0)).getId();
 
@@ -127,11 +139,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testTaskAssigneeChange() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
@@ -148,11 +156,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testTaskAssigneeChangeToNull() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
@@ -169,11 +173,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testClaimTask() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
         taskService.setAssignee(task.getId(), null);
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
@@ -190,11 +190,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testSetTaskOwner() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
         assertNull(task.getOwner());
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
@@ -216,11 +212,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testSetTaskName() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
         assertEquals("The Task", task.getName());
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
@@ -238,11 +230,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testSetTaskDescription() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
         assertNull(task.getDescription());
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
@@ -268,11 +256,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testSetTaskDueDate() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
         assertNull(task.getDueDate());
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
@@ -294,16 +278,12 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testSetTaskPriority() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
-        assertEquals(org.flowable.task.api.Task.DEFAULT_PRIORITY, task.getPriority());
+        Task task = startOneTaskprocess();
+        assertEquals(Task.DEFAULT_PRIORITY, task.getPriority());
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
-        assertEquals(org.flowable.task.api.Task.DEFAULT_PRIORITY, historicTaskInstance.getPriority());
+        assertEquals(Task.DEFAULT_PRIORITY, historicTaskInstance.getPriority());
 
         taskService.setPriority(task.getId(), 1);
 
@@ -315,11 +295,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testSetTaskCategory() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
         assertNull(task.getCategory());
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
@@ -337,11 +313,7 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testSetTaskFormKey() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task task = startOneTaskprocess();
+        Task task = startOneTaskprocess();
         assertNull(task.getFormKey());
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
@@ -358,19 +330,15 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
     }
 
     public void testSetTaskParentId() {
-        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            return;
-        }
-        
-        org.flowable.task.api.Task parentTask1 = taskService.newTask();
+        Task parentTask1 = taskService.newTask();
         parentTask1.setName("Parent task 1");
         taskService.saveTask(parentTask1);
 
-        org.flowable.task.api.Task parentTask2 = taskService.newTask();
+        Task parentTask2 = taskService.newTask();
         parentTask2.setName("Parent task 2");
         taskService.saveTask(parentTask2);
 
-        org.flowable.task.api.Task childTask = taskService.newTask();
+        Task childTask = taskService.newTask();
         childTask.setName("child task");
         childTask.setParentTaskId(parentTask1.getId());
         taskService.saveTask(childTask);
@@ -397,14 +365,14 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
         taskService.deleteTask(parentTask2.getId(), true);
     }
 
-    protected org.flowable.task.api.Task startOneTaskprocess() {
+    protected Task startOneTaskprocess() {
         deployOneTaskTestProcess();
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
         return task;
     }
 
-    protected void finishOneTaskProcess(org.flowable.task.api.Task task) {
+    protected void finishOneTaskProcess(Task task) {
         taskService.complete(task.getId());
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
         assertNull(managementService.createHistoryJobQuery().singleResult());

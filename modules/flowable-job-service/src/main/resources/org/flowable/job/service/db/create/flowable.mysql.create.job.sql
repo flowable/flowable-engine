@@ -114,6 +114,7 @@ create table ACT_RU_HISTORY_JOB (
     CUSTOM_VALUES_ID_ varchar(64),
     ADV_HANDLER_CFG_ID_ varchar(64),
     CREATE_TIME_ timestamp(3) NULL,
+    SCOPE_TYPE_ varchar(255),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

@@ -114,6 +114,7 @@ create table ACT_RU_HISTORY_JOB (
     CUSTOM_VALUES_ID_ nvarchar(64),
     ADV_HANDLER_CFG_ID_ nvarchar(64),
     CREATE_TIME_ datetime2 NULL,
+    SCOPE_TYPE_ nvarchar(255),
     TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
 );

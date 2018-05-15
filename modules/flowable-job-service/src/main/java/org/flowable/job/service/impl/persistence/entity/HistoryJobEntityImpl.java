@@ -42,11 +42,12 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     protected JobByteArrayRef exceptionByteArrayRef;
     protected String exceptionMessage;
 
-    protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
-
     protected String lockOwner;
     protected Date lockExpirationTime;
     protected Date createTime;
+    protected String scopeType;
+    
+    protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
 
     @Override
     public Object getPersistentState() {
@@ -61,6 +62,8 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
 
         persistentState.put("lockOwner", lockOwner);
         persistentState.put("lockExpirationTime", lockExpirationTime);
+        
+        persistentState.put("scopeType", scopeType);
 
         return persistentState;
     }
@@ -229,6 +232,14 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     @Override
     public void setLockExpirationTime(Date claimedUntil) {
         this.lockExpirationTime = claimedUntil;
+    }
+    
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
