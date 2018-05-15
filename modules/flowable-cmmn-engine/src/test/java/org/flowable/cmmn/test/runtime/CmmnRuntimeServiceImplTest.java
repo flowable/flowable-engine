@@ -4,7 +4,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.CallbackType;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -22,11 +22,11 @@ public class CmmnRuntimeServiceImplTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             callbackId("testCallBackId").
-            callbackType(PlanItemInstanceCallbackType.CASE_ADHOC_CHILD).
+            callbackType(CallbackType.CASE_ADHOC_CHILD).
             start();
 
         // in fact it must be possible to set any callbackType and Id
-        assertThat(caseInstance.getCallbackType(), is(PlanItemInstanceCallbackType.CASE_ADHOC_CHILD));
+        assertThat(caseInstance.getCallbackType(), is(CallbackType.CASE_ADHOC_CHILD));
         assertThat(caseInstance.getCallbackId(), is("testCallBackId"));
     }
 
