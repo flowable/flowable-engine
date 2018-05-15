@@ -69,7 +69,7 @@ public class ConversionHelper {
 
     public void addCaseElement(CaseElement caseElement) {
         if (!caseElements.containsKey(currentCase)) {
-            caseElements.put(currentCase, new ArrayList<CaseElement>());
+            caseElements.put(currentCase, new ArrayList<>());
         }
         caseElements.get(currentCase).add(caseElement);
     }

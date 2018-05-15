@@ -376,7 +376,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     }
 
     public static void writeCustomAttributes(Collection<List<ExtensionAttribute>> attributes, XMLStreamWriter xtw, List<ExtensionAttribute>... blackLists) throws XMLStreamException {
-        writeCustomAttributes(attributes, xtw, new LinkedHashMap<String, String>(), blackLists);
+        writeCustomAttributes(attributes, xtw, new LinkedHashMap<>(), blackLists);
     }
 
     /**

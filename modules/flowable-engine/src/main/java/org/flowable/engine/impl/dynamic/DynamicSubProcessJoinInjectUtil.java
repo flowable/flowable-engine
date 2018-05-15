@@ -76,8 +76,8 @@ public class DynamicSubProcessJoinInjectUtil extends BaseDynamicSubProcessInject
         }
         parentSubProcess.setOutgoingFlows(userTask.getOutgoingFlows());
         
-        userTask.setIncomingFlows(new ArrayList<SequenceFlow>());
-        userTask.setOutgoingFlows(new ArrayList<SequenceFlow>());
+        userTask.setIncomingFlows(new ArrayList<>());
+        userTask.setOutgoingFlows(new ArrayList<>());
         
         if (elementGraphicInfo != null) {
             elementGraphicInfo.setExpanded(false);

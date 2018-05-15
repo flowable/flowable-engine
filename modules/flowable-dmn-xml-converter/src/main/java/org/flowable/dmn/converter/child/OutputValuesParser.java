@@ -49,7 +49,7 @@ public class OutputValuesParser extends BaseChildElementParser {
 
                     if (StringUtils.isNotEmpty(outputValuesText)) {
                         String[] outputValuesSplit = outputValuesText.replaceAll("^\"", "").split("\"?(,|$)(?=(([^\"]*\"){2})*[^\"]*$) *\"?");
-                        outputValues.setTextValues(new ArrayList<Object>(Arrays.asList(outputValuesSplit)));
+                        outputValues.setTextValues(new ArrayList<>(Arrays.asList(outputValuesSplit)));
                     }
 
 

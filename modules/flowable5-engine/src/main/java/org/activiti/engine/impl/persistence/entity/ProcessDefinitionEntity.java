@@ -86,7 +86,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
             processInstance = (ExecutionEntity) super.createProcessInstanceForInitial(initial);
         }
 
-        processInstance.setExecutions(new ArrayList<ExecutionEntity>());
+        processInstance.setExecutions(new ArrayList<>());
         processInstance.setProcessDefinition(processDefinition);
         // Do not initialize variable map (let it happen lazily)
 

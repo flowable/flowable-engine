@@ -68,7 +68,7 @@ public class DummyTenantInfoHolder implements TenantInfoHolder {
     }
 
     public void addTenant(String tenantId) {
-        tenantToUserMapping.put(tenantId, new ArrayList<String>());
+        tenantToUserMapping.put(tenantId, new ArrayList<>());
         updateUserMap();
     }
 

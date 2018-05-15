@@ -54,7 +54,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (typeAliasConfigs != null) {
             for (MybatisTypeAliasConfigurator customMybatisTypeAliasConfig : typeAliasConfigs) {
                 if (engineConfiguration.getDependentEngineMybatisTypeAliasConfigs() == null) {
-                    engineConfiguration.setDependentEngineMybatisTypeAliasConfigs(new ArrayList<MybatisTypeAliasConfigurator>());
+                    engineConfiguration.setDependentEngineMybatisTypeAliasConfigs(new ArrayList<>());
                 }
                 engineConfiguration.getDependentEngineMybatisTypeAliasConfigs().add(customMybatisTypeAliasConfig);
             }
@@ -64,7 +64,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (typeHandlerConfigs != null) {
             for (MybatisTypeHandlerConfigurator typeHandler : typeHandlerConfigs) {
                 if (engineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() == null) {
-                    engineConfiguration.setDependentEngineMybatisTypeHandlerConfigs(new ArrayList<MybatisTypeHandlerConfigurator>());
+                    engineConfiguration.setDependentEngineMybatisTypeHandlerConfigs(new ArrayList<>());
                 }
                 engineConfiguration.getDependentEngineMybatisTypeHandlerConfigs() .add(typeHandler);
             }
@@ -75,7 +75,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         List<EngineDeployer> deployers = getCustomDeployers();
         if (deployers != null) {
             if (engineConfiguration.getCustomPostDeployers() == null) {
-                engineConfiguration.setCustomPostDeployers(new ArrayList<EngineDeployer>());
+                engineConfiguration.setCustomPostDeployers(new ArrayList<>());
             }
             engineConfiguration.getCustomPostDeployers().addAll(deployers);
         }

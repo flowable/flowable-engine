@@ -145,7 +145,7 @@ public class Parser {
 
     public void putExtensionHandler(Scanner.ExtensionToken token, ExtensionHandler extension) {
         if (extensions.isEmpty()) {
-            extensions = new HashMap<Scanner.ExtensionToken, ExtensionHandler>(16);
+            extensions = new HashMap<>(16);
         }
         extensions.put(token, extension);
     }
@@ -253,7 +253,7 @@ public class Parser {
      */
     protected final Token lookahead(int index) throws ScanException, ParseException {
         if (lookahead.isEmpty()) {
-            lookahead = new LinkedList<LookaheadToken>();
+            lookahead = new LinkedList<>();
         }
         while (index >= lookahead.size()) {
             lookahead.add(new LookaheadToken(scanner.next(), scanner.getPosition()));
@@ -305,7 +305,7 @@ public class Parser {
         if (token.getSymbol() == EOF && t == null) {
             return new Tree(e, functions, identifiers, e.isDeferred());
         }
-        ArrayList<AstNode> list = new ArrayList<AstNode>();
+        ArrayList<AstNode> list = new ArrayList<>();
         if (t != null) {
             list.add(t);
         }
@@ -678,7 +678,7 @@ public class Parser {
         List<AstNode> l = Collections.emptyList();
         AstNode v = expr(false);
         if (v != null) {
-            l = new ArrayList<AstNode>();
+            l = new ArrayList<>();
             l.add(v);
             while (token.getSymbol() == COMMA) {
                 consumeToken();
@@ -730,7 +730,7 @@ public class Parser {
 
     protected final AstFunction function(String name, AstParameters params) {
         if (functions.isEmpty()) {
-            functions = new ArrayList<FunctionNode>(4);
+            functions = new ArrayList<>(4);
         }
         AstFunction function = createAstFunction(name, functions.size(), params);
         functions.add(function);
@@ -739,7 +739,7 @@ public class Parser {
 
     protected final AstIdentifier identifier(String name) {
         if (identifiers.isEmpty()) {
-            identifiers = new ArrayList<IdentifierNode>(4);
+            identifiers = new ArrayList<>(4);
         }
         AstIdentifier identifier = createAstIdentifier(name, identifiers.size());
         identifiers.add(identifier);

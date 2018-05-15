@@ -248,7 +248,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("task1", task.getTaskDefinitionKey());
         Map<String, Object> transientVarMap = new HashMap<>();
         transientVarMap.put("status", 201);
-        taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+        taskService.complete(task.getId(), new HashMap<>(), transientVarMap);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("task2", task.getTaskDefinitionKey());
@@ -258,13 +258,13 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("task1", task.getTaskDefinitionKey());
         transientVarMap.clear();
         transientVarMap.put("status", 200);
-        taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+        taskService.complete(task.getId(), new HashMap<>(), transientVarMap);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("task3", task.getTaskDefinitionKey());
         transientVarMap.clear();
         transientVarMap.put("status2", 200);
-        taskService.complete(task.getId(), new HashMap<String, Object>(), transientVarMap);
+        taskService.complete(task.getId(), new HashMap<>(), transientVarMap);
     }
 
     /* Service task class for previous tests */

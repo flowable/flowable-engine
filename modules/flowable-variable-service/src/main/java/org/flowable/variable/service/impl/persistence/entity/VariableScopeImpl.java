@@ -86,12 +86,12 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public Map<String, Object> getVariables() {
-        return collectVariables(new HashMap<String, Object>());
+        return collectVariables(new HashMap<>());
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstances() {
-        return collectVariableInstances(new HashMap<String, VariableInstance>());
+        return collectVariableInstances(new HashMap<>());
     }
 
     @Override
@@ -451,7 +451,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public Set<String> getVariableNames() {
-        return collectVariableNames(new HashSet<String>());
+        return collectVariableNames(new HashSet<>());
     }
 
     @Override
@@ -983,7 +983,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     @Override
     public Map<String, Object> getTransientVariables() {
-        return collectTransientVariables(new HashMap<String, Object>());
+        return collectTransientVariables(new HashMap<>());
     }
 
     protected Map<String, Object> collectTransientVariables(HashMap<String, Object> variables) {

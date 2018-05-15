@@ -209,7 +209,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         runtimeService.suspendProcessInstanceById(processInstance.getId());
 
         try {
-            formService.submitTaskFormData(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId(), new HashMap<String, String>());
+            formService.submitTaskFormData(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId(), new HashMap<>());
             fail();
         } catch (FlowableException e) {
             // This is expected
@@ -233,7 +233,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
 
         try {
-            runtimeService.messageEventReceived("someMessage", processInstance.getId(), new HashMap<String, Object>());
+            runtimeService.messageEventReceived("someMessage", processInstance.getId(), new HashMap<>());
             fail();
         } catch (FlowableException e) {
             // This is expected
@@ -289,7 +289,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
 
         try {
-            runtimeService.setVariables(processInstance.getId(), new HashMap<String, Object>());
+            runtimeService.setVariables(processInstance.getId(), new HashMap<>());
             fail();
         } catch (FlowableException e) {
             // This is expected
@@ -297,7 +297,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
 
         try {
-            runtimeService.setVariablesLocal(processInstance.getId(), new HashMap<String, Object>());
+            runtimeService.setVariablesLocal(processInstance.getId(), new HashMap<>());
             fail();
         } catch (FlowableException e) {
             // This is expected
@@ -313,7 +313,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
 
         try {
-            runtimeService.trigger(processInstance.getId(), new HashMap<String, Object>());
+            runtimeService.trigger(processInstance.getId(), new HashMap<>());
             fail();
         } catch (FlowableException e) {
             // This is expected
@@ -329,7 +329,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
 
         try {
-            runtimeService.signalEventReceived("someSignal", processInstance.getId(), new HashMap<String, Object>());
+            runtimeService.signalEventReceived("someSignal", processInstance.getId(), new HashMap<>());
             fail();
         } catch (FlowableException e) {
             // This is expected
@@ -354,7 +354,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         runtimeService.signalEventReceived(signal);
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());
 
-        runtimeService.signalEventReceived(signal, new HashMap<String, Object>());
+        runtimeService.signalEventReceived(signal, new HashMap<>());
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());
 
         // Activate and try again
@@ -383,7 +383,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         runtimeService.signalEventReceived(signal);
         assertEquals(2, runtimeService.createProcessInstanceQuery().count());
 
-        runtimeService.signalEventReceived(signal, new HashMap<String, Object>());
+        runtimeService.signalEventReceived(signal, new HashMap<>());
         assertEquals(2, runtimeService.createProcessInstanceQuery().count());
 
         // Activate and try again

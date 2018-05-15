@@ -138,7 +138,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         caseInstanceEntityManager.insert(caseInstanceEntity);
 
-        caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
+        caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<>(1));
 
         return caseInstanceEntity;
     }

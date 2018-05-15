@@ -538,7 +538,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         fireActivityCompletedEvent();
 
         transitions = new ArrayList<>(transitions);
-        recyclableExecutions = (recyclableExecutions != null ? new ArrayList<>(recyclableExecutions) : new ArrayList<ActivityExecution>());
+        recyclableExecutions = (recyclableExecutions != null ? new ArrayList<>(recyclableExecutions) : new ArrayList<>());
 
         if (recyclableExecutions.size() > 1) {
             for (ActivityExecution recyclableExecution : recyclableExecutions) {
@@ -1096,7 +1096,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
         // remove all child executions and sub process instances:
         HistoryManager historyManager = Context.getCommandContext().getHistoryManager();
-        List<InterpretableExecution> executions = new ArrayList<InterpretableExecution>(getExecutions());
+        List<InterpretableExecution> executions = new ArrayList<>(getExecutions());
         for (InterpretableExecution childExecution : executions) {
             if (childExecution.getSubProcessInstance() != null) {
                 childExecution.getSubProcessInstance().deleteCascade(reason);
@@ -1114,7 +1114,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
 
     private void removeEventScopes() {
-        List<InterpretableExecution> childExecutions = new ArrayList<InterpretableExecution>(getExecutions());
+        List<InterpretableExecution> childExecutions = new ArrayList<>(getExecutions());
         for (InterpretableExecution childExecution : childExecutions) {
             if (childExecution.isEventScope()) {
                 LOGGER.debug("removing eventScope {}", childExecution);
