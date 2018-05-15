@@ -14,6 +14,7 @@ package org.flowable.ui.idm.conf;
 
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
+import org.flowable.ui.common.security.ActuatorRequestMatcher;
 import org.flowable.ui.common.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.idm.properties.FlowableIdmAppProperties;
@@ -216,7 +217,7 @@ public class SecurityConfiguration {
 
     @ConditionalOnClass(EndpointRequest.class)
     @Configuration
-    @Order(15) // Actuator configuration should kick in after the Form Login so the custom login filter can be applied before
+    @Order(5) // Actuator configuration should kick in before the Form Login there should always be http basic for the endpoints
     public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         @Override
@@ -230,6 +231,7 @@ public class SecurityConfiguration {
                 .disable();
 
             http
+                .requestMatcher(new ActuatorRequestMatcher())
                 .authorizeRequests()
                 .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
                 .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN)
