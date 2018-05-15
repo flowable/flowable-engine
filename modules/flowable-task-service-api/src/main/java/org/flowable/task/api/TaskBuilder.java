@@ -100,4 +100,16 @@ public interface TaskBuilder {
      */
     TaskBuilder identityLinks(Set<? extends IdentityLinkInfo> identityLinks);
     Set<? extends IdentityLinkInfo> getIdentityLinks();
+
+    /**
+     * add task scopeId
+     */
+    TaskBuilder scopeId(String scopeId);
+    String getScopeId();
+
+    /**
+     * Add scope type
+     */
+    TaskBuilder scopeType(String scopeType);
+    String getScopeType();
 }

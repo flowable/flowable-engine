@@ -29,6 +29,8 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder {
     protected String formKey;
     protected String taskDefinitionId;
     protected String taskDefinitionKey;
+    protected String scopeId;
+    protected String scopeType;
     protected Set<? extends IdentityLinkInfo> identityLinks = Collections.EMPTY_SET;
 
     public BaseTaskBuilderImpl(CommandExecutor commandExecutor) {
@@ -123,6 +125,18 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder {
     }
 
     @Override
+    public TaskBuilder scopeId(String scopeId) {
+        this.scopeId = scopeId;
+        return this;
+    }
+
+    @Override
+    public TaskBuilder scopeType(String scopeType) {
+        this.scopeType = scopeType;
+        return this;
+    }
+
+    @Override
     public String getId() {
         return id;
     }
@@ -192,4 +206,15 @@ public abstract class BaseTaskBuilderImpl implements TaskBuilder {
     public Set<? extends IdentityLinkInfo> getIdentityLinks() {
         return identityLinks;
     }
+
+    @Override
+    public String getScopeId() {
+        return this.scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return this.scopeType;
+    }
+
 }

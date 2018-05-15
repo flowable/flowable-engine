@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -197,6 +198,37 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertEquals(0, cmmnTaskService.createTaskQuery().count());
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    public void testCreateTaskWithBuilderAndScopes() {
+        Task task = cmmnTaskService.createTaskBuilder().name("builderTask").
+            scopeId("testScopeId").
+            scopeType("testScopeType").
+            create();
+
+        try {
+            Task taskFromQuery = cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+            assertThat(taskFromQuery.getScopeId(), is("testScopeId"));
+            assertThat(taskFromQuery.getScopeType(), is("testScopeType"));
+        } finally {
+            cmmnTaskService.deleteTask(task.getId());
+            cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+        }
+    }
+
+    @Test
+    public void testCreateTaskWithBuilderWithoutScopes() {
+        Task task = cmmnTaskService.createTaskBuilder().name("builderTask").
+            create();
+        try {
+            Task taskFromQuery = cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+            assertThat(taskFromQuery.getScopeId(), nullValue());
+            assertThat(taskFromQuery.getScopeType(), nullValue());
+        } finally {
+            cmmnTaskService.deleteTask(task.getId());
+            cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+        }
     }
 
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
