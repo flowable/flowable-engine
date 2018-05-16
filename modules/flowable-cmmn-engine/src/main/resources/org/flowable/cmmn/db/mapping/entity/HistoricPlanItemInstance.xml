@@ -76,38 +76,38 @@
     </insert>
 
     <insert id="bulkInsertHistoricPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
-        ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATED_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-        LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
-        values
+        INSERT ALL
         <foreach collection="list" item="historicPlanItemInstance" index="index">
-            (
-            #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
-            1,
-            #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.caseInstanceId ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.stageInstanceId ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.isStage ,jdbcType=BOOLEAN},
-            #{historicPlanItemInstance.elementId ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.planItemDefinitionId ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.planItemDefinitionType ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.createdTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.lastStartedTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.lastSuspendedTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.completedTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.occurredTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.terminatedTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.exitTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.endedTime ,jdbcType=TIMESTAMP},
-            #{historicPlanItemInstance.startUserId ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.referenceId ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.referenceType ,jdbcType=VARCHAR},
-            #{historicPlanItemInstance.tenantId ,jdbcType=VARCHAR}
+            into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
+            ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATED_TIME_, LAST_AVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
+            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
+            VALUES (
+                #{historicPlanItemInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{historicPlanItemInstance.name ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.state ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.caseInstanceId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.stageInstanceId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.isStage ,jdbcType=BOOLEAN},
+                #{historicPlanItemInstance.elementId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.planItemDefinitionId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.planItemDefinitionType ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.createdTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.lastStartedTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.lastSuspendedTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.completedTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.occurredTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.terminatedTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.exitTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.endedTime ,jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.startUserId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.referenceId ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.referenceType ,jdbcType=VARCHAR},
+                #{historicPlanItemInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
