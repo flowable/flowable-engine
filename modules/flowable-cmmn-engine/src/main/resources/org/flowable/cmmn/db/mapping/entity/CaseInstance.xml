@@ -99,7 +99,7 @@
                 CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.completeable != completeable">
-                IS_COMPLETEABLE_ = #{completeable, jdbcType=VARCHAR}
+                IS_COMPLETEABLE_ = #{completeable, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}

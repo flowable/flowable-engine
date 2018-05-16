@@ -136,16 +136,16 @@
             REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.completeable != completeable">
-            IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
+            IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN},
         </if>
         <if test="originalPersistentState.countEnabled != countEnabled">
-            IS_COUNT_ENABLED_ = #{countEnabled, jdbcType=BOOLEAN}
+            IS_COUNT_ENABLED_ = #{countEnabled, jdbcType=BOOLEAN},
         </if>
         <if test="originalPersistentState.variableCount != variableCount">
-            VAR_COUNT_ = #{variableCount, jdbcType=INTEGER}
+            VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
         </if>
         <if test="originalPersistentState.sentryPartInstanceCount != sentryPartInstanceCount">
-            SENTRY_PART_INST_COUNT_ = #{sentryPartInstanceCount, jdbcType=INTEGER}
+            SENTRY_PART_INST_COUNT_ = #{sentryPartInstanceCount, jdbcType=INTEGER},
         </if>
         <if test="originalPersistentState.tenantId != tenantId">
             TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
