@@ -378,14 +378,30 @@ public class DefaultJobManager implements JobManager {
         VariableScope variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(jobEntity);
 
         Map<String, JobHandler> jobHandlers = jobServiceConfiguration.getJobHandlers();
-        JobHandler jobHandler = jobHandlers.get(jobEntity.getJobHandlerType());
-        jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
+        if (jobEntity.getJobHandlerType() != null) {
+            JobHandler jobHandler = jobHandlers.get(jobEntity.getJobHandlerType());
+            if (jobHandler != null) {
+                jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
+            } else {
+                throw new FlowableException("No job handler registered for type " + jobEntity.getJobType());
+            }
+        } else {
+            throw new FlowableException("Job has no job handler type");
+        }
     }
 
     protected void executeHistoryJobHandler(HistoryJobEntity historyJobEntity) {
         Map<String, HistoryJobHandler> jobHandlers = jobServiceConfiguration.getHistoryJobHandlers();
-        HistoryJobHandler jobHandler = jobHandlers.get(historyJobEntity.getJobHandlerType());
-        jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext());
+        if (historyJobEntity.getJobHandlerType() != null) {
+            HistoryJobHandler jobHandler = jobHandlers.get(historyJobEntity.getJobHandlerType());
+            if (jobHandler != null) {
+                jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext());
+            } else {
+                throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType());
+            }
+        } else {
+            throw new FlowableException("Async history job has no job handler type");
+        }
     }
 
     protected boolean isValidTime(JobEntity timerEntity, Date newTimerDate, VariableScope variableScope) {

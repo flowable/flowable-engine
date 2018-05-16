@@ -12,8 +12,9 @@
  */
 package org.flowable.engine.impl.history.async;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.convertToBase64;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,7 +32,6 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
-import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -658,46 +658,4 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
         return null;
     }
     
-    protected void putIfNotNull(Map<String, String> map, String key, String value) {
-        if (value != null) {
-            map.put(key, value);
-        }
-    }
-
-    protected void putIfNotNull(Map<String, String> map, String key, int value) {
-        map.put(key, Integer.toString(value));
-    }
-    
-    protected void putIfNotNull(Map<String, String> map, String key, Double value) {
-        if (value != null) {
-            map.put(key, Double.toString(value));
-        }
-    }
-    
-    protected void putIfNotNull(Map<String, String> map, String key, Long value) {
-        if (value != null) {
-            map.put(key, Long.toString(value));
-        }
-    }
-
-    protected void putIfNotNull(Map<String, String> map, String key, Date value) {
-        if (value != null) {
-            map.put(key, AsyncHistoryDateUtil.formatDate(value));
-        }
-    }
-    
-    protected void putIfNotNull(Map<String, String> map, String key, Boolean value) {
-        if (value != null) {
-            map.put(key, Boolean.toString(value));
-        }
-    }
-
-    private static String convertToBase64(VariableInstanceEntity variable) {
-        byte[] bytes = variable.getBytes();
-        if (bytes != null) {
-            return new String(Base64.getEncoder().encode(variable.getBytes()), StandardCharsets.US_ASCII);
-        } else {
-            return null;
-        }
-    }
 }

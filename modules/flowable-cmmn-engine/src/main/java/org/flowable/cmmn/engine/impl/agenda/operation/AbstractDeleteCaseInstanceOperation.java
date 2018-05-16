@@ -46,7 +46,7 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
         String newState = getNewState();
         CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
                 caseInstanceEntity, caseInstanceEntity.getState(), newState);
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceEntityId, newState);
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceEntity, newState);
     }
 
     protected void updateChildPlanItemInstancesState() {

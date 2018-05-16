@@ -28,13 +28,13 @@ import javax.sql.DataSource;
 
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
+import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
-import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -63,6 +63,9 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
+import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryManager;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceEndHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceStartHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
@@ -796,7 +799,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initDefaultAsyncHistoryListener() {
         DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer(
-                CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
+                CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, 
+                CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED,
+                jobExecutionScope);
         asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
         asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
         asyncHistoryListener = asyncHistoryJobProducer;
@@ -972,7 +977,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
-            cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
+            if (isAsyncHistoryEnabled) {
+                cmmnHistoryManager = new CmmnAsyncHistoryManager(this);
+            } else {
+                cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
+            }
         }
     }
 
@@ -1271,6 +1280,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
         List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
+        historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer());
+        historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer());
         return historyJsonTransformers;
     }
 
@@ -1296,6 +1307,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
 
         this.jobServiceConfiguration.setJobHandlers(this.jobHandlers);
+        this.jobServiceConfiguration.setHistoryJobHandlers(this.historyJobHandlers);
         this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
 
         List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();

@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.test.impl;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -36,9 +37,32 @@ public class CmmnJobTestHelper {
     
     public static void waitForJobExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<Boolean>() {
+            
+            @Override
+            public Boolean call() throws Exception {
+                return cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0
+                || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
+            }
+            
+        }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
+    }
+    
+    public static void waitForAsyncHistoryExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
+            final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncHistoryExecutor(), new Callable<Boolean>() {
+            
+            @Override
+            public Boolean call() throws Exception {
+                return cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().count() > 0;
+            }
+            
+        }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
+    }
+    
+    public static void waitForExecutorToProcessAllJobs(final AsyncExecutor asyncExecutor, Callable<Boolean> callable,
+            final long maxMillisToWait, final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
 
-        AsyncExecutor asyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
-        
         if (asyncExecutor == null) {
             throw new FlowableException("No async executor set. Check the cmmn engine configuration.");
         }
@@ -55,8 +79,7 @@ public class CmmnJobTestHelper {
                 while (areJobsAvailable && !jobInterruptionTask.isMaxTimeUsed()) {
                     Thread.sleep(intervalMillis);
                     try {
-                        areJobsAvailable = cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0
-                                || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
+                        areJobsAvailable = callable.call();
                     } catch (Throwable t) { 
                         // ignore
                     }

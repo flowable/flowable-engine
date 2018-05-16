@@ -35,6 +35,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     protected String jobTypeAsyncHistory;
     protected String jobTypeAsyncHistoryZipped;
+    protected String historyJobScopeType;
     
     protected boolean isJsonGzipCompressionEnabled;
     protected boolean isAsyncHistoryJsonGroupingEnabled;
@@ -43,6 +44,11 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
     public DefaultAsyncHistoryJobProducer(String jobTypeAsyncHistory, String jobTypeAsyncHistoryZipped) {
         this.jobTypeAsyncHistory = jobTypeAsyncHistory;
         this.jobTypeAsyncHistoryZipped = jobTypeAsyncHistoryZipped;
+    }
+    
+    public DefaultAsyncHistoryJobProducer(String jobTypeAsyncHistory, String jobTypeAsyncHistoryZipped, String historyJobScopeType) {
+       this(jobTypeAsyncHistory, jobTypeAsyncHistoryZipped);
+       this.historyJobScopeType = historyJobScopeType;
     }
     
     @Override
@@ -82,6 +88,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         currentJobEntity.setRetries(jobServiceConfiguration.getAsyncHistoryExecutorNumberOfRetries());
         currentJobEntity.setTenantId(asyncHistorySession.getTenantId());
         currentJobEntity.setCreateTime(jobServiceConfiguration.getClock().getCurrentTime());
+        currentJobEntity.setScopeType(historyJobScopeType);
         CommandContextUtil.getJobManager(commandContext).scheduleHistoryJob(currentJobEntity);
         return currentJobEntity;
     }

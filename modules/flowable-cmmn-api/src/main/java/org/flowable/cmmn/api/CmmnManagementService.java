@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
@@ -214,5 +215,10 @@ public interface CmmnManagementService {
      *             when no job exists with the given id.
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
+    
+    /**
+     * Returns a new HistoryJobQuery implementation, that can be used to dynamically query the history jobs.
+     */
+    HistoryJobQuery createHistoryJobQuery();
 
 }

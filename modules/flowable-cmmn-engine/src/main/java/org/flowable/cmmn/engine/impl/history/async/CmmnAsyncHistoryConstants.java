@@ -23,7 +23,29 @@ public interface CmmnAsyncHistoryConstants {
     List<String> ORDERED_TYPES = Arrays.asList();
     
     String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY = "cmmn-async-history";
-    
     String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED = "cmmn-async-history-zipped";
+    
+    String TYPE_CASE_INSTANCE_END = "cmmn-case-instance-end";
+    String TYPE_CASE_INSTANCE_START = "cmmn-case-instance-start";
 
+    String FIELD_BUSINESS_KEY = "businessKey";
+    String FIELD_CASE_DEFINITION_CATEGORY = "caseDefinitionCategory";
+    String FIELD_CASE_DEFINITION_DEPLOYMENT_ID = "caseDefinitionDeploymentId";
+    String FIELD_CASE_DEFINITION_DESCRIPTION = "caseDefinitionDescription";
+    String FIELD_CASE_DEFINITION_ID = "caseDefinitionId";
+    String FIELD_CASE_DEFINITION_KEY = "caseDefinitionKey";
+    String FIELD_CASE_DEFINITION_NAME = "caseDefinitionName";
+    String FIELD_CASE_DEFINITION_VERSION = "caseDefinitionVersion";
+    String FIELD_CASE_INSTANCE_ID = "caseInstanceId";
+    String FIELD_DURATION = "duration";
+    String FIELD_END_TIME = "endTime";
+    String FIELD_ID = "id";
+    String FIELD_NAME = "name";
+    String FIELD_PARENT_ID = "parentId";
+    String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
+    String FIELD_START_TIME = "startTime";
+    String FIELD_START_USER_ID = "startUserId";
+    String FIELD_STATE = "state";
+    String FIELD_TENANT_ID = "tenantId";
+ 
 }

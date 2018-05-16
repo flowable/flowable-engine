@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
