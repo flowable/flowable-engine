@@ -18,6 +18,7 @@ import org.flowable.ui.admin.security.AjaxLogoutSuccessHandler;
 import org.flowable.ui.admin.security.RemoteIdmAuthenticationProvider;
 import org.flowable.ui.common.filter.FlowableCookieFilterRegistrationBean;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
+import org.flowable.ui.common.security.ActuatorRequestMatcher;
 import org.flowable.ui.common.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.ui.common.security.CookieConstants;
 import org.flowable.ui.common.security.DefaultPrivileges;
@@ -47,6 +48,7 @@ public class SecurityConfiguration {
     @Bean
     public FlowableCookieFilterRegistrationBean flowableCookieFilterRegistrationBean(RemoteIdmService remoteIdmService, FlowableCommonAppProperties properties) {
         FlowableCookieFilterRegistrationBean registrationBean = new FlowableCookieFilterRegistrationBean(remoteIdmService, properties);
+        registrationBean.addUrlPatterns("/app/*");
         registrationBean.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_ADMIN));
         return registrationBean;
     }
@@ -91,7 +93,7 @@ public class SecurityConfiguration {
 
     @ConditionalOnClass(EndpointRequest.class)
     @Configuration
-    @Order(15) // Actuator configuration should kick in after the Form Login so the custom login filter can be applied before
+    @Order(5) // Actuator configuration should kick in before the Form Login there should always be http basic for the endpoints
     public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         protected void configure(HttpSecurity http) throws Exception {
@@ -104,6 +106,7 @@ public class SecurityConfiguration {
                 .disable();
 
             http
+                .requestMatcher(new ActuatorRequestMatcher())
                 .authorizeRequests()
                 .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
                 .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN)

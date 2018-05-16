@@ -18,6 +18,7 @@ import org.flowable.ui.common.filter.FlowableCookieFilterCallback;
 import org.flowable.ui.common.filter.FlowableCookieFilterRegistrationBean;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
+import org.flowable.ui.common.security.ActuatorRequestMatcher;
 import org.flowable.ui.common.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
@@ -117,6 +118,7 @@ public class SecurityConfiguration {
                     .addHeaderWriter(new XXssProtectionHeaderWriter())
                     .and()
                     .authorizeRequests()
+                .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK)
                 .antMatchers("/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
         }
     }
@@ -167,7 +169,7 @@ public class SecurityConfiguration {
 
     @ConditionalOnClass(EndpointRequest.class)
     @Configuration
-    @Order(15) // Actuator configuration should kick in after the Form Login so the custom login filter can be applied before
+    @Order(5) // Actuator configuration should kick in before the Form Login there should always be http basic for the endpoints
     public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         protected void configure(HttpSecurity http) throws Exception {
@@ -180,6 +182,7 @@ public class SecurityConfiguration {
                 .disable();
 
             http
+                .requestMatcher(new ActuatorRequestMatcher())
                 .authorizeRequests()
                 .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
                 .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN)

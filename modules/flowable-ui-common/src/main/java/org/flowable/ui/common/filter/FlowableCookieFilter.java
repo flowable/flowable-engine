@@ -143,7 +143,19 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         if (!skipAuthenticationCheck(request)) {
             RemoteToken token = getValidToken(request);
             if (token != null) {
-                onValidTokenFound(request, response, token);
+                try {
+                    FlowableAppUser appUser = userCache.get(token.getUserId());
+                    if (!validateRequiredPriviliges(request, response, appUser)) {
+                        redirectOrSendNotPermitted(request, response, appUser.getUserObject().getId());
+                        return; // no need to execute any other filters
+                    }
+                    SecurityContextHolder.getContext().setAuthentication(new RememberMeAuthenticationToken(token.getId(),
+                        appUser, appUser.getAuthorities()));
+
+                } catch (Exception e) {
+                    LOGGER.trace("Could not set necessary threadlocals for token", e);
+                    redirectOrSendNotPermitted(request, response, token.getUserId());
+                }
                 if (filterCallback != null) {
                     filterCallback.onValidTokenFound(request, response, token);
                 }
@@ -195,23 +207,10 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         return null;
     }
 
-    protected void onValidTokenFound(HttpServletRequest request, HttpServletResponse response, RemoteToken token) {
-        try {
-            FlowableAppUser appUser = userCache.get(token.getUserId());
-            validateRequiredPriviliges(request, response, appUser);
-            SecurityContextHolder.getContext().setAuthentication(new RememberMeAuthenticationToken(token.getId(),
-                    appUser, appUser.getAuthorities()));
-
-        } catch (Exception e) {
-            LOGGER.trace("Could not set necessary threadlocals for token", e);
-            redirectOrSendNotPermitted(request, response, token.getUserId());
-        }
-    }
-
-    protected void validateRequiredPriviliges(HttpServletRequest request, HttpServletResponse response, FlowableAppUser user) {
+    protected boolean validateRequiredPriviliges(HttpServletRequest request, HttpServletResponse response, FlowableAppUser user) {
 
         if (user == null) {
-            return;
+            return true;
         }
 
         String pathInfo = request.getPathInfo();
@@ -221,7 +220,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
             if (requiredPrivileges != null && requiredPrivileges.size() > 0) {
 
                 if (user.getAuthorities() == null || user.getAuthorities().size() == 0) {
-                    redirectOrSendNotPermitted(request, response, user.getUserObject().getId());
+                    return false;
                 } else {
                     int matchingPrivileges = 0;
                     for (GrantedAuthority authority : user.getAuthorities()) {
@@ -231,12 +230,14 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
                     }
 
                     if (matchingPrivileges != requiredPrivileges.size()) {
-                        redirectOrSendNotPermitted(request, response, user.getUserObject().getId());
+                        return false;
                     }
                 }
             }
 
         }
+
+        return true;
     }
 
     protected void redirectOrSendNotPermitted(HttpServletRequest request, HttpServletResponse response, String userId) {
