@@ -12,6 +12,9 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -20,12 +23,10 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 
 public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableExecutionExceptionHandler {
-
+    
     @Override
     public boolean handleException(final JobServiceConfiguration jobServiceConfiguration, final JobInfo job, final Throwable exception) {
-        if (job != null 
-                && ("async-history".equals(job.getJobHandlerType()) || "async-history-zipped".equals(job.getJobHandlerType()) ) ) {
-            
+        if (job != null && getAsyncHistoryJobHandlerTypes(jobServiceConfiguration).contains(job.getJobHandlerType())) {
             return jobServiceConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
                 @Override
                 public Boolean execute(CommandContext commandContext) {
@@ -41,6 +42,13 @@ public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableEx
             });
         }
         return false;
+    }
+    
+    protected Set<String> getAsyncHistoryJobHandlerTypes(JobServiceConfiguration jobServiceConfiguration) {
+        if (jobServiceConfiguration.getHistoryJobHandlers() != null) {
+            return jobServiceConfiguration.getHistoryJobHandlers().keySet();
+        }
+        return Collections.emptySet();
     }
 
 }

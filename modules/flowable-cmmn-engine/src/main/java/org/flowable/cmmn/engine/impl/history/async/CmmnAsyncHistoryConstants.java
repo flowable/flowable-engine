@@ -20,13 +20,24 @@ import java.util.List;
  */
 public interface CmmnAsyncHistoryConstants {
     
-    List<String> ORDERED_TYPES = Arrays.asList();
-    
     String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY = "cmmn-async-history";
     String JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED = "cmmn-async-history-zipped";
     
     String TYPE_CASE_INSTANCE_END = "cmmn-case-instance-end";
     String TYPE_CASE_INSTANCE_START = "cmmn-case-instance-start";
+    String TYPE_HISTORIC_CASE_INSTANCE_DELETED = "cmmn-historic-case-instance-deleted";
+    String TYPE_IDENTITY_LINK_CREATED = "cmmn-identity-link-created";
+    String TYPE_IDENTITY_LINK_DELETED = "cmmn-identity-link-deleted";
+    String TYPE_MILESTONE_REACHED = "cmmn-milestone-reached";
+    
+    List<String> ORDERED_TYPES = Arrays.asList(
+            TYPE_CASE_INSTANCE_END,
+            TYPE_CASE_INSTANCE_START,
+            TYPE_HISTORIC_CASE_INSTANCE_DELETED,
+            TYPE_IDENTITY_LINK_CREATED,
+            TYPE_IDENTITY_LINK_DELETED,
+            TYPE_MILESTONE_REACHED
+    );
 
     String FIELD_BUSINESS_KEY = "businessKey";
     String FIELD_CASE_DEFINITION_CATEGORY = "caseDefinitionCategory";
@@ -37,15 +48,24 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_CASE_DEFINITION_NAME = "caseDefinitionName";
     String FIELD_CASE_DEFINITION_VERSION = "caseDefinitionVersion";
     String FIELD_CASE_INSTANCE_ID = "caseInstanceId";
+    String FIELD_CREATE_TIME = "createTime";
     String FIELD_DURATION = "duration";
+    String FIELD_ELEMENT_ID = "elementId";
     String FIELD_END_TIME = "endTime";
+    String FIELD_GROUP_ID = "groupId";
     String FIELD_ID = "id";
+    String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
     String FIELD_NAME = "name";
     String FIELD_PARENT_ID = "parentId";
+    String FIELD_SCOPE_ID = "scopeId";
+    String FIELD_SCOPE_DEFINITION_ID = "scopeDefinitionId";
+    String FIELD_SCOPE_TYPE = "scopeType";
     String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
     String FIELD_START_TIME = "startTime";
     String FIELD_START_USER_ID = "startUserId";
     String FIELD_STATE = "state";
+    String FIELD_TASK_ID = "taskId";
     String FIELD_TENANT_ID = "tenantId";
+    String FIELD_USER_ID = "userId";
  
 }

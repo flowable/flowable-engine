@@ -67,6 +67,7 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
             for (String type : asyncHistorySession.getJobDataTypes()) {
                 if (jobData.containsKey(type)) {
                     generateJson(commandContext, jobData, objectNodes, type);
+                    jobData.remove(type);
                 }
             }
             
@@ -87,7 +88,6 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
             ObjectNode historyJson = generateJson(commandContext, type, historicData);
             objectNodes.add(historyJson);
         }
-        jobData.remove(type);
     }
     
     protected ObjectNode generateJson(CommandContext commandContext, String type, Map<String, String> historicData) {

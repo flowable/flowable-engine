@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.Date;
 import java.util.function.Consumer;
 
-import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
@@ -24,6 +23,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanc
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -76,7 +76,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordMilestoneReached(MilestoneInstance milestoneInstance) {
+    public void recordMilestoneReached(MilestoneInstanceEntity milestoneInstance) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
             HistoricMilestoneInstanceEntity historicMilestoneInstanceEntity = historicMilestoneInstanceEntityManager.create();
@@ -86,31 +86,15 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicMilestoneInstanceEntity.setCaseDefinitionId(milestoneInstance.getCaseDefinitionId());
             historicMilestoneInstanceEntity.setElementId(milestoneInstance.getElementId());
             historicMilestoneInstanceEntity.setTimeStamp(cmmnEngineConfiguration.getClock().getCurrentTime());
+            historicMilestoneInstanceEntity.setTenantId(milestoneInstance.getTenantId());
             historicMilestoneInstanceEntityManager.insert(historicMilestoneInstanceEntity);
         }
     }
 
     @Override
-    public void recordCaseInstanceDeleted(String caseInstanceId) {
+    public void recordHistoricCaseInstanceDeleted(String caseInstanceId) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
-            HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
-            HistoricCaseInstanceEntity historicCaseInstance = historicCaseInstanceEntityManager.findById(caseInstanceId);
-
-            HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
-            historicMilestoneInstanceEntityManager.findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseInstanceId(historicCaseInstance.getId()))
-                    .forEach(m -> historicMilestoneInstanceEntityManager.delete(m.getId()));
-
-            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
-            historicPlanItemInstanceEntityManager.findByCriteria(new HistoricPlanItemInstanceQueryImpl().planItemInstanceCaseInstanceId(historicCaseInstance.getId()))
-                    .forEach(p -> historicPlanItemInstanceEntityManager.delete(p.getId()));
-
-            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
-
-            historicCaseInstanceEntityManager.delete(historicCaseInstance);
-
-            // Also delete any sub cases that may be active
-            historicCaseInstanceEntityManager.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstanceId).list()
-                    .forEach(c -> recordCaseInstanceDeleted(c.getId()));
+            CmmnHistoryHelper.deleteHistoricCaseInstance(cmmnEngineConfiguration, caseInstanceId);
         }
     }
 
@@ -134,9 +118,9 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordIdentityLinkDeleted(String identityLinkId) {
+    public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
-            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLinkId);
+            CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLink.getId());
         }
     }
 

@@ -26,6 +26,9 @@ public interface MilestoneInstanceQuery extends Query<MilestoneInstanceQuery, Mi
     MilestoneInstanceQuery milestoneInstanceCaseDefinitionId(String caseDefinitionId);
     MilestoneInstanceQuery milestoneInstanceReachedBefore(Date reachedBefore);
     MilestoneInstanceQuery milestoneInstanceReachedAfter(Date reachedAfter);
+    MilestoneInstanceQuery milestoneInstanceTenantId(String tenantId);
+    MilestoneInstanceQuery milestoneInstanceTenantIdLike(String tenantIdLike);
+    MilestoneInstanceQuery milestoneInstanceWithoutTenantId();
     
     MilestoneInstanceQuery orderByMilestoneName();
     MilestoneInstanceQuery orderByTimeStamp();

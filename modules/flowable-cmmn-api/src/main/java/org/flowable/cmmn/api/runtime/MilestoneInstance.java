@@ -25,5 +25,6 @@ public interface MilestoneInstance {
     String getCaseInstanceId();
     String getCaseDefinitionId();
     String getElementId();
+    String getTenantId();
 
 }

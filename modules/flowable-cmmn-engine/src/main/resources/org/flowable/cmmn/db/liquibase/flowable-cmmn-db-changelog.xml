@@ -371,6 +371,14 @@
             <column name="REFERENCE_TYPE_" type="varchar(255)" />
             <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
         </createTable>
+        
+        <addColumn tableName="ACT_CMMN_RU_MIL_INST">
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+        </addColumn>
+        
+        <addColumn tableName="ACT_CMMN_HI_MIL_INST">
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+        </addColumn>
 
     </changeSet>
 

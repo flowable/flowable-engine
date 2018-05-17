@@ -591,6 +591,7 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setCustomValues(copyFromJob.getCustomValues());
         copyToJob.setRetries(copyFromJob.getRetries());
         copyToJob.setRevision(copyFromJob.getRevision());
+        copyToJob.setScopeType(copyFromJob.getScopeType());
         copyToJob.setTenantId(copyFromJob.getTenantId());
 
         return copyToJob;

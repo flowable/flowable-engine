@@ -29,23 +29,11 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 /**
  * @author Joram Barrez
  */
-public class CaseInstanceEndHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
+public class CaseInstanceEndHistoryJsonTransformer extends AbstractNeedsHistoricCaseInstanceJsonTransformer {
 
     @Override
     public String getType() {
         return CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_END;
-    }
-
-    @Override
-    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-        HistoricCaseInstanceEntity historicCaseInstanceEntity = getHistoricCaseInstanceEntity(historicalData, commandContext);
-        return historicCaseInstanceEntity != null;
-    }
-
-    protected HistoricCaseInstanceEntity getHistoricCaseInstanceEntity(ObjectNode historicalData, CommandContext commandContext) {
-        String id = getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID);
-        HistoricCaseInstanceEntity historicCaseInstanceEntity = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findById(id);
-        return historicCaseInstanceEntity;
     }
 
     @Override

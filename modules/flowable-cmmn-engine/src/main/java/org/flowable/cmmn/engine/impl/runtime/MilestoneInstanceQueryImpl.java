@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -32,6 +33,9 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
     protected String caseDefinitionId;
     protected Date reachedBefore;
     protected Date reachedAfter;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
     
     public MilestoneInstanceQueryImpl() {
         
@@ -68,6 +72,30 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
     @Override
     public MilestoneInstanceQuery milestoneInstanceReachedAfter(Date reachedAfter) {
         this.reachedAfter = reachedAfter;
+        return this;
+    }
+    
+    @Override
+    public MilestoneInstanceQuery milestoneInstanceTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    @Override
+    public MilestoneInstanceQuery milestoneInstanceTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        this.tenantIdLike = tenantIdLike;
+        return this;
+    }
+    
+    @Override
+    public MilestoneInstanceQuery milestoneInstanceWithoutTenantId() {
+        this.withoutTenantId = true;
         return this;
     }
 
@@ -109,6 +137,18 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
 
     public Date getReachedAfter() {
         return reachedAfter;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
     }
     
 }

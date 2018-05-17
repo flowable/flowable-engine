@@ -34,6 +34,7 @@ public abstract class CustomConfigurationFlowableTestCase extends AbstractFlowab
     protected void initializeProcessEngine() {
         ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.cfg.xml");
         processEngineConfiguration.setEngineName(getEngineName()); // to distinguish between different engines in different tests
+        processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         configureConfiguration((ProcessEngineConfigurationImpl) processEngineConfiguration);
         this.processEngine = processEngineConfiguration.buildProcessEngine();
     }

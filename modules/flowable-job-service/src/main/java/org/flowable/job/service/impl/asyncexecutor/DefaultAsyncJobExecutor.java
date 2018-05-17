@@ -98,6 +98,8 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
      * The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution
      */
     protected long secondsToWaitOnShutdown = 60L;
+    
+    protected String threadPoolNamingPattern = "flowable-async-job-executor-thread-%d";
 
     @Override
     protected boolean executeAsyncJob(final JobInfo job, Runnable runnable) {
@@ -172,7 +174,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         if (executorService == null) {
             LOGGER.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
 
-            BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("flowable-async-job-executor-thread-%d").build();
+            BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern(threadPoolNamingPattern).build();
             executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
         }
     }
@@ -383,4 +385,12 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         this.executorService = executorService;
     }
 
+    public String getThreadPoolNamingPattern() {
+        return threadPoolNamingPattern;
+    }
+
+    public void setThreadPoolNamingPattern(String threadPoolNamingPattern) {
+        this.threadPoolNamingPattern = threadPoolNamingPattern;
+    }
+    
 }

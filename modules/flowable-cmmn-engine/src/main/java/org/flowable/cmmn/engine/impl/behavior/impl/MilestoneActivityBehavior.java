@@ -46,6 +46,7 @@ public class MilestoneActivityBehavior extends CoreCmmnActivityBehavior {
         milestoneInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
         milestoneInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
         milestoneInstanceEntity.setElementId(planItemInstanceEntity.getElementId());
+        milestoneInstanceEntity.setTenantId(planItemInstanceEntity.getTenantId());
         milestoneInstanceEntityManager.insert(milestoneInstanceEntity);
         return milestoneInstanceEntity;
     }

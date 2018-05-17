@@ -535,4 +535,5 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public InternalJobParentStateResolver getJobParentStateResolver() {
         return jobParentStateResolver;
     }
+    
 }

@@ -28,5 +28,6 @@ public interface MilestoneInstanceEntity extends Entity, MilestoneInstance {
     void setCaseInstanceId(String caseInstanceId);
     void setCaseDefinitionId(String caseDefinitionId);
     void setElementId(String elementId);
+    void setTenantId(String tenantId);
     
 }

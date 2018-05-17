@@ -50,7 +50,7 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
             throw new FlowableException("Case instance is still running, cannot delete historic case instance: " + caseInstanceId);
         }
 
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceDeleted(caseInstanceId);
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordHistoricCaseInstanceDeleted(caseInstanceId);
 
         return null;
     }

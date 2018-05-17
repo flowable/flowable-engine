@@ -19,6 +19,7 @@ import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryProperty;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -34,6 +35,9 @@ public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMi
     protected String caseDefinitionId;
     protected Date reachedBefore;
     protected Date reachedAfter;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
     
     public HistoricMilestoneInstanceQueryImpl() {
         
@@ -90,6 +94,30 @@ public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMi
     }
     
     @Override
+    public HistoricMilestoneInstanceQuery milestoneInstanceTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    @Override
+    public HistoricMilestoneInstanceQuery milestoneInstanceTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        this.tenantIdLike = tenantIdLike;
+        return this;
+    }
+    
+    @Override
+    public HistoricMilestoneInstanceQuery milestoneInstanceWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
+    }
+    
+    @Override
     public long executeCount(CommandContext commandContext) {
         return CommandContextUtil.getHistoricMilestoneInstanceEntityManager(commandContext).findHistoricMilestoneInstanceCountByQueryCriteria(this);
     }
@@ -122,4 +150,17 @@ public class HistoricMilestoneInstanceQueryImpl extends AbstractQuery<HistoricMi
     public Date getReachedAfter() {
         return reachedAfter;
     }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
+    }
+    
 }

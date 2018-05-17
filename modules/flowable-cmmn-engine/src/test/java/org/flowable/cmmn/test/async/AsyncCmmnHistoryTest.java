@@ -17,11 +17,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -85,6 +87,62 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertEquals(CaseInstanceState.ACTIVE, historicCaseInstance.getState());
         assertNotNull(historicCaseInstance.getStartTime());
         assertNotNull(historicCaseInstance.getEndTime());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testHistoricCaseInstanceDeleted() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
+        cmmnHistoryService.deleteHistoricCaseInstance(caseInstance.getId());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testMilestoneReached() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();
+        assertEquals(1, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        
+        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        HistoricMilestoneInstance historicMilestoneInstance =  cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+                .milestoneInstanceCaseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertEquals("xyzMilestone", historicMilestoneInstance.getName());
+        assertEquals("milestonePlanItem1", historicMilestoneInstance.getElementId());
+        assertEquals(caseInstance.getId(), historicMilestoneInstance.getCaseInstanceId());
+        assertEquals(caseInstance.getCaseDefinitionId(), historicMilestoneInstance.getCaseDefinitionId());
+        assertNotNull(historicMilestoneInstance.getTimeStamp());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testIdentityLinks() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();
+        cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "someUser", IdentityLinkType.PARTICIPANT);
+        assertEquals(0, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId()).size());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals(1, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId()).size());
+        
+        cmmnRuntimeService.deleteUserIdentityLink(caseInstance.getId(), "someUser", IdentityLinkType.PARTICIPANT);
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals(0, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId()).size());
     }
 
 }

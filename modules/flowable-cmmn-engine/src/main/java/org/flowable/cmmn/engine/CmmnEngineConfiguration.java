@@ -66,6 +66,10 @@ import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryManager;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceEndHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceStartHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricCaseInstanceDeletedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.MilestoneReachedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
@@ -1280,8 +1284,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
         List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
+        
         historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer());
         historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer());
+        historyJsonTransformers.add(new HistoricCaseInstanceDeletedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new MilestoneReachedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer());
+        
         return historyJsonTransformers;
     }
 
@@ -1403,7 +1415,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     public void initAsyncHistoryExecutor() {
         if (isAsyncHistoryEnabled && asyncHistoryExecutor == null) {
-            DefaultAsyncJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
+            DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
 
             // Message queue mode
             defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);

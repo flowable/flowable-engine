@@ -29,6 +29,7 @@ public class MilestoneInstanceEntityImpl extends AbstractEntity implements Miles
     protected String caseInstanceId;
     protected String caseDefinitionId;
     protected String elementId;
+    protected String tenantId;
     
     @Override
     public Object getPersistentState() {
@@ -39,6 +40,7 @@ public class MilestoneInstanceEntityImpl extends AbstractEntity implements Miles
         persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("caseDefinitionId", caseDefinitionId);
         persistentState.put("elementId", elementId);
+        persistentState.put("tenantId", tenantId);
         return persistentState;
     }
     
@@ -82,5 +84,13 @@ public class MilestoneInstanceEntityImpl extends AbstractEntity implements Miles
     public void setElementId(String elementId) {
         this.elementId = elementId;
     }
-
+    @Override
+    public String getTenantId() {
+        return tenantId;
+    }
+    @Override
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    
 }

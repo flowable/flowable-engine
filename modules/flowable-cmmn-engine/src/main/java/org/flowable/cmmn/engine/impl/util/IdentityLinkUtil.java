@@ -46,7 +46,7 @@ public class IdentityLinkUtil {
                         caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
         
         for (IdentityLinkEntity identityLinkEntity : removedIdentityLinkEntities) {
-            CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
+            CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
         }
     }
     
@@ -87,7 +87,7 @@ public class IdentityLinkUtil {
                 countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() - 1);
             }
             if (cascaseHistory) {
-                CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
+                CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
             }
         }
         
