@@ -85,10 +85,10 @@ public class DebuggerResource {
         return debuggerService.getExecutions(processInstanceId);
     }
 
-    @RequestMapping(value = "/rest/debugger/evaluate/expression/{executionId}", method = RequestMethod.POST, produces = "application/json")
-    public Object evaluateExpression(@PathVariable String executionId, @RequestBody String expression) {
+    @RequestMapping(value = "/rest/debugger/evaluate/expression/{executionId}", method = RequestMethod.POST, produces = "application/text")
+    public String evaluateExpression(@PathVariable String executionId, @RequestBody String expression) {
         assertDebuggerEnabled();
-        return debuggerService.evaluateExpression(executionId, expression);
+        return debuggerService.evaluateExpression(executionId, expression).toString();
     }
 
     @RequestMapping(value = "/rest/debugger/evaluate/{scriptLanguage}/{executionId}", method = RequestMethod.POST)
