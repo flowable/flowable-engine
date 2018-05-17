@@ -35,6 +35,7 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     HistoricPlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId();
+    HistoricPlanItemInstanceQuery planItemInstanceTenantIdLike(String tenantIdLike);
     HistoricPlanItemInstanceQuery createdBefore(Date createdBefore);
     HistoricPlanItemInstanceQuery createdAfter(Date createdAfter);
     HistoricPlanItemInstanceQuery lastAvailableBefore(Date availableBefore);

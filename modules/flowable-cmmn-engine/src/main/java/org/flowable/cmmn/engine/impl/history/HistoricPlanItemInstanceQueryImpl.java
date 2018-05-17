@@ -12,16 +12,16 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Date;
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history. HistoricPlanItemInstanceQuery;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Dennis Federico
@@ -64,7 +64,9 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
 
     public HistoricPlanItemInstanceQueryImpl() {
 
@@ -154,7 +156,16 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId() {
-        this.tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
+        this.withoutTenantId = true;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        this.tenantIdLike = tenantIdLike;
         return this;
     }
 

@@ -480,9 +480,13 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
                 .collect(Collectors.toList());
     }
 
-    private void checkHistoryCreateTimestamp(final List<PlanItemInstance> currentPlanItems, final List<HistoricPlanItemInstance> historicPlanItems1, long threshold) {
+    private void checkHistoryCreateTimestamp(final List<PlanItemInstance> currentPlanItems, final List<HistoricPlanItemInstance> historicPlanItemInstances, long threshold) {
         currentPlanItems.forEach(p -> {
-            Optional<Long> createTimestamp = historicPlanItems1.stream().filter(h -> h.getId().equals(p.getId())).findFirst().map(HistoricPlanItemInstance::getCreatedTime).map(Date::getTime);
+            Optional<Long> createTimestamp = historicPlanItemInstances.stream()
+                    .filter(h -> h.getId().equals(p.getId()))
+                    .findFirst()
+                    .map(HistoricPlanItemInstance::getCreatedTime)
+                    .map(Date::getTime);
             assertTrue(createTimestamp.isPresent());
             long delta = createTimestamp.orElse(Long.MAX_VALUE) - p.getStartTime().getTime();
             assertTrue(delta <= threshold);

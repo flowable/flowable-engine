@@ -361,6 +361,12 @@
             <if test="tenantId != null">
                 and RES.TENANT_ID_ = #{tenantId}
             </if>
+            <if test="tenantIdLike != null">
+                and RES.TENANT_ID_ like #{tenantIdLike}
+            </if>
+            <if test="withoutTenantId">
+                and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
+            </if>
 
         </where>
     </sql>
