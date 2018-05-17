@@ -33,18 +33,20 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.convertToBase64;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnAsyncHistoryManager implements CmmnHistoryManager {
+public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
-    public CmmnAsyncHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+    public AsyncCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
@@ -127,6 +129,7 @@ public class CmmnAsyncHistoryManager implements CmmnHistoryManager {
 
     protected void addCaseDefinitionFields(Map<String, String> data, CaseDefinition caseDefinition) {
         if (caseDefinition != null) {
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, caseDefinition.getId());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_CATEGORY, caseDefinition.getCategory());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_DEPLOYMENT_ID, caseDefinition.getDeploymentId());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_DESCRIPTION, caseDefinition.getDescription());
@@ -224,21 +227,60 @@ public class CmmnAsyncHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable) {
-        
-        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            Map<String, String> data = new HashMap<>();
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
+            addCommonVariableFields(variable, data);
+            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_VARIABLE_CREATED, data);
+        }
     }
 
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variable) {
-        
-        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) { 
+            Map<String, String> data = new HashMap<>();
+            addCommonVariableFields(variable, data);
+            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED, data);
+        }
     }
 
     @Override
     public void recordVariableRemoved(VariableInstanceEntity variable) {
-        
-        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            Map<String, String> data = new HashMap<>();
+            addCommonVariableFields(variable, data);
+            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_VARIABLE_REMOVED, data);
+        }
     }
+    
+    protected void addCommonVariableFields(VariableInstanceEntity variable, Map<String, String> data) {
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, variable.getId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID, variable.getScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, variable.getScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SUB_SCOPE_ID, variable.getSubScopeId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, variable.getScopeType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_TASK_ID, variable.getTaskId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, variable.getRevision());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, variable.getName());
+        
+        Date time = cmmnEngineConfiguration.getClock().getCurrentTime();
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, time);
+        
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_VARIABLE_TYPE, variable.getType().getTypeName());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_VARIABLE_TEXT_VALUE, variable.getTextValue());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_VARIABLE_TEXT_VALUE2, variable.getTextValue2());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_VARIABLE_DOUBLE_VALUE, variable.getDoubleValue());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_VARIABLE_LONG_VALUE, variable.getLongValue());
+        if (variable.getByteArrayRef() != null) {
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_VARIABLE_BYTES_VALUE, convertToBase64(variable));
+        }
+        
+        if (variable.getScopeId() != null && ScopeTypes.CMMN.equals(variable.getScopeType())) {
+            CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(variable.getScopeId());
+            addCaseDefinitionFields(data, CaseDefinitionUtil.getCaseDefinition(caseInstance.getCaseDefinitionId()));
+        }
+    }
+
 
     @Override
     public void recordTaskCreated(TaskEntity task) {

@@ -29,6 +29,9 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_IDENTITY_LINK_CREATED = "cmmn-identity-link-created";
     String TYPE_IDENTITY_LINK_DELETED = "cmmn-identity-link-deleted";
     String TYPE_MILESTONE_REACHED = "cmmn-milestone-reached";
+    String TYPE_VARIABLE_CREATED = "cmmn-variable-created";
+    String TYPE_VARIABLE_REMOVED = "cmmn-variable-removed";
+    String TYPE_VARIABLE_UPDATED = "cmmn-variable-updated";
     
     List<String> ORDERED_TYPES = Arrays.asList(
             TYPE_CASE_INSTANCE_END,
@@ -36,7 +39,10 @@ public interface CmmnAsyncHistoryConstants {
             TYPE_HISTORIC_CASE_INSTANCE_DELETED,
             TYPE_IDENTITY_LINK_CREATED,
             TYPE_IDENTITY_LINK_DELETED,
-            TYPE_MILESTONE_REACHED
+            TYPE_MILESTONE_REACHED,
+            TYPE_VARIABLE_CREATED,
+            TYPE_VARIABLE_REMOVED,
+            TYPE_VARIABLE_UPDATED
     );
 
     String FIELD_BUSINESS_KEY = "businessKey";
@@ -55,11 +61,14 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_GROUP_ID = "groupId";
     String FIELD_ID = "id";
     String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
+    String FIELD_LAST_UPDATE_TIME = "lastUpdateTime";
     String FIELD_NAME = "name";
     String FIELD_PARENT_ID = "parentId";
+    String FIELD_REVISION = "revision";
     String FIELD_SCOPE_ID = "scopeId";
     String FIELD_SCOPE_DEFINITION_ID = "scopeDefinitionId";
     String FIELD_SCOPE_TYPE = "scopeType";
+    String FIELD_SUB_SCOPE_ID = "subScopeId";
     String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
     String FIELD_START_TIME = "startTime";
     String FIELD_START_USER_ID = "startUserId";
@@ -67,5 +76,11 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_TASK_ID = "taskId";
     String FIELD_TENANT_ID = "tenantId";
     String FIELD_USER_ID = "userId";
+    String FIELD_VARIABLE_BYTES_VALUE = "variableBytesValue";
+    String FIELD_VARIABLE_DOUBLE_VALUE = "variableDoubleValue";
+    String FIELD_VARIABLE_LONG_VALUE = "variableLongValue";
+    String FIELD_VARIABLE_TEXT_VALUE = "variableTextValue";
+    String FIELD_VARIABLE_TEXT_VALUE2 = "variableTextValue2";
+    String FIELD_VARIABLE_TYPE = "variableType";
  
 }

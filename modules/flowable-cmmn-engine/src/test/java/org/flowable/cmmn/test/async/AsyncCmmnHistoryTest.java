@@ -13,8 +13,10 @@
 package org.flowable.cmmn.test.async;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -23,8 +25,10 @@ import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
 /**
@@ -143,6 +147,56 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         
         waitForAsyncHistoryExecutorToProcessAllJobs();
         assertEquals(0, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId()).size());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        assertEquals(0, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "test", "hello world");
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "test2", 2);
+        
+        // Create
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals(2, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("test").singleResult();
+        assertEquals("test", historicVariableInstance.getVariableName());
+        assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
+        assertEquals(ScopeTypes.CMMN, historicVariableInstance.getScopeType());
+        assertEquals("hello world", historicVariableInstance.getValue());
+        assertNotNull(historicVariableInstance.getCreateTime());
+        assertNotNull(historicVariableInstance.getLastUpdatedTime());
+        
+        historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("test2").singleResult();
+        assertEquals("test2", historicVariableInstance.getVariableName());
+        assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
+        assertNull(historicVariableInstance.getSubScopeId());
+        assertEquals(ScopeTypes.CMMN, historicVariableInstance.getScopeType());
+        assertEquals(2, historicVariableInstance.getValue());
+        assertNotNull(historicVariableInstance.getCreateTime());
+        assertNotNull(historicVariableInstance.getLastUpdatedTime());
+        
+        // Update
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "test", "hello test");
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        
+        HistoricVariableInstance updatedHistoricVariable = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("test").singleResult();
+        assertEquals("test", updatedHistoricVariable.getVariableName());
+        assertEquals(caseInstance.getId(), updatedHistoricVariable.getScopeId());
+        assertNull(updatedHistoricVariable.getSubScopeId());
+        assertEquals(ScopeTypes.CMMN, updatedHistoricVariable.getScopeType());
+        assertEquals("hello test", updatedHistoricVariable.getValue());
+        assertNotNull(updatedHistoricVariable.getCreateTime());
+        assertNotNull(updatedHistoricVariable.getLastUpdatedTime());
+        assertNotEquals(updatedHistoricVariable.getLastUpdatedTime(), historicVariableInstance.getLastUpdatedTime());
+        
+        // Delete
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "test");
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertNull(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("test").singleResult());
     }
 
 }
