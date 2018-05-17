@@ -47,6 +47,7 @@ public abstract class CustomCmmnConfigurationFlowableTestCase extends FlowableCm
             if (inputStream != null) {
                 CmmnEngineConfiguration cmmnEngineConfiguration = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream);
                 cmmnEngineConfiguration.setCmmnEngineName(getEngineName());
+                cmmnEngineConfiguration.setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE); // override the default db setting of drop-create when running in QA 
                 configureConfiguration(cmmnEngineConfiguration);
                 
                 cmmnEngine = cmmnEngineConfiguration.buildCmmnEngine();
