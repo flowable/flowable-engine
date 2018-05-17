@@ -29,6 +29,9 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_IDENTITY_LINK_CREATED = "cmmn-identity-link-created";
     String TYPE_IDENTITY_LINK_DELETED = "cmmn-identity-link-deleted";
     String TYPE_MILESTONE_REACHED = "cmmn-milestone-reached";
+    String TYPE_TASK_CREATED = "cmmn-task-created";
+    String TYPE_TASK_REMOVED = "cmmn-task-removed";
+    String TYPE_TASK_UPDATED = "cmmn-task-updated";
     String TYPE_VARIABLE_CREATED = "cmmn-variable-created";
     String TYPE_VARIABLE_REMOVED = "cmmn-variable-removed";
     String TYPE_VARIABLE_UPDATED = "cmmn-variable-updated";
@@ -40,11 +43,15 @@ public interface CmmnAsyncHistoryConstants {
             TYPE_IDENTITY_LINK_CREATED,
             TYPE_IDENTITY_LINK_DELETED,
             TYPE_MILESTONE_REACHED,
+            TYPE_TASK_CREATED,
+            TYPE_TASK_REMOVED,
+            TYPE_TASK_UPDATED,
             TYPE_VARIABLE_CREATED,
             TYPE_VARIABLE_REMOVED,
             TYPE_VARIABLE_UPDATED
     );
 
+    String FIELD_ASSIGNEE = "assignee";
     String FIELD_BUSINESS_KEY = "businessKey";
     String FIELD_CASE_DEFINITION_CATEGORY = "caseDefinitionCategory";
     String FIELD_CASE_DEFINITION_DEPLOYMENT_ID = "caseDefinitionDeploymentId";
@@ -54,16 +61,26 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_CASE_DEFINITION_NAME = "caseDefinitionName";
     String FIELD_CASE_DEFINITION_VERSION = "caseDefinitionVersion";
     String FIELD_CASE_INSTANCE_ID = "caseInstanceId";
+    String FIELD_CATEGORY = "category";
+    String FIELD_CLAIM_TIME = "claimTime";
     String FIELD_CREATE_TIME = "createTime";
+    String FIELD_DELETE_REASON = "deleteReason";
+    String FIELD_DESCRIPTION = "description";
+    String FIELD_DUE_DATE = "dueDate";
     String FIELD_DURATION = "duration";
     String FIELD_ELEMENT_ID = "elementId";
     String FIELD_END_TIME = "endTime";
+    String FIELD_FORM_KEY = "formKey";
     String FIELD_GROUP_ID = "groupId";
     String FIELD_ID = "id";
     String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
     String FIELD_LAST_UPDATE_TIME = "lastUpdateTime";
     String FIELD_NAME = "name";
+    String FIELD_OWNER = "owner";
     String FIELD_PARENT_ID = "parentId";
+    String FIELD_PARENT_TASK_ID = "parentTaskId";
+    String FIELD_PLAN_ITEM_INSTANCE_ID = "planItemInstanceId";
+    String FIELD_PRIORITY = "priority";
     String FIELD_REVISION = "revision";
     String FIELD_SCOPE_ID = "scopeId";
     String FIELD_SCOPE_DEFINITION_ID = "scopeDefinitionId";
@@ -74,6 +91,8 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_START_USER_ID = "startUserId";
     String FIELD_STATE = "state";
     String FIELD_TASK_ID = "taskId";
+    String FIELD_TASK_DEFINITION_ID = "taskDefinitionId";
+    String FIELD_TASK_DEFINITION_KEY = "taskDefinitionKey";
     String FIELD_TENANT_ID = "tenantId";
     String FIELD_USER_ID = "userId";
     String FIELD_VARIABLE_BYTES_VALUE = "variableBytesValue";

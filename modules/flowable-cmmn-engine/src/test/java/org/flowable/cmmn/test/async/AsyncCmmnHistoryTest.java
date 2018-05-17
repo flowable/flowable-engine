@@ -28,6 +28,7 @@ import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
@@ -180,6 +181,11 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertNotNull(historicVariableInstance.getLastUpdatedTime());
         
         // Update
+        try {
+            Thread.sleep(16); // wait time for diff in last updated time
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } 
         cmmnRuntimeService.setVariable(caseInstance.getId(), "test", "hello test");
         waitForAsyncHistoryExecutorToProcessAllJobs();
         
@@ -197,6 +203,49 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         cmmnRuntimeService.removeVariable(caseInstance.getId(), "test");
         waitForAsyncHistoryExecutorToProcessAllJobs();
         assertNull(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("test").singleResult());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testHumanTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals(1, cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Create
+        HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("The Task", historicTaskInstance.getName());
+        assertEquals("johnDoe", historicTaskInstance.getAssignee());
+        assertEquals(caseInstance.getId(), historicTaskInstance.getScopeId());
+        assertEquals(caseInstance.getCaseDefinitionId(), historicTaskInstance.getScopeDefinitionId());
+        assertEquals(ScopeTypes.CMMN, historicTaskInstance.getScopeType());
+        assertNotNull(historicTaskInstance.getStartTime());
+        
+        // Update
+        cmmnTaskService.setAssignee(historicTaskInstance.getId(), "janeDoe");
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("The Task", historicTaskInstance.getName());
+        assertEquals("janeDoe", historicTaskInstance.getAssignee());
+        
+        cmmnTaskService.setPriority(historicTaskInstance.getId(), 99);
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals(99, historicTaskInstance.getPriority());
+        assertNull(historicTaskInstance.getEndTime());
+        
+        // Complete
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(historicTaskInstance.getEndTime());
     }
 
 }

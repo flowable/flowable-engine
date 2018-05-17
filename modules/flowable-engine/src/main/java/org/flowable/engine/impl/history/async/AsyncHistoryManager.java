@@ -251,6 +251,7 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.START_TIME, getClock().getCurrentTime());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
             putIfNotNull(data, HistoryJsonConstants.TASK_DEFINITION_ID, task.getTaskDefinitionId());
+            putIfNotNull(data, HistoryJsonConstants.FORM_KEY, task.getFormKey());
             putIfNotNull(data, HistoryJsonConstants.PRIORITY, task.getPriority());
             if (task.getDueDate() != null) {
                 putIfNotNull(data, HistoryJsonConstants.DUE_DATE, task.getDueDate());

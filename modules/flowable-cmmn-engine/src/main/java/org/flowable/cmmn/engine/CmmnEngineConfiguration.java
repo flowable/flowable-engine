@@ -70,6 +70,9 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricCase
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.MilestoneReachedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
@@ -1300,6 +1303,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer());
         historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer());
         historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer());
         
         return historyJsonTransformers;
     }

@@ -51,6 +51,7 @@ public abstract class CustomCmmnConfigurationFlowableTestCase extends FlowableCm
                 configureConfiguration(cmmnEngineConfiguration);
                 
                 cmmnEngine = cmmnEngineConfiguration.buildCmmnEngine();
+                cmmnEngineConfiguration.getClock().reset();
                 CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngineConfiguration);
                 
                 // Calling this will change the cmmnEngine and cmmnEngineConfiguration

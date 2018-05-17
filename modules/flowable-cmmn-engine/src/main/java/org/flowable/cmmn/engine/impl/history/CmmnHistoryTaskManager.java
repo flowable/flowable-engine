@@ -29,7 +29,7 @@ public class CmmnHistoryTaskManager implements InternalHistoryTaskManager {
 
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity) {
-        CommandContextUtil.getHistoricTaskService().recordTaskInfoChange(taskEntity);
+        CommandContextUtil.getCmmnHistoryManager().recordTaskInfoChange(taskEntity);
     }
 
 }
