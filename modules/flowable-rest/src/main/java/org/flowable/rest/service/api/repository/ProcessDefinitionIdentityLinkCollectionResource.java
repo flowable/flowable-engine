@@ -22,7 +22,7 @@ import io.swagger.annotations.Authorization;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
