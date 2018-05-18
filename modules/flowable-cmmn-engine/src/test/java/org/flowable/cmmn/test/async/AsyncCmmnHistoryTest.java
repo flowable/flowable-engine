@@ -331,6 +331,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         
         historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(task.getId()).singleResult();
         assertNotNull(historicPlanItemInstance.getLastStartedTime());
+        assertNull(historicPlanItemInstance.getEndedTime());
         
         // Complete task
         cmmnRuntimeService.triggerPlanItemInstance(task.getId());

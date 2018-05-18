@@ -380,25 +380,25 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordPlanItemInstanceCompleted(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_SUSPENDED, 
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_COMPLETED, 
                 CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_COMPLETED_TIME);    
     }
 
     @Override
     public void recordPlanItemInstanceOccurred(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_SUSPENDED, 
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_OCCURRED, 
                 CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_OCCURRED_TIME);      
     }
 
     @Override
     public void recordPlanItemInstanceTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_SUSPENDED, 
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_TERMINATED, 
                 CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_TERMINATED_TIME);      
     }
 
     @Override
     public void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity) {
-        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_SUSPENDED, 
+        updatePlanItemInstanceTimeStamp(planItemInstanceEntity, CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_EXIT, 
                 CmmnAsyncHistoryConstants.FIELD_END_TIME, CmmnAsyncHistoryConstants.FIELD_EXIT_TIME);         
     }
     
