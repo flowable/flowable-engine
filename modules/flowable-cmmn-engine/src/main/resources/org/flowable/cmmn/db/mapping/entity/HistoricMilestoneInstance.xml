@@ -48,7 +48,7 @@
                 #{milestone.caseInstanceId ,jdbcType=VARCHAR},
                 #{milestone.caseDefinitionId ,jdbcType=VARCHAR},
                 #{milestone.elementId, jdbcType=VARCHAR},
-                #{milestonetenantId, jdbcType=VARCHAR}
+                #{milestone.tenantId, jdbcType=VARCHAR}
             )
       </foreach>
     SELECT * FROM dual
