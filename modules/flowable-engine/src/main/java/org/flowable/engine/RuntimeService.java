@@ -38,7 +38,7 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -439,7 +439,7 @@ public interface RuntimeService {
     void addGroupIdentityLink(String processInstanceId, String groupId, String identityLinkType);
 
     /**
-     * Convenience shorthand for {@link #addUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
+     * Convenience shorthand for {@link #addUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
      * 
      * @param processInstanceId
      *            id of the process instance, cannot be null.
@@ -451,7 +451,7 @@ public interface RuntimeService {
     void addParticipantUser(String processInstanceId, String userId);
 
     /**
-     * Convenience shorthand for {@link #addGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
+     * Convenience shorthand for {@link #addGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
      * 
      * @param processInstanceId
      *            id of the process instance, cannot be null.
@@ -463,7 +463,7 @@ public interface RuntimeService {
     void addParticipantGroup(String processInstanceId, String groupId);
 
     /**
-     * Convenience shorthand for {@link #deleteUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
+     * Convenience shorthand for {@link #deleteUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
      * 
      * @param processInstanceId
      *            id of the process instance, cannot be null.
@@ -475,7 +475,7 @@ public interface RuntimeService {
     void deleteParticipantUser(String processInstanceId, String userId);
 
     /**
-     * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
+     * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
      * 
      * @param processInstanceId
      *            id of the process instance, cannot be null.

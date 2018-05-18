@@ -28,7 +28,7 @@ import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
