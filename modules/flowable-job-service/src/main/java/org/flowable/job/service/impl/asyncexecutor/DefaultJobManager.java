@@ -510,7 +510,7 @@ public class DefaultJobManager implements JobManager {
         jobEntity.setExclusive(exclusive);
     }
 
-    protected JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {
+    public JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {
         JobEntity executableJob = jobServiceConfiguration.getJobEntityManager().create();
         copyJobInfo(executableJob, job);
 
@@ -525,25 +525,25 @@ public class DefaultJobManager implements JobManager {
         return executableJob;
     }
 
-    protected TimerJobEntity createTimerJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
+    public TimerJobEntity createTimerJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         TimerJobEntity timerJob = jobServiceConfiguration.getTimerJobEntityManager().create();
         copyJobInfo(timerJob, otherJob);
         return timerJob;
     }
 
-    protected SuspendedJobEntity createSuspendedJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
+    public SuspendedJobEntity createSuspendedJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         SuspendedJobEntity suspendedJob = jobServiceConfiguration.getSuspendedJobEntityManager().create();
         copyJobInfo(suspendedJob, otherJob);
         return suspendedJob;
     }
 
-    protected DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
+    public DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         DeadLetterJobEntity deadLetterJob = jobServiceConfiguration.getDeadLetterJobEntityManager().create();
         copyJobInfo(deadLetterJob, otherJob);
         return deadLetterJob;
     }
 
-    protected AbstractRuntimeJobEntity copyJobInfo(AbstractRuntimeJobEntity copyToJob, AbstractRuntimeJobEntity copyFromJob) {
+    public AbstractRuntimeJobEntity copyJobInfo(AbstractRuntimeJobEntity copyToJob, AbstractRuntimeJobEntity copyFromJob) {
         copyToJob.setDuedate(copyFromJob.getDuedate());
         copyToJob.setEndDate(copyFromJob.getEndDate());
         copyToJob.setExclusive(copyFromJob.isExclusive());

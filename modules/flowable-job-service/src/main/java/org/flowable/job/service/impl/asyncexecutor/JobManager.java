@@ -109,5 +109,29 @@ public interface JobManager {
      * The ProcessEngineConfiguration instance will be passed when the ProcessEngine is built.
      */
     void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration);
+    
+    /**
+     * Create an executable job from another job
+     */
+    JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job);
 
+    /**
+     * Create a timer job from another job
+     */
+    TimerJobEntity createTimerJobFromOtherJob(AbstractRuntimeJobEntity otherJob);
+
+    /**
+     * Create a suspended job from another job
+     */
+    SuspendedJobEntity createSuspendedJobFromOtherJob(AbstractRuntimeJobEntity otherJob);
+
+    /**
+     * Create a dead letter job from another job
+     */
+    DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob);
+
+    /**
+     * Copy job info from one job to the other
+     */
+    AbstractRuntimeJobEntity copyJobInfo(AbstractRuntimeJobEntity copyToJob, AbstractRuntimeJobEntity copyFromJob);
 }
