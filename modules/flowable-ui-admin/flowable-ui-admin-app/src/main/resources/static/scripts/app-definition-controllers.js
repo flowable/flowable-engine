@@ -59,15 +59,15 @@ flowableAdminApp.controller('AppDefinitionController', ['$scope', '$rootScope', 
         };
     
         $scope.openFormDefinition = function (formDefinition) {
-            if (formDefintion && formDefintion.getProperty('id')) {
-                $location.path("/form-definition/" + formDefintion.getProperty('id'));
-              }
+            if (formDefinition && formDefinition.getProperty('id')) {
+                $location.path("/form-definition/" + formDefinition.getProperty('id'));
+            }
         };
         
         $scope.openDecisionTable = function (decisionTable) {
             if (decisionTable && decisionTable.getProperty('id')) {
                 $location.path("/decision-table/" + decisionTable.getProperty('id'));
-              }
+            }
         };
         
         $scope.loadProcessDefinitions = function() {
@@ -189,7 +189,7 @@ flowableAdminApp.controller('AppDefinitionController', ['$scope', '$rootScope', 
                     keepLastSelected : false,
                     enableSorting: false,
                     rowHeight: 36,
-                    afterSelectionChange: $scope.openDecisionTables,
+                    afterSelectionChange: $scope.openDecisionTable,
                     columnDefs: [
                         { field: 'id', displayName: headers[0], width: 75},
                         { field: 'name', displayName: headers[1]},

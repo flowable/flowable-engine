@@ -27,7 +27,7 @@
                             <td class="property-name" translate="DECISION-TABLE-DEPLOYMENT.TENANTID"></td>
                             <td>{{deployment.tenantId | empty}}</td>
 							<td ng-if="deployment.parentDeploymentId" class="property-name" translate="DECISION-TABLE-DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
-							<td ng-if="deployment.parentDeploymentId"><a ng-href="#/deployments/{{parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{deployment.parentDeploymentId}}</a></td>
+							<td ng-if="deployment.parentDeploymentId"><a ng-href="#/app-deployment/{{deployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{deployment.parentDeploymentId}}</a></td>
 						</tr>
 					</table>
 				</div>

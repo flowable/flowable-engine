@@ -469,7 +469,7 @@ public interface RepositoryService {
      *             when the process definition or group doesn't exist.
      */
     void deleteCandidateStarterGroup(String processDefinitionId, String groupId);
-
+    
     /**
      * Retrieves the {@link IdentityLink}s associated with the given process definition. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is authorized for a certain
      * process definition

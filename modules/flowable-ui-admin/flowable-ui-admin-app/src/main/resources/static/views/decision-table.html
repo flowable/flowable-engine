@@ -32,14 +32,12 @@
 						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE.DEPLOYMENT-ID"></td>
 							<td><a ng-href="#/decision-table-deployment/{{decisionTable.deploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{decisionTable.deploymentId}}</a></td>
-							<td class="property-name" translate="DECISION-TABLE.PARENT-DEPLOYMENT-ID"></td>
-							<td><a ng-href="#/deployment/{{decisionTable.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{decisionTable.parentDeploymentId}}</a></td>
+							<td ng-if="decisionTable.parentDeploymentId" class="property-name" translate="DECISION-TABLE.PARENT-DEPLOYMENT-ID"></td>
+							<td ng-if="decisionTable.parentDeploymentId"><a ng-href="#/deployment/{{decisionTable.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{decisionTable.parentDeploymentId}}</a></td>
 						</tr>
 						<tr class="property">
                             <td class="property-name" translate="DECISION-TABLE.TENANT"></td>
                             <td>{{decisionTable.tenantId | empty}}</td>
-                            <td ng-if="appId" class="property-name" translate="APP-DEPLOYMENT.APP-ID"></td>
-                            <td ng-if="appId"><a ng-href="#/app/{{appId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{appId}}</a></td>
                         </tr>
 					</table>
 				</div>

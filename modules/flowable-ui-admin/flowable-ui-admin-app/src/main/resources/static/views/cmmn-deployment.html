@@ -27,7 +27,7 @@
                             <td class="property-name" translate="CMMN-DEPLOYMENT.TENANTID"></td>
                             <td>{{cmmnDeployment.tenantId | empty}}</td>
                             <td ng-if="cmmnDeployment.parentDeploymentId" class="property-name" translate="CMMN-DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
-                            <td ng-if="cmmnDeployment.parentDeploymentId"><a ng-href="#/deployment/{{cmmnDeployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{cmmnDeployment.parentDeploymentId}}</a></td>
+                            <td ng-if="cmmnDeployment.parentDeploymentId"><a ng-href="#/app-deployment/{{cmmnDeployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{cmmnDeployment.parentDeploymentId}}</a></td>
                         </tr>
 					</table>
 				</div>

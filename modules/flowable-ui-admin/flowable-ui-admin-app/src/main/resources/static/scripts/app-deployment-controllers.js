@@ -27,14 +27,6 @@ flowableAdminApp.controller('AppDeploymentController', ['$scope', '$rootScope', 
 			}
 		};
 		
-		$scope.showAllDefinitions = function() {
-		    // Populate the app-filter with parentId
-		    $rootScope.filters.forced.appDefinitionFilter = {
-	            deploymentId: $scope.appDeployment.id
-		    };
-		    $location.path("/app-definitions");
-		};
-		
 		$q.all([$translate('APP-DEFINITIONS.HEADER.ID'),
             $translate('APP-DEFINITIONS.HEADER.NAME'),
             $translate('APP-DEFINITIONS.HEADER.VERSION'),
@@ -78,7 +70,7 @@ flowableAdminApp.controller('AppDeploymentController', ['$scope', '$rootScope', 
                 if (result === true) {
                     $http({method: 'DELETE', url: '/app/rest/admin/app-deployments/' + $routeParams.deploymentId}).
                     success(function(data, status, headers, config) {
-                        $scope.addAlert($translate.instant('ALERT.APP-DEPLOYMENT.DELETED-DEPLOYMENT', $scope.cmmnDeployment), 'info');
+                        $scope.addAlert($translate.instant('ALERT.APP-DEPLOYMENT.DELETED-DEPLOYMENT', $scope.appDeployment), 'info');
                         $scope.returnToList();
                     }).
                     error(function(data, status, headers, config) {
@@ -93,7 +85,7 @@ flowableAdminApp.controller('AppDeploymentController', ['$scope', '$rootScope', 
 		    // Load deployment
 		    $http({method: 'GET', url: '/app/rest/admin/app-deployments/' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
-  	    	        $scope.cmmnDeployment = data;
+  	    	        $scope.appDeployment = data;
   	    	    }).
   	    	    error(function(data, status, headers, config) {
                     if (data && data.message) {

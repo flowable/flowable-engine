@@ -27,7 +27,7 @@
                             <td class="property-name" translate="FORM-DEPLOYMENT.TENANTID"></td>
                             <td>{{formDeployment.tenantId | empty}}</td>
                             <td ng-if="formDeployment.parentDeploymentId" class="property-name" translate="FORM-DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
-                            <td ng-if="formDeployment.parentDeploymentId"><a ng-href="#/deployment/{{formDeployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formDeployment.parentDeploymentId}}</a></td>
+                            <td ng-if="formDeployment.parentDeploymentId"><a ng-href="#/app-deployment/{{formDeployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{formDeployment.parentDeploymentId}}</a></td>
                         </tr>
 					</table>
 				</div>

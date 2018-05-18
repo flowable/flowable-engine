@@ -1,5 +1,10 @@
 package org.flowable.rest.service.api.repository;
 
+import java.util.Date;
+
+import org.flowable.common.rest.util.DateToStringSerializer;
+import org.flowable.engine.repository.Deployment;
+
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,12 +19,8 @@ package org.flowable.rest.service.api.repository;
  */
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.swagger.annotations.ApiModelProperty;
-
-import org.flowable.common.rest.util.DateToStringSerializer;
-import org.flowable.engine.repository.Deployment;
-
-import java.util.Date;
 
 /**
  * @author Tijs Rademakers
@@ -27,19 +28,21 @@ import java.util.Date;
  */
 public class DeploymentResponse {
 
-    String id;
-    String name;
+    protected String id;
+    protected String name;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-    Date deploymentTime;
-    String category;
-    String url;
-    String tenantId;
+    protected Date deploymentTime;
+    protected String category;
+    protected String parentDeploymentId;
+    protected String url;
+    protected String tenantId;
 
     public DeploymentResponse(Deployment deployment, String url) {
         setId(deployment.getId());
         setName(deployment.getName());
         setDeploymentTime(deployment.getDeploymentTime());
         setCategory(deployment.getCategory());
+        setParentDeploymentId(deployment.getParentDeploymentId());
         setTenantId(deployment.getTenantId());
         setUrl(url);
     }
@@ -78,6 +81,15 @@ public class DeploymentResponse {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+    
+    @ApiModelProperty(example = "12")
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
     }
 
     public void setUrl(String url) {

@@ -430,6 +430,7 @@
         "NAME": "Name:",
         "TIME": "Deployment time:",
         "CATEGORY": "Category:",
+        "PARENT-DEPLOYMENT-ID": "Parent deployment id:",
         "TENANTID": "Tenant identifier:",
         "DEFINITIONS-MESSAGE": "This deployment has {{total}} process definitions, showing {{size}}.",
         "DEFINITIONS-MESSAGE-EMPTY": "This deployment has no process definitions.",
@@ -821,6 +822,7 @@
         "TIME": "Deployment time:",
         "CATEGORY": "Category:",
         "TENANTID": "Tenant identifier:",
+        "PARENT-DEPLOYMENT-ID": "Parent deployment id:",
         "DEFINITIONS-MESSAGE": "This deployment has {{total}} case definitions, showing {{size}}.",
         "DEFINITIONS-MESSAGE-EMPTY": "This deployment has no case definitions.",
         "TITLE": {
@@ -1075,7 +1077,7 @@
         "DEFINITIONS-MESSAGE": "This deployment has {{total}} app definitions, showing {{size}}.",
         "DEFINITIONS-MESSAGE-EMPTY": "This deployment has no app definitions.",
         "TITLE": {
-            "APP-DEFINITIONS": "APp Definitions",
+            "APP-DEFINITIONS": "App Definitions",
             "RESOURCES": "Resources"
         },
         "ACTION": {

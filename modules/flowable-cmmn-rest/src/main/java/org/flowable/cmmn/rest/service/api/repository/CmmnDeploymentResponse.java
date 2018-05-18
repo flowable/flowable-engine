@@ -27,19 +27,21 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class CmmnDeploymentResponse {
 
-    String id;
-    String name;
+    protected String id;
+    protected String name;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
-    Date deploymentTime;
-    String category;
-    String url;
-    String tenantId;
+    protected Date deploymentTime;
+    protected String category;
+    protected String parentDeploymentId;
+    protected String url;
+    protected String tenantId;
 
     public CmmnDeploymentResponse(CmmnDeployment deployment, String url) {
         setId(deployment.getId());
         setName(deployment.getName());
         setDeploymentTime(deployment.getDeploymentTime());
         setCategory(deployment.getCategory());
+        setParentDeploymentId(deployment.getParentDeploymentId());
         setTenantId(deployment.getTenantId());
         setUrl(url);
     }
@@ -78,6 +80,15 @@ public class CmmnDeploymentResponse {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    @ApiModelProperty(example = "12")
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
     }
 
     public void setUrl(String url) {

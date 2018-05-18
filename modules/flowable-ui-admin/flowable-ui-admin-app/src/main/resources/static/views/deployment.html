@@ -26,8 +26,8 @@
 						<tr class="property">
                             <td class="property-name" translate="DEPLOYMENT.TENANTID"></td>
                             <td>{{deployment.tenantId | empty}}</td>
-                            <td ng-if="appId" class="property-name" translate="APP-DEPLOYMENT.APP-ID"></td>
-                            <td ng-if="appId"><a ng-href="#/app/{{appId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{appId}}</a></td>
+                            <td ng-if="deployment.parentDeploymentId" class="property-name" translate="DEPLOYMENT.PARENT-DEPLOYMENT-ID"></td>
+                            <td ng-if="deployment.parentDeploymentId"><a ng-href="#/app-deployment/{{deployment.parentDeploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{deployment.parentDeploymentId}}</a></td>
                         </tr>
 					</table>
 				</div>

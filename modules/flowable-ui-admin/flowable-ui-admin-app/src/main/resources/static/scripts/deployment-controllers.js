@@ -96,6 +96,7 @@ flowableAdminApp.controller('DeploymentController', ['$scope', '$rootScope', '$h
 		    $http({method: 'GET', url: '/app/rest/admin/deployments/' + $routeParams.deploymentId}).
   	    	    success(function(data, status, headers, config) {
   	    	        $scope.deployment = data;
+  	    	        console.log($scope.deployment);
   	    	    }).
   	    	    error(function(data, status, headers, config) {
                     if (data && data.message) {
