@@ -22,7 +22,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;

@@ -21,7 +21,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.event.impl.FlowableIdentityLinkEventBuilder;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 

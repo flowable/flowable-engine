@@ -10,16 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.identitylink.service;
+package org.flowable.identitylink.api;
 
 /**
- * Contains constants for all types of identity links that can be used to involve a user or group with a certain task.
+ * Contains constants for all types of identity links that can be used to involve a user or group with a certain object.
  * 
- * see TaskService#addUserIdentityLink(String, String, String)
- * see TaskService#addGroupIdentityLink(String, String, String)
+ * see e.g. TaskService#addUserIdentityLink(String, String, String)
+ * see e.g. TaskService#addGroupIdentityLink(String, String, String)}
  * 
  * @author Joram Barrez
- * @deprecated use {@link org.flowable.identitylink.api.IdentityLinkType} instead
  */
 public class IdentityLinkType {
 

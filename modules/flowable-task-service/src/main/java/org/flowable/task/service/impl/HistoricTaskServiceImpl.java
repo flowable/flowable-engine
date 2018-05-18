@@ -17,7 +17,7 @@ import java.util.Objects;
 
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
