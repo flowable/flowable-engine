@@ -18,10 +18,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
@@ -246,6 +252,102 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         waitForAsyncHistoryExecutorToProcessAllJobs();
         historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertNotNull(historicTaskInstance.getEndTime());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testPlanItemInstances() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleCaseFlow").start();
+        List<PlanItemInstance> currentPlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertEquals(3, currentPlanItemInstances.size());
+        assertEquals(0, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertEquals(3, cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).count());
+        
+        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+        assertTrue(historicPlanItemInstances.stream().map(HistoricPlanItemInstance::getPlanItemDefinitionType).anyMatch(PlanItemDefinitionType.STAGE::equalsIgnoreCase));
+        assertTrue(historicPlanItemInstances.stream().map(HistoricPlanItemInstance::getPlanItemDefinitionType).anyMatch(PlanItemDefinitionType.MILESTONE::equalsIgnoreCase));
+        assertTrue(historicPlanItemInstances.stream().anyMatch(h -> "task".equalsIgnoreCase(h.getPlanItemDefinitionType()) && "planItemTaskA".equalsIgnoreCase(h.getElementId())));
+        
+        for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+            assertEquals(caseInstance.getId(), historicPlanItemInstance.getCaseInstanceId());
+            assertEquals(caseInstance.getCaseDefinitionId(), historicPlanItemInstance.getCaseDefinitionId());
+            assertNotNull(historicPlanItemInstance.getElementId());
+            assertNotNull(historicPlanItemInstance.getCreatedTime());
+            assertNotNull(historicPlanItemInstance.getLastAvailableTime());
+            assertNull(historicPlanItemInstance.getEndedTime());
+            assertNull(historicPlanItemInstance.getLastDisabledTime());
+            assertNull(historicPlanItemInstance.getLastSuspendedTime());
+            assertNull(historicPlanItemInstance.getExitTime());
+            assertNull(historicPlanItemInstance.getTerminatedTime());
+            
+            if (historicPlanItemInstance.getElementId().equals("planItemTaskA")) {
+                assertNotNull(historicPlanItemInstance.getLastEnabledTime());
+            } else {
+                assertNull(historicPlanItemInstance.getLastEnabledTime());
+            }
+        }
+        
+        // Disable task
+        PlanItemInstance task = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemTaskA").singleResult();
+        assertNotNull(task);
+        
+        cmmnRuntimeService.disablePlanItemInstance(task.getId());
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        
+        HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(task.getId()).singleResult();
+        assertEquals(PlanItemInstanceState.DISABLED, historicPlanItemInstance.getState());
+        assertNotNull(historicPlanItemInstance.getLastEnabledTime());
+        assertNotNull(historicPlanItemInstance.getLastDisabledTime());
+        
+        assertNotNull(historicPlanItemInstance.getLastAvailableTime());
+        assertNull(historicPlanItemInstance.getLastStartedTime());
+        assertNull(historicPlanItemInstance.getEndedTime());
+        assertNull(historicPlanItemInstance.getLastSuspendedTime());
+        assertNull(historicPlanItemInstance.getExitTime());
+        assertNull(historicPlanItemInstance.getTerminatedTime());
+        assertNotNull(historicPlanItemInstance.getLastUpdatedTime());
+        
+        // Enable task
+        cmmnRuntimeService.enablePlanItemInstance(task.getId());
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(task.getId()).singleResult();
+        assertEquals(PlanItemInstanceState.ENABLED, historicPlanItemInstance.getState());
+        assertNotNull(historicPlanItemInstance.getLastEnabledTime());
+        
+        assertNotNull(historicPlanItemInstance.getLastAvailableTime());
+        assertNotNull(historicPlanItemInstance.getLastDisabledTime());
+        assertNull(historicPlanItemInstance.getLastStartedTime());
+        assertNull(historicPlanItemInstance.getEndedTime());
+        assertNull(historicPlanItemInstance.getLastSuspendedTime());
+        assertNull(historicPlanItemInstance.getExitTime());
+        assertNull(historicPlanItemInstance.getTerminatedTime());
+        assertNotNull(historicPlanItemInstance.getLastUpdatedTime());
+        
+        // Manually enable
+        cmmnRuntimeService.startPlanItemInstance(task.getId());
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        
+        historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(task.getId()).singleResult();
+        assertNotNull(historicPlanItemInstance.getLastStartedTime());
+        
+        // Complete task
+        cmmnRuntimeService.triggerPlanItemInstance(task.getId());
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        
+        HistoricPlanItemInstance completedHistoricPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(task.getId()).singleResult();
+        assertNotNull(completedHistoricPlanItemInstance.getEndedTime());
+        
+        assertNotNull(completedHistoricPlanItemInstance.getLastEnabledTime());
+        assertNotNull(completedHistoricPlanItemInstance.getLastDisabledTime());
+        assertNotNull(completedHistoricPlanItemInstance.getLastAvailableTime());
+        assertNotNull(completedHistoricPlanItemInstance.getLastStartedTime());
+        assertNull(completedHistoricPlanItemInstance.getLastSuspendedTime());
+        assertNull(completedHistoricPlanItemInstance.getExitTime());
+        assertNull(completedHistoricPlanItemInstance.getTerminatedTime());
+        assertNotNull(completedHistoricPlanItemInstance.getLastUpdatedTime());
+        assertTrue(historicPlanItemInstance.getLastUpdatedTime().before(completedHistoricPlanItemInstance.getLastUpdatedTime()));
     }
 
 }

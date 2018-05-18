@@ -64,6 +64,8 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HistoricPlanItem
     void setExitTime(Date exitTime);
 
     void setEndedTime(Date endedTime);
+    
+    void setLastUpdatedTime(Date lastUpdatedTime);
 
     void setStartUserId(String startUserId);
 

@@ -70,6 +70,16 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricCase
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.MilestoneReachedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceAvailableHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceCompletedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceCreatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceDisabledHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceEnabledHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceExitHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceOccurredHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceStartedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceSuspendedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceTerminatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
@@ -1307,6 +1317,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer());
         historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer());
         historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer());
+        
+        historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceCompletedHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceCreatedHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceDisabledHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceEnabledHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceExitHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceOccurredHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer());
+        historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer());
         
         return historyJsonTransformers;
     }

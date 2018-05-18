@@ -366,6 +366,7 @@
             <column name="TERMINATED_TIME_" type="datetime" />
             <column name="EXIT_TIME_" type="datetime" />
             <column name="ENDED_TIME_" type="datetime" />
+            <column name="LAST_UPDATED_TIME_" type="datetime" />
             <column name="START_USER_ID_" type="varchar(255)" />
             <column name="REFERENCE_ID_" type="varchar(255)" />
             <column name="REFERENCE_TYPE_" type="varchar(255)" />

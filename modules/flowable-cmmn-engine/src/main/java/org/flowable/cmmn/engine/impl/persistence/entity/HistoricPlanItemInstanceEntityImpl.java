@@ -44,6 +44,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractEntity implement
     protected Date terminatedTime;
     protected Date exitTime;
     protected Date endedTime;
+    protected Date lastUpdatedTime;
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
@@ -70,6 +71,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractEntity implement
         persistentState.put("terminatedTime", terminatedTime);
         persistentState.put("exitTime", exitTime);
         persistentState.put("endedTime", endedTime);
+        persistentState.put("lastUpdatedTime", lastUpdatedTime);
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
@@ -277,6 +279,16 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractEntity implement
     @Override
     public void setEndedTime(Date endedTime) {
         this.endedTime = endedTime;
+    }
+    
+    @Override
+    public Date getLastUpdatedTime() {
+        return lastUpdatedTime;
+    }
+
+    @Override
+    public void setLastUpdatedTime(Date lastUpdatedTime) {
+        this.lastUpdatedTime = lastUpdatedTime;
     }
 
     @Override

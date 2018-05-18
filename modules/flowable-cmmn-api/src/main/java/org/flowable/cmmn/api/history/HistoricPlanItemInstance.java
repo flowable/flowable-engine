@@ -60,6 +60,8 @@ public interface HistoricPlanItemInstance {
     Date getExitTime();
 
     Date getEndedTime();
+    
+    Date getLastUpdatedTime();
 
     String getStartUserId();
 

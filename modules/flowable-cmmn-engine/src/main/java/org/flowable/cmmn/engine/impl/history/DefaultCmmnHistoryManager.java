@@ -257,6 +257,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.findById(planItemInstanceEntity.getId());
             if (historicPlanItemInstanceEntity != null) {
                 historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
+                historicPlanItemInstanceEntity.setLastUpdatedTime(cmmnEngineConfiguration.getClock().getCurrentTime());
                 changes.accept(historicPlanItemInstanceEntity);
             }
         }
