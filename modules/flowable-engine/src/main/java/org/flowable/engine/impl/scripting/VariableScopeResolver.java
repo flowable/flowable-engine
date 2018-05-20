@@ -87,6 +87,8 @@ public class VariableScopeResolver implements Resolver {
             return processEngineConfiguration.getFormService();
         } else if (identityServiceKey.equals(key)) {
             return processEngineConfiguration.getIdentityService();
+        } else if (historyServiceKey.equals(key)) {
+            return processEngineConfiguration.getHistoryService();
         }
 
         return variableScope.getVariable((String) key);
