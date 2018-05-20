@@ -144,6 +144,7 @@ angular.module('flowableApp')
         if(newValue && newValue.id) {
             $scope.model.taskUpdating = true;
             $scope.model.task = newValue;
+            $scope.model.claimButtonDisabled = false;
             if ($scope.model.task.formKey) {
                 $scope.resetModel();
             }
