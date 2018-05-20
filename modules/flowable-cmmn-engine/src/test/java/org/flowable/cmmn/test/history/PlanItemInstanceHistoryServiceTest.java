@@ -12,6 +12,22 @@
  */
 package org.flowable.cmmn.test.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -23,21 +39,6 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dennis Federico
@@ -178,9 +179,14 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSimpleStage() {
-        Date beforeCaseInstance = setClockFixedToCurrentTime();
+        setClockFixedToCurrentTime();
+        Calendar beforeCaseCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        beforeCaseCalendar.add(Calendar.HOUR, -1);
+        Date beforeCaseInstance = beforeCaseCalendar.getTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleStage").start();
-        Date afterCaseInstance = cmmnEngineConfiguration.getClock().getCurrentTime();
+        Calendar afterCaseCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        afterCaseCalendar.add(Calendar.HOUR, 1);
+        Date afterCaseInstance = afterCaseCalendar.getTime();
 
         //Basic case setup check
         List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().list();
@@ -200,7 +206,9 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .count());
 
-        Date beforeComplete = cmmnEngineConfiguration.getClock().getCurrentTime();
+        Calendar beforeCompleteCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        beforeCompleteCalendar.add(Calendar.HOUR, -1);
+        Date beforeComplete = beforeCompleteCalendar.getTime();
         PlanItemInstance planItemTask = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemTaskA").singleResult();
         Task task = cmmnTaskService.createTaskQuery().subScopeId(planItemTask.getId()).singleResult();
         cmmnTaskService.complete(task.getId());
@@ -225,9 +233,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
             assertTrue(h.getCompletedTime().getTime() <= h.getEndedTime().getTime());
         });
 
-
         assertCaseInstanceEnded(caseInstance);
-
     }
 
     @Test
@@ -285,8 +291,8 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         PlanItemInstance event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemStartStageOneEvent").singleResult();
         cmmnRuntimeService.triggerPlanItemInstance(event.getId());
         assertCaseInstanceNotEnded(caseInstance);
-        Date occurredBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
         forwardClock(TimeUnit.MINUTES.toMillis(1));
+        Date occurredBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
 
         //A userEventListeners is removed and two human task are instanced
         currentPlanItems = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
@@ -352,8 +358,8 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         PlanItemInstance planItemTask = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemTaskA").singleResult();
         Task task = cmmnTaskService.createTaskQuery().subScopeId(planItemTask.getId()).singleResult();
         cmmnTaskService.complete(task.getId());
-        Date completedBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
         forwardClock(TimeUnit.MINUTES.toMillis(1));
+        Date completedBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
 
         //one completed task, fetched with completeTime queryCriteria
         HistoricPlanItemInstance historicPlanItem = cmmnHistoryService.createHistoricPlanItemInstanceQuery().completedBefore(completedBefore).completedAfter(completedAfter).singleResult();
@@ -379,8 +385,8 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         forwardClock(TimeUnit.MINUTES.toMillis(1));
         event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemExitStageOneEvent").singleResult();
         cmmnRuntimeService.triggerPlanItemInstance(event.getId());
-        Date endedBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
         forwardClock(TimeUnit.MINUTES.toMillis(1));
+        Date endedBefore = cmmnEngineConfiguration.getClock().getCurrentTime();
 
         //Exit condition should have propagated to the remaining task
         historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()

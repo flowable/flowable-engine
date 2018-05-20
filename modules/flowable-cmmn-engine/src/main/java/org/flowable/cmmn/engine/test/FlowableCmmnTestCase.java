@@ -146,11 +146,11 @@ public abstract class FlowableCmmnTestCase {
     }
     
     protected void waitForJobExecutorToProcessAllJobs() {
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 200L, true);
     }
     
     protected void waitForAsyncHistoryExecutorToProcessAllJobs() {
-        CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
+        CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 200L, true);
     }
 
 }

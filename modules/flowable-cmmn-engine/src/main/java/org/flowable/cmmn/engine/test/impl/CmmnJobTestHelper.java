@@ -32,11 +32,13 @@ public class CmmnJobTestHelper {
     
     public static void waitForJobExecutorToProcessAllJobs(final CmmnEngine cmmnEngine, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+        
         waitForJobExecutorToProcessAllJobs(cmmnEngine.getCmmnEngineConfiguration(), maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
     
     public static void waitForJobExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+        
         waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<Boolean>() {
             
             @Override
@@ -50,11 +52,12 @@ public class CmmnJobTestHelper {
     
     public static void waitForAsyncHistoryExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+        
         waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncHistoryExecutor(), new Callable<Boolean>() {
             
             @Override
             public Boolean call() throws Exception {
-                return cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().count() > 0;
+                return cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().list().size() > 0;
             }
             
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);

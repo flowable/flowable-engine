@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -54,10 +55,10 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         cmmnEngineConfiguration.setAsyncExecutorActivate(false);
         cmmnEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(true);
         cmmnEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
-        cmmnEngineConfiguration.setAsyncFailedJobWaitTime(100);
-        cmmnEngineConfiguration.setDefaultFailedJobWaitTime(100);
+        cmmnEngineConfiguration.setAsyncFailedJobWaitTime(1000);
+        cmmnEngineConfiguration.setDefaultFailedJobWaitTime(1000);
         cmmnEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(10);
-        cmmnEngineConfiguration.setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(100);
+        cmmnEngineConfiguration.setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(1000);
     }
     
     @Test
@@ -296,6 +297,9 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         cmmnRuntimeService.disablePlanItemInstance(task.getId());
         waitForAsyncHistoryExecutorToProcessAllJobs();
         
+        assertEquals(0, cmmnManagementService.createHistoryJobQuery().scopeType(ScopeTypes.CMMN).count());
+        assertEquals(0, cmmnManagementService.createDeadLetterJobQuery().scopeType(ScopeTypes.CMMN).count());
+        
         HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(task.getId()).singleResult();
         assertEquals(PlanItemInstanceState.DISABLED, historicPlanItemInstance.getState());
         assertNotNull(historicPlanItemInstance.getLastEnabledTime());
@@ -334,6 +338,9 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertNull(historicPlanItemInstance.getEndedTime());
         
         // Complete task
+        Calendar clockCal = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        clockCal.add(Calendar.HOUR, 1);
+        setClockTo(clockCal.getTime());
         cmmnRuntimeService.triggerPlanItemInstance(task.getId());
         waitForAsyncHistoryExecutorToProcessAllJobs();
         
@@ -349,6 +356,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertNull(completedHistoricPlanItemInstance.getTerminatedTime());
         assertNotNull(completedHistoricPlanItemInstance.getLastUpdatedTime());
         assertTrue(historicPlanItemInstance.getLastUpdatedTime().before(completedHistoricPlanItemInstance.getLastUpdatedTime()));
+        
+        cmmnEngineConfiguration.getClock().reset();
     }
 
 }
