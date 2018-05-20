@@ -273,6 +273,9 @@ angular.module('flowableApp')
             $scope.selectDefaultDefinition();
         };
 
+        $scope.$on('process-started-error', function (event, data) {
+            $rootScope.addAlert(data.error.message, 'error');
+        });
 
         // Called after form is submitted
         $scope.$on('process-started', function (event, data) {
