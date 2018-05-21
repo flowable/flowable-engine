@@ -75,7 +75,7 @@ public interface HistoryJsonConstants {
     String DATA = "data";
 
     String ID = "id";
-
+    
     String NAME = "name";
 
     String DESCRIPTION = "description";
@@ -103,7 +103,15 @@ public interface HistoryJsonConstants {
     String PROCESS_DEFINITION_NAME = "processDefinitionName";
 
     String PROCESS_DEFINITION_VERSION = "processDefinitionVersion";
+    
+    String PROCESS_DEFINITION_CATEGORY = "processDefinitionCategory";
 
+    String PROCESS_DEFINITIN_DERIVED_FROM = "processDefinitionDerivedFrom";
+    
+    String PROCESS_DEFINITIN_DERIVED_FROM_ROOT = "processDefinitionDerivedFromRoot";
+    
+    String PROCESS_DEFINITIN_DERIVED_VERSION = "processDefinitionDerivedVersion";
+    
     String DEPLOYMENT_ID = "deploymentId";
 
     String START_TIME = "startTime";

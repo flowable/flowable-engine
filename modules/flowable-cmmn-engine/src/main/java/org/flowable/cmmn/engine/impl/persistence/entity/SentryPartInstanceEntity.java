@@ -14,12 +14,13 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
 
+import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez
  */
-public interface SentryPartInstanceEntity extends Entity {
+public interface SentryPartInstanceEntity extends HasRevision, Entity {
     
     String getCaseDefinitionId();
     void setCaseDefinitionId(String caseDefinitionId);

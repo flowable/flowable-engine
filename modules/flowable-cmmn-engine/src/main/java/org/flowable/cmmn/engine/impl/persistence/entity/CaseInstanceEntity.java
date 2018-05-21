@@ -15,13 +15,14 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.Date;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
  */
-public interface CaseInstanceEntity extends Entity, EntityWithSentryPartInstances, VariableScope, PlanItemInstanceContainer, CaseInstance {
+public interface CaseInstanceEntity extends Entity, EntityWithSentryPartInstances, VariableScope, HasRevision, PlanItemInstanceContainer, CaseInstance {
 
     void setBusinessKey(String businessKey);
     void setName(String name);

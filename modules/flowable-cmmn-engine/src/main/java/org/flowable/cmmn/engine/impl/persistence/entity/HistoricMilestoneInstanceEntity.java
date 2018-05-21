@@ -16,12 +16,13 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.Date;
 
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricMilestoneInstanceEntity extends Entity, HistoricMilestoneInstance {
+public interface HistoricMilestoneInstanceEntity extends Entity, HasRevision, HistoricMilestoneInstance {
     
     void setName(String name);
     void setTimeStamp(Date timeStamp);

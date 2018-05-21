@@ -13,12 +13,13 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez
  */
-public interface PlanItemInstanceEntity extends Entity, DelegatePlanItemInstance, EntityWithSentryPartInstances, PlanItemInstanceContainer {
+public interface PlanItemInstanceEntity extends Entity, HasRevision, DelegatePlanItemInstance, EntityWithSentryPartInstances, PlanItemInstanceContainer {
     
     PlanItemInstanceEntity getStagePlanItemInstanceEntity();
     

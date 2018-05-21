@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 import java.util.Date;
@@ -20,7 +21,7 @@ import java.util.Date;
 /**
  * @author Dennis Federico
  */
-public interface HistoricPlanItemInstanceEntity extends Entity, HistoricPlanItemInstance {
+public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, HistoricPlanItemInstance {
 
     @Override
     void setId(String id);
