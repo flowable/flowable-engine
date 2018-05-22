@@ -14,7 +14,7 @@
   </parent>
 
   <properties>
-    <swagger.host>localhost:8080</swagger.host>
+    <!--<swagger.host>localhost:8080</swagger.host>-->
     <swagger.generated.directory>target/generated-swagger</swagger.generated.directory>
   </properties>
 
