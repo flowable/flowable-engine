@@ -55,6 +55,10 @@ services:
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_CONTENT_PORT=9977
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_CONTENT_CONTEXT-ROOT=flowable-rest
             - FLOWABLE_ADMIN_APP_SERVER-CONFIG_CONTENT_REST-ROOT=content-api
+            - FLOWABLE_ADMIN_APP_SERVER-CONFIG_APP_SERVER-ADDRESS=http://flowable-task-app
+            - FLOWABLE_ADMIN_APP_SERVER-CONFIG_APP_PORT=9977
+            - FLOWABLE_ADMIN_APP_SERVER-CONFIG_APP_CONTEXT-ROOT=flowable-task
+            - FLOWABLE_ADMIN_APP_SERVER-CONFIG_APP_REST-ROOT=app-api
         ports:
             - 9988:9988
         entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
