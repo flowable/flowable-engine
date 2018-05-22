@@ -28,14 +28,35 @@
 
 <h3>Release Notes - Flowable - 6.3.1</h3>
 
-<h4>GENERAL</h4>
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of an app engine, so apps are now a first class citizen and the process engine is not misused any more to handle app deployments. 
+    When starting the Flowable Task application all app deployments are automatically migrated to the new app engine.</li>
+    <li>Added async history support to the CMMN engine.</li>
+    <li>Added more history information to the CMMN engine with historic plan items.</li>
+    <li>Improved the Spring Boot support and upgraded to Spring Boot 2.0.2.</li>
+    <li>Enhanced debugger in the Flowable Task application to evaluate expressions and scripts.</li>
+    <li>Made the job service more generic with the scope type property to improve the possibility to run different job handlers for different job types.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Pascal Schumacher (PascalSchumacher)</li>
+    <li>Amina Zoheir (AminaZoheir)</li>
+    <li>Toni (ttonl)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Michael Lippens (mlippens)</li>
+</ul>
 
 <h4>Upgrade notes</h4>
 	
 <h5>Package renaming</h5>
 	
 <p>To make the Flowable modules compatible with OSGi and Java 9 modules some package renaming was needed to prevent clashes.
-org.flowable.engine.common -> org.flowable.common.engine</p>
+The renaming has been done according to this pattern org.flowable.engine.common -> org.flowable.common.engine</p>
 
 <h5>StrongUuidGenerator usage with Spring Boot</h5>
 
