@@ -26,6 +26,11 @@ public class FlowableTaskAppProperties {
      * Enables the REST API (this is not the REST api used by the UI, but an api that's available over basic auth authentication).
      */
     private boolean restEnabled = true;
+    
+    /**
+     * Enables the logic to migrate old app definitions from the process engine to the app engine
+     */
+    private boolean appMigrationEnabled = true;
 
     public boolean isRestEnabled() {
         return restEnabled;
@@ -33,5 +38,13 @@ public class FlowableTaskAppProperties {
 
     public void setRestEnabled(boolean restEnabled) {
         this.restEnabled = restEnabled;
+    }
+
+    public boolean isAppMigrationEnabled() {
+        return appMigrationEnabled;
+    }
+
+    public void setAppMigrationEnabled(boolean appMigrationEnabled) {
+        this.appMigrationEnabled = appMigrationEnabled;
     }
 }
