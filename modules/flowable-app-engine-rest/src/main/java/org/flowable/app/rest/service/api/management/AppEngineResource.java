@@ -36,7 +36,7 @@ public class AppEngineResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
-    @GetMapping(value = "/form-management/engine", produces = "application/json")
+    @GetMapping(value = "/app-management/engine", produces = "application/json")
     public AppEngineInfoResponse getEngineInfo() {
         AppEngineInfoResponse response = new AppEngineInfoResponse();
 
