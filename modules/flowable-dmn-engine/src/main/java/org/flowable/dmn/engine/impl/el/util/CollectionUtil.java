@@ -46,7 +46,7 @@ public class CollectionUtil {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
             return valueCollection != null && targetCollection.containsAll(valueCollection);
         } else {
-            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), targetCollection);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
             return targetCollection.contains(formattedValue);
         }
     }
@@ -74,7 +74,7 @@ public class CollectionUtil {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
             return valueCollection == null || !targetCollection.containsAll(valueCollection);
         } else {
-            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), targetCollection);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
             return !targetCollection.contains(formattedValue);
         }
     }
@@ -102,7 +102,7 @@ public class CollectionUtil {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
             return valueCollection != null && CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
-            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(),targetCollection);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value,targetCollection);
             return targetCollection.contains(formattedValue);
         }
     }
@@ -130,7 +130,7 @@ public class CollectionUtil {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
             return valueCollection == null || !CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
-            Object formattedValue = DMNParseUtil.getFormattedValue(value.toString(), targetCollection);
+            Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
             return !targetCollection.contains(formattedValue);
         }
     }

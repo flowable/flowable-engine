@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '6.3.0.1', 1);
+values ('common.schema.version', '6.3.1.0', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -41,7 +41,7 @@ create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_IDENT_LNK_SCOPE on ACT_RU_IDENTITYLINK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_IDENT_LNK_SCOPE_DEF on ACT_RU_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.3.0.1', 1);
+insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.3.1.0', 1);
 create table ACT_RU_TASK (
     ID_ varchar(64),
     REV_ integer,
@@ -80,7 +80,7 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.3.0.1', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.3.1.0', 1);
 create table ACT_RU_VARIABLE (
     ID_ varchar(64) not null,
     REV_ integer,
@@ -108,7 +108,7 @@ alter table ACT_RU_VARIABLE
     foreign key (BYTEARRAY_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.3.0.1', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.3.1.0', 1);
 create table ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
@@ -224,8 +224,9 @@ create table ACT_RU_HISTORY_JOB (
     HANDLER_CFG_ varchar(4000),
     CUSTOM_VALUES_ID_ varchar(64),
     ADV_HANDLER_CFG_ID_ varchar(64),
-    TENANT_ID_ varchar(255) default '',
     CREATE_TIME_ timestamp NULL,
+    SCOPE_TYPE_ varchar(255),
+    TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -297,7 +298,7 @@ create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_)
 create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_); 
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.3.0.1', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.3.1.0', 1);
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
     NAME_ varchar(255),
@@ -307,6 +308,7 @@ create table ACT_RE_DEPLOYMENT (
     DEPLOY_TIME_ timestamp NULL,
     DERIVED_FROM_ varchar(64),
     DERIVED_FROM_ROOT_ varchar(64),
+    PARENT_DEPLOYMENT_ID_ varchar(255),
     ENGINE_VERSION_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -596,8 +598,8 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
     
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.3.0.1', 1);   
+values ('schema.version', '6.3.1.0', 1);   
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.3.0.1)', 1);  
+values ('schema.history', 'create(6.3.1.0)', 1);  
 
