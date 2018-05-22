@@ -1113,6 +1113,7 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/Historic*InstanceTest.java</exclude>
                                 <exclude>**/HistoryServiceTest.java</exclude>
+                                <exclude>**/HistoryLevelServiceTest.java</exclude>
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
