@@ -134,8 +134,8 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(50000L, 100L);
         assertNull(managementService.createHistoryJobQuery().singleResult());
 
-        // 1002 -> (start, 1) + (end, 1) + (gateway, 1000), + (service task, 1000)
-        assertEquals(2002, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count());
+        // 1002 -> (start, 1) + (end, 1) + (gateway, 500), + (service task, 500)
+        assertEquals(1002, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count());
     }
 
     public void testTaskAssigneeChange() {
