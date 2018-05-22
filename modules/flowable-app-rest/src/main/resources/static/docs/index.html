@@ -53,7 +53,10 @@
           case "specfile/content/flowable.json":
               api = "content";
               break;
-        }
+          case "specfile/app/flowable.json":
+              api = "app";
+              break;
+      }
 
         if (!api) {
             window.location.search = window.location.search.replace(url, "specfile/process/flowable.json");
@@ -117,6 +120,9 @@
               case "content":
                   specFile = "specfile/content/flowable.json";
                   break;
+              case "app":
+                  specFile = "specfile/app/flowable.json";
+                  break;
           }
 
           var url = window.location.search.match(/url=([^&]+)/);
@@ -143,6 +149,7 @@
           <option value="dmn">DMN</option>
           <option value="form">Form</option>
           <option value="content">Content</option>
+          <option value="app">App</option>
         </select>
       </div>
   </div>
