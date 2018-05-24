@@ -73,36 +73,38 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
         String oldOwnerId = task.getOwner();
         
         boolean assignedToNoOne = false;
-        if (IdentityLinkType.ASSIGNEE.equals(identityType)) {
-            
-            if (oldAssigneeId == null && identityId == null) {
-                return null;
-            }
-            
-            if (oldAssigneeId != null && oldAssigneeId.equals(identityId)) {
-                return null;
-            }
-            
-            TaskHelper.changeTaskAssignee(task, identityId);
-            assignedToNoOne = identityId == null;
-            
-        } else if (IdentityLinkType.OWNER.equals(identityType)) {
-            
-            if (oldOwnerId == null && identityId == null) {
-                return null;
-            }
-            
-            if (oldOwnerId != null && oldOwnerId.equals(identityId)) {
-                return null;
-            }
-            
-            TaskHelper.changeTaskOwner(task, identityId);
-            assignedToNoOne = identityId == null;
+        if (IDENTITY_USER == identityIdType) {
+            if (IdentityLinkType.ASSIGNEE.equals(identityType)) {
 
-        } else if (IDENTITY_USER == identityIdType) {
-            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), identityId, null, identityType);
-            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-            
+                if (oldAssigneeId == null && identityId == null) {
+                    return null;
+                }
+
+                if (oldAssigneeId != null && oldAssigneeId.equals(identityId)) {
+                    return null;
+                }
+
+                TaskHelper.changeTaskAssignee(task, identityId);
+                assignedToNoOne = identityId == null;
+
+            } else if (IdentityLinkType.OWNER.equals(identityType)) {
+
+                if (oldOwnerId == null && identityId == null) {
+                    return null;
+                }
+
+                if (oldOwnerId != null && oldOwnerId.equals(identityId)) {
+                    return null;
+                }
+
+                TaskHelper.changeTaskOwner(task, identityId);
+                assignedToNoOne = identityId == null;
+
+            } else {
+                IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService()
+                    .createTaskIdentityLink(task.getId(), identityId, null, identityType);
+                IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+            }
         } else if (IDENTITY_GROUP == identityIdType) {
             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), null, identityId, identityType);
             IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);

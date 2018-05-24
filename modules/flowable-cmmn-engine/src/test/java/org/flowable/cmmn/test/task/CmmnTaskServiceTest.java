@@ -20,6 +20,7 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.task.api.Task;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -229,6 +231,22 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
             cmmnTaskService.deleteTask(task.getId());
             cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testHumanTask.cmmn")
+    public void addGroupIdentityLinkToTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        cmmnTaskService.addGroupIdentityLink(task.getId(), "testGroupId", IdentityLinkType.OWNER);
+
+        List<IdentityLink> identityLinks = cmmnTaskService.getIdentityLinksForTask(task.getId());
+        Task updatedTask = cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedTask.getOwner(), is(nullValue()));
+        assertThat(identityLinks.size(), is(1));
+        assertThat(identityLinks.get(0).getGroupId(), is("testGroupId"));
+        assertThat(identityLinks.get(0).getType(), is(IdentityLinkType.OWNER));
     }
 
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
