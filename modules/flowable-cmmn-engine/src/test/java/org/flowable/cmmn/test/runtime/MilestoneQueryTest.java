@@ -12,6 +12,14 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
@@ -20,13 +28,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Test;
-
-import java.util.Date;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dennis Federico
@@ -52,23 +53,34 @@ public class MilestoneQueryTest extends FlowableCmmnTestCase {
 
         //event triggering
         setClockTo(new Date(System.currentTimeMillis() + 60_000L));
-        Date beforeFirstTrigger = cmmnEngineConfiguration.getClock().getCurrentTime();
+        Calendar beforeFirstCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        beforeFirstCalendar.add(Calendar.MINUTE, -1);
+        Date beforeFirstTrigger = beforeFirstCalendar.getTime();
         PlanItemInstance event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("event1").singleResult();
         cmmnRuntimeService.triggerPlanItemInstance(event.getId());
-        Date afterFirstTrigger = cmmnEngineConfiguration.getClock().getCurrentTime();
+        Calendar afterFirstCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        afterFirstCalendar.add(Calendar.MINUTE, 1);
+        Date afterFirstTrigger = afterFirstCalendar.getTime();
 
         setClockTo(new Date(afterFirstTrigger.getTime() + 60_000L));
-        Date beforeSecondTrigger = cmmnEngineConfiguration.getClock().getCurrentTime();
+        Calendar beforeSecondCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        beforeSecondCalendar.add(Calendar.MINUTE, -1);
+        Date beforeSecondTrigger = beforeSecondCalendar.getTime();
         event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("event2").singleResult();
         cmmnRuntimeService.triggerPlanItemInstance(event.getId());
-        Date afterSecondTrigger = cmmnEngineConfiguration.getClock().getCurrentTime();
-
+        Calendar afterSecondCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        afterSecondCalendar.add(Calendar.MINUTE, 1);
+        Date afterSecondTrigger = afterSecondCalendar.getTime();
 
         setClockTo(new Date(afterSecondTrigger.getTime() + 60_000L));
-        Date beforeThirdTrigger = cmmnEngineConfiguration.getClock().getCurrentTime();
+        Calendar beforeThirdCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        beforeThirdCalendar.add(Calendar.MINUTE, -1);
+        Date beforeThirdTrigger = beforeThirdCalendar.getTime();
         event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("event3").singleResult();
         cmmnRuntimeService.triggerPlanItemInstance(event.getId());
-        Date afterThirdTrigger = cmmnEngineConfiguration.getClock().getCurrentTime();
+        Calendar afterThirdCalendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+        afterThirdCalendar.add(Calendar.MINUTE, 1);
+        Date afterThirdTrigger = afterThirdCalendar.getTime();
 
         assertEquals(3, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
 

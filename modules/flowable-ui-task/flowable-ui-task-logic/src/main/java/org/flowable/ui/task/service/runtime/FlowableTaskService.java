@@ -20,7 +20,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;

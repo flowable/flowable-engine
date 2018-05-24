@@ -5,11 +5,19 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.job.api.Job;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.ui.task.model.debugger.BreakpointRepresentation;
 import org.flowable.ui.task.model.debugger.ExecutionRepresentation;
 import org.springframework.beans.BeansException;
@@ -143,5 +151,26 @@ public class DebuggerService implements ProcessDebugger, ApplicationContextAware
                     execution.isSuspended(), execution.getTenantId()));
         }
         return executionRepresentations;
+    }
+
+    public Object evaluateExpression(final String executionId, final String expressionString) {
+        final ProcessEngineConfigurationImpl processEngineConfiguration = this.applicationContext.getBean(ProcessEngineConfigurationImpl.class);
+        return processEngineConfiguration.getManagementService().executeCommand(commandContext -> {
+            ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+            Expression expression = expressionManager.createExpression(expressionString);
+            Execution execution = Context.getProcessEngineConfiguration().getExecutionEntityManager().findById(executionId);
+            return expression.getValue((VariableScope) execution);
+        });
+    }
+
+    public void evaluateScript(final String executionId, final String scriptLanguage, final String script) {
+        getManagementService().executeCommand(
+                (Command<Void>) commandContext -> {
+                    ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+                    Execution execution = Context.getProcessEngineConfiguration().getExecutionEntityManager().findById(executionId);
+                    scriptingEngines.evaluate(script, scriptLanguage, (ExecutionEntityImpl) execution, false);
+                    return null;
+                }
+        );
     }
 }

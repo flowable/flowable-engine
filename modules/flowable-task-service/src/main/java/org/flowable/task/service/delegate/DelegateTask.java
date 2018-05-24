@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.variable.api.delegate.VariableScope;
 

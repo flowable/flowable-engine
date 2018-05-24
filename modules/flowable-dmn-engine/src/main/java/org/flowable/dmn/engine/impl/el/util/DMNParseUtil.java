@@ -107,27 +107,32 @@ public class DMNParseUtil {
             .collect(Collectors.toList());
     }
 
-    protected static Object getFormattedValue(String value, Object inputCollection) {
+    protected static Object getFormattedValue(Object value, Object inputCollection) {
         Class<?> collectionType = getTargetType(inputCollection);
         return formatElementValue(value, collectionType);
     }
 
-    protected static Object formatElementValue(String value, Class<?> collectionType) {
-        if (value.isEmpty()) {
-            return null;
-        }
-
-        value = removedSurroundingQuotes(value);
+    protected static Object formatElementValue(Object value, Class<?> collectionType) {
+    		
+	    	if(value instanceof String) {
+	    		String stringValue = (String) value;
+	    	
+	        if (stringValue.isEmpty()) {
+	            return null;
+	        }
+	
+	        value = removedSurroundingQuotes(stringValue);
+	    	}
 
         // format element based on collection type
         if (Date.class.equals(collectionType)) {
-            return DateUtil.toDate(value);
+            return DateUtil.toDate(value.toString());
         } else if (LocalDate.class.equals(collectionType)) {
             return new DateTime(DateUtil.toDate(value)).toLocalDate();
         } else if (Integer.class.equals(collectionType) || Long.class.equals(collectionType) || Float.class.equals(collectionType) || Double.class.equals(collectionType)) {
-            return getNumberValue(value, collectionType);
+            return getNumberValue(value.toString(), collectionType);
         } else if (Boolean.class.equals(collectionType)) {
-            return Boolean.valueOf(value);
+            return Boolean.valueOf(value.toString());
         } else { // Default case String
             return value;
         }

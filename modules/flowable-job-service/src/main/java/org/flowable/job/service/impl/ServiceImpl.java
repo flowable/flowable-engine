@@ -13,6 +13,7 @@
 package org.flowable.job.service.impl;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
@@ -61,5 +62,9 @@ public class ServiceImpl extends CommonServiceImpl<JobServiceConfiguration> {
     
     public HistoryJobEntityManager getHistoryJobEntityManager() {
         return configuration.getHistoryJobEntityManager();
+    }
+    
+    public CommandExecutor getCommandExecutor() {
+        return configuration.getCommandExecutor();
     }
 }

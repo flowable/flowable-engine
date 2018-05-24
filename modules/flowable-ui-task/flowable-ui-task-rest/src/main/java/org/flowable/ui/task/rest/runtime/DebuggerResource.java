@@ -45,42 +45,67 @@ public class DebuggerResource {
 
     @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.GET, produces = "application/json")
     public Collection<BreakpointRepresentation> getBreakpoints() {
+        assertDebuggerEnabled();
         return debuggerService.getBreakpoints();
     }
 
     @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.POST)
     public void addBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
+        assertDebuggerEnabled();
         debuggerService.addBreakpoint(breakpointRepresentation);
     }
 
     @RequestMapping(value = "/rest/debugger/breakpoints/{executionId}/continue", method = RequestMethod.PUT)
     public void continueExecution(@PathVariable String executionId) {
+        assertDebuggerEnabled();
         debuggerService.continueExecution(executionId);
     }
 
     @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.DELETE)
     public void deleteBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
+        assertDebuggerEnabled();
         debuggerService.removeBreakpoint(breakpointRepresentation);
     }
 
     @RequestMapping(value = "/rest/debugger/eventlog/{processInstanceId}", method = RequestMethod.GET)
     public List<EventLogEntry> getEventLog(@PathVariable String processInstanceId) {
+        assertDebuggerEnabled();
         return debuggerService.getProcessInstanceEventLog(processInstanceId);
     }
 
     @RequestMapping(value = "/rest/debugger/variables/{executionId}", method = RequestMethod.GET)
     public List<DebuggerRestVariable> getExecutionVariables(@PathVariable String executionId) {
+        assertDebuggerEnabled();
         return debuggerService.getExecutionVariables(executionId);
     }
 
     @RequestMapping(value = "/rest/debugger/executions/{processInstanceId}", method = RequestMethod.GET)
     public List<ExecutionRepresentation> getExecutions(@PathVariable String processInstanceId) {
+        assertDebuggerEnabled();
         return debuggerService.getExecutions(processInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/debugger/evaluate/expression/{executionId}", method = RequestMethod.POST, produces = "application/text")
+    public String evaluateExpression(@PathVariable String executionId, @RequestBody String expression) {
+        assertDebuggerEnabled();
+        return debuggerService.evaluateExpression(executionId, expression).toString();
+    }
+
+    @RequestMapping(value = "/rest/debugger/evaluate/{scriptLanguage}/{executionId}", method = RequestMethod.POST)
+    public void evaluateScript(@PathVariable String executionId, @PathVariable String scriptLanguage, @RequestBody String script) {
+        assertDebuggerEnabled();
+        debuggerService.evaluateScript(executionId, scriptLanguage, script);
     }
 
     @RequestMapping(value = "/rest/debugger", method = RequestMethod.GET)
     public boolean isDebuggerAllowed() {
         return environment.getProperty("flowable.experimental.debugger.enabled", Boolean.class, false);
+    }
+
+    protected void assertDebuggerEnabled() {
+        if (!environment.getProperty("flowable.experimental.debugger.enabled", Boolean.class, false)) {
+            throw new RuntimeException("property flowable.experimental.debugger.enabled is not enabled");
+        }
     }
 
 }

@@ -27,7 +27,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.ui.common.model.RemoteGroup;

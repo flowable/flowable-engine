@@ -81,6 +81,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     
     protected void addCommonCaseInstanceFields(CaseInstanceEntity caseInstanceEntity, Map<String, String> data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, caseInstanceEntity.getId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, caseInstanceEntity.getRevision());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, caseInstanceEntity.getName());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, caseInstanceEntity.getState());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_BUSINESS_KEY, caseInstanceEntity.getBusinessKey());
@@ -107,6 +108,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceId);
             if (historicCaseInstanceEntity != null) {
                 putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, historicCaseInstanceEntity.getId());
+                putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, historicCaseInstanceEntity.getRevision());
                 putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, historicCaseInstanceEntity.getName());
                 putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, historicCaseInstanceEntity.getState());
                 putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_BUSINESS_KEY, historicCaseInstanceEntity.getBusinessKey());
@@ -143,6 +145,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             Map<String, String> data = new HashMap<>();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, milestoneInstanceEntity.getId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, milestoneInstanceEntity.getRevision());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, milestoneInstanceEntity.getName());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID, milestoneInstanceEntity.getCaseInstanceId());
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, milestoneInstanceEntity.getCaseDefinitionId());
@@ -316,6 +319,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     
     protected void addCommonTaskFields(TaskEntity task, Map<String, String> data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, task.getId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, task.getRevision());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, task.getName());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PARENT_TASK_ID, task.getParentTaskId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DESCRIPTION, task.getDescription());
@@ -404,6 +408,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
     
     protected void addCommonPlanItemInstanceFields(PlanItemInstanceEntity planItemInstanceEntity, Map<String, String> data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, planItemInstanceEntity.getId());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_REVISION, planItemInstanceEntity.getRevision());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, planItemInstanceEntity.getName());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, planItemInstanceEntity.getState());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, planItemInstanceEntity.getCaseDefinitionId());

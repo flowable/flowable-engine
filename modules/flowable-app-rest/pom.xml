@@ -10,11 +10,11 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-spring-boot</artifactId>
     <relativePath>../flowable-spring-boot/pom.xml</relativePath>
-    <version>6.3.1-SNAPSHOT</version>
+    <version>6.3.2-SNAPSHOT</version>
   </parent>
 
   <properties>
-    <swagger.host>localhost:8080</swagger.host>
+    <!--<swagger.host>localhost:8080</swagger.host>-->
     <swagger.generated.directory>target/generated-swagger</swagger.generated.directory>
   </properties>
 
@@ -317,6 +317,44 @@
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
                   <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/content</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
+                <!-- APP -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.app.rest.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/app-api</basePath>
+                  <info>
+                    <title>Flowable APP REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/app</swaggerDirectory>
                 </apiSource>
               </apiSources>
             </configuration>

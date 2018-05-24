@@ -61,7 +61,7 @@ import org.osgi.framework.Constants;
 @ExamReactorStrategy(PerMethod.class)
 public class BlueprintBasicTest {
     
-    private static final String FLOWABLE_VERSION = "6.3.1-SNAPSHOT";
+    private static final String FLOWABLE_VERSION = "6.3.2-SNAPSHOT";
 
     @Inject
     protected BundleContext ctx;

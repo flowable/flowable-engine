@@ -17,7 +17,12 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.JobInfo;
+import org.flowable.job.api.JobQuery;
+import org.flowable.job.api.SuspendedJobQuery;
+import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -38,6 +43,31 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
         super(jobServiceConfiguration);
     }
     
+    @Override
+    public JobQuery createJobQuery() {
+        return new JobQueryImpl(getCommandExecutor());
+    }
+
+    @Override
+    public TimerJobQuery createTimerJobQuery() {
+        return new TimerJobQueryImpl(getCommandExecutor());
+    }
+
+    @Override
+    public SuspendedJobQuery createSuspendedJobQuery() {
+        return new SuspendedJobQueryImpl(getCommandExecutor());
+    }
+
+    @Override
+    public DeadLetterJobQuery createDeadLetterJobQuery() {
+        return new DeadLetterJobQueryImpl(getCommandExecutor());
+    }
+
+    @Override
+    public HistoryJobQuery createHistoryJobQuery() {
+        return new HistoryJobQueryImpl(getCommandExecutor());
+    }
+
     @Override
     public void scheduleAsyncJob(JobEntity job) {
         getJobManager().scheduleAsyncJob(job);

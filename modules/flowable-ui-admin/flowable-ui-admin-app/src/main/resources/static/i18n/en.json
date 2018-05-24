@@ -656,7 +656,8 @@
             "CMMN-ENDPOINT": "CMMN API Endpoint configuration",
             "DMN-ENDPOINT": "DMN API Endpoint configuration",
             "FORM-ENDPOINT": "Form API Endpoint configuration",
-            "CONTENT-ENDPOINT": "Content API Endpoint configuration"
+            "CONTENT-ENDPOINT": "Content API Endpoint configuration",
+            "APP-ENDPOINT": "App API Endpoint configuration"
         },
         "POPUP": {
             "EDIT-ENDPOINT": {

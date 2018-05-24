@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.3.1-SNAPSHOT" />
+	<property name="flowable.version" value="6.3.2-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="flowable.website" value="../../flowable-website" />
 
@@ -151,6 +151,18 @@
 			<fileset dir="../modules/flowable-cmmn-rest/target">
 			    <include name="flowable-cmmn-rest-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-app-engine-api/target">
+                <include name="flowable-app-engine-api-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-app-engine/target">
+                <include name="flowable-app-engine-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-app-engine-spring/target">
+                <include name="flowable-app-engine-spring-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-app-engine-rest/target">
+                <include name="flowable-app-engine-rest-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-dmn-model/target">
 				<include name="flowable-dmn-model-*.jar" />
 			</fileset>

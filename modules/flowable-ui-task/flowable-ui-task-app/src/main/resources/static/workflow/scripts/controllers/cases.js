@@ -63,7 +63,7 @@ angular.module('flowableApp')
         $scope.appDefinitionKey = $routeParams.appDefinitionKey;
         $scope.missingAppdefinition = $scope.appDefinitionKey === false;
 
-        // In case of viewing process instances in an app-context, need to make filter aware of this
+        // In case of viewing case instances in an app-context, need to make filter aware of this
         $scope.model.filter.param.appDefinitionKey = $scope.appDefinitionKey;
 
         // The filter is stored on the rootScope, which allows the user to switch back and forth without losing the filter.
@@ -92,7 +92,7 @@ angular.module('flowableApp')
         $scope.$watch("model.filter.param", function (newValue) {
             if (newValue) {
                 if ($scope.model.initialLoad) {
-                    $scope.loadProcessInstances();
+                    $scope.loadCaseInstances();
                 }
 
                 if (newValue.state.id === 'completed' || newValue.state.id === 'all') {
@@ -189,7 +189,7 @@ angular.module('flowableApp')
                                 }
                             }
                         }
-                       // Always reset when loading process instance
+                       // Always reset when loading case instance
                         $scope.newCaseInstance = undefined;
                     }
 
@@ -298,7 +298,7 @@ angular.module('flowableApp')
                 $scope.loadCaseInstances();
             }
 
-            // In case we're coming from the task page, no process instances have been loaded
+            // In case we're coming from the task page, no case instances have been loaded
             if ($scope.model.caseInstances === null || $scope.model.caseInstances === undefined) {
                 $scope.loadCaseInstances();
             }

@@ -13,7 +13,10 @@
 
 package org.flowable.engine.test.api.history;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -134,8 +137,8 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     taskService.setOwner(task.getId(), "test");
     taskService.setAssignee(task.getId(), "anotherTest");
     taskService.setPriority(task.getId(), 40);
-    Date dueDateValue = new Date();
-    taskService.setDueDate(task.getId(), dueDateValue);
+    Calendar dueDateCalendar = new GregorianCalendar();
+    taskService.setDueDate(task.getId(), dueDateCalendar.getTime());
     taskService.setVariable(task.getId(), "var1", "test");
     taskService.setVariableLocal(task.getId(), "localVar1", "test2");
     taskService.complete(task.getId());
@@ -150,7 +153,9 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     assertEquals("test", historicTask.getOwner());
     assertEquals("anotherTest", historicTask.getAssignee());
     assertEquals(40, historicTask.getPriority());
-    assertEquals(dueDateValue, historicTask.getDueDate());
+    
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    assertEquals(simpleDateFormat.format(dueDateCalendar.getTime()), simpleDateFormat.format(historicTask.getDueDate()));
     
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
     
@@ -213,7 +218,9 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
     assertEquals("test", historicTask.getOwner());
     assertEquals("anotherTest", historicTask.getAssignee());
     assertEquals(40, historicTask.getPriority());
-    assertEquals(dueDateValue, historicTask.getDueDate());
+    
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    assertEquals(simpleDateFormat.format(dueDateValue), simpleDateFormat.format(historicTask.getDueDate()));
     
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
     
