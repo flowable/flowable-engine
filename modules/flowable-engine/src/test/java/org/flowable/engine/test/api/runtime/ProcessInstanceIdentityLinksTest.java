@@ -13,14 +13,20 @@
 
 package org.flowable.engine.test.api.runtime;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.task.api.Task;
 import org.flowable.identitylink.api.IdentityLinkType;
 
 import junit.framework.AssertionFailedError;
@@ -151,6 +157,18 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         runtimeService.deleteGroupIdentityLink(processInstanceId, "muppets", "playing");
 
         assertEquals(0, runtimeService.getIdentityLinksForProcessInstance(processInstanceId).size());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testAddGroupIdentityLinkToProcessTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", (Map<String, Object>) null);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        taskService.addGroupIdentityLink(task.getId(), "testGroupId", IdentityLinkType.OWNER);
+
+        List<IdentityLink> taskIdentityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertThat(taskIdentityLinks.size(), is(1));
+        assertThat(taskIdentityLinks.get(0).getGroupId(), is("testGroupId"));
     }
 
 }
