@@ -7,25 +7,25 @@ update ACT_GE_PROPERTY set VALUE_ = '6.2.1.0' where NAME_ = 'task.schema.version
 
 update ACT_GE_PROPERTY set VALUE_ = '6.2.1.0' where NAME_ = 'variable.schema.version';
 
-alter table ACT_RU_JOB add SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_JOB add SUB_SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_JOB add SCOPE_TYPE_ nvarchar(255);
-alter table ACT_RU_JOB add SCOPE_DEFINITION_ID_ nvarchar(255);
+alter table ACT_RU_JOB add SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_JOB add SUB_SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_JOB add SCOPE_TYPE_ nvarchar(191);
+alter table ACT_RU_JOB add SCOPE_DEFINITION_ID_ nvarchar(191);
 
-alter table ACT_RU_TIMER_JOB add SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_TIMER_JOB add SUB_SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_TIMER_JOB add SCOPE_TYPE_ nvarchar(255);
-alter table ACT_RU_TIMER_JOB add SCOPE_DEFINITION_ID_ nvarchar(255);
+alter table ACT_RU_TIMER_JOB add SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_TIMER_JOB add SUB_SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_TIMER_JOB add SCOPE_TYPE_ nvarchar(191);
+alter table ACT_RU_TIMER_JOB add SCOPE_DEFINITION_ID_ nvarchar(191);
 
-alter table ACT_RU_SUSPENDED_JOB add SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_SUSPENDED_JOB add SUB_SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_SUSPENDED_JOB add SCOPE_TYPE_ nvarchar(255);
-alter table ACT_RU_SUSPENDED_JOB add SCOPE_DEFINITION_ID_ nvarchar(255);
+alter table ACT_RU_SUSPENDED_JOB add SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_SUSPENDED_JOB add SUB_SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_SUSPENDED_JOB add SCOPE_TYPE_ nvarchar(191);
+alter table ACT_RU_SUSPENDED_JOB add SCOPE_DEFINITION_ID_ nvarchar(191);
 
-alter table ACT_RU_DEADLETTER_JOB add SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_DEADLETTER_JOB add SUB_SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_DEADLETTER_JOB add SCOPE_TYPE_ nvarchar(255);
-alter table ACT_RU_DEADLETTER_JOB add SCOPE_DEFINITION_ID_ nvarchar(255);
+alter table ACT_RU_DEADLETTER_JOB add SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_DEADLETTER_JOB add SUB_SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_DEADLETTER_JOB add SCOPE_TYPE_ nvarchar(191);
+alter table ACT_RU_DEADLETTER_JOB add SCOPE_DEFINITION_ID_ nvarchar(191);
 
 create index ACT_IDX_JOB_SCOPE on ACT_RU_JOB(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_JOB_SUB_SCOPE on ACT_RU_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);

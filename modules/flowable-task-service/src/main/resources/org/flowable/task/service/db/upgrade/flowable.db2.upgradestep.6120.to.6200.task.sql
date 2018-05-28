@@ -1,7 +1,7 @@
-alter table ACT_RU_TASK add column SCOPE_ID_ varchar(255);
-alter table ACT_RU_TASK add column SUB_SCOPE_ID_ varchar(255);
-alter table ACT_RU_TASK add column SCOPE_TYPE_ varchar(255);
-alter table ACT_RU_TASK add column SCOPE_DEFINITION_ID_ varchar(255);
+alter table ACT_RU_TASK add column SCOPE_ID_ varchar(191);
+alter table ACT_RU_TASK add column SUB_SCOPE_ID_ varchar(191);
+alter table ACT_RU_TASK add column SCOPE_TYPE_ varchar(191);
+alter table ACT_RU_TASK add column SCOPE_DEFINITION_ID_ varchar(191);
 
 create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);

@@ -8,31 +8,31 @@
     <changeSet id="1" author="flowable">
 
         <createTable tableName="ACT_CMMN_DEPLOYMENT">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="CATEGORY_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)" />
+            <column name="CATEGORY_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="KEY_" type="varchar(255)">
+            <column name="KEY_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="DEPLOY_TIME_" type="datetime">
                 <constraints nullable="true" />
             </column>
-            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(255)">
+            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </createTable>
 
         <createTable tableName="ACT_CMMN_DEPLOYMENT_RESOURCE">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" primaryKeyName="PK_CMMN_DEPLOYMENT_RESOURCE" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(191)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
             <column name="RESOURCE_BYTES_" type="longblob">
                 <constraints nullable="true" />
             </column>
@@ -49,25 +49,25 @@
         </createIndex>            
 
         <createTable tableName="ACT_CMMN_CASEDEF">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="KEY_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)" />
+            <column name="KEY_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
             <column name="VERSION_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="CATEGORY_" type="varchar(255)" />
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="CATEGORY_" type="varchar(191)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
             <column name="RESOURCE_NAME_" type="varchar(4000)" />
             <column name="DESCRIPTION_" type="varchar(4000)" />
             <column name="HAS_GRAPHICAL_NOTATION_" type="boolean" />
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </createTable>
         
         <addForeignKeyConstraint constraintName="ACT_FK_CASE_DEF_DPLY" 
@@ -81,22 +81,22 @@
         </createIndex>            
 
         <createTable tableName="ACT_CMMN_RU_CASE_INST">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="BUSINESS_KEY_" type="varchar(255)" />
-            <column name="NAME_" type="varchar(255)" />
-            <column name="PARENT_ID_" type="varchar(255)" />
-            <column name="CASE_DEF_ID_" type="varchar(255)" />
-            <column name="STATE_" type="varchar(255)" />
+            <column name="BUSINESS_KEY_" type="varchar(191)" />
+            <column name="NAME_" type="varchar(191)" />
+            <column name="PARENT_ID_" type="varchar(191)" />
+            <column name="CASE_DEF_ID_" type="varchar(191)" />
+            <column name="STATE_" type="varchar(191)" />
             <column name="START_TIME_" type="datetime" />
-            <column name="START_USER_ID_" type="varchar(255)" />
-            <column name="CALLBACK_ID_" type="varchar(255)" />
-            <column name="CALLBACK_TYPE_" type="varchar(255)" />
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="START_USER_ID_" type="varchar(191)" />
+            <column name="CALLBACK_ID_" type="varchar(191)" />
+            <column name="CALLBACK_TYPE_" type="varchar(191)" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </createTable>
 
         <addForeignKeyConstraint constraintName="ACT_FK_CASE_INST_CASE_DEF" 
@@ -116,24 +116,24 @@
         </createIndex>           
 
         <createTable tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" primaryKeyName="PK_CMMN_PLAN_ITEM_INST" />
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="CASE_DEF_ID_" type="varchar(255)" />
-            <column name="CASE_INST_ID_" type="varchar(255)" />
-            <column name="STAGE_INST_ID_" type="varchar(255)" />
+            <column name="CASE_DEF_ID_" type="varchar(191)" />
+            <column name="CASE_INST_ID_" type="varchar(191)" />
+            <column name="STAGE_INST_ID_" type="varchar(191)" />
             <column name="IS_STAGE_" type="boolean" />
-            <column name="ELEMENT_ID_" type="varchar(255)" />
-            <column name="NAME_" type="varchar(255)" />
-            <column name="STATE_" type="varchar(255)" />
+            <column name="ELEMENT_ID_" type="varchar(191)" />
+            <column name="NAME_" type="varchar(191)" />
+            <column name="STATE_" type="varchar(191)" />
             <column name="START_TIME_" type="datetime" />
-            <column name="START_USER_ID_" type="varchar(255)" />
-            <column name="REFERENCE_ID_" type="varchar(255)" />
-            <column name="REFERENCE_TYPE_" type="varchar(255)" />
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="START_USER_ID_" type="varchar(191)" />
+            <column name="REFERENCE_ID_" type="varchar(191)" />
+            <column name="REFERENCE_TYPE_" type="varchar(191)" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </createTable>
 
         <addForeignKeyConstraint constraintName="ACT_FK_PLAN_ITEM_CASE_DEF" 
@@ -157,17 +157,17 @@
         </createIndex>            
 
         <createTable tableName="ACT_CMMN_RU_SENTRY_PART_INST">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" primaryKeyName="PK_CMMN_SENTRY_PART_INST"/>
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="CASE_DEF_ID_" type="varchar(255)" />
-            <column name="CASE_INST_ID_" type="varchar(255)" />
-            <column name="PLAN_ITEM_INST_ID_" type="varchar(255)" />
-            <column name="ON_PART_ID_" type="varchar(255)" />
-            <column name="IF_PART_ID_" type="varchar(255)" />
+            <column name="CASE_DEF_ID_" type="varchar(191)" />
+            <column name="CASE_INST_ID_" type="varchar(191)" />
+            <column name="PLAN_ITEM_INST_ID_" type="varchar(191)" />
+            <column name="ON_PART_ID_" type="varchar(191)" />
+            <column name="IF_PART_ID_" type="varchar(191)" />
             <column name="TIME_STAMP_" type="datetime" />
         </createTable>
 
@@ -202,22 +202,22 @@
         </createIndex>            
 
         <createTable tableName="ACT_CMMN_RU_MIL_INST">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
             <column name="TIME_STAMP_" type="datetime">
                 <constraints nullable="false" />
             </column>
-            <column name="CASE_INST_ID_" type="varchar(255)">
+            <column name="CASE_INST_ID_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
-            <column name="CASE_DEF_ID_" type="varchar(255)">
+            <column name="CASE_DEF_ID_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
-            <column name="ELEMENT_ID_" type="varchar(255)">
+            <column name="ELEMENT_ID_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
         </createTable>
@@ -243,45 +243,45 @@
         </createIndex>                   
 
         <createTable tableName="ACT_CMMN_HI_CASE_INST">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="BUSINESS_KEY_" type="varchar(255)" />
-            <column name="NAME_" type="varchar(255)" />
-            <column name="PARENT_ID_" type="varchar(255)" />
-            <column name="CASE_DEF_ID_" type="varchar(255)" />
-            <column name="STATE_" type="varchar(255)" />
+            <column name="BUSINESS_KEY_" type="varchar(191)" />
+            <column name="NAME_" type="varchar(191)" />
+            <column name="PARENT_ID_" type="varchar(191)" />
+            <column name="CASE_DEF_ID_" type="varchar(191)" />
+            <column name="STATE_" type="varchar(191)" />
             <column name="START_TIME_" type="datetime" />
             <column name="END_TIME_" type="datetime" />
-            <column name="START_USER_ID_" type="varchar(255)" />
-            <column name="CALLBACK_ID_" type="varchar(255)" />
-            <column name="CALLBACK_TYPE_" type="varchar(255)" />
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="START_USER_ID_" type="varchar(191)" />
+            <column name="CALLBACK_ID_" type="varchar(191)" />
+            <column name="CALLBACK_TYPE_" type="varchar(191)" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </createTable>
 
         <createTable tableName="ACT_CMMN_HI_MIL_INST">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
             <column name="TIME_STAMP_" type="datetime">
                 <constraints nullable="false" />
             </column>
-            <column name="CASE_INST_ID_" type="varchar(255)">
+            <column name="CASE_INST_ID_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
-            <column name="CASE_DEF_ID_" type="varchar(255)">
+            <column name="CASE_DEF_ID_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
-            <column name="ELEMENT_ID_" type="varchar(255)">
+            <column name="ELEMENT_ID_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
         </createTable>
@@ -304,8 +304,8 @@
         </addColumn>
         
         <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
-            <column name="ITEM_DEFINITION_ID_" type="varchar(255)" />
-            <column name="ITEM_DEFINITION_TYPE_" type="varchar(255)" />
+            <column name="ITEM_DEFINITION_ID_" type="varchar(191)" />
+            <column name="ITEM_DEFINITION_TYPE_" type="varchar(191)" />
         </addColumn>        
     
     </changeSet>
@@ -340,21 +340,21 @@
     <changeSet id="4" author="flowable">
 
         <createTable tableName="ACT_CMMN_HI_PLAN_ITEM_INST">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="STATE_" type="varchar(255)" />
-            <column name="CASE_DEF_ID_" type="varchar(255)" />
-            <column name="CASE_INST_ID_" type="varchar(255)" />
-            <column name="STAGE_INST_ID_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(191)" />
+            <column name="STATE_" type="varchar(191)" />
+            <column name="CASE_DEF_ID_" type="varchar(191)" />
+            <column name="CASE_INST_ID_" type="varchar(191)" />
+            <column name="STAGE_INST_ID_" type="varchar(191)" />
             <column name="IS_STAGE_" type="boolean" />
-            <column name="ELEMENT_ID_" type="varchar(255)" />
-            <column name="ITEM_DEFINITION_ID_" type="varchar(255)" />
-            <column name="ITEM_DEFINITION_TYPE_" type="varchar(255)" />
+            <column name="ELEMENT_ID_" type="varchar(191)" />
+            <column name="ITEM_DEFINITION_ID_" type="varchar(191)" />
+            <column name="ITEM_DEFINITION_TYPE_" type="varchar(191)" />
             <column name="CREATED_TIME_" type="datetime" />
             <column name="LAST_AVAILABLE_TIME_" type="datetime" />
             <column name="LAST_ENABLED_TIME_" type="datetime" />
@@ -367,18 +367,18 @@
             <column name="EXIT_TIME_" type="datetime" />
             <column name="ENDED_TIME_" type="datetime" />
             <column name="LAST_UPDATED_TIME_" type="datetime" />
-            <column name="START_USER_ID_" type="varchar(255)" />
-            <column name="REFERENCE_ID_" type="varchar(255)" />
-            <column name="REFERENCE_TYPE_" type="varchar(255)" />
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="START_USER_ID_" type="varchar(191)" />
+            <column name="REFERENCE_ID_" type="varchar(191)" />
+            <column name="REFERENCE_TYPE_" type="varchar(191)" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </createTable>
         
         <addColumn tableName="ACT_CMMN_RU_MIL_INST">
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </addColumn>
         
         <addColumn tableName="ACT_CMMN_HI_MIL_INST">
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </addColumn>
 
     </changeSet>

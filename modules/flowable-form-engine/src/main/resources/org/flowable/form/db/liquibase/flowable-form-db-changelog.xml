@@ -7,82 +7,82 @@
     <changeSet id="1" author="activiti">
 
         <createTable tableName="ACT_FO_FORM_DEPLOYMENT">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="CATEGORY_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)" />
+            <column name="CATEGORY_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
             <column name="DEPLOY_TIME_" type="datetime">
                 <constraints nullable="true" />
             </column>
-            <column name="TENANT_ID_" type="varchar(255)">
+            <column name="TENANT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
-            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(255)">
+            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
         </createTable>
         
         <createTable tableName="ACT_FO_FORM_RESOURCE">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(191)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
             <column name="RESOURCE_BYTES_" type="longblob">
                 <constraints nullable="true" />
             </column>
         </createTable>
         
         <createTable tableName="ACT_FO_FORM_DEFINITION">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(191)" />
             <column name="VERSION_" type="int" />
-            <column name="KEY_" type="varchar(255)" />
-            <column name="CATEGORY_" type="varchar(255)">
+            <column name="KEY_" type="varchar(191)" />
+            <column name="CATEGORY_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
-            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(255)">
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
+            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
-            <column name="TENANT_ID_" type="varchar(255)">
+            <column name="TENANT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
-            <column name="RESOURCE_NAME_" type="varchar(255)" />
-            <column name="DESCRIPTION_" type="varchar(255)">
+            <column name="RESOURCE_NAME_" type="varchar(191)" />
+            <column name="DESCRIPTION_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
         </createTable>
         
         <createTable tableName="ACT_FO_FORM_INSTANCE">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="FORM_DEFINITION_ID_" type="varchar(255)">
+            <column name="FORM_DEFINITION_ID_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
-            <column name="TASK_ID_" type="varchar(255)">
+            <column name="TASK_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="PROC_INST_ID_" type="varchar(255)">
+            <column name="PROC_INST_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="PROC_DEF_ID_" type="varchar(255)">
+            <column name="PROC_DEF_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="SUBMITTED_DATE_" type="datetime" />
-            <column name="SUBMITTED_BY_" type="varchar(255)">
+            <column name="SUBMITTED_BY_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="FORM_VALUES_ID_" type="varchar(255)">
+            <column name="FORM_VALUES_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="TENANT_ID_" type="varchar(255)">
+            <column name="TENANT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
         </createTable>
@@ -92,9 +92,9 @@
     <changeSet id="2" author="flowable">
     
         <addColumn tableName="ACT_FO_FORM_INSTANCE">
-            <column name="SCOPE_ID_" type="varchar(255)" />
-            <column name="SCOPE_TYPE_" type="varchar(255)" />
-            <column name="SCOPE_DEFINITION_ID_" type="varchar(255)" />
+            <column name="SCOPE_ID_" type="varchar(191)" />
+            <column name="SCOPE_TYPE_" type="varchar(191)" />
+            <column name="SCOPE_DEFINITION_ID_" type="varchar(191)" />
         </addColumn>
     
     </changeSet>

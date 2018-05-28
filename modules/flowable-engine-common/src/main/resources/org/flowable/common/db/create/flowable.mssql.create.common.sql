@@ -8,7 +8,7 @@ create table ACT_GE_PROPERTY (
 create table ACT_GE_BYTEARRAY (
     ID_ nvarchar(64),
     REV_ int,
-    NAME_ nvarchar(255),
+    NAME_ nvarchar(191),
     DEPLOYMENT_ID_ nvarchar(64),
     BYTES_  varbinary(max),
     GENERATED_ tinyint,

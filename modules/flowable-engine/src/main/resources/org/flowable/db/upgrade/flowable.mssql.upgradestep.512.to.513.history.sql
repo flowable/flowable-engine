@@ -1,8 +1,8 @@
 create table ACT_HI_IDENTITYLINK (
     ID_ nvarchar(64),
-    GROUP_ID_ nvarchar(255),
-    TYPE_ nvarchar(255),
-    USER_ID_ nvarchar(255),
+    GROUP_ID_ nvarchar(191),
+    TYPE_ nvarchar(191),
+    USER_ID_ nvarchar(191),
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     primary key (ID_)

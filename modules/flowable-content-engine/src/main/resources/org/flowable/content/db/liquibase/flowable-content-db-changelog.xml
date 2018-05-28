@@ -7,25 +7,25 @@
 	<changeSet id="1" author="activiti">
 
         <createTable tableName="ACT_CO_CONTENT_ITEM">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
-            <column name="MIME_TYPE_" type="varchar(255)">
+            <column name="MIME_TYPE_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="TASK_ID_" type="varchar(255)">
+            <column name="TASK_ID_" type="varchar(191)">
                 <constraints nullable="true"/>
             </column>
-            <column name="PROC_INST_ID_" type="varchar(255)">
+            <column name="PROC_INST_ID_" type="varchar(191)">
                 <constraints nullable="true"/>
             </column>
-            <column name="CONTENT_STORE_ID_" type="varchar(255)">
+            <column name="CONTENT_STORE_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="CONTENT_STORE_NAME_" type="varchar(255)">
+            <column name="CONTENT_STORE_NAME_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="FIELD_" type="varchar(400)">
@@ -33,11 +33,11 @@
             </column>
            	<column name="CONTENT_AVAILABLE_" type="boolean" defaultValueBoolean="false" />
             <column name="CREATED_" type="timestamp(6)" />
-            <column name="CREATED_BY_" type="varchar(255)" />
+            <column name="CREATED_BY_" type="varchar(191)" />
             <column name="LAST_MODIFIED_" type="timestamp(6)" />
-            <column name="LAST_MODIFIED_BY_" type="varchar(255)" />
+            <column name="LAST_MODIFIED_BY_" type="varchar(191)" />
             <column name="CONTENT_SIZE_" type="bigint" defaultValueNumeric="0" />
-            <column name="TENANT_ID_" type="varchar(255)" />
+            <column name="TENANT_ID_" type="varchar(191)" />
         </createTable>
 
         <createIndex tableName="ACT_CO_CONTENT_ITEM" indexName="idx_contitem_taskid">
@@ -51,10 +51,10 @@
 
     <changeSet id="2" author="flowable">
         <addColumn tableName="ACT_CO_CONTENT_ITEM">
-            <column name="SCOPE_ID_" type="varchar(255)">
+            <column name="SCOPE_ID_" type="varchar(191)">
                 <constraints nullable="true"/>
             </column>
-            <column name="SCOPE_TYPE_" type="varchar(255)">
+            <column name="SCOPE_TYPE_" type="varchar(191)">
                 <constraints nullable="true"/>
             </column>
         </addColumn>

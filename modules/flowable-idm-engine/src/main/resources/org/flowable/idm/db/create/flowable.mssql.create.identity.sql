@@ -11,7 +11,7 @@ values ('schema.version', '6.3.2.0', 1);
 create table ACT_ID_BYTEARRAY (
     ID_ nvarchar(64),
     REV_ int,
-    NAME_ nvarchar(255),
+    NAME_ nvarchar(191),
     BYTES_  varbinary(max),
     primary key (ID_)
 );
@@ -19,8 +19,8 @@ create table ACT_ID_BYTEARRAY (
 create table ACT_ID_GROUP (
     ID_ nvarchar(64),
     REV_ int,
-    NAME_ nvarchar(255),
-    TYPE_ nvarchar(255),
+    NAME_ nvarchar(191),
+    TYPE_ nvarchar(191),
     primary key (ID_)
 );
 
@@ -33,12 +33,12 @@ create table ACT_ID_MEMBERSHIP (
 create table ACT_ID_USER (
     ID_ nvarchar(64),
     REV_ int,
-    FIRST_ nvarchar(255),
-    LAST_ nvarchar(255),
-    EMAIL_ nvarchar(255),
-    PWD_ nvarchar(255),
+    FIRST_ nvarchar(191),
+    LAST_ nvarchar(191),
+    EMAIL_ nvarchar(191),
+    PWD_ nvarchar(191),
     PICTURE_ID_ nvarchar(64),
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
@@ -47,36 +47,36 @@ create table ACT_ID_INFO (
     REV_ int,
     USER_ID_ nvarchar(64),
     TYPE_ nvarchar(64),
-    KEY_ nvarchar(255),
-    VALUE_ nvarchar(255),
+    KEY_ nvarchar(191),
+    VALUE_ nvarchar(191),
     PASSWORD_ varbinary(max),
-    PARENT_ID_ nvarchar(255),
+    PARENT_ID_ nvarchar(191),
     primary key (ID_)
 );
 
 create table ACT_ID_TOKEN (
     ID_ nvarchar(64) not null,
     REV_ int,
-    TOKEN_VALUE_ nvarchar(255),
+    TOKEN_VALUE_ nvarchar(191),
     TOKEN_DATE_ datetime,
-    IP_ADDRESS_ nvarchar(255),
-    USER_AGENT_ nvarchar(255),
-    USER_ID_ nvarchar(255),
+    IP_ADDRESS_ nvarchar(191),
+    USER_AGENT_ nvarchar(191),
+    USER_ID_ nvarchar(191),
     TOKEN_DATA_ nvarchar(2000),
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV (
     ID_ nvarchar(64) not null,
-    NAME_ nvarchar(255) not null,
+    NAME_ nvarchar(191) not null,
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV_MAPPING (
     ID_ nvarchar(64) not null,
     PRIV_ID_ nvarchar(64) not null,
-    USER_ID_ nvarchar(255),
-    GROUP_ID_ nvarchar(255),
+    USER_ID_ nvarchar(191),
+    GROUP_ID_ nvarchar(191),
     primary key (ID_)
 );
 

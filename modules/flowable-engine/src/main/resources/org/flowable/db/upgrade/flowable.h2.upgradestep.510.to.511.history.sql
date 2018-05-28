@@ -3,7 +3,7 @@ create table ACT_HI_VARINST (
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
-    NAME_ varchar(255) not null,
+    NAME_ varchar(191) not null,
     VAR_TYPE_ varchar(100),
     REV_ integer,
     BYTEARRAY_ID_ varchar(64),

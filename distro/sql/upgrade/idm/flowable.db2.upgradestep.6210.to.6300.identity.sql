@@ -1,4 +1,4 @@
-alter table ACT_ID_USER add TENANT_ID_ varchar(255) default '';
+alter table ACT_ID_USER add TENANT_ID_ varchar(191) default '';
 
 alter table ACT_ID_PRIV alter column NAME_ set not null;
 Call Sysproc.admin_cmd ('REORG TABLE ACT_ID_PRIV');

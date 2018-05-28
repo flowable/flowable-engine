@@ -8,7 +8,7 @@
     
         <!-- model -->
 		<createTable tableName="ACT_DE_MODEL">
-			<column name="id" type="varchar(255)">
+			<column name="id" type="varchar(191)">
 				<constraints primaryKey="true" nullable="false" />
 			</column>
 			<column name="name" type="varchar(400)">
@@ -26,13 +26,13 @@
 			<column name="created" type="datetime(6)">
 				<constraints nullable="true" />
 			</column>
-			<column name="created_by" type="varchar(255)">
+			<column name="created_by" type="varchar(191)">
 				<constraints nullable="true" />
 			</column>
 			<column name="last_updated" type="datetime(6)">
 				<constraints nullable="true" />
 			</column>
-			<column name="last_updated_by" type="varchar(255)">
+			<column name="last_updated_by" type="varchar(191)">
 				<constraints nullable="true" />
 			</column>
 			<column name="version" type="int">
@@ -56,7 +56,7 @@
         
         <!-- Model history -->
         <createTable tableName="ACT_DE_MODEL_HISTORY">
-            <column name="id" type="varchar(255)">
+            <column name="id" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="name" type="varchar(400)">
@@ -74,13 +74,13 @@
             <column name="created" type="datetime(6)">
                 <constraints nullable="true" />
             </column>
-            <column name="created_by" type="varchar(255)">
+            <column name="created_by" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="last_updated" type="datetime(6)">
                 <constraints nullable="true" />
             </column>
-            <column name="last_updated_by" type="varchar(255)">
+            <column name="last_updated_by" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="removal_date" type="datetime(6)">
@@ -92,7 +92,7 @@
             <column name="model_editor_json" type="longtext">
                 <constraints nullable="true" />
             </column>
-            <column name="model_id" type="varchar(255)">
+            <column name="model_id" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
             <column name="model_type" type="int">
@@ -108,12 +108,12 @@
 		<!-- MODEL RELATION -->
 		
 		 <createTable tableName="ACT_DE_MODEL_RELATION">
-		 	<column name="id" type="varchar(255)">
+		 	<column name="id" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="parent_model_id" type="varchar(255)" />
-            <column name="model_id" type="varchar(255)" />
-            <column name="relation_type" type="varchar(255)" />
+            <column name="parent_model_id" type="varchar(191)" />
+            <column name="model_id" type="varchar(191)" />
+            <column name="relation_type" type="varchar(191)" />
         </createTable>
         
         <addForeignKeyConstraint baseColumnNames="parent_model_id"
@@ -143,10 +143,10 @@
 
     <changeSet id="3" author="flowable">
         <addColumn tableName="ACT_DE_MODEL">
-            <column  name="tenant_id" type="varchar(255)" />
+            <column  name="tenant_id" type="varchar(191)" />
         </addColumn>
         <addColumn tableName="ACT_DE_MODEL_HISTORY">
-            <column  name="tenant_id" type="varchar(255)" />
+            <column  name="tenant_id" type="varchar(191)" />
         </addColumn>
     </changeSet>
 

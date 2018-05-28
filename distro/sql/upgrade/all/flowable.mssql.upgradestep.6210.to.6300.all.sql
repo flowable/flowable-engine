@@ -1,6 +1,6 @@
-alter table ACT_ID_USER add TENANT_ID_ nvarchar(255) default '';
+alter table ACT_ID_USER add TENANT_ID_ nvarchar(191) default '';
 
-alter table ACT_ID_PRIV alter column NAME_ nvarchar(255) not null;
+alter table ACT_ID_PRIV alter column NAME_ nvarchar(191) not null;
 alter table ACT_ID_PRIV add constraint ACT_UNIQ_PRIV_NAME unique (NAME_);
 
 update ACT_ID_PROPERTY set VALUE_ = '6.3.0.0' where NAME_ = 'schema.version';
@@ -26,9 +26,9 @@ GO
 
 update ACT_GE_PROPERTY set VALUE_ = '6.3.0.0' where NAME_ = 'identitylink.schema.version';
 
-alter table ACT_RU_IDENTITYLINK add SCOPE_ID_ nvarchar(255);
-alter table ACT_RU_IDENTITYLINK add SCOPE_TYPE_ nvarchar(255);
-alter table ACT_RU_IDENTITYLINK add SCOPE_DEFINITION_ID_ nvarchar(255);
+alter table ACT_RU_IDENTITYLINK add SCOPE_ID_ nvarchar(191);
+alter table ACT_RU_IDENTITYLINK add SCOPE_TYPE_ nvarchar(191);
+alter table ACT_RU_IDENTITYLINK add SCOPE_DEFINITION_ID_ nvarchar(191);
 
 create index ACT_IDX_IDENT_LNK_SCOPE on ACT_RU_IDENTITYLINK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_IDENT_LNK_SCOPE_DEF on ACT_RU_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
@@ -45,9 +45,9 @@ update ACT_RU_TIMER_JOB set HANDLER_TYPE_ = 'cmmn-trigger-timer' where HANDLER_T
 update ACT_GE_PROPERTY set VALUE_ = '6.3.0.0' where NAME_ = 'job.schema.version';
 update ACT_GE_PROPERTY set VALUE_ = '6.3.0.0' where NAME_ = 'schema.version';
 
-alter table ACT_HI_IDENTITYLINK add SCOPE_ID_ nvarchar(255);
-alter table ACT_HI_IDENTITYLINK add SCOPE_TYPE_ nvarchar(255);
-alter table ACT_HI_IDENTITYLINK add SCOPE_DEFINITION_ID_ nvarchar(255);
+alter table ACT_HI_IDENTITYLINK add SCOPE_ID_ nvarchar(191);
+alter table ACT_HI_IDENTITYLINK add SCOPE_TYPE_ nvarchar(191);
+alter table ACT_HI_IDENTITYLINK add SCOPE_DEFINITION_ID_ nvarchar(191);
 
 create index ACT_IDX_HI_IDENT_LNK_SCOPE on ACT_HI_IDENTITYLINK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_HI_IDENT_LNK_SCOPE_DEF on ACT_HI_IDENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);

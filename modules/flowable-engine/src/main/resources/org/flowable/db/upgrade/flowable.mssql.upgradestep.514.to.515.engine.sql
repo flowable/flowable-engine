@@ -1,28 +1,28 @@
 alter table ACT_RU_TASK 
-    add CATEGORY_ nvarchar(255);
+    add CATEGORY_ nvarchar(191);
     
 drop index ACT_RU_EXECUTION.ACT_UNIQ_RU_BUS_KEY;  
 
 alter table ACT_RE_DEPLOYMENT 
-    add TENANT_ID_ nvarchar(255) default '';  
+    add TENANT_ID_ nvarchar(191) default '';  
     
 alter table ACT_RE_PROCDEF 
-    add TENANT_ID_ nvarchar(255) default ''; 
+    add TENANT_ID_ nvarchar(191) default ''; 
     
 alter table ACT_RU_EXECUTION 
-    add TENANT_ID_ nvarchar(255) default '';
+    add TENANT_ID_ nvarchar(191) default '';
     
 alter table ACT_RU_TASK 
-    add TENANT_ID_ nvarchar(255) default '';      
+    add TENANT_ID_ nvarchar(191) default '';      
     
 alter table ACT_RU_JOB
-    add TENANT_ID_ nvarchar(255) default ''; 
+    add TENANT_ID_ nvarchar(191) default ''; 
     
 alter table ACT_RE_MODEL
-    add TENANT_ID_ nvarchar(255) default ''; 
+    add TENANT_ID_ nvarchar(191) default ''; 
     
 alter table ACT_RU_EVENT_SUBSCR
-    add TENANT_ID_ nvarchar(255) default ''; 
+    add TENANT_ID_ nvarchar(191) default ''; 
     
 alter table ACT_RU_EVENT_SUBSCR
    add PROC_DEF_ID_ nvarchar(64);            

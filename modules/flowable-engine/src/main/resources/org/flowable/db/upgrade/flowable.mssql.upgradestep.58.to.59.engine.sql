@@ -18,12 +18,12 @@ update ACT_RU_EXECUTION set SUSPENSION_STATE_ = 1;
 create table ACT_RU_EVENT_SUBSCR (
     ID_ nvarchar(64) not null,
     REV_ int,
-    EVENT_TYPE_ nvarchar(255) not null,
-    EVENT_NAME_ nvarchar(255),
+    EVENT_TYPE_ nvarchar(191) not null,
+    EVENT_NAME_ nvarchar(191),
     EXECUTION_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     ACTIVITY_ID_ nvarchar(64),
-    CONFIGURATION_ nvarchar(255),
+    CONFIGURATION_ nvarchar(191),
     CREATED_ datetime not null,
     primary key (ID_)
 );

@@ -4,20 +4,20 @@ execute java org.activiti.engine.impl.db.upgrade.DbUpgradeStep52To53InsertProper
 
 create table ACT_HI_DETAIL_TMP (
     ID_ varchar(64) not null,
-    TYPE_ varchar(255) not null,
+    TYPE_ varchar(191) not null,
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
     ACT_INST_ID_ varchar(64),
-    NAME_ varchar(255),
-    VAR_TYPE_ varchar(255),
+    NAME_ varchar(191),
+    VAR_TYPE_ varchar(191),
     REV_ integer,
     TIME_ datetime not null,
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double,
     LONG_ bigint,
-    TEXT_ varchar(255),
-    TEXT2_ varchar(255),
+    TEXT_ varchar(191),
+    TEXT2_ varchar(191),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -28,20 +28,20 @@ drop table ACT_HI_DETAIL;
 
 create table ACT_HI_DETAIL (
     ID_ varchar(64) not null,
-    TYPE_ varchar(255) not null,
+    TYPE_ varchar(191) not null,
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
     ACT_INST_ID_ varchar(64),
-    NAME_ varchar(255),
-    VAR_TYPE_ varchar(255),
+    NAME_ varchar(191),
+    VAR_TYPE_ varchar(191),
     REV_ integer,
     TIME_ datetime not null,
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double,
     LONG_ bigint,
-    TEXT_ varchar(255),
-    TEXT2_ varchar(255),
+    TEXT_ varchar(191),
+    TEXT2_ varchar(191),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

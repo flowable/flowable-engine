@@ -7,22 +7,22 @@ add DUE_DATE_ timestamp;
 create table ACT_HI_COMMENT (
     ID_ varchar(64) not null,
     TIME_ timestamp not null,
-    USER_ID_ varchar(255),
+    USER_ID_ varchar(191),
     TASK_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
-    MESSAGE_ varchar(255),
+    MESSAGE_ varchar(191),
     primary key (ID_)
 );
 
 create table ACT_HI_ATTACHMENT (
     ID_ varchar(64) not null,
     REV_ integer,
-    NAME_ varchar(255),
-    DESCRIPTION_ varchar(255),
-    TYPE_ varchar(255),
+    NAME_ varchar(191),
+    DESCRIPTION_ varchar(191),
+    TYPE_ varchar(191),
     TASK_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
-    URL_ varchar(255),
+    URL_ varchar(191),
     CONTENT_ID_ varchar(64),
     primary key (ID_)
 );

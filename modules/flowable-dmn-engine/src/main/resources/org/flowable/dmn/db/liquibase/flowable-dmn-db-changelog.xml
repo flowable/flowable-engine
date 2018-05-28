@@ -7,54 +7,54 @@
     <changeSet id="1" author="activiti">
 
         <createTable tableName="ACT_DMN_DEPLOYMENT">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="CATEGORY_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)" />
+            <column name="CATEGORY_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
             <column name="DEPLOY_TIME_" type="datetime">
                 <constraints nullable="true" />
             </column>
-            <column name="TENANT_ID_" type="varchar(255)">
+            <column name="TENANT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
-            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(255)">
+            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
         </createTable>
         
         <createTable tableName="ACT_DMN_DEPLOYMENT_RESOURCE">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(191)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
             <column name="RESOURCE_BYTES_" type="longblob">
                 <constraints nullable="true" />
             </column>
         </createTable>
         
         <createTable tableName="ACT_DMN_DECISION_TABLE">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(191)" />
             <column name="VERSION_" type="int" />
-            <column name="KEY_" type="varchar(255)" />
-            <column name="CATEGORY_" type="varchar(255)">
+            <column name="KEY_" type="varchar(191)" />
+            <column name="CATEGORY_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
-            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(255)">
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
+            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
-            <column name="TENANT_ID_" type="varchar(255)">
+            <column name="TENANT_ID_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
-            <column name="RESOURCE_NAME_" type="varchar(255)" />
-            <column name="DESCRIPTION_" type="varchar(255)">
+            <column name="RESOURCE_NAME_" type="varchar(191)" />
+            <column name="DESCRIPTION_" type="varchar(191)">
             	<constraints nullable="true" />
             </column>
         </createTable>
@@ -64,26 +64,26 @@
     <changeSet id="2" author="flowable">
     
         <createTable tableName="ACT_DMN_HI_DECISION_EXECUTION">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="DECISION_DEFINITION_ID_" type="varchar(255)" />
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="DECISION_DEFINITION_ID_" type="varchar(191)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
             <column name="START_TIME_" type="datetime" />
             <column name="END_TIME_" type="datetime">
                 <constraints nullable="true" />
             </column>
-            <column name="INSTANCE_ID_" type="varchar(255)">
+            <column name="INSTANCE_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="EXECUTION_ID_" type="varchar(255)">
+            <column name="EXECUTION_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="ACTIVITY_ID_" type="varchar(255)">
+            <column name="ACTIVITY_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="FAILED_" type="boolean" defaultValueBoolean="false" />
-            <column name="TENANT_ID_" type="varchar(255)">
+            <column name="TENANT_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="EXECUTION_JSON_" type="longtext">
@@ -96,26 +96,26 @@
     <changeSet id="2" author="flowable">
     
         <createTable tableName="ACT_DMN_HI_DECISION_EXECUTION">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="DECISION_DEFINITION_ID_" type="varchar(255)" />
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="DECISION_DEFINITION_ID_" type="varchar(191)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
             <column name="START_TIME_" type="datetime" />
             <column name="END_TIME_" type="datetime">
                 <constraints nullable="true" />
             </column>
-            <column name="INSTANCE_ID_" type="varchar(255)">
+            <column name="INSTANCE_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="EXECUTION_ID_" type="varchar(255)">
+            <column name="EXECUTION_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="ACTIVITY_ID_" type="varchar(255)">
+            <column name="ACTIVITY_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="FAILED_" type="boolean" defaultValueBoolean="false" />
-            <column name="TENANT_ID_" type="varchar(255)">
+            <column name="TENANT_ID_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="EXECUTION_JSON_" type="longtext">
@@ -128,7 +128,7 @@
     <changeSet id="3" author="flowable">
     
         <addColumn tableName="ACT_DMN_HI_DECISION_EXECUTION">
-            <column name="SCOPE_TYPE_" type="varchar(255)" />
+            <column name="SCOPE_TYPE_" type="varchar(191)" />
         </addColumn>
     
     </changeSet>
