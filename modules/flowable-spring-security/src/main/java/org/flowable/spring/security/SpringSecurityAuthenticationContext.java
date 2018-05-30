@@ -14,8 +14,10 @@ package org.flowable.spring.security;
 
 import java.security.Principal;
 
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.identity.AuthenticationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -26,6 +28,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author Filip Hrisafov
  */
 public class SpringSecurityAuthenticationContext implements AuthenticationContext {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringSecurityAuthenticationContext.class);
 
     @Override
     public String getAuthenticatedUserId() {
@@ -45,7 +49,11 @@ public class SpringSecurityAuthenticationContext implements AuthenticationContex
         } else if (principal instanceof Authentication) {
             SecurityContextHolder.getContext().setAuthentication((Authentication) principal);
         } else {
-            throw new FlowableIllegalArgumentException("Principal must be of Authentication type. It was of " + principal.getClass());
+            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principal, null));
+            LOGGER.warn("Setting a principal that is not of type `org.springframework.security.core.Authentication`."
+                    + " When using Spring Security you can just set the user through 'SecurityContextHolder.getContext().setAuthentication(..)'"
+                    + " Using 'org.springframework.security.authentication.UsernamePasswordAuthenticationToken' to wrap the principal of type '{}'",
+                principal.getClass());
         }
     }
 }
