@@ -64,6 +64,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String subProcessInstanceId;
     protected boolean excludeSubprocesses;
     protected String involvedUser;
+    protected Set<String> involvedGroups;
     protected SuspensionState suspensionState;
     protected boolean includeProcessVariables;
     protected Integer processInstanceVariablesLimit;
@@ -374,6 +375,24 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             this.currentOrQueryObject.involvedUser = involvedUser;
         } else {
             this.involvedUser = involvedUser;
+        }
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceQuery involvedGroups(Set<String> involvedGroups) {
+        if (involvedGroups == null) {
+            throw new FlowableIllegalArgumentException("Involved groups are null");
+        }
+        if (involvedGroups.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Involved groups are empty");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroups = involvedGroups;
+        } else {
+            this.involvedGroups = involvedGroups
+            ;
         }
         return this;
     }
@@ -837,6 +856,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getInvolvedUser() {
         return involvedUser;
+    }
+
+    public Set<String> getInvolvedGroups() {
+        return involvedGroups;
     }
 
     public SuspensionState getSuspensionState() {
