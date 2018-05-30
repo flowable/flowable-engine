@@ -65,6 +65,12 @@
             <artifactId>flowable-ldap</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-security</artifactId>
+            <!-- TODO make it optional so people pull it explicitly if needed -->
+            <!--<optional>true</optional>-->
+        </dependency>
 
         <!-- rest api -->
         <dependency>

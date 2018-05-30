@@ -212,6 +212,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-spring-security</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-cdi</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -983,6 +988,7 @@
 		<module>modules/flowable-engine</module>
 		<module>modules/flowable-app-engine-api</module>
 		<module>modules/flowable-app-engine</module>
+		<module>modules/flowable-spring-security</module>
 	</modules>
 
 	<build>

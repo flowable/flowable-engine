@@ -82,6 +82,9 @@
 			<fileset dir="../modules/flowable-spring/target">
 				<include name="flowable-spring-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-spring-security/target">
+				<include name="flowable-spring-security-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-bpmn-model/target">
 				<include name="flowable-bpmn-model-*.jar" />
 			</fileset>
