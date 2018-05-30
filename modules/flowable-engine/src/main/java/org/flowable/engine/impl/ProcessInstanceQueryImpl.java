@@ -391,8 +391,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         if (inOrStatement) {
             this.currentOrQueryObject.involvedGroups = involvedGroups;
         } else {
-            this.involvedGroups = involvedGroups
-            ;
+            this.involvedGroups = involvedGroups;
         }
         return this;
     }
