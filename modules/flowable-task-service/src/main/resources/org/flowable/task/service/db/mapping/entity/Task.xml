@@ -838,6 +838,14 @@
           or RES.OWNER_ = #{involvedUser}
           )
       </if>
+      <if test="involvedGroups != null">
+          and EXISTS(
+          select ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_ and LINK.GROUP_ID_ in
+          <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
+              #{involvedGroup}
+          </foreach>
+          )
+      </if>
       <foreach item="var" collection="queryVariableValues" index="index">
         <choose>
             <when test="var.operator.equals('EXISTS')">
@@ -1221,6 +1229,16 @@
                 or RES.ASSIGNEE_ = #{orQueryObject.involvedUser}
                 or RES.OWNER_ = #{orQueryObject.involvedUser}
                 )
+            </if>
+            <if test="orQueryObject.involvedGroups != null">
+              or (
+                EXISTS(
+                select ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_ and LINK.GROUP_ID_ in
+                <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
+                    #{involvedGroup}
+                </foreach>
+                )
+              )
             </if>
             <foreach item="var" collection="orQueryObject.queryVariableValues" index="index">
               or 
