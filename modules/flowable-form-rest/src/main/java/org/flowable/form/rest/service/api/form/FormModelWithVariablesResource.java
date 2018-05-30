@@ -56,8 +56,8 @@ public class FormModelWithVariablesResource {
 
         if (formRequest.getParentDeploymentId() != null) {
             formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(
-                    formRequest.getParentDeploymentId(),
                     formRequest.getFormDefinitionKey(),
+                    formRequest.getParentDeploymentId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
