@@ -44,12 +44,11 @@ public class ProcessAsyncHistoryExecutorTest {
             DataSourceAutoConfiguration.class,
             TransactionAutoConfiguration.class
         ))
-        .withPropertyValues("flowable.process.async-history.enable=true")
         .withClassLoader(new FilteredClassLoader(EntityManagerFactory.class));
 
     @Test
     public void asyncHistoryExecutorBeanAvailable() {
-        contextRunner.run((context -> {
+        contextRunner.withPropertyValues("flowable.process.async-history.enable=true").run((context -> {
             assertThat(context).hasSingleBean(ProcessEngine.class);
             assertThat(context).hasBean("taskExecutor");
             assertThat(context).hasBean("processAsyncExecutor");
@@ -73,6 +72,53 @@ public class ProcessAsyncHistoryExecutorTest {
             assertThat(((ProcessEngineConfigurationImpl) context.getBean(ProcessEngine.class).getProcessEngineConfiguration()).isAsyncHistoryEnabled()).isTrue();
             
         }));
+    }
+
+    @Test
+    public void asyncHistoryExecutorBeanDisabled() {
+        contextRunner
+            .withPropertyValues("flowable.process.async-history.enable=false")
+            .run((context -> {
+                assertThat(context).hasSingleBean(ProcessEngine.class);
+                assertThat(context).hasBean("taskExecutor");
+                assertThat(context).hasBean("processAsyncExecutor");
+                assertThat(context).doesNotHaveBean("asyncHistoryExecutor");
+
+                AsyncExecutor processAsyncExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncExecutor();
+                assertThat(processAsyncExecutor).isNotNull();
+                AsyncExecutor processAsyncHistoryExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncHistoryExecutor();
+                assertThat(processAsyncHistoryExecutor).isNull();
+
+                assertThat(processAsyncExecutor).isNotSameAs(processAsyncHistoryExecutor);
+
+                TaskExecutor taskExecutorBean = context.getBean("taskExecutor", TaskExecutor.class);
+
+                assertThat(((SpringAsyncExecutor) processAsyncExecutor).getTaskExecutor()).isSameAs(taskExecutorBean);
+
+                assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncExecutorActivate()).isTrue();
+                assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncHistoryExecutorActivate()).isTrue();
+
+                assertThat(((ProcessEngineConfigurationImpl) context.getBean(ProcessEngine.class).getProcessEngineConfiguration()).isAsyncHistoryEnabled())
+                    .isFalse();
+
+            }));
+    }
+
+    @Test
+    public void asyncHistoryExecutorBeanWithDefault() {
+        contextRunner
+            .run((context -> {
+                assertThat(context).doesNotHaveBean("asyncHistoryExecutor");
+
+                AsyncExecutor processAsyncHistoryExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncHistoryExecutor();
+                assertThat(processAsyncHistoryExecutor).isNull();
+
+                assertThat(context.getBean(ProcessEngine.class).getProcessEngineConfiguration().isAsyncHistoryExecutorActivate()).isTrue();
+
+                assertThat(((ProcessEngineConfigurationImpl) context.getBean(ProcessEngine.class).getProcessEngineConfiguration()).isAsyncHistoryEnabled())
+                    .isFalse();
+
+            }));
     }
 
 }
