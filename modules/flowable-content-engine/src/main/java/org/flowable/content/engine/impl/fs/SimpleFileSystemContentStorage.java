@@ -94,8 +94,8 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     public ContentObject createContentObject(InputStream contentStream, Map<String, Object> metaData) {
         String uuid = UUID_GENERATOR.generate().toString();
         File file = getContentFile(metaData, uuid);
-        try {
-            long length = IOUtils.copy(contentStream, new FileOutputStream(file, false));
+        try (FileOutputStream fos = new FileOutputStream(file, false)) {
+            long length = IOUtils.copy(contentStream, fos);
             String contentId = generateContentId(uuid, metaData);
             return new FileSystemContentObject(file, contentId, length);
         } catch (IOException e) {
