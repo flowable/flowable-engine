@@ -77,6 +77,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected boolean includeChildExecutionsWithBusinessKeyQuery;
     protected boolean isActive;
     protected String involvedUser;
+    protected Set<String> involvedGroups;
     protected Set<String> processDefinitionKeys;
     protected Set<String> processDefinitionIds;
 
@@ -952,6 +953,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public void setInvolvedUser(String involvedUser) {
         this.involvedUser = involvedUser;
+    }
+
+    public Set<String> getInvolvedGroups(Set<String> involvedGroups) {
+        return involvedGroups;
+    }
+
+    public void setInvolvedGroups(Set<String> involvedGroups) {
+        this.involvedGroups = involvedGroups;
     }
 
     public Set<String> getProcessDefinitionIds() {
