@@ -217,6 +217,9 @@
 
     <select id="selectCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultType="long">
         select count(RES.ID_) from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        <if test="caseDefinitionId != null || caseDefinitionKey != null || caseDefinitionKeys != null || caseDefinitionName != null || caseDefinitionCategory != null || caseDefinitionVersion != null">
+            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        </if>
         <include refid="commonSelectCaseInstancesByQueryCriteriaSql" />
     </select>
 
