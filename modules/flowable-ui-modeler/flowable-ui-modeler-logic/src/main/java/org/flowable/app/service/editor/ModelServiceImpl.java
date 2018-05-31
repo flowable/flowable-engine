@@ -905,8 +905,7 @@ public class ModelServiceImpl implements ModelService {
       extensionElement.setNamespace(BPMN_RDS_NAMESPACE);
       extensionElement.setNamespacePrefix(BPMN_RDS_NAMESPACE_PREFIX);
       extensionElement.setName(FORM);
-      extensionElement.setElementText(formContent);
-  
+
       ExtensionAttribute attribute = new ExtensionAttribute();
       attribute.setName(FORMKEY);
       attribute.setValue(formKey);
@@ -929,6 +928,9 @@ public class ModelServiceImpl implements ModelService {
       try
       {
         JsonNode objectNode = objectMapper.readTree(formContent);
+        String indented = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode);
+        extensionElement.setElementText(indented);
+
         List<JsonNode> parentNodes = objectNode.findParents("formId");
         if (parentNodes != null)
         {
