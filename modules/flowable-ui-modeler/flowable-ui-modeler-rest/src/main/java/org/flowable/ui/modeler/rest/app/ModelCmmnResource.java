@@ -39,7 +39,7 @@ public class ModelCmmnResource extends AbstractModelCmmnResource {
     /**
      * GET /rest/models/{modelId}/history/{caseModelHistoryId}/cmmn -> Get CMMN 1.1 xml
      */
-    @RequestMapping(value = "/rest/models/{caseModelId}/history/{caseModelHistoryId}/bpmn20", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/models/{caseModelId}/history/{caseModelHistoryId}/cmmn", method = RequestMethod.GET)
     public void getHistoricProcessModelCmmnXml(HttpServletResponse response, @PathVariable String caseModelId, @PathVariable String caseModelHistoryId) throws IOException {
         super.getHistoricCaseModelCmmnXml(response, caseModelId, caseModelHistoryId);
     }
