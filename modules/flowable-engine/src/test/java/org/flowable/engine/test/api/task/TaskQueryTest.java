@@ -678,6 +678,52 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    public void testQueryByInvolvedGroups() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).taskInvolvedGroups(Collections.singleton("testGroup")).count());
+
+        } finally {
+            List<org.flowable.task.api.Task> allTasks = taskService.createTaskQuery().list();
+            for (org.flowable.task.api.Task task : allTasks) {
+                if (task.getExecutionId() == null) {
+                    taskService.deleteTask(task.getId());
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                        historyService.deleteHistoricTaskInstance(task.getId());
+                    }
+                }
+            }
+        }
+    }
+
+    public void testQueryByInvolvedGroupOr() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedGroups(Collections.singleton("testGroup")).count());
+
+        } finally {
+            List<org.flowable.task.api.Task> allTasks = taskService.createTaskQuery().list();
+            for (org.flowable.task.api.Task task : allTasks) {
+                if (task.getExecutionId() == null) {
+                    taskService.deleteTask(task.getId());
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                        historyService.deleteHistoricTaskInstance(task.getId());
+                    }
+                }
+            }
+        }
+    }
+
     public void testQueryByNullAssignee() {
         try {
             taskService.createTaskQuery().taskAssignee(null).list();

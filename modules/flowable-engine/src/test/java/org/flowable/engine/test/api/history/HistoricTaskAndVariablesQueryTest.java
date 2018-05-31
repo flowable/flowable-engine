@@ -26,6 +26,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLinkInfo;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 
@@ -85,7 +86,12 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             Map<String, Object> startMap = new HashMap<>();
             startMap.put("processVar", true);
             runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
-            
+            String taskId = taskService.createTaskQuery().taskAssignee("kermit").singleResult().getId();
+            taskService.addGroupIdentityLink(
+                taskId,
+                "testGroup",
+                IdentityLinkType.PARTICIPANT
+            );
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             task = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().taskAssignee("kermit").singleResult();
@@ -162,6 +168,14 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals("someVariable", variableMap.get("testVar"));
             assertNotNull(variableMap.get("testVar2"));
             assertEquals(123, variableMap.get("testVar2"));
+
+            assertEquals(1L, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).count());
+            assertEquals( taskId, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertEquals( taskId, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).singleResult().getId());
+            assertEquals(3L, historyService.createHistoricTaskInstanceQuery().
+                or().taskInvolvedGroups(Collections.singleton("testGroup")).taskInvolvedUser("kermit").endOr().count());
+            assertEquals(1L, historyService.createHistoricTaskInstanceQuery().
+                or().taskInvolvedGroups(Collections.singleton("testGroup")).processInstanceId("undefined").endOr().count());
         }
     }
 
