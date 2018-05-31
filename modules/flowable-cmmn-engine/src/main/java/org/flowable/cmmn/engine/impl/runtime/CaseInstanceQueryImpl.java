@@ -54,6 +54,8 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
+    protected String involvedUser;
+    protected Set<String> involvedGroups;
 
     protected Integer caseInstanceVariablesLimit;
 
@@ -226,6 +228,26 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         this.withoutTenantId = true;
         return this;
     }
+    @Override
+    public CaseInstanceQuery involvedUser(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("involvedUser is null");
+        }
+        this.involvedUser = userId;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery involvedGroups(Set<String> groupIds) {
+        if (groupIds == null) {
+            throw new FlowableIllegalArgumentException("involvedGroups are null");
+        }
+        if (groupIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("involvedGroups are empty");
+        }
+        this.involvedGroups = groupIds;
+        return this;
+    }
 
     // ordering ////////////////////////////////////////////////////
 
@@ -374,6 +396,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public String getInvolvedUser() {
+        return involvedUser;
+    }
+
+    public Set<String> getInvolvedGroups() {
+        return involvedGroups;
     }
 
     public boolean isIncludeCaseVariables() {

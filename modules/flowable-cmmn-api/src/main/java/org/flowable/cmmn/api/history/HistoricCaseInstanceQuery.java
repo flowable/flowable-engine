@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.common.engine.api.query.Query;
 
 /**
@@ -149,7 +150,17 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that have no tenant identifier.
      */
     HistoricCaseInstanceQuery caseInstanceWithoutTenantId();
-    
+
+    /**
+     * Select the historic case instances with which the user with the given id is involved.
+     */
+    HistoricCaseInstanceQuery involvedUser(String userId);
+
+    /**
+     * Select the historic case instances with which the groups with the given ids are involved.
+     */
+    HistoricCaseInstanceQuery involvedGroups(Set<String> groupIds);
+
     /**
      * Only select case instances which had a global variable with the given value when they ended. 
      * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.

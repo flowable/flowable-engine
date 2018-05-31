@@ -58,6 +58,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
     protected Integer caseVariablesLimit;
+    protected String involvedUser;
+    protected Set<String> involvedGroups;
 
 
     public HistoricCaseInstanceQueryImpl() {
@@ -336,6 +338,27 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return this;
     }
 
+    @Override
+    public HistoricCaseInstanceQuery involvedUser(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("involvedUser is null");
+        }
+        this.involvedUser = userId;
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery involvedGroups(Set<String> groupIds) {
+        if (groupIds == null) {
+            throw new FlowableIllegalArgumentException("involvedGroups are null");
+        }
+        if (groupIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("involvedGroups are empty");
+        }
+        this.involvedGroups = groupIds;
+        return this;
+    }
+
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
@@ -418,6 +441,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public String getInvolvedUser() {
+        return involvedUser;
+    }
+
+    public Set<String> getInvolvedGroups() {
+        return involvedGroups;
     }
 
     public boolean isIncludeCaseVariables() {
