@@ -194,6 +194,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery includeCaseVariables();
 
     /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    CaseInstanceQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    CaseInstanceQuery endOr();
+
+    /**
      * Limit case instance variables
      */
     CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit);

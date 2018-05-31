@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import java.util.Set;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -57,6 +59,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String involvedUser;
     protected Set<String> involvedGroups;
 
+    protected List<CaseInstanceQueryImpl> orQueryObjects = new ArrayList<>();
+    protected CaseInstanceQueryImpl currentOrQueryObject;
+    protected boolean inOrStatement;
+
     protected Integer caseInstanceVariablesLimit;
 
     public CaseInstanceQueryImpl() {
@@ -75,7 +81,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (caseDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Case definition id is null");
         }
-        this.caseDefinitionId = caseDefinitionId;
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionId = caseDefinitionId;
+        } else {
+            this.caseDefinitionId = caseDefinitionId;
+        }
         return this;
     }
 
@@ -84,7 +95,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (caseDefinitionKey == null) {
             throw new FlowableIllegalArgumentException("Case definition key is null");
         }
-        this.caseDefinitionKey = caseDefinitionKey;
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionKey = caseDefinitionKey;
+        } else {
+            this.caseDefinitionKey = caseDefinitionKey;
+        }
         return this;
     }
 
@@ -93,7 +108,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (caseDefinitionCategory == null) {
             throw new FlowableIllegalArgumentException("Case definition category is null");
         }
-        this.caseDefinitionCategory = caseDefinitionCategory;
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionCategory = caseDefinitionCategory;
+        } else {
+            this.caseDefinitionCategory = caseDefinitionCategory;
+        }
         return this;
     }
 
@@ -102,7 +122,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (caseDefinitionName == null) {
             throw new FlowableIllegalArgumentException("Case definition name is null");
         }
-        this.caseDefinitionName = caseDefinitionName;
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionName = caseDefinitionName;
+        } else {
+            this.caseDefinitionName = caseDefinitionName;
+        }
         return this;
     }
 
@@ -111,7 +136,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (caseDefinitionVersion == null) {
             throw new FlowableIllegalArgumentException("Case definition version is null");
         }
-        this.caseDefinitionVersion = caseDefinitionVersion;
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionVersion = caseDefinitionVersion;
+        } else {
+            this.caseDefinitionVersion = caseDefinitionVersion;
+        }
         return this;
     }
 
@@ -120,7 +149,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("Case instance id is null");
         }
-        this.caseInstanceId = caseInstanceId;
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceId = caseInstanceId;
+        } else {
+            this.caseInstanceId = caseInstanceId;
+        }
         return this;
     }
 
@@ -129,7 +163,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (caseInstanceIds == null) {
             throw new FlowableIllegalArgumentException("Case instance ids is null");
         }
-        this.caseInstanceIds = caseInstanceIds;
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceIds = caseInstanceIds;
+        } else {
+            this.caseInstanceIds = caseInstanceIds;
+        }
         return this;
     }
 
@@ -138,7 +177,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (businessKey == null) {
             throw new FlowableIllegalArgumentException("Business key is null");
         }
-        this.businessKey = businessKey;
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessKey = businessKey;
+        } else {
+            this.businessKey = businessKey;
+        }
         return this;
     }
 
@@ -147,7 +190,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (caseDefinitionKeys == null) {
             throw new FlowableIllegalArgumentException("Case definition keys is null");
         }
-        this.caseDefinitionKeys = caseDefinitionKeys;
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionKeys = caseDefinitionKeys;
+        } else {
+            this.caseDefinitionKeys = caseDefinitionKeys;
+        }
         return this;
     }
 
@@ -156,7 +203,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (parentId == null) {
             throw new FlowableIllegalArgumentException("Parent id is null");
         }
-        this.caseInstanceParentId = parentId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceParentId = parentId;
+        } else {
+            this.caseInstanceParentId = parentId;
+        }
         return this;
     }
 
@@ -165,7 +216,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (beforeTime == null) {
             throw new FlowableIllegalArgumentException("before time is null");
         }
-        this.startedBefore = beforeTime;
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.startedBefore = beforeTime;
+        } else {
+            this.startedBefore = beforeTime;
+        }
         return this;
     }
 
@@ -174,7 +230,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (afterTime == null) {
             throw new FlowableIllegalArgumentException("after time is null");
         }
-        this.startedAfter = afterTime;
+        if (inOrStatement) {
+            this.currentOrQueryObject.startedAfter = afterTime;
+        } else {
+            this.startedAfter = afterTime;
+        }
         return this;
     }
 
@@ -183,25 +243,47 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (userId == null) {
             throw new FlowableIllegalArgumentException("user id is null");
         }
-        this.startedBy = userId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.startedBy = userId;
+        } else {
+            this.startedBy = userId;
+        }
         return this;
     }
 
     @Override
     public CaseInstanceQuery caseInstanceCallbackId(String callbackId) {
-        this.callbackId = callbackId;
+        if (callbackId == null) {
+            throw new FlowableIllegalArgumentException("callbackId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackId = callbackId;
+        } else {
+            this.callbackId = callbackId;
+        }
         return this;
     }
 
     @Override
     public CaseInstanceQuery caseInstanceCallbackType(String callbackType) {
-        this.callbackType = callbackType;
+        if (callbackType == null) {
+            throw new FlowableIllegalArgumentException("callbackType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackType= callbackType;
+        } else {
+            this.callbackType = callbackType;
+        }
         return this;
     }
 
     @Override
     public CaseInstanceQuery caseInstanceIsCompleteable() {
-        this.completeable = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.completeable = true;
+        } else {
+            this.completeable = true;
+        }
         return this;
     }
 
@@ -210,7 +292,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("tenant id is null");
         }
-        this.tenantId = tenantId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantId = tenantId;
+        } else {
+            this.tenantId = tenantId;
+        }
         return this;
     }
 
@@ -219,13 +305,22 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("tenant id is null");
         }
-        this.tenantIdLike = tenantIdLike;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantIdLike = tenantIdLike;
+        } else {
+            this.tenantIdLike = tenantIdLike;
+        }
         return this;
     }
     
     @Override
     public CaseInstanceQueryImpl caseInstanceWithoutTenantId() {
-        this.withoutTenantId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutTenantId = true;
+        } else {
+            this.withoutTenantId = true;
+        }
+
         return this;
     }
     @Override
@@ -233,7 +328,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (userId == null) {
             throw new FlowableIllegalArgumentException("involvedUser is null");
         }
-        this.involvedUser = userId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedUser = userId;
+        } else {
+            this.involvedUser = userId;
+        }
         return this;
     }
 
@@ -245,7 +344,34 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (groupIds.isEmpty()) {
             throw new FlowableIllegalArgumentException("involvedGroups are empty");
         }
-        this.involvedGroups = groupIds;
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroups = groupIds;
+        } else {
+            this.involvedGroups = groupIds;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery or() {
+        if (inOrStatement) {
+            throw new FlowableException("the query is already in an or statement");
+        }
+
+        inOrStatement = true;
+        currentOrQueryObject = new CaseInstanceQueryImpl();
+        orQueryObjects.add(currentOrQueryObject);
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery endOr() {
+        if (!inOrStatement) {
+            throw new FlowableException("endOr() can only be called after calling or()");
+        }
+
+        inOrStatement = false;
+        currentOrQueryObject = null;
         return this;
     }
 
@@ -336,6 +462,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getCaseInstanceId() {
         return caseInstanceId;
+    }
+
+    public Set<String> getCaseInstanceIds() {
+        return caseInstanceIds;
     }
 
     public String getBusinessKey() {
