@@ -517,9 +517,9 @@
   </sql>
   
   <sql id="commonSelectTaskByQueryCriteriaSql">
-    <if test="candidateUser != null || candidateGroups != null || bothCandidateAndAssigned">
+    <if test="candidateUser != null || candidateGroups != null || bothCandidateAndAssigned || involvedGroups != null">
       <choose>
-        <when test="bothCandidateAndAssigned">left</when>
+        <when test="bothCandidateAndAssigned || (assignee != null &amp;&amp; involvedGroups != null)">left</when>
         <otherwise>inner</otherwise>
       </choose>
       join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
@@ -537,9 +537,9 @@
       </if>       
     </foreach>
     <foreach collection="orQueryObjects" index="orIndex" item="orQueryObject">
-      <if test="orQueryObject.candidateUser != null || orQueryObject.candidateGroups != null || orQueryObject.bothCandidateAndAssigned">
+      <if test="orQueryObject.candidateUser != null || orQueryObject.candidateGroups != null || orQueryObject.bothCandidateAndAssigned || orQueryObject.involvedGroups">
         <choose>
-          <when test="orQueryObject.bothCandidateAndAssigned">left</when>
+          <when test="orQueryObject.bothCandidateAndAssigned || ( (orQueryObject.assignee != null || orQueryObject.owner != null) &amp;&amp; orQueryObject.involvedGroups != null)">left</when>
           <otherwise>inner</otherwise>
         </choose>
         join ${prefix}ACT_RU_IDENTITYLINK I_OR${orIndex} on I_OR${orIndex}.TASK_ID_ = RES.ID_
