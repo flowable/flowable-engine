@@ -268,19 +268,19 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 caseDefinitionKey("oneTaskCase").
                 start();
 
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date()).count(), is(2L));
-            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date()).list().size(),
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date(100)).count(), is(2L));
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date(100)).list().size(),
                 is(2));
 
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().
                 or().
-                caseInstanceStartedBefore(new Date()).
+                caseInstanceStartedBefore(new Date(100)).
                 caseDefinitionName("undefinedId").
                 endOr().
                 count(), is(2L));
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().
                 or().
-                caseInstanceStartedBefore(new Date()).
+                caseInstanceStartedBefore(new Date(100)).
                 caseDefinitionName("undefinedId").
                 endOr().
                 list().size(), is(2));
