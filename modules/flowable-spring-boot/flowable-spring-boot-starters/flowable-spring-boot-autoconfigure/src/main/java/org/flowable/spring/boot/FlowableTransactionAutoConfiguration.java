@@ -36,6 +36,10 @@ import javax.sql.DataSource;
  * @author Filip Hrisafov
  */
 @Configuration
+@ConditionalOnClass({
+    PlatformTransactionManager.class,
+    DataSource.class
+})
 @AutoConfigureAfter({
     DataSourceAutoConfiguration.class,
     TransactionAutoConfiguration.class,
@@ -50,7 +54,7 @@ public class FlowableTransactionAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public PlatformTransactionManager transactionManager(DataSource dataSource) {
+        public PlatformTransactionManager flowableTransactionManager(DataSource dataSource) {
             return new DataSourceTransactionManager(dataSource);
         }
 
@@ -62,7 +66,7 @@ public class FlowableTransactionAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+        public PlatformTransactionManager flowableTransactionManager(EntityManagerFactory emf) {
             return new JpaTransactionManager(emf);
         }
 
