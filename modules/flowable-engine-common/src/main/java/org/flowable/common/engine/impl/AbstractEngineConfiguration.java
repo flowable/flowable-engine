@@ -487,6 +487,7 @@ public abstract class AbstractEngineConfiguration {
             if (commandContextFactory != null) {
                 String engineCfgKey = getEngineCfgKey();
                 CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
+                engineConfigurations.put(engineCfgKey, this);
                 commandContextInterceptor.setEngineConfigurations(engineConfigurations);
                 commandContextInterceptor.setServiceConfigurations(serviceConfigurations);
                 commandContextInterceptor.setCurrentEngineConfigurationKey(engineCfgKey);

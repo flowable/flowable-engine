@@ -22,6 +22,8 @@ import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.history.async.HistoryJsonConstants;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.junit.After;
@@ -44,6 +46,9 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
     
     @After
     public void cleanup() {
+        processEngine.getManagementService().createHistoryJobQuery().list()
+            .forEach(historyJob -> processEngine.getManagementService().deleteHistoryJob(historyJob.getId()));
+        
         cmmnEngine.close();
         processEngine.close();
     }
@@ -83,6 +88,17 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
         assertEquals(1, processEngine.getHistoryService().createHistoricProcessInstanceQuery().count());
         assertEquals(0, cmmnEngine.getCmmnManagementService().createHistoryJobQuery().count());
         assertEquals(0, processEngine.getManagementService().createHistoryJobQuery().count());
+    }
+    
+    @Test
+    public void testProcessAsyncHistoryNotChanged() {
+        // This test validates that the shared async history executor does not intervene when running a process regularly
+        processEngine.getRepositoryService().createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
+        processEngine.getRuntimeService().startProcessInstanceByKey("oneTask");
+        assertEquals(1, processEngine.getManagementService().createHistoryJobQuery().count());
+        
+        HistoryJob historyJob = processEngine.getManagementService().createHistoryJobQuery().singleResult();
+        assertEquals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, historyJob.getJobHandlerType());
     }
 
 }
