@@ -29,12 +29,12 @@ public abstract class JobExecutorTestCase extends PluggableFlowableTestCase {
 
     @Override
     public void setUp() throws Exception {
-        processEngineConfiguration.getJobHandlers().put(tweetHandler.getType(), tweetHandler);
+        processEngineConfiguration.addJobHandler(tweetHandler);
     }
 
     @Override
     public void tearDown() throws Exception {
-        processEngineConfiguration.getJobHandlers().remove(tweetHandler.getType());
+        processEngineConfiguration.removeJobHandler(tweetHandler.getType());
     }
 
     protected JobEntity createTweetMessage(String msg) {

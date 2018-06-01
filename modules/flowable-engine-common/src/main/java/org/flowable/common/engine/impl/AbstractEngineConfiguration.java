@@ -20,10 +20,13 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import javax.naming.InitialContext;
@@ -71,6 +74,7 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,6 +244,13 @@ public abstract class AbstractEngineConfiguration {
     protected List<EngineDeployer> customPreDeployers;
     protected List<EngineDeployer> customPostDeployers;
     protected List<EngineDeployer> deployers;
+    
+    // CONFIGURATORS ////////////////////////////////////////////////////////////
+
+    protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
+    protected List<EngineConfigurator> configurators; // The injected configurators
+    protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
+    protected EngineConfigurator idmEngineConfigurator;
 
     public static final String DATABASE_TYPE_H2 = "h2";
     public static final String DATABASE_TYPE_HSQL = "hsql";
@@ -296,6 +307,10 @@ public abstract class AbstractEngineConfiguration {
      * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
      */
     protected int maxLengthStringVariableType = -1;
+    
+    protected void initEngineConfigurations() {
+        engineConfigurations.put(getEngineCfgKey(), this);
+    }
 
     // DataSource
     // ///////////////////////////////////////////////////////////////
@@ -472,7 +487,6 @@ public abstract class AbstractEngineConfiguration {
             if (commandContextFactory != null) {
                 String engineCfgKey = getEngineCfgKey();
                 CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
-                engineConfigurations.put(engineCfgKey, this);
                 commandContextInterceptor.setEngineConfigurations(engineConfigurations);
                 commandContextInterceptor.setServiceConfigurations(serviceConfigurations);
                 commandContextInterceptor.setCurrentEngineConfigurationKey(engineCfgKey);
@@ -755,6 +769,83 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public abstract InputStream getMyBatisXmlConfigurationStream();
+    
+    public void initConfigurators() {
+
+        allConfigurators = new ArrayList<>();
+        allConfigurators.addAll(getEngineSpecificEngineConfigurators());
+
+        // Configurators that are explicitly added to the config
+        if (configurators != null) {
+            allConfigurators.addAll(configurators);
+        }
+
+        // Auto discovery through ServiceLoader
+        if (enableConfiguratorServiceLoader) {
+            ClassLoader classLoader = getClassLoader();
+            if (classLoader == null) {
+                classLoader = ReflectUtil.getClassLoader();
+            }
+
+            ServiceLoader<EngineConfigurator> configuratorServiceLoader = ServiceLoader.load(EngineConfigurator.class, classLoader);
+            int nrOfServiceLoadedConfigurators = 0;
+            for (EngineConfigurator configurator : configuratorServiceLoader) {
+                allConfigurators.add(configurator);
+                nrOfServiceLoadedConfigurators++;
+            }
+
+            if (nrOfServiceLoadedConfigurators > 0) {
+                LOGGER.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
+            }
+
+            if (!allConfigurators.isEmpty()) {
+
+                // Order them according to the priorities (useful for dependent
+                // configurator)
+                Collections.sort(allConfigurators, new Comparator<EngineConfigurator>() {
+                    @Override
+                    public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
+                        int priority1 = configurator1.getPriority();
+                        int priority2 = configurator2.getPriority();
+
+                        if (priority1 < priority2) {
+                            return -1;
+                        } else if (priority1 > priority2) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+                });
+
+                // Execute the configurators
+                LOGGER.info("Found {} Engine Configurators in total:", allConfigurators.size());
+                for (EngineConfigurator configurator : allConfigurators) {
+                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
+                }
+
+            }
+
+        }
+    }
+    
+    protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
+        // meant to be overridden if needed
+        return Collections.emptyList();
+    }
+
+    public void configuratorsBeforeInit() {
+        for (EngineConfigurator configurator : allConfigurators) {
+            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            configurator.beforeInit(this);
+        }
+    }
+    
+    public void configuratorsAfterInit() {
+        for (EngineConfigurator configurator : allConfigurators) {
+            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            configurator.configure(this);
+        }
+    }    
 
     // getters and setters
     // //////////////////////////////////////////////////////
@@ -1372,6 +1463,41 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setCustomPostDeployers(List<EngineDeployer> customPostDeployers) {
         this.customPostDeployers = customPostDeployers;
+        return this;
+    }
+    
+    public boolean isEnableConfiguratorServiceLoader() {
+        return enableConfiguratorServiceLoader;
+    }
+    
+    public AbstractEngineConfiguration setEnableConfiguratorServiceLoader(boolean enableConfiguratorServiceLoader) {
+        this.enableConfiguratorServiceLoader = enableConfiguratorServiceLoader;
+        return this;
+    }
+
+    public List<EngineConfigurator> getConfigurators() {
+        return configurators;
+    }
+
+    public AbstractEngineConfiguration addConfigurator(EngineConfigurator configurator) {
+        if (configurators == null) {
+            configurators = new ArrayList<>();
+        }
+        configurators.add(configurator);
+        return this;
+    }
+
+    public AbstractEngineConfiguration setConfigurators(List<EngineConfigurator> configurators) {
+        this.configurators = configurators;
+        return this;
+    }
+
+    public EngineConfigurator getIdmEngineConfigurator() {
+        return idmEngineConfigurator;
+    }
+
+    public AbstractEngineConfiguration setIdmEngineConfigurator(EngineConfigurator idmEngineConfigurator) {
+        this.idmEngineConfigurator = idmEngineConfigurator;
         return this;
     }
 

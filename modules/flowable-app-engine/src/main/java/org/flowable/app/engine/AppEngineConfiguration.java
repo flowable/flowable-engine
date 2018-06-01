@@ -16,9 +16,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.ServiceLoader;
 
 import javax.sql.DataSource;
 
@@ -70,7 +68,6 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
-import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmIdentityService;
@@ -139,13 +136,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
 
-    // CONFIGURATORS ////////////////////////////////////////////////////////////
-
-    protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
-    protected List<EngineConfigurator> configurators; // The injected configurators
-    protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
-    protected EngineConfigurator idmEngineConfigurator;
-
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
 
@@ -193,6 +183,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     protected void init() {
+        initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
         initCommandContextFactory();
@@ -379,85 +370,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
     }
 
-    public void initConfigurators() {
-
-        allConfigurators = new ArrayList<>();
-
-        if (!disableIdmEngine) {
-            if (idmEngineConfigurator != null) {
-                allConfigurators.add(idmEngineConfigurator);
-            } else {
-                allConfigurators.add(new IdmEngineConfigurator());
-            }
-        }
-
-        // Configurators that are explicitly added to the config
-        if (configurators != null) {
-            allConfigurators.addAll(configurators);
-        }
-
-        // Auto discovery through ServiceLoader
-        if (enableConfiguratorServiceLoader) {
-            ClassLoader classLoader = getClassLoader();
-            if (classLoader == null) {
-                classLoader = ReflectUtil.getClassLoader();
-            }
-
-            ServiceLoader<EngineConfigurator> configuratorServiceLoader = ServiceLoader.load(EngineConfigurator.class, classLoader);
-            int nrOfServiceLoadedConfigurators = 0;
-            for (EngineConfigurator configurator : configuratorServiceLoader) {
-                allConfigurators.add(configurator);
-                nrOfServiceLoadedConfigurators++;
-            }
-
-            if (nrOfServiceLoadedConfigurators > 0) {
-                LOGGER.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
-            }
-
-            if (!allConfigurators.isEmpty()) {
-
-                // Order them according to the priorities (useful for dependent
-                // configurator)
-                Collections.sort(allConfigurators, new Comparator<EngineConfigurator>() {
-                    @Override
-                    public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
-                        int priority1 = configurator1.getPriority();
-                        int priority2 = configurator2.getPriority();
-
-                        if (priority1 < priority2) {
-                            return -1;
-                        } else if (priority1 > priority2) {
-                            return 1;
-                        }
-                        return 0;
-                    }
-                });
-
-                // Execute the configurators
-                LOGGER.info("Found {} Engine Configurators in total:", allConfigurators.size());
-                for (EngineConfigurator configurator : allConfigurators) {
-                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
-                }
-
-            }
-
-        }
-    }
-
-    public void configuratorsBeforeInit() {
-        for (EngineConfigurator configurator : allConfigurators) {
-            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
-            configurator.beforeInit(this);
-        }
-    }
-
-    public void configuratorsAfterInit() {
-        for (EngineConfigurator configurator : allConfigurators) {
-            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
-            configurator.configure(this);
-        }
-    }
-
     public void initVariableTypes() {
         if (variableTypes == null) {
             variableTypes = new DefaultVariableTypes();
@@ -527,6 +439,20 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
             businessCalendarManager = mapBusinessCalendarManager;
         }
+    }
+    
+    @Override
+    protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
+        if (!disableIdmEngine) {
+            List<EngineConfigurator> specificConfigurators = new ArrayList<>();
+            if (idmEngineConfigurator != null) {
+                specificConfigurators.add(idmEngineConfigurator);
+            } else {
+                specificConfigurators.add(new IdmEngineConfigurator());
+            }
+            return specificConfigurators;
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -787,41 +713,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public AppEngineConfiguration setDisableIdmEngine(boolean disableIdmEngine) {
         this.disableIdmEngine = disableIdmEngine;
-        return this;
-    }
-
-    public boolean isEnableConfiguratorServiceLoader() {
-        return enableConfiguratorServiceLoader;
-    }
-
-    public AppEngineConfiguration setEnableConfiguratorServiceLoader(boolean enableConfiguratorServiceLoader) {
-        this.enableConfiguratorServiceLoader = enableConfiguratorServiceLoader;
-        return this;
-    }
-
-    public List<EngineConfigurator> getConfigurators() {
-        return configurators;
-    }
-
-    public AppEngineConfiguration addConfigurator(EngineConfigurator configurator) {
-        if (configurators == null) {
-            configurators = new ArrayList<>();
-        }
-        configurators.add(configurator);
-        return this;
-    }
-
-    public AppEngineConfiguration setConfigurators(List<EngineConfigurator> configurators) {
-        this.configurators = configurators;
-        return this;
-    }
-
-    public EngineConfigurator getIdmEngineConfigurator() {
-        return idmEngineConfigurator;
-    }
-
-    public AppEngineConfiguration setIdmEngineConfigurator(EngineConfigurator idmEngineConfigurator) {
-        this.idmEngineConfigurator = idmEngineConfigurator;
         return this;
     }
 

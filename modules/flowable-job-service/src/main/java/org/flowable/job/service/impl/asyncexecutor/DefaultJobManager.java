@@ -383,7 +383,7 @@ public class DefaultJobManager implements JobManager {
             if (jobHandler != null) {
                 jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
             } else {
-                throw new FlowableException("No job handler registered for type " + jobEntity.getJobType());
+                throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType());
             }
         } else {
             throw new FlowableException("Job has no job handler type");

@@ -15,14 +15,11 @@ package org.flowable.form.engine;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
@@ -93,10 +90,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_FO_";
 
     protected String formEngineName = FormEngines.NAME_DEFAULT;
-
-    // CONFIGURATORS
-    // /////////////////////////////////////////////////////////////////
-    protected List<EngineConfigurator> configurators; // The injected configurators
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////
@@ -181,6 +174,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     // /////////////////////////////////////////////////////////////////////
 
     protected void init() {
+        initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
         initExpressionManager();
@@ -209,44 +203,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         initEntityManagers();
         initDeployers();
         initClock();
-    }
-
-    // configurators
-    // /////////////////////////////////////////////////////////////////
-
-    protected void initConfigurators() {
-
-        if (this.configurators == null) {
-            this.configurators = Collections.emptyList();
-        } else {
-            this.configurators.sort(Comparator.comparing(EngineConfigurator::getPriority));
-        }
-    }
-
-    protected void configuratorsBeforeInit() {
-        this.configurators.forEach(
-            configurator -> {
-                LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
-                configurator.beforeInit(this);
-            }
-        );
-    }
-
-    public void configuratorsAfterInit() {
-        this.configurators.forEach(
-            configurator -> {
-                LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
-                configurator.configure(this);
-            }
-        );
-    }
-
-    public FormEngineConfiguration addConfigurator(EngineConfigurator configurator) {
-        if (configurators == null) {
-            configurators = new ArrayList<>();
-        }
-        configurators.add(configurator);
-        return this;
     }
 
     // services

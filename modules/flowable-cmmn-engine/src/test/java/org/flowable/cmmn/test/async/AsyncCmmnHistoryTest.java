@@ -55,8 +55,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         cmmnEngineConfiguration.setAsyncExecutorActivate(false);
         cmmnEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(true);
         cmmnEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
-        cmmnEngineConfiguration.setAsyncFailedJobWaitTime(1000);
-        cmmnEngineConfiguration.setDefaultFailedJobWaitTime(1000);
+        cmmnEngineConfiguration.setAsyncFailedJobWaitTime(1);
+        cmmnEngineConfiguration.setDefaultFailedJobWaitTime(1);
         cmmnEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(10);
         cmmnEngineConfiguration.setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(1000);
     }
