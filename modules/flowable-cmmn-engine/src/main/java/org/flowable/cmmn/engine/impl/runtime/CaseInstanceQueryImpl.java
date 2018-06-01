@@ -77,6 +77,15 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
 
     @Override
+    protected void ensureVariablesInitialized() {
+        super.ensureVariablesInitialized();
+
+        for (CaseInstanceQueryImpl orQueryObject : orQueryObjects) {
+            orQueryObject.ensureVariablesInitialized();
+        }
+    }
+
+    @Override
     public CaseInstanceQueryImpl caseDefinitionId(String caseDefinitionId) {
         if (caseDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Case definition id is null");
@@ -374,6 +383,136 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         currentOrQueryObject = null;
         return this;
     }
+    
+    @Override
+    public CaseInstanceQuery variableValueEquals(String variableName, Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEquals(variableName, variableValue, false);
+            return this;
+        } else {
+            return variableValueEquals(variableName, variableValue, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueNotEquals(String variableName, Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueNotEquals(variableName, variableValue, false);
+            return this;
+        } else {
+            return variableValueNotEquals(variableName, variableValue, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueEquals(Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEquals(variableValue, false);
+            return this;
+        } else {
+            return variableValueEquals(variableValue, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueEqualsIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEqualsIgnoreCase(name, value, false);
+            return this;
+        } else {
+            return variableValueEqualsIgnoreCase(name, value, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueNotEqualsIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueNotEqualsIgnoreCase(name, value, false);
+            return this;
+        } else {
+            return variableValueNotEqualsIgnoreCase(name, value, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueGreaterThan(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueGreaterThan(name, value, false);
+            return this;
+        } else {
+            return variableValueGreaterThan(name, value, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueGreaterThanOrEqual(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueGreaterThanOrEqual(name, value, false);
+            return this;
+        } else {
+            return variableValueGreaterThanOrEqual(name, value, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueLessThan(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLessThan(name, value, false);
+            return this;
+        } else {
+            return variableValueLessThan(name, value, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueLessThanOrEqual(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLessThanOrEqual(name, value, false);
+            return this;
+        } else {
+            return variableValueLessThanOrEqual(name, value, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueLike(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLike(name, value, false);
+            return this;
+        } else {
+            return variableValueLike(name, value, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableValueLikeIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLikeIgnoreCase(name, value, false);
+            return this;
+        } else {
+            return variableValueLikeIgnoreCase(name, value, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableExists(name, false);
+            return this;
+        } else {
+            return variableExists(name, false);
+        }
+    }
+
+    @Override
+    public CaseInstanceQuery variableNotExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableNotExists(name, false);
+            return this;
+        } else {
+            return variableNotExists(name, false);
+        }
+    }
 
     // ordering ////////////////////////////////////////////////////
 
@@ -423,7 +562,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return this.caseInstanceVariablesLimit;
     }
 
-// results ////////////////////////////////////////////////////
+    // results ////////////////////////////////////////////////////
 
     @Override
     public long executeCount(CommandContext commandContext) {

@@ -657,4 +657,52 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             list().size(), is(3));
     }
 
+    @Test
+    public void getCaseInstanceByVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            variable("queryVariable", "queryVariableValue").
+            start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            variable("queryVariable", "queryVariableValue").
+            variable("queryVariable2", "queryVariableValue2").
+            start();
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            variable("queryVariable", "queryVariableValue").
+            variable("queryVariable3", "queryVariableValue3").
+            start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            variableValueEquals("queryVariable", "queryVariableValue").
+            variableValueEquals("queryVariable2","queryVariableValue2").
+            count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            variableValueEquals("queryVariable", "queryVariableValue").
+            variableValueEquals("queryVariable2", "queryVariableValue2")
+            .list().get(0).getId(),
+            is(caseInstance2.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+                variableValueEquals("queryVariable", "queryVariableValue").
+                variableValueEquals("queryVariable2", "queryVariableValue2").
+                singleResult().getId(),
+            is(caseInstance2.getId()));
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            variableValueEquals("queryVariable", "queryVariableValue").
+            variableValueEquals("queryVariable2", "queryVariableValue2").
+            caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(3L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            variableValueEquals("queryVariable", "queryVariableValue").
+            variableValueEquals("queryVariable2", "queryVariableValue2").
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().size(), is(3));
+    }
+
 }
