@@ -207,7 +207,8 @@
 
     <select id="selectCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultMap="caseInstanceResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>, CASE_DEF.KEY_ as CaseDefinitionKey, CASE_DEF.ID_ as
+        CaseDefinitionId, CASE_DEF.NAME_ as CaseDefinitionName, CASE_DEF.VERSION_ as CaseDefinitionVersion, CASE_DEF.DEPLOYMENT_ID_ as DeploymentId
         from ${prefix}ACT_CMMN_RU_CASE_INST RES
         inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         <include refid="commonSelectCaseInstancesByQueryCriteriaSql" />
