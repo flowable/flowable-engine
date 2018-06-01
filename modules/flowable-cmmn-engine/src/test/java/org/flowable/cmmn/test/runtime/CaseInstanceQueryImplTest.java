@@ -33,9 +33,14 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn").
             deploy()
             .getId();
-        cmmnRuntimeService.createCaseInstanceBuilder().
-            caseDefinitionKey("myCase").
-            start();
+        cmmnEngineConfiguration.getClock().setCurrentTime(new Date(0));
+        try {
+            cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("myCase").
+                start();
+        } finally {
+            cmmnEngineConfiguration.getClock().reset();
+        }
     }
 
     @After
@@ -257,27 +262,31 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
     @Test
     public void getCaseInstanceByStartedBefore() throws InterruptedException {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
-            caseDefinitionKey("oneTaskCase").
-            start();
-        TimeUnit.MILLISECONDS.sleep(10);
+        cmmnEngineConfiguration.getClock().setCurrentTime(new Date(0));
+        try {
+            cmmnRuntimeService.createCaseInstanceBuilder().
+                caseDefinitionKey("oneTaskCase").
+                start();
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date()).count(), is(2L));
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date()).list().size(),
-            is(2));
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date()).count(), is(2L));
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date()).list().size(),
+                is(2));
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
-            or().
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+                or().
                 caseInstanceStartedBefore(new Date()).
                 caseDefinitionName("undefinedId").
-            endOr().
-            count(), is(2L));
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
-            or().
+                endOr().
+                count(), is(2L));
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+                or().
                 caseInstanceStartedBefore(new Date()).
                 caseDefinitionName("undefinedId").
-            endOr().
-            list().size(), is(2));
+                endOr().
+                list().size(), is(2));
+        } finally {
+            cmmnEngineConfiguration.getClock().reset();
+        }
     }
 
     @Test
