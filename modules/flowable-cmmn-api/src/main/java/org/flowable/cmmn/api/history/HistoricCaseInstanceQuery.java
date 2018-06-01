@@ -152,6 +152,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery caseInstanceWithoutTenantId();
 
     /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement. Only one OR statement is allowed, for the second call to this method an exception will be thrown.
+     */
+    HistoricCaseInstanceQuery or();
+
+    /**
+     * End an OR statement. Only one OR statement is allowed, for the second call to this method an exception will be thrown.
+     */
+    HistoricCaseInstanceQuery endOr();
+
+    /**
      * Select the historic case instances with which the user with the given id is involved.
      */
     HistoricCaseInstanceQuery involvedUser(String userId);
