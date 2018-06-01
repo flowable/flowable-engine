@@ -566,7 +566,7 @@
                         #{orQueryObject.involvedUser})
                     </if>
                     <if test="orQueryObject.involvedGroups != null">
-                        and EXISTS(
+                        or EXISTS(
                         select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
                         <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
                             #{involvedGroup}

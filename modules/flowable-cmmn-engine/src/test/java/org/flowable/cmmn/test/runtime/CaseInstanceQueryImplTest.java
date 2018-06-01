@@ -6,11 +6,14 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -531,6 +534,127 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         } finally {
             cmmnRepositoryService.deleteDeployment(tempDeploymentId, true);
         }
+    }
+
+    @Test
+    public void getCaseInstanceByInvolvedUser() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+        cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").list().get(0).getId(),
+            is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedUser("kermit").singleResult().getId(),
+            is(caseInstance.getId()));
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+                involvedUser("kermit").
+                caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            involvedUser("kermit").
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            involvedUser("kermit").
+            caseDefinitionId("undefined").
+            endOr().
+            singleResult().getId(), is(caseInstance.getId()));
+    }
+
+    @Test
+    public void getCaseInstanceByInvolvedGroup() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup2", IdentityLinkType.PARTICIPANT);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId(),
+            is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.singleton("testGroup")).singleResult().getId(),
+            is(caseInstance.getId()));
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+                involvedGroups(Collections.singleton("testGroup")).
+                caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            involvedGroups(Collections.singleton("testGroup")).
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().get(0).getId(), is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            involvedGroups(Collections.singleton("testGroup")).
+            caseDefinitionId("undefined").
+            endOr().
+            singleResult().getId(), is(caseInstance.getId()));
+    }
+
+    @Test
+    public void getCaseInstanceByInvolvedGroupOrUser() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance.getId(), "testGroup2", IdentityLinkType.PARTICIPANT);
+        cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.CANDIDATE);
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+        cmmnRuntimeService.addGroupIdentityLink(caseInstance2.getId(), "testGroup2", IdentityLinkType.PARTICIPANT);
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder().
+            caseDefinitionKey("oneTaskCase").
+            start();
+        cmmnRuntimeService.addUserIdentityLink(caseInstance3.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).involvedUser("kermit").count(), is(1L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet()))
+                .involvedUser("kermit").list().get(0).getId(),
+            is(caseInstance.getId()));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet()))
+                .involvedUser("kermit").singleResult().getId(),
+            is(caseInstance.getId()));
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+                involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).
+                caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(2L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().size(), is(2));
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+                involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).
+                involvedUser("kermit").
+                caseDefinitionName("undefinedId").
+            endOr().
+            count(), is(3L));
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().
+            or().
+            involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).
+            involvedUser("kermit").
+            caseDefinitionName("undefinedId").
+            endOr().
+            list().size(), is(3));
     }
 
 }
