@@ -19,13 +19,13 @@ import javax.persistence.EntityManagerFactory;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -40,7 +40,7 @@ public class ProcessAsyncHistoryExecutorTest {
         .withConfiguration(AutoConfigurations.of(
             ProcessEngineServicesAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
             DataSourceAutoConfiguration.class,
             TransactionAutoConfiguration.class
         ))
