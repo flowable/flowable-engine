@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -259,7 +260,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().
             caseDefinitionKey("oneTaskCase").
             start();
-        Thread.sleep(1);
+        TimeUnit.MILLISECONDS.sleep(10);
 
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date()).count(), is(2L));
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceStartedBefore(new Date()).list().size(),
