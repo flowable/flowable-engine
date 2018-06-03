@@ -515,11 +515,11 @@
     </if>
     <include refid="commonSelectTaskByQueryCriteriaSql"/>
   </sql>
-  
+
   <sql id="commonSelectTaskByQueryCriteriaSql">
-    <if test="candidateUser != null || candidateGroups != null || bothCandidateAndAssigned">
+    <if test="candidateUser != null || candidateGroups != null || bothCandidateAndAssigned || involvedUser != null || involvedGroups !=null">
       <choose>
-        <when test="bothCandidateAndAssigned">left</when>
+        <when test="bothCandidateAndAssigned || involvedUser != null || involvedGroups != null">left</when>
         <otherwise>inner</otherwise>
       </choose>
       join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
@@ -537,9 +537,9 @@
       </if>       
     </foreach>
     <foreach collection="orQueryObjects" index="orIndex" item="orQueryObject">
-      <if test="orQueryObject.candidateUser != null || orQueryObject.candidateGroups != null || orQueryObject.bothCandidateAndAssigned || orQueryObject.involvedGroups">
+      <if test="orQueryObject.involvedUser != null || orQueryObject.candidateUser != null || orQueryObject.candidateGroups != null || orQueryObject.bothCandidateAndAssigned || orQueryObject.involvedGroups">
         <choose>
-          <when test="orQueryObject.bothCandidateAndAssigned || ( (orQueryObject.assignee != null || orQueryObject.owner != null || orQueryObject.ownerLike != null || orQueryObject.ownerLikeIgnoreCase != null || orQueryObject.assigneeLike != null || orQueryObject.assigneeLikeIgnoreCase != null || orQueryObject.assigneeIds !=null) &amp;&amp; orQueryObject.involvedGroups != null)">left</when>
+          <when test="orQueryObject.involvedUser != null || orQueryObject.bothCandidateAndAssigned || ( (orQueryObject.assignee != null || orQueryObject.owner != null || orQueryObject.ownerLike != null || orQueryObject.ownerLikeIgnoreCase != null || orQueryObject.assigneeLike != null || orQueryObject.assigneeLikeIgnoreCase != null || orQueryObject.assigneeIds !=null) &amp;&amp; orQueryObject.involvedGroups != null)">left</when>
           <otherwise>inner</otherwise>
         </choose>
         join ${prefix}ACT_RU_IDENTITYLINK I_OR${orIndex} on I_OR${orIndex}.TASK_ID_ = RES.ID_
@@ -833,18 +833,16 @@
       </if>
       <if test="involvedUser != null">
         and (
-          exists(select LINK.USER_ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where USER_ID_ = #{involvedUser} and LINK.TASK_ID_ = RES.ID_)
+          I.USER_ID_ = #{involvedUser}
           or RES.ASSIGNEE_ = #{involvedUser}
           or RES.OWNER_ = #{involvedUser}
           )
       </if>
       <if test="involvedGroups != null">
-          and EXISTS(
-          select ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_ and LINK.GROUP_ID_ in
+          and I.GROUP_ID_ in
           <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
               #{involvedGroup}
           </foreach>
-          )
       </if>
       <foreach item="var" collection="queryVariableValues" index="index">
         <choose>
@@ -1225,19 +1223,17 @@
             </if>
             <if test="orQueryObject.involvedUser != null">
               or (
-                exists(select LINK.USER_ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where USER_ID_ = #{orQueryObject.involvedUser} and LINK.TASK_ID_ = RES.ID_)
+                I_OR${orIndex}.USER_ID_ = #{orQueryObject.involvedUser}
                 or RES.ASSIGNEE_ = #{orQueryObject.involvedUser}
                 or RES.OWNER_ = #{orQueryObject.involvedUser}
                 )
             </if>
             <if test="orQueryObject.involvedGroups != null">
               or (
-                EXISTS(
-                select ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_ and LINK.GROUP_ID_ in
+                I_OR${orIndex}.GROUP_ID_ in
                 <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
                     #{involvedGroup}
                 </foreach>
-                )
               )
             </if>
             <foreach item="var" collection="orQueryObject.queryVariableValues" index="index">
