@@ -17,10 +17,12 @@
 
 var FLOWABLE = FLOWABLE || {};
 
+var pathname = window.location.pathname.replace(/\/$/, '');
+
 FLOWABLE.CONFIG = {
 	'onPremise' : true,
-	'contextRoot' : '/flowable-idm',
-	'webContextRoot' : '/flowable-idm',
+	'contextRoot' : pathname,
+	'webContextRoot' : pathname,
     'datesLocalization' : false
 };
 
