@@ -404,7 +404,7 @@
   </select>
   
   <select id="selectHistoricTaskInstanceCountByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
   </select>
   
@@ -1201,7 +1201,7 @@
           </if>
           <if test="orQueryObject.involvedUser != null">
             or (
-              HI_OR#{orIndex}.USER_ID_ = #{orQueryObject.involvedUser}
+              HI_OR${orIndex}.USER_ID_ = #{orQueryObject.involvedUser}
               or RES.ASSIGNEE_ = #{orQueryObject.involvedUser}
               or RES.OWNER_ = #{orQueryObject.involvedUser}
               )
