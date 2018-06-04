@@ -1244,13 +1244,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initAsyncHistorySessionFactory() {
-        AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
-        if (asyncHistoryListener == null) {
-            initDefaultAsyncHistoryListener();
+        if (!sessionFactories.containsKey(AsyncHistorySession.class)) {
+            AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
+            if (asyncHistoryListener == null) {
+                initDefaultAsyncHistoryListener();
+            }
+            asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
+            sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
         }
-        asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
-        asyncHistorySessionFactory.registerJobDataTypes(HistoryJsonConstants.ORDERED_TYPES);
-        sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
+        
+        ((AsyncHistorySessionFactory) sessionFactories.get(AsyncHistorySession.class)).registerJobDataTypes(HistoryJsonConstants.ORDERED_TYPES);
     }
 
     protected void initDefaultAsyncHistoryListener() {

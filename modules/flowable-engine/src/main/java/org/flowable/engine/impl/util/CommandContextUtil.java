@@ -90,7 +90,7 @@ public class CommandContextUtil {
     }
     
     public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
-        return (VariableServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+        return (VariableServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
                         .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
     }
     
@@ -124,7 +124,7 @@ public class CommandContextUtil {
     }
     
     public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
-        return (IdentityLinkServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+        return (IdentityLinkServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
                         .get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
     }
     
@@ -158,7 +158,7 @@ public class CommandContextUtil {
     }
     
     public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
-        return (TaskServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+        return (TaskServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
                         .get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
     }
     
@@ -191,7 +191,7 @@ public class CommandContextUtil {
     }
     
     public static JobServiceConfiguration getJobServiceConfiguration(CommandContext commandContext) {
-        return (JobServiceConfiguration) commandContext.getCurrentEngineConfiguration().getServiceConfigurations()
+        return (JobServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
                         .get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
     }
     
