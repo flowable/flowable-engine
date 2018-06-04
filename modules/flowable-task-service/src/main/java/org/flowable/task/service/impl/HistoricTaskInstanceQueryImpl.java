@@ -120,6 +120,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean includeIdentityLinks;
     protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
+    private boolean isHistoricIdentityLinkJoinNeeded = false;
+
     protected boolean inOrStatement;
 
     public HistoricTaskInstanceQueryImpl() {
@@ -1210,8 +1212,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         if (inOrStatement) {
+            this.currentOrQueryObject.isHistoricIdentityLinkJoinNeeded = true;
             this.currentOrQueryObject.candidateUser = candidateUser;
         } else {
+            this.isHistoricIdentityLinkJoinNeeded = true;
             this.candidateUser = candidateUser;
         }
         return this;
@@ -1228,8 +1232,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         if (inOrStatement) {
+            this.currentOrQueryObject.isHistoricIdentityLinkJoinNeeded = true;
             this.currentOrQueryObject.candidateGroup = candidateGroup;
         } else {
+            this.isHistoricIdentityLinkJoinNeeded = true;
             this.candidateGroup = candidateGroup;
         }
         return this;
@@ -1250,8 +1256,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         if (inOrStatement) {
+            this.currentOrQueryObject.isHistoricIdentityLinkJoinNeeded = true;
             this.currentOrQueryObject.candidateGroups = candidateGroups;
         } else {
+            this.isHistoricIdentityLinkJoinNeeded = true;
             this.candidateGroups = candidateGroups;
         }
         return this;
@@ -1259,9 +1267,15 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricTaskInstanceQuery taskInvolvedUser(String involvedUser) {
+        if (involvedUser == null) {
+            throw new FlowableIllegalArgumentException("involved user is null");
+        }
+
         if (inOrStatement) {
+            this.currentOrQueryObject.isHistoricIdentityLinkJoinNeeded = true;
             this.currentOrQueryObject.involvedUser = involvedUser;
         } else {
+            this.isHistoricIdentityLinkJoinNeeded = true;
             this.involvedUser = involvedUser;
         }
         return this;
@@ -1276,8 +1290,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             throw new FlowableIllegalArgumentException("Involved groups are empty");
         }
         if (inOrStatement) {
+            this.currentOrQueryObject.isHistoricIdentityLinkJoinNeeded = true;
             this.currentOrQueryObject.involvedGroups = involvedGroups;
         } else {
+            this.isHistoricIdentityLinkJoinNeeded = true;
             this.involvedGroups = involvedGroups;
         }
         return this;
@@ -1873,5 +1889,9 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public List<HistoricTaskInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+
+    public boolean isHistoricIdentityLinkJoinNeeded() {
+        return isHistoricIdentityLinkJoinNeeded;
     }
 }
