@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
+import org.flowable.identitylink.service.impl.NoOperationIdentityLinkEventHandler;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManagerImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
@@ -51,6 +52,9 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     
     protected IdentityLinkEntityManager identityLinkEntityManager;
     protected HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager;
+
+    /** IdentityLink event handler */
+    protected IdentityLinkEventHandler identityLinkEventHandler;
     
     protected HistoryLevel historyLevel;
     
@@ -62,6 +66,7 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     public void init() {
         initDataManagers();
         initEntityManagers();
+        initEventHandler();
     }
     
     @Override
@@ -99,6 +104,12 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
         }
         if (historicIdentityLinkEntityManager == null) {
             historicIdentityLinkEntityManager = new HistoricIdentityLinkEntityManagerImpl(this, historicIdentityLinkDataManager);
+        }
+    }
+
+    public void initEventHandler() {
+        if (identityLinkEventHandler == null) {
+            identityLinkEventHandler = new NoOperationIdentityLinkEventHandler();
         }
     }
 
@@ -182,6 +193,15 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     @Override
     public IdentityLinkServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public IdentityLinkEventHandler getIdentityLinkEventHandler() {
+        return identityLinkEventHandler;
+    }
+
+    public IdentityLinkServiceConfiguration setIdentityLinkEventHandler(IdentityLinkEventHandler identityLinkEventHandler) {
+        this.identityLinkEventHandler = identityLinkEventHandler;
         return this;
     }
 }
