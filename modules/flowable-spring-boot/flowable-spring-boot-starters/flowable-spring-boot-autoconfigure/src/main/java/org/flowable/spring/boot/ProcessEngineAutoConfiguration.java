@@ -68,7 +68,7 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableIdmProperties.class
 })
 @AutoConfigureAfter({
-    FlowableTransactionAutoConfiguration.class,
+    FlowableJpaAutoConfiguration.class,
     AppEngineAutoConfiguration.class,
 })
 @AutoConfigureBefore({

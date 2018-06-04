@@ -31,10 +31,9 @@ import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
@@ -62,7 +61,6 @@ public class AppEngineAutoConfigurationTest {
             DataSourceAutoConfiguration.class,
             DataSourceTransactionManagerAutoConfiguration.class,
             HibernateJpaAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
             AppEngineServicesAutoConfiguration.class,
             AppEngineAutoConfiguration.class,
             IdmEngineAutoConfiguration.class,

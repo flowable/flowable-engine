@@ -32,7 +32,6 @@ import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
-import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
@@ -44,7 +43,6 @@ import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 
@@ -88,8 +86,6 @@ public class IdmEngineAutoConfigurationTest {
     @Test
     public void idmEngineWithBasicDataSourceAndProcessEngine() {
         contextRunner.withConfiguration(AutoConfigurations.of(
-            HibernateJpaAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
             ProcessEngineServicesAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class
         )).run(context -> {
@@ -126,8 +122,6 @@ public class IdmEngineAutoConfigurationTest {
     @Test
     public void idmEngineWithBasicDataSourceAndAppEngine() {
         contextRunner.withConfiguration(AutoConfigurations.of(
-            HibernateJpaAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
             AppEngineServicesAutoConfiguration.class,
             AppEngineAutoConfiguration.class,
             ProcessEngineServicesAutoConfiguration.class,
