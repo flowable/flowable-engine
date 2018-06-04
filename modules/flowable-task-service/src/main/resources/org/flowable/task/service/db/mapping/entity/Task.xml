@@ -517,9 +517,9 @@
   </sql>
 
   <sql id="commonSelectTaskByQueryCriteriaSql">
-    <if test="candidateUser != null || candidateGroups != null || bothCandidateAndAssigned || involvedUser != null || involvedGroups !=null">
+    <if test="isIdentityLinkJoinNeeded">
       <choose>
-        <when test="bothCandidateAndAssigned || involvedUser != null || involvedGroups != null">left</when>
+        <when test="bothCandidateAndAssigned">left</when>
         <otherwise>inner</otherwise>
       </choose>
       join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
@@ -537,12 +537,8 @@
       </if>       
     </foreach>
     <foreach collection="orQueryObjects" index="orIndex" item="orQueryObject">
-      <if test="orQueryObject.involvedUser != null || orQueryObject.candidateUser != null || orQueryObject.candidateGroups != null || orQueryObject.bothCandidateAndAssigned || orQueryObject.involvedGroups">
-        <choose>
-          <when test="orQueryObject.involvedUser != null || orQueryObject.bothCandidateAndAssigned || ( (orQueryObject.assignee != null || orQueryObject.owner != null || orQueryObject.ownerLike != null || orQueryObject.ownerLikeIgnoreCase != null || orQueryObject.assigneeLike != null || orQueryObject.assigneeLikeIgnoreCase != null || orQueryObject.assigneeIds !=null) &amp;&amp; orQueryObject.involvedGroups != null)">left</when>
-          <otherwise>inner</otherwise>
-        </choose>
-        join ${prefix}ACT_RU_IDENTITYLINK I_OR${orIndex} on I_OR${orIndex}.TASK_ID_ = RES.ID_
+      <if test="orQueryObject.isIdentityLinkJoinNeeded">
+        left join ${prefix}ACT_RU_IDENTITYLINK I_OR${orIndex} on I_OR${orIndex}.TASK_ID_ = RES.ID_
       </if>
       <if test="orQueryObject.queryVariableValues.size() &gt; 0">
         <if test="orQueryObject.hasValueComparisonQueryVariables()">
