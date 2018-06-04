@@ -15,7 +15,11 @@ package org.flowable.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
@@ -32,7 +36,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -209,14 +212,14 @@ public class HttpActivityExecutor {
         }
 
         try {
-            URIBuilder uri = new URIBuilder(requestInfo.getUrl());
+            URI uri = ensureUrlIsEncodedAndConvertToUri(new URL(requestInfo.getUrl()));
             switch (requestInfo.getMethod()) {
                 case "GET": {
-                    request = new HttpGet(uri.toString());
+                    request = new HttpGet(uri);
                     break;
                 }
                 case "POST": {
-                    HttpPost post = new HttpPost(uri.toString());
+                    HttpPost post = new HttpPost(uri);
                     if (requestInfo.getBody() != null) {
                         post.setEntity(new StringEntity(requestInfo.getBody()));
                     }
@@ -224,13 +227,13 @@ public class HttpActivityExecutor {
                     break;
                 }
                 case "PUT": {
-                    HttpPut put = new HttpPut(uri.toString());
+                    HttpPut put = new HttpPut(uri);
                     put.setEntity(new StringEntity(requestInfo.getBody()));
                     request = put;
                     break;
                 }
                 case "DELETE": {
-                    request = new HttpDelete(uri.toString());
+                    request = new HttpDelete(uri);
                     break;
                 }
                 default: {
@@ -331,6 +334,25 @@ public class HttpActivityExecutor {
                     throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID);
                 }
             }
+        }
+    }
+
+    protected URI ensureUrlIsEncodedAndConvertToUri(URL url) throws URISyntaxException {
+        String decodedPath = decode(url.getPath());
+        String decodedQuery = decode(url.getQuery());
+        String decodedRef = decode(url.getRef());
+
+        return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), decodedPath, decodedQuery, decodedRef);
+    }
+
+    protected String decode(String string) {
+        if (string == null) {
+            return null;
+        }
+        try {
+            return URLDecoder.decode(string, "UTF-8");
+        } catch (UnsupportedEncodingException unsupportedEncodingException) {
+            throw new IllegalStateException("JVM does not support UTF-8 encoding.", unsupportedEncodingException);
         }
     }
 
