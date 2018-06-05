@@ -28,24 +28,23 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobsByExecutionIdMatcher;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implements JobDataManager {
-
-    protected String jobExecutionScope;
     
+    protected JobServiceConfiguration jobServiceConfiguration;
+
     protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
     
     public MybatisJobDataManager() {
         
     }
     
-    public MybatisJobDataManager(String jobExecutionScope) {
-        this.jobExecutionScope = jobExecutionScope;
+    public MybatisJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -62,7 +61,7 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     @SuppressWarnings("unchecked")
     public List<JobEntity> findJobsToExecute(Page page) {
         HashMap<String, Object> params = new HashMap<>();
-        params.put("jobExecutionScope", jobExecutionScope);
+        params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
         
         return getDbSqlSession().selectList("selectJobsToExecute", params, page);
     }
@@ -89,9 +88,7 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     @SuppressWarnings("unchecked")
     public List<JobEntity> findExpiredJobs(Page page) {
         Map<String, Object> params = new HashMap<>();
-        
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration();
-        params.put("jobExecutionScope", jobExecutionScope);
+        params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
         Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
@@ -123,7 +120,7 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     public void resetExpiredJob(String jobId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);
-        params.put("now", CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime());
+        params.put("now", jobServiceConfiguration.getClock().getCurrentTime());
         getDbSqlSession().update("resetExpiredJob", params);
     }
     
@@ -135,14 +132,6 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         } else {
             bulkDelete("deleteJobsByExecutionId", jobsByExecutionIdMatcher, executionId);
         }
-    }
-
-    public String getJobExecutionScope() {
-        return jobExecutionScope;
-    }
-
-    public void setJobExecutionScope(String jobExecutionScope) {
-        this.jobExecutionScope = jobExecutionScope;
     }
 
 }

@@ -4,7 +4,6 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
-import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.SecurityAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
@@ -15,6 +14,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +47,7 @@ public class SecurityAutoConfigurationTest {
 
     @Configuration
     @Import({ DataSourceAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
             IdmEngineAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
             IdmEngineServicesAutoConfiguration.class,

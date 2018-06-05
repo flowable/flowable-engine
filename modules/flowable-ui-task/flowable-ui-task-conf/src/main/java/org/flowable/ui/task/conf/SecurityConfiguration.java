@@ -14,7 +14,6 @@ package org.flowable.ui.task.conf;
 
 import java.util.Collections;
 
-import org.flowable.ui.common.filter.FlowableCookieFilterCallback;
 import org.flowable.ui.common.filter.FlowableCookieFilterRegistrationBean;
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
@@ -24,7 +23,6 @@ import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.service.idm.RemoteIdmService;
 import org.flowable.ui.task.properties.FlowableTaskAppProperties;
 import org.flowable.ui.task.security.AjaxLogoutSuccessHandler;
-import org.flowable.ui.task.security.EngineAuthenticationCookieFilterCallback;
 import org.flowable.ui.task.security.RemoteIdmAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,11 +64,6 @@ public class SecurityConfiguration {
         registrationBean.addUrlPatterns("/app/*");
         registrationBean.setRequiredPrivileges(Collections.singletonList(DefaultPrivileges.ACCESS_TASK));
         return registrationBean;
-    }
-
-    @Bean
-    public FlowableCookieFilterCallback flowableCookieFilterCallback() {
-        return new EngineAuthenticationCookieFilterCallback();
     }
 
     @Autowired

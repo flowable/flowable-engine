@@ -13,18 +13,28 @@
 
 package org.flowable.common.engine.impl.identity;
 
+import org.flowable.common.engine.api.identity.AuthenticationContext;
+
 /**
  * @author Tom Baeyens
  */
 public abstract class Authentication {
 
-    static ThreadLocal<String> authenticatedUserIdThreadLocal = new ThreadLocal<>();
+    private static AuthenticationContext authenticationContext = new UserIdAuthenticationContext();
 
     public static void setAuthenticatedUserId(String authenticatedUserId) {
-        authenticatedUserIdThreadLocal.set(authenticatedUserId);
+        authenticationContext.setPrincipal(authenticatedUserId == null ? null : new UserIdPrincipal(authenticatedUserId));
     }
 
     public static String getAuthenticatedUserId() {
-        return authenticatedUserIdThreadLocal.get();
+        return authenticationContext.getAuthenticatedUserId();
+    }
+
+    public static AuthenticationContext getAuthenticationContext() {
+        return authenticationContext;
+    }
+
+    public static void setAuthenticationContext(AuthenticationContext authenticationContext) {
+        Authentication.authenticationContext = authenticationContext;
     }
 }

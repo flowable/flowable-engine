@@ -60,7 +60,6 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
                 grantedAuthorities.add(new SimpleGrantedAuthority(SecurityConstants.PRIVILEGE_ACCESS_REST_API));
             }
             
-            identityService.setAuthenticatedUserId(userId);
             return new UsernamePasswordAuthenticationToken(userId, password, grantedAuthorities);
         } else {
             throw new BadCredentialsException("Authentication failed for this username and password");

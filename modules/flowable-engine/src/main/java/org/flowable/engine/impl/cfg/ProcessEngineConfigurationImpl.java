@@ -18,12 +18,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -75,7 +73,6 @@ import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
-import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DefaultCandidateManager;
 import org.flowable.engine.DynamicBpmnService;
@@ -458,17 +455,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     
     protected DynamicStateManager dynamicStateManager;
     
-    // CONFIGURATORS ////////////////////////////////////////////////////////////
-
-    protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
-    protected List<EngineConfigurator> configurators; // The injected configurators
-    protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
-
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected JobServiceConfiguration jobServiceConfiguration;
-    protected EngineConfigurator idmEngineConfigurator;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -695,6 +685,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean isAsyncHistoryExecutorResetExpiredJobsEnabled = true;
     
     protected String jobExecutionScope;
+    protected String historyJobExecutionScope;
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
@@ -876,6 +867,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
         initProcessDiagramGenerator();
@@ -1252,13 +1244,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initAsyncHistorySessionFactory() {
-        AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
-        if (asyncHistoryListener == null) {
-            initDefaultAsyncHistoryListener();
+        if (!sessionFactories.containsKey(AsyncHistorySession.class)) {
+            AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
+            if (asyncHistoryListener == null) {
+                initDefaultAsyncHistoryListener();
+            }
+            asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
+            sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
         }
-        asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
-        asyncHistorySessionFactory.registerJobDataTypes(HistoryJsonConstants.ORDERED_TYPES);
-        sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
+        
+        ((AsyncHistorySessionFactory) sessionFactories.get(AsyncHistorySession.class)).registerJobDataTypes(HistoryJsonConstants.ORDERED_TYPES);
     }
 
     protected void initDefaultAsyncHistoryListener() {
@@ -1267,78 +1262,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
         asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
         asyncHistoryListener = asyncHistoryJobProducer;
-    }
-
-    public void initConfigurators() {
-
-        allConfigurators = new ArrayList<>();
-
-        if (!disableIdmEngine) {
-            if (idmEngineConfigurator != null) {
-                allConfigurators.add(idmEngineConfigurator);
-            } else {
-                allConfigurators.add(new IdmEngineConfigurator());
-            }
-        }
-
-        // Configurators that are explicitly added to the config
-        if (configurators != null) {
-            allConfigurators.addAll(configurators);
-        }
-
-        // Auto discovery through ServiceLoader
-        if (enableConfiguratorServiceLoader) {
-            ClassLoader classLoader = getClassLoader();
-            if (classLoader == null) {
-                classLoader = ReflectUtil.getClassLoader();
-            }
-
-            ServiceLoader<EngineConfigurator> configuratorServiceLoader = ServiceLoader.load(EngineConfigurator.class, classLoader);
-            int nrOfServiceLoadedConfigurators = 0;
-            for (EngineConfigurator configurator : configuratorServiceLoader) {
-                allConfigurators.add(configurator);
-                nrOfServiceLoadedConfigurators++;
-            }
-
-            if (nrOfServiceLoadedConfigurators > 0) {
-                LOGGER.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
-            }
-
-            if (!allConfigurators.isEmpty()) {
-
-                // Order them according to the priorities (useful for dependent
-                // configurator)
-                Collections.sort(allConfigurators, new Comparator<EngineConfigurator>() {
-                    @Override
-                    public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
-                        int priority1 = configurator1.getPriority();
-                        int priority2 = configurator2.getPriority();
-
-                        if (priority1 < priority2) {
-                            return -1;
-                        } else if (priority1 > priority2) {
-                            return 1;
-                        }
-                        return 0;
-                    }
-                });
-
-                // Execute the configurators
-                LOGGER.info("Found {} Engine Configurators in total:", allConfigurators.size());
-                for (EngineConfigurator configurator : allConfigurators) {
-                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
-                }
-
-            }
-
-        }
-    }
-
-    public void configuratorsBeforeInit() {
-        for (EngineConfigurator configurator : allConfigurators) {
-            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
-            configurator.beforeInit(this);
-        }
     }
 
     public void initVariableServiceConfiguration() {
@@ -1429,76 +1352,111 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initJobServiceConfiguration() {
-        this.jobServiceConfiguration = new JobServiceConfiguration();
-        this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
-        this.jobServiceConfiguration.setClock(this.clock);
-        this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
-        this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
-        this.jobServiceConfiguration.setExpressionManager(this.expressionManager);
-        this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
-
-        this.jobServiceConfiguration.setJobHandlers(this.jobHandlers);
-        this.jobServiceConfiguration.setHistoryJobHandlers(this.historyJobHandlers);
-        this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
-
-        List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
-        if (customAsyncRunnableExecutionExceptionHandlers != null) {
-            exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
-        }
-
-        if (addDefaultExceptionHandler) {
-            exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
-        }
-
-        if (internalJobParentStateResolver != null) {
-            this.jobServiceConfiguration.setJobParentStateResolver(internalJobParentStateResolver); 
-        } else {
-            this.jobServiceConfiguration.setJobParentStateResolver(new DefaultProcessJobParentStateResolver(this));
-        }
-
-        this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
-        this.jobServiceConfiguration.setAsyncExecutorNumberOfRetries(this.asyncExecutorNumberOfRetries);
-        this.jobServiceConfiguration.setAsyncExecutorResetExpiredJobsMaxTimeout(this.asyncExecutorResetExpiredJobsMaxTimeout);
-
-        if (this.jobManager != null) {
-            this.jobServiceConfiguration.setJobManager(this.jobManager);
-        }
-
-        if (this.internalJobManager != null) {
-            this.jobServiceConfiguration.setInternalJobManager(this.internalJobManager);
-        } else {
-            this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalJobManager(this));
+        if (jobServiceConfiguration == null) {
+            this.jobServiceConfiguration = new JobServiceConfiguration();
+            this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
+            this.jobServiceConfiguration.setClock(this.clock);
+            this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
+            this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+            this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
+            this.jobServiceConfiguration.setExpressionManager(this.expressionManager);
+            this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
+    
+            this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
+    
+            List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
+            if (customAsyncRunnableExecutionExceptionHandlers != null) {
+                exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
+            }
+    
+            if (addDefaultExceptionHandler) {
+                exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
+            }
+    
+            if (internalJobParentStateResolver != null) {
+                this.jobServiceConfiguration.setJobParentStateResolver(internalJobParentStateResolver); 
+            } else {
+                this.jobServiceConfiguration.setJobParentStateResolver(new DefaultProcessJobParentStateResolver(this));
+            }
+    
+            this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
+            this.jobServiceConfiguration.setAsyncExecutorNumberOfRetries(this.asyncExecutorNumberOfRetries);
+            this.jobServiceConfiguration.setAsyncExecutorResetExpiredJobsMaxTimeout(this.asyncExecutorResetExpiredJobsMaxTimeout);
+    
+            if (this.jobManager != null) {
+                this.jobServiceConfiguration.setJobManager(this.jobManager);
+            }
+    
+            if (this.internalJobManager != null) {
+                this.jobServiceConfiguration.setInternalJobManager(this.internalJobManager);
+            } else {
+                this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalJobManager(this));
+            }
+            
+            if (this.internalJobCompatibilityManager != null) {
+                this.jobServiceConfiguration.setInternalJobCompatibilityManager(internalJobCompatibilityManager);
+            } else {
+                this.jobServiceConfiguration.setInternalJobCompatibilityManager(new DefaultInternalJobCompatibilityManager(this));
+            }
+    
+            // set the job processors
+            this.jobServiceConfiguration.setJobProcessors(this.jobProcessors);
+            this.jobServiceConfiguration.setHistoryJobProcessors(this.historyJobProcessors);
+            
+            this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
+            this.jobServiceConfiguration.setHistoryJobExecutionScope(this.historyJobExecutionScope);
+    
+            this.jobServiceConfiguration.init();
         }
         
-        if (this.internalJobCompatibilityManager != null) {
-            this.jobServiceConfiguration.setInternalJobCompatibilityManager(internalJobCompatibilityManager);
-        } else {
-            this.jobServiceConfiguration.setInternalJobCompatibilityManager(new DefaultInternalJobCompatibilityManager(this));
+        if (this.jobHandlers != null) {
+            for (String type : this.jobHandlers.keySet()) {
+                this.jobServiceConfiguration.addJobHandler(type, this.jobHandlers.get(type));
+            }
         }
-
-        // set the job processors
-        this.jobServiceConfiguration.setJobProcessors(this.jobProcessors);
-        this.jobServiceConfiguration.setHistoryJobProcessors(this.historyJobProcessors);
         
-        this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
-
-        this.jobServiceConfiguration.init();
-
+        if (this.historyJobHandlers != null) {
+            for (String type : this.historyJobHandlers.keySet()) {
+                this.jobServiceConfiguration.addHistoryJobHandler(type, this.historyJobHandlers.get(type));
+            }
+        }
+        
         addServiceConfiguration(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, this.jobServiceConfiguration);
     }
-
-    public void configuratorsAfterInit() {
-        for (EngineConfigurator configurator : allConfigurators) {
-            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
-            configurator.configure(this);
+    
+    public void addJobHandler(JobHandler jobHandler) {
+        this.jobHandlers.put(jobHandler.getType(), jobHandler);
+        if (this.jobServiceConfiguration != null) {
+            this.jobServiceConfiguration.addJobHandler(jobHandler.getType(), jobHandler);
         }
     }
+    
+    public void removeJobHandler(String jobHandlerType) {
+        this.jobHandlers.remove(jobHandlerType);
+        if (this.jobServiceConfiguration != null) {
+            this.jobServiceConfiguration.getJobHandlers().remove(jobHandlerType);
+        }
+    }
+    
+    public void addHistoryJobHandler(HistoryJobHandler historyJobHandler) {
+        this.historyJobHandlers.put(historyJobHandler.getType(), historyJobHandler);
+        if (this.jobServiceConfiguration != null) {
+            this.jobServiceConfiguration.addHistoryJobHandler(historyJobHandler.getType(), historyJobHandler);
+        }
+    }
+
 
     public void afterInitTaskServiceConfiguration() {
         if (engineConfigurations.containsKey(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)) {
             IdmEngineConfiguration idmEngineConfiguration = (IdmEngineConfiguration) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
             this.taskServiceConfiguration.setIdmIdentityService(idmEngineConfiguration.getIdmIdentityService());
+        }
+    }
+    
+    public void removeHistoryJobHandler(String historyJobHandlerType) {
+        this.historyJobHandlers.remove(historyJobHandlerType);
+        if (this.jobServiceConfiguration != null) {
+            this.jobServiceConfiguration.getHistoryJobHandlers().remove(historyJobHandlerType);
         }
     }
 
@@ -1918,56 +1876,75 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initAsyncHistoryExecutor() {
-        if (isAsyncHistoryEnabled && asyncHistoryExecutor == null) {
-            DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
-
-            // Message queue mode
-            defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
-
-            // Thread pool config
-            defaultAsyncHistoryExecutor.setCorePoolSize(asyncHistoryExecutorCorePoolSize);
-            defaultAsyncHistoryExecutor.setMaxPoolSize(asyncHistoryExecutorMaxPoolSize);
-            defaultAsyncHistoryExecutor.setKeepAliveTime(asyncHistoryExecutorThreadKeepAliveTime);
-
-            // Threadpool queue
-            if (asyncHistoryExecutorThreadPoolQueue != null) {
-                defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
+        if (isAsyncHistoryEnabled) {
+            if (asyncHistoryExecutor == null) {
+                DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
+    
+                // Message queue mode
+                defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
+    
+                // Thread pool config
+                defaultAsyncHistoryExecutor.setCorePoolSize(asyncHistoryExecutorCorePoolSize);
+                defaultAsyncHistoryExecutor.setMaxPoolSize(asyncHistoryExecutorMaxPoolSize);
+                defaultAsyncHistoryExecutor.setKeepAliveTime(asyncHistoryExecutorThreadKeepAliveTime);
+    
+                // Threadpool queue
+                if (asyncHistoryExecutorThreadPoolQueue != null) {
+                    defaultAsyncHistoryExecutor.setThreadPoolQueue(asyncHistoryExecutorThreadPoolQueue);
+                }
+                defaultAsyncHistoryExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
+                
+                // Thread flags
+                defaultAsyncHistoryExecutor.setAsyncJobAcquisitionEnabled(isAsyncHistoryExecutorAsyncJobAcquisitionEnabled);
+                defaultAsyncHistoryExecutor.setTimerJobAcquisitionEnabled(isAsyncHistoryExecutorTimerJobAcquisitionEnabled);
+                defaultAsyncHistoryExecutor.setResetExpiredJobEnabled(isAsyncHistoryExecutorResetExpiredJobsEnabled);
+    
+                // Acquisition wait time
+                defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime);
+    
+                // Queue full wait time
+                defaultAsyncHistoryExecutor.setDefaultQueueSizeFullWaitTimeInMillis(asyncHistoryExecutorDefaultQueueSizeFullWaitTime);
+    
+                // Job locking
+                defaultAsyncHistoryExecutor.setAsyncJobLockTimeInMillis(asyncHistoryExecutorAsyncJobLockTimeInMillis);
+                if (asyncHistoryExecutorLockOwner != null) {
+                    defaultAsyncHistoryExecutor.setLockOwner(asyncHistoryExecutorLockOwner);
+                }
+    
+                // Reset expired
+                defaultAsyncHistoryExecutor.setResetExpiredJobsInterval(asyncHistoryExecutorResetExpiredJobsInterval);
+                defaultAsyncHistoryExecutor.setResetExpiredJobsPageSize(asyncHistoryExecutorResetExpiredJobsPageSize);
+    
+                // Shutdown
+                defaultAsyncHistoryExecutor.setSecondsToWaitOnShutdown(asyncHistoryExecutorSecondsToWaitOnShutdown);
+    
+                asyncHistoryExecutor = defaultAsyncHistoryExecutor;
+                
+                if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
+                    asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
+                }
+                asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
+                
+            } else {
+                // In case an async history executor was injected, only the job handlers are set. 
+                // In the normal case, these are set on the jobServiceConfiguration, but these are not shared between instances
+                if (historyJobHandlers != null) {
+                    if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
+                        asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
+                    }
+                    historyJobHandlers.forEach((type, handler) -> {
+                        asyncHistoryExecutor.getJobServiceConfiguration().mergeHistoryJobHandler(handler); 
+                    });
+                }
+                
             }
-            defaultAsyncHistoryExecutor.setQueueSize(asyncHistoryExecutorThreadPoolQueueSize);
             
-            // Thread flags
-            defaultAsyncHistoryExecutor.setAsyncJobAcquisitionEnabled(isAsyncHistoryExecutorAsyncJobAcquisitionEnabled);
-            defaultAsyncHistoryExecutor.setTimerJobAcquisitionEnabled(isAsyncHistoryExecutorTimerJobAcquisitionEnabled);
-            defaultAsyncHistoryExecutor.setResetExpiredJobEnabled(isAsyncHistoryExecutorResetExpiredJobsEnabled);
-
-            // Acquisition wait time
-            defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime);
-
-            // Queue full wait time
-            defaultAsyncHistoryExecutor.setDefaultQueueSizeFullWaitTimeInMillis(asyncHistoryExecutorDefaultQueueSizeFullWaitTime);
-
-            // Job locking
-            defaultAsyncHistoryExecutor.setAsyncJobLockTimeInMillis(asyncHistoryExecutorAsyncJobLockTimeInMillis);
-            if (asyncHistoryExecutorLockOwner != null) {
-                defaultAsyncHistoryExecutor.setLockOwner(asyncHistoryExecutorLockOwner);
-            }
-
-            // Reset expired
-            defaultAsyncHistoryExecutor.setResetExpiredJobsInterval(asyncHistoryExecutorResetExpiredJobsInterval);
-            defaultAsyncHistoryExecutor.setResetExpiredJobsPageSize(asyncHistoryExecutorResetExpiredJobsPageSize);
-
-            // Shutdown
-            defaultAsyncHistoryExecutor.setSecondsToWaitOnShutdown(asyncHistoryExecutorSecondsToWaitOnShutdown);
-
-            asyncHistoryExecutor = defaultAsyncHistoryExecutor;
         }
 
         if (asyncHistoryExecutor != null) {
-            asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
-            asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
+            jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
+            jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
         }
-        jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
-        jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
     }
 
     // history
@@ -2309,6 +2286,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         };
     }
+    
+    @Override
+    protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
+        if (!disableIdmEngine) {
+            List<EngineConfigurator> specificConfigurators = new ArrayList<>();
+            if (idmEngineConfigurator != null) {
+                specificConfigurators.add(idmEngineConfigurator);
+            } else {
+                specificConfigurators.add(new IdmEngineConfigurator());
+            }
+            return specificConfigurators;
+        }
+        return Collections.emptyList();
+    }
+    
+    public ProcessEngineConfigurationImpl addConfigurator(EngineConfigurator configurator) {
+        super.addConfigurator(configurator);
+        return this;
+    }
 
     // getters and setters
     // //////////////////////////////////////////////////////
@@ -2472,40 +2468,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public ProcessEngineConfigurationImpl setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
         this.sessionFactories = sessionFactories;
-        return this;
-    }
-
-    public List<EngineConfigurator> getConfigurators() {
-        return configurators;
-    }
-
-    public ProcessEngineConfigurationImpl addConfigurator(EngineConfigurator configurator) {
-        if (this.configurators == null) {
-            this.configurators = new ArrayList<>();
-        }
-        this.configurators.add(configurator);
-        return this;
-    }
-
-    public ProcessEngineConfigurationImpl setConfigurators(List<EngineConfigurator> configurators) {
-        this.configurators = configurators;
-        return this;
-    }
-
-    public void setEnableConfiguratorServiceLoader(boolean enableConfiguratorServiceLoader) {
-        this.enableConfiguratorServiceLoader = enableConfiguratorServiceLoader;
-    }
-
-    public List<EngineConfigurator> getAllConfigurators() {
-        return allConfigurators;
-    }
-
-    public EngineConfigurator getIdmEngineConfigurator() {
-        return idmEngineConfigurator;
-    }
-
-    public ProcessEngineConfigurationImpl setIdmEngineConfigurator(EngineConfigurator idmEngineConfigurator) {
-        this.idmEngineConfigurator = idmEngineConfigurator;
         return this;
     }
 
@@ -3398,10 +3360,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public boolean isEnableConfiguratorServiceLoader() {
-        return enableConfiguratorServiceLoader;
-    }
-
     public AttachmentEntityManager getAttachmentEntityManager() {
         return attachmentEntityManager;
     }
@@ -4089,6 +4047,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobExecutionScope = jobExecutionScope;
         return this;
     }
+    
+    public String getHistoryJobExecutionScope() {
+        return historyJobExecutionScope;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoryJobExecutionScope(String historyJobExecutionScope) {
+        this.historyJobExecutionScope = historyJobExecutionScope;
+        return this;
+    }
 
     public int getAsyncHistoryExecutorCorePoolSize() {
         return asyncHistoryExecutorCorePoolSize;
@@ -4257,6 +4224,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAsyncHistoryExecutorResetExpiredJobsEnabled(boolean isAsyncHistoryExecutorResetExpiredJobsEnabled) {
         this.isAsyncHistoryExecutorResetExpiredJobsEnabled = isAsyncHistoryExecutorResetExpiredJobsEnabled;
+        return this;
+    }
+
+    public JobServiceConfiguration getJobServiceConfiguration() {
+        return jobServiceConfiguration;
+    }
+
+    public ProcessEngineConfigurationImpl setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
         return this;
     }
     

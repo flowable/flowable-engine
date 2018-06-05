@@ -220,6 +220,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     // /////////////////////////////////////////////////////////////////////
 
     protected void init() {
+        initEngineConfigurations();
         initFunctionDelegates();
         initExpressionManager();
         initCommandContextFactory();

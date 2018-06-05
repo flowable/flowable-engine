@@ -32,13 +32,13 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
     @Override
     public void setUp() throws Exception {
-        processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
+        processEngineConfiguration.addJobHandler(tweetExceptionHandler);
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 
     @Override
     public void tearDown() throws Exception {
-        processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
+        processEngineConfiguration.removeJobHandler(tweetExceptionHandler.getType());
     }
 
     public void testJobCommandsWith2Exceptions() {

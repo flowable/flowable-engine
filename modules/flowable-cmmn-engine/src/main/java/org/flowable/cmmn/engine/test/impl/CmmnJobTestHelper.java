@@ -57,7 +57,7 @@ public class CmmnJobTestHelper {
             
             @Override
             public Boolean call() throws Exception {
-                return cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().list().size() > 0;
+                return cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().count() > 0;
             }
             
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);

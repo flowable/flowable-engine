@@ -30,6 +30,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLinkInfo;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
@@ -639,15 +640,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).taskInvolvedUser("fozzie").count());
 
         } finally {
-            List<org.flowable.task.api.Task> allTasks = taskService.createTaskQuery().list();
-            for (org.flowable.task.api.Task task : allTasks) {
-                if (task.getExecutionId() == null) {
-                    taskService.deleteTask(task.getId());
-                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                        historyService.deleteHistoricTaskInstance(task.getId());
-                    }
-                }
-            }
+            deleteAllTasks();
         }
     }
 
@@ -665,16 +658,521 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("kermit").count());
             assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("fozzie").count());
 
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("fozzie").count());
+
         } finally {
-            List<org.flowable.task.api.Task> allTasks = taskService.createTaskQuery().list();
-            for (org.flowable.task.api.Task task : allTasks) {
-                if (task.getExecutionId() == null) {
-                    taskService.deleteTask(task.getId());
-                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                        historyService.deleteHistoricTaskInstance(task.getId());
-                    }
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroups() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).taskInvolvedGroups(Collections.singleton("testGroup")).count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupOr() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedGroups(Collections.singleton("testGroup")).count());
+
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedGroups(Collections.singleton("testGroup")).count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    private void deleteAllTasks() {
+        List<org.flowable.task.api.Task> allTasks = taskService.createTaskQuery().list();
+        for (org.flowable.task.api.Task task : allTasks) {
+            if (task.getExecutionId() == null) {
+                taskService.deleteTask(task.getId());
+                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                    historyService.deleteHistoricTaskInstance(task.getId());
                 }
             }
+        }
+    }
+
+    public void testQueryByInvolvedGroupOrAssignee() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setAssignee("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(2, taskService.createTaskQuery().
+                or().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
+
+            assertEquals(2, historyService.createHistoricTaskInstanceQuery().
+                or().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupOrOwner() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setOwner("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(2, taskService.createTaskQuery().
+                or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
+
+            assertEquals(2, historyService.createHistoricTaskInstanceQuery().
+                or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupAndAssignee() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setAssignee("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setAssignee("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.createTaskQuery().
+                taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupAndOwner() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setOwner("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setOwner("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(1, taskService.createTaskQuery().
+                taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupAndOwnerLike() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setOwner("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setOwner("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(1, taskService.createTaskQuery().
+                taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupAndAssigneeLike() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setAssignee("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setAssignee("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(1, taskService.createTaskQuery().
+                taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupAndAssigneeIds() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setAssignee("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setAssignee("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(1, taskService.getIdentityLinksForTask(adhocTask.getId()).size());
+
+            assertEquals(1, taskService.createTaskQuery().
+                taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupOrOwnerLike() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setOwner("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setOwner("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(3, taskService.createTaskQuery().
+                or().
+                    taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+            assertEquals(3, historyService.createHistoricTaskInstanceQuery().
+                or().
+                    taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupOrAssigneeLike() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setAssignee("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setAssignee("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(3, taskService.createTaskQuery().
+                or().
+                    taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+            assertEquals(3, historyService.createHistoricTaskInstanceQuery().
+                or().
+                    taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupOrAssigneeIds() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setAssignee("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setAssignee("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(3, taskService.createTaskQuery().
+                or().
+                    taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+            assertEquals(3, historyService.createHistoricTaskInstanceQuery().
+                or().
+                    taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupOrAssigneeId() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setAssignee("kermit");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            adhocTask3.setAssignee("kermit");
+            taskService.saveTask(adhocTask3);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+
+            assertEquals(3, taskService.createTaskQuery().
+                or().
+                    taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+            assertEquals(3, historyService.createHistoricTaskInstanceQuery().
+                or().
+                    taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByInvolvedGroupTaskName() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setName("testName");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            taskService.saveTask(adhocTask3);
+            org.flowable.task.api.Task adhocTask4 = taskService.newTask();
+            adhocTask4.setName("testName");
+            taskService.saveTask(adhocTask4);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", "customType");
+            taskService.addGroupIdentityLink(adhocTask4.getId(), "testGroup", "customType");
+
+            assertEquals(4, taskService.createTaskQuery().
+                or().
+                    taskName("testName").
+                    taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+            assertEquals(1, taskService.createTaskQuery().
+                    taskName("testName").
+                    taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+            assertEquals(4, historyService.createHistoricTaskInstanceQuery().
+                or().
+                    taskName("testName").
+                    taskInvolvedGroups(Collections.singleton("testGroup")).
+                endOr().
+                count());
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                    taskName("testName").
+                    taskInvolvedGroups(Collections.singleton("testGroup")).
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByCandidateGroupsTaskName() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setName("testName");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            taskService.saveTask(adhocTask3);
+            org.flowable.task.api.Task adhocTask4 = taskService.newTask();
+            adhocTask4.setName("testName");
+            taskService.saveTask(adhocTask4);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+            taskService.addGroupIdentityLink(adhocTask4.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+
+            assertEquals(4, taskService.createTaskQuery().
+                or().
+                    taskName("testName").
+                    taskCandidateGroupIn(Collections.singletonList("testGroup")).
+                endOr().
+                count());
+            assertEquals(1, taskService.createTaskQuery().
+                    taskName("testName").
+                    taskCandidateGroupIn(Collections.singletonList("testGroup")).
+                count());
+            assertEquals(4, historyService.createHistoricTaskInstanceQuery().
+                or().
+                    taskName("testName").
+                    taskCandidateGroupIn(Collections.singletonList("testGroup")).
+                endOr().
+                count());
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                    taskName("testName").
+                    taskCandidateGroupIn(Collections.singletonList("testGroup")).
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByCandidateUserTaskName() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setName("testName");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            taskService.saveTask(adhocTask3);
+            org.flowable.task.api.Task adhocTask4 = taskService.newTask();
+            adhocTask4.setName("testName");
+            taskService.saveTask(adhocTask4);
+            taskService.addUserIdentityLink(adhocTask.getId(), "homer", IdentityLinkType.CANDIDATE);
+            taskService.addUserIdentityLink(adhocTask3.getId(), "homer", IdentityLinkType.CANDIDATE);
+            taskService.addUserIdentityLink(adhocTask4.getId(), "homer", IdentityLinkType.CANDIDATE);
+
+            assertEquals(4, taskService.createTaskQuery().
+                or().
+                    taskName("testName").
+                    taskCandidateUser("homer").
+                endOr().
+                count());
+            assertEquals(1, taskService.createTaskQuery().
+                taskName("testName").
+                taskCandidateUser("homer").
+                count());
+            assertEquals(4, historyService.createHistoricTaskInstanceQuery().
+                or().
+                    taskName("testName").
+                    taskCandidateUser("homer").
+                endOr().
+                count());
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                taskName("testName").
+                taskCandidateUser("homer").
+                count());
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    public void testQueryByCandidateGroupTaskName() {
+        try {
+            org.flowable.task.api.Task adhocTask = taskService.newTask();
+            taskService.saveTask(adhocTask);
+            org.flowable.task.api.Task adhocTask2 = taskService.newTask();
+            adhocTask2.setName("testName");
+            taskService.saveTask(adhocTask2);
+            org.flowable.task.api.Task adhocTask3 = taskService.newTask();
+            taskService.saveTask(adhocTask3);
+            org.flowable.task.api.Task adhocTask4 = taskService.newTask();
+            adhocTask4.setName("testName");
+            taskService.saveTask(adhocTask4);
+            taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+            taskService.addGroupIdentityLink(adhocTask3.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+            taskService.addGroupIdentityLink(adhocTask4.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+
+            assertEquals(4, taskService.createTaskQuery().
+                or().
+                    taskName("testName").
+                    taskCandidateGroup("testGroup").
+                endOr().
+                count());
+            assertEquals(1, taskService.createTaskQuery().
+                taskName("testName").
+                taskCandidateGroup("testGroup").
+                count());
+            assertEquals(4, historyService.createHistoricTaskInstanceQuery().
+                or().
+                    taskName("testName").
+                    taskCandidateGroup("testGroup").
+                endOr().
+                count());
+            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                taskName("testName").
+                taskCandidateGroup("testGroup").
+                count());
+
+        } finally {
+            deleteAllTasks();
         }
     }
 

@@ -15,6 +15,7 @@ package org.flowable.task.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -60,6 +61,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String assigneeLikeIgnoreCase;
     protected List<String> assigneeIds;
     protected String involvedUser;
+    protected Set<String> involvedGroups;
     protected String owner;
     protected String ownerLike;
     protected String ownerLikeIgnoreCase;
@@ -120,6 +122,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean orActive;
     protected List<TaskQueryImpl> orQueryObjects = new ArrayList<>();
     protected TaskQueryImpl currentOrQueryObject;
+    private boolean isIdentityLinkJoinNeeded = false;
 
     private List<String> cachedCandidateGroups;
 
@@ -363,7 +366,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             throw new FlowableIllegalArgumentException("AssigneeLike is null");
         }
         if (orActive) {
-            currentOrQueryObject.assigneeLike = assignee;
+            currentOrQueryObject.assigneeLike = assigneeLike;
         } else {
             this.assigneeLike = assigneeLike;
         }
@@ -489,8 +492,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         if (orActive) {
+            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.candidateUser = candidateUser;
         } else {
+            this.isIdentityLinkJoinNeeded = true;
             this.candidateUser = candidateUser;
         }
 
@@ -503,9 +508,29 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             throw new FlowableIllegalArgumentException("Involved user is null");
         }
         if (orActive) {
+            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.involvedUser = involvedUser;
         } else {
+            isIdentityLinkJoinNeeded = true;
             this.involvedUser = involvedUser;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQueryImpl taskInvolvedGroups(Set<String> involvedGroups) {
+        if (involvedGroups == null) {
+            throw new FlowableIllegalArgumentException("Involved groups are null");
+        }
+        if (involvedGroups.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Involved groups are empty");
+        }
+        if (orActive) {
+            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
+            currentOrQueryObject.involvedGroups = involvedGroups;
+        } else {
+            isIdentityLinkJoinNeeded = true;
+            this.involvedGroups = involvedGroups;
         }
         return this;
     }
@@ -521,8 +546,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         if (orActive) {
+            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.candidateGroup = candidateGroup;
         } else {
+            this.isIdentityLinkJoinNeeded = true;
             this.candidateGroup = candidateGroup;
         }
         return this;
@@ -539,9 +566,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
         if (orActive) {
             currentOrQueryObject.bothCandidateAndAssigned = true;
+            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.userIdForCandidateAndAssignee = userIdForCandidateAndAssignee;
         } else {
             this.bothCandidateAndAssigned = true;
+            this.isIdentityLinkJoinNeeded = true;
             this.userIdForCandidateAndAssignee = userIdForCandidateAndAssignee;
         }
 
@@ -563,8 +592,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         if (orActive) {
+            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.candidateGroups = candidateGroups;
         } else {
+            this.isIdentityLinkJoinNeeded = true;
             this.candidateGroups = candidateGroups;
         }
         return this;
@@ -1755,6 +1786,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return involvedUser;
     }
 
+    public Set<String> getInvolvedGroups() {
+        return involvedGroups;
+    }
+
     public String getOwner() {
         return owner;
     }
@@ -1873,6 +1908,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean isOrActive() {
         return orActive;
+    }
+
+    public boolean isIdentityLinkJoinNeeded() {
+        return isIdentityLinkJoinNeeded;
     }
 
     @Override

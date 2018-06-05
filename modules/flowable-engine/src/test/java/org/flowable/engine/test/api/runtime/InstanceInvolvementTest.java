@@ -13,17 +13,35 @@
 
 package org.flowable.engine.test.api.runtime;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.idm.api.Group;
 
 /**
  * @author Marcus Klimstra
  */
 public class InstanceInvolvementTest extends PluggableFlowableTestCase {
+
+    public void setUp() throws Exception {
+        super.setUp();
+        Group testGroup = identityService.newGroup("testGroup");
+        identityService.saveGroup(testGroup);
+        testGroup = identityService.newGroup("testGroup2");
+        identityService.saveGroup(testGroup);
+    }
+
+    public void tearDown() {
+        identityService.deleteGroup("testGroup");
+        identityService.deleteGroup("testGroup2");
+    }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/threeParallelTasks.bpmn20.xml" })
     public void testInvolvements() {
@@ -108,6 +126,436 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "type2");
 
         assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedUser("kermit").count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testInvolvedGroupsWithProcessInstance() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOneInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testTwoInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testTwoInvolvedGroupsInOne() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testNoInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+
+        assertEquals(0L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("nonInvolvedGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOneInvolvedGroupsInMultiple() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        assertEquals(processInstance.getId(),
+            runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOneInvolvedGroupInNone() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.deleteGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(0L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrInvolvedGroupsWithProcessInstance() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrOneInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrTwoInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrTwoInvolvedGroupsInOne() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
+        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrNoInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+
+        assertEquals(0L, runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("nonInvolvedGroup")).endOr().count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrOneInvolvedGroupsInMultiple() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        assertEquals(processInstance.getId(),
+            runtimeService.createProcessInstanceQuery().
+                or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrOneInvolvedGroupInNone() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.deleteGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(0L, runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrOneInvolvedGroupWithUser() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().
+            or().involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOneInvolvedGroupWithUser() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOneInvolvedGroupTogetherWithUser() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(0L, runtimeService.createProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOneInvolvedUserTogetherWithGroup() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(0L, runtimeService.createProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrOneInvolvedUserTogetherWithGroup() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(1L, runtimeService.createProcessInstanceQuery().
+            or().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).
+            endOr().
+            count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testInvolvedGroupsWithHistoricProcessInstance() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOneInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+        
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        assertEquals(processInstance.getId(),
+            historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryTwoInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
+        assertEquals(processInstance.getId(),
+            historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryTwoInvolvedGroupsInOne() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
+        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryNoInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("nonInvolvedGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOneInvolvedGroupsInMultiple() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        assertEquals(processInstance.getId(),
+            historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOneInvolvedGroupInNone() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.deleteGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrInvolvedGroupsWithProcessInstance() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrOneInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrTwoInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
+        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrTwoInvolvedGroupsInOne() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
+        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrNoInvolvedGroupsInTwo() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("nonInvolvedGroup")).endOr().count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrOneInvolvedGroupsInMultiple() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.CANDIDATE);
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        assertEquals(processInstance.getId(),
+            historyService.createHistoricProcessInstanceQuery().
+                or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrOneInvolvedGroupInNone() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.deleteGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrOneInvolvedGroupWithUser() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+            or().involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOneInvolvedGroupWithUser() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOneInvolvedGroupTogetherWithUser() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOneInvolvedUserTogetherWithGroup() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrOneInvolvedUserTogetherWithGroup() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+            or().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).
+            endOr().
+            count());
     }
 
     private void assertNoInvolvement(String userId) {

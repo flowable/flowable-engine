@@ -19,7 +19,6 @@ import javax.persistence.EntityManagerFactory;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.cmmn.Cmmn;
@@ -31,6 +30,7 @@ import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -51,7 +51,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
             ProcessEngineServicesAutoConfiguration.class,
             CmmnEngineAutoConfiguration.class,
             CmmnEngineServicesAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
             DataSourceAutoConfiguration.class,
             TransactionAutoConfiguration.class
         ))

@@ -508,7 +508,15 @@
           exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{involvedUser} and LINK.PROC_INST_ID_ = RES.ID_)
         )
       </if>
-      <if test="startedBy != null">
+        <if test="involvedGroups != null">
+            and EXISTS(
+            select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = RES.ID_ and LINK.GROUP_ID_ in
+            <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
+                #{involvedGroup}
+            </foreach>
+            )
+        </if>
+        <if test="startedBy != null">
         and RES.START_USER_ID_ = #{startedBy}
       </if>
       <if test="superProcessInstanceId != null">
@@ -689,6 +697,14 @@
               exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{orQueryObject.involvedUser} and LINK.PROC_INST_ID_ = RES.ID_)
             )
           </if>
+            <if test="orQueryObject.involvedGroups != null">
+              or EXISTS(
+                    select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = RES.ID_ and LINK.GROUP_ID_ in
+                    <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
+                        #{involvedGroup}
+                    </foreach>
+              )
+            </if>
           <if test="orQueryObject.startedBy != null">
             or RES.START_USER_ID_ = #{orQueryObject.startedBy}
           </if>

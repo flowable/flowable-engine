@@ -209,6 +209,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.flowable</groupId>
+      <artifactId>flowable-spring-security</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>io.swagger</groupId>
       <artifactId>swagger-annotations</artifactId>
     </dependency>

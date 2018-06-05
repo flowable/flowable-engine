@@ -45,6 +45,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceWithoutTenantId();
 
     /**
+     * Select the case instances with which the user with the given id is involved.
+     */
+    CaseInstanceQuery involvedUser(String userId);
+
+    /**
+     * Select the case instances with which the groups with the given ids are involved.
+     */
+    CaseInstanceQuery involvedGroups(Set<String> groupIds);
+
+    /**
      * Only select case instances which have a global variable with the given value. The type of variable is determined based on the value.
      * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      *
@@ -182,6 +192,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      * @return caseInstanceQuery with the flag to retrieve case variables into the response.
      */
     CaseInstanceQuery includeCaseVariables();
+
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    CaseInstanceQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    CaseInstanceQuery endOr();
 
     /**
      * Limit case instance variables
