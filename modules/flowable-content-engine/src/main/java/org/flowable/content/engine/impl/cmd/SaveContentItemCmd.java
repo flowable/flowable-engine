@@ -91,17 +91,13 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
             contentItemEntity.setContentSize(createContentObject.getContentLength());
         }
 
-        if (contentItemEntity.getLastModified() == null) {
-            contentItemEntity.setLastModified(contentEngineConfiguration.getClock().getCurrentTime());
-        }
+        contentItemEntity.setLastModified(contentEngineConfiguration.getClock().getCurrentTime());
 
         if (contentItem.getId() == null) {
             if (contentItemEntity.getCreated() == null) {
                 contentItemEntity.setCreated(contentEngineConfiguration.getClock().getCurrentTime());
             }
-
             CommandContextUtil.getContentItemEntityManager().insert(contentItemEntity);
-
         } else {
             CommandContextUtil.getContentItemEntityManager().update(contentItemEntity);
         }
