@@ -32,7 +32,7 @@ angular.module('flowableModeler')
             var numberOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
             var booleanOperators = ['==', '!='];
             var dateOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
-            var collectionOperators = ['IN', 'NOT IN', 'ANY', 'NOT ANY', '==', '!='];
+            var collectionOperators = ['IN', 'NOT IN', 'ANY', 'NOT ANY', 'CONTAINS', 'NOT CONTAINS', 'CONTAINS ANY', 'NOT CONTAINS ANY', '==', '!='];
             var allOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
             var collectOperators = {
                 'SUM': '+',

@@ -384,12 +384,7 @@ public class DmnJsonConverter {
 
                         String inputExpressionVariable = ruleInputClauseContainer.getInputClause().getInputExpression().getText();
 
-                        String formattedCollectionExpression;
-                        if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
-                            formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
-                        } else {
-                            formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, expressionValue, inputExpressionVariable);
-                        }
+                        String formattedCollectionExpression = DmnJsonConverterUtil.formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
 
                         inputEntry.setText(formattedCollectionExpression);
 

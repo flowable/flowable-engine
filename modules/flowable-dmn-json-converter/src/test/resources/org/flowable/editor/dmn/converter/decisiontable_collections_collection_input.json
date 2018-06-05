@@ -102,6 +102,36 @@
       "1_operator": "IN",
       "1_expression": "\"test,Value1\", \"test,Value2\"",
       "2": "result 4"
+    },
+    {
+      "1_operator": "CONTAINS",
+      "1_expression": "\"testValue\"",
+      "2": "result 1"
+    },
+    {
+      "1_operator": "NOT CONTAINS",
+      "1_expression": "\"testValue\"",
+      "2": "result 2"
+    },
+    {
+      "1_operator": "CONTAINS ANY",
+      "1_expression": "\"testValue1\", \"testValue2\"",
+      "2": "result 3"
+    },
+    {
+      "1_operator": "NOT CONTAINS ANY",
+      "1_expression": "\"testValue1\", \"testValue2\"",
+      "2": "result 4"
+    },
+    {
+      "1_operator": "CONTAINS",
+      "1_expression": "\"testValue1\", \"testValue2\"",
+      "2": "result 5"
+    },
+    {
+      "1_operator": "NOT CONTAINS",
+      "1_expression": "\"testValue1\", \"testValue2\"",
+      "2": "result 6"
     }
   ]
 }

@@ -134,6 +134,24 @@ public class CollectionUtil {
             return !targetCollection.contains(formattedValue);
         }
     }
+    public static boolean in(Object collection, Object value) {
+    	
+    		return contains(value, collection);
+
+    } public static boolean notIn(Object collection, Object value) {
+    	
+    		return notContains(value, collection);
+
+    } public static boolean any(Object collection, Object value) {
+    	
+    		return containsAny(value, collection);
+
+    }
+    public static boolean notAny(Object collection, Object value) {
+
+    		return notContainsAny(value, collection);
+    	
+    }
 
     protected static Collection getTargetCollection(Object collection, Object value) {
         Collection targetCollection;
