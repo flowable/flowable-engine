@@ -296,6 +296,7 @@ import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.form.api.FormFieldHandler;
+import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
@@ -728,6 +729,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskAssignmentManager internalTaskAssignmentManager;
+    protected IdentityLinkEventHandler identityLinkEventHandler;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
     protected InternalJobManager internalJobManager;
     protected InternalJobCompatibilityManager internalJobCompatibilityManager;
@@ -1293,6 +1295,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.identityLinkServiceConfiguration.setClock(this.clock);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.identityLinkServiceConfiguration.setIdentityLinkEventHandler(this.identityLinkEventHandler);
 
         this.identityLinkServiceConfiguration.init();
 
@@ -2665,6 +2668,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setInternalTaskAssignmentManager(InternalTaskAssignmentManager internalTaskAssignmentManager) {
         this.internalTaskAssignmentManager = internalTaskAssignmentManager;
+        return this;
+    }
+
+    public IdentityLinkEventHandler getIdentityLinkEventHandler() {
+        return identityLinkEventHandler;
+    }
+
+    public ProcessEngineConfigurationImpl setIdentityLinkEventHandler(IdentityLinkEventHandler identityLinkEventHandler) {
+        this.identityLinkEventHandler = identityLinkEventHandler;
         return this;
     }
 
