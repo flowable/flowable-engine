@@ -16,7 +16,6 @@ import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
-import org.flowable.identitylink.service.impl.NoOperationIdentityLinkEventHandler;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManagerImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
@@ -66,7 +65,6 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     public void init() {
         initDataManagers();
         initEntityManagers();
-        initEventHandler();
     }
     
     @Override
@@ -104,12 +102,6 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
         }
         if (historicIdentityLinkEntityManager == null) {
             historicIdentityLinkEntityManager = new HistoricIdentityLinkEntityManagerImpl(this, historicIdentityLinkDataManager);
-        }
-    }
-
-    public void initEventHandler() {
-        if (identityLinkEventHandler == null) {
-            identityLinkEventHandler = new NoOperationIdentityLinkEventHandler();
         }
     }
 

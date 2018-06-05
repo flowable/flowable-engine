@@ -49,14 +49,20 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public void insert(IdentityLinkEntity entity, boolean fireCreateEvent) {
         super.insert(entity, fireCreateEvent);
 
-        getIdentityLinkEventHandler().handleLinkAddition(entity);
+        IdentityLinkEventHandler identityLinkEventHandler = getIdentityLinkEventHandler();
+        if (identityLinkEventHandler != null) {
+            identityLinkEventHandler.handleIdentityLinkAddition(entity);
+        }
     }
 
     @Override
     public void delete(IdentityLinkEntity entity, boolean fireDeleteEvent) {
         super.delete(entity, fireDeleteEvent);
 
-        getIdentityLinkEventHandler().handleLinkDeletion(entity);
+        IdentityLinkEventHandler identityLinkEventHandler = getIdentityLinkEventHandler();
+        if (identityLinkEventHandler != null) {
+            getIdentityLinkEventHandler().handleIdentityLinkDeletion(entity);
+        }
     }
 
     @Override

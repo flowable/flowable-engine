@@ -14,12 +14,12 @@ public interface IdentityLinkEventHandler {
      *
      * @param identityLink identityLink which was recently added
      */
-    void handleLinkAddition(IdentityLink identityLink);
+    void handleIdentityLinkAddition(IdentityLink identityLink);
 
     /**
      * Handle an event of {@link IdentityLink} deletion
      *
       * @param identityLink identityLink which is going to be deleted
      */
-    void handleLinkDeletion(IdentityLink identityLink);
+    void handleIdentityLinkDeletion(IdentityLink identityLink);
 }
