@@ -165,7 +165,7 @@ public class ModelsResource {
                 editorNode = deleteEmbededReferencesFromBPMNModel(editorJsonNode);
 
                 ObjectNode propertiesNode = (ObjectNode) editorNode.get("properties");
-                String processId = modelRepresentation.getName().replaceAll(" ", "");
+                String processId = modelRepresentation.getKey().replaceAll(" ", "");
                 propertiesNode.put("process_id", processId);
                 propertiesNode.put("name", modelRepresentation.getName());
                 if (StringUtils.isNotEmpty(modelRepresentation.getDescription())) {
