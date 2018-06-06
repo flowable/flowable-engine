@@ -69,7 +69,7 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
             CommandContextUtil.getTaskService().changeTaskOwner((TaskEntity) task, owner);
 
             if (task.getId() != null) {
-                addUserIdentityLinkToParent(task, task.getAssignee());
+                addUserIdentityLinkToParent(task, task.getOwner());
             }
         }
     }
