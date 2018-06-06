@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -28,6 +28,7 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.InternalTaskAssignmentManager;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -49,17 +50,33 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
 
     @Override
     public void changeAssignee(Task task, String assignee) {
-        TaskHelper.changeTaskAssignee((TaskEntity) task, assignee, parentIdentityLinkType);
+        if ((task.getAssignee() != null && !task.getAssignee().equals(assignee))
+            || (task.getAssignee() == null && assignee != null)) {
+
+            CommandContextUtil.getTaskService().changeTaskAssignee((TaskEntity) task, assignee);
+
+            if (task.getId() != null) {
+                addUserIdentityLinkToParent(task, task.getAssignee());
+            }
+        }
     }
-    
+
     @Override
     public void changeOwner(Task task, String owner) {
-        TaskHelper.changeTaskOwner((TaskEntity) task, owner, parentIdentityLinkType);
+        if ((task.getOwner() != null && !task.getOwner().equals(owner))
+            || (task.getOwner() == null && owner != null)) {
+
+            CommandContextUtil.getTaskService().changeTaskOwner((TaskEntity) task, owner);
+
+            if (task.getId() != null) {
+                addUserIdentityLinkToParent(task, task.getAssignee());
+            }
+        }
     }
 
     @Override
     public void addCandidateUser(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, parentIdentityLinkType);
+        handleTaskIdentityLinkAddition( task, identityLink);
     }
 
     @Override
@@ -69,12 +86,12 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
 
-        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks, parentIdentityLinkType);
+        handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
     }
 
     @Override
     public void addCandidateGroup(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, parentIdentityLinkType);
+        handleTaskIdentityLinkAddition(task, identityLink);
     }
 
     @Override
@@ -83,17 +100,17 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateGroups) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks, parentIdentityLinkType);
+        handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
     }
 
     @Override
     public void addUserIdentityLink(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, parentIdentityLinkType);
+        handleTaskIdentityLinkAddition(task, identityLink);
     }
 
     @Override
     public void addGroupIdentityLink(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, parentIdentityLinkType);
+        handleTaskIdentityLinkAddition( task, identityLink);
     }
 
     @Override
@@ -114,7 +131,48 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
     public void addUserIdentityLinkToParent(Task task, String userId) {
         if (userId != null && ScopeTypes.CMMN.equals(task.getScopeType()) && StringUtils.isNotEmpty(task.getScopeId())) {
             CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager().findById(task.getScopeId());
-            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstanceEntity, userId, null, parentIdentityLinkType);
+            createCaseInstanceIdentityLink(caseInstanceEntity, userId, null, parentIdentityLinkType);
         }
     }
+
+    protected void handleTaskIdentityLinkAddition(Task task, IdentityLink identityLink) {
+        CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated((IdentityLinkEntity) identityLink);
+
+        CountingTaskEntity countingTaskEntity = (CountingTaskEntity) task;
+        if (countingTaskEntity.isCountEnabled()) {
+            countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
+        }
+
+        ((TaskEntity) task).getIdentityLinks().add((IdentityLinkEntity) identityLink);
+        if (identityLink.getUserId() != null && task.getScopeId() != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
+            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(task.getScopeId());
+            if (caseInstance != null) {
+                List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService()
+                    .findIdentityLinksByScopeIdAndType(task.getScopeId(), ScopeTypes.CMMN);
+                for (IdentityLinkEntity identityLink1 : identityLinks) {
+                    if (identityLink1.isUser() && identityLink.getUserId().equals(identityLink.getUserId())) {
+                        return;
+                    }
+                }
+
+                createCaseInstanceIdentityLink(caseInstance, identityLink.getUserId(), null, parentIdentityLinkType);
+            }
+        }
+    }
+
+    protected IdentityLinkEntity createCaseInstanceIdentityLink(CaseInstance caseInstance, String userId, String groupId, String type) {
+        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createScopeIdentityLink(
+            caseInstance.getCaseDefinitionId(), caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
+
+        CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+
+        return identityLinkEntity;
+    }
+
+    protected void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
+        for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
+            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
+        }
+    }
+
 }

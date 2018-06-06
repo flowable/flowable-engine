@@ -16,14 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
@@ -38,6 +35,18 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Joram Barrez
  */
 public class TaskHelper {
+
+    public static void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {
+        if (taskEntity.getOwner() != null) {
+            addOwnerIdentityLink(taskEntity);
+        }
+        if (taskEntity.getAssignee() != null) {
+            addAssigneeIdentityLinks(taskEntity);
+        }
+
+        CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
+        CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(taskEntity);
+    }
 
     public static void deleteTask(String taskId, String deleteReason, boolean cascade) {
         TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
@@ -101,48 +110,30 @@ public class TaskHelper {
         }
     }
 
-    public static void changeTaskAssignee(TaskEntity taskEntity, String assignee, String parentIdentityLinkType) {
+    public static void changeTaskAssignee(TaskEntity taskEntity, String assignee) {
         if ((taskEntity.getAssignee() != null && !taskEntity.getAssignee().equals(assignee))
                 || (taskEntity.getAssignee() == null && assignee != null)) {
             
             CommandContextUtil.getTaskService().changeTaskAssignee(taskEntity, assignee);
 
             if (taskEntity.getId() != null) {
-                addAssigneeIdentityLinks(taskEntity, parentIdentityLinkType);
+                addAssigneeIdentityLinks(taskEntity);
             }
         }
     }
     
-    public static void changeTaskOwner(TaskEntity taskEntity, String owner, String parentIdentityLinkType) {
-        if ((taskEntity.getOwner() != null && !taskEntity.getOwner().equals(owner))
-                || (taskEntity.getOwner() == null && owner != null)) {
-            
-            CommandContextUtil.getTaskService().changeTaskOwner(taskEntity, owner);
-            
-            if (taskEntity.getId() != null) {
-                addOwnerIdentityLink(taskEntity, taskEntity.getOwner(), parentIdentityLinkType);
-            }
-        }
+    public static void changeTaskOwner(TaskEntity taskEntity, String owner) {
+        CommandContextUtil.getInternalTaskAssignmentManager().changeOwner(taskEntity, owner);
     }
     
-    protected static void addAssigneeIdentityLinks(TaskEntity taskEntity, String identityLinkType) {
-        if (taskEntity.getAssignee() != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
-            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(taskEntity.getScopeId());
-            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, taskEntity.getAssignee(), null, identityLinkType);
-        }
+    protected static void addAssigneeIdentityLinks(TaskEntity taskEntity) {
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getAssignee());
     }
-    
-    protected static void addOwnerIdentityLink(TaskEntity taskEntity, String owner, String identityLinkType) {
-        if (owner == null && taskEntity.getOwner() == null) {
-            return;
-        }
 
-        if (owner != null && taskEntity.getScopeId() != null && ScopeTypes.CMMN.equals(taskEntity.getScopeType())) {
-            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager().findById(taskEntity.getScopeId());
-            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, owner, null, identityLinkType);
-        }
+    protected static void addOwnerIdentityLink(TaskEntity taskEntity) {
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getOwner());
     }
-    
+
     public static void deleteHistoricTask(String taskId) {
         if (CommandContextUtil.getCmmnEngineConfiguration().getHistoryLevel() != HistoryLevel.NONE) {
             HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();

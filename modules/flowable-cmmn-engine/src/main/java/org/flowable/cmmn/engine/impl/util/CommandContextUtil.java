@@ -443,4 +443,8 @@ public class CommandContextUtil {
         return getCmmnEngineConfiguration(commandContext).getTaskServiceConfiguration().getInternalTaskAssignmentManager();
     }
 
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return getInternalTaskAssignmentManager(getCommandContext());
+    }
+
 }

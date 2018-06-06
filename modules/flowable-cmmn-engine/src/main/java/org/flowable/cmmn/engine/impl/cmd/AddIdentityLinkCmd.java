@@ -83,7 +83,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
             
-           CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeAssignee(task, identityId);
+           TaskHelper.changeTaskAssignee(task, identityId);
             assignedToNoOne = identityId == null;
             
         } else if (IdentityLinkType.OWNER.equals(identityType)) {
@@ -96,7 +96,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
 
-           CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeOwner(task, identityId);
+           TaskHelper.changeTaskOwner(task, identityId);
             assignedToNoOne = identityId == null;
 
         } else if (IDENTITY_USER == identityIdType) {

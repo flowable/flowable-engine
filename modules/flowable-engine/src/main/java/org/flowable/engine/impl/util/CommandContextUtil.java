@@ -586,4 +586,8 @@ public class CommandContextUtil {
         return getTaskServiceConfiguration(commandContext).getInternalTaskAssignmentManager();
     }
 
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return getInternalTaskAssignmentManager(getCommandContext());
+    }
+
 }

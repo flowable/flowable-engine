@@ -51,35 +51,6 @@ public class IdentityLinkUtil {
         processInstanceEntity.getIdentityLinks().removeAll(removedIdentityLinkEntities);
     }
     
-    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities, String parentIdentityLinkType) {
-        for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
-            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity, parentIdentityLinkType);
-        }
-    }
-    
-    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity, String parentIdentityLinkType) {
-        CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
-
-        if (CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
-            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
-            if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
-                countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
-            }
-        }
-        
-        taskEntity.getIdentityLinks().add(identityLinkEntity);
-        if (identityLinkEntity.getUserId() != null && taskEntity.getProcessInstanceId() != null) {
-            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
-            for (IdentityLinkEntity identityLink : executionEntity.getIdentityLinks()) {
-                if (identityLink.isUser() && identityLink.getUserId().equals(identityLinkEntity.getUserId())) {
-                    return;
-                }
-            }
-            
-            IdentityLinkUtil.createProcessInstanceIdentityLink(executionEntity, identityLinkEntity.getUserId(), null, parentIdentityLinkType);
-        }
-    }
-    
     public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascadeHistory, boolean updateTaskCounts) {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             if (cascadeHistory) {

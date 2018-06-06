@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -89,7 +90,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
             
-            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeAssignee(task, identityId);
+            TaskHelper.changeTaskAssignee(task, identityId);
             assignedToNoOne = identityId == null;
             
         } else if (IdentityLinkType.OWNER.equals(identityType)) {
@@ -102,7 +103,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
 
-            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeOwner(task, identityId);
+            TaskHelper.changeTaskOwner(task, identityId);
             assignedToNoOne = identityId == null;
 
         } else if (IDENTITY_USER == identityIdType) {

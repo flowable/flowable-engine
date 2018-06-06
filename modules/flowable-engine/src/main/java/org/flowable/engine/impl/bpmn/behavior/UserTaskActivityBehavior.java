@@ -223,7 +223,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         // Handling assignments need to be done after the task is inserted, to have an id
         if (!skipUserTask) {
             handleAssignments(taskService, activeTaskAssignee, activeTaskOwner,
-                    activeTaskCandidateUsers, activeTaskCandidateGroups, task, expressionManager, execution, commandContext);
+                    activeTaskCandidateUsers, activeTaskCandidateGroups, task, expressionManager, execution);
             
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
@@ -253,9 +253,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void handleAssignments(TaskService taskService, String assignee, String owner, List<String> candidateUsers,
-            List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution,
-        CommandContext commandContext
-        ) {
+            List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution) {
 
         if (StringUtils.isNotEmpty(assignee)) {
             Object assigneeExpressionValue = expressionManager.createExpression(assignee).getValue(execution);
@@ -265,7 +263,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
 
             if (StringUtils.isNotEmpty(assigneeValue)) {
-                CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeAssignee(task, assigneeValue);
+                TaskHelper.changeTaskAssignee(task, assigneeValue);
             }
         }
 
@@ -277,7 +275,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             }
 
             if (StringUtils.isNotEmpty(ownerValue)) {
-                CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeOwner(task, ownerValue);
+                TaskHelper.changeTaskOwner(task, ownerValue);
             }
         }
 
@@ -288,14 +286,14 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 if (value != null) {
                     if (value instanceof Collection) {
                         List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
-                        CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addCandidateUsers(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
+                        CommandContextUtil.getInternalTaskAssignmentManager().addCandidateUsers(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
                         
                     } else {
                         String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {
                             List<String> candidates = extractCandidates(strValue);
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
-                            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addCandidateGroups(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
+                            CommandContextUtil.getInternalTaskAssignmentManager().addCandidateGroups(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
                         }
                     }
                 }
@@ -309,7 +307,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 if (value != null) {
                     if (value instanceof Collection) {
                         List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
-                        CommandContextUtil.getInternalTaskAssignmentManager(commandContext)
+                        CommandContextUtil.getInternalTaskAssignmentManager()
                             .addCandidateUsers(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
 
                     } else {
@@ -317,7 +315,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         if (StringUtils.isNotEmpty(strValue)) {
                             List<String> candidates = extractCandidates(strValue);
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
-                            CommandContextUtil.getInternalTaskAssignmentManager(commandContext)
+                            CommandContextUtil.getInternalTaskAssignmentManager()
                                 .addCandidateUsers(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
                         }
                         
@@ -337,14 +335,14 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         while (userIdSet.hasNext()) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
                                             task.getId(), userIdSet.next().toString(), null, customUserIdentityLinkType);
-                            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLink(task, identityLinkEntity);
+                            CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLink(task, identityLinkEntity);
                         }
                         
                     } else {
                         List<String> userIds = extractCandidates(value.toString());
                         for (String userId : userIds) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
-                            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLink(task, identityLinkEntity);
+                            CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLink(task, identityLinkEntity);
                         }
                         
                     }
@@ -366,7 +364,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         while (groupIdSet.hasNext()) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
                                             task.getId(), null, groupIdSet.next().toString(), customGroupIdentityLinkType);
-                            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addGroupIdentityLink(task, identityLinkEntity);
+                            CommandContextUtil.getInternalTaskAssignmentManager().addGroupIdentityLink(task, identityLinkEntity);
                         }
                         
                     } else {
@@ -374,7 +372,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         for (String groupId : groupIds) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
                                             task.getId(), null, groupId, customGroupIdentityLinkType);
-                            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addGroupIdentityLink(task, identityLinkEntity);
+                            CommandContextUtil.getInternalTaskAssignmentManager().addGroupIdentityLink(task, identityLinkEntity);
                         }
                         
                     }

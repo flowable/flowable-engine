@@ -16,7 +16,7 @@ package org.flowable.engine.impl.cmd;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -51,7 +51,7 @@ public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         task.setDelegationState(DelegationState.RESOLVED);
-        CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeAssignee(task, task.getOwner());
+        TaskHelper.changeTaskAssignee(task, task.getOwner());
 
         return null;
     }

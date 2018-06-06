@@ -49,28 +49,12 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class TaskHelper {
 
-    public static void changeTaskAssignee(TaskEntity taskEntity, String assignee, String parentIdentityLink) {
-        if ((taskEntity.getAssignee() != null && !taskEntity.getAssignee().equals(assignee))
-                || (taskEntity.getAssignee() == null && assignee != null)) {
-
-            CommandContextUtil.getTaskService().changeTaskAssignee(taskEntity, assignee);
-            fireAssignmentEvents(taskEntity);
-
-            if (taskEntity.getId() != null) {
-                addAssigneeIdentityLinks(taskEntity, parentIdentityLink);
-            }
-        }
+    public static void changeTaskAssignee(TaskEntity taskEntity, String assignee) {
+        CommandContextUtil.getInternalTaskAssignmentManager().changeAssignee(taskEntity, assignee);
     }
 
-    public static void changeTaskOwner(TaskEntity taskEntity, String owner, String parentIdentityLink) {
-        if ((taskEntity.getOwner() != null && !taskEntity.getOwner().equals(owner))
-                || (taskEntity.getOwner() == null && owner != null)) {
-
-            CommandContextUtil.getTaskService().changeTaskOwner(taskEntity, owner);
-            if (taskEntity.getId() != null) {
-                addOwnerIdentityLink(taskEntity, taskEntity.getOwner(), parentIdentityLink);
-            }
-        }
+    public static void changeTaskOwner(TaskEntity taskEntity, String owner) {
+        CommandContextUtil.getInternalTaskAssignmentManager().changeOwner(taskEntity, owner);
     }
 
     public static void insertTask(TaskEntity taskEntity, ExecutionEntity execution, boolean fireCreateEvent) {
@@ -86,7 +70,7 @@ public class TaskHelper {
             taskEntity.setProcessDefinitionId(execution.getProcessDefinitionId());
         }
 
-        insertTask(taskEntity, fireCreateEvent, IdentityLinkType.PARTICIPANT);
+        insertTask(taskEntity, fireCreateEvent);
 
         if (execution != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
             CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
@@ -103,33 +87,23 @@ public class TaskHelper {
         CommandContextUtil.getHistoryManager().recordTaskCreated(taskEntity, execution);
     }
 
-    public static void insertTask(TaskEntity taskEntity, boolean fireCreateEvent, String parentIdentityLink) {
+    public static void insertTask(TaskEntity taskEntity, boolean fireCreateEvent) {
         if (taskEntity.getOwner() != null) {
-            addOwnerIdentityLink(taskEntity, taskEntity.getOwner(), parentIdentityLink);
+            addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
         }
         if (taskEntity.getAssignee() != null) {
-            addAssigneeIdentityLinks(taskEntity, parentIdentityLink);
+            CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getAssignee());
         }
 
         CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
     }
 
-    protected static void addAssigneeIdentityLinks(TaskEntity taskEntity, String parentIdentityLink) {
-        if (taskEntity.getAssignee() != null && taskEntity.getProcessInstanceId() != null) {
-            ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
-            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, taskEntity.getAssignee(), null, parentIdentityLink);
-        }
-    }
-
-    protected static void addOwnerIdentityLink(TaskEntity taskEntity, String owner, String parentIdentityLink) {
+    protected static void addOwnerIdentityLink(TaskEntity taskEntity, String owner) {
         if (owner == null && taskEntity.getOwner() == null) {
             return;
         }
 
-        if (owner != null && taskEntity.getProcessInstanceId() != null) {
-            ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
-            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, owner, null, parentIdentityLink);
-        }
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, owner);
     }
     
     /**
@@ -369,12 +343,4 @@ public class TaskHelper {
         }
     }
 
-    protected static void fireAssignmentEvents(TaskEntity taskEntity) {
-        CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
-
-        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
-        }
-    }
 }
