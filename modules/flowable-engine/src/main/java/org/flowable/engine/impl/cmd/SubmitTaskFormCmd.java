@@ -22,14 +22,13 @@ import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
+public class SubmitTaskFormCmd extends CompleteTaskCmd {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,7 +37,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
     protected boolean completeTask;
 
     public SubmitTaskFormCmd(String taskId, Map<String, String> properties, boolean completeTask) {
-        super(taskId);
+        super(taskId, null);
         this.taskId = taskId;
         this.properties = properties;
         this.completeTask = completeTask;
@@ -66,7 +65,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
             taskFormHandler.submitFormProperties(properties, executionEntity);
 
             if (completeTask) {
-                TaskHelper.completeTask(task, null, null, false, commandContext);
+                completeTask(commandContext, null, task);
             }
         }
 

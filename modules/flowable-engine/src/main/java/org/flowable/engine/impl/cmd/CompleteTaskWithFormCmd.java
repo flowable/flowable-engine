@@ -17,7 +17,6 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
@@ -27,7 +26,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 /**
  * @author Tijs Rademakers
  */
-public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
+public class CompleteTaskWithFormCmd extends CompleteTaskCmd {
 
     private static final long serialVersionUID = 1L;
     protected String formDefinitionId;
@@ -37,7 +36,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     protected boolean localScope;
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
-        super(taskId);
+        super(taskId, variables);
         this.formDefinitionId = formDefinitionId;
         this.outcome = outcome;
         this.variables = variables;
@@ -80,10 +79,10 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, variables);
 
-            TaskHelper.completeTask(task, formVariables, transientVariables, localScope, commandContext);
+            completeTask(commandContext, formVariables, task);
 
         } else {
-            TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
+            completeTask(commandContext, variables, task);
         }
         
         return null;

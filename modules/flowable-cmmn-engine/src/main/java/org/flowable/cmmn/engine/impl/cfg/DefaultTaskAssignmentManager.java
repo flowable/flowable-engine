@@ -105,4 +105,9 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         identityLinks.add((IdentityLinkEntity) identityLink);
         IdentityLinkUtil.handleTaskIdentityLinkDeletions((TaskEntity) task, identityLinks, true);
     }
+
+    @Override
+    public void addUserIdentityLinkToParent(Task task, String userId) {
+
+    }
 }

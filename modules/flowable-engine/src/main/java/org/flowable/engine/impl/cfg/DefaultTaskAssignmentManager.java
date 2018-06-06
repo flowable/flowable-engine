@@ -16,9 +16,13 @@ package org.flowable.engine.impl.cfg;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.InternalTaskAssignmentManager;
@@ -30,24 +34,30 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected final String identityLinkType;
 
     public DefaultTaskAssignmentManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        this.processEngineConfiguration = processEngineConfiguration;
+        this(processEngineConfiguration, IdentityLinkType.PARTICIPANT);
     }
-    
+
+    public DefaultTaskAssignmentManager(ProcessEngineConfigurationImpl processEngineConfiguration, String identityLinkType) {
+        this.processEngineConfiguration = processEngineConfiguration;
+        this.identityLinkType = identityLinkType;
+    }
+
     @Override
     public void changeAssignee(Task task, String assignee) {
-        TaskHelper.changeTaskAssignee((TaskEntity) task, assignee);
+        TaskHelper.changeTaskAssignee((TaskEntity) task, assignee, identityLinkType);
     }
     
     @Override
     public void changeOwner(Task task, String owner) {
-        TaskHelper.changeTaskOwner((TaskEntity) task, owner);
+        TaskHelper.changeTaskOwner((TaskEntity) task, owner, identityLinkType);
     }
 
     @Override
     public void addCandidateUser(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, identityLinkType);
     }
 
     @Override
@@ -56,12 +66,12 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateUsers) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
+        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks, identityLinkType);
     }
 
     @Override
     public void addCandidateGroup(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, identityLinkType);
     }
 
     @Override
@@ -70,17 +80,17 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateGroups) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
+        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks, identityLinkType);
     }
 
     @Override
     public void addUserIdentityLink(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, identityLinkType);
     }
 
     @Override
     public void addGroupIdentityLink(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, identityLinkType);
     }
 
     @Override
@@ -95,5 +105,14 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         List<IdentityLinkEntity> identityLinks = new ArrayList<>();
         identityLinks.add((IdentityLinkEntity) identityLink);
         IdentityLinkUtil.handleTaskIdentityLinkDeletions((TaskEntity) task, identityLinks, true, true);
+    }
+
+    @Override
+    public void addUserIdentityLinkToParent(Task task, String userId) {
+        if (Authentication.getAuthenticatedUserId() != null && task.getProcessInstanceId() != null) {
+            ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getProcessInstanceId());
+            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity,
+                userId, null, identityLinkType);
+        }
     }
 }

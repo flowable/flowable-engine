@@ -55,7 +55,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
                 
             } else {
-                TaskHelper.changeTaskAssignee(task, userId);
+                CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeAssignee(task, userId);
             }
             
             CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(task, userId, IdentityLinkType.ASSIGNEE, true);
@@ -68,7 +68,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 String oldAssigneeId = task.getAssignee();
     
                 // Task should be assigned to no one
-                TaskHelper.changeTaskAssignee(task, null);
+                CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeAssignee(task, null);
                 
                 CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(task, oldAssigneeId, IdentityLinkType.ASSIGNEE, true, true);
             }

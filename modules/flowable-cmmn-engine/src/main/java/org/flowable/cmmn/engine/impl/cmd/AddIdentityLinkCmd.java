@@ -101,7 +101,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
         } else if (IDENTITY_USER == identityIdType) {
             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), identityId, null, identityType);
-           CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLink(task, identityLinkEntity);
+            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLink(task, identityLinkEntity);
         } else if (IDENTITY_GROUP == identityIdType) {
             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), null, identityId, identityType);
            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addGroupIdentityLink(task, identityLinkEntity);

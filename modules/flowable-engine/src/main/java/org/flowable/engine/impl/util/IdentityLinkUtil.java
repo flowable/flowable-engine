@@ -15,7 +15,6 @@ package org.flowable.engine.impl.util;
 import java.util.List;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -52,13 +51,13 @@ public class IdentityLinkUtil {
         processInstanceEntity.getIdentityLinks().removeAll(removedIdentityLinkEntities);
     }
     
-    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
+    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities, String parentIdentityLinkType) {
         for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
-            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
+            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity, parentIdentityLinkType);
         }
     }
     
-    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
+    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity, String parentIdentityLinkType) {
         CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
 
         if (CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
@@ -77,7 +76,7 @@ public class IdentityLinkUtil {
                 }
             }
             
-            IdentityLinkUtil.createProcessInstanceIdentityLink(executionEntity, identityLinkEntity.getUserId(), null, IdentityLinkType.PARTICIPANT);
+            IdentityLinkUtil.createProcessInstanceIdentityLink(executionEntity, identityLinkEntity.getUserId(), null, parentIdentityLinkType);
         }
     }
     
