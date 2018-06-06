@@ -16,7 +16,6 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -48,7 +47,16 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         }
 
         if (task.getRevision() == 0) {
-            TaskHelper.insertTask(task, true);
+            if (task.getOwner() != null) {
+               CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeOwner(task, task.getOwner());
+            }
+            if (task.getAssignee() != null) {
+               CommandContextUtil.getInternalTaskAssignmentManager(commandContext)
+                    .changeAssignee(task, task.getAssignee());
+            }
+
+            CommandContextUtil.getTaskService().insertTask(task, true);
+            CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(task);
 
             if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
                 CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));

@@ -55,6 +55,7 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
@@ -436,6 +437,10 @@ public class CommandContextUtil {
             throw new FlowableException("Dmn engine is not configured");
         }
         return dmnEngineConfiguration.getDmnRuleService();
+    }
+
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getTaskServiceConfiguration().getInternalTaskAssignmentManager();
     }
 
 }

@@ -50,13 +50,13 @@ public class IdentityLinkUtil {
         }
     }
     
-    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
+    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities, String parentIdentityLinkType) {
         for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
-            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
+            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity, parentIdentityLinkType);
         }
     }
     
-    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
+    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity, String parentIdentityLinkType) {
         CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
         
         CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
@@ -75,7 +75,7 @@ public class IdentityLinkUtil {
                     }
                 }
                 
-                createCaseInstanceIdentityLink(caseInstance, identityLinkEntity.getUserId(), null, IdentityLinkType.PARTICIPANT);
+                createCaseInstanceIdentityLink(caseInstance, identityLinkEntity.getUserId(), null, parentIdentityLinkType);
             }
         }
     }

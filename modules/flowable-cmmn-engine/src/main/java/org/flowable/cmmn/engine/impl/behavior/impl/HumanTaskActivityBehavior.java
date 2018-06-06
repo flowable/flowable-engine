@@ -77,7 +77,15 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleDueDate(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCategory(planItemInstanceEntity, expressionManager, taskEntity);
 
-            TaskHelper.insertTask(taskEntity, true);
+            if (taskEntity.getOwner() != null) {
+               CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeOwner(taskEntity, taskEntity.getOwner());
+            }
+            if (taskEntity.getAssignee() != null) {
+               CommandContextUtil.getInternalTaskAssignmentManager(commandContext)
+                    .changeAssignee(taskEntity, taskEntity.getAssignee());
+            }
+            CommandContextUtil.getTaskService().insertTask(taskEntity, true);
+            CommandContextUtil.getCmmnHistoryManager().recordTaskCreated(taskEntity);
 
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity);

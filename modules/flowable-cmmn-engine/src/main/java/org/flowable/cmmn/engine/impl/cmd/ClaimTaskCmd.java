@@ -46,7 +46,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task);
                 
             } else {
-                TaskHelper.changeTaskAssignee(task, userId);
+               CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeAssignee(task, userId);
             }
             
         } else {
@@ -55,7 +55,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 task.setClaimTime(null);
                 
                 // Task should be assigned to no one
-                TaskHelper.changeTaskAssignee(task, null);
+               CommandContextUtil.getInternalTaskAssignmentManager(commandContext).changeAssignee(task, null);
             }
         }
 
