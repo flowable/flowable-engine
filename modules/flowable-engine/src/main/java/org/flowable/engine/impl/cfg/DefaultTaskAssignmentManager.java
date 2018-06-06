@@ -109,7 +109,7 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
 
     @Override
     public void addUserIdentityLinkToParent(Task task, String userId) {
-        if (Authentication.getAuthenticatedUserId() != null && task.getProcessInstanceId() != null) {
+        if (userId != null && task.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getProcessInstanceId());
             IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity,
                 userId, null, identityLinkType);

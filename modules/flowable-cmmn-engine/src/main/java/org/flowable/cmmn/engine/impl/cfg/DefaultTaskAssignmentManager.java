@@ -13,18 +13,22 @@
 
 package org.flowable.cmmn.engine.impl.cfg;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author martin.grofcik
@@ -108,6 +112,9 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
 
     @Override
     public void addUserIdentityLinkToParent(Task task, String userId) {
-
+        if (userId != null && ScopeTypes.CMMN.equals(task.getScopeType()) && StringUtils.isNotEmpty(task.getScopeId())) {
+            CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager().findById(task.getScopeId());
+            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstanceEntity, userId, null, parentIdentityLinkType);
+        }
     }
 }
