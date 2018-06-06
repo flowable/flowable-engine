@@ -41,7 +41,6 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
-import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
@@ -69,7 +68,7 @@ public class ProcessEngineAutoConfigurationTest {
         .withConfiguration(AutoConfigurations.of(
             ProcessEngineServicesAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
             DataSourceAutoConfiguration.class,
             TransactionAutoConfiguration.class
         ))
@@ -108,7 +107,6 @@ public class ProcessEngineAutoConfigurationTest {
     public void processEngineWithBasicDataSourceAndAppEngine() {
         contextRunner.withConfiguration(AutoConfigurations.of(
             DataSourceTransactionManagerAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
             AppEngineServicesAutoConfiguration.class,
             AppEngineAutoConfiguration.class,
             IdmEngineAutoConfiguration.class,

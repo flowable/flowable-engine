@@ -21,10 +21,8 @@ import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.FlowableProperties;
-import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,9 +41,6 @@ import org.springframework.transaction.PlatformTransactionManager;
     FlowableProperties.class,
     FlowableAppProperties.class,
     FlowableIdmProperties.class
-})
-@AutoConfigureAfter({
-    FlowableTransactionAutoConfiguration.class
 })
 public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 

@@ -168,7 +168,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initDataManagers() {
         if (jobDataManager == null) {
-            jobDataManager = new MybatisJobDataManager(jobExecutionScope);
+            jobDataManager = new MybatisJobDataManager(this);
         }
         if (deadLetterJobDataManager == null) {
             deadLetterJobDataManager = new MybatisDeadLetterJobDataManager();
@@ -177,10 +177,10 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
             suspendedJobDataManager = new MybatisSuspendedJobDataManager();
         }
         if (timerJobDataManager == null) {
-            timerJobDataManager = new MybatisTimerJobDataManager();
+            timerJobDataManager = new MybatisTimerJobDataManager(this);
         }
         if (historyJobDataManager == null) {
-            historyJobDataManager = new MybatisHistoryJobDataManager(historyJobExecutionScope);
+            historyJobDataManager = new MybatisHistoryJobDataManager(this);
         }
         if (jobByteArrayDataManager == null) {
             jobByteArrayDataManager = new MybatisJobByteArrayDataManager();

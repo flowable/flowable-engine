@@ -32,7 +32,6 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.spring.SpringProcessEngineConfiguration;
-import org.flowable.spring.boot.FlowableTransactionAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
@@ -89,7 +88,6 @@ public class ContentEngineAutoConfigurationTest {
     public void contentEngineWithBasicDataSourceAndProcessEngine() {
         contextRunner.withConfiguration(AutoConfigurations.of(
             HibernateJpaAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
             ProcessEngineServicesAutoConfiguration.class
         )).run(context -> {
@@ -127,7 +125,6 @@ public class ContentEngineAutoConfigurationTest {
 
         contextRunner.withConfiguration(AutoConfigurations.of(
             HibernateJpaAutoConfiguration.class,
-            FlowableTransactionAutoConfiguration.class,
             AppEngineServicesAutoConfiguration.class,
             AppEngineAutoConfiguration.class,
             ProcessEngineServicesAutoConfiguration.class,

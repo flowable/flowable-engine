@@ -13,7 +13,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.flowable.spring.boot.app.AppEngineAutoConfiguration,\
     org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.ProcessEngineAutoConfiguration,\
-    org.flowable.spring.boot.FlowableTransactionAutoConfiguration,\
+    org.flowable.spring.boot.FlowableJpaAutoConfiguration,\
     org.flowable.spring.boot.form.FormEngineAutoConfiguration,\
     org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.content.ContentEngineAutoConfiguration,\

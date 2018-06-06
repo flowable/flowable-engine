@@ -28,7 +28,6 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.TimerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.TimerJobsByExecutionIdMatcher;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -36,8 +35,14 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
  */
 public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEntity> implements TimerJobDataManager {
 
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
     protected CachedEntityMatcher<TimerJobEntity> timerJobsByExecutionIdMatcher = new TimerJobsByExecutionIdMatcher();
 
+    public MybatisTimerJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends TimerJobEntity> getManagedEntityClass() {
         return TimerJobEntityImpl.class;
@@ -64,11 +69,10 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
     @SuppressWarnings("unchecked")
     public List<TimerJobEntity> findTimerJobsToExecute(Page page) {
         Map<String, Object> params = new HashMap<>(2);
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration();
         String jobExecutionScope = jobServiceConfiguration.getJobExecutionScope();
         params.put("jobExecutionScope", jobExecutionScope);
         
-        Date now = CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
         
         return getDbSqlSession().selectList("selectTimerJobsToExecute", params, page);
