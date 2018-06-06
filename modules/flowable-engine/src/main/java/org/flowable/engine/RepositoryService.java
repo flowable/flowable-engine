@@ -370,7 +370,7 @@ public interface RepositoryService {
 
     /**
      * @param modelId
-     *            id of model to delete, cannot be null. When an id is passed for an unexisting model, this operation is ignored.
+     *            id of model to delete, cannot be null. When an id is passed for a non-existent model, this operation is ignored.
      */
     public void deleteModel(String modelId);
 
@@ -378,7 +378,7 @@ public interface RepositoryService {
      * Saves the model editor source for a model
      * 
      * @param modelId
-     *            id of model to delete, cannot be null. When an id is passed for an unexisting model, this operation is ignored.
+     *            id of model to delete, cannot be null. When an id is passed for a non-existent model, this operation is ignored.
      */
     public void addModelEditorSource(String modelId, byte[] bytes);
 
