@@ -7,25 +7,25 @@ update ACT_GE_PROPERTY set VALUE_ = '6.2.1.0' where NAME_ = 'task.schema.version
 
 update ACT_GE_PROPERTY set VALUE_ = '6.2.1.0' where NAME_ = 'variable.schema.version';
 
-alter table ACT_RU_JOB add column SCOPE_ID_ varchar(255);
-alter table ACT_RU_JOB add column SUB_SCOPE_ID_ varchar(255);
-alter table ACT_RU_JOB add column SCOPE_TYPE_ varchar(255);
-alter table ACT_RU_JOB add column SCOPE_DEFINITION_ID_ varchar(255);
+alter table ACT_RU_JOB add column SCOPE_ID_ varchar(191);
+alter table ACT_RU_JOB add column SUB_SCOPE_ID_ varchar(191);
+alter table ACT_RU_JOB add column SCOPE_TYPE_ varchar(191);
+alter table ACT_RU_JOB add column SCOPE_DEFINITION_ID_ varchar(191);
 
-alter table ACT_RU_TIMER_JOB add column SCOPE_ID_ varchar(255);
-alter table ACT_RU_TIMER_JOB add column SUB_SCOPE_ID_ varchar(255);
-alter table ACT_RU_TIMER_JOB add column SCOPE_TYPE_ varchar(255);
-alter table ACT_RU_TIMER_JOB add column SCOPE_DEFINITION_ID_ varchar(255);
+alter table ACT_RU_TIMER_JOB add column SCOPE_ID_ varchar(191);
+alter table ACT_RU_TIMER_JOB add column SUB_SCOPE_ID_ varchar(191);
+alter table ACT_RU_TIMER_JOB add column SCOPE_TYPE_ varchar(191);
+alter table ACT_RU_TIMER_JOB add column SCOPE_DEFINITION_ID_ varchar(191);
 
-alter table ACT_RU_SUSPENDED_JOB add column SCOPE_ID_ varchar(255);
-alter table ACT_RU_SUSPENDED_JOB add column SUB_SCOPE_ID_ varchar(255);
-alter table ACT_RU_SUSPENDED_JOB add column SCOPE_TYPE_ varchar(255);
-alter table ACT_RU_SUSPENDED_JOB add column SCOPE_DEFINITION_ID_ varchar(255);
+alter table ACT_RU_SUSPENDED_JOB add column SCOPE_ID_ varchar(191);
+alter table ACT_RU_SUSPENDED_JOB add column SUB_SCOPE_ID_ varchar(191);
+alter table ACT_RU_SUSPENDED_JOB add column SCOPE_TYPE_ varchar(191);
+alter table ACT_RU_SUSPENDED_JOB add column SCOPE_DEFINITION_ID_ varchar(191);
 
-alter table ACT_RU_DEADLETTER_JOB add column SCOPE_ID_ varchar(255);
-alter table ACT_RU_DEADLETTER_JOB add column SUB_SCOPE_ID_ varchar(255);
-alter table ACT_RU_DEADLETTER_JOB add column SCOPE_TYPE_ varchar(255);
-alter table ACT_RU_DEADLETTER_JOB add column SCOPE_DEFINITION_ID_ varchar(255);
+alter table ACT_RU_DEADLETTER_JOB add column SCOPE_ID_ varchar(191);
+alter table ACT_RU_DEADLETTER_JOB add column SUB_SCOPE_ID_ varchar(191);
+alter table ACT_RU_DEADLETTER_JOB add column SCOPE_TYPE_ varchar(191);
+alter table ACT_RU_DEADLETTER_JOB add column SCOPE_DEFINITION_ID_ varchar(191);
 
 create index ACT_IDX_JOB_SCOPE on ACT_RU_JOB(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_JOB_SUB_SCOPE on ACT_RU_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
@@ -84,7 +84,7 @@ ALTER TABLE ACT_CMMN_DEPLOYMENT_RESOURCE ADD GENERATED_ BIT(1) NULL;
 
 ALTER TABLE ACT_CMMN_RU_CASE_INST ADD LOCK_TIME_ datetime NULL;
 
-ALTER TABLE ACT_CMMN_RU_PLAN_ITEM_INST ADD ITEM_DEFINITION_ID_ VARCHAR(255) NULL, ADD ITEM_DEFINITION_TYPE_ VARCHAR(255) NULL;
+ALTER TABLE ACT_CMMN_RU_PLAN_ITEM_INST ADD ITEM_DEFINITION_ID_ varchar(191) NULL, ADD ITEM_DEFINITION_TYPE_ varchar(191) NULL;
 
 INSERT INTO ACT_CMMN_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('2', 'flowable', 'changelog-xml/cmmn/6210.xml', NOW(), 3, '7:72a1f3f4767524ec0e22288a1621ebb9', 'addColumn tableName=ACT_CMMN_CASEDEF; addColumn tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addColumn tableName=ACT_CMMN_RU_CASE_INST; addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST', '', 'EXECUTED', NULL, NULL, '3.5.3', '2985405266');
 

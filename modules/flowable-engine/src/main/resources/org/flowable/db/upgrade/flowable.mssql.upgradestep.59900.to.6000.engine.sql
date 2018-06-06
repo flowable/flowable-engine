@@ -1,7 +1,7 @@
-alter table ACT_RE_PROCDEF add ENGINE_VERSION_ nvarchar(255);
+alter table ACT_RE_PROCDEF add ENGINE_VERSION_ nvarchar(191);
 update ACT_RE_PROCDEF set ENGINE_VERSION_ = 'v5';
 
-alter table ACT_RE_DEPLOYMENT add ENGINE_VERSION_ nvarchar(255);
+alter table ACT_RE_DEPLOYMENT add ENGINE_VERSION_ nvarchar(191);
 update ACT_RE_DEPLOYMENT set ENGINE_VERSION_ = 'v5';
 
 alter table ACT_RU_EXECUTION add ROOT_PROC_INST_ID_ nvarchar(64);

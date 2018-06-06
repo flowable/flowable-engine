@@ -7,11 +7,11 @@
 	<changeSet id="1" author="flowable">
 
         <createTable tableName="ACT_ADM_SERVER_CONFIG">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="NAME_" type="varchar(50)" />
-            <column name="DESCRIPTION_" type="varchar(255)" />
+            <column name="DESCRIPTION_" type="varchar(191)" />
             <column name="SERVER_ADDRESS_" type="varchar(100)" />
             <column name="PORT_" type="integer" />
             <column name="CONTEXT_ROOT_" type="varchar(100)" />

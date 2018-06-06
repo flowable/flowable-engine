@@ -1,8 +1,8 @@
 alter table ACT_RU_TASK
-	add FORM_KEY_ varchar(255);
+	add FORM_KEY_ varchar(191);
 	
 alter table ACT_RU_EXECUTION
-	add NAME_ varchar(255);
+	add NAME_ varchar(191);
 	
 create table ACT_EVT_LOG (
     LOG_NR_ bigint auto_increment,
@@ -12,9 +12,9 @@ create table ACT_EVT_LOG (
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
     TIME_STAMP_ timestamp(3) not null,
-    USER_ID_ varchar(255),
+    USER_ID_ varchar(191),
     DATA_ LONGBLOB,
-    LOCK_OWNER_ varchar(255),
+    LOCK_OWNER_ varchar(191),
     LOCK_TIME_ timestamp(3) null,
     IS_PROCESSED_ tinyint default 0,
     primary key (LOG_NR_)

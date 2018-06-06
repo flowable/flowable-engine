@@ -1,3 +1,3 @@
 alter table ACT_HI_PROCINST
-	add NAME_ varchar(255);
+	add NAME_ varchar(191);
 	

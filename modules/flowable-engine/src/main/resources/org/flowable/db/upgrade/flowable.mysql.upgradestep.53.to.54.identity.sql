@@ -6,9 +6,9 @@ create table ACT_ID_INFO (
     REV_ integer,
     USER_ID_ varchar(64),
     TYPE_ varchar(64),
-    KEY_ varchar(255),
-    VALUE_ varchar(255),
+    KEY_ varchar(191),
+    VALUE_ varchar(191),
     PASSWORD_ LONGBLOB,
-    PARENT_ID_ varchar(255),
+    PARENT_ID_ varchar(191),
     primary key (ID_)
 );

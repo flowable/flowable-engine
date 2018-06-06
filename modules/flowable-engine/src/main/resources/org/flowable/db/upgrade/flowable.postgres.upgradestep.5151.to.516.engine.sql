@@ -1,8 +1,8 @@
 alter table ACT_RU_TASK
-	add FORM_KEY_ varchar(255);
+	add FORM_KEY_ varchar(191);
 	
 alter table ACT_RU_EXECUTION
-	add NAME_ varchar(255);
+	add NAME_ varchar(191);
 
 create table ACT_EVT_LOG (
     LOG_NR_ SERIAL PRIMARY KEY,
@@ -12,9 +12,9 @@ create table ACT_EVT_LOG (
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
     TIME_STAMP_ timestamp not null,
-    USER_ID_ varchar(255),
+    USER_ID_ varchar(191),
     DATA_ bytea,
-    LOCK_OWNER_ varchar(255),
+    LOCK_OWNER_ varchar(191),
     LOCK_TIME_ timestamp null,
     IS_PROCESSED_ smallint default 0
 );  	

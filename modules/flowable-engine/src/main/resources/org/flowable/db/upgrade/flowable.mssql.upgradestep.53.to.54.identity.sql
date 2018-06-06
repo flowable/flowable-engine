@@ -6,9 +6,9 @@ create table ACT_ID_INFO (
     REV_ integer,
     USER_ID_ nvarchar(64),
     TYPE_ nvarchar(64),
-    KEY_ nvarchar(255),
-    VALUE_ nvarchar(255),
+    KEY_ nvarchar(191),
+    VALUE_ nvarchar(191),
     PASSWORD_ image,
-    PARENT_ID_ nvarchar(255),
+    PARENT_ID_ nvarchar(191),
     primary key (ID_)
 );

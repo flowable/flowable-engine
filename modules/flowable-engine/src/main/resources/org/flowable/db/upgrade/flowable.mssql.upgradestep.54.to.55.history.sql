@@ -1,8 +1,8 @@
 alter table ACT_HI_COMMENT 
-add TYPE_ nvarchar(255);
+add TYPE_ nvarchar(191);
 
 alter table ACT_HI_COMMENT 
-add ACTION_ nvarchar(255);
+add ACTION_ nvarchar(191);
 
 alter table ACT_HI_COMMENT 
 add FULL_MSG_ image;

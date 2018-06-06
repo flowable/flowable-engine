@@ -1,8 +1,8 @@
 alter table ACT_HI_COMMENT 
-add TYPE_ varchar(255);
+add TYPE_ varchar(191);
 
 alter table ACT_HI_COMMENT 
-add ACTION_ varchar(255);
+add ACTION_ varchar(191);
 
 alter table ACT_HI_COMMENT 
 add FULL_MSG_ bytea;

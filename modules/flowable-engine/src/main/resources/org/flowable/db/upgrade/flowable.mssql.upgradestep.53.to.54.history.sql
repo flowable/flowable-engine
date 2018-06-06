@@ -7,22 +7,22 @@ add DUE_DATE_ datetime;
 create table ACT_HI_COMMENT (
     ID_ nvarchar(64) not null,
     TIME_ datetime not null,
-    USER_ID_ nvarchar(255),
+    USER_ID_ nvarchar(191),
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
-    MESSAGE_ nvarchar(255),
+    MESSAGE_ nvarchar(191),
     primary key (ID_)
 );
 
 create table ACT_HI_ATTACHMENT (
     ID_ nvarchar(64) not null,
     REV_ integer,
-    NAME_ nvarchar(255),
-    DESCRIPTION_ nvarchar(255),
-    TYPE_ nvarchar(255),
+    NAME_ nvarchar(191),
+    DESCRIPTION_ nvarchar(191),
+    TYPE_ nvarchar(191),
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
-    URL_ nvarchar(255),
+    URL_ nvarchar(191),
     CONTENT_ID_ nvarchar(64),
     primary key (ID_)
 );

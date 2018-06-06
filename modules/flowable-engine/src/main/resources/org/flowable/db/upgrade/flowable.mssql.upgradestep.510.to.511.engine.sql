@@ -1,6 +1,6 @@
 alter table ACT_RE_PROCDEF drop constraint ACT_UNIQ_PROCDEF;
 
-alter table ACT_RE_PROCDEF alter column KEY_ nvarchar(255) not null;
+alter table ACT_RE_PROCDEF alter column KEY_ nvarchar(191) not null;
 
 alter table ACT_RE_PROCDEF alter column VERSION_ int not null;
 
@@ -8,7 +8,7 @@ alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_);
 
-alter table ACT_RE_DEPLOYMENT add CATEGORY_ nvarchar(255);
+alter table ACT_RE_DEPLOYMENT add CATEGORY_ nvarchar(191);
     
 alter table ACT_RE_PROCDEF
     add DESCRIPTION_ nvarchar(4000);
@@ -26,9 +26,9 @@ alter table ACT_RU_EXECUTION
 create table ACT_RE_MODEL (
     ID_ nvarchar(64) not null,
     REV_ int,
-    NAME_ nvarchar(255),
-    KEY_ nvarchar(255),
-    CATEGORY_ nvarchar(255),
+    NAME_ nvarchar(191),
+    KEY_ nvarchar(191),
+    CATEGORY_ nvarchar(191),
     CREATE_TIME_ datetime,
     LAST_UPDATE_TIME_ datetime,
     VERSION_ int,

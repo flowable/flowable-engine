@@ -11,7 +11,7 @@ values ('schema.version', '6.0.0.0', 1);
 create table ACT_ID_BYTEARRAY (
     ID_ varchar(64),
     REV_ integer,
-    NAME_ varchar(255),
+    NAME_ varchar(191),
     BYTES_ longvarbinary,
     primary key (ID_)
 );
@@ -19,26 +19,26 @@ create table ACT_ID_BYTEARRAY (
 create table ACT_ID_TOKEN (
     ID_ varchar(64) not null,
     REV_ integer,
-    TOKEN_VALUE_ varchar(255),
+    TOKEN_VALUE_ varchar(191),
     TOKEN_DATE_ timestamp,
-    IP_ADDRESS_ varchar(255),
-    USER_AGENT_ varchar(255),
-    USER_ID_ varchar(255),
+    IP_ADDRESS_ varchar(191),
+    USER_AGENT_ varchar(191),
+    USER_ID_ varchar(191),
     TOKEN_DATA_ varchar(2000),
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV (
     ID_ varchar(64) not null,
-    NAME_ varchar(255),
+    NAME_ varchar(191),
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV_MAPPING (
     ID_ varchar(64) not null,
     PRIV_ID_ varchar(64) not null,
-    USER_ID_ varchar(255),
-    GROUP_ID_ varchar(255),
+    USER_ID_ varchar(191),
+    GROUP_ID_ varchar(191),
     primary key (ID_)
 );
 
@@ -49,10 +49,10 @@ alter table ACT_ID_PRIV_MAPPING
     
 create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
 create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);    
-alter table ACT_RE_PROCDEF add column ENGINE_VERSION_ varchar(255);
+alter table ACT_RE_PROCDEF add column ENGINE_VERSION_ varchar(191);
 update ACT_RE_PROCDEF set ENGINE_VERSION_ = 'v5';
 
-alter table ACT_RE_DEPLOYMENT add column ENGINE_VERSION_ varchar(255);
+alter table ACT_RE_DEPLOYMENT add column ENGINE_VERSION_ varchar(191);
 update ACT_RE_DEPLOYMENT set ENGINE_VERSION_ = 'v5';
 
 alter table ACT_RU_EXECUTION add column ROOT_PROC_INST_ID_ varchar(64);

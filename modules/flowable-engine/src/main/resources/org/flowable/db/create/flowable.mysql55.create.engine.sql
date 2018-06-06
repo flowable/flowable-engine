@@ -1,23 +1,23 @@
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
-    NAME_ varchar(255),
-    CATEGORY_ varchar(255),
-    KEY_ varchar(255),
-    TENANT_ID_ varchar(255) default '',
+    NAME_ varchar(191),
+    CATEGORY_ varchar(191),
+    KEY_ varchar(191),
+    TENANT_ID_ varchar(191) default '',
     DEPLOY_TIME_ timestamp NULL,
     DERIVED_FROM_ varchar(64),
     DERIVED_FROM_ROOT_ varchar(64),
-    PARENT_DEPLOYMENT_ID_ varchar(255),
-    ENGINE_VERSION_ varchar(255),
+    PARENT_DEPLOYMENT_ID_ varchar(191),
+    ENGINE_VERSION_ varchar(191),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 create table ACT_RE_MODEL (
     ID_ varchar(64) not null,
     REV_ integer,
-    NAME_ varchar(255),
-    KEY_ varchar(255),
-    CATEGORY_ varchar(255),
+    NAME_ varchar(191),
+    KEY_ varchar(191),
+    CATEGORY_ varchar(191),
     CREATE_TIME_ timestamp null,
     LAST_UPDATE_TIME_ timestamp null,
     VERSION_ integer,
@@ -25,7 +25,7 @@ create table ACT_RE_MODEL (
     DEPLOYMENT_ID_ varchar(64),
     EDITOR_SOURCE_VALUE_ID_ varchar(64),
     EDITOR_SOURCE_EXTRA_VALUE_ID_ varchar(64),
-    TENANT_ID_ varchar(255) default '',
+    TENANT_ID_ varchar(191) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -33,12 +33,12 @@ create table ACT_RU_EXECUTION (
     ID_ varchar(64),
     REV_ integer,
     PROC_INST_ID_ varchar(64),
-    BUSINESS_KEY_ varchar(255),
+    BUSINESS_KEY_ varchar(191),
     PARENT_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
     SUPER_EXEC_ varchar(64),
     ROOT_PROC_INST_ID_ varchar(64),
-    ACT_ID_ varchar(255),
+    ACT_ID_ varchar(191),
     IS_ACTIVE_ TINYINT,
     IS_CONCURRENT_ TINYINT,
     IS_SCOPE_ TINYINT,
@@ -46,10 +46,10 @@ create table ACT_RU_EXECUTION (
     IS_MI_ROOT_ TINYINT,
     SUSPENSION_STATE_ integer,
     CACHED_ENT_STATE_ integer,
-    TENANT_ID_ varchar(255) default '',
-    NAME_ varchar(255),
+    TENANT_ID_ varchar(191) default '',
+    NAME_ varchar(191),
     START_TIME_ datetime,
-    START_USER_ID_ varchar(255),
+    START_USER_ID_ varchar(191),
     LOCK_TIME_ timestamp NULL,
     IS_COUNT_ENABLED_ TINYINT,
     EVT_SUBSCR_COUNT_ integer, 
@@ -60,17 +60,17 @@ create table ACT_RU_EXECUTION (
     DEADLETTER_JOB_COUNT_ integer,
     VAR_COUNT_ integer, 
     ID_LINK_COUNT_ integer,
-    CALLBACK_ID_ varchar(255),
-    CALLBACK_TYPE_ varchar(255),
+    CALLBACK_ID_ varchar(191),
+    CALLBACK_TYPE_ varchar(191),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 create table ACT_RE_PROCDEF (
     ID_ varchar(64) not null,
     REV_ integer,
-    CATEGORY_ varchar(255),
-    NAME_ varchar(255),
-    KEY_ varchar(255) not null,
+    CATEGORY_ varchar(191),
+    NAME_ varchar(191),
+    KEY_ varchar(191) not null,
     VERSION_ integer not null,
     DEPLOYMENT_ID_ varchar(64),
     RESOURCE_NAME_ varchar(4000),
@@ -79,26 +79,26 @@ create table ACT_RE_PROCDEF (
     HAS_START_FORM_KEY_ TINYINT,
     HAS_GRAPHICAL_NOTATION_ TINYINT,
     SUSPENSION_STATE_ integer,
-    TENANT_ID_ varchar(255) default '',
+    TENANT_ID_ varchar(191) default '',
     DERIVED_FROM_ varchar(64),
     DERIVED_FROM_ROOT_ varchar(64),
     DERIVED_VERSION_ integer not null default 0,
-    ENGINE_VERSION_ varchar(255),
+    ENGINE_VERSION_ varchar(191),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 create table ACT_RU_EVENT_SUBSCR (
     ID_ varchar(64) not null,
     REV_ integer,
-    EVENT_TYPE_ varchar(255) not null,
-    EVENT_NAME_ varchar(255),
+    EVENT_TYPE_ varchar(191) not null,
+    EVENT_NAME_ varchar(191),
     EXECUTION_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     ACTIVITY_ID_ varchar(64),
-    CONFIGURATION_ varchar(255),
+    CONFIGURATION_ varchar(191),
     CREATED_ timestamp not null DEFAULT CURRENT_TIMESTAMP,
     PROC_DEF_ID_ varchar(64),
-    TENANT_ID_ varchar(255) default '',
+    TENANT_ID_ varchar(191) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -110,9 +110,9 @@ create table ACT_EVT_LOG (
     EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
     TIME_STAMP_ timestamp not null,
-    USER_ID_ varchar(255),
+    USER_ID_ varchar(191),
     DATA_ LONGBLOB,
-    LOCK_OWNER_ varchar(255),
+    LOCK_OWNER_ varchar(191),
     LOCK_TIME_ timestamp null,
     IS_PROCESSED_ tinyint default 0,
     primary key (LOG_NR_)

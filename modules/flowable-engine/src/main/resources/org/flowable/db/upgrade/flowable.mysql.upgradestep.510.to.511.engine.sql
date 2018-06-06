@@ -1,5 +1,5 @@
 alter table ACT_RE_PROCDEF 
-    MODIFY KEY_ varchar(255) not null;
+    MODIFY KEY_ varchar(191) not null;
 
 alter table ACT_RE_PROCDEF 
     MODIFY VERSION_ integer not null;
@@ -9,7 +9,7 @@ alter table ACT_RU_JOB
     MODIFY LOCK_EXP_TIME_ timestamp null;
     
 alter table ACT_RE_DEPLOYMENT 
-    add CATEGORY_ varchar(255);
+    add CATEGORY_ varchar(191);
     
 alter table ACT_RE_PROCDEF
     add DESCRIPTION_ varchar(4000);
@@ -27,9 +27,9 @@ alter table ACT_RU_EXECUTION
 create table ACT_RE_MODEL (
     ID_ varchar(64) not null,
     REV_ integer,
-    NAME_ varchar(255),
-    KEY_ varchar(255),
-    CATEGORY_ varchar(255),
+    NAME_ varchar(191),
+    KEY_ varchar(191),
+    CATEGORY_ varchar(191),
     CREATE_TIME_ timestamp null,
     LAST_UPDATE_TIME_ timestamp null,
     VERSION_ integer,

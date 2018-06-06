@@ -18,12 +18,12 @@ update ACT_RU_EXECUTION set SUSPENSION_STATE_ = 1;
 create table ACT_RU_EVENT_SUBSCR (
     ID_ varchar(64) not null,
     REV_ integer,
-    EVENT_TYPE_ varchar(255) not null,
-    EVENT_NAME_ varchar(255),
+    EVENT_TYPE_ varchar(191) not null,
+    EVENT_NAME_ varchar(191),
     EXECUTION_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     ACTIVITY_ID_ varchar(64),
-    CONFIGURATION_ varchar(255),
+    CONFIGURATION_ varchar(191),
     CREATED_ timestamp not null DEFAULT CURRENT_TIMESTAMP,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

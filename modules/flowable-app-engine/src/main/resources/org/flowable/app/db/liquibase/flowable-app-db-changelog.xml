@@ -8,28 +8,28 @@
     <changeSet id="1" author="flowable">
 
         <createTable tableName="ACT_APP_DEPLOYMENT">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="CATEGORY_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)" />
+            <column name="CATEGORY_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
-            <column name="KEY_" type="varchar(255)">
+            <column name="KEY_" type="varchar(191)">
                 <constraints nullable="true" />
             </column>
             <column name="DEPLOY_TIME_" type="datetime">
                 <constraints nullable="true" />
             </column>
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </createTable>
 
         <createTable tableName="ACT_APP_DEPLOYMENT_RESOURCE">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" primaryKeyName="PK_APP_DEPLOYMENT_RESOURCE" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(191)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
             <column name="RESOURCE_BYTES_" type="longblob">
                 <constraints nullable="true" />
             </column>
@@ -46,24 +46,24 @@
         </createIndex>            
 
         <createTable tableName="ACT_APP_APPDEF">
-            <column name="ID_" type="varchar(255)">
+            <column name="ID_" type="varchar(191)">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="NAME_" type="varchar(255)" />
-            <column name="KEY_" type="varchar(255)">
+            <column name="NAME_" type="varchar(191)" />
+            <column name="KEY_" type="varchar(191)">
                 <constraints nullable="false" />
             </column>
             <column name="VERSION_" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="CATEGORY_" type="varchar(255)" />
-            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="CATEGORY_" type="varchar(191)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(191)" />
             <column name="RESOURCE_NAME_" type="varchar(4000)" />
             <column name="DESCRIPTION_" type="varchar(4000)" />
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+            <column name="TENANT_ID_" type="varchar(191)" defaultValue="" />
         </createTable>
         
         <addForeignKeyConstraint constraintName="ACT_FK_APP_DEF_DPLY" 

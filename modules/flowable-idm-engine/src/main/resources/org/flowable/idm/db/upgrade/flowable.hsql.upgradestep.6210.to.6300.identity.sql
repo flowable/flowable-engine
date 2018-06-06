@@ -1,4 +1,4 @@
-alter table ACT_ID_USER add column TENANT_ID_ varchar(255) default '';
+alter table ACT_ID_USER add column TENANT_ID_ varchar(191) default '';
 
 alter table ACT_ID_PRIV alter column NAME_ set not null;
 alter table ACT_ID_PRIV add constraint ACT_UNIQ_PRIV_NAME unique (NAME_);

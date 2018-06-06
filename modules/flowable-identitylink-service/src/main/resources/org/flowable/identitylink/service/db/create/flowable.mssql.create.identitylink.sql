@@ -1,15 +1,15 @@
 create table ACT_RU_IDENTITYLINK (
     ID_ nvarchar(64),
     REV_ int,
-    GROUP_ID_ nvarchar(255),
-    TYPE_ nvarchar(255),
-    USER_ID_ nvarchar(255),
+    GROUP_ID_ nvarchar(191),
+    TYPE_ nvarchar(191),
+    USER_ID_ nvarchar(191),
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
     primary key (ID_)
 );
 

@@ -5,7 +5,7 @@ alter table ACT_RE_PROCDEF
     alter column VERSION_ set not null;
     
 alter table ACT_RE_DEPLOYMENT 
-add CATEGORY_ varchar(255);
+add CATEGORY_ varchar(191);
 
 alter table ACT_RE_PROCDEF
     add DESCRIPTION_ varchar(4000);  
@@ -23,9 +23,9 @@ update ACT_RU_TASK set SUSPENSION_STATE_ = 1;
 create table ACT_RE_MODEL (
     ID_ varchar(64) not null,
     REV_ integer,
-    NAME_ varchar(255),
-    KEY_ varchar(255),
-    CATEGORY_ varchar(255),
+    NAME_ varchar(191),
+    KEY_ varchar(191),
+    CATEGORY_ varchar(191),
     CREATE_TIME_ timestamp,
     LAST_UPDATE_TIME_ timestamp,
     VERSION_ integer,

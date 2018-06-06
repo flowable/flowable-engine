@@ -11,7 +11,7 @@ values ('schema.version', '6.3.2.0', 1);
 create table ACT_ID_BYTEARRAY (
     ID_ varchar(64),
     REV_ integer,
-    NAME_ varchar(255),
+    NAME_ varchar(191),
     BYTES_ bytea,
     primary key (ID_)
 );
@@ -19,8 +19,8 @@ create table ACT_ID_BYTEARRAY (
 create table ACT_ID_GROUP (
     ID_ varchar(64),
     REV_ integer,
-    NAME_ varchar(255),
-    TYPE_ varchar(255),
+    NAME_ varchar(191),
+    TYPE_ varchar(191),
     primary key (ID_)
 );
 
@@ -33,12 +33,12 @@ create table ACT_ID_MEMBERSHIP (
 create table ACT_ID_USER (
     ID_ varchar(64),
     REV_ integer,
-    FIRST_ varchar(255),
-    LAST_ varchar(255),
-    EMAIL_ varchar(255),
-    PWD_ varchar(255),
+    FIRST_ varchar(191),
+    LAST_ varchar(191),
+    EMAIL_ varchar(191),
+    PWD_ varchar(191),
     PICTURE_ID_ varchar(64),
-    TENANT_ID_ varchar(255) default '',
+    TENANT_ID_ varchar(191) default '',
     primary key (ID_)
 );
 
@@ -47,36 +47,36 @@ create table ACT_ID_INFO (
     REV_ integer,
     USER_ID_ varchar(64),
     TYPE_ varchar(64),
-    KEY_ varchar(255),
-    VALUE_ varchar(255),
+    KEY_ varchar(191),
+    VALUE_ varchar(191),
     PASSWORD_ bytea,
-    PARENT_ID_ varchar(255),
+    PARENT_ID_ varchar(191),
     primary key (ID_)
 );
 
 create table ACT_ID_TOKEN (
     ID_ varchar(64) not null,
     REV_ integer,
-    TOKEN_VALUE_ varchar(255),
+    TOKEN_VALUE_ varchar(191),
     TOKEN_DATE_ timestamp,
-    IP_ADDRESS_ varchar(255),
-    USER_AGENT_ varchar(255),
-    USER_ID_ varchar(255),
+    IP_ADDRESS_ varchar(191),
+    USER_AGENT_ varchar(191),
+    USER_ID_ varchar(191),
     TOKEN_DATA_ varchar(2000),
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV (
     ID_ varchar(64) not null,
-    NAME_ varchar(255) not null,
+    NAME_ varchar(191) not null,
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV_MAPPING (
     ID_ varchar(64) not null,
     PRIV_ID_ varchar(64) not null,
-    USER_ID_ varchar(255),
-    GROUP_ID_ varchar(255),
+    USER_ID_ varchar(191),
+    GROUP_ID_ varchar(191),
     primary key (ID_)
 );
 

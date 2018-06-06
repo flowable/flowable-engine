@@ -4,20 +4,20 @@ execute java org.activiti.engine.impl.db.upgrade.DbUpgradeStep52To53InsertProper
 
 create table ACT_HI_DETAIL_TMP (
     ID_ nvarchar(64) not null,
-    TYPE_ nvarchar(255) not null,
+    TYPE_ nvarchar(191) not null,
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
-    NAME_ nvarchar(255),
-    VAR_TYPE_ nvarchar(255),
+    NAME_ nvarchar(191),
+    VAR_TYPE_ nvarchar(191),
     REV_ int,
     TIME_ datetime not null,
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
     LONG_ numeric(19,0),
-    TEXT_ nvarchar(255),
-    TEXT2_ nvarchar(255),
+    TEXT_ nvarchar(191),
+    TEXT2_ nvarchar(191),
     primary key (ID_)
 );
 
@@ -28,20 +28,20 @@ drop table ACT_HI_DETAIL;
 
 create table ACT_HI_DETAIL (
     ID_ nvarchar(64) not null,
-    TYPE_ nvarchar(255) not null,
+    TYPE_ nvarchar(191) not null,
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
-    NAME_ nvarchar(255),
-    VAR_TYPE_ nvarchar(255),
+    NAME_ nvarchar(191),
+    VAR_TYPE_ nvarchar(191),
     REV_ int,
     TIME_ datetime not null,
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
     LONG_ numeric(19,0),
-    TEXT_ nvarchar(255),
-    TEXT2_ nvarchar(255),
+    TEXT_ nvarchar(191),
+    TEXT2_ nvarchar(191),
     primary key (ID_)
 );
 

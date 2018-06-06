@@ -1,14 +1,14 @@
 create table ACT_HI_IDENTITYLINK (
     ID_ varchar(64),
-    GROUP_ID_ varchar(255),
-    TYPE_ varchar(255),
-    USER_ID_ varchar(255),
+    GROUP_ID_ varchar(191),
+    TYPE_ varchar(191),
+    USER_ID_ varchar(191),
     TASK_ID_ varchar(64),
     CREATE_TIME_ timestamp,
     PROC_INST_ID_ varchar(64) null,
-    SCOPE_ID_ varchar(255),
-    SCOPE_TYPE_ varchar(255),
-    SCOPE_DEFINITION_ID_ varchar(255),
+    SCOPE_ID_ varchar(191),
+    SCOPE_TYPE_ varchar(191),
+    SCOPE_DEFINITION_ID_ varchar(191),
     primary key (ID_)
 );
 

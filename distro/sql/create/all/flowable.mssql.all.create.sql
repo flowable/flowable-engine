@@ -8,7 +8,7 @@ create table ACT_GE_PROPERTY (
 create table ACT_GE_BYTEARRAY (
     ID_ nvarchar(64),
     REV_ int,
-    NAME_ nvarchar(255),
+    NAME_ nvarchar(191),
     DEPLOYMENT_ID_ nvarchar(64),
     BYTES_  varbinary(max),
     GENERATED_ tinyint,
@@ -24,15 +24,15 @@ values ('next.dbid', '1', 1);
 create table ACT_RU_IDENTITYLINK (
     ID_ nvarchar(64),
     REV_ int,
-    GROUP_ID_ nvarchar(255),
-    TYPE_ nvarchar(255),
-    USER_ID_ nvarchar(255),
+    GROUP_ID_ nvarchar(191),
+    TYPE_ nvarchar(191),
+    USER_ID_ nvarchar(191),
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
     primary key (ID_)
 );
 
@@ -49,24 +49,24 @@ create table ACT_RU_TASK (
     PROC_INST_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
     TASK_DEF_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SUB_SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
-    NAME_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SUB_SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
+    NAME_ nvarchar(191),
     PARENT_TASK_ID_ nvarchar(64),
     DESCRIPTION_ nvarchar(4000),
-    TASK_DEF_KEY_ nvarchar(255),
-    OWNER_ nvarchar(255),
-    ASSIGNEE_ nvarchar(255),
+    TASK_DEF_KEY_ nvarchar(191),
+    OWNER_ nvarchar(191),
+    ASSIGNEE_ nvarchar(191),
     DELEGATION_ nvarchar(64),
     PRIORITY_ int,
     CREATE_TIME_ datetime,
     DUE_DATE_ datetime,
-    CATEGORY_ nvarchar(255),
+    CATEGORY_ nvarchar(191),
     SUSPENSION_STATE_ int,
-    TENANT_ID_ nvarchar(255) default '',
-    FORM_KEY_ nvarchar(255),
+    TENANT_ID_ nvarchar(191) default '',
+    FORM_KEY_ nvarchar(191),
     CLAIM_TIME_ datetime,
     IS_COUNT_ENABLED_ tinyint,
     VAR_COUNT_ int, 
@@ -84,14 +84,14 @@ insert into ACT_GE_PROPERTY values ('task.schema.version', '6.3.1.0', 1);
 create table ACT_RU_VARIABLE (
     ID_ nvarchar(64) not null,
     REV_ int,
-    TYPE_ nvarchar(255) not null,
-    NAME_ nvarchar(255) not null,
+    TYPE_ nvarchar(191) not null,
+    NAME_ nvarchar(191) not null,
     EXECUTION_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SUB_SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SUB_SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
     LONG_ numeric(19,0),
@@ -113,103 +113,103 @@ insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.3.1.0', 1);
 create table ACT_RU_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
-    TYPE_ nvarchar(255) NOT NULL,
+    TYPE_ nvarchar(191) NOT NULL,
     LOCK_EXP_TIME_ datetime,
-    LOCK_OWNER_ nvarchar(255),
+    LOCK_OWNER_ nvarchar(191),
     EXCLUSIVE_ bit,
     EXECUTION_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SUB_SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SUB_SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
     RETRIES_ int,
     EXCEPTION_STACK_ID_ nvarchar(64),
     EXCEPTION_MSG_ nvarchar(4000),
     DUEDATE_ datetime NULL,
-    REPEAT_ nvarchar(255),
-    HANDLER_TYPE_ nvarchar(255),
+    REPEAT_ nvarchar(191),
+    HANDLER_TYPE_ nvarchar(191),
     HANDLER_CFG_ nvarchar(4000),
     CUSTOM_VALUES_ID_ nvarchar(64),
     CREATE_TIME_ datetime2 NULL,
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
 create table ACT_RU_TIMER_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
-    TYPE_ nvarchar(255) NOT NULL,
+    TYPE_ nvarchar(191) NOT NULL,
     LOCK_EXP_TIME_ datetime,
-    LOCK_OWNER_ nvarchar(255),
+    LOCK_OWNER_ nvarchar(191),
     EXCLUSIVE_ bit,
     EXECUTION_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SUB_SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SUB_SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
     RETRIES_ int,
     EXCEPTION_STACK_ID_ nvarchar(64),
     EXCEPTION_MSG_ nvarchar(4000),
     DUEDATE_ datetime NULL,
-    REPEAT_ nvarchar(255),
-    HANDLER_TYPE_ nvarchar(255),
+    REPEAT_ nvarchar(191),
+    HANDLER_TYPE_ nvarchar(191),
     HANDLER_CFG_ nvarchar(4000),
     CUSTOM_VALUES_ID_ nvarchar(64),
     CREATE_TIME_ datetime2 NULL,
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
 create table ACT_RU_SUSPENDED_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
-    TYPE_ nvarchar(255) NOT NULL,
+    TYPE_ nvarchar(191) NOT NULL,
     EXCLUSIVE_ bit,
     EXECUTION_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SUB_SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SUB_SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
     RETRIES_ int,
     EXCEPTION_STACK_ID_ nvarchar(64),
     EXCEPTION_MSG_ nvarchar(4000),
     DUEDATE_ datetime NULL,
-    REPEAT_ nvarchar(255),
-    HANDLER_TYPE_ nvarchar(255),
+    REPEAT_ nvarchar(191),
+    HANDLER_TYPE_ nvarchar(191),
     HANDLER_CFG_ nvarchar(4000),
     CUSTOM_VALUES_ID_ nvarchar(64),
     CREATE_TIME_ datetime2 NULL,
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
 create table ACT_RU_DEADLETTER_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
-    TYPE_ nvarchar(255) NOT NULL,
+    TYPE_ nvarchar(191) NOT NULL,
     EXCLUSIVE_ bit,
     EXECUTION_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SUB_SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SUB_SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
     EXCEPTION_STACK_ID_ nvarchar(64),
     EXCEPTION_MSG_ nvarchar(4000),
     DUEDATE_ datetime NULL,
-    REPEAT_ nvarchar(255),
-    HANDLER_TYPE_ nvarchar(255),
+    REPEAT_ nvarchar(191),
+    HANDLER_TYPE_ nvarchar(191),
     HANDLER_CFG_ nvarchar(4000),
     CUSTOM_VALUES_ID_ nvarchar(64),
     CREATE_TIME_ datetime2 NULL,
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
@@ -217,17 +217,17 @@ create table ACT_RU_HISTORY_JOB (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,
     LOCK_EXP_TIME_ datetime NULL,
-    LOCK_OWNER_ nvarchar(255),
+    LOCK_OWNER_ nvarchar(191),
     RETRIES_ int,
     EXCEPTION_STACK_ID_ nvarchar(64),
     EXCEPTION_MSG_ nvarchar(4000),
-    HANDLER_TYPE_ nvarchar(255),
+    HANDLER_TYPE_ nvarchar(191),
     HANDLER_CFG_ nvarchar(4000),
     CUSTOM_VALUES_ID_ nvarchar(64),
     ADV_HANDLER_CFG_ID_ nvarchar(64),
     CREATE_TIME_ datetime2 NULL,
-    SCOPE_TYPE_ nvarchar(255),
-    TENANT_ID_ nvarchar(255) default '',
+    SCOPE_TYPE_ nvarchar(191),
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
@@ -302,24 +302,24 @@ create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID
 insert into ACT_GE_PROPERTY values ('job.schema.version', '6.3.1.0', 1);
 create table ACT_RE_DEPLOYMENT (
     ID_ nvarchar(64),
-    NAME_ nvarchar(255),
-    CATEGORY_ nvarchar(255),
-    KEY_ nvarchar(255),
-    TENANT_ID_ nvarchar(255) default '',
+    NAME_ nvarchar(191),
+    CATEGORY_ nvarchar(191),
+    KEY_ nvarchar(191),
+    TENANT_ID_ nvarchar(191) default '',
     DEPLOY_TIME_ datetime,
     DERIVED_FROM_ nvarchar(64),
     DERIVED_FROM_ROOT_ nvarchar(64),
-    PARENT_DEPLOYMENT_ID_ nvarchar(255),
-    ENGINE_VERSION_ nvarchar(255),
+    PARENT_DEPLOYMENT_ID_ nvarchar(191),
+    ENGINE_VERSION_ nvarchar(191),
     primary key (ID_)
 );
 
 create table ACT_RE_MODEL (
     ID_ nvarchar(64) not null,
     REV_ int,
-    NAME_ nvarchar(255),
-    KEY_ nvarchar(255),
-    CATEGORY_ nvarchar(255),
+    NAME_ nvarchar(191),
+    KEY_ nvarchar(191),
+    CATEGORY_ nvarchar(191),
     CREATE_TIME_ datetime,
     LAST_UPDATE_TIME_ datetime,
     VERSION_ int,
@@ -327,7 +327,7 @@ create table ACT_RE_MODEL (
     DEPLOYMENT_ID_ nvarchar(64),
     EDITOR_SOURCE_VALUE_ID_ nvarchar(64),
     EDITOR_SOURCE_EXTRA_VALUE_ID_ nvarchar(64),
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
@@ -335,12 +335,12 @@ create table ACT_RU_EXECUTION (
     ID_ nvarchar(64),
     REV_ int,
     PROC_INST_ID_ nvarchar(64),
-    BUSINESS_KEY_ nvarchar(255),
+    BUSINESS_KEY_ nvarchar(191),
     PARENT_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
     SUPER_EXEC_ nvarchar(64),
     ROOT_PROC_INST_ID_ nvarchar(64),
-    ACT_ID_ nvarchar(255),
+    ACT_ID_ nvarchar(191),
     IS_ACTIVE_ tinyint,
     IS_CONCURRENT_ tinyint,
     IS_SCOPE_ tinyint,
@@ -348,11 +348,11 @@ create table ACT_RU_EXECUTION (
     IS_MI_ROOT_ tinyint,
     SUSPENSION_STATE_ tinyint,
     CACHED_ENT_STATE_ int,
-    TENANT_ID_ nvarchar(255) default '',
-    NAME_ nvarchar(255),
-    START_ACT_ID_ nvarchar(255),
+    TENANT_ID_ nvarchar(191) default '',
+    NAME_ nvarchar(191),
+    START_ACT_ID_ nvarchar(191),
     START_TIME_ datetime,
-    START_USER_ID_ nvarchar(255),
+    START_USER_ID_ nvarchar(191),
     LOCK_TIME_ datetime,
     IS_COUNT_ENABLED_ tinyint,
     EVT_SUBSCR_COUNT_ int, 
@@ -363,17 +363,17 @@ create table ACT_RU_EXECUTION (
     DEADLETTER_JOB_COUNT_ int,
     VAR_COUNT_ int, 
     ID_LINK_COUNT_ int,
-    CALLBACK_ID_ nvarchar(255),
-    CALLBACK_TYPE_ nvarchar(255),
+    CALLBACK_ID_ nvarchar(191),
+    CALLBACK_TYPE_ nvarchar(191),
     primary key (ID_)
 );
 
 create table ACT_RE_PROCDEF (
     ID_ nvarchar(64) not null,
     REV_ int,
-    CATEGORY_ nvarchar(255),
-    NAME_ nvarchar(255),
-    KEY_ nvarchar(255) not null,
+    CATEGORY_ nvarchar(191),
+    NAME_ nvarchar(191),
+    KEY_ nvarchar(191) not null,
     VERSION_ int not null,
     DEPLOYMENT_ID_ nvarchar(64),
     RESOURCE_NAME_ nvarchar(4000),
@@ -382,26 +382,26 @@ create table ACT_RE_PROCDEF (
     HAS_START_FORM_KEY_ tinyint,
     HAS_GRAPHICAL_NOTATION_ tinyint,
     SUSPENSION_STATE_ tinyint,
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     DERIVED_FROM_ nvarchar(64),
     DERIVED_FROM_ROOT_ nvarchar(64),
     DERIVED_VERSION_ int not null default 0,
-    ENGINE_VERSION_ nvarchar(255),
+    ENGINE_VERSION_ nvarchar(191),
     primary key (ID_)
 );
 
 create table ACT_RU_EVENT_SUBSCR (
     ID_ nvarchar(64) not null,
     REV_ int,
-    EVENT_TYPE_ nvarchar(255) not null,
-    EVENT_NAME_ nvarchar(255),
+    EVENT_TYPE_ nvarchar(191) not null,
+    EVENT_NAME_ nvarchar(191),
     EXECUTION_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     ACTIVITY_ID_ nvarchar(64),
-    CONFIGURATION_ nvarchar(255),
+    CONFIGURATION_ nvarchar(191),
     CREATED_ datetime not null,
     PROC_DEF_ID_ nvarchar(64),
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
@@ -413,9 +413,9 @@ create table ACT_EVT_LOG (
     EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     TIME_STAMP_ datetime not null,
-    USER_ID_ nvarchar(255),
+    USER_ID_ nvarchar(191),
     DATA_ varbinary(max),
-    LOCK_OWNER_ nvarchar(255),
+    LOCK_OWNER_ nvarchar(191),
     LOCK_TIME_ datetime null,
     IS_PROCESSED_ tinyint default 0,
     primary key (LOG_NR_)
@@ -627,15 +627,15 @@ values ('schema.history', 'create(6.3.1.0)', 1);
 
 create table ACT_HI_IDENTITYLINK (
     ID_ nvarchar(64),
-    GROUP_ID_ nvarchar(255),
-    TYPE_ nvarchar(255),
-    USER_ID_ nvarchar(255),
+    GROUP_ID_ nvarchar(191),
+    TYPE_ nvarchar(191),
+    USER_ID_ nvarchar(191),
     TASK_ID_ nvarchar(64),
     CREATE_TIME_ datetime,
     PROC_INST_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
     primary key (ID_)
 );
 
@@ -648,18 +648,18 @@ create table ACT_HI_TASKINST (
     REV_ int default 1,
     PROC_DEF_ID_ nvarchar(64),
     TASK_DEF_ID_ nvarchar(64),
-    TASK_DEF_KEY_ nvarchar(255),
+    TASK_DEF_KEY_ nvarchar(191),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
-    SCOPE_ID_ nvarchar(255),
-    SUB_SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
-    SCOPE_DEFINITION_ID_ nvarchar(255),
-    NAME_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SUB_SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
+    SCOPE_DEFINITION_ID_ nvarchar(191),
+    NAME_ nvarchar(191),
     PARENT_TASK_ID_ nvarchar(64),
     DESCRIPTION_ nvarchar(4000),
-    OWNER_ nvarchar(255),
-    ASSIGNEE_ nvarchar(255),
+    OWNER_ nvarchar(191),
+    ASSIGNEE_ nvarchar(191),
     START_TIME_ datetime not null,
     CLAIM_TIME_ datetime,
     END_TIME_ datetime,
@@ -667,9 +667,9 @@ create table ACT_HI_TASKINST (
     DELETE_REASON_ nvarchar(4000),
     PRIORITY_ int,
     DUE_DATE_ datetime,
-    FORM_KEY_ nvarchar(255),
-    CATEGORY_ nvarchar(255),
-    TENANT_ID_ nvarchar(255) default '',
+    FORM_KEY_ nvarchar(191),
+    CATEGORY_ nvarchar(191),
+    TENANT_ID_ nvarchar(191) default '',
     LAST_UPDATED_TIME_ datetime2,
     primary key (ID_)
 );
@@ -683,11 +683,11 @@ create table ACT_HI_VARINST (
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
-    NAME_ nvarchar(255) not null,
+    NAME_ nvarchar(191) not null,
     VAR_TYPE_ nvarchar(100),
-    SCOPE_ID_ nvarchar(255),
-    SUB_SCOPE_ID_ nvarchar(255),
-    SCOPE_TYPE_ nvarchar(255),
+    SCOPE_ID_ nvarchar(191),
+    SUB_SCOPE_ID_ nvarchar(191),
+    SCOPE_TYPE_ nvarchar(191),
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
     LONG_ numeric(19,0),
@@ -706,20 +706,20 @@ create table ACT_HI_PROCINST (
     ID_ nvarchar(64) not null,
     REV_ int default 1,
     PROC_INST_ID_ nvarchar(64) not null,
-    BUSINESS_KEY_ nvarchar(255),
+    BUSINESS_KEY_ nvarchar(191),
     PROC_DEF_ID_ nvarchar(64) not null,
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     DURATION_ numeric(19,0),
-    START_USER_ID_ nvarchar(255),
-    START_ACT_ID_ nvarchar(255),
-    END_ACT_ID_ nvarchar(255),
+    START_USER_ID_ nvarchar(191),
+    START_ACT_ID_ nvarchar(191),
+    END_ACT_ID_ nvarchar(191),
     SUPER_PROCESS_INSTANCE_ID_ nvarchar(64),
     DELETE_REASON_ nvarchar(4000),
-    TENANT_ID_ nvarchar(255) default '',
-    NAME_ nvarchar(255),
-    CALLBACK_ID_ nvarchar(255),
-    CALLBACK_TYPE_ nvarchar(255),
+    TENANT_ID_ nvarchar(191) default '',
+    NAME_ nvarchar(191),
+    CALLBACK_ID_ nvarchar(191),
+    CALLBACK_TYPE_ nvarchar(191),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );
@@ -730,29 +730,29 @@ create table ACT_HI_ACTINST (
     PROC_DEF_ID_ nvarchar(64) not null,
     PROC_INST_ID_ nvarchar(64) not null,
     EXECUTION_ID_ nvarchar(64) not null,
-    ACT_ID_ nvarchar(255) not null,
+    ACT_ID_ nvarchar(191) not null,
     TASK_ID_ nvarchar(64),
     CALL_PROC_INST_ID_ nvarchar(64),
-    ACT_NAME_ nvarchar(255),
-    ACT_TYPE_ nvarchar(255) not null,
-    ASSIGNEE_ nvarchar(255),
+    ACT_NAME_ nvarchar(191),
+    ACT_TYPE_ nvarchar(191) not null,
+    ASSIGNEE_ nvarchar(191),
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     DURATION_ numeric(19,0),
     DELETE_REASON_ nvarchar(4000),
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
 create table ACT_HI_DETAIL (
     ID_ nvarchar(64) not null,
-    TYPE_ nvarchar(255) not null,
+    TYPE_ nvarchar(191) not null,
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
-    NAME_ nvarchar(255) not null,
-    VAR_TYPE_ nvarchar(255),
+    NAME_ nvarchar(191) not null,
+    VAR_TYPE_ nvarchar(191),
     REV_ int,
     TIME_ datetime not null,
     BYTEARRAY_ID_ nvarchar(64),
@@ -765,12 +765,12 @@ create table ACT_HI_DETAIL (
 
 create table ACT_HI_COMMENT (
     ID_ nvarchar(64) not null,
-    TYPE_ nvarchar(255),
+    TYPE_ nvarchar(191),
     TIME_ datetime not null,
-    USER_ID_ nvarchar(255),
+    USER_ID_ nvarchar(191),
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
-    ACTION_ nvarchar(255),
+    ACTION_ nvarchar(191),
     MESSAGE_ nvarchar(4000),
     FULL_MSG_ varbinary(max),
     primary key (ID_)
@@ -779,10 +779,10 @@ create table ACT_HI_COMMENT (
 create table ACT_HI_ATTACHMENT (
     ID_ nvarchar(64) not null,
     REV_ integer,
-    USER_ID_ nvarchar(255),
-    NAME_ nvarchar(255),
+    USER_ID_ nvarchar(191),
+    NAME_ nvarchar(191),
     DESCRIPTION_ nvarchar(4000),
-    TYPE_ nvarchar(255),
+    TYPE_ nvarchar(191),
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     URL_ nvarchar(4000),
@@ -811,13 +811,13 @@ create index ACT_IDX_HI_IDENT_LNK_PROCINST on ACT_HI_IDENTITYLINK(PROC_INST_ID_)
 create index ACT_IDX_HI_TASK_INST_PROCINST on ACT_HI_TASKINST(PROC_INST_ID_);
 
 
-CREATE TABLE ACT_CMMN_DATABASECHANGELOG (ID nvarchar(255) NOT NULL, AUTHOR nvarchar(255) NOT NULL, FILENAME nvarchar(255) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(255), COMMENTS nvarchar(255), TAG nvarchar(255), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(255), LABELS nvarchar(255), DEPLOYMENT_ID nvarchar(10))
+CREATE TABLE ACT_CMMN_DATABASECHANGELOG (ID nvarchar(191) NOT NULL, AUTHOR nvarchar(191) NOT NULL, FILENAME nvarchar(191) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(191), COMMENTS nvarchar(191), TAG nvarchar(191), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(191), LABELS nvarchar(191), DEPLOYMENT_ID nvarchar(10))
 GO
 
-CREATE TABLE ACT_CMMN_DEPLOYMENT (ID_ varchar(255) NOT NULL, NAME_ varchar(255), CATEGORY_ varchar(255), KEY_ varchar(255), DEPLOY_TIME_ datetime, PARENT_DEPLOYMENT_ID_ varchar(255), TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_CMMN_DEPLOYMENT_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_DEPLOYMENT PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_DEPLOYMENT (ID_ varchar(191) NOT NULL, NAME_ varchar(191), CATEGORY_ varchar(191), KEY_ varchar(191), DEPLOY_TIME_ datetime, PARENT_DEPLOYMENT_ID_ varchar(191), TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_CMMN_DEPLOYMENT_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_DEPLOYMENT PRIMARY KEY (ID_))
 GO
 
-CREATE TABLE ACT_CMMN_DEPLOYMENT_RESOURCE (ID_ varchar(255) NOT NULL, NAME_ varchar(255), DEPLOYMENT_ID_ varchar(255), RESOURCE_BYTES_ varbinary(MAX), CONSTRAINT PK_CMMN_DEPLOYMENT_RESOURCE PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_DEPLOYMENT_RESOURCE (ID_ varchar(191) NOT NULL, NAME_ varchar(191), DEPLOYMENT_ID_ varchar(191), RESOURCE_BYTES_ varbinary(MAX), CONSTRAINT PK_CMMN_DEPLOYMENT_RESOURCE PRIMARY KEY (ID_))
 GO
 
 ALTER TABLE ACT_CMMN_DEPLOYMENT_RESOURCE ADD CONSTRAINT ACT_FK_CMMN_RSRC_DPL FOREIGN KEY (DEPLOYMENT_ID_) REFERENCES ACT_CMMN_DEPLOYMENT (ID_)
@@ -826,7 +826,7 @@ GO
 CREATE NONCLUSTERED INDEX ACT_IDX_CMMN_RSRC_DPL ON ACT_CMMN_DEPLOYMENT_RESOURCE(DEPLOYMENT_ID_)
 GO
 
-CREATE TABLE ACT_CMMN_CASEDEF (ID_ varchar(255) NOT NULL, REV_ int NOT NULL, NAME_ varchar(255), KEY_ varchar(255) NOT NULL, VERSION_ int NOT NULL, CATEGORY_ varchar(255), DEPLOYMENT_ID_ varchar(255), RESOURCE_NAME_ varchar(4000), DESCRIPTION_ varchar(4000), HAS_GRAPHICAL_NOTATION_ bit, TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_CMMN_CASEDEF_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_CASEDEF PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_CASEDEF (ID_ varchar(191) NOT NULL, REV_ int NOT NULL, NAME_ varchar(191), KEY_ varchar(191) NOT NULL, VERSION_ int NOT NULL, CATEGORY_ varchar(191), DEPLOYMENT_ID_ varchar(191), RESOURCE_NAME_ varchar(4000), DESCRIPTION_ varchar(4000), HAS_GRAPHICAL_NOTATION_ bit, TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_CMMN_CASEDEF_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_CASEDEF PRIMARY KEY (ID_))
 GO
 
 ALTER TABLE ACT_CMMN_CASEDEF ADD CONSTRAINT ACT_FK_CASE_DEF_DPLY FOREIGN KEY (DEPLOYMENT_ID_) REFERENCES ACT_CMMN_DEPLOYMENT (ID_)
@@ -835,7 +835,7 @@ GO
 CREATE NONCLUSTERED INDEX ACT_IDX_CASE_DEF_DPLY ON ACT_CMMN_CASEDEF(DEPLOYMENT_ID_)
 GO
 
-CREATE TABLE ACT_CMMN_RU_CASE_INST (ID_ varchar(255) NOT NULL, REV_ int NOT NULL, BUSINESS_KEY_ varchar(255), NAME_ varchar(255), PARENT_ID_ varchar(255), CASE_DEF_ID_ varchar(255), STATE_ varchar(255), START_TIME_ datetime, START_USER_ID_ varchar(255), CALLBACK_ID_ varchar(255), CALLBACK_TYPE_ varchar(255), TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_CMMN_RU_CASE_INST_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_RU_CASE_INST PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_RU_CASE_INST (ID_ varchar(191) NOT NULL, REV_ int NOT NULL, BUSINESS_KEY_ varchar(191), NAME_ varchar(191), PARENT_ID_ varchar(191), CASE_DEF_ID_ varchar(191), STATE_ varchar(191), START_TIME_ datetime, START_USER_ID_ varchar(191), CALLBACK_ID_ varchar(191), CALLBACK_TYPE_ varchar(191), TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_CMMN_RU_CASE_INST_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_RU_CASE_INST PRIMARY KEY (ID_))
 GO
 
 ALTER TABLE ACT_CMMN_RU_CASE_INST ADD CONSTRAINT ACT_FK_CASE_INST_CASE_DEF FOREIGN KEY (CASE_DEF_ID_) REFERENCES ACT_CMMN_CASEDEF (ID_)
@@ -847,7 +847,7 @@ GO
 CREATE NONCLUSTERED INDEX ACT_IDX_CASE_INST_PARENT ON ACT_CMMN_RU_CASE_INST(PARENT_ID_)
 GO
 
-CREATE TABLE ACT_CMMN_RU_PLAN_ITEM_INST (ID_ varchar(255) NOT NULL, REV_ int NOT NULL, CASE_DEF_ID_ varchar(255), CASE_INST_ID_ varchar(255), STAGE_INST_ID_ varchar(255), IS_STAGE_ bit, ELEMENT_ID_ varchar(255), NAME_ varchar(255), STATE_ varchar(255), START_TIME_ datetime, START_USER_ID_ varchar(255), REFERENCE_ID_ varchar(255), REFERENCE_TYPE_ varchar(255), TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_CMMN_RU_PLAN_ITEM_INST_TENANT_ID_ DEFAULT '', CONSTRAINT PK_CMMN_PLAN_ITEM_INST PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_RU_PLAN_ITEM_INST (ID_ varchar(191) NOT NULL, REV_ int NOT NULL, CASE_DEF_ID_ varchar(191), CASE_INST_ID_ varchar(191), STAGE_INST_ID_ varchar(191), IS_STAGE_ bit, ELEMENT_ID_ varchar(191), NAME_ varchar(191), STATE_ varchar(191), START_TIME_ datetime, START_USER_ID_ varchar(191), REFERENCE_ID_ varchar(191), REFERENCE_TYPE_ varchar(191), TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_CMMN_RU_PLAN_ITEM_INST_TENANT_ID_ DEFAULT '', CONSTRAINT PK_CMMN_PLAN_ITEM_INST PRIMARY KEY (ID_))
 GO
 
 ALTER TABLE ACT_CMMN_RU_PLAN_ITEM_INST ADD CONSTRAINT ACT_FK_PLAN_ITEM_CASE_DEF FOREIGN KEY (CASE_DEF_ID_) REFERENCES ACT_CMMN_CASEDEF (ID_)
@@ -862,7 +862,7 @@ GO
 CREATE NONCLUSTERED INDEX ACT_IDX_PLAN_ITEM_CASE_INST ON ACT_CMMN_RU_PLAN_ITEM_INST(CASE_INST_ID_)
 GO
 
-CREATE TABLE ACT_CMMN_RU_SENTRY_PART_INST (ID_ varchar(255) NOT NULL, REV_ int NOT NULL, CASE_DEF_ID_ varchar(255), CASE_INST_ID_ varchar(255), PLAN_ITEM_INST_ID_ varchar(255), ON_PART_ID_ varchar(255), IF_PART_ID_ varchar(255), TIME_STAMP_ datetime, CONSTRAINT PK_CMMN_SENTRY_PART_INST PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_RU_SENTRY_PART_INST (ID_ varchar(191) NOT NULL, REV_ int NOT NULL, CASE_DEF_ID_ varchar(191), CASE_INST_ID_ varchar(191), PLAN_ITEM_INST_ID_ varchar(191), ON_PART_ID_ varchar(191), IF_PART_ID_ varchar(191), TIME_STAMP_ datetime, CONSTRAINT PK_CMMN_SENTRY_PART_INST PRIMARY KEY (ID_))
 GO
 
 ALTER TABLE ACT_CMMN_RU_SENTRY_PART_INST ADD CONSTRAINT ACT_FK_SENTRY_CASE_DEF FOREIGN KEY (CASE_DEF_ID_) REFERENCES ACT_CMMN_CASEDEF (ID_)
@@ -883,7 +883,7 @@ GO
 CREATE NONCLUSTERED INDEX ACT_IDX_SENTRY_PLAN_ITEM ON ACT_CMMN_RU_SENTRY_PART_INST(PLAN_ITEM_INST_ID_)
 GO
 
-CREATE TABLE ACT_CMMN_RU_MIL_INST (ID_ varchar(255) NOT NULL, NAME_ varchar(255) NOT NULL, TIME_STAMP_ datetime NOT NULL, CASE_INST_ID_ varchar(255) NOT NULL, CASE_DEF_ID_ varchar(255) NOT NULL, ELEMENT_ID_ varchar(255) NOT NULL, CONSTRAINT PK_ACT_CMMN_RU_MIL_INST PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_RU_MIL_INST (ID_ varchar(191) NOT NULL, NAME_ varchar(191) NOT NULL, TIME_STAMP_ datetime NOT NULL, CASE_INST_ID_ varchar(191) NOT NULL, CASE_DEF_ID_ varchar(191) NOT NULL, ELEMENT_ID_ varchar(191) NOT NULL, CONSTRAINT PK_ACT_CMMN_RU_MIL_INST PRIMARY KEY (ID_))
 GO
 
 ALTER TABLE ACT_CMMN_RU_MIL_INST ADD CONSTRAINT ACT_FK_MIL_CASE_DEF FOREIGN KEY (CASE_DEF_ID_) REFERENCES ACT_CMMN_CASEDEF (ID_)
@@ -898,10 +898,10 @@ GO
 CREATE NONCLUSTERED INDEX ACT_IDX_MIL_CASE_INST ON ACT_CMMN_RU_MIL_INST(CASE_INST_ID_)
 GO
 
-CREATE TABLE ACT_CMMN_HI_CASE_INST (ID_ varchar(255) NOT NULL, REV_ int NOT NULL, BUSINESS_KEY_ varchar(255), NAME_ varchar(255), PARENT_ID_ varchar(255), CASE_DEF_ID_ varchar(255), STATE_ varchar(255), START_TIME_ datetime, END_TIME_ datetime, START_USER_ID_ varchar(255), CALLBACK_ID_ varchar(255), CALLBACK_TYPE_ varchar(255), TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_CMMN_HI_CASE_INST_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_HI_CASE_INST PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_HI_CASE_INST (ID_ varchar(191) NOT NULL, REV_ int NOT NULL, BUSINESS_KEY_ varchar(191), NAME_ varchar(191), PARENT_ID_ varchar(191), CASE_DEF_ID_ varchar(191), STATE_ varchar(191), START_TIME_ datetime, END_TIME_ datetime, START_USER_ID_ varchar(191), CALLBACK_ID_ varchar(191), CALLBACK_TYPE_ varchar(191), TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_CMMN_HI_CASE_INST_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_HI_CASE_INST PRIMARY KEY (ID_))
 GO
 
-CREATE TABLE ACT_CMMN_HI_MIL_INST (ID_ varchar(255) NOT NULL, REV_ int NOT NULL, NAME_ varchar(255) NOT NULL, TIME_STAMP_ datetime NOT NULL, CASE_INST_ID_ varchar(255) NOT NULL, CASE_DEF_ID_ varchar(255) NOT NULL, ELEMENT_ID_ varchar(255) NOT NULL, CONSTRAINT PK_ACT_CMMN_HI_MIL_INST PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_HI_MIL_INST (ID_ varchar(191) NOT NULL, REV_ int NOT NULL, NAME_ varchar(191) NOT NULL, TIME_STAMP_ datetime NOT NULL, CASE_INST_ID_ varchar(191) NOT NULL, CASE_DEF_ID_ varchar(191) NOT NULL, ELEMENT_ID_ varchar(191) NOT NULL, CONSTRAINT PK_ACT_CMMN_HI_MIL_INST PRIMARY KEY (ID_))
 GO
 
 INSERT INTO ACT_CMMN_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('1', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 1, '8:8b4b922d90b05ff27483abefc9597aa6', 'createTable tableName=ACT_CMMN_DEPLOYMENT; createTable tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addForeignKeyConstraint baseTableName=ACT_CMMN_DEPLOYMENT_RESOURCE, constraintName=ACT_FK_CMMN_RSRC_DPL, referencedTableName=ACT_CMMN_DEPLOYMENT; create...', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084415')
@@ -919,10 +919,10 @@ GO
 ALTER TABLE ACT_CMMN_RU_CASE_INST ADD LOCK_TIME_ datetime
 GO
 
-ALTER TABLE ACT_CMMN_RU_PLAN_ITEM_INST ADD ITEM_DEFINITION_ID_ varchar(255)
+ALTER TABLE ACT_CMMN_RU_PLAN_ITEM_INST ADD ITEM_DEFINITION_ID_ varchar(191)
 GO
 
-ALTER TABLE ACT_CMMN_RU_PLAN_ITEM_INST ADD ITEM_DEFINITION_TYPE_ varchar(255)
+ALTER TABLE ACT_CMMN_RU_PLAN_ITEM_INST ADD ITEM_DEFINITION_TYPE_ varchar(191)
 GO
 
 INSERT INTO ACT_CMMN_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('2', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 3, '8:65e39b3d385706bb261cbeffe7533cbe', 'addColumn tableName=ACT_CMMN_CASEDEF; addColumn tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addColumn tableName=ACT_CMMN_RU_CASE_INST; addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084415')
@@ -949,13 +949,13 @@ GO
 INSERT INTO ACT_CMMN_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('3', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 5, '8:c01f6e802b49436b4489040da3012359', 'addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST; addColumn tableName=ACT_CMMN_RU_CASE_INST; createIndex indexName=ACT_IDX_PLAN_ITEM_STAGE_INST, tableName=ACT_CMMN_RU_PLAN_ITEM_INST; addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST; addColumn tableNam...', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084415')
 GO
 
-CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST (ID_ varchar(255) NOT NULL, REV_ int NOT NULL, NAME_ varchar(255), STATE_ varchar(255), CASE_DEF_ID_ varchar(255), CASE_INST_ID_ varchar(255), STAGE_INST_ID_ varchar(255), IS_STAGE_ bit, ELEMENT_ID_ varchar(255), ITEM_DEFINITION_ID_ varchar(255), ITEM_DEFINITION_TYPE_ varchar(255), CREATED_TIME_ datetime, LAST_AVAILABLE_TIME_ datetime, LAST_ENABLED_TIME_ datetime, LAST_DISABLED_TIME_ datetime, LAST_STARTED_TIME_ datetime, LAST_SUSPENDED_TIME_ datetime, COMPLETED_TIME_ datetime, OCCURRED_TIME_ datetime, TERMINATED_TIME_ datetime, EXIT_TIME_ datetime, ENDED_TIME_ datetime, LAST_UPDATED_TIME_ datetime, START_USER_ID_ varchar(255), REFERENCE_ID_ varchar(255), REFERENCE_TYPE_ varchar(255), TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_CMMN_HI_PLAN_ITEM_INST_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_HI_PLAN_ITEM_INST PRIMARY KEY (ID_))
+CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST (ID_ varchar(191) NOT NULL, REV_ int NOT NULL, NAME_ varchar(191), STATE_ varchar(191), CASE_DEF_ID_ varchar(191), CASE_INST_ID_ varchar(191), STAGE_INST_ID_ varchar(191), IS_STAGE_ bit, ELEMENT_ID_ varchar(191), ITEM_DEFINITION_ID_ varchar(191), ITEM_DEFINITION_TYPE_ varchar(191), CREATED_TIME_ datetime, LAST_AVAILABLE_TIME_ datetime, LAST_ENABLED_TIME_ datetime, LAST_DISABLED_TIME_ datetime, LAST_STARTED_TIME_ datetime, LAST_SUSPENDED_TIME_ datetime, COMPLETED_TIME_ datetime, OCCURRED_TIME_ datetime, TERMINATED_TIME_ datetime, EXIT_TIME_ datetime, ENDED_TIME_ datetime, LAST_UPDATED_TIME_ datetime, START_USER_ID_ varchar(191), REFERENCE_ID_ varchar(191), REFERENCE_TYPE_ varchar(191), TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_CMMN_HI_PLAN_ITEM_INST_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_CMMN_HI_PLAN_ITEM_INST PRIMARY KEY (ID_))
 GO
 
-ALTER TABLE ACT_CMMN_RU_MIL_INST ADD TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_CMMN_RU_MIL_INST_TENANT_ID_ DEFAULT ''
+ALTER TABLE ACT_CMMN_RU_MIL_INST ADD TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_CMMN_RU_MIL_INST_TENANT_ID_ DEFAULT ''
 GO
 
-ALTER TABLE ACT_CMMN_HI_MIL_INST ADD TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_CMMN_HI_MIL_INST_TENANT_ID_ DEFAULT ''
+ALTER TABLE ACT_CMMN_HI_MIL_INST ADD TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_CMMN_HI_MIL_INST_TENANT_ID_ DEFAULT ''
 GO
 
 INSERT INTO ACT_CMMN_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('4', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 7, '8:e40d29cb79345b7fb5afd38a7f0ba8fc', 'createTable tableName=ACT_CMMN_HI_PLAN_ITEM_INST; addColumn tableName=ACT_CMMN_RU_MIL_INST; addColumn tableName=ACT_CMMN_HI_MIL_INST', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084415')
@@ -963,28 +963,28 @@ GO
 
 
 
-CREATE TABLE ACT_DMN_DATABASECHANGELOG (ID nvarchar(255) NOT NULL, AUTHOR nvarchar(255) NOT NULL, FILENAME nvarchar(255) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(255), COMMENTS nvarchar(255), TAG nvarchar(255), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(255), LABELS nvarchar(255), DEPLOYMENT_ID nvarchar(10))
+CREATE TABLE ACT_DMN_DATABASECHANGELOG (ID nvarchar(191) NOT NULL, AUTHOR nvarchar(191) NOT NULL, FILENAME nvarchar(191) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(191), COMMENTS nvarchar(191), TAG nvarchar(191), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(191), LABELS nvarchar(191), DEPLOYMENT_ID nvarchar(10))
 GO
 
-CREATE TABLE ACT_DMN_DEPLOYMENT (ID_ varchar(255) NOT NULL, NAME_ varchar(255), CATEGORY_ varchar(255), DEPLOY_TIME_ datetime, TENANT_ID_ varchar(255), PARENT_DEPLOYMENT_ID_ varchar(255), CONSTRAINT PK_ACT_DMN_DEPLOYMENT PRIMARY KEY (ID_))
+CREATE TABLE ACT_DMN_DEPLOYMENT (ID_ varchar(191) NOT NULL, NAME_ varchar(191), CATEGORY_ varchar(191), DEPLOY_TIME_ datetime, TENANT_ID_ varchar(191), PARENT_DEPLOYMENT_ID_ varchar(191), CONSTRAINT PK_ACT_DMN_DEPLOYMENT PRIMARY KEY (ID_))
 GO
 
-CREATE TABLE ACT_DMN_DEPLOYMENT_RESOURCE (ID_ varchar(255) NOT NULL, NAME_ varchar(255), DEPLOYMENT_ID_ varchar(255), RESOURCE_BYTES_ varbinary(MAX), CONSTRAINT PK_ACT_DMN_DEPLOYMENT_RESOURCE PRIMARY KEY (ID_))
+CREATE TABLE ACT_DMN_DEPLOYMENT_RESOURCE (ID_ varchar(191) NOT NULL, NAME_ varchar(191), DEPLOYMENT_ID_ varchar(191), RESOURCE_BYTES_ varbinary(MAX), CONSTRAINT PK_ACT_DMN_DEPLOYMENT_RESOURCE PRIMARY KEY (ID_))
 GO
 
-CREATE TABLE ACT_DMN_DECISION_TABLE (ID_ varchar(255) NOT NULL, NAME_ varchar(255), VERSION_ int, KEY_ varchar(255), CATEGORY_ varchar(255), DEPLOYMENT_ID_ varchar(255), PARENT_DEPLOYMENT_ID_ varchar(255), TENANT_ID_ varchar(255), RESOURCE_NAME_ varchar(255), DESCRIPTION_ varchar(255), CONSTRAINT PK_ACT_DMN_DECISION_TABLE PRIMARY KEY (ID_))
+CREATE TABLE ACT_DMN_DECISION_TABLE (ID_ varchar(191) NOT NULL, NAME_ varchar(191), VERSION_ int, KEY_ varchar(191), CATEGORY_ varchar(191), DEPLOYMENT_ID_ varchar(191), PARENT_DEPLOYMENT_ID_ varchar(191), TENANT_ID_ varchar(191), RESOURCE_NAME_ varchar(191), DESCRIPTION_ varchar(191), CONSTRAINT PK_ACT_DMN_DECISION_TABLE PRIMARY KEY (ID_))
 GO
 
 INSERT INTO ACT_DMN_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('1', 'activiti', 'org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml', GETDATE(), 1, '8:c8701f1c71018b55029f450b2e9a10a1', 'createTable tableName=ACT_DMN_DEPLOYMENT; createTable tableName=ACT_DMN_DEPLOYMENT_RESOURCE; createTable tableName=ACT_DMN_DECISION_TABLE', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084510')
 GO
 
-CREATE TABLE ACT_DMN_HI_DECISION_EXECUTION (ID_ varchar(255) NOT NULL, DECISION_DEFINITION_ID_ varchar(255), DEPLOYMENT_ID_ varchar(255), START_TIME_ datetime, END_TIME_ datetime, INSTANCE_ID_ varchar(255), EXECUTION_ID_ varchar(255), ACTIVITY_ID_ varchar(255), FAILED_ bit CONSTRAINT DF_ACT_DMN_HI_DECISION_EXECUTION_FAILED_ DEFAULT 0, TENANT_ID_ varchar(255), EXECUTION_JSON_ varchar(MAX), CONSTRAINT PK_ACT_DMN_HI_DECISION_EXECUTION PRIMARY KEY (ID_))
+CREATE TABLE ACT_DMN_HI_DECISION_EXECUTION (ID_ varchar(191) NOT NULL, DECISION_DEFINITION_ID_ varchar(191), DEPLOYMENT_ID_ varchar(191), START_TIME_ datetime, END_TIME_ datetime, INSTANCE_ID_ varchar(191), EXECUTION_ID_ varchar(191), ACTIVITY_ID_ varchar(191), FAILED_ bit CONSTRAINT DF_ACT_DMN_HI_DECISION_EXECUTION_FAILED_ DEFAULT 0, TENANT_ID_ varchar(191), EXECUTION_JSON_ varchar(MAX), CONSTRAINT PK_ACT_DMN_HI_DECISION_EXECUTION PRIMARY KEY (ID_))
 GO
 
 INSERT INTO ACT_DMN_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('2', 'flowable', 'org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml', GETDATE(), 3, '8:47f94b27feb7df8a30d4e338c7bd5fb8', 'createTable tableName=ACT_DMN_HI_DECISION_EXECUTION', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084510')
 GO
 
-ALTER TABLE ACT_DMN_HI_DECISION_EXECUTION ADD SCOPE_TYPE_ varchar(255)
+ALTER TABLE ACT_DMN_HI_DECISION_EXECUTION ADD SCOPE_TYPE_ varchar(191)
 GO
 
 INSERT INTO ACT_DMN_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('3', 'flowable', 'org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml', GETDATE(), 5, '8:ac17eae89fbdccb6e08daf3c7797b579', 'addColumn tableName=ACT_DMN_HI_DECISION_EXECUTION', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084510')
@@ -998,31 +998,31 @@ GO
 
 
 
-CREATE TABLE ACT_FO_DATABASECHANGELOG (ID nvarchar(255) NOT NULL, AUTHOR nvarchar(255) NOT NULL, FILENAME nvarchar(255) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(255), COMMENTS nvarchar(255), TAG nvarchar(255), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(255), LABELS nvarchar(255), DEPLOYMENT_ID nvarchar(10))
+CREATE TABLE ACT_FO_DATABASECHANGELOG (ID nvarchar(191) NOT NULL, AUTHOR nvarchar(191) NOT NULL, FILENAME nvarchar(191) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(191), COMMENTS nvarchar(191), TAG nvarchar(191), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(191), LABELS nvarchar(191), DEPLOYMENT_ID nvarchar(10))
 GO
 
-CREATE TABLE ACT_FO_FORM_DEPLOYMENT (ID_ varchar(255) NOT NULL, NAME_ varchar(255), CATEGORY_ varchar(255), DEPLOY_TIME_ datetime, TENANT_ID_ varchar(255), PARENT_DEPLOYMENT_ID_ varchar(255), CONSTRAINT PK_ACT_FO_FORM_DEPLOYMENT PRIMARY KEY (ID_))
+CREATE TABLE ACT_FO_FORM_DEPLOYMENT (ID_ varchar(191) NOT NULL, NAME_ varchar(191), CATEGORY_ varchar(191), DEPLOY_TIME_ datetime, TENANT_ID_ varchar(191), PARENT_DEPLOYMENT_ID_ varchar(191), CONSTRAINT PK_ACT_FO_FORM_DEPLOYMENT PRIMARY KEY (ID_))
 GO
 
-CREATE TABLE ACT_FO_FORM_RESOURCE (ID_ varchar(255) NOT NULL, NAME_ varchar(255), DEPLOYMENT_ID_ varchar(255), RESOURCE_BYTES_ varbinary(MAX), CONSTRAINT PK_ACT_FO_FORM_RESOURCE PRIMARY KEY (ID_))
+CREATE TABLE ACT_FO_FORM_RESOURCE (ID_ varchar(191) NOT NULL, NAME_ varchar(191), DEPLOYMENT_ID_ varchar(191), RESOURCE_BYTES_ varbinary(MAX), CONSTRAINT PK_ACT_FO_FORM_RESOURCE PRIMARY KEY (ID_))
 GO
 
-CREATE TABLE ACT_FO_FORM_DEFINITION (ID_ varchar(255) NOT NULL, NAME_ varchar(255), VERSION_ int, KEY_ varchar(255), CATEGORY_ varchar(255), DEPLOYMENT_ID_ varchar(255), PARENT_DEPLOYMENT_ID_ varchar(255), TENANT_ID_ varchar(255), RESOURCE_NAME_ varchar(255), DESCRIPTION_ varchar(255), CONSTRAINT PK_ACT_FO_FORM_DEFINITION PRIMARY KEY (ID_))
+CREATE TABLE ACT_FO_FORM_DEFINITION (ID_ varchar(191) NOT NULL, NAME_ varchar(191), VERSION_ int, KEY_ varchar(191), CATEGORY_ varchar(191), DEPLOYMENT_ID_ varchar(191), PARENT_DEPLOYMENT_ID_ varchar(191), TENANT_ID_ varchar(191), RESOURCE_NAME_ varchar(191), DESCRIPTION_ varchar(191), CONSTRAINT PK_ACT_FO_FORM_DEFINITION PRIMARY KEY (ID_))
 GO
 
-CREATE TABLE ACT_FO_FORM_INSTANCE (ID_ varchar(255) NOT NULL, FORM_DEFINITION_ID_ varchar(255) NOT NULL, TASK_ID_ varchar(255), PROC_INST_ID_ varchar(255), PROC_DEF_ID_ varchar(255), SUBMITTED_DATE_ datetime, SUBMITTED_BY_ varchar(255), FORM_VALUES_ID_ varchar(255), TENANT_ID_ varchar(255), CONSTRAINT PK_ACT_FO_FORM_INSTANCE PRIMARY KEY (ID_))
+CREATE TABLE ACT_FO_FORM_INSTANCE (ID_ varchar(191) NOT NULL, FORM_DEFINITION_ID_ varchar(191) NOT NULL, TASK_ID_ varchar(191), PROC_INST_ID_ varchar(191), PROC_DEF_ID_ varchar(191), SUBMITTED_DATE_ datetime, SUBMITTED_BY_ varchar(191), FORM_VALUES_ID_ varchar(191), TENANT_ID_ varchar(191), CONSTRAINT PK_ACT_FO_FORM_INSTANCE PRIMARY KEY (ID_))
 GO
 
 INSERT INTO ACT_FO_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('1', 'activiti', 'org/flowable/form/db/liquibase/flowable-form-db-changelog.xml', GETDATE(), 1, '8:033ebf9380889aed7c453927ecc3250d', 'createTable tableName=ACT_FO_FORM_DEPLOYMENT; createTable tableName=ACT_FO_FORM_RESOURCE; createTable tableName=ACT_FO_FORM_DEFINITION; createTable tableName=ACT_FO_FORM_INSTANCE', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084563')
 GO
 
-ALTER TABLE ACT_FO_FORM_INSTANCE ADD SCOPE_ID_ varchar(255)
+ALTER TABLE ACT_FO_FORM_INSTANCE ADD SCOPE_ID_ varchar(191)
 GO
 
-ALTER TABLE ACT_FO_FORM_INSTANCE ADD SCOPE_TYPE_ varchar(255)
+ALTER TABLE ACT_FO_FORM_INSTANCE ADD SCOPE_TYPE_ varchar(191)
 GO
 
-ALTER TABLE ACT_FO_FORM_INSTANCE ADD SCOPE_DEFINITION_ID_ varchar(255)
+ALTER TABLE ACT_FO_FORM_INSTANCE ADD SCOPE_DEFINITION_ID_ varchar(191)
 GO
 
 INSERT INTO ACT_FO_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('2', 'flowable', 'org/flowable/form/db/liquibase/flowable-form-db-changelog.xml', GETDATE(), 3, '8:986365ceb40445ce3b27a8e6b40f159b', 'addColumn tableName=ACT_FO_FORM_INSTANCE', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084563')
@@ -1036,10 +1036,10 @@ GO
 
 
 
-CREATE TABLE ACT_CO_DATABASECHANGELOG (ID nvarchar(255) NOT NULL, AUTHOR nvarchar(255) NOT NULL, FILENAME nvarchar(255) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(255), COMMENTS nvarchar(255), TAG nvarchar(255), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(255), LABELS nvarchar(255), DEPLOYMENT_ID nvarchar(10))
+CREATE TABLE ACT_CO_DATABASECHANGELOG (ID nvarchar(191) NOT NULL, AUTHOR nvarchar(191) NOT NULL, FILENAME nvarchar(191) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(191), COMMENTS nvarchar(191), TAG nvarchar(191), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(191), LABELS nvarchar(191), DEPLOYMENT_ID nvarchar(10))
 GO
 
-CREATE TABLE ACT_CO_CONTENT_ITEM (ID_ varchar(255) NOT NULL, NAME_ varchar(255) NOT NULL, MIME_TYPE_ varchar(255), TASK_ID_ varchar(255), PROC_INST_ID_ varchar(255), CONTENT_STORE_ID_ varchar(255), CONTENT_STORE_NAME_ varchar(255), FIELD_ varchar(400), CONTENT_AVAILABLE_ bit CONSTRAINT DF_ACT_CO_CONTENT_ITEM_CONTENT_AVAILABLE_ DEFAULT 0, CREATED_ datetime, CREATED_BY_ varchar(255), LAST_MODIFIED_ datetime, LAST_MODIFIED_BY_ varchar(255), CONTENT_SIZE_ bigint CONSTRAINT DF_ACT_CO_CONTENT_ITEM_CONTENT_SIZE_ DEFAULT 0, TENANT_ID_ varchar(255), CONSTRAINT PK_ACT_CO_CONTENT_ITEM PRIMARY KEY (ID_))
+CREATE TABLE ACT_CO_CONTENT_ITEM (ID_ varchar(191) NOT NULL, NAME_ varchar(191) NOT NULL, MIME_TYPE_ varchar(191), TASK_ID_ varchar(191), PROC_INST_ID_ varchar(191), CONTENT_STORE_ID_ varchar(191), CONTENT_STORE_NAME_ varchar(191), FIELD_ varchar(400), CONTENT_AVAILABLE_ bit CONSTRAINT DF_ACT_CO_CONTENT_ITEM_CONTENT_AVAILABLE_ DEFAULT 0, CREATED_ datetime, CREATED_BY_ varchar(191), LAST_MODIFIED_ datetime, LAST_MODIFIED_BY_ varchar(191), CONTENT_SIZE_ bigint CONSTRAINT DF_ACT_CO_CONTENT_ITEM_CONTENT_SIZE_ DEFAULT 0, TENANT_ID_ varchar(191), CONSTRAINT PK_ACT_CO_CONTENT_ITEM PRIMARY KEY (ID_))
 GO
 
 CREATE NONCLUSTERED INDEX idx_contitem_taskid ON ACT_CO_CONTENT_ITEM(TASK_ID_)
@@ -1051,10 +1051,10 @@ GO
 INSERT INTO ACT_CO_DATABASECHANGELOG (ID, AUTHOR, FILENAME, DATEEXECUTED, ORDEREXECUTED, MD5SUM, DESCRIPTION, COMMENTS, EXECTYPE, CONTEXTS, LABELS, LIQUIBASE, DEPLOYMENT_ID) VALUES ('1', 'activiti', 'org/flowable/content/db/liquibase/flowable-content-db-changelog.xml', GETDATE(), 1, '8:7644d7165cfe799200a2abdd3419e8b6', 'createTable tableName=ACT_CO_CONTENT_ITEM; createIndex indexName=idx_contitem_taskid, tableName=ACT_CO_CONTENT_ITEM; createIndex indexName=idx_contitem_procid, tableName=ACT_CO_CONTENT_ITEM', '', 'EXECUTED', NULL, NULL, '3.6.1', '6986084610')
 GO
 
-ALTER TABLE ACT_CO_CONTENT_ITEM ADD SCOPE_ID_ varchar(255)
+ALTER TABLE ACT_CO_CONTENT_ITEM ADD SCOPE_ID_ varchar(191)
 GO
 
-ALTER TABLE ACT_CO_CONTENT_ITEM ADD SCOPE_TYPE_ varchar(255)
+ALTER TABLE ACT_CO_CONTENT_ITEM ADD SCOPE_TYPE_ varchar(191)
 GO
 
 CREATE NONCLUSTERED INDEX idx_contitem_scope ON ACT_CO_CONTENT_ITEM(SCOPE_ID_, SCOPE_TYPE_)
@@ -1077,7 +1077,7 @@ values ('schema.version', '6.3.1.0', 1);
 create table ACT_ID_BYTEARRAY (
     ID_ nvarchar(64),
     REV_ int,
-    NAME_ nvarchar(255),
+    NAME_ nvarchar(191),
     BYTES_  varbinary(max),
     primary key (ID_)
 );
@@ -1085,8 +1085,8 @@ create table ACT_ID_BYTEARRAY (
 create table ACT_ID_GROUP (
     ID_ nvarchar(64),
     REV_ int,
-    NAME_ nvarchar(255),
-    TYPE_ nvarchar(255),
+    NAME_ nvarchar(191),
+    TYPE_ nvarchar(191),
     primary key (ID_)
 );
 
@@ -1099,12 +1099,12 @@ create table ACT_ID_MEMBERSHIP (
 create table ACT_ID_USER (
     ID_ nvarchar(64),
     REV_ int,
-    FIRST_ nvarchar(255),
-    LAST_ nvarchar(255),
-    EMAIL_ nvarchar(255),
-    PWD_ nvarchar(255),
+    FIRST_ nvarchar(191),
+    LAST_ nvarchar(191),
+    EMAIL_ nvarchar(191),
+    PWD_ nvarchar(191),
     PICTURE_ID_ nvarchar(64),
-    TENANT_ID_ nvarchar(255) default '',
+    TENANT_ID_ nvarchar(191) default '',
     primary key (ID_)
 );
 
@@ -1113,36 +1113,36 @@ create table ACT_ID_INFO (
     REV_ int,
     USER_ID_ nvarchar(64),
     TYPE_ nvarchar(64),
-    KEY_ nvarchar(255),
-    VALUE_ nvarchar(255),
+    KEY_ nvarchar(191),
+    VALUE_ nvarchar(191),
     PASSWORD_ varbinary(max),
-    PARENT_ID_ nvarchar(255),
+    PARENT_ID_ nvarchar(191),
     primary key (ID_)
 );
 
 create table ACT_ID_TOKEN (
     ID_ nvarchar(64) not null,
     REV_ int,
-    TOKEN_VALUE_ nvarchar(255),
+    TOKEN_VALUE_ nvarchar(191),
     TOKEN_DATE_ datetime,
-    IP_ADDRESS_ nvarchar(255),
-    USER_AGENT_ nvarchar(255),
-    USER_ID_ nvarchar(255),
+    IP_ADDRESS_ nvarchar(191),
+    USER_AGENT_ nvarchar(191),
+    USER_ID_ nvarchar(191),
     TOKEN_DATA_ nvarchar(2000),
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV (
     ID_ nvarchar(64) not null,
-    NAME_ nvarchar(255) not null,
+    NAME_ nvarchar(191) not null,
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV_MAPPING (
     ID_ nvarchar(64) not null,
     PRIV_ID_ nvarchar(64) not null,
-    USER_ID_ nvarchar(255),
-    GROUP_ID_ nvarchar(255),
+    USER_ID_ nvarchar(191),
+    GROUP_ID_ nvarchar(191),
     primary key (ID_)
 );
 
@@ -1169,13 +1169,13 @@ alter table ACT_ID_PRIV
     unique (NAME_);
 
 
-CREATE TABLE ACT_APP_DATABASECHANGELOG (ID nvarchar(255) NOT NULL, AUTHOR nvarchar(255) NOT NULL, FILENAME nvarchar(255) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(255), COMMENTS nvarchar(255), TAG nvarchar(255), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(255), LABELS nvarchar(255), DEPLOYMENT_ID nvarchar(10))
+CREATE TABLE ACT_APP_DATABASECHANGELOG (ID nvarchar(191) NOT NULL, AUTHOR nvarchar(191) NOT NULL, FILENAME nvarchar(191) NOT NULL, DATEEXECUTED datetime2(3) NOT NULL, ORDEREXECUTED int NOT NULL, EXECTYPE nvarchar(10) NOT NULL, MD5SUM nvarchar(35), DESCRIPTION nvarchar(191), COMMENTS nvarchar(191), TAG nvarchar(191), LIQUIBASE nvarchar(20), CONTEXTS nvarchar(191), LABELS nvarchar(191), DEPLOYMENT_ID nvarchar(10))
 GO
 
-CREATE TABLE ACT_APP_DEPLOYMENT (ID_ varchar(255) NOT NULL, NAME_ varchar(255), CATEGORY_ varchar(255), KEY_ varchar(255), DEPLOY_TIME_ datetime, TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_APP_DEPLOYMENT_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_APP_DEPLOYMENT PRIMARY KEY (ID_))
+CREATE TABLE ACT_APP_DEPLOYMENT (ID_ varchar(191) NOT NULL, NAME_ varchar(191), CATEGORY_ varchar(191), KEY_ varchar(191), DEPLOY_TIME_ datetime, TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_APP_DEPLOYMENT_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_APP_DEPLOYMENT PRIMARY KEY (ID_))
 GO
 
-CREATE TABLE ACT_APP_DEPLOYMENT_RESOURCE (ID_ varchar(255) NOT NULL, NAME_ varchar(255), DEPLOYMENT_ID_ varchar(255), RESOURCE_BYTES_ varbinary(MAX), CONSTRAINT PK_APP_DEPLOYMENT_RESOURCE PRIMARY KEY (ID_))
+CREATE TABLE ACT_APP_DEPLOYMENT_RESOURCE (ID_ varchar(191) NOT NULL, NAME_ varchar(191), DEPLOYMENT_ID_ varchar(191), RESOURCE_BYTES_ varbinary(MAX), CONSTRAINT PK_APP_DEPLOYMENT_RESOURCE PRIMARY KEY (ID_))
 GO
 
 ALTER TABLE ACT_APP_DEPLOYMENT_RESOURCE ADD CONSTRAINT ACT_FK_APP_RSRC_DPL FOREIGN KEY (DEPLOYMENT_ID_) REFERENCES ACT_APP_DEPLOYMENT (ID_)
@@ -1184,7 +1184,7 @@ GO
 CREATE NONCLUSTERED INDEX ACT_IDX_APP_RSRC_DPL ON ACT_APP_DEPLOYMENT_RESOURCE(DEPLOYMENT_ID_)
 GO
 
-CREATE TABLE ACT_APP_APPDEF (ID_ varchar(255) NOT NULL, REV_ int NOT NULL, NAME_ varchar(255), KEY_ varchar(255) NOT NULL, VERSION_ int NOT NULL, CATEGORY_ varchar(255), DEPLOYMENT_ID_ varchar(255), RESOURCE_NAME_ varchar(4000), DESCRIPTION_ varchar(4000), TENANT_ID_ varchar(255) CONSTRAINT DF_ACT_APP_APPDEF_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_APP_APPDEF PRIMARY KEY (ID_))
+CREATE TABLE ACT_APP_APPDEF (ID_ varchar(191) NOT NULL, REV_ int NOT NULL, NAME_ varchar(191), KEY_ varchar(191) NOT NULL, VERSION_ int NOT NULL, CATEGORY_ varchar(191), DEPLOYMENT_ID_ varchar(191), RESOURCE_NAME_ varchar(4000), DESCRIPTION_ varchar(4000), TENANT_ID_ varchar(191) CONSTRAINT DF_ACT_APP_APPDEF_TENANT_ID_ DEFAULT '', CONSTRAINT PK_ACT_APP_APPDEF PRIMARY KEY (ID_))
 GO
 
 ALTER TABLE ACT_APP_APPDEF ADD CONSTRAINT ACT_FK_APP_DEF_DPLY FOREIGN KEY (DEPLOYMENT_ID_) REFERENCES ACT_APP_DEPLOYMENT (ID_)

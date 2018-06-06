@@ -1,9 +1,9 @@
 create table ACT_RU_TIMER_JOB (
     ID_ varchar(64) not null,
     REV_ integer,
-    TYPE_ varchar(255) not null,
+    TYPE_ varchar(191) not null,
     LOCK_EXP_TIME_ timestamp,
-    LOCK_OWNER_ varchar(255),
+    LOCK_OWNER_ varchar(191),
     EXCLUSIVE_ smallint check(EXCLUSIVE_ in (1,0)),
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
@@ -12,17 +12,17 @@ create table ACT_RU_TIMER_JOB (
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
     DUEDATE_ timestamp,
-    REPEAT_ varchar(255),
-    HANDLER_TYPE_ varchar(255),
+    REPEAT_ varchar(191),
+    HANDLER_TYPE_ varchar(191),
     HANDLER_CFG_ varchar(4000),
-    TENANT_ID_ varchar(255) default '',
+    TENANT_ID_ varchar(191) default '',
     primary key (ID_)
 );
 
 create table ACT_RU_SUSPENDED_JOB (
     ID_ varchar(64) not null,
     REV_ integer,
-    TYPE_ varchar(255) not null,
+    TYPE_ varchar(191) not null,
     EXCLUSIVE_ smallint check(EXCLUSIVE_ in (1,0)),
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
@@ -31,17 +31,17 @@ create table ACT_RU_SUSPENDED_JOB (
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
     DUEDATE_ timestamp,
-    REPEAT_ varchar(255),
-    HANDLER_TYPE_ varchar(255),
+    REPEAT_ varchar(191),
+    HANDLER_TYPE_ varchar(191),
     HANDLER_CFG_ varchar(4000),
-    TENANT_ID_ varchar(255) default '',
+    TENANT_ID_ varchar(191) default '',
     primary key (ID_)
 );
 
 create table ACT_RU_DEADLETTER_JOB (
     ID_ varchar(64) not null,
     REV_ integer,
-    TYPE_ varchar(255) not null,
+    TYPE_ varchar(191) not null,
     EXCLUSIVE_ smallint check(EXCLUSIVE_ in (1,0)),
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
@@ -50,10 +50,10 @@ create table ACT_RU_DEADLETTER_JOB (
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
     DUEDATE_ timestamp,
-    REPEAT_ varchar(255),
-    HANDLER_TYPE_ varchar(255),
+    REPEAT_ varchar(191),
+    HANDLER_TYPE_ varchar(191),
     HANDLER_CFG_ varchar(4000),
-    TENANT_ID_ varchar(255) default '',
+    TENANT_ID_ varchar(191) default '',
     primary key (ID_)
 );
 
@@ -192,10 +192,10 @@ and LOCK_EXP_TIME_ is null;
         
 
 alter table ACT_RU_EXECUTION add column START_TIME_ timestamp;
-alter table ACT_RU_EXECUTION add column START_USER_ID_ varchar(255);
+alter table ACT_RU_EXECUTION add column START_USER_ID_ varchar(191);
 alter table ACT_RU_TASK add column CLAIM_TIME_ timestamp;
 
-alter table ACT_RE_DEPLOYMENT add column KEY_ varchar(255);
+alter table ACT_RE_DEPLOYMENT add column KEY_ varchar(191);
 
 -- Upgrade added in upgradestep.52001.to.52002.engine, which is not applied when already on beta2 
 update ACT_RU_EVENT_SUBSCR set PROC_DEF_ID_ = CONFIGURATION_ where EVENT_TYPE_ = 'message' and PROC_INST_ID_ is null and EXECUTION_ID_ is null and PROC_DEF_ID_ is null;

@@ -2,7 +2,7 @@ alter table ACT_HI_TASKINST
   add CLAIM_TIME_ datetime;
 
 alter table ACT_HI_TASKINST
-  add FORM_KEY_ nvarchar(255);
+  add FORM_KEY_ nvarchar(191);
   
 alter table ACT_RU_IDENTITYLINK
   add PROC_INST_ID_ nvarchar(64);

@@ -1,28 +1,28 @@
 alter table ACT_RU_TASK 
-    add CATEGORY_ varchar(255);
+    add CATEGORY_ varchar(191);
     
 alter table ACT_RU_EXECUTION drop constraint act_ru_execution_proc_def_id__business_key__key;
 
 alter table ACT_RE_DEPLOYMENT 
-    add TENANT_ID_ varchar(255) default '';  
+    add TENANT_ID_ varchar(191) default '';  
     
 alter table ACT_RE_PROCDEF 
-    add TENANT_ID_ varchar(255) default ''; 
+    add TENANT_ID_ varchar(191) default ''; 
     
 alter table ACT_RU_EXECUTION
-    add TENANT_ID_ varchar(255) default '';       
+    add TENANT_ID_ varchar(191) default '';       
     
 alter table ACT_RU_TASK
-    add TENANT_ID_ varchar(255) default '';  
+    add TENANT_ID_ varchar(191) default '';  
     
 alter table ACT_RU_JOB
-    add TENANT_ID_ varchar(255) default '';   
+    add TENANT_ID_ varchar(191) default '';   
     
 alter table ACT_RE_MODEL
-    add TENANT_ID_ varchar(255) default '';
+    add TENANT_ID_ varchar(191) default '';
     
 alter table ACT_RU_EVENT_SUBSCR
-   add TENANT_ID_ varchar(255) default ''; 
+   add TENANT_ID_ varchar(191) default ''; 
    
 alter table ACT_RU_EVENT_SUBSCR
    add PROC_DEF_ID_ varchar(64);       
