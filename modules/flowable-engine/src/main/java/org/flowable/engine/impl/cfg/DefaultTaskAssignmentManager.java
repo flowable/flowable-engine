@@ -37,7 +37,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
-    protected final String identityLinkType;
+    protected final String parentIdentityLinkType;
 
     public DefaultTaskAssignmentManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         this(processEngineConfiguration, IdentityLinkType.PARTICIPANT);
@@ -45,7 +45,7 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
 
     public DefaultTaskAssignmentManager(ProcessEngineConfigurationImpl processEngineConfiguration, String identityLinkType) {
         this.processEngineConfiguration = processEngineConfiguration;
-        this.identityLinkType = identityLinkType;
+        this.parentIdentityLinkType = identityLinkType;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
 
     @Override
     public void addCandidateUser(Task task, IdentityLink identityLink) {
-        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, identityLinkType);
+        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
     }
 
     @Override
@@ -86,12 +86,12 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateUsers) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks, identityLinkType);
+        handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
     }
 
     @Override
     public void addCandidateGroup(Task task, IdentityLink identityLink) {
-        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, identityLinkType);
+        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
     }
 
     @Override
@@ -100,17 +100,17 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateGroups) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks, identityLinkType);
+        handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
     }
 
     @Override
     public void addUserIdentityLink(Task task, IdentityLink identityLink) {
-        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, identityLinkType);
+        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
     }
 
     @Override
     public void addGroupIdentityLink(Task task, IdentityLink identityLink) {
-        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, identityLinkType);
+        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         if (userId != null && task.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getProcessInstanceId());
             IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity,
-                userId, null, identityLinkType);
+                userId, null, parentIdentityLinkType);
         }
     }
 
@@ -145,7 +145,7 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         }
     }
 
-    protected void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity, String parentIdentityLinkType) {
+    protected void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
         CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
 
         if (CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
@@ -168,9 +168,9 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         }
     }
 
-    protected void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities, String parentIdentityLinkType) {
+    protected void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
         for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
-            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity, parentIdentityLinkType);
+            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
         }
     }
 
