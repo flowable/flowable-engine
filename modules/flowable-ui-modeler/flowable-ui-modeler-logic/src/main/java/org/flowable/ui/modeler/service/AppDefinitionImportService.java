@@ -309,6 +309,10 @@ public class AppDefinitionImportService {
         for (String decisionTableKey : decisionTableMap.keySet()) {
 
             Model decisionTableModel = createModelObject(decisionTableMap.get(decisionTableKey), Model.MODEL_TYPE_DECISION_TABLE);
+
+            // migrate to new version
+            DecisionTableModelConversionUtil.convertModelToV3(decisionTableModel);
+
             String oldDecisionTableId = decisionTableModel.getId();
 
             Model existingModel = null;

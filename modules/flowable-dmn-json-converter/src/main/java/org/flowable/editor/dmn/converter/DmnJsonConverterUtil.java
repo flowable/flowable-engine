@@ -51,8 +51,8 @@ public class DmnJsonConverterUtil {
 
         // check if model is version 1
         if (decisionTableNode.get("modelVersion") == null || decisionTableNode.get("modelVersion").isNull()) {
-            String modelId =  decisionTableNode.get("id").asText();
-            LOGGER.info("Decision table model with id " +modelId+ " found with version < v2; migrating to v3");
+            String modelName = decisionTableNode.get("name").asText();
+            LOGGER.info("Decision table model with name " + modelName + " found with version < v2; migrating to v3");
 
             ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
             decisionTableObjectNode.put("modelVersion", "3");
@@ -111,7 +111,7 @@ public class DmnJsonConverterUtil {
                                     // if build in date function
                                     if (expressionValue.startsWith("fn_date(")) {
                                         expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
-                                        
+
                                     } else if (expressionValue.startsWith("date:toDate(")) {
                                         expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
                                     }
@@ -147,14 +147,15 @@ public class DmnJsonConverterUtil {
                             String outputExpressionValue = ruleNode.get(outputExpressionId).asText();
 
                             // remove outer escape quotes
-                            if (StringUtils.isNotEmpty(outputExpressionValue) && outputExpressionValue.startsWith("\"") && outputExpressionValue.endsWith("\"")) {
+                            if (StringUtils.isNotEmpty(outputExpressionValue) && outputExpressionValue.startsWith("\"") && outputExpressionValue
+                                .endsWith("\"")) {
                                 outputExpressionValue = outputExpressionValue.substring(1, outputExpressionValue.length() - 1);
                             }
 
                             // if build in date function
                             if (outputExpressionValue.startsWith("fn_date(")) {
                                 outputExpressionValue = outputExpressionValue.substring(9, outputExpressionValue.lastIndexOf('\''));
-                                
+
                             } else if (outputExpressionValue.startsWith("date:toDate(")) {
                                 outputExpressionValue = outputExpressionValue.substring(13, outputExpressionValue.lastIndexOf('\''));
                             }
@@ -180,7 +181,7 @@ public class DmnJsonConverterUtil {
                 decisionTableObjectNode.replace("rules", newRuleNodes);
             }
 
-            LOGGER.info("Decision table model " + modelId + " migrated to v2");
+            LOGGER.info("Decision table model " + modelName + " migrated to v2");
         }
 
         return decisionTableNode;
@@ -192,8 +193,8 @@ public class DmnJsonConverterUtil {
 
         // migrate to v3
         if (decisionTableNode.get("modelVersion").asText().equals("2")) {
-            String modelId =  decisionTableNode.get("id").asText();
-            LOGGER.info("Decision table model " + modelId + " found with version v2; migrating to v3");
+            String modelName = decisionTableNode.get("name").asText();
+            LOGGER.info("Decision table model " + modelName + " found with version v2; migrating to v3");
 
             ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
             decisionTableObjectNode.put("modelVersion", "3");
@@ -216,7 +217,6 @@ public class DmnJsonConverterUtil {
                 }
             }
 
-
             // split input rule nodes
             JsonNode ruleNodes = decisionTableNode.get("rules");
 
@@ -238,7 +238,7 @@ public class DmnJsonConverterUtil {
                                     // replace operator value
                                     ((ObjectNode) ruleNode).put(inputExpressionOperatorId, newInputExpressionOperatorValue);
                                 } catch (IllegalArgumentException iae) {
-                                    LOGGER.warn("Skipping model migration; could not transform collection operator for model id: " + modelId, iae);
+                                    LOGGER.warn("Skipping model migration; could not transform collection operator for model name: " + modelName, iae);
                                 }
                             }
                         }
@@ -246,7 +246,7 @@ public class DmnJsonConverterUtil {
                 }
             }
 
-            LOGGER.info("Decision table model " + modelId + " migrated to v3");
+            LOGGER.info("Decision table model " + modelName + " migrated to v3");
         }
 
         return decisionTableNode;
@@ -327,7 +327,7 @@ public class DmnJsonConverterUtil {
             stringBuilder.append(formatCollectionExpressionValue(expressionValue));
         }
 
-       return stringBuilder.toString();
+        return stringBuilder.toString();
     }
 
     public static boolean isCollectionOperator(String operator) {
@@ -371,7 +371,7 @@ public class DmnJsonConverterUtil {
 
     protected static String formatCollectionExpressionValue(String expressionValue) {
         if (StringUtils.isEmpty(expressionValue)) {
-            return  "\"\"";
+            return "\"\"";
         }
 
         StringBuilder formattedExpressionValue = new StringBuilder();
@@ -399,7 +399,7 @@ public class DmnJsonConverterUtil {
         String regex;
         if (str.contains("\"")) {
             // only split on comma between matching quotes
-            regex  =",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+            regex = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
         } else {
             regex = ",";
         }
