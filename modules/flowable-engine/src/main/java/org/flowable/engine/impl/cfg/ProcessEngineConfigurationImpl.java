@@ -1331,7 +1331,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (this.internalTaskAssignmentManager != null) {
             this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
         } else {
-            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager());
         }
 
         if (this.internalTaskLocalizationManager != null) {
