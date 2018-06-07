@@ -28,12 +28,12 @@ angular.module('flowableModeler')
 
             var hotDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
-            var stringOperators = ['==', '!=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
-            var numberOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
+            var stringOperators = ['==', '!=', 'IS IN', 'IS NOT IN'];
+            var numberOperators = ['==', '!=', '<', '>', '>=', '<=', 'IS IN', 'IS NOT IN'];
             var booleanOperators = ['==', '!='];
-            var dateOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
-            var collectionOperators = ['IN', 'NOT IN', 'ANY', 'NOT ANY', '==', '!='];
-            var allOperators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
+            var dateOperators = ['==', '!=', '<', '>', '>=', '<=', 'IS IN', 'IS NOT IN'];
+            var collectionOperators = ['ANY OF', 'NONE OF', 'ALL OF', 'NOT ALL OF', '==', '!='];
+            var allOperators = ['==', '!=', '<', '>', '>=', '<=', 'ANY OF', 'NONE OF', 'ALL OF', 'NOT ALL OF', 'IS IN', 'IS NOT IN'];
             var collectOperators = {
                 'SUM': '+',
                 'MIN': '<',
@@ -880,6 +880,9 @@ angular.module('flowableModeler')
                                 }
                             });
 
+                            // collection operators backwards compatibility
+                            // var cellValue = regressionTransformation(id, rule[id]);
+
                             tmpRowValues[id] = rule[id];
                         }
 
@@ -906,6 +909,16 @@ angular.module('flowableModeler')
                 columnIdCounter++;
                 return "" + columnIdCounter;
             };
+
+            // var regressionTransformation = function (id, value) {
+            //     if (value === null || id === null || id.endsWith("_operator") === false) {
+            //         return value;
+            //     }
+            //     // collect operators
+            //     if (value === 'IN') {
+            //         return ''
+            //     }
+            // };
 
         }]);
 

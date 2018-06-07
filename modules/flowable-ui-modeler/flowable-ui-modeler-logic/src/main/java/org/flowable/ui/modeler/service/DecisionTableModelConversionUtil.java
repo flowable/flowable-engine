@@ -12,17 +12,22 @@
  */
 package org.flowable.ui.modeler.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.editor.dmn.converter.DmnJsonConverterUtil;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.modeler.domain.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Yvo Swillens
  */
 public class DecisionTableModelConversionUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableDecisionTableService.class);
 
     public static Model convertModel(Model decisionTableModel) {
 
@@ -38,6 +43,26 @@ public class DecisionTableModelConversionUtil {
 
             } catch (Exception e) {
                 throw new InternalServerErrorException(String.format("Error converting decision table %s to new model version", decisionTableModel.getName()));
+            }
+        }
+
+        return decisionTableModel;
+    }
+
+    public static Model convertModelToV3(Model decisionTableModel) {
+
+        if (StringUtils.isNotEmpty(decisionTableModel.getModelEditorJson())) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
+                DmnJsonConverterUtil.migrateModelV3(decisionTableNode, objectMapper);
+
+                // replace editor json
+                decisionTableModel.setModelEditorJson(decisionTableNode.toString());
+
+            } catch (Exception e) {
+                throw new InternalServerErrorException(String.format("Error converting decision table %s to new model version", decisionTableModel.getName()), e);
             }
         }
 

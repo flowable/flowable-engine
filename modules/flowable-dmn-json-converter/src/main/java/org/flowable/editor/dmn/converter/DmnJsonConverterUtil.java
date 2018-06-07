@@ -51,6 +51,11 @@ public class DmnJsonConverterUtil {
 
         // check if model is version 1
         if (decisionTableNode.get("modelVersion") == null || decisionTableNode.get("modelVersion").isNull()) {
+            LOGGER.info("decision table model found with version < v2; migrating to v3");
+
+            ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
+            decisionTableObjectNode.put("modelVersion", "3");
+
             // split input rule nodes into operator and expression nodes
             //
             // determine input node ids
@@ -171,12 +176,114 @@ public class DmnJsonConverterUtil {
                 }
 
                 // replace rules node
-                ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
                 decisionTableObjectNode.replace("rules", newRuleNodes);
             }
+
+            LOGGER.info("decision table model migrated to v2");
         }
 
         return decisionTableNode;
+    }
+
+    public static JsonNode migrateModelV3(JsonNode decisionTableNode, ObjectMapper objectMapper) {
+        // migrate to v2
+        decisionTableNode = migrateModel(decisionTableNode, objectMapper);
+
+        // migrate to v3
+        if (decisionTableNode.get("modelVersion").asText().equals("2")) {
+            LOGGER.info("decision table model found with version v2; migrating to v3");
+
+            ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
+            decisionTableObjectNode.put("modelVersion", "3");
+
+            JsonNode inputExpressionNodes = decisionTableNode.get("inputExpressions");
+            Map<String, String> inputExpressionIds = new HashMap<>();
+
+            if (inputExpressionNodes != null && !inputExpressionNodes.isNull()) {
+                for (JsonNode inputExpressionNode : inputExpressionNodes) {
+                    if (inputExpressionNode.get("id") != null && !inputExpressionNode.get("id").isNull()) {
+                        String inputId = inputExpressionNode.get("id").asText();
+
+                        String inputType = null;
+                        if (inputExpressionNode.get("type") != null && !inputExpressionNode.get("type").isNull()) {
+                            inputType = inputExpressionNode.get("type").asText();
+                        }
+
+                        inputExpressionIds.put(inputId, inputType);
+                    }
+                }
+            }
+
+
+            // split input rule nodes
+            JsonNode ruleNodes = decisionTableNode.get("rules");
+
+            if (ruleNodes != null && !ruleNodes.isNull()) {
+                for (JsonNode ruleNode : ruleNodes) {
+
+                    for (String inputExpressionId : inputExpressionIds.keySet()) {
+
+                        // get operator
+                        String inputExpressionOperatorId = inputExpressionId + "_operator";
+
+                        if (ruleNode.has(inputExpressionOperatorId)) {
+                            if (ruleNode.get(inputExpressionOperatorId) != null && !ruleNode.get(inputExpressionOperatorId).isNull()) {
+                                String oldInputExpressionOperatorValue = ruleNode.get(inputExpressionOperatorId).asText();
+                                String inputType = inputExpressionIds.get(inputExpressionId);
+                                try {
+                                    String newInputExpressionOperatorValue = transformCollectionOperation(oldInputExpressionOperatorValue, inputType);
+
+                                    // replace operator value
+                                    ((ObjectNode) ruleNode).put(inputExpressionOperatorId, newInputExpressionOperatorValue);
+                                } catch (IllegalArgumentException iae) {
+                                    String modelId =  decisionTableNode.get("id").asText();
+                                    LOGGER.warn("skipping model migration; could not transform collection operator for model id: " + modelId, iae);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            LOGGER.info("decision table model migrated to v3");
+
+        }
+
+        return decisionTableNode;
+    }
+
+    protected static String transformCollectionOperation(String operatorValue, String inputType) {
+        if (StringUtils.isEmpty(operatorValue) || StringUtils.isEmpty(inputType)) {
+            throw new IllegalArgumentException("operator value and input type must be present");
+        }
+
+        if ("collection".equalsIgnoreCase(inputType)) {
+            switch (operatorValue) {
+                case "IN":
+                    return "ALL OF";
+                case "NOT IN":
+                    return "NONE OF";
+                case "ANY":
+                    return "ANY OF";
+                case "NOT ANY":
+                    return "NOT ALL OF";
+                default:
+                    return operatorValue;
+            }
+        } else {
+            switch (operatorValue) {
+                case "IN":
+                    return "IS IN";
+                case "NOT IN":
+                    return "IS NOT IN";
+                case "ANY":
+                    return "IS IN";
+                case "NOT ANY":
+                    return "IS NOT IN";
+                default:
+                    return operatorValue;
+            }
+        }
     }
 
     public static String determineExpressionType(String expressionValue) {
@@ -224,7 +331,9 @@ public class DmnJsonConverterUtil {
     }
 
     public static boolean isCollectionOperator(String operator) {
-        return "IN".equals(operator) || "NOT IN".equals(operator) || "ANY".equals(operator) || "NOT ANY".equals(operator);
+        return "IN".equals(operator) || "NOT IN".equals(operator) || "ANY".equals(operator) || "NOT ANY".equals(operator) ||
+            "IS IN".equals(operator) || "IS NOT IN".equals(operator) ||
+            "ALL OF".equals(operator) || "NONE OF".equals(operator) || "NOT ALL OF".equals(operator) || "ALL OF".equals(operator);
     }
 
     protected static String getDMNContainsExpressionMethod(String containsOperator) {
@@ -235,17 +344,23 @@ public class DmnJsonConverterUtil {
         String containsPrefixAndMethod;
 
         switch (containsOperator) {
+            case "IS IN":
+            case "ALL OF":
             case "IN":
-                containsPrefixAndMethod = "collection:contains";
+                containsPrefixAndMethod = "collection:allOf";
                 break;
+            case "IS NOT IN":
+            case "NONE OF":
             case "NOT IN":
-                containsPrefixAndMethod = "collection:notContains";
+                containsPrefixAndMethod = "collection:noneOf";
                 break;
+            case "ANY OF":
             case "ANY":
-                containsPrefixAndMethod = "collection:containsAny";
+                containsPrefixAndMethod = "collection:anyOf";
                 break;
+            case "NOT ALL OF":
             case "NOT ANY":
-                containsPrefixAndMethod = "collection:notContainsAny";
+                containsPrefixAndMethod = "collection:notAllOf";
                 break;
             default:
                 containsPrefixAndMethod = null;
