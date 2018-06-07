@@ -887,6 +887,9 @@ public class ModelServiceImpl implements ModelService {
   
     private void addFormToProcess(Process process, String formKey, Map<String, String> processedForms, boolean resolveFormReference)
     {
+      if(processedForms.containsKey(formKey)) {
+          return;
+      }
       String formContent;
       List<String> refKeys = new ArrayList();
       if(resolveFormReference)
