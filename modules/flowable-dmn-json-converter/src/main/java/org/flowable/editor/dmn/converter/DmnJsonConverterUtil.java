@@ -51,7 +51,8 @@ public class DmnJsonConverterUtil {
 
         // check if model is version 1
         if (decisionTableNode.get("modelVersion") == null || decisionTableNode.get("modelVersion").isNull()) {
-            LOGGER.info("decision table model found with version < v2; migrating to v3");
+            String modelId =  decisionTableNode.get("id").asText();
+            LOGGER.info("Decision table model with id " +modelId+ " found with version < v2; migrating to v3");
 
             ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
             decisionTableObjectNode.put("modelVersion", "3");
@@ -179,7 +180,7 @@ public class DmnJsonConverterUtil {
                 decisionTableObjectNode.replace("rules", newRuleNodes);
             }
 
-            LOGGER.info("decision table model migrated to v2");
+            LOGGER.info("Decision table model " + modelId + " migrated to v2");
         }
 
         return decisionTableNode;
@@ -191,7 +192,8 @@ public class DmnJsonConverterUtil {
 
         // migrate to v3
         if (decisionTableNode.get("modelVersion").asText().equals("2")) {
-            LOGGER.info("decision table model found with version v2; migrating to v3");
+            String modelId =  decisionTableNode.get("id").asText();
+            LOGGER.info("Decision table model " + modelId + " found with version v2; migrating to v3");
 
             ObjectNode decisionTableObjectNode = (ObjectNode) decisionTableNode;
             decisionTableObjectNode.put("modelVersion", "3");
@@ -236,8 +238,7 @@ public class DmnJsonConverterUtil {
                                     // replace operator value
                                     ((ObjectNode) ruleNode).put(inputExpressionOperatorId, newInputExpressionOperatorValue);
                                 } catch (IllegalArgumentException iae) {
-                                    String modelId =  decisionTableNode.get("id").asText();
-                                    LOGGER.warn("skipping model migration; could not transform collection operator for model id: " + modelId, iae);
+                                    LOGGER.warn("Skipping model migration; could not transform collection operator for model id: " + modelId, iae);
                                 }
                             }
                         }
@@ -245,8 +246,7 @@ public class DmnJsonConverterUtil {
                 }
             }
 
-            LOGGER.info("decision table model migrated to v3");
-
+            LOGGER.info("Decision table model " + modelId + " migrated to v3");
         }
 
         return decisionTableNode;
