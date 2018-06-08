@@ -910,16 +910,6 @@ angular.module('flowableModeler')
                 return "" + columnIdCounter;
             };
 
-            // var regressionTransformation = function (id, value) {
-            //     if (value === null || id === null || id.endsWith("_operator") === false) {
-            //         return value;
-            //     }
-            //     // collect operators
-            //     if (value === 'IN') {
-            //         return ''
-            //     }
-            // };
-
         }]);
 
 angular.module('flowableModeler')
