@@ -49,6 +49,66 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class TaskHelper {
 
+    public static void completeTask(TaskEntity taskEntity, Map<String, Object> variables,
+            Map<String, Object> transientVariables, boolean localScope, CommandContext commandContext) {
+
+        // Task complete logic
+
+        if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState() == DelegationState.PENDING) {
+            throw new FlowableException("A delegated task cannot be completed, but should be resolved instead.");
+        }
+
+        if (variables != null) {
+            if (localScope) {
+                taskEntity.setVariablesLocal(variables);
+
+            } else if (taskEntity.getExecutionId() != null) {
+                ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+                if (execution != null) {
+                    execution.setVariables(variables);
+                }
+
+            } else {
+                taskEntity.setVariables(variables);
+            }
+        }
+
+        if (transientVariables != null) {
+            if (localScope) {
+                taskEntity.setTransientVariablesLocal(transientVariables);
+            } else {
+                taskEntity.setTransientVariables(transientVariables);
+            }
+        }
+
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
+            .executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+        if (Authentication.getAuthenticatedUserId() != null && taskEntity.getProcessInstanceId() != null) {
+            ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getProcessInstanceId());
+            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity,
+                    Authentication.getAuthenticatedUserId(), null, IdentityLinkType.PARTICIPANT);
+        }
+
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        if (eventDispatcher.isEnabled()) {
+            if (variables != null) {
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(
+                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables, localScope));
+            } else {
+                eventDispatcher.dispatchEvent(
+                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity));
+            }
+        }
+
+        deleteTask(taskEntity, null, false, true, true);
+
+        // Continue process (if not a standalone task)
+        if (taskEntity.getExecutionId() != null) {
+            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getExecutionId());
+            CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
+        }
+    }
+
     public static void changeTaskAssignee(TaskEntity taskEntity, String assignee) {
         CommandContextUtil.getInternalTaskAssignmentManager().changeAssignee(taskEntity, assignee);
     }
