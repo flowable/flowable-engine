@@ -50,7 +50,7 @@ public class DmnJsonConverterUtil {
     public static JsonNode migrateModel(JsonNode decisionTableNode, ObjectMapper objectMapper) {
 
         // check if model is version 1
-        if (decisionTableNode.get("modelVersion") == null || decisionTableNode.get("modelVersion").isNull()) {
+        if ((decisionTableNode.get("modelVersion") == null || decisionTableNode.get("modelVersion").isNull()) && decisionTableNode.has("name")) {
             String modelName = decisionTableNode.get("name").asText();
             LOGGER.info("Decision table model with name " + modelName + " found with version < v2; migrating to v3");
 
@@ -192,7 +192,7 @@ public class DmnJsonConverterUtil {
         decisionTableNode = migrateModel(decisionTableNode, objectMapper);
 
         // migrate to v3
-        if (decisionTableNode.get("modelVersion").asText().equals("2")) {
+        if (decisionTableNode.has("modelVersion") && decisionTableNode.get("modelVersion").asText().equals("2") && decisionTableNode.has("name")) {
             String modelName = decisionTableNode.get("name").asText();
             LOGGER.info("Decision table model " + modelName + " found with version v2; migrating to v3");
 
