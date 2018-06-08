@@ -35,6 +35,7 @@ create table ACT_ID_USER (
   REV_ integer,
   FIRST_ varchar(255),
   LAST_ varchar(255),
+  DISPLAY_NAME_ varchar(255),
   EMAIL_ varchar(255),
   PWD_ varchar(255),
   PICTURE_ID_ varchar(64),
