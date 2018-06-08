@@ -129,11 +129,11 @@ public class ExtensionElementConverterTest extends AbstractConverterTest {
         /*
          * Verify input entry extension elements
          */
-        assertEquals("NOT IN", decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("NONE OF", decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
         assertEquals("20, 13", decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
-        assertEquals("ANY", decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("ANY OF", decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
         assertEquals("\"20\", \"13\"", decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
-        assertEquals("IN", decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
+        assertEquals("ALL OF", decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
         assertEquals("20", decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
     }
 
