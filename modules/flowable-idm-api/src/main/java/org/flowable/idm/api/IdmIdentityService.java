@@ -65,7 +65,7 @@ public interface IdmIdentityService {
 
     /**
      * @param userId
-     *            id of user to delete, cannot be null. When an id is passed for an unexisting user, this operation is ignored.
+     *            id of user to delete, cannot be null. When an id is passed for a non-existent user, this operation is ignored.
      */
     void deleteUser(String userId);
 
@@ -175,7 +175,7 @@ public interface IdmIdentityService {
 
     /**
      * @param tokenId
-     *            id of token to delete, cannot be null. When an id is passed for an unexisting token, this operation is ignored.
+     *            id of token to delete, cannot be null. When an id is passed for an non-existent token, this operation is ignored.
      */
     void deleteToken(String tokenId);
 
