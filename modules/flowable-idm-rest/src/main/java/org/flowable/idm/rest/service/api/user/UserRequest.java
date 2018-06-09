@@ -17,11 +17,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Frederik Heremans
+ * @author Filip Hrisafov
  */
 public class UserRequest extends UserResponse {
 
     protected boolean firstNameChanged;
     protected boolean lastNameChanged;
+    protected boolean displayNameChanged;
     protected boolean passwordChanged;
     protected boolean emailChanged;
 
@@ -44,6 +46,12 @@ public class UserRequest extends UserResponse {
     }
 
     @Override
+    public void setDisplayName(String displayName) {
+        super.setDisplayName(displayName);
+        displayNameChanged = true;
+    }
+
+    @Override
     public void setPassword(String passWord) {
         super.setPassword(passWord);
         passwordChanged = true;
@@ -62,6 +70,11 @@ public class UserRequest extends UserResponse {
     @JsonIgnore
     public boolean isLastNameChanged() {
         return lastNameChanged;
+    }
+
+    @JsonIgnore
+    public boolean isDisplayNameChanged() {
+        return displayNameChanged;
     }
 
     @JsonIgnore
