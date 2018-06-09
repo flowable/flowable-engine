@@ -111,7 +111,7 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core").version("2.9.3"),
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-databind").version("2.9.3"),
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-annotations").version("2.9.3"),
-                mavenBundle().groupId("joda-time").artifactId("joda-time").version("2.9.9"),
+                mavenBundle().groupId("joda-time").artifactId("joda-time").version("2.10"),
                 mavenBundle().groupId("com.h2database").artifactId("h2").version("1.4.196"),
                 mavenBundle().groupId("org.mybatis").artifactId("mybatis").version("3.4.5"),
                 mavenBundle().groupId("org.slf4j").artifactId("slf4j-log4j12").version("1.7.25").noStart(),
