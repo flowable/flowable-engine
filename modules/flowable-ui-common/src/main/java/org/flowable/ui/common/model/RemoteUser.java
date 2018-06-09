@@ -22,6 +22,7 @@ public class RemoteUser implements User {
     protected String id;
     protected String firstName;
     protected String lastName;
+    protected String displayName;
     protected String email;
     protected String fullName;
     protected String tenantId;
@@ -56,6 +57,16 @@ public class RemoteUser implements User {
     @Override
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    @Override
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     @Override
