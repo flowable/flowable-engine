@@ -109,7 +109,7 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         if (userId != null && task.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getProcessInstanceId());
             for (IdentityLinkEntity identityLink : processInstanceEntity.getIdentityLinks()) {
-                if (identityLink.isUser() && identityLink.getUserId().equals(userId)) {
+                if (identityLink.isUser() && identityLink.getUserId().equals(userId) && parentIdentityLinkType.equals(identityLink.getType())) {
                     return;
                 }
             }

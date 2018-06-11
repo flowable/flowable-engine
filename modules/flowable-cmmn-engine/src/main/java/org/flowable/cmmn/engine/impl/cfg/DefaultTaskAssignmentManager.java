@@ -114,7 +114,7 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
                 List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService()
                     .findIdentityLinksByScopeIdAndType(caseInstanceEntity.getId(), ScopeTypes.CMMN);
                 for (IdentityLinkEntity identityLink : identityLinks) {
-                    if (identityLink.isUser() && identityLink.getUserId().equals(userId)) {
+                    if (identityLink.isUser() && identityLink.getUserId().equals(userId) && parentIdentityLinkType.equals(identityLink.getType())) {
                         return;
                     }
                 }
