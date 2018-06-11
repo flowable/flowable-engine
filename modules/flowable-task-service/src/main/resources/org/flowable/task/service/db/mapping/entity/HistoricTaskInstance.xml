@@ -510,9 +510,6 @@
   </sql>
   
   <sql id="commonSelectHistoricTaskInstancesByQueryCriteriaSql">
-    <if test="isHistoricIdentityLinkJoinNeeded">
-      inner join ${prefix}ACT_HI_IDENTITYLINK HI on HI.TASK_ID_ = RES.ID_
-    </if>
     <if test="processFinished || processUnfinished || processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null || processInstanceBusinessKeyLikeIgnoreCase != null">
       inner join ${prefix}ACT_HI_PROCINST HPI ON RES.PROC_INST_ID_ = HPI.ID_
     </if>
@@ -538,9 +535,6 @@
       </if>       
     </foreach>
     <foreach collection="orQueryObjects" index="orIndex" item="orQueryObject">
-      <if test="orQueryObject.isHistoricIdentityLinkJoinNeeded">
-        left join ${prefix}ACT_HI_IDENTITYLINK HI_OR${orIndex} on HI_OR${orIndex}.TASK_ID_ = RES.ID_
-      </if>
       <if test="orQueryObject.processFinished || orQueryObject.processUnfinished || orQueryObject.processInstanceBusinessKey != null || orQueryObject.processInstanceBusinessKeyLike != null || orQueryObject.processInstanceBusinessKeyLikeIgnoreCase != null">
         inner join ${prefix}ACT_HI_PROCINST HPI_OR${orIndex} ON RES.PROC_INST_ID_ = HPI_OR${orIndex}.ID_
       </if>
@@ -717,7 +711,7 @@
       <if test="taskDescriptionLike != null">
         and RES.DESCRIPTION_ like #{taskDescriptionLike}${wildcardEscapeClause}
       </if>
-       <if test="taskDescriptionLikeIgnoreCase != null">
+      <if test="taskDescriptionLikeIgnoreCase != null">
         and lower(RES.DESCRIPTION_) like #{taskDescriptionLikeIgnoreCase}${wildcardEscapeClause}
       </if>
       <if test="taskDeleteReason != null">
@@ -732,7 +726,7 @@
       <if test="taskOwnerLike != null">
         and RES.OWNER_ like #{taskOwnerLike}${wildcardEscapeClause}
       </if>
-       <if test="taskOwnerLikeIgnoreCase != null">
+      <if test="taskOwnerLikeIgnoreCase != null">
         and lower(RES.OWNER_) like #{taskOwnerLikeIgnoreCase}${wildcardEscapeClause}
       </if>
       <if test="taskAssignee != null">
@@ -818,36 +812,38 @@
         <if test="!ignoreAssigneeValue">
             and RES.ASSIGNEE_ is null
         </if>
-        and HI.TYPE_ = 'candidate'
-        and
-        (
-          <if test="candidateUser != null">
-            HI.USER_ID_ = #{candidateUser}
-          </if>
-          <if test="candidateUser != null &amp;&amp; candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
-            or
-          </if>
-          <if test="candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
-            HI.GROUP_ID_ IN
-            <foreach item="group" index="index" collection="candidateGroups"
-                     open="(" separator="," close=")">
-              #{group}
-            </foreach>
-          </if>
+        and EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TYPE_ = 'candidate' and LINK.TASK_ID_ = RES.ID_
+            and
+            (
+              <if test="candidateUser != null">
+                LINK.USER_ID_ = #{candidateUser}
+              </if>
+              <if test="candidateUser != null &amp;&amp; candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
+                or
+              </if>
+              <if test="candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
+                LINK.GROUP_ID_ IN
+                <foreach item="group" index="index" collection="candidateGroups"
+                         open="(" separator="," close=")">
+                  #{group}
+                </foreach>
+              </if>
+            )
         )
       </if>
       <if test="involvedUser != null">
         and (
-          HI.USER_ID_ = #{involvedUser}
+          EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.USER_ID_ = #{involvedUser} and LINK.TASK_ID_ = RES.ID_)
           or RES.ASSIGNEE_ = #{involvedUser}
           or RES.OWNER_ = #{involvedUser}
           )
       </if>
       <if test="involvedGroups != null">
-        and HI.GROUP_ID_ in
+        and EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_ and LINK.GROUP_ID_ in
         <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
           #{involvedGroup}
         </foreach>
+        )
       </if>
       <foreach item="queryVar" collection="queryVariableValues" index="index">
         <choose>
@@ -1176,43 +1172,43 @@
             or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
           </if>
           <if test="orQueryObject.candidateUser != null || orQueryObject.candidateGroups != null">
-            or (HI_OR${orIndex}.TYPE_ = 'candidate'
-            
+            or (EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TYPE_ = 'candidate' and LINK.TASK_ID_ = RES.ID_
+                and
+                (
+                  <if test="orQueryObject.candidateUser != null">
+                    LINK.USER_ID_ = #{orQueryObject.candidateUser}
+                  </if>
+                  <if test="orQueryObject.candidateUser != null &amp;&amp; orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
+                    or
+                  </if>
+                  <if test="orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
+                    LINK.GROUP_ID_ IN
+                    <foreach item="group" index="index" collection="orQueryObject.candidateGroups"
+                             open="(" separator="," close=")">
+                      #{group}
+                    </foreach>
+                  </if>
+                )
+              )
             <if test="!orQueryObject.ignoreAssigneeValue">
                 and RES.ASSIGNEE_ is null
             </if>
-            
-            and
-            (
-              <if test="orQueryObject.candidateUser != null">
-                HI_OR${orIndex}.USER_ID_ = #{orQueryObject.candidateUser}
-              </if>
-              <if test="orQueryObject.candidateUser != null &amp;&amp; orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
-                or
-              </if>
-              <if test="orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
-                HI_OR${orIndex}.GROUP_ID_ IN
-                <foreach item="group" index="index" collection="orQueryObject.candidateGroups"
-                         open="(" separator="," close=")">
-                  #{group}
-                </foreach>
-              </if>
-            ))
+            )
           </if>
           <if test="orQueryObject.involvedUser != null">
             or (
-              HI_OR${orIndex}.USER_ID_ = #{orQueryObject.involvedUser}
+              EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.USER_ID_ = #{orQueryObject.involvedUser} and LINK.TASK_ID_ = RES.ID_)
               or RES.ASSIGNEE_ = #{orQueryObject.involvedUser}
               or RES.OWNER_ = #{orQueryObject.involvedUser}
               )
           </if>
           <if test="orQueryObject.involvedGroups != null">
             or
-              HI_OR${orIndex}.GROUP_ID_ in
+              EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_ and LINK.GROUP_ID_ in
               <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
                 #{involvedGroup}
               </foreach>
-
+              )
           </if>
           <foreach item="queryVar" collection="orQueryObject.queryVariableValues" index="index">
             or
