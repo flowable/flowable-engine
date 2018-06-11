@@ -34,6 +34,7 @@ import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
+ * @author Filip Hrisafov
  */
 @RestController
 @Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
@@ -66,6 +67,9 @@ public class UserResource extends BaseUserResource {
         }
         if (userRequest.isFirstNameChanged()) {
             user.setFirstName(userRequest.getFirstName());
+        }
+        if (userRequest.isDisplayNameChanged()) {
+            user.setDisplayName(userRequest.getDisplayName());
         }
         if (userRequest.isLastNameChanged()) {
             user.setLastName(userRequest.getLastName());

@@ -27,8 +27,7 @@ angular.module('flowableModeler')
     $scope.loadProcess = function() {
       var url;
       if ($routeParams.modelHistoryId) {
-        url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
-          + '/history/' + $routeParams.modelHistoryId;
+        url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId) + '/history/' + $routeParams.modelHistoryId;
       } else {
         url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
       }

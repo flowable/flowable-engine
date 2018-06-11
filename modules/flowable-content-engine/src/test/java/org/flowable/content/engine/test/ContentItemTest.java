@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,8 +14,10 @@ package org.flowable.content.engine.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -73,7 +75,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
             fail("Expected not found exception, not " + e);
         }
     }
-    
+
     @Test
     public void queryContentItemWithScopeId() {
         createContentItem();
@@ -112,7 +114,37 @@ public class ContentItemTest extends AbstractFlowableContentTest {
 
         assertEquals(0, contentService.createContentItemQuery().scopeTypeLike("testScope%").list().size());
     }
-    
+
+    @Test
+    public void lastModifiedTimestampUpdateOnContentChange() throws IOException {
+        ContentItem initialContentItem = contentService.newContentItem();
+        initialContentItem.setName("testItem");
+        initialContentItem.setMimeType("text/plain");
+        contentService.saveContentItem(initialContentItem);
+        long initialTS = System.currentTimeMillis();
+        assertNotNull(initialContentItem.getId());
+        assertNotNull(initialContentItem.getLastModified());
+        assertTrue(initialContentItem.getLastModified().getTime() <= System.currentTimeMillis());
+
+        ContentItem storedContentItem = contentService.createContentItemQuery().id(initialContentItem.getId()).singleResult();
+        assertNotNull(storedContentItem);
+        assertEquals(initialContentItem.getId(), storedContentItem.getId());
+        assertTrue(initialContentItem.getLastModified().getTime() == storedContentItem.getLastModified().getTime());
+
+        long storeTS = System.currentTimeMillis();
+        contentService.saveContentItem(storedContentItem, this.getClass().getClassLoader().getResourceAsStream("test.txt"));
+        storedContentItem = contentService.createContentItemQuery().id(initialContentItem.getId()).singleResult();
+        assertNotNull(storedContentItem);
+        assertEquals(initialContentItem.getId(), storedContentItem.getId());
+        InputStream contentStream = contentService.getContentItemData(initialContentItem.getId());
+        String contentValue = IOUtils.toString(contentStream, "utf-8");
+        assertEquals("hello", contentValue);
+
+        assertTrue(initialContentItem.getLastModified().getTime() < storedContentItem.getLastModified().getTime());
+
+        contentService.deleteContentItem(initialContentItem.getId());
+    }
+
     protected void createContentItem() {
         ContentItem contentItem = contentService.newContentItem();
         contentItem.setName("testScopeItem");
