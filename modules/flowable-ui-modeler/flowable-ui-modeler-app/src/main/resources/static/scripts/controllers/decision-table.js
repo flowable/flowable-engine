@@ -45,7 +45,7 @@ angular.module('flowableModeler')
 
             var hotReadOnlyDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
-            var operators = ['==', '!=', '<', '>', '>=', '<=', 'IN', 'NOT IN', 'ANY', 'NOT ANY'];
+            var operators = ['==', '!=', '<', '>', '>=', '<=', 'ANY OF', 'NONE OF', 'ALL OF', 'NOT ALL OF', 'IS IN', 'IS NOT IN'];
             var columnIdCounter = 0;
             var dateFormat = 'YYYY-MM-DD';
 

@@ -57,9 +57,13 @@ import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.dmn.engine.impl.el.FlowableAddDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableAllOfFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableAnyOfFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableContainsAnyFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableContainsFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableCurrentDateFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableNoneOfFunctionDelegate;
+import org.flowable.dmn.engine.impl.el.FlowableNotAllOfFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableNotContainsAnyFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableNotContainsFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableSubtractDateFunctionDelegate;
@@ -371,6 +375,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
             this.flowableFunctionDelegates.add(new FlowableAddDateFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableCurrentDateFunctionDelegate());
             // collections
+            this.flowableFunctionDelegates.add(new FlowableAllOfFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableNoneOfFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableAnyOfFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableNotAllOfFunctionDelegate());
+            // deprecated collections
             this.flowableFunctionDelegates.add(new FlowableContainsFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableNotContainsFunctionDelegate());
             this.flowableFunctionDelegates.add(new FlowableContainsAnyFunctionDelegate());

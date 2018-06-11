@@ -38,6 +38,11 @@ public class FlowableModelerAppProperties {
      */
     private String dataSourcePrefix = "";
 
+    /**
+     * Enables the logic to migrate old decision table models to the new model version
+     */
+    private boolean decisionTableMigrationEnabled = true;
+
     public boolean isRestEnabled() {
         return restEnabled;
     }
@@ -60,5 +65,12 @@ public class FlowableModelerAppProperties {
 
     public void setDataSourcePrefix(String dataSourcePrefix) {
         this.dataSourcePrefix = dataSourcePrefix;
+    }
+
+    public boolean isDecisionTableMigrationEnabled() {
+        return decisionTableMigrationEnabled;
+    }
+    public void setDecisionTableMigrationEnabled(boolean decisionTableMigrationEnabled) {
+        this.decisionTableMigrationEnabled = decisionTableMigrationEnabled;
     }
 }

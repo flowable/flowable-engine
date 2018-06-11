@@ -55,17 +55,6 @@ public class DmnXMLUtil implements DmnXMLConstants {
         genericChildParserMap.put(parser.getElementName(), parser);
     }
 
-    public static void addXMLLocation(DmnElement element, XMLStreamReader xtr) {
-        // Location location = xtr.getLocation();
-        // element.setXmlRowNumber(location.getLineNumber());
-        // element.setXmlColumnNumber(location.getColumnNumber());
-    }
-
-    // public static void parseChildElements(String elementName, DmnElement parentElement, XMLStreamReader xtr, DmnDefinition model) throws Exception {
-    // String test = ""
-    // parseChildElements(elementName, parentElement, xtr, null, model);
-    // }
-
     public static void parseChildElements(String elementName, DmnElement parentElement, XMLStreamReader xtr,
             Map<String, BaseChildElementParser> childParsers, DecisionTable decisionTable) throws Exception {
 

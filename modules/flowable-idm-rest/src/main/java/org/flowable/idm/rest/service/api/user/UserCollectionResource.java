@@ -48,6 +48,7 @@ import io.swagger.annotations.Authorization;
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 @RestController
 @Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
@@ -59,6 +60,7 @@ public class UserCollectionResource {
         properties.put("id", UserQueryProperty.USER_ID);
         properties.put("firstName", UserQueryProperty.FIRST_NAME);
         properties.put("lastName", UserQueryProperty.LAST_NAME);
+        properties.put("displayName", UserQueryProperty.DISPLAY_NAME);
         properties.put("email", UserQueryProperty.EMAIL);
     }
 
@@ -73,12 +75,14 @@ public class UserCollectionResource {
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "firstName", dataType = "string", value = "Only return users with the given firstname", paramType = "query"),
             @ApiImplicitParam(name = "lastName", dataType = "string", value = "Only return users with the given lastname", paramType = "query"),
+            @ApiImplicitParam(name = "displayName", dataType = "string", value = "Only return users with the given displayName", paramType = "query"),
             @ApiImplicitParam(name = "email", dataType = "string", value = "Only return users with the given email", paramType = "query"),
             @ApiImplicitParam(name = "firstNameLike", dataType = "string", value = "Only return users with a firstname like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "lastNameLike", dataType = "string", value = "Only return users with a lastname like the given value. ", paramType = "query"),
+            @ApiImplicitParam(name = "displayNameLike", dataType = "string", value = "Only return users with a displayName like the given value. ", paramType = "query"),
             @ApiImplicitParam(name = "emailLike", dataType = "string", value = "Only return users with an email like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "memberOfGroup", dataType = "string", value = "Only return users which are a member of the given group.", paramType = "query"),
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,firstName,lastname,email", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,firstName,lastname,email,displayName", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the group exists and is returned.")
@@ -96,6 +100,9 @@ public class UserCollectionResource {
         if (allRequestParams.containsKey("lastName")) {
             query.userLastName(allRequestParams.get("lastName"));
         }
+        if (allRequestParams.containsKey("displayName")) {
+            query.userDisplayName(allRequestParams.get("displayName"));
+        }
         if (allRequestParams.containsKey("email")) {
             query.userEmail(allRequestParams.get("email"));
         }
@@ -104,6 +111,9 @@ public class UserCollectionResource {
         }
         if (allRequestParams.containsKey("lastNameLike")) {
             query.userLastNameLike(allRequestParams.get("lastNameLike"));
+        }
+        if (allRequestParams.containsKey("displayNameLike")) {
+            query.userDisplayNameLike(allRequestParams.get("displayNameLike"));
         }
         if (allRequestParams.containsKey("emailLike")) {
             query.userEmailLike(allRequestParams.get("emailLike"));
@@ -136,6 +146,7 @@ public class UserCollectionResource {
         created.setEmail(userRequest.getEmail());
         created.setFirstName(userRequest.getFirstName());
         created.setLastName(userRequest.getLastName());
+        created.setDisplayName(userRequest.getDisplayName());
         created.setPassword(userRequest.getPassword());
         identityService.saveUser(created);
 

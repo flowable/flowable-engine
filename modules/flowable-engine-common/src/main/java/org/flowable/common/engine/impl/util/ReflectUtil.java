@@ -162,7 +162,7 @@ public abstract class ReflectUtil {
             Field field = ReflectUtil.getField(name, target);
             if (field == null) {
                 if (throwExceptionOnMissingField) {
-                    throw new FlowableIllegalArgumentException("Field definition uses unexisting field '" + name + "' on class " + target.getClass().getName());
+                    throw new FlowableIllegalArgumentException("Field definition uses non-existent field '" + name + "' of class " + target.getClass().getName());
                 } else {
                     return;
                 }

@@ -32,6 +32,10 @@ public interface User extends Serializable {
     void setLastName(String lastName);
 
     String getLastName();
+    
+    void setDisplayName(String displayName);
+
+    String getDisplayName();
 
     void setEmail(String email);
 
