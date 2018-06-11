@@ -50,6 +50,24 @@ public class IdentityLinkUtil {
         }
     }
 
+    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
+        for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
+            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
+        }
+    }
+
+    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
+        CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+
+        CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
+        if (countingTaskEntity.isCountEnabled()) {
+            countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
+        }
+
+        taskEntity.getIdentityLinks().add(identityLinkEntity);
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, identityLinkEntity.getUserId());
+    }
+
     public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascaseHistory) {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;

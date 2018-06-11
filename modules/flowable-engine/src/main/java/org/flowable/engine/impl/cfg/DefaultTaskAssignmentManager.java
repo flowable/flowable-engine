@@ -16,19 +16,15 @@ package org.flowable.engine.impl.cfg;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
+import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.InternalTaskAssignmentManager;
-import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -48,34 +44,17 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
 
     @Override
     public void changeAssignee(Task task, String assignee) {
-        if ((task.getAssignee() != null && !task.getAssignee().equals(assignee))
-            || (task.getAssignee() == null && assignee != null)) {
-
-            CommandContextUtil.getTaskService().changeTaskAssignee((TaskEntity) task, assignee);
-            fireAssignmentEvents((TaskEntity) task);
-
-            if (task.getId() != null) {
-                CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(task, task.getAssignee());
-            }
-        }
+        TaskHelper.changeTaskAssignee((TaskEntity) task, assignee);
     }
     
     @Override
     public void changeOwner(Task task, String owner) {
-        if ((task.getOwner() != null && !task.getOwner().equals(owner))
-            || (task.getOwner() == null && owner != null)) {
-
-            CommandContextUtil.getTaskService().changeTaskOwner((TaskEntity) task, owner);
-
-            if (task.getId() != null) {
-                addUserIdentityLinkToParent(task, task.getOwner());
-            }
-        }
+        TaskHelper.changeTaskOwner((TaskEntity) task, owner);
     }
 
     @Override
     public void addCandidateUser(Task task, IdentityLink identityLink) {
-        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
     }
 
     @Override
@@ -84,12 +63,12 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateUsers) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
+        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
     }
 
     @Override
     public void addCandidateGroup(Task task, IdentityLink identityLink) {
-        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
     }
 
     @Override
@@ -98,17 +77,17 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateGroups) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
+        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
     }
 
     @Override
     public void addUserIdentityLink(Task task, IdentityLink identityLink) {
-        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
     }
 
     @Override
     public void addGroupIdentityLink(Task task, IdentityLink identityLink) {
-        handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
     }
 
     @Override
@@ -129,46 +108,13 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
     public void addUserIdentityLinkToParent(Task task, String userId) {
         if (userId != null && task.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getProcessInstanceId());
-            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity,
-                userId, null, parentIdentityLinkType);
-        }
-    }
-
-    protected void fireAssignmentEvents(TaskEntity taskEntity) {
-        CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
-
-        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getEventDispatcher().dispatchEvent(
-                FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
-        }
-    }
-
-    protected void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
-        CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
-
-        if (CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
-            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
-            if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
-                countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
-            }
-        }
-
-        taskEntity.getIdentityLinks().add(identityLinkEntity);
-        if (identityLinkEntity.getUserId() != null && taskEntity.getProcessInstanceId() != null) {
-            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
-            for (IdentityLinkEntity identityLink : executionEntity.getIdentityLinks()) {
-                if (identityLink.isUser() && identityLink.getUserId().equals(identityLinkEntity.getUserId())) {
+            for (IdentityLinkEntity identityLink : processInstanceEntity.getIdentityLinks()) {
+                if (identityLink.isUser() && identityLink.getUserId().equals(userId)) {
                     return;
                 }
             }
-
-            IdentityLinkUtil.createProcessInstanceIdentityLink(executionEntity, identityLinkEntity.getUserId(), null, parentIdentityLinkType);
-        }
-    }
-
-    protected void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
-        for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
-            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
+            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity,
+                userId, null, parentIdentityLinkType);
         }
     }
 

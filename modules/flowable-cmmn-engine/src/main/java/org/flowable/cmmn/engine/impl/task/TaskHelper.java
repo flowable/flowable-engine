@@ -123,7 +123,15 @@ public class TaskHelper {
     }
     
     public static void changeTaskOwner(TaskEntity taskEntity, String owner) {
-        CommandContextUtil.getInternalTaskAssignmentManager().changeOwner(taskEntity, owner);
+        if ((taskEntity.getOwner() != null && !taskEntity.getOwner().equals(owner))
+                || (taskEntity.getOwner() == null && owner != null)) {
+
+            CommandContextUtil.getTaskService().changeTaskOwner(taskEntity, owner);
+
+            if (taskEntity.getId() != null) {
+                addOwnerIdentityLink(taskEntity);
+            }
+        }
     }
     
     protected static void addAssigneeIdentityLinks(TaskEntity taskEntity) {

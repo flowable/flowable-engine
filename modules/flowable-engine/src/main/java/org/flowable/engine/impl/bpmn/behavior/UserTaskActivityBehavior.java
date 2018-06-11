@@ -37,6 +37,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -286,14 +287,14 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 if (value != null) {
                     if (value instanceof Collection) {
                         List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
-                        CommandContextUtil.getInternalTaskAssignmentManager().addCandidateUsers(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
+                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         
                     } else {
                         String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {
                             List<String> candidates = extractCandidates(strValue);
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
-                            CommandContextUtil.getInternalTaskAssignmentManager().addCandidateGroups(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
+                            IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         }
                     }
                 }
@@ -307,16 +308,14 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 if (value != null) {
                     if (value instanceof Collection) {
                         List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
-                        CommandContextUtil.getInternalTaskAssignmentManager()
-                            .addCandidateUsers(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
+                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
 
                     } else {
                         String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {
                             List<String> candidates = extractCandidates(strValue);
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
-                            CommandContextUtil.getInternalTaskAssignmentManager()
-                                .addCandidateUsers(task, identityLinkEntities.stream().map(IdentityLink.class::cast).collect(Collectors.toList()));
+                            IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         }
                         
                     }
@@ -335,14 +334,14 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         while (userIdSet.hasNext()) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
                                             task.getId(), userIdSet.next().toString(), null, customUserIdentityLinkType);
-                            CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLink(task, identityLinkEntity);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
                         
                     } else {
                         List<String> userIds = extractCandidates(value.toString());
                         for (String userId : userIds) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
-                            CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLink(task, identityLinkEntity);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
                         
                     }
@@ -364,7 +363,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         while (groupIdSet.hasNext()) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
                                             task.getId(), null, groupIdSet.next().toString(), customGroupIdentityLinkType);
-                            CommandContextUtil.getInternalTaskAssignmentManager().addGroupIdentityLink(task, identityLinkEntity);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
                         
                     } else {
@@ -372,7 +371,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         for (String groupId : groupIds) {
                             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
                                             task.getId(), null, groupId, customGroupIdentityLinkType);
-                            CommandContextUtil.getInternalTaskAssignmentManager().addGroupIdentityLink(task, identityLinkEntity);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
                         
                     }

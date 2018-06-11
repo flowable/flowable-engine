@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -108,11 +109,12 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
         } else if (IDENTITY_USER == identityIdType) {
             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), identityId, null, identityType);
-            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLink(task, identityLinkEntity);
+            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
             
         } else if (IDENTITY_GROUP == identityIdType) {
             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), null, identityId, identityType);
-            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addGroupIdentityLink(task, identityLinkEntity);
+            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+
         }
 
         boolean forceNullUserId = false;

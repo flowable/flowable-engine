@@ -226,7 +226,6 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         assertEquals(1, cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).size());
         assertEquals("JohnDoe", cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).get(0).getUserId());
         assertEquals(IdentityLinkType.PARTICIPANT, cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()).get(0).getType());
-
     }
 
 }

@@ -110,11 +110,27 @@ public class TaskHelper {
     }
 
     public static void changeTaskAssignee(TaskEntity taskEntity, String assignee) {
-        CommandContextUtil.getInternalTaskAssignmentManager().changeAssignee(taskEntity, assignee);
+        if ((taskEntity.getAssignee() != null && !taskEntity.getAssignee().equals(assignee))
+                || (taskEntity.getAssignee() == null && assignee != null)) {
+
+            CommandContextUtil.getTaskService().changeTaskAssignee(taskEntity, assignee);
+            fireAssignmentEvents(taskEntity);
+
+            if (taskEntity.getId() != null) {
+                addAssigneeIdentityLinks(taskEntity);
+            }
+        }
     }
 
     public static void changeTaskOwner(TaskEntity taskEntity, String owner) {
-        CommandContextUtil.getInternalTaskAssignmentManager().changeOwner(taskEntity, owner);
+        if ((taskEntity.getOwner() != null && !taskEntity.getOwner().equals(owner))
+                || (taskEntity.getOwner() == null && owner != null)) {
+
+            CommandContextUtil.getTaskService().changeTaskOwner(taskEntity, owner);
+            if (taskEntity.getId() != null) {
+                addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
+            }
+        }
     }
 
     public static void insertTask(TaskEntity taskEntity, ExecutionEntity execution, boolean fireCreateEvent) {
@@ -152,13 +168,17 @@ public class TaskHelper {
             addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
         }
         if (taskEntity.getAssignee() != null) {
-            CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getAssignee());
+            addAssigneeIdentityLinks(taskEntity);
         }
 
         CommandContextUtil.getTaskService().insertTask(taskEntity, fireCreateEvent);
     }
 
-    protected static void addOwnerIdentityLink(TaskEntity taskEntity, String owner) {
+    public static void addAssigneeIdentityLinks(TaskEntity taskEntity) {
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getAssignee());
+    }
+
+    public static void addOwnerIdentityLink(TaskEntity taskEntity, String owner) {
         if (owner == null && taskEntity.getOwner() == null) {
             return;
         }
@@ -403,4 +423,12 @@ public class TaskHelper {
         }
     }
 
+    protected static void fireAssignmentEvents(TaskEntity taskEntity) {
+        CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+
+        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
+        }
+    }
 }

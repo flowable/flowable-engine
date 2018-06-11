@@ -50,7 +50,27 @@ public class IdentityLinkUtil {
         }
         processInstanceEntity.getIdentityLinks().removeAll(removedIdentityLinkEntities);
     }
-    
+
+    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
+        for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
+            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
+        }
+    }
+
+    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
+        CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+
+        if (CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
+            if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
+                countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
+            }
+        }
+
+        taskEntity.getIdentityLinks().add(identityLinkEntity);
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, identityLinkEntity.getUserId());
+    }
+
     public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascadeHistory, boolean updateTaskCounts) {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             if (cascadeHistory) {

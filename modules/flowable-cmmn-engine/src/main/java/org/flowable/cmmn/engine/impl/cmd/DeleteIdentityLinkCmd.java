@@ -71,7 +71,7 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
         if (IdentityLinkType.ASSIGNEE.equals(type)) {
             TaskHelper.changeTaskAssignee(task, null);
         } else if (IdentityLinkType.OWNER.equals(type)) {
-           TaskHelper.changeTaskOwner(task, null);
+            TaskHelper.changeTaskOwner(task, null);
         } else {
             IdentityLinkUtil.deleteTaskIdentityLinks(task, userId, groupId, type);
         }

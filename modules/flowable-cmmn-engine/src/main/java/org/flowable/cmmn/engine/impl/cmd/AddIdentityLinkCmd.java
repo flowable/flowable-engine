@@ -83,7 +83,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
             
-           TaskHelper.changeTaskAssignee(task, identityId);
+            TaskHelper.changeTaskAssignee(task, identityId);
             assignedToNoOne = identityId == null;
             
         } else if (IdentityLinkType.OWNER.equals(identityType)) {
@@ -96,15 +96,17 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
 
-           TaskHelper.changeTaskOwner(task, identityId);
+            TaskHelper.changeTaskOwner(task, identityId);
             assignedToNoOne = identityId == null;
 
         } else if (IDENTITY_USER == identityIdType) {
             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), identityId, null, identityType);
-            CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addUserIdentityLink(task, identityLinkEntity);
+            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+
         } else if (IDENTITY_GROUP == identityIdType) {
             IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), null, identityId, identityType);
-           CommandContextUtil.getInternalTaskAssignmentManager(commandContext).addGroupIdentityLink(task, identityLinkEntity);
+            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+
         }
 
         boolean forceNullUserId = false;
