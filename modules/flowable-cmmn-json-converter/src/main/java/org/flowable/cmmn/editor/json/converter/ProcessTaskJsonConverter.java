@@ -12,14 +12,13 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.CaseTask;
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -70,8 +69,34 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
                 task.setProcessRef(processModelKey);
             }
         }
-        
+
+        JsonNode processTaskInParametersNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_PROCESS_IN_PARAMETERS, elementNode);
+        if (processTaskInParametersNode != null && processTaskInParametersNode.has("inParameters") && !processTaskInParametersNode.get("inParameters").isNull()) {
+            JsonNode inParametersNode =  processTaskInParametersNode.get("inParameters");
+            List<IOParameter> inParameters = new ArrayList<>();
+            readIOParameter(inParametersNode, inParameters);
+            task.setInParameters(inParameters);
+        }
+
+
+        JsonNode processTaskOutParametersNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_PROCESS_OUT_PARAMETERS, elementNode);
+        if (processTaskOutParametersNode != null && processTaskOutParametersNode.has("outParameters") && !processTaskOutParametersNode.get("outParameters").isNull()) {
+            JsonNode outParametersNode =  processTaskOutParametersNode.get("outParameters");
+            List<IOParameter> outParameters = new ArrayList<>();
+            readIOParameter(outParametersNode, outParameters);
+            task.setOutParameters(outParameters);
+        }
         return task;
+    }
+
+    private void readIOParameter(JsonNode outParametersNode, List<IOParameter> ioParameters) {
+        for (JsonNode in : outParametersNode){
+            IOParameter ioParameter = new IOParameter();
+            ioParameter.setSource(in.get("source").asText());
+            ioParameter.setSourceExpression(in.get("sourceExpression").asText());
+            ioParameter.setTarget(in.get("target").asText());
+            ioParameters.add(ioParameter);
+        }
     }
 
     @Override

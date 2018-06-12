@@ -32,9 +32,14 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     private static final long serialVersionUID = 1L;
     protected String formDefinitionId;
     protected String outcome;
+
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected boolean localScope;
+
+    public Object getVariable(String key) {
+        return variables.get(key);
+    }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         super(taskId);

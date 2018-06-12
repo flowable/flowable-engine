@@ -13,9 +13,11 @@
 package org.flowable.cmmn.converter.export;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ProcessTask;
 
 import javax.xml.stream.XMLStreamWriter;
+import java.util.List;
 
 public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessTask> {
 
@@ -38,6 +40,16 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
     @Override
     protected void writePlanItemDefinitionBody(ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionBody(processTask, xtw);
+        boolean didWriteParameterStartElement = false;
+        if(null != processTask.getInParameters() || null != processTask.getOutParameters()){
+            didWriteParameterStartElement = writeIOParameters(ELEMENT_PROCESS_TASK_IN_PARAMETERS,
+                    processTask.getInParameters(), didWriteParameterStartElement, xtw);
+            didWriteParameterStartElement = writeIOParameters(ELEMENT_PROCESS_TASK_OUT_PARAMETERS,
+                    processTask.getOutParameters(), didWriteParameterStartElement, xtw);
+            if(didWriteParameterStartElement){
+                xtw.writeEndElement();
+            }
+        }
         if (StringUtils.isNotEmpty(processTask.getProcessRef()) || StringUtils.isNotEmpty(processTask.getProcessRefExpression())) {
             xtw.writeStartElement(ELEMENT_PROCESS_REF_EXPRESSION);
             xtw.writeCData(
@@ -48,4 +60,36 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
             xtw.writeEndElement();
         }
     }
+
+    private boolean writeIOParameters(String elementName, List<IOParameter> parameterList, boolean didWriteParameterStartElement,
+                                      XMLStreamWriter xtw) throws Exception {
+
+        if (parameterList.isEmpty()) {
+            return didWriteParameterStartElement;
+        }
+
+        for (IOParameter ioParameter : parameterList) {
+            if (!didWriteParameterStartElement) {
+                xtw.writeStartElement(ELEMENT_PARAMETER_MAPPING);
+                didWriteParameterStartElement = true;
+            }
+
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, elementName, FLOWABLE_EXTENSIONS_NAMESPACE);
+            if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, ioParameter.getSourceExpression());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget());
+            }
+
+            xtw.writeEndElement();
+        }
+
+        return didWriteParameterStartElement;
+    }
+
+
 }

@@ -96,6 +96,15 @@ public interface CmmnXmlConstants {
     String ELEMENT_DECISION_REF_EXPRESSION = "decisionRefExpression";
     String ELEMENT_CONDITION = "condition";
 
+    String ELEMENT_PARAMETER_MAPPING = "extensionElements";
+
+    String ELEMENT_PROCESS_TASK_IN_PARAMETERS = "in";
+    String ELEMENT_PROCESS_TASK_OUT_PARAMETERS = "out";
+
+    String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
+    String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
+    String ATTRIBUTE_IOPARAMETER_TARGET = "target";
+
     String ELEMENT_TIMER_EXPRESSION = "timerExpression";
     String ELEMENT_PLAN_ITEM_START_TRIGGER = "planItemStartTrigger";
     String ATTRIBUTE_PLAN_ITEM_START_TRIGGER_SRC_REF = "sourceRef";

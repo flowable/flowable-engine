@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Joram Barrez
  */
@@ -21,6 +24,9 @@ public class ProcessTask extends Task {
     protected String processRef;
     
     protected Process process;
+
+    protected List<IOParameter> inParameters = new ArrayList<>();
+    protected List<IOParameter> outParameters = new ArrayList<>();
 
     public String getProcessRefExpression() {
         return processRefExpression;
@@ -44,6 +50,22 @@ public class ProcessTask extends Task {
 
     public void setProcess(Process process) {
         this.process = process;
+    }
+
+    public List<IOParameter> getInParameters() {
+        return inParameters;
+    }
+
+    public void setInParameters(List<IOParameter> inParameters) {
+        this.inParameters = inParameters;
+    }
+
+    public List<IOParameter> getOutParameters() {
+        return outParameters;
+    }
+
+    public void setOutParameters(List<IOParameter> outParameters) {
+        this.outParameters = outParameters;
     }
     
 }
