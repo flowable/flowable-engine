@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:flowable="http://flowable.org/bpmn"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="Examples">
 
   <process id="startSimpleSubProcess">
 
@@ -13,6 +15,11 @@
     <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="subProcess" />
 
     <subProcess id="subProcess">
+      <dataObject itemSubjectRef="xsd:string" name="name" id="ID_91ee51f3-481d-439c-a62d-8b382a1cf7a1">
+        <extensionElements>
+          <flowable:value>John</flowable:value>
+        </extensionElements>
+      </dataObject>
 
       <startEvent id="theSubProcessStart" />
 
