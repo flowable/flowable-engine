@@ -246,13 +246,9 @@ public class BaseAppDefinitionService {
     }
 
     protected byte[] createDeployZipArtifact(Map<String, byte[]> deployableAssets) {
-        ByteArrayOutputStream baos = null;
-        ZipOutputStream zos = null;
-        byte[] deployZipArtifact = null;
-        try {
-            baos = new ByteArrayOutputStream();
-            zos = new ZipOutputStream(baos);
 
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             ZipOutputStream zos = new ZipOutputStream(baos)) {
             for (Map.Entry<String, byte[]> entry : deployableAssets.entrySet()) {
                 ZipEntry zipEntry = new ZipEntry(entry.getKey());
                 zipEntry.setSize(entry.getValue().length);
@@ -261,17 +257,11 @@ public class BaseAppDefinitionService {
                 zos.closeEntry();
             }
 
-            IOUtils.closeQuietly(zos);
-
             // this is the zip file as byte[]
-            deployZipArtifact = baos.toByteArray();
-
-            IOUtils.closeQuietly(baos);
+            return baos.toByteArray();
 
         } catch (IOException ioe) {
             throw new InternalServerErrorException("Could not create deploy zip artifact");
         }
-
-        return deployZipArtifact;
     }
 }

@@ -157,16 +157,12 @@ public abstract class FormEngines {
     }
 
     protected static FormEngine buildFormEngine(URL resource) {
-        InputStream inputStream = null;
-        try {
-            inputStream = resource.openStream();
+        try (InputStream inputStream = resource.openStream()) {
             FormEngineConfiguration formEngineConfiguration = FormEngineConfiguration.createFormEngineConfigurationFromInputStream(inputStream);
             return formEngineConfiguration.buildFormEngine();
 
         } catch (IOException e) {
             throw new FlowableException("couldn't open resource stream: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 
