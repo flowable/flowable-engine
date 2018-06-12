@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,8 +11,6 @@
  * limitations under the License.
  */
 package org.flowable.engine.impl.cmd;
-
-import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -23,6 +21,8 @@ import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -49,14 +49,14 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, boolean localScope) {
+                                   Map<String, Object> variables, boolean localScope) {
 
         this(taskId, formDefinitionId, outcome, variables);
         this.localScope = localScope;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
+                                   Map<String, Object> variables, Map<String, Object> transientVariables) {
 
         this(taskId, formDefinitionId, outcome, variables);
         this.transientVariables = transientVariables;
@@ -90,7 +90,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         } else {
             TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
         }
-        
+
         return null;
     }
 

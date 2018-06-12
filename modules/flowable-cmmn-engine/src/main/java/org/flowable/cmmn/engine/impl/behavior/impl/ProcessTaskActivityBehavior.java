@@ -89,7 +89,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
                 value = planItemInstanceEntity.getVariable(ioParameter.getSource());
             }
-            inParametersMap.put(ioParameter.getTarget(),value);
+            inParametersMap.put(ioParameter.getTarget(), value);
         }
         if (blocking) {
             processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getId(), planItemInstanceEntity.getTenantId(), inParametersMap);
@@ -129,9 +129,9 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         // The process task plan item will be deleted by the regular TerminatePlanItemOperation
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             deleteProcessInstance(commandContext, planItemInstance);
-        }else if (PlanItemTransition.COMPLETE.equals(transition)) {
+        } else if (PlanItemTransition.COMPLETE.equals(transition)) {
             Command command = commandContext.getCommand();
-            if(command instanceof CompleteTaskWithFormCmd){
+            if (command instanceof CompleteTaskWithFormCmd) {
                 CompleteTaskWithFormCmd completeTaskWithFormCmd = (CompleteTaskWithFormCmd) command;
 
                 CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstance.getCaseInstanceId());

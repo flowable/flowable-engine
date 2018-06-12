@@ -12,16 +12,19 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.CaseTask;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.IOParameter;
+import org.flowable.cmmn.model.ProcessTask;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
-import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.model.*;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers

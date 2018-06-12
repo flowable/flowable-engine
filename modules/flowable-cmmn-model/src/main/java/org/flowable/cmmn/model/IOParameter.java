@@ -13,7 +13,7 @@
 package org.flowable.cmmn.model;
 
 /**
- * @author Tijs Rademakers
+ * @author Avinash Gosi
  */
 public class IOParameter extends BaseElement {
 

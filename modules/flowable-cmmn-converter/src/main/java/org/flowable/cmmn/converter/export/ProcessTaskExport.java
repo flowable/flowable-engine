@@ -41,12 +41,12 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
     protected void writePlanItemDefinitionBody(ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionBody(processTask, xtw);
         boolean didWriteParameterStartElement = false;
-        if(null != processTask.getInParameters() || null != processTask.getOutParameters()){
+        if (null != processTask.getInParameters() || null != processTask.getOutParameters()) {
             didWriteParameterStartElement = writeIOParameters(ELEMENT_PROCESS_TASK_IN_PARAMETERS,
                     processTask.getInParameters(), didWriteParameterStartElement, xtw);
             didWriteParameterStartElement = writeIOParameters(ELEMENT_PROCESS_TASK_OUT_PARAMETERS,
                     processTask.getOutParameters(), didWriteParameterStartElement, xtw);
-            if(didWriteParameterStartElement){
+            if (didWriteParameterStartElement) {
                 xtw.writeEndElement();
             }
         }
