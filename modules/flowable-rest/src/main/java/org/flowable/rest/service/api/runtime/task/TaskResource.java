@@ -23,8 +23,8 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableForbiddenException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.rest.exception.FlowableForbiddenException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.Task;
 import org.springframework.http.HttpStatus;
