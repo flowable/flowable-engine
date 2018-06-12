@@ -308,7 +308,8 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                     ExecutionEntity subProcessExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
                     subProcessExecution.setCurrentFlowElement(subProcess);
                     subProcessExecution.setScope(true);
-                    
+                    subProcessExecution.setVariablesLocal(processDataObjects(subProcess.getDataObjects()));
+
                     CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessExecution);
                     
                     List<BoundaryEvent> boundaryEvents = subProcess.getBoundaryEvents();
