@@ -1,6 +1,4 @@
-package org.flowable.common.rest.exception;
-
-import org.flowable.common.engine.api.FlowableException;
+package org.flowable.common.engine.api;
 
 public class FlowableForbiddenException extends FlowableException {
 
