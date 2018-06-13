@@ -16,9 +16,12 @@ package org.flowable.engine.impl.cfg;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.InternalTaskAssignmentManager;
@@ -29,12 +32,16 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManager {
     
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected String parentIdentityLinkType;
 
-    public DefaultTaskAssignmentManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public DefaultTaskAssignmentManager() {
+        this(IdentityLinkType.PARTICIPANT);
     }
-    
+
+    public DefaultTaskAssignmentManager( String identityLinkType) {
+        this.parentIdentityLinkType = identityLinkType;
+    }
+
     @Override
     public void changeAssignee(Task task, String assignee) {
         TaskHelper.changeTaskAssignee((TaskEntity) task, assignee);
@@ -96,4 +103,19 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         identityLinks.add((IdentityLinkEntity) identityLink);
         IdentityLinkUtil.handleTaskIdentityLinkDeletions((TaskEntity) task, identityLinks, true, true);
     }
+
+    @Override
+    public void addUserIdentityLinkToParent(Task task, String userId) {
+        if (userId != null && task.getProcessInstanceId() != null) {
+            ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getProcessInstanceId());
+            for (IdentityLinkEntity identityLink : processInstanceEntity.getIdentityLinks()) {
+                if (identityLink.isUser() && identityLink.getUserId().equals(userId) && parentIdentityLinkType.equals(identityLink.getType())) {
+                    return;
+                }
+            }
+            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstanceEntity,
+                userId, null, parentIdentityLinkType);
+        }
+    }
+
 }
