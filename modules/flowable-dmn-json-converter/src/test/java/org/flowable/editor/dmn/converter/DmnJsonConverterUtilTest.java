@@ -67,15 +67,11 @@ public class DmnJsonConverterUtilTest {
 
     /* Helper methods */
     protected String readJsonToString(String resource) {
-        InputStream is = null;
-        try {
-            is = this.getClass().getClassLoader().getResourceAsStream(resource);
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(resource)) {
             return IOUtils.toString(is);
         } catch (IOException e) {
             fail("Could not read " + resource + " : " + e.getMessage());
             return null;
-        } finally {
-            IOUtils.closeQuietly(is);
         }
     }
 
