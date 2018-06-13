@@ -34,7 +34,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManager {
     
-    protected final String parentIdentityLinkType;
+    protected String parentIdentityLinkType;
 
     public DefaultTaskAssignmentManager() {
         this(IdentityLinkType.PARTICIPANT);
