@@ -175,10 +175,7 @@ public class TaskHelper {
     }
 
     public static void addAssigneeIdentityLinks(TaskEntity taskEntity) {
-        if (taskEntity.getAssignee() != null && taskEntity.getProcessInstanceId() != null) {
-            ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
-            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, taskEntity.getAssignee(), null, IdentityLinkType.PARTICIPANT);
-        }
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, taskEntity.getAssignee());
     }
 
     public static void addOwnerIdentityLink(TaskEntity taskEntity, String owner) {
@@ -186,10 +183,7 @@ public class TaskHelper {
             return;
         }
 
-        if (owner != null && taskEntity.getProcessInstanceId() != null) {
-            ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
-            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, owner, null, IdentityLinkType.PARTICIPANT);
-        }
+        CommandContextUtil.getInternalTaskAssignmentManager().addUserIdentityLinkToParent(taskEntity, owner);
     }
     
     /**

@@ -201,17 +201,11 @@ public abstract class AbstractRelatedContentResource {
         }
 
         // Write content response
-        InputStream inputstream = contentService.getContentItemData(contentId);
-        try {
+        try (InputStream inputstream = contentService.getContentItemData(contentId)) {
             IOUtils.copy(inputstream, response.getOutputStream());
 
         } catch (IOException e) {
             throw new InternalServerErrorException("Error while writing raw content data for content: " + contentId, e);
-        } finally {
-            // Be sure to close the content object stream to free any resources that may be related to it
-            if (inputstream != null) {
-                IOUtils.closeQuietly(inputstream);
-            }
         }
     }
 
