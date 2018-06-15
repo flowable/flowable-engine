@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.util.Map;
+
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -22,8 +24,6 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-import java.util.Map;
-
 /**
  * @author Tijs Rademakers
  */
@@ -32,14 +32,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     private static final long serialVersionUID = 1L;
     protected String formDefinitionId;
     protected String outcome;
-
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected boolean localScope;
-
-    public Object getVariable(String key) {
-        return variables.get(key);
-    }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         super(taskId);
@@ -49,14 +44,14 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-                                   Map<String, Object> variables, boolean localScope) {
+            Map<String, Object> variables, boolean localScope) {
 
         this(taskId, formDefinitionId, outcome, variables);
         this.localScope = localScope;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-                                   Map<String, Object> variables, Map<String, Object> transientVariables) {
+            Map<String, Object> variables, Map<String, Object> transientVariables) {
 
         this(taskId, formDefinitionId, outcome, variables);
         this.transientVariables = transientVariables;

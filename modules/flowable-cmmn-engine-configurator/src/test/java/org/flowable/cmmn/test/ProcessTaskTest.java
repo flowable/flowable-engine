@@ -170,6 +170,34 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals("Task Two", planItemInstances.get(0).getName());
         assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
     }
+
+    @Test
+    @CmmnDeployment
+    public void testProcessIOParameter() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("processDefinitionKey", "oneTask");
+        variables.put("num2", 123);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
+                .variables(variables)
+                .start();
+
+        Task task = processEngine.getTaskService().createTaskQuery().singleResult();
+        assertNotNull(task);
+
+        // Completing task will trigger completion of process task plan item
+        processEngine.getTaskService().complete(task.getId());
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemInstanceStateActive()
+                .list();
+
+        assertEquals(1, planItemInstances.size());
+        assertEquals("Task Two", planItemInstances.get(0).getName());
+        assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "num3"));
+        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+
+    }
     
     protected CaseInstance startCaseInstanceWithOneTaskProcess() {
         return startCaseInstanceWithOneTaskProcess(null);

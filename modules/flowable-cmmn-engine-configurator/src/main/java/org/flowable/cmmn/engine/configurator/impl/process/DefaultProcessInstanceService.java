@@ -67,4 +67,9 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
         processEngineRuntimeService.deleteProcessInstance(processInstanceId, DELETE_REASON);
     }
 
+    @Override
+    public Map<String, Object> getVariables(String execId){
+       return processEngineRuntimeService.getVariables(execId);
+    }
+
 }

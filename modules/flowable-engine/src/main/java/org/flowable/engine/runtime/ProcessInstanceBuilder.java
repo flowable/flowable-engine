@@ -100,4 +100,6 @@ public interface ProcessInstanceBuilder {
      **/
     ProcessInstance start();
 
+    Map<String, Object> getVariables();
+
 }

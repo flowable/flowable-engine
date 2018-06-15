@@ -28,9 +28,7 @@ import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.cmd.CompleteTaskWithFormCmd;
 
 import java.util.HashMap;
 import java.util.List;
@@ -130,20 +128,17 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             deleteProcessInstance(commandContext, planItemInstance);
         } else if (PlanItemTransition.COMPLETE.equals(transition)) {
-            Command command = commandContext.getCommand();
-            if (command instanceof CompleteTaskWithFormCmd) {
-                CompleteTaskWithFormCmd completeTaskWithFormCmd = (CompleteTaskWithFormCmd) command;
+            ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration().getProcessInstanceService();
 
-                CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstance.getCaseInstanceId());
-                for (IOParameter ioParameter : outParameters) {
-                    Object value = null;
-                    if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                        value = completeTaskWithFormCmd.getVariable(ioParameter.getSourceExpression());
-                    } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
-                        value = completeTaskWithFormCmd.getVariable(ioParameter.getSource());
-                    }
-                    ((CaseInstanceEntity) caseInstance).setVariable(ioParameter.getTarget(), value);
+            CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstance.getCaseInstanceId());
+            for (IOParameter ioParameter : outParameters) {
+                Object value = null;
+                if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                    value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSourceExpression());
+                } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                    value = processInstanceService.getVariables(planItemInstance.getReferenceId()).get(ioParameter.getSource());
                 }
+                ((CaseInstanceEntity) caseInstance).setVariable(ioParameter.getTarget(), value);
             }
         }
     }
