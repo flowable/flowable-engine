@@ -701,6 +701,26 @@
       "popular" : true
     } ]
   }, {
+      "name" : "processtaskinparameterspackage",
+      "properties" : [ {
+        "id" : "processtaskinparameters",
+        "type" : "Complex",
+        "title" : "In parameters",
+        "value" : "",
+        "description" : "Definition of the input parameters",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "processtaskoutparameterspackage",
+      "properties" : [ {
+        "id" : "processtaskoutparameters",
+        "type" : "Complex",
+        "title" : "Out parameters",
+        "value" : "",
+        "description" : "Definition of the output parameters",
+        "popular" : true
+      } ]
+    }, {
     "name" : "timerexpressionpackage",
     "properties" : [ {
       "id" : "timerexpression",
@@ -1152,6 +1172,8 @@
       "documentationpackage",
       "blockingpackage",
       "processtaskprocessreferencepackage",
+      "processtaskinparameterspackage",
+      "processtaskoutparameterspackage",
       "asyncpackage",
       "requiredrulepackage",
       "repetitionrulepackage",

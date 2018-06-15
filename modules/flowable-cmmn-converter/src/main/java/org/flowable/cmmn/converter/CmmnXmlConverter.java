@@ -117,6 +117,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new FieldExtensionXmlConverter());
         addElementConverter(new FlowableHttpResponseHandlerXmlConverter());
         addElementConverter(new FlowableHttpRequestHandlerXmlConverter());
+        addElementConverter(new ParameterMappingXMLConverter());
 
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
