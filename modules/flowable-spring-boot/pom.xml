@@ -26,10 +26,10 @@
             org.flowable.spring.boot
         </flowable.artifact>
 
-        <spring.framework.version>5.0.6.RELEASE</spring.framework.version>
-        <spring.security.version>5.0.5.RELEASE</spring.security.version>
-        <jackson.version>2.9.5</jackson.version>
-        <spring.boot.version>2.0.2.RELEASE</spring.boot.version>
+        <spring.framework.version>5.0.7.RELEASE</spring.framework.version>
+        <spring.security.version>5.0.6.RELEASE</spring.security.version>
+        <jackson.version>2.9.6</jackson.version>
+        <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
 
     </properties>
 
