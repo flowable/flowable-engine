@@ -38,7 +38,7 @@ public interface VariableScope extends VariableContainer {
     Map<String, Object> getVariables();
 
     /**
-     * Returns all variables, as instances of the {@link VariableInstance} interface, which gives more information than only the the value (type, execution id, etc.)
+     * Returns all variables, as instances of the {@link VariableInstance} interface, which gives more information than only the value (type, execution id, etc.)
      */
     Map<String, VariableInstance> getVariableInstances();
 
@@ -61,7 +61,7 @@ public interface VariableScope extends VariableContainer {
     Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables);
 
     /**
-     * Similar to {@link #getVariables(Collection, boolean)} but returns the variables as instances of the {@link VariableInstance} interface, which gives more information than only the the value
+     * Similar to {@link #getVariables(Collection, boolean)} but returns the variables as instances of the {@link VariableInstance} interface, which gives more information than only the value
      * (type, execution id, etc.)
      */
     Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames, boolean fetchAllVariables);

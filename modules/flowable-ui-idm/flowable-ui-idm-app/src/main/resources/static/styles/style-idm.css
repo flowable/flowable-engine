@@ -470,7 +470,7 @@ ul.filter-list li.current a:hover, ul.filter-list li.current a:focus {
     height: 35px;
 }
 
-/*We will apply the hover effect the the lineage of the element also*/
+/*We will apply the hover effect the lineage of the element also*/
 .group-tree li a:hover, .group-tree li a:hover+ul li a {
     background-color: #eeeeee;
     color: #000;

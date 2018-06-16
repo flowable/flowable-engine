@@ -79,7 +79,7 @@ angular.module('flowableApp')
                   // process definition
                }
                else {
-                  // Lets queue the the content to be added
+                  // Lets queue the content to be added
                   $scope.startProcessContentQueued = true;
                   if (typeof $scope.startProcessContent == 'function') {
                      // Instead of the actual content that hsall be added a function was provided,
