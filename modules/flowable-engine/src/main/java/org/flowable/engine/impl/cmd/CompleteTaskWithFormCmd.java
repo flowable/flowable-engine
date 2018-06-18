@@ -72,9 +72,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
 
             if (task.getProcessInstanceId() != null) {
-                formService.saveFormInstance(formVariables, formInfo, task.getId(), task.getProcessInstanceId(), task.getProcessDefinitionId());
+                formService.saveFormInstance(formVariables, formInfo, task.getId(), task.getProcessInstanceId(), task.getProcessDefinitionId(), task.getAssignee());
             } else {
-                formService.saveFormInstanceWithScopeId(formVariables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId());
+                formService.saveFormInstanceWithScopeId(formVariables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId(), task.getAssignee());
             }
 
             FormFieldHandler formFieldHandler = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormFieldHandler();
