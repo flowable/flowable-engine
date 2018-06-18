@@ -28,8 +28,8 @@ import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.engine.IdmEngine;
-import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -95,7 +95,7 @@ public class IdmEngineAutoConfigurationTest {
                 .doesNotHaveBean("idmAppEngineConfigurationConfigurer");
             ProcessEngine processEngine = context.getBean(ProcessEngine.class);
             assertThat(processEngine).as("Process engine").isNotNull();
-            IdmEngineConfiguration idmProcessConfiguration = idmEngine(processEngine);
+            IdmEngineConfigurationApi idmProcessConfiguration = idmEngine(processEngine);
 
             IdmEngine idmEngine = context.getBean(IdmEngine.class);
             assertThat(idmEngine).as("Idm engine").isNotNull();
@@ -132,7 +132,7 @@ public class IdmEngineAutoConfigurationTest {
                 .hasBean("idmAppEngineConfigurationConfigurer");
             AppEngine appEngine = context.getBean(AppEngine.class);
             assertThat(appEngine).as("App engine").isNotNull();
-            IdmEngineConfiguration idmProcessConfiguration = idmEngine(appEngine);
+            IdmEngineConfigurationApi idmProcessConfiguration = idmEngine(appEngine);
 
             IdmEngine idmEngine = context.getBean(IdmEngine.class);
             assertThat(idmEngine).as("Idm engine").isNotNull();
@@ -173,12 +173,12 @@ public class IdmEngineAutoConfigurationTest {
         });
     }
 
-    private static IdmEngineConfiguration idmEngine(ProcessEngine processEngine) {
+    private static IdmEngineConfigurationApi idmEngine(ProcessEngine processEngine) {
         ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
         return EngineServiceUtil.getIdmEngineConfiguration(processEngineConfiguration);
     }
     
-    private static IdmEngineConfiguration idmEngine(AppEngine appEngine) {
+    private static IdmEngineConfigurationApi idmEngine(AppEngine appEngine) {
         AppEngineConfiguration appEngineConfiguration = appEngine.getAppEngineConfiguration();
         return EngineServiceUtil.getIdmEngineConfiguration(appEngineConfiguration);
     }

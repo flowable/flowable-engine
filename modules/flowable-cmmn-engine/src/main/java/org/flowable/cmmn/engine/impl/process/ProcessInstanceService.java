@@ -12,15 +12,19 @@
  */
 package org.flowable.cmmn.engine.impl.process;
 
+import java.util.Map;
+
 /**
  * @author Joram Barrez
  */
 public interface ProcessInstanceService {
     
-    String startProcessInstanceByKey(String processDefinitionKey, String tenantId);
+    String startProcessInstanceByKey(String processDefinitionKey, String tenantId, Map<String, Object> inParametersMap);
 
-    String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId, String tenantId);
+    String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId, String tenantId, Map<String, Object> inParametersMap);
 
     void deleteProcessInstance(String processInstanceId);
+
+    Map<String, Object> getVariables(String execId);
 
 }
