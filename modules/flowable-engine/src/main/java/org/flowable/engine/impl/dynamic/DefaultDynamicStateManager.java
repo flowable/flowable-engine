@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -282,20 +283,23 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 ExecutionEntity processInstanceExecution = defaultContinueParentExecution.getProcessInstance();
                 processInstanceExecution.setVariables(processVariables);
             }
-            
-            if (moveExecutionContainer.getMoveToFlowElements().size() == 1 && localVariables != null && localVariables.size() > 0) {
-                FlowElement moveToFlowElement = moveExecutionContainer.getMoveToFlowElements().iterator().next();
-                if (localVariables.containsKey(moveToFlowElement.getId())) {
-                    List<SubProcess> toCreateSubProcesses = moveExecutionContainer.getSubProcessesToCreateMap().get(moveToFlowElement.getId());
-                    if (toCreateSubProcesses != null && toCreateSubProcesses.size() > 0) {
-                        moveExecutionContainer.getNewSubProcessChildExecution(toCreateSubProcesses.get(0).getId())
-                            .setVariablesLocal(localVariables.get(moveToFlowElement.getId()));
-                    } else {
-                        newChildExecutions.get(0).setVariablesLocal(localVariables.get(moveToFlowElement.getId()));
+
+            if (localVariables != null && localVariables.size() > 0) {
+                Iterator<ExecutionEntity> newChildExecutionsIter = newChildExecutions.iterator();
+                while (newChildExecutionsIter.hasNext()) {
+                    ExecutionEntity execution = newChildExecutionsIter.next();
+                    while (null != execution) {
+                        if (null != execution.getActivityId()) {
+                            Map<String, Object> localVars = localVariables.get(execution.getActivityId());
+                            if (null != localVars) {
+                                execution.setVariablesLocal(localVars);
+                            }
+                        }
+                        execution = execution.getParent();
                     }
                 }
             }
-            
+
             for (ExecutionEntity newChildExecution : newChildExecutions) {
                 CommandContextUtil.getAgenda().planContinueProcessOperation(newChildExecution);
             }
