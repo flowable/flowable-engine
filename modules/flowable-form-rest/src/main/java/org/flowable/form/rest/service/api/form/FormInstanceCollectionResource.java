@@ -164,11 +164,11 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
 
         if (formRequest.getScopeId() != null) {
             formService.createFormInstanceWithScopeId(formRequest.getVariables(), formModel, formRequest.getTaskId(),
-                            formRequest.getScopeId(), formRequest.getScopeType(), formRequest.getScopeDefinitionId());
+                            formRequest.getScopeId(), formRequest.getScopeType(), formRequest.getScopeDefinitionId(), null);
             
         } else {
             formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
-                            formRequest.getProcessInstanceId(), formRequest.getProcessDefinitionId());
+                            formRequest.getProcessInstanceId(), formRequest.getProcessDefinitionId(), null);
         }
     }
 }
