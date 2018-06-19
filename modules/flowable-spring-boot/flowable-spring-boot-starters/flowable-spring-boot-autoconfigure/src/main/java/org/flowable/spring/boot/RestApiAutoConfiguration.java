@@ -72,7 +72,7 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter({
     //FIXME in order to support both 1.5.x and 2.0 we can't use MultipartAutoConfiguration (the package is changed)
     //MultipartAutoConfiguration.class,
-    SecurityAutoConfiguration.class,
+    FlowableSecurityAutoConfiguration.class,
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
     CmmnEngineServicesAutoConfiguration.class,
