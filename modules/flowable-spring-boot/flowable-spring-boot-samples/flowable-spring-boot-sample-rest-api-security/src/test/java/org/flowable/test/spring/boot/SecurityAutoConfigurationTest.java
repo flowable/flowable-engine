@@ -5,7 +5,7 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
-import org.flowable.spring.boot.SecurityAutoConfiguration;
+import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.junit.After;
@@ -52,7 +52,7 @@ public class SecurityAutoConfigurationTest {
             ProcessEngineAutoConfiguration.class,
             IdmEngineServicesAutoConfiguration.class,
             org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
-            SecurityAutoConfiguration.class })
+            FlowableSecurityAutoConfiguration.class })
     public static class SecurityConfiguration {
 
         @Autowired
