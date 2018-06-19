@@ -17,8 +17,14 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventType;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
+import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -43,6 +49,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -1086,6 +1094,9 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testSetCurrentActivityForSimpleProcess() {
+        StateChangedEventListener eventListener = new StateChangedEventListener();
+        processEngine.getRuntimeService().addEventListener(eventListener);
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -1093,10 +1104,22 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("secondTask", task.getTaskDefinitionKey());
 
+        eventListener.clear();
+
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstance.getId())
                 .moveActivityIdTo("secondTask", "firstTask")
                 .changeState();
+
+// TODO: Missing ACTIVITY_CANCELLED event.
+//        assertEquals(2, eventListener.eventCount());
+        Iterator<FlowableEngineEvent> eventIterator = eventListener.iterator();
+        FlowableEngineEvent event = eventIterator.next();
+//        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+//        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+//        event = eventIterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("firstTask", task.getTaskDefinitionKey());
@@ -1148,12 +1171,17 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityForSubProcess() {
+        StateChangedEventListener eventListener = new StateChangedEventListener();
+        processEngine.getRuntimeService().addEventListener(eventListener);
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("subtask", task.getTaskDefinitionKey());
+
+        eventListener.clear();
 
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstance.getId())
@@ -1162,6 +1190,21 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+// TODO: Missing ACTIVITY_CANCELLED event
+//        assertEquals(3, eventListener.eventCount());
+        Iterator<FlowableEngineEvent> eventIterator = eventListener.iterator();
+        FlowableEngineEvent event = eventIterator.next();
+//        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+//        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+//        event = eventIterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subtask", ((FlowableActivityEvent)event).getActivityId());
+        event = eventIterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+
+
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, executions.size());
@@ -1212,6 +1255,9 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityForSubProcessExecution() {
+        StateChangedEventListener eventListener = new StateChangedEventListener();
+        processEngine.getRuntimeService().addEventListener(eventListener);
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -1219,12 +1265,28 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("subtask", task.getTaskDefinitionKey());
 
+        eventListener.clear();
+
         runtimeService.createChangeActivityStateBuilder()
                 .moveExecutionToActivityId(task.getExecutionId(), "taskBefore")
                 .changeState();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+// TODO: Missing ACTIVITY_CANCELLED event
+//        assertEquals(3, eventListener.eventCount());
+        Iterator<FlowableEngineEvent> eventIterator = eventListener.iterator();
+        FlowableEngineEvent event = eventIterator.next();
+//        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+//        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+//        event = eventIterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subtask", ((FlowableActivityEvent)event).getActivityId());
+        event = eventIterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, executions.size());
@@ -1381,9 +1443,14 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityToTaskInSubProcessWithTaskTimer() {
+        StateChangedEventListener eventListener = new StateChangedEventListener();
+        processEngine.getRuntimeService().addEventListener(eventListener);
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        eventListener.clear();
 
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstance.getId())
@@ -1393,6 +1460,19 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("subtask", task.getTaskDefinitionKey());
 
+        // TODO: Missing ACTIVITY_CANCELLED and ACTIVITY_STARTED event.
+//        assertEquals(3, eventListener.eventCount());
+        Iterator<FlowableEngineEvent> eventIterator = eventListener.iterator();
+        FlowableEngineEvent event = eventIterator.next();
+//        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+//        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+//        event = eventIterator.next();
+//        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+//        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+//        event = eventIterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subtask", ((FlowableActivityEvent)event).getActivityId());
+        
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(4, executions.size());
 
@@ -2174,5 +2254,51 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         assertThat(processInstance.getCallbackId(), is("nonExistingCase"));
         assertThat(processInstance.getCallbackType(), is(CallbackTypes.CASE_ADHOC_CHILD));
+    }
+
+    class StateChangedEventListener extends AbstractFlowableEngineEventListener {
+        private List<FlowableEngineEvent> events = new ArrayList<>();
+
+        public StateChangedEventListener() {
+            super(new HashSet<>(
+                    Arrays.asList(
+                            FlowableEngineEventType.ACTIVITY_STARTED,
+                            FlowableEngineEventType.ACTIVITY_CANCELLED
+                    )
+            ));
+        }
+
+        @Override
+        protected void activityStarted(FlowableActivityEvent event) {
+
+            if("userTask".equals(event.getActivityType()) ||
+                    "subProcess".equals(event.getActivityType())) {
+                events.add(event);
+            }
+        }
+
+        @Override
+        protected void activityCancelled(FlowableActivityCancelledEvent event) {
+            if("userTask".equals(event.getActivityType()) ||
+                    "subProcess".equals(event.getActivityType())) {
+                events.add(event);
+            }
+        }
+
+        public void clear() {
+            events.clear();
+        }
+
+        public Iterator<FlowableEngineEvent> iterator() {
+            return events.iterator();
+        }
+
+        public boolean hasEvents() {
+            return events.isEmpty();
+        }
+
+        public int eventCount() {
+            return events.size();
+        }
     }
 }
