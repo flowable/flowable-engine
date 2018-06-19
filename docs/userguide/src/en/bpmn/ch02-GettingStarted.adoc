@@ -351,7 +351,7 @@ In the example here, when the first user task is completed, one database transac
 
 In a more realistic application, there will be a user interface where the employees and the managers can log in and see their task lists. With these, they can inspect the process instance data that is stored as _process variables_ and decide what they want to do with the task. In this example, we will mimic task lists by executing the API calls that normally would be behind a service call that drives a UI.
 
-We haven't yet configured the assignment for the user tasks. We want the first task to go the the 'managers' group and the second user task to be assigned to the original requester of the holiday. To do this, add the _candidateGroups_ attribute to the first task:
+We haven't yet configured the assignment for the user tasks. We want the first task to go the 'managers' group and the second user task to be assigned to the original requester of the holiday. To do this, add the _candidateGroups_ attribute to the first task:
 
 [source,xml]
 ----
