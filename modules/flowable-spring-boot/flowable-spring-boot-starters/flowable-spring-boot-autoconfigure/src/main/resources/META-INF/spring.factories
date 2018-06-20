@@ -25,4 +25,4 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.flowable.spring.boot.cmmn.CmmnEngineAutoConfiguration,\
     org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration,\
     org.flowable.spring.boot.ldap.FlowableLdapAutoConfiguration,\
-    org.flowable.spring.boot.SecurityAutoConfiguration
+    org.flowable.spring.boot.FlowableSecurityAutoConfiguration

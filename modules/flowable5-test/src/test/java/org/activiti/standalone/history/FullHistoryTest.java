@@ -351,7 +351,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals("initial value", startVarUpdate.getValue());
         assertEquals(0, startVarUpdate.getRevision());
         assertEquals(processInstance.getId(), startVarUpdate.getProcessInstanceId());
-        // Date should the the one set when starting
+        // Date should the one set when starting
         assertEquals(startedDate, startVarUpdate.getTime());
 
         HistoricVariableUpdate updatedStringVariable = (HistoricVariableUpdate) details.get(1);

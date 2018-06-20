@@ -48,7 +48,6 @@
     <foreach collection="list" item="historicDecisionExecution" index="index">
      INTO ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
         ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_, SCOPE_TYPE_) VALUES
-        values
             (#{historicDecisionExecution.id, jdbcType=VARCHAR},
              #{historicDecisionExecution.decisionDefinitionId, jdbcType=VARCHAR},
              #{historicDecisionExecution.deploymentId, jdbcType=VARCHAR},

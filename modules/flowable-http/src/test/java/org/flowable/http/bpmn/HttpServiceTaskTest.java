@@ -87,6 +87,27 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     }
 
     @Deployment
+    public void testGetWithParametrizedResponseHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertEquals(2, variables.size());
+        String firstName = null;
+        String lastName = null;
+
+        for (HistoricVariableInstance historicVariableInstance : variables) {
+            if ("firstName".equals(historicVariableInstance.getVariableName())) {
+                firstName = (String) historicVariableInstance.getValue();
+            } else if ("lastName".equals(historicVariableInstance.getVariableName())) {
+                lastName = (String) historicVariableInstance.getValue();
+            }
+        }
+
+        assertEquals("John", firstName);
+        assertEquals("Doe", lastName);
+        assertProcessEnded(procId);
+    }
+
+    @Deployment
     public void testGetWithRequestHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
