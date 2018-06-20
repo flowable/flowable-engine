@@ -34,6 +34,7 @@ import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetLocalVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HasCaseInstanceVariableCmd;
@@ -51,6 +52,7 @@ import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 
 /**
@@ -73,6 +75,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     
     public CaseInstance startCaseInstanceWithForm(CaseInstanceBuilder caseInstanceBuilder) {
         return commandExecutor.execute(new StartCaseInstanceWithFormCmd(caseInstanceBuilder));
+    }
+
+    @Override
+    public FormInfo getStartFormModel(String caseDefinitionId, String caseInstanceId) {
+        return commandExecutor.execute(new GetStartFormModelCmd(caseDefinitionId, caseInstanceId));
     }
 
     @Override public void triggerPlanItemInstance(String planItemInstanceId) {

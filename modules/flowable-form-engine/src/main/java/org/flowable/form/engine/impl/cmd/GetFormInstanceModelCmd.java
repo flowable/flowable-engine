@@ -72,6 +72,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
     protected String formDefinitionId;
     protected String taskId;
     protected String processInstanceId;
+    protected String caseInstanceId;
     protected String tenantId;
     protected Map<String, Object> variables;
 
@@ -98,10 +99,16 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
         initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, tenantId, taskId, processInstanceId, variables);
     }
 
+    public GetFormInstanceModelCmd(String formDefinitionKey, String parentDeploymentId, String caseInstanceId, String tenantId) {
+
+        initializeValues(formDefinitionKey, parentDeploymentId, null, tenantId, null, null, null);
+        this.caseInstanceId = caseInstanceId;
+    }
+
     @Override
     public FormInstanceInfo execute(CommandContext commandContext) {
-        if (formInstanceId == null && (taskId == null && processInstanceId == null)) {
-            throw new FlowableException("A processtask id or process instance id should be provided");
+        if (formInstanceId == null && (taskId == null && processInstanceId == null && caseInstanceId == null)) {
+            throw new FlowableException("A processtask id or process instance id or case instance id should be provided");
         }
 
         FormDefinitionCacheEntry formDefinitionCacheEntry = resolveFormDefinition(commandContext);
@@ -318,9 +325,16 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
             
         } else if (processInstanceId != null) {
             formInstanceQuery.processInstanceId(processInstanceId);
-        
+
+        } else if (caseInstanceId != null) {
+            formInstanceQuery.scopeId(caseInstanceId);
+
         } else {
             return null;
+        }
+
+        if (taskId == null) {
+            formInstanceQuery.withoutTaskId();
         }
 
         List<FormInstance> formInstances = formInstanceQuery.orderBySubmittedDate().asc().list();
