@@ -72,7 +72,8 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
     protected String formDefinitionId;
     protected String taskId;
     protected String processInstanceId;
-    protected String caseInstanceId;
+    protected String scopeId;
+    protected String scopeType;
     protected String tenantId;
     protected Map<String, Object> variables;
 
@@ -99,15 +100,16 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
         initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, tenantId, taskId, processInstanceId, variables);
     }
 
-    public GetFormInstanceModelCmd(String formDefinitionKey, String parentDeploymentId, String caseInstanceId, String tenantId) {
+    public GetFormInstanceModelCmd(String formDefinitionKey, String parentDeploymentId, String scopeId, String scopeType, String tenantId) {
 
         initializeValues(formDefinitionKey, parentDeploymentId, null, tenantId, null, null, null);
-        this.caseInstanceId = caseInstanceId;
+        this.scopeId = scopeId;
+        this.scopeType = scopeType;
     }
 
     @Override
     public FormInstanceInfo execute(CommandContext commandContext) {
-        if (formInstanceId == null && (taskId == null && processInstanceId == null && caseInstanceId == null)) {
+        if (formInstanceId == null && (taskId == null && processInstanceId == null && scopeId == null)) {
             throw new FlowableException("A processtask id or process instance id or case instance id should be provided");
         }
 
@@ -326,15 +328,18 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
         } else if (processInstanceId != null) {
             formInstanceQuery.processInstanceId(processInstanceId);
 
-        } else if (caseInstanceId != null) {
-            formInstanceQuery.scopeId(caseInstanceId);
+            if (taskId == null) {
+                formInstanceQuery.withoutTaskId();
+            }
+        } else if (scopeId != null) {
+            formInstanceQuery.scopeId(scopeId);
+            formInstanceQuery.scopeType(scopeType);
 
+            if (taskId == null) {
+                formInstanceQuery.withoutTaskId();
+            }
         } else {
             return null;
-        }
-
-        if (taskId == null) {
-            formInstanceQuery.withoutTaskId();
         }
 
         List<FormInstance> formInstances = formInstanceQuery.orderBySubmittedDate().asc().list();
