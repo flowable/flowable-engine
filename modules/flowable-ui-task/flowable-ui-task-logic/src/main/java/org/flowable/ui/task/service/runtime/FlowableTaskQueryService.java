@@ -156,7 +156,7 @@ public class FlowableTaskQueryService {
             handleProcessInstanceFiltering(currentUser, taskInfoQueryWrapper, processInstanceIdNode);
         }
 
-        JsonNode caseInstanceIdNode = requestNode.get("caseInstanceId");
+        JsonNode caseInstanceIdNode = requestNode.get("scopeId");
         if (caseInstanceIdNode != null && !caseInstanceIdNode.isNull()) {
             handleCaseInstanceFiltering(currentUser, taskInfoQueryWrapper, caseInstanceIdNode);
         }

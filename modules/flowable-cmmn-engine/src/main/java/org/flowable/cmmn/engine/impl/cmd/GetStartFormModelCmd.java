@@ -24,6 +24,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormFieldHandler;
@@ -60,8 +61,8 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
 
         if (StringUtils.isNotEmpty(planModel.getFormKey())) {
             CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).findById(caseDefinition.getDeploymentId());
-            formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(
-                planModel.getFormKey(), deployment.getParentDeploymentId(), caseInstanceId, caseDefinition.getTenantId());
+            formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(
+                planModel.getFormKey(), deployment.getParentDeploymentId(), caseInstanceId, ScopeTypes.CMMN, caseDefinition.getTenantId());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone
