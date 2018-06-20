@@ -23,6 +23,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
@@ -58,6 +60,8 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceMatcher;
 import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -762,7 +766,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         deleteUserTasks(executionEntity, deleteReason, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteJobs(executionEntity, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteEventSubScriptions(executionEntity, enableExecutionRelationshipCounts, eventDispatcherEnabled);
-
+        deleteActiveChildTimers(executionEntity, commandContext);
     }
 
     protected void deleteIdentityLinks(ExecutionEntity executionEntity, CommandContext commandContext, boolean eventDispatcherEnabled) {
@@ -881,6 +885,29 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 eventSubscriptionEntityManager.deleteEventSubscriptionsByExecutionId(executionEntity.getId());
             }
         }
+    }
+
+    protected void deleteActiveChildTimers(ExecutionEntity executionEntity, CommandContext commandContext) {
+
+        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+
+        List<TimerJobEntity> timers = CommandContextUtil.getExecutionEntityManager(commandContext)
+            .findChildExecutionsByParentExecutionId(executionEntity.getId())
+            .stream()
+            .filter(ExecutionEntity::isActive)
+            .map(ExecutionEntity::getId)
+            .map(timerJobService::findTimerJobsByExecutionId)
+            .flatMap(t -> t.stream())
+            .collect(Collectors.toList());
+
+        //Get the distinct execution Ids of timerJobs to delete
+        Set<String> childsToDelete = timers.stream().map(TimerJobEntity::getExecutionId).collect(Collectors.toSet());
+
+        //Delete Timers
+        timers.forEach(timerJobService::deleteTimerJob);
+
+        //Delete child executions (timer parents)
+        childsToDelete.forEach(this::delete);
     }
 
     // OTHER METHODS
