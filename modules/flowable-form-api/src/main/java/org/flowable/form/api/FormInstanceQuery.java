@@ -130,6 +130,11 @@ public interface FormInstanceQuery extends Query<FormInstanceQuery, FormInstance
      */
     FormInstanceQuery deploymentWithoutTenantId();
 
+    /**
+     * Only select submitted forms that do not have a task id.
+     */
+    FormInstanceQuery withoutTaskId();
+
     // sorting ////////////////////////////////////////////////////////
 
     /**
