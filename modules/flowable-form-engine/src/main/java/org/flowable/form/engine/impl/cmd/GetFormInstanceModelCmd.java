@@ -110,7 +110,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceInfo>, Seria
     @Override
     public FormInstanceInfo execute(CommandContext commandContext) {
         if (formInstanceId == null && (taskId == null && processInstanceId == null && scopeId == null)) {
-            throw new FlowableException("A processtask id or process instance id or case instance id should be provided");
+            throw new FlowableException("A processtask id or process instance id or case scope id should be provided");
         }
 
         FormDefinitionCacheEntry formDefinitionCacheEntry = resolveFormDefinition(commandContext);
