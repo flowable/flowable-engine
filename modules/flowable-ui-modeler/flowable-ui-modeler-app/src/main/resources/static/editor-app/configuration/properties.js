@@ -26,6 +26,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/text-property-write-template.html"
     },
+    "flowable-calledelementtype" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/calledelementtype-property-write-template.html"
+    },
     "flowable-multiinstance" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/multiinstance-property-write-template.html"
