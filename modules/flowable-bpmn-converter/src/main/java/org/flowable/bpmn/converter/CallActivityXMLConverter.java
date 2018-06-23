@@ -56,7 +56,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         CallActivity callActivity = new CallActivity();
         BpmnXMLUtil.addXMLLocation(callActivity, xtr);
         callActivity.setCalledElement(xtr.getAttributeValue(null, ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENT));
-        callActivity.setCalledElementType(String.valueOf(BpmnXMLUtil.getAttributeValue(BpmnXMLConstants.ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENTTYPE, xtr)));
+        callActivity.setCalledElementType(BpmnXMLUtil.getAttributeValue(BpmnXMLConstants.ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENTTYPE, xtr));
         callActivity.setProcessInstanceName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_PROCESS_INSTANCE_NAME, xtr));
         callActivity.setBusinessKey(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY, xtr));
         callActivity.setInheritBusinessKey(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY, xtr)));
