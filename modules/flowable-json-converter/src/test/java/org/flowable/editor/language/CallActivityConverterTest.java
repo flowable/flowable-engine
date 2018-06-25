@@ -53,6 +53,7 @@ public class CallActivityConverterTest extends AbstractConverterTest {
         assertEquals("Call activity", callActivity.getName());
 
         assertEquals("processId", callActivity.getCalledElement());
+        assertEquals("id", callActivity.getCalledElementType());
         assertTrue(callActivity.isInheritVariables());
         assertTrue(callActivity.isSameDeployment());
         assertTrue(callActivity.isInheritBusinessKey());

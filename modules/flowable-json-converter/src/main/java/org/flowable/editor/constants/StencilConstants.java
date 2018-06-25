@@ -219,6 +219,7 @@ public interface StencilConstants {
     final String PROPERTY_MAILTASK_CHARSET = "mailtaskcharset";
 
     final String PROPERTY_CALLACTIVITY_CALLEDELEMENT = "callactivitycalledelement";
+    final String PROPERTY_CALLACTIVITY_CALLEDELEMENTTYPE = "callactivitycalledelementtype";
     final String PROPERTY_CALLACTIVITY_IN = "callactivityinparameters";
     final String PROPERTY_CALLACTIVITY_OUT = "callactivityoutparameters";
     final String PROPERTY_CALLACTIVITY_INHERIT_VARIABLES = "callactivityinheritvariables";

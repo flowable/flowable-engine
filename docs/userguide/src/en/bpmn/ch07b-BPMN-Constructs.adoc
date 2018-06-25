@@ -5105,8 +5105,6 @@ Defining the 'inheritBusinessKey' attribute with a value of +true+ will set the 
 ----
 
 
-[[bpmnCallActivityExample]]
-
 ===== Reference the process from the same deployment
 
 The default behavior is that the latest deployed process definition is taken to start the referenced process. There are use cases where
@@ -5124,6 +5122,23 @@ like in the following example:
 ----
 
 By default the `sameDeployment` attribute is set to false.
+
+===== Reference the process definition by id
+
+The default behavior is that the latest deployed process definition is taken to start the referenced process by key. There are use cases where
+you would like to reference exact process definition by its id.
+
+To use the referenced process definition by its id use `flowable:calledElementType` with the value `id`. Allowed values are `key` and `id`.
+
+----
+<callActivity id="callSubProcess" calledElement="UNIQUE-PROCESS_DEFINITION-ID" flowable:calledElementType="id">
+...
+</callActivity>
+----
+
+By default the `flowable:calledElementType` attribute is set to `key`.
+
+[[bpmnCallActivityExample]]
 
 ===== Example
 
