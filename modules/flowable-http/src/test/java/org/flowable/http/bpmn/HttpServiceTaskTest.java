@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -115,6 +116,28 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertEquals("httpGetResponseBody", variables.get(0).getVariableName());
         String variableValue = variables.get(0).getValue().toString();
         assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
+        assertProcessEnded(procId);
+    }
+
+    @Deployment
+    public void testGetWithBpmnThrowingResponseHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(procId)
+            .singleResult();
+
+        assertEquals("theEnd2", processInstance.getEndActivityId());
+        assertProcessEnded(procId);
+    }
+
+    @Deployment
+    public void testGetWithBpmnThrowingRequestHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(procId)
+            .singleResult();
+
+        assertEquals("theEnd2", processInstance.getEndActivityId());
         assertProcessEnded(procId);
     }
 
