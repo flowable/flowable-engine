@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -222,9 +224,11 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 ExecutionEntity continueParentExecution = deleteParentExecutions(execution.getParentId(), moveToFlowElements, commandContext);
                 moveExecutionContainer.addContinueParentExecution(execution.getId(), continueParentExecution);
             }
-    
+
+            String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
             for (ExecutionEntity execution : currentExecutions) {
-                executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + printFlowElementIds(moveToFlowElements));
+                executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
+                executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine);
             }
             
             List<ExecutionEntity> newChildExecutions = createEmbeddedSubProcessExecutions(moveToFlowElements, currentExecutions, moveExecutionContainer, commandContext);
@@ -352,23 +356,21 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         
         return newChildExecutions;
     }
-    
+
     protected ExecutionEntity getActiveExecution(String activityId, ExecutionEntity processExecution, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        
-        ExecutionEntity activeExecutionEntity = null;
-        List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processExecution.getId());
-        for (ExecutionEntity childExecution : childExecutions) {
-            if (childExecution.getCurrentActivityId().equals(activityId)) {
-                activeExecutionEntity = childExecution;
-            }
-        }
 
-        if (activeExecutionEntity == null) {
-            throw new FlowableException("Active execution could not be found with activity id " + activityId);
-        }
-        
-        return activeExecutionEntity;
+        //Find the first process child execution that matches the activityId we are looking for
+        List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processExecution.getId());
+        //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since
+        //it may not be guaranteed in the query result
+        Optional<ExecutionEntity> activeExecutionEntity = childExecutions.stream()
+            .filter(c -> c.getCurrentActivityId().equals(activityId))
+            .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
+            .findFirst();
+
+        return activeExecutionEntity
+            .orElseThrow(() -> new FlowableException("Active execution could not be found with activity id " + activityId));
     }
     
     protected ExecutionEntity deleteParentExecutions(String parentExecutionId, Collection<FlowElement> moveToFlowElements, CommandContext commandContext) {
@@ -586,14 +588,8 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
     }
 
     protected String printFlowElementIds(Collection<FlowElement> flowElements) {
-        StringBuilder elementBuilder = new StringBuilder();
-        for (FlowElement flowElement : flowElements) {
-            if (elementBuilder.length() > 0) {
-                elementBuilder.append(", ");
-            }
-            
-            elementBuilder.append(flowElement.getId());
-        }
-        return elementBuilder.toString();
+        return flowElements.stream()
+            .map(FlowElement::getId)
+            .collect(Collectors.joining(","));
     }
 }
