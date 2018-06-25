@@ -746,6 +746,21 @@
     </annotation>
   </attribute>
 
+  <attribute name="calledElementType">
+    <annotation>
+      <documentation>
+		Specifies content of the call activity calledElement.
+      </documentation>
+    </annotation>
+    <simpleType>
+      <restriction base="string">
+        <enumeration value="key"/>
+        <enumeration value="id"/>
+      </restriction>
+    </simpleType>
+
+  </attribute>
+
   <attribute name="businessKey" type="tns:tExpression">
     <annotation>
       <documentation>
