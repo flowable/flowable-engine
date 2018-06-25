@@ -6,7 +6,7 @@
   <groupId>au.com.rds.sb</groupId>
   <artifactId>rds-designer</artifactId>
   <packaging>pom</packaging>
-  <version>1.9.0-SNAPSHOT</version>
+  <version>1.9.0</version>
 
   <parent>
     <groupId>org.flowable</groupId>
@@ -23,7 +23,7 @@
 		<!-- Web container version -->
 		<tomcat.version>7.0.53</tomcat.version>
 
-        <system-builder.version>2.0.0</system-builder.version>
+        <system-builder.version>2.1.0</system-builder.version>
         <flowable.version>6.1.0</flowable.version>
   </properties>
 
