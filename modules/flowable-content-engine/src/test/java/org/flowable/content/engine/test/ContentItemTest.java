@@ -178,6 +178,12 @@ public class ContentItemTest extends AbstractFlowableContentTest {
 
     }
 
+    @Test
+    public void createAndDeleteUncategorizedContentTwice() throws Exception {
+        createSimpleUncategorizedContentItemWithoutIdWithData();
+        createSimpleUncategorizedContentItemWithoutIdWithData();
+    }
+
     protected void assertCreateContentWithData(ContentItem contentItem, String typeDirectory) throws IOException {
         contentItem.setName("testItem");
         contentItem.setMimeType("application/pdf");

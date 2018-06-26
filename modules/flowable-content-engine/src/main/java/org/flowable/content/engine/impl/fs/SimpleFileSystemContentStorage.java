@@ -234,7 +234,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             File parentFile = contentFile.getParentFile();
             contentFile.delete();
 
-            if (parentFile.listFiles().length == 0) {
+            if (parentFile.listFiles().length == 0 && !id.startsWith(UNCATEGORIZED_PREFIX)) {
                 parentFile.delete();
             }
         } catch (Exception e) {
