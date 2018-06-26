@@ -13,10 +13,13 @@
 package org.flowable.content.engine.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,7 +31,7 @@ import org.junit.Test;
 public class ContentItemTest extends AbstractFlowableContentTest {
 
     @Test
-    public void createSimpleContentItemNoData() throws Exception {
+    public void createSimpleProcessContentItemNoData() throws Exception {
         ContentItem contentItem = contentService.newContentItem();
         contentItem.setName("testItem");
         contentItem.setMimeType("application/pdf");
@@ -45,27 +48,70 @@ public class ContentItemTest extends AbstractFlowableContentTest {
     }
 
     @Test
-    public void createSimpleContentItemWithData() throws Exception {
+    public void createSimpleProcessContentItemWithData() throws Exception {
         ContentItem contentItem = contentService.newContentItem();
+        contentItem.setProcessInstanceId("123456");
+        assertCreateContentWithData(contentItem, "process-instance-content");
+    }
+
+    @Test
+    public void createSimpleTaskContentItemWithData() throws Exception {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setTaskId("123456");
+        assertCreateContentWithData(contentItem, "task-content");
+    }
+
+    @Test
+    public void createSimpleCaseContentItemWithData() throws Exception {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setScopeId("123456");
+        contentItem.setScopeType("cmmn");
+        assertCreateContentWithData(contentItem, "cmmn");
+    }
+
+    @Test
+    public void createSimpleNewTypeContentItemWithData() throws Exception {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setScopeId("123456");
+        contentItem.setScopeType("newType");
+        assertCreateContentWithData(contentItem, "newType");
+    }
+
+    @Test
+    public void createSimpleUnrecognizedContentItemWithData() throws Exception {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setScopeId("123456");
+        contentItem.setScopeType(null);
         contentItem.setName("testItem");
         contentItem.setMimeType("application/pdf");
-        contentItem.setProcessInstanceId("123456");
-        contentService.saveContentItem(contentItem, this.getClass().getClassLoader().getResourceAsStream("test.txt"));
+
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("test.txt")) {
+            contentService.saveContentItem(contentItem, in);
+        }
 
         assertNotNull(contentItem.getId());
+        assertTrue(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+                contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
+            ).exists()
+        );
 
         ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
         assertNotNull(dbContentItem);
         assertEquals(contentItem.getId(), dbContentItem.getId());
 
-        InputStream contentStream = contentService.getContentItemData(contentItem.getId());
-        String contentValue = IOUtils.toString(contentStream, "utf-8");
-        assertEquals("hello", contentValue);
+        try (InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
+            String contentValue = IOUtils.toString(contentStream, "utf-8");
+            assertEquals("hello", contentValue);
+        }
 
         contentService.deleteContentItem(contentItem.getId());
 
+        assertFalse(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+                contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
+            ).exists()
+        );
         try {
-            contentStream = contentService.getContentItemData(contentItem.getId());
+            contentService.getContentItemData(contentItem.getId());
             fail("Expected not found exception");
 
         } catch (FlowableObjectNotFoundException e) {
@@ -74,6 +120,57 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         } catch (Exception e) {
             fail("Expected not found exception, not " + e);
         }
+
+    }
+
+    protected void assertCreateContentWithData(ContentItem contentItem, String typeDirectory) throws IOException {
+        contentItem.setName("testItem");
+        contentItem.setMimeType("application/pdf");
+        try(InputStream in = this.getClass().getClassLoader().getResourceAsStream("test.txt")) {
+            contentService.saveContentItem(contentItem, in);
+        }
+
+        assertNotNull(contentItem.getId());
+        assertFileExists(typeDirectory, "123456", contentItem.getContentStoreId());
+
+        ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
+        assertNotNull(dbContentItem);
+        assertEquals(contentItem.getId(), dbContentItem.getId());
+
+        try(InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
+            String contentValue = IOUtils.toString(contentStream, "utf-8");
+            assertEquals("hello", contentValue);
+        }
+
+        contentService.deleteContentItem(contentItem.getId());
+
+        assertMissingFile(typeDirectory, "123456", contentItem.getContentStoreId());
+        try {
+            contentService.getContentItemData(contentItem.getId());
+            fail("Expected not found exception");
+
+        } catch (FlowableObjectNotFoundException e) {
+            // expected
+
+        } catch (Exception e) {
+            fail("Expected not found exception, not " + e);
+        }
+    }
+
+    protected void assertFileExists(String typeFolder, String idFolder, String contentStoreId) {
+        assertTrue(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + typeFolder
+                + File.separator + idFolder +File.separator+
+                contentStoreId.substring(contentStoreId.lastIndexOf('.') + 1)
+            ).exists()
+        );
+    }
+
+    protected void assertMissingFile(String typeFolder, String idFolder, String contentStoreId) {
+        assertFalse(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + typeFolder
+                + File.separator + idFolder +File.separator+
+                contentStoreId.substring(contentStoreId.lastIndexOf('.') + 1)
+            ).exists()
+        );
     }
 
     @Test
