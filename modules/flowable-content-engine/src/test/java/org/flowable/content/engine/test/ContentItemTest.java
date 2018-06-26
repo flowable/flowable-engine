@@ -70,7 +70,6 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertCreateContentWithData(contentItem, "cmmn");
     }
 
-    @Ignore
     @Test
     public void createSimpleNewTypeContentItemWithData() throws Exception {
         ContentItem contentItem = contentService.newContentItem();
@@ -80,9 +79,63 @@ public class ContentItemTest extends AbstractFlowableContentTest {
     }
 
     @Test
-    public void createSimpleUnrecognizedContentItemWithData() throws Exception {
+    public void createSimpleUncategorizedTypeContentItemWithData() throws Exception {
         ContentItem contentItem = contentService.newContentItem();
         contentItem.setScopeId("123456");
+        contentItem.setScopeType("uncategorizedNewType");
+        assertCreateContentWithData(contentItem, "uncategorizedNewType");
+    }
+
+    @Test
+    public void createSimpleUncategorizedContentItemWithData() throws Exception {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setScopeId("123456");
+        contentItem.setScopeType(null);
+        contentItem.setName("testItem");
+        contentItem.setMimeType("application/pdf");
+
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("test.txt")) {
+            contentService.saveContentItem(contentItem, in);
+        }
+
+        assertNotNull(contentItem.getId());
+        assertTrue(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+                contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
+            ).exists()
+        );
+
+        ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
+        assertNotNull(dbContentItem);
+        assertEquals(contentItem.getId(), dbContentItem.getId());
+
+        try (InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
+            String contentValue = IOUtils.toString(contentStream, "utf-8");
+            assertEquals("hello", contentValue);
+        }
+
+        contentService.deleteContentItem(contentItem.getId());
+
+        assertFalse(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+                contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
+            ).exists()
+        );
+        try {
+            contentService.getContentItemData(contentItem.getId());
+            fail("Expected not found exception");
+
+        } catch (FlowableObjectNotFoundException e) {
+            // expected
+
+        } catch (Exception e) {
+            fail("Expected not found exception, not " + e);
+        }
+
+    }
+
+    @Test
+    public void createSimpleUncategorizedContentItemWithoutIdWithData() throws Exception {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setScopeId(null);
         contentItem.setScopeType(null);
         contentItem.setName("testItem");
         contentItem.setMimeType("application/pdf");
