@@ -18,6 +18,8 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.history.async.AsyncHistorySession.AsyncHistorySessionData;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.util.CommandContextUtil;
@@ -59,26 +61,30 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
         // This logic needs to be done before the dbSqlSession is flushed 
         // which means it can't be done in the transaction pre-commit
         
-        Map<String, List<Map<String, String>>> jobData = asyncHistorySession.getJobData();
-        if (!jobData.isEmpty()) {
-            List<ObjectNode> objectNodes = new ArrayList<>();
+        Map<JobServiceConfiguration, AsyncHistorySessionData> sessionData = asyncHistorySession.getSessionData();
+        for (JobServiceConfiguration jobServiceConfiguration : sessionData.keySet()) {
             
-            // First, the registered types
-            for (String type : asyncHistorySession.getJobDataTypes()) {
-                if (jobData.containsKey(type)) {
-                    generateJson(commandContext, jobData, objectNodes, type);
-                    jobData.remove(type);
-                }
-            }
-            
-            // Additional data for which the type is not registered
+            Map<String, List<Map<String, String>>> jobData = sessionData.get(jobServiceConfiguration).getJobData();
             if (!jobData.isEmpty()) {
-                for (String type : jobData.keySet()) {
-                    generateJson(commandContext, jobData, objectNodes, type);
+                List<ObjectNode> objectNodes = new ArrayList<>();
+                
+                // First, the registered types
+                for (String type : asyncHistorySession.getJobDataTypes()) {
+                    if (jobData.containsKey(type)) {
+                        generateJson(commandContext, jobData, objectNodes, type);
+                        jobData.remove(type);
+                    }
                 }
+                
+                // Additional data for which the type is not registered
+                if (!jobData.isEmpty()) {
+                    for (String type : jobData.keySet()) {
+                        generateJson(commandContext, jobData, objectNodes, type);
+                    }
+                }
+                
+                asyncHistoryListener.historyDataGenerated(jobServiceConfiguration, objectNodes);
             }
-            
-            asyncHistoryListener.historyDataGenerated(objectNodes);
         }
     }
 
