@@ -95,7 +95,7 @@ public class StartCaseInstanceWithFormCmd implements Command<CaseInstance>, Seri
 
         if (formInfo != null) {
             formService.createFormInstanceWithScopeId(formVariables, formInfo, null, caseInstance.getId(),
-                    ScopeTypes.CMMN, caseInstance.getCaseDefinitionId());
+                    ScopeTypes.CMMN, caseInstance.getCaseDefinitionId(), null);
             FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldHandler();
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null, caseInstance.getId(), ScopeTypes.CMMN, caseInstanceBuilder.getVariables());
         }
