@@ -30,7 +30,7 @@ FLOWABLE.APP_URL = {
 
     /* MODEL URLS */
 
-    getModelsUrl: function (query) {
+    getModelsUrl: function (query = null) {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/models' + (query || "");
     },
 
@@ -66,7 +66,7 @@ FLOWABLE.APP_URL = {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/history/' + modelHistoryId + '/bpmn20?version=' + Date.now();
     },
 
-    getCmmnModelDownloadUrl: function (modelId, modelHistoryId) {
+    getCmmnModelDownloadUrl: function (modelId, modelHistoryId = null) {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + (modelHistoryId ? '/history/' + modelHistoryId : '') + '/cmmn?version=' + Date.now();
     },
 
@@ -196,7 +196,7 @@ FLOWABLE.APP_URL = {
 
     /* CASE MODEL URLS */
 
-    getCaseModelsUrl: function (query) {
+    getCaseModelsUrl: function (query = null) {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/case-models' + (query || "");
     },
 
@@ -226,7 +226,7 @@ FLOWABLE.APP_URL = {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/image/' + imageId;
     },
 
-    getModelThumbnailUrl: function (modelId, version) {
+    getModelThumbnailUrl: function (modelId, version = null) {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/thumbnail' + (version ? "?version=" + version : "");
     },
 
