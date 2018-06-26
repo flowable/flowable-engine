@@ -658,7 +658,9 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("kermit").count());
             assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("fozzie").count());
 
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("fozzie").count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("fozzie").count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -690,7 +692,9 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             assertEquals(1, taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedGroups(Collections.singleton("testGroup")).count());
 
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedGroups(Collections.singleton("testGroup")).count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedGroups(Collections.singleton("testGroup")).count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -725,8 +729,10 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertEquals(2, taskService.createTaskQuery().
                 or().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
 
-            assertEquals(2, historyService.createHistoricTaskInstanceQuery().
-                or().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(2, historyService.createHistoricTaskInstanceQuery().
+                        or().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -749,8 +755,10 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertEquals(2, taskService.createTaskQuery().
                 or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
 
-            assertEquals(2, historyService.createHistoricTaskInstanceQuery().
-                or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(2, historyService.createHistoricTaskInstanceQuery().
+                        or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -774,9 +782,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
                 count());
 
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
-                count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                        taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                        count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -802,9 +812,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
                 count());
 
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
-                count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                        taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                        count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -829,9 +841,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertEquals(1, taskService.createTaskQuery().
                 taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
                 count());
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
-                count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                        taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                        count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -856,9 +870,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertEquals(1, taskService.createTaskQuery().
                 taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
                 count());
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
-                count());
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                        taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                        count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -883,9 +900,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertEquals(1, taskService.createTaskQuery().
                 taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
                 count());
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
-                count());
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                        taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
+                        count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -910,11 +930,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
                 endOr().
                 count());
-            assertEquals(3, historyService.createHistoricTaskInstanceQuery().
-                or().
-                    taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
-                endOr().
-                count());
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(3, historyService.createHistoricTaskInstanceQuery().
+                    or().
+                        taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                    endOr().
+                    count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -939,11 +962,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
                 endOr().
                 count());
-            assertEquals(3, historyService.createHistoricTaskInstanceQuery().
-                or().
-                    taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
-                endOr().
-                count());
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(3, historyService.createHistoricTaskInstanceQuery().
+                        or().
+                            taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).
+                        endOr().
+                        count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -968,11 +994,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
                 endOr().
                 count());
-            assertEquals(3, historyService.createHistoricTaskInstanceQuery().
-                or().
-                    taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
-                endOr().
-                count());
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(3, historyService.createHistoricTaskInstanceQuery().
+                        or().
+                            taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup")).
+                        endOr().
+                        count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -997,11 +1026,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
                 endOr().
                 count());
-            assertEquals(3, historyService.createHistoricTaskInstanceQuery().
-                or().
-                    taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
-                endOr().
-                count());
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(3, historyService.createHistoricTaskInstanceQuery().
+                        or().
+                            taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).
+                        endOr().
+                        count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -1034,16 +1066,18 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskName("testName").
                     taskInvolvedGroups(Collections.singleton("testGroup")).
                 count());
-            assertEquals(4, historyService.createHistoricTaskInstanceQuery().
-                or().
-                    taskName("testName").
-                    taskInvolvedGroups(Collections.singleton("testGroup")).
-                endOr().
-                count());
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                    taskName("testName").
-                    taskInvolvedGroups(Collections.singleton("testGroup")).
-                count());
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(4, historyService.createHistoricTaskInstanceQuery().
+                    or().
+                        taskName("testName").
+                        taskInvolvedGroups(Collections.singleton("testGroup")).
+                    endOr().
+                    count());
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
+                        taskName("testName").
+                        taskInvolvedGroups(Collections.singleton("testGroup")).
+                    count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -1076,16 +1110,19 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskName("testName").
                     taskCandidateGroupIn(Collections.singletonList("testGroup")).
                 count());
-            assertEquals(4, historyService.createHistoricTaskInstanceQuery().
-                or().
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(4, historyService.createHistoricTaskInstanceQuery().
+                        or().
+                            taskName("testName").
+                            taskCandidateGroupIn(Collections.singletonList("testGroup")).
+                        endOr().
+                        count());
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
                     taskName("testName").
                     taskCandidateGroupIn(Collections.singletonList("testGroup")).
-                endOr().
-                count());
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                    taskName("testName").
-                    taskCandidateGroupIn(Collections.singletonList("testGroup")).
-                count());
+                    count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -1118,16 +1155,19 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 taskName("testName").
                 taskCandidateUser("homer").
                 count());
-            assertEquals(4, historyService.createHistoricTaskInstanceQuery().
-                or().
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(4, historyService.createHistoricTaskInstanceQuery().
+                    or().
+                        taskName("testName").
+                        taskCandidateUser("homer").
+                    endOr().
+                    count());
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
                     taskName("testName").
                     taskCandidateUser("homer").
-                endOr().
-                count());
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                taskName("testName").
-                taskCandidateUser("homer").
-                count());
+                    count());
+            }
 
         } finally {
             deleteAllTasks();
@@ -1160,16 +1200,19 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 taskName("testName").
                 taskCandidateGroup("testGroup").
                 count());
-            assertEquals(4, historyService.createHistoricTaskInstanceQuery().
-                or().
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                assertEquals(4, historyService.createHistoricTaskInstanceQuery().
+                    or().
+                        taskName("testName").
+                        taskCandidateGroup("testGroup").
+                    endOr().
+                    count());
+                assertEquals(1, historyService.createHistoricTaskInstanceQuery().
                     taskName("testName").
                     taskCandidateGroup("testGroup").
-                endOr().
-                count());
-            assertEquals(1, historyService.createHistoricTaskInstanceQuery().
-                taskName("testName").
-                taskCandidateGroup("testGroup").
-                count());
+                    count());
+            }
 
         } finally {
             deleteAllTasks();
