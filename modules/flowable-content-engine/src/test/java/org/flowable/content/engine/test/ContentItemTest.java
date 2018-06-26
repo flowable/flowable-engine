@@ -26,6 +26,7 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.content.api.ContentItem;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ContentItemTest extends AbstractFlowableContentTest {
@@ -69,6 +70,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertCreateContentWithData(contentItem, "cmmn");
     }
 
+    @Ignore
     @Test
     public void createSimpleNewTypeContentItemWithData() throws Exception {
         ContentItem contentItem = contentService.newContentItem();
