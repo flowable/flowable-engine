@@ -46,33 +46,33 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public FormInstance createFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId) {
-        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId));
+    public FormInstance createFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId, String submittedBy) {
+        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId, submittedBy));
     }
 
     @Override
-    public FormInstance saveFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId) {
-        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId));
+    public FormInstance saveFormInstance(Map<String, Object> variables, FormInfo formInfo, String taskId, String processInstanceId, String processDefinitionId, String submittedBy) {
+        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, processInstanceId, processDefinitionId, submittedBy));
     }
 
     @Override
-    public FormInstance saveFormInstanceByFormDefinitionId(Map<String, Object> variables, String formDefinitionId, String taskId, String processInstanceId, String processDefinitionId) {
-        return commandExecutor.execute(new SaveFormInstanceCmd(formDefinitionId, variables, taskId, processInstanceId, processDefinitionId));
+    public FormInstance saveFormInstanceByFormDefinitionId(Map<String, Object> variables, String formDefinitionId, String taskId, String processInstanceId, String processDefinitionId, String submittedBy) {
+        return commandExecutor.execute(new SaveFormInstanceCmd(formDefinitionId, variables, taskId, processInstanceId, processDefinitionId, submittedBy));
     }
     
     @Override
-    public FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
-        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId));
+    public FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType, String scopeDefinitionId, String submittedBy) {
+        return commandExecutor.execute(new CreateFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, submittedBy));
     }
 
     @Override
-    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
-        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId));
+    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormInfo formInfo, String taskId, String scopeId, String scopeType, String scopeDefinitionId, String submittedBy) {
+        return commandExecutor.execute(new SaveFormInstanceCmd(formInfo, variables, taskId, scopeId, scopeType, scopeDefinitionId, submittedBy));
     }
 
     @Override
-    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formModelId, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
-        return commandExecutor.execute(new SaveFormInstanceCmd(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId));
+    public FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formModelId, String taskId, String scopeId, String scopeType, String scopeDefinitionId, String submittedBy) {
+        return commandExecutor.execute(new SaveFormInstanceCmd(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId, submittedBy));
     }
 
     @Override
