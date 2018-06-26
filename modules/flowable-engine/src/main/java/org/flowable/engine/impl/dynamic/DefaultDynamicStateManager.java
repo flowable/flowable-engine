@@ -374,7 +374,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         
         return newChildExecutions;
     }
-
+    
     protected ExecutionEntity getActiveExecution(String activityId, ExecutionEntity processExecution, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
