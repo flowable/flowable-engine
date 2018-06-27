@@ -325,5 +325,6 @@ public interface BpmnXMLConstants {
     public static final String MAP_EXCEPTION = "mapException";
     public static final String MAP_EXCEPTION_ERRORCODE = "errorCode";
     public static final String MAP_EXCEPTION_ANDCHILDREN = "includeChildExceptions";
+    public static final String MAP_EXCEPTION_ROOTCAUSE = "rootCause";
 
 }
