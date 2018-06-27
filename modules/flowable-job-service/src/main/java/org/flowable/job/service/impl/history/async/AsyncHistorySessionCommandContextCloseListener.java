@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession.AsyncHistorySessionData;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
@@ -71,7 +73,7 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
                 // First, the registered types
                 for (String type : asyncHistorySession.getJobDataTypes()) {
                     if (jobData.containsKey(type)) {
-                        generateJson(commandContext, jobData, objectNodes, type);
+                        generateJson(jobServiceConfiguration, jobData, objectNodes, type);
                         jobData.remove(type);
                     }
                 }
@@ -79,25 +81,33 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
                 // Additional data for which the type is not registered
                 if (!jobData.isEmpty()) {
                     for (String type : jobData.keySet()) {
-                        generateJson(commandContext, jobData, objectNodes, type);
+                        generateJson(jobServiceConfiguration, jobData, objectNodes, type);
                     }
                 }
                 
-                asyncHistoryListener.historyDataGenerated(jobServiceConfiguration, objectNodes);
+                // History job needs to be created in the context of which it orginated
+                JobServiceConfiguration originalJobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+                try {
+                    commandContext.getCurrentEngineConfiguration().getServiceConfigurations().put(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, jobServiceConfiguration);
+                    asyncHistoryListener.historyDataGenerated(jobServiceConfiguration, objectNodes);    
+                } finally {
+                    commandContext.getCurrentEngineConfiguration().getServiceConfigurations().put(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, originalJobServiceConfiguration);
+                }
+                
             }
         }
     }
 
-    protected void generateJson(CommandContext commandContext, Map<String, List<Map<String, String>>> jobData, List<ObjectNode> objectNodes, String type) {
+    protected void generateJson(JobServiceConfiguration jobServiceConfiguration, Map<String, List<Map<String, String>>> jobData, List<ObjectNode> objectNodes, String type) {
         List<Map<String, String>> historicDataList = jobData.get(type);
         for (Map<String, String> historicData: historicDataList) {
-            ObjectNode historyJson = generateJson(commandContext, type, historicData);
+            ObjectNode historyJson = generateJson(jobServiceConfiguration, type, historicData);
             objectNodes.add(historyJson);
         }
     }
     
-    protected ObjectNode generateJson(CommandContext commandContext, String type, Map<String, String> historicData) {
-        ObjectNode elementObjectNode = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper().createObjectNode();
+    protected ObjectNode generateJson(JobServiceConfiguration jobServiceConfiguration, String type, Map<String, String> historicData) {
+        ObjectNode elementObjectNode = jobServiceConfiguration.getObjectMapper().createObjectNode();
         elementObjectNode.put(typeFieldName, type);
 
         ObjectNode dataNode = elementObjectNode.putObject(dataFieldName);
