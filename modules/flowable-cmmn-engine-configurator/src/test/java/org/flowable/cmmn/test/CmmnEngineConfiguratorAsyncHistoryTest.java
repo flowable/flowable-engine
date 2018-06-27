@@ -98,7 +98,7 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
                     || historyJob.getJobHandlerType().equals(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {
                 cmmnHistoryJobs++;
             } else if (historyJob.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
-                    || historyJob.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)) {
+                    || historyJob.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {
                 bpmnHistoryJobs++;
             }
             
