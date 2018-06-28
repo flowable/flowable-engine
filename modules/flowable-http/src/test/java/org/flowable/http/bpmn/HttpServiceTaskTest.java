@@ -331,7 +331,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPost2XX");
         assertFalse(process.isEnded());
 
-        String body = "{\"test\":\"Alen Turković\",\"result\":true}";
+        String body = "{\"test\":\"sample\",\"result\":true}";
         // Request assertions
         Map<String, Object> request = new HashMap<>();
         request.put("httpPostRequestMethod", "POST");
