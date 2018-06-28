@@ -226,14 +226,22 @@ public class HttpActivityExecutor {
                 case "POST": {
                     HttpPost post = new HttpPost(uri.toString());
                     if (requestInfo.getBody() != null) {
-                        post.setEntity(new StringEntity(requestInfo.getBody()));
+                        if (StringUtils.isNotEmpty(requestInfo.getBodyEncoding())) {
+                            post.setEntity(new StringEntity(requestInfo.getBody(), requestInfo.getBodyEncoding()));
+                        } else {
+                            post.setEntity(new StringEntity(requestInfo.getBody()));
+                        }
                     }
                     request = post;
                     break;
                 }
                 case "PUT": {
                     HttpPut put = new HttpPut(uri.toString());
-                    put.setEntity(new StringEntity(requestInfo.getBody()));
+                    if (StringUtils.isNotEmpty(requestInfo.getBodyEncoding())) {
+                        put.setEntity(new StringEntity(requestInfo.getBody(), requestInfo.getBodyEncoding()));
+                    } else {
+                        put.setEntity(new StringEntity(requestInfo.getBody()));
+                    }
                     request = put;
                     break;
                 }

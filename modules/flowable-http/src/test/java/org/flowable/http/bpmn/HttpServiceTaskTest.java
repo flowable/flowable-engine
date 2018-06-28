@@ -331,7 +331,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPost2XX");
         assertFalse(process.isEnded());
 
-        String body = "{\"test\":\"sample\",\"result\":true}";
+        String body = "{\"test\":\"Alen Turković\",\"result\":true}";
         // Request assertions
         Map<String, Object> request = new HashMap<>();
         request.put("httpPostRequestMethod", "POST");
@@ -360,6 +360,29 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         Map<String, Object> response = new HashMap<>();
         response.put("httpPostResponseStatusCode", 302);
         assertEquals(process.getId(), response);
+        continueProcess(process);
+    }
+
+    @Deployment
+    public void testHttpPostBodyEncoding() throws Exception {
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPostBodyEncoding");
+        assertFalse(process.isEnded());
+
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("httpPostRequestMethod", "POST");
+        request.put("httpPostRequestUrl", "http://localhost:9798/hello");
+        request.put("httpPostRequestHeaders", "Content-Type: application/json; charset=utf-8");
+        request.put("httpPostRequestBody", "{\"name\":\"Alen Turković\"}");
+        assertEquals(process.getId(), request);
+        // Response assertions
+        Map<String, Object> response = new HashMap<>();
+        response.put("httpPostResponseStatusCode", 200);
+        assertEquals(process.getId(), response);
+        // Response body assertions
+        String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPostResponseBody");
+        assertNotNull(responseBody);
+        assertEquals("{\"result\":\"Hello Alen Turković\"}", responseBody.trim());
         continueProcess(process);
     }
 
