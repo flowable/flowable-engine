@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -792,6 +793,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getExecutionQueryInterceptor() != null) {
+            processEngineConfiguration.getExecutionQueryInterceptor().beforeExecutionQueryExecute(this);
+        }
+        
         return CommandContextUtil.getExecutionEntityManager(commandContext).findExecutionCountByQueryCriteria(this);
     }
 
@@ -800,14 +807,20 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public List<Execution> executeList(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getExecutionQueryInterceptor() != null) {
+            processEngineConfiguration.getExecutionQueryInterceptor().beforeExecutionQueryExecute(this);
+        }
+        
         List<?> executions = CommandContextUtil.getExecutionEntityManager(commandContext).findExecutionsByQueryCriteria(this);
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
+        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization()) {
             for (ExecutionEntity execution : (List<ExecutionEntity>) executions) {
                 String activityId = null;
                 if (execution.getId().equals(execution.getProcessInstanceId())) {
                     if (execution.getProcessDefinitionId() != null) {
-                        ProcessDefinition processDefinition = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                        ProcessDefinition processDefinition = processEngineConfiguration
                                 .getDeploymentManager()
                                 .findDeployedProcessDefinitionById(execution.getProcessDefinitionId());
                         activityId = processDefinition.getKey();
@@ -821,6 +834,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
                     localize(execution, activityId);
                 }
             }
+        }
+        
+        if (processEngineConfiguration.getExecutionQueryInterceptor() != null) {
+            processEngineConfiguration.getExecutionQueryInterceptor().afterExecutionQueryExecute(this, (List<Execution>) executions);
         }
 
         return (List<Execution>) executions;

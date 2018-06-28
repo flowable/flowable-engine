@@ -66,8 +66,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 variableScope = RestVariableScope.LOCAL;
                 variableFound = true;
             } else {
-                // Revert to execution-variable when not present local on the
-                // task
+                // Revert to execution-variable when not present local on the task
                 Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
                 if (task.getExecutionId() != null && runtimeService.hasVariable(task.getExecutionId(), variableName)) {
                     value = runtimeService.getVariable(task.getExecutionId(), variableName);

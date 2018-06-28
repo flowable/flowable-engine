@@ -12,19 +12,22 @@
  */
 package org.flowable.rest.service.api.repository;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * @author Yvo Swillens
@@ -43,7 +46,9 @@ public class ProcessDefinitionDecisionTableCollectionResource extends BaseProces
             @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             HttpServletRequest request) {
 
-        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        
+        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
 
         return restResponseFactory.createDecisionTableResponseList(decisionTables, processDefinitionId);
     }

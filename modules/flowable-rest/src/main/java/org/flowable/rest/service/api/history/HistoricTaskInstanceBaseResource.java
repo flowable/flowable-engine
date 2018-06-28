@@ -18,11 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +65,9 @@ public class HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<HistoricTaskInstanceResponse> getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams, String serverRootUrl) {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -239,8 +245,25 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskCandidateGroup() != null) {
             query.taskCandidateGroup(queryRequest.getTaskCandidateGroup());
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoWithQuery(query);
+        }
 
         return new HistoricTaskInstancePaginateList(restResponseFactory, serverRootUrl).paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties);
+    }
+    
+    protected HistoricTaskInstance getHistoricTaskInstanceFromRequest(String taskId) {
+        HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+        if (taskInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task instance with id '" + taskId + "'.", HistoricTaskInstance.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoById(taskInstance);
+        }
+        
+        return taskInstance;
     }
 
     protected void addTaskVariables(HistoricTaskInstanceQuery taskInstanceQuery, List<QueryVariable> variables) {

@@ -139,6 +139,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         checkQueryOk();
+        
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getHistoricTaskQueryInterceptor().beforeHistoricTaskQueryExecute(this);
+        }
+        
         return CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstanceCountByQueryCriteria(this);
     }
 
@@ -147,17 +153,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         ensureVariablesInitialized();
         checkQueryOk();
         List<HistoricTaskInstance> tasks = null;
+        
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getHistoricTaskQueryInterceptor().beforeHistoricTaskQueryExecute(this);
+        }
+        
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
             tasks = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(this);
         } else {
             tasks = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesByQueryCriteria(this);
         }
 
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
             for (HistoricTaskInstance task : tasks) {
                 taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
+        }
+        
+        if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getHistoricTaskQueryInterceptor().afterHistoricTaskQueryExecute(this, tasks);
         }
 
         return tasks;

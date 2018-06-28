@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
@@ -62,6 +63,9 @@ public class TaskBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected DelegationState getDelegationState(String delegationState) {
         DelegationState state = null;
@@ -291,6 +295,10 @@ public class TaskBaseResource {
         if (request.getCategory() != null) {
             taskQuery.taskCategory(request.getCategory());
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskInfoWithQuery(taskQuery);
+        }
 
         return new TaskPaginateList(restResponseFactory).paginateList(requestParams, request, taskQuery, "id", properties);
     }
@@ -459,6 +467,11 @@ public class TaskBaseResource {
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskInfoById(task);
+        }
+        
         return task;
     }
 
@@ -470,6 +483,11 @@ public class TaskBaseResource {
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoById(task);
+        }
+        
         return task;
     }
 }

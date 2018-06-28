@@ -13,6 +13,22 @@
 
 package org.flowable.rest.service.api.management;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
+import org.flowable.engine.ManagementService;
+import org.flowable.job.api.JobQuery;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,20 +37,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.rest.api.DataResponse;
-import org.flowable.common.rest.api.RequestUtil;
-import org.flowable.engine.ManagementService;
-import org.flowable.job.api.JobQuery;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * @author Frederik Heremans
@@ -48,6 +50,9 @@ public class JobCollectionResource {
 
     @Autowired
     protected ManagementService managementService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     // Fixme documentation & real parameters
     @ApiOperation(value = "List jobs", tags = { "Jobs" }, nickname = "listJobs")
@@ -138,6 +143,10 @@ public class JobCollectionResource {
             if (Boolean.valueOf(allRequestParams.get("unlocked"))) {
                 query.unlocked();
             }
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessJobInfoWithQuery(query);
         }
 
         return new JobPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES);
