@@ -195,6 +195,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             if (transientVariables != null) {
                 caseInstanceBuilder.transientVariables(transientVariables);
             }
+            
+            if (restApiInterceptor != null) {
+                restApiInterceptor.createCaseInstance(caseInstanceBuilder);
+            }
 
             instance = caseInstanceBuilder.start();
 

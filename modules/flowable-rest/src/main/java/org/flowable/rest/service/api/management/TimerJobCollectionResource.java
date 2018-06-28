@@ -139,7 +139,7 @@ public class TimerJobCollectionResource {
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessTimerJoInfobWithQuery(query);
+            restApiInterceptor.accessTimerJobInfoWithQuery(query);
         }
 
         return new JobPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES);

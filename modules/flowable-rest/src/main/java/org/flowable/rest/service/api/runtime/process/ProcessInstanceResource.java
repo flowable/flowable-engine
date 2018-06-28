@@ -68,8 +68,10 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     })
     @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}")
     public void deleteProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
-
         ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteProcessInstance(processInstance);
+        }
 
         runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
         response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -106,6 +108,10 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/change-state", produces = "application/json")
     public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
             @RequestBody ExecutionChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.changeActivityState(activityStateRequest);
+        }
 
         if (activityStateRequest.getCancelActivityIds() != null && activityStateRequest.getCancelActivityIds().size() == 1) {
             runtimeService.createChangeActivityStateBuilder()
@@ -132,6 +138,10 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/inject", produces = "application/json")
     public void injectActivityInProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
             @RequestBody InjectActivityRequest injectActivityRequest, HttpServletRequest request) {
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.injectActivity(injectActivityRequest);
+        }
 
         if ("task".equalsIgnoreCase(injectActivityRequest.getInjectionType())) {
             DynamicUserTaskBuilder taskBuilder = new DynamicUserTaskBuilder();

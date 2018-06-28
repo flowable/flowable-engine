@@ -14,19 +14,15 @@
 package org.flowable.cmmn.rest.service.api.repository;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
-import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
-import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Tijs Rademakers
  */
-public class BaseCaseDefinitionResource {
-
-    @Autowired
-    protected CmmnRestResponseFactory restResponseFactory;
+public class BaseDeploymentResource {
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
@@ -34,20 +30,17 @@ public class BaseCaseDefinitionResource {
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
 
-    /**
-     * Returns the {@link CaseDefinition} that is requested. Throws the right exceptions when bad request was made or definition is not found.
-     */
-    protected CaseDefinition getCaseDefinitionFromRequest(String caseDefinitionId) {
-        CaseDefinition caseDefinition = repositoryService.getCaseDefinition(caseDefinitionId);
+    protected CmmnDeployment getCmmnDeployment(String deploymentId) {
+        CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
-        if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case definition with id '" + caseDefinitionId + "'.", CaseDefinition.class);
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", CmmnDeployment.class);
         }
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessCaseDefinitionById(caseDefinition);
+            restApiInterceptor.accessDeploymentById(deployment);
         }
         
-        return caseDefinition;
+        return deployment;
     }
 }

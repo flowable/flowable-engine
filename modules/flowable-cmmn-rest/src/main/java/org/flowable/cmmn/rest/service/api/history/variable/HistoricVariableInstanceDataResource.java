@@ -25,8 +25,6 @@ import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +43,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricVariableInstanceDataResource {
+public class HistoricVariableInstanceDataResource extends HistoricVariableInstanceBaseResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -84,16 +82,6 @@ public class HistoricVariableInstanceDataResource {
         } catch (IOException ioe) {
             // Re-throw IOException
             throw new FlowableException("Unexpected exception getting variable data", ioe);
-        }
-    }
-
-    public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId, HttpServletRequest request) {
-        HistoricVariableInstance varObject = historyService.createHistoricVariableInstanceQuery().id(varInstanceId).singleResult();
-
-        if (varObject == null) {
-            throw new FlowableObjectNotFoundException("Historic variable instance '" + varInstanceId + "' couldn't be found.", VariableInstanceEntity.class);
-        } else {
-            return restResponseFactory.createRestVariable(varObject.getVariableName(), varObject.getValue(), null, varInstanceId, CmmnRestResponseFactory.VARIABLE_HISTORY_VARINSTANCE, includeBinary);
         }
     }
 }

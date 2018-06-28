@@ -13,14 +13,10 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
@@ -31,9 +27,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -128,6 +129,10 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
     })
     @PutMapping(value = "/runtime/executions")
     public void executeExecutionAction(@RequestBody ExecutionActionRequest actionRequest, HttpServletResponse response) {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doExecutionActionRequest(actionRequest);
+        }
+        
         if (!ExecutionActionRequest.ACTION_SIGNAL_EVENT_RECEIVED.equals(actionRequest.getAction())) {
             throw new FlowableIllegalArgumentException("Illegal action: '" + actionRequest.getAction() + "'.");
         }

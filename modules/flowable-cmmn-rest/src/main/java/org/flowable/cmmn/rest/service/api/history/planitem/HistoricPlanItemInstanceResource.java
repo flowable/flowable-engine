@@ -13,19 +13,20 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -45,6 +46,11 @@ public class HistoricPlanItemInstanceResource extends HistoricPlanItemInstanceBa
         if (planItemInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a plan item instance with id '" + planItemInstanceId + "'.", HistoricPlanItemInstance.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryPlanItemInfoById(planItemInstance);
+        }
+        
         return restResponseFactory.createHistoricPlanItemInstanceResponse(planItemInstance);
     }
 

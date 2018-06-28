@@ -12,6 +12,7 @@
  */
 package org.flowable.rest.service.api;
 
+import org.flowable.engine.form.FormData;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricDetailQuery;
@@ -28,19 +29,25 @@ import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
+import org.flowable.rest.service.api.form.SubmitFormRequest;
 import org.flowable.rest.service.api.identity.GroupRequest;
 import org.flowable.rest.service.api.identity.UserRequest;
+import org.flowable.rest.service.api.runtime.process.ExecutionActionRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionChangeActivityStateRequest;
+import org.flowable.rest.service.api.runtime.process.InjectActivityRequest;
 import org.flowable.rest.service.api.runtime.process.SignalEventReceivedRequest;
+import org.flowable.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -58,17 +65,27 @@ public interface BpmnRestApiInterceptor {
     
     void deleteTask(Task task);
     
+    void executeTaskAction(Task task, TaskActionRequest actionRequest);
+    
     void accessExecutionInfoById(Execution execution);
 
     void accessExecutionInfoWithQuery(ExecutionQuery executionQuery);
+    
+    void doExecutionActionRequest(ExecutionActionRequest executionActionRequest);
     
     void accessProcessInstanceInfoById(ProcessInstance processInstance);
 
     void accessProcessInstanceInfoWithQuery(ProcessInstanceQuery processInstanceQuery);
     
+    void createProcessInstance(ProcessInstanceBuilder processInstanceBuilder);
+    
+    void deleteProcessInstance(ProcessInstance processInstance);
+    
     void sendSignal(SignalEventReceivedRequest signalEventReceivedRequest);
     
     void changeActivityState(ExecutionChangeActivityStateRequest changeActivityStateRequest);
+    
+    void injectActivity(InjectActivityRequest injectActivityRequest);
     
     void accessEventSubscriptionById(EventSubscription eventSubscription);
     
@@ -92,15 +109,21 @@ public interface BpmnRestApiInterceptor {
     
     void createModel(Model model);
     
+    void accessJobInfoById(Job job);
+    
     void accessJobInfoWithQuery(JobQuery jobQuery);
     
-    void accessTimerJoInfobWithQuery(TimerJobQuery jobQuery);
+    void accessTimerJobInfoWithQuery(TimerJobQuery jobQuery);
     
     void accessSuspendedJobInfoWithQuery(SuspendedJobQuery jobQuery);
     
     void accessDeadLetterJobInfoWithQuery(DeadLetterJobQuery jobQuery);
     
+    void deleteJob(Job job);
+    
     void accessManagementInfo();
+    
+    void accessTableInfo();
     
     void accessHistoryTaskInfoById(HistoricTaskInstance historicTaskInstance);
     
@@ -139,4 +162,8 @@ public interface BpmnRestApiInterceptor {
     void createUser(UserRequest userRequest);
     
     void deleteUser(User user);
+    
+    void accessFormData(FormData formData);
+    
+    void submitFormData(SubmitFormRequest formRequest);
 }

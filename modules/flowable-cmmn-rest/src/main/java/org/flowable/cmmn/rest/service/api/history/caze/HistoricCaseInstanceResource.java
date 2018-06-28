@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,7 +38,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Case" }, description = "Manage History Case Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricCaseInstanceResource {
+public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -62,15 +61,12 @@ public class HistoricCaseInstanceResource {
             @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
     @DeleteMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}")
     public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        historyService.deleteHistoricCaseInstance(caseInstanceId);
-        response.setStatus(HttpStatus.NO_CONTENT.value());
-    }
-
-    protected HistoricCaseInstance getHistoricCaseInstanceFromRequest(String caseInstanceId) {
-        HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.", HistoricCaseInstance.class);
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteHistoricCase(caseInstance);
         }
-        return caseInstance;
+        
+        historyService.deleteHistoricCaseInstance(caseInstance.getId());
+        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }
