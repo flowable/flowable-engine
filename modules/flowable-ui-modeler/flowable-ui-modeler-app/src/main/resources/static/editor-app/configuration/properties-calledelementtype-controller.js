@@ -10,17 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.job.service.impl.history.async;
 
-import java.util.List;
+/*
+ * Call activity calledElement type property
+ */
 
-import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+angular.module('flowableModeler').controller('FlowableCalledElementTypeCtrl', [ '$scope', function($scope) {
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-public interface AsyncHistoryListener {
-
-    List<HistoryJobEntity> historyDataGenerated(JobServiceConfiguration jobServiceConfiguration, List<ObjectNode> historyObjectNodes);
-
-}
+    if ($scope.property.value == undefined && $scope.property.value == null)
+    {
+    	$scope.property.value = 'key';
+    }
+        
+    $scope.calledElementTypeChanged = function() {
+    	$scope.updatePropertyInModel($scope.property);
+    };
+}]);
