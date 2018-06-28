@@ -83,11 +83,13 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivity
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.MailActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.RuntimeMultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
@@ -406,13 +408,8 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     // Multi Instance
 
     @Override
-    public SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
-        return new SequentialMultiInstanceBehavior(activity, innerActivityBehavior);
-    }
-
-    @Override
-    public ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
-        return new ParallelMultiInstanceBehavior(activity, innerActivityBehavior);
+    public MultiInstanceActivityBehavior createMultiInstanceActivityBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+        return new RuntimeMultiInstanceActivityBehavior(activity, innerActivityBehavior);
     }
 
     // Subprocess

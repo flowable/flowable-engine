@@ -48,6 +48,11 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
         ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
 
         // loop cardinality
+        if (StringUtils.isNotEmpty(loopCharacteristics.getSequential())) {
+            miActivityBehavior.setSequential(expressionManager.createExpression(loopCharacteristics.getSequential()));
+        }
+
+        // loop cardinality
         if (StringUtils.isNotEmpty(loopCharacteristics.getLoopCardinality())) {
             miActivityBehavior.setLoopCardinalityExpression(expressionManager.createExpression(loopCharacteristics.getLoopCardinality()));
         }
@@ -87,12 +92,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
         MultiInstanceActivityBehavior miActivityBehavior = null;
 
         AbstractBpmnActivityBehavior modelActivityBehavior = (AbstractBpmnActivityBehavior) modelActivity.getBehavior();
-        if (loopCharacteristics.isSequential()) {
-            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, modelActivityBehavior);
-        } else {
-            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, modelActivityBehavior);
-        }
-        
+        miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createMultiInstanceActivityBehavior(modelActivity, modelActivityBehavior);
         return miActivityBehavior;
     }
 }

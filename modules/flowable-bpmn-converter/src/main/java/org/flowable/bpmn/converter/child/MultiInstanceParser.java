@@ -41,7 +41,7 @@ public class MultiInstanceParser extends BaseChildElementParser {
         MultiInstanceLoopCharacteristics multiInstanceDef = new MultiInstanceLoopCharacteristics();
         BpmnXMLUtil.addXMLLocation(multiInstanceDef, xtr);
         if (xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL) != null) {
-            multiInstanceDef.setSequential(Boolean.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL)));
+            multiInstanceDef.setSequential(xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL));
         }
         multiInstanceDef.setInputDataItem(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_MULTIINSTANCE_COLLECTION, xtr));
         multiInstanceDef.setElementVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_MULTIINSTANCE_VARIABLE, xtr));

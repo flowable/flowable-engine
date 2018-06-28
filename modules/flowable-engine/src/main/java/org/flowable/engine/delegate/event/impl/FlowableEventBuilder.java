@@ -260,8 +260,6 @@ public class FlowableEventBuilder {
             if (behaviour != null) {
                 newEvent.setBehaviorClass(behaviour.getClass().getCanonicalName());
             }
-
-            newEvent.setSequential(((Activity) flowNode).getLoopCharacteristics().isSequential());
         }
 
         return newEvent;
@@ -288,8 +286,6 @@ public class FlowableEventBuilder {
             if (behaviour != null) {
                 newEvent.setBehaviorClass(behaviour.getClass().getCanonicalName());
             }
-
-            newEvent.setSequential(((Activity) flowNode).getLoopCharacteristics().isSequential());
         }
 
         return newEvent;

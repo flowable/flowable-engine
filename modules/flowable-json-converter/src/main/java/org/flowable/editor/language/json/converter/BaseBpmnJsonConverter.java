@@ -159,12 +159,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 MultiInstanceLoopCharacteristics loopDef = activity.getLoopCharacteristics();
                 if (StringUtils.isNotEmpty(loopDef.getLoopCardinality()) || StringUtils.isNotEmpty(loopDef.getInputDataItem()) || StringUtils.isNotEmpty(loopDef.getCompletionCondition())) {
 
-                    if (!loopDef.isSequential()) {
-                        propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE, "Parallel");
-                    } else {
-                        propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE, "Sequential");
+                    if (StringUtils.isNotEmpty(loopDef.getSequential())) {
+                        propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE, loopDef.getSequential());
                     }
-
                     if (StringUtils.isNotEmpty(loopDef.getLoopCardinality())) {
                         propertiesNode.put(PROPERTY_MULTIINSTANCE_CARDINALITY, loopDef.getLoopCardinality());
                     }
@@ -321,9 +318,11 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
                     MultiInstanceLoopCharacteristics multiInstanceObject = new MultiInstanceLoopCharacteristics();
                     if ("sequential".equalsIgnoreCase(multiInstanceType)) {
-                        multiInstanceObject.setSequential(true);
+                        multiInstanceObject.setSequential("true");
+                    } if ("parallel".equalsIgnoreCase(multiInstanceType)) {
+                        multiInstanceObject.setSequential("false");
                     } else {
-                        multiInstanceObject.setSequential(false);
+                        multiInstanceObject.setSequential(multiInstanceType);
                     }
                     multiInstanceObject.setLoopCardinality(multiInstanceCardinality);
                     multiInstanceObject.setInputDataItem(multiInstanceCollection);

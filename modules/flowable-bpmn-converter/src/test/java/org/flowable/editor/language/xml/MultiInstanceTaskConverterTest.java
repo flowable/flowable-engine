@@ -91,7 +91,7 @@ public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
 
         SubProcess subProcess = (SubProcess) flowElement;
         loopCharacteristics = subProcess.getLoopCharacteristics();
-        assertTrue(loopCharacteristics.isSequential());
+        assertEquals("true", loopCharacteristics.getSequential());
         assertEquals("10", loopCharacteristics.getLoopCardinality());
         assertEquals(5, subProcess.getFlowElements().size());
 
@@ -103,7 +103,7 @@ public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
 
         task = (UserTask) flowElement;
         loopCharacteristics = task.getLoopCharacteristics();
-        assertTrue(loopCharacteristics.isSequential());
+        assertEquals("true", loopCharacteristics.getSequential());
         assertEquals("participant", loopCharacteristics.getElementVariable());
         assertEquals("${participants}", loopCharacteristics.getInputDataItem());
         assertEquals("${numActiveTasks == \"2\"}", loopCharacteristics.getCompletionCondition());
