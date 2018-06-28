@@ -1848,15 +1848,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
         assertEquals(0, subTask2Executions.size());
 
-        //Move the other two executions
+        //Move the other two executions, one by one
         ChangeActivityStateBuilder changeActivityStateBuilder = runtimeService.createChangeActivityStateBuilder();
         subTask1Executions.forEach(e -> changeActivityStateBuilder.moveExecutionToActivityId(e.getId(), "subTask2"));
         changeActivityStateBuilder.changeState();
-
-        //This one doesn't work properly as only one of the parallel task gets moved, the other remain "task-less"
-        //        runtimeService.createChangeActivityStateBuilder()
-        //            .moveExecutionsToSingleActivityId(subTask1Executions.stream().map(Execution::getId).collect(Collectors.toList()), "subTask2")
-        //            .changeState();
 
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
         assertEquals(5, executionsCount);
@@ -2405,6 +2400,57 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().active().singleResult();
         assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses2.bpmn20.xml")
+    public void testSetCurrentMultiInstanceNestedSubProcessParentActivityWithinSubProcess2() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("rootProcess").start();
+
+        //Start the nested subProcesses by completing the first task of the outer subProcess
+        List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("shellTask1").list();
+        assertEquals(1, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        //Complete some of the Nested tasks
+        List<Execution> nestedSubTasks = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTasks.get(0).getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTasks.get(3).getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTasks.get(6).getId()).singleResult().getId());
+
+        List<Execution> nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(3, nestedSubTask2Executions.size());
+
+        //Complete one of the nested subProcesses
+        Task task = taskService.createTaskQuery().executionId(nestedSubTask2Executions.get(0).getId()).singleResult();
+        taskService.complete(task.getId());
+
+        nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(2, nestedSubTask2Executions.size());
+
+        //Move the activity nested multiInstance parent
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("parallelNestedSubProcess", "subTask2")
+            .changeState();
+
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(3, subTask2Executions.size());
+
+        //Complete the outer subProcesses
+        tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+
+        task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("shellLastTask", task.getTaskDefinitionKey());
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());

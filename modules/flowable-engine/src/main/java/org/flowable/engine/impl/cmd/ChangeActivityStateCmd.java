@@ -18,6 +18,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.FlowElementsContainer;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -75,17 +79,20 @@ public class ChangeActivityStateCmd implements Command<Void> {
                     if (!activityExecutions.isEmpty()) {
                         ExecutionEntity execution = activityExecutions.get(0);
 
-                        //Is this activity inside a multiInstance subProcess?
-                        ExecutionEntity parent = execution.getParent();
-                        while (parent != null) {
-                            if (parent.isMultiInstanceRoot()) {
+                        //Check if the activity is inside a multiInstance subProcess
+                        boolean insideMultiInstance = false;
+                        FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
+                        while (!(parentContainer instanceof Process)) {
+                            MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentContainer).getLoopCharacteristics();
+                            if (loopCharacteristics != null && !loopCharacteristics.isSequential()) {
+
+                                insideMultiInstance = true;
                                 break;
                             }
-                            parent = parent.getParent();
+                            parentContainer = ((Activity) parentContainer).getParentContainer();
                         }
-
                         //If inside a multiInstance, we create one container for each execution
-                        if (parent != null) {
+                        if (insideMultiInstance) {
                             Stream<ExecutionEntity> executionsStream = activityExecutions.stream();
                             //If the source activity is already a multiInstance, we need to move only the parents (filter)
                             if (execution.isMultiInstanceRoot()) {
@@ -110,7 +117,7 @@ public class ChangeActivityStateCmd implements Command<Void> {
         return null;
     }
 
-    private MoveExecutionEntityContainer createMoveExecutionContainer(MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions) {
+    protected static MoveExecutionEntityContainer createMoveExecutionContainer(MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions) {
         MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds());
 
         if (activityContainer.isMoveToParentProcess()) {
