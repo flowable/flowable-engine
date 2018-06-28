@@ -20,4 +20,10 @@ public class BoundaryErrorParentException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
+    public BoundaryErrorParentException() {
+    }
+
+    public BoundaryErrorParentException(Throwable cause) {
+        super(cause);
+    }
 }
