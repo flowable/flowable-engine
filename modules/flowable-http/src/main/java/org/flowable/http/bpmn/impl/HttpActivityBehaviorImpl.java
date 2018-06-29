@@ -77,6 +77,8 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
     protected Expression requestHeaders;
     // HttpRequest body expression (Optional)
     protected Expression requestBody;
+    // HttpRequest body encoding expression, for example UTF-8 (Optional)
+    protected Expression requestBodyEncoding;
     // Timeout in seconds for the body (Optional)
     protected Expression requestTimeout;
     // HttpRequest retry disable HTTP redirects (Optional)
@@ -148,6 +150,7 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
             request.setUrl(getStringFromField(requestUrl, execution));
             request.setHeaders(getStringFromField(requestHeaders, execution));
             request.setBody(getStringFromField(requestBody, execution));
+            request.setBodyEncoding(getStringFromField(requestBodyEncoding, execution));
             request.setTimeout(getIntFromField(requestTimeout, execution));
             request.setNoRedirects(getBooleanFromField(disallowRedirects, execution));
             request.setIgnoreErrors(getBooleanFromField(ignoreException, execution));
