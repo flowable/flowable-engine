@@ -21,10 +21,6 @@
         <tomcat.version>7.0.53</tomcat.version>
     </properties>
 
-    <prerequisites>
-        <maven>3.0.0</maven>
-    </prerequisites>
-
     <modules>
         <module>flowable-ui-admin-logic</module>
         <module>flowable-ui-admin-rest</module>
