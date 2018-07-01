@@ -28,7 +28,9 @@ public interface DynamicStateManager {
     ExecutionEntity resolveActiveExecution(String executionId, CommandContext commandContext);
     
     ExecutionEntity resolveActiveExecution(String processInstanceId, String activityId, CommandContext commandContext);
-    
+
+    List<ExecutionEntity> resolveActiveExecutions(String processInstanceId, String activityId, CommandContext commandContext);
+
     void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, 
                     Map<String, Map<String, Object>> localVariables, CommandContext commandContext);
 
