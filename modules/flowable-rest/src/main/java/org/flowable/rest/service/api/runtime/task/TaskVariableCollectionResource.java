@@ -13,15 +13,14 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
@@ -39,13 +38,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -212,10 +214,8 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             Map<String, Object> rawVariables = runtimeService.getVariables(task.getExecutionId());
             List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), RestResponseFactory.VARIABLE_TASK, RestVariableScope.GLOBAL);
 
-            // Overlay global variables over local ones. In case they are
-            // present the values are not overridden,
-            // since local variables get precedence over global ones at all
-            // times.
+            // Overlay global variables over local ones. In case they are present the values are not overridden,
+            // since local variables get precedence over global ones at all times.
             for (RestVariable var : globalVariables) {
                 if (!variableMap.containsKey(var.getName())) {
                     variableMap.put(var.getName(), var);

@@ -13,6 +13,21 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.runtime.EventSubscriptionQuery;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,19 +36,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import org.flowable.common.rest.api.DataResponse;
-import org.flowable.common.rest.api.RequestUtil;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.runtime.EventSubscriptionQuery;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -47,6 +49,9 @@ public class EventSubscriptionCollectionResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of event subscriptions", tags = { "Event subscriptions" }, nickname = "listEventSubscriptions")
     @ApiImplicitParams({
@@ -99,6 +104,10 @@ public class EventSubscriptionCollectionResource {
         }
         if (allRequestParams.containsKey("tenantId")) {
             query.tenantId(allRequestParams.get("tenantId"));
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessEventSubscriptionInfoWithQuery(query);
         }
 
         return new EventSubscriptionPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", EventSubscriptionQueryProperties.PROPERTIES);

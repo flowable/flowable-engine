@@ -27,6 +27,7 @@ import org.flowable.engine.IdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.api.UserQueryProperty;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,6 +69,9 @@ public class UserCollectionResource {
 
     @Autowired
     protected IdentityService identityService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List users", nickname = "listUsers", tags = { "Users" })
     @ApiImplicitParams({
@@ -125,6 +129,10 @@ public class UserCollectionResource {
         if (allRequestParams.containsKey("tenantId")) {
             query.tenantId(allRequestParams.get("tenantId"));
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessUserInfoWithQuery(query);
+        }
 
         return new UserPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
     }
@@ -139,6 +147,10 @@ public class UserCollectionResource {
     public UserResponse createUser(@RequestBody UserRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
         if (userRequest.getId() == null) {
             throw new FlowableIllegalArgumentException("Id cannot be null.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createUser(userRequest);
         }
 
         // Check if a user with the given ID already exists so we return a CONFLICT

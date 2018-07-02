@@ -92,6 +92,11 @@ public class UserResource extends BaseUserResource {
     @DeleteMapping("/identity/users/{userId}")
     public void deleteUser(@ApiParam(name = "userId") @PathVariable String userId, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteUser(user);
+        }
+        
         identityService.deleteUser(user.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

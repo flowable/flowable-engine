@@ -55,6 +55,8 @@ public class TaskVariableBaseResource extends TaskBaseResource {
     }
 
     public RestVariable getVariableFromRequest(String taskId, String variableName, String scope, boolean includeBinary) {
+        Task task = getTaskFromRequest(taskId);
+        
         boolean variableFound = false;
         Object value = null;
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
@@ -66,7 +68,6 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 variableFound = true;
             } else {
                 // Revert to execution-variable when not present local on the task
-                Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
                 if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                     value = runtimeService.getVariable(task.getScopeId(), variableName);
                     variableScope = RestVariableScope.GLOBAL;
@@ -75,7 +76,6 @@ public class TaskVariableBaseResource extends TaskBaseResource {
             }
 
         } else if (variableScope == RestVariableScope.GLOBAL) {
-            Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
             if (ScopeTypes.CMMN.equals(task.getScopeType()) && task.getScopeId() != null && runtimeService.hasVariable(task.getScopeId(), variableName)) {
                 value = runtimeService.getVariable(task.getScopeId(), variableName);
                 variableFound = true;

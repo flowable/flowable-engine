@@ -17,10 +17,6 @@
 		<!-- Web container version -->		<tomcat.version>7.0.53</tomcat.version>
   </properties>
 
-	<prerequisites>
-		<maven>3.0.0</maven>
-	</prerequisites>
-	
 	<modules>
 		<module>flowable-ui-modeler-logic</module>
 		<module>flowable-ui-modeler-rest</module>
