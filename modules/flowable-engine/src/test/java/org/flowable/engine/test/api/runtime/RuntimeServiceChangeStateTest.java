@@ -14,10 +14,13 @@
 package org.flowable.engine.test.api.runtime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -2400,6 +2403,160 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().active().singleResult();
         assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivitiesUsingParallelGatewayNestedInMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayInsideMultiInstanceSubProcess");
+
+        long totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> preForkTaskExecutions = runtimeService.createExecutionQuery().activityId("preForkTask").list();
+        assertEquals(3, preForkTaskExecutions.size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        assertEquals("preForkTask", tasks.get(0).getTaskDefinitionKey());
+
+        //Move a task before the fork within the multiInstance subProcess
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveSingleActivityIdToActivityIds("preForkTask", Arrays.asList("forkTask1", "forkTask2"))
+            .changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(10, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> forkTask1Executions = runtimeService.createExecutionQuery().activityId("forkTask1").list();
+        assertEquals(3, forkTask1Executions.size());
+        List<Execution> forkTask2Executions = runtimeService.createExecutionQuery().activityId("forkTask2").list();
+        assertEquals(3, forkTask2Executions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(6, tasks.size());
+        Map<String, List<Task>> taskGroups = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, taskGroups.keySet().size());
+        assertEquals(new HashSet(Arrays.asList("forkTask1", "forkTask2")), taskGroups.keySet());
+        assertEquals(3, taskGroups.get("forkTask1").size());
+        assertEquals(3, taskGroups.get("forkTask2").size());
+
+        //Move the parallel gateway task forward
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdsToSingleActivityId(Arrays.asList("forkTask1", "forkTask2"), "postForkTask")
+            .changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
+        assertEquals(3, postForkTaskExecutions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Complete one of the tasks
+        taskService.complete(tasks.get(1).getId());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(5, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(2, parallelSubProcessCount);
+        postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
+        assertEquals(2, postForkTaskExecutions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Finish the rest since we cannot move out of a multiInstance subProcess
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, totalChildExecutions);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml" })
+    public void testSetCurrentExecutionsUsingParallelGatewayNestedInMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayInsideMultiInstanceSubProcess");
+
+        long totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> preForkTaskExecutions = runtimeService.createExecutionQuery().activityId("preForkTask").list();
+        assertEquals(3, preForkTaskExecutions.size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        assertEquals("preForkTask", tasks.get(0).getTaskDefinitionKey());
+
+        //Move a task before the fork within the multiInstance subProcess
+        preForkTaskExecutions.forEach(e -> runtimeService.createChangeActivityStateBuilder()
+            .moveSingleExecutionToActivityIds(e.getId(), Arrays.asList("forkTask1", "forkTask2"))
+            .changeState());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(10, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> forkTask1Executions = runtimeService.createExecutionQuery().activityId("forkTask1").list();
+        assertEquals(3, forkTask1Executions.size());
+        List<Execution> forkTask2Executions = runtimeService.createExecutionQuery().activityId("forkTask2").list();
+        assertEquals(3, forkTask2Executions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(6, tasks.size());
+        Map<String, List<Task>> taskGroups = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, taskGroups.keySet().size());
+        assertEquals(new HashSet(Arrays.asList("forkTask1", "forkTask2")), taskGroups.keySet());
+        assertEquals(3, taskGroups.get("forkTask1").size());
+        assertEquals(3, taskGroups.get("forkTask2").size());
+
+        //Move the parallel gateway task forward
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(Stream.concat(forkTask1Executions.stream().map(Execution::getId), forkTask2Executions.stream().map(Execution::getId)).collect(Collectors.toList()), "postForkTask")
+            .changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
+        assertEquals(3, postForkTaskExecutions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Complete one of the tasks
+        taskService.complete(tasks.get(1).getId());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(5, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(2, parallelSubProcessCount);
+        postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
+        assertEquals(2, postForkTaskExecutions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Finish the rest since we cannot move out of a multiInstance subProcess
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, totalChildExecutions);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
