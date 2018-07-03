@@ -43,14 +43,6 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine-common</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-idm-engine</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-idm-engine-configurator</artifactId>
-		</dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

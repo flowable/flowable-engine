@@ -15,13 +15,16 @@ package org.flowable.form.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
@@ -31,6 +34,9 @@ import org.flowable.form.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -54,6 +60,17 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
     protected volatile boolean running = false;
     protected List<String> enginesBuild = new ArrayList<>();
     protected final Object lifeCycleMonitor = new Object();
+
+    protected boolean disableIdmEngine;
+
+    public boolean isDisableIdmEngine() {
+        return disableIdmEngine;
+    }
+
+    public FormEngineConfiguration setDisableIdmEngine(boolean disableIdmEngine) {
+        this.disableIdmEngine = disableIdmEngine;
+        return this;
+    }
 
     public SpringFormEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -113,6 +130,20 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
             DataSource proxiedDataSource = new TransactionAwareDataSourceProxy(dataSource);
             return (FormEngineConfiguration) super.setDataSource(proxiedDataSource);
         }
+    }
+
+    @Override
+    protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
+        if (!disableIdmEngine) {
+            List<EngineConfigurator> specificConfigurators = new ArrayList<>();
+            if (idmEngineConfigurator != null) {
+                specificConfigurators.add(idmEngineConfigurator);
+            } else {
+                specificConfigurators.add(new IdmEngineConfigurator());
+            }
+            return specificConfigurators;
+        }
+        return Collections.emptyList();
     }
 
     @Override

@@ -12,6 +12,7 @@
  */
 package org.flowable.form.rest.conf.engine;
 
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
@@ -19,6 +20,7 @@ import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.spring.FormEngineFactoryBean;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -96,7 +98,8 @@ public class EngineConfiguration {
 
     @Bean
     public IdmIdentityService idmIdentityService() {
-        return formEngine().getFormEngineConfiguration().getIdmIdentityService();
+        return ((IdmEngineConfigurationApi) formEngine().getFormEngineConfiguration().getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
 }
