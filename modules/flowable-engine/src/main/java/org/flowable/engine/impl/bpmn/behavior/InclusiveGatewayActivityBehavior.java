@@ -66,30 +66,36 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
 
         Collection<ExecutionEntity> allExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(execution.getProcessInstanceId());
         Iterator<ExecutionEntity> executionIterator = allExecutions.iterator();
-        boolean oneExecutionCanReachGateway = false;
-        while (!oneExecutionCanReachGateway && executionIterator.hasNext()) {
+        boolean oneExecutionCanReachGatewayInstance = false;
+        while (!oneExecutionCanReachGatewayInstance && executionIterator.hasNext()) {
             ExecutionEntity executionEntity = executionIterator.next();
             if (!executionEntity.getActivityId().equals(execution.getCurrentActivityId())) {
-                boolean canReachGateway = ExecutionGraphUtil.isReachable(execution.getProcessDefinitionId(), executionEntity.getActivityId(), execution.getCurrentActivityId());
-                if (canReachGateway) {
-                    oneExecutionCanReachGateway = true;
+                if (ExecutionGraphUtil.isReachable(execution.getProcessDefinitionId(), executionEntity.getActivityId(), execution.getCurrentActivityId())) {
+                    //Now check if they are in the same "execution path"
+                                        if (executionEntity.getParentId().equals(execution.getParentId())) {
+                    oneExecutionCanReachGatewayInstance = true;
+                    break;
+                                        }
                 }
-            } else if (executionEntity.getActivityId().equals(execution.getCurrentActivityId()) && executionEntity.isActive()) {
+//                            } else if (executionEntity.getActivityId().equals(execution.getCurrentActivityId()) && executionEntity.isActive()) {
+            } else if (executionEntity.getId().equals(execution.getId()) && executionEntity.isActive()) {
                 // Special case: the execution has reached the inc gw, but the operation hasn't been executed yet for that execution
-                oneExecutionCanReachGateway = true;
+                oneExecutionCanReachGatewayInstance = true;
+                break;
             }
         }
 
         // If no execution can reach the gateway, the gateway activates and executes fork behavior
-        if (!oneExecutionCanReachGateway) {
+        if (!oneExecutionCanReachGatewayInstance) {
 
             LOGGER.debug("Inclusive gateway cannot be reached by any execution and is activated");
 
             // Kill all executions here (except the incoming)
             Collection<ExecutionEntity> executionsInGateway = executionEntityManager
-                    .findInactiveExecutionsByActivityIdAndProcessInstanceId(execution.getCurrentActivityId(), execution.getProcessInstanceId());
+                .findInactiveExecutionsByActivityIdAndProcessInstanceId(execution.getCurrentActivityId(), execution.getProcessInstanceId());
             for (ExecutionEntity executionEntityInGateway : executionsInGateway) {
-                if (!executionEntityInGateway.getId().equals(execution.getId())) {
+//                if (!executionEntityInGateway.getId().equals(execution.getId())) {
+                                    if (!executionEntityInGateway.getId().equals(execution.getId()) && executionEntityInGateway.getParentId().equals(execution.getParentId())) {
                     CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(executionEntityInGateway, null);
                     executionEntityManager.deleteExecutionAndRelatedData(executionEntityInGateway, null);
                 }

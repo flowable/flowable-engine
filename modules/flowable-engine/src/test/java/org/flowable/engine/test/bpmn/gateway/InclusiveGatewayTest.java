@@ -657,8 +657,9 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertTrue(classifiedTasks.containsKey("taskInclusive3"));
         assertEquals(3, classifiedTasks.get("taskInclusive3").size());
 
-        //Finish one of the activities
-        taskService.complete(classifiedTasks.get("taskInclusive3").get(0).getId());
+        //Finish a couple of tasks
+        taskService.complete(classifiedTasks.get("taskInclusive2").get(0).getId());
+        taskService.complete(classifiedTasks.get("taskInclusive3").get(1).getId());
 
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(13, childExecutions.size());
@@ -668,22 +669,25 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertNotNull(classifiedExecutions.get("taskInclusive1"));
         assertEquals(3, classifiedExecutions.get("taskInclusive1").size());
         assertNotNull(classifiedExecutions.get("taskInclusive2"));
-        assertEquals(3, classifiedExecutions.get("taskInclusive2").size());
-        assertNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive3").size());
         assertNotNull(classifiedExecutions.get("inclusiveJoin"));
-        assertEquals(3, classifiedExecutions.get("inclusiveJoin").size());
+        assertEquals(2, classifiedExecutions.get("inclusiveJoin").size());
 
-        //6x pending User Tasks
+        //7x pending User Tasks
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
-        assertEquals(6, classifiedTasks.size());
+        assertEquals(3, classifiedTasks.size());
         assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(3, classifiedTasks.get("taskInclusive1").size());
         assertTrue(classifiedTasks.containsKey("taskInclusive2"));
-        assertFalse(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(2, classifiedTasks.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(2, classifiedTasks.get("taskInclusive3").size());
 
         //Finish the rest of the tasks
-        Stream.concat(classifiedTasks.get("taskInclusive1").stream(), classifiedTasks.get("taskInclusive2").stream())
-            .forEach(task -> taskService.complete(task.getId()));
+        classifiedTasks.values().stream().flatMap(List::stream).forEach(task -> taskService.complete(task.getId()));
 
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(7, childExecutions.size());
