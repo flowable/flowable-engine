@@ -159,13 +159,12 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 MultiInstanceLoopCharacteristics loopDef = activity.getLoopCharacteristics();
                 if (StringUtils.isNotEmpty(loopDef.getLoopCardinality()) || StringUtils.isNotEmpty(loopDef.getInputDataItem()) || StringUtils.isNotEmpty(loopDef.getCompletionCondition())) {
 
-                    if (StringUtils.isNotEmpty(loopDef.getSequential())) {
-                        if (loopDef.getSequential().startsWith("${") || loopDef.getSequential().startsWith("#{")) {
-                            propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE_EXPRESSION, loopDef.getSequential());
-                        } else {
-                            propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE, loopDef.getSequential());
-                        }
+                    if (!loopDef.isSequential()) {
+                        propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE, "Parallel");
+                    } else {
+                        propertiesNode.put(PROPERTY_MULTIINSTANCE_TYPE, "Sequential");
                     }
+
                     if (StringUtils.isNotEmpty(loopDef.getLoopCardinality())) {
                         propertiesNode.put(PROPERTY_MULTIINSTANCE_CARDINALITY, loopDef.getLoopCardinality());
                     }
@@ -311,8 +310,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 activity.setAsynchronous(getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, elementNode));
                 activity.setNotExclusive(!getPropertyValueAsBoolean(PROPERTY_EXCLUSIVE, elementNode));
 
-                String multiInstanceTypeExpression = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_TYPE_EXPRESSION, elementNode);
-                String multiInstanceType = StringUtils.isNotEmpty(multiInstanceTypeExpression) ? multiInstanceTypeExpression : getPropertyValueAsString(PROPERTY_MULTIINSTANCE_TYPE, elementNode);
+                String multiInstanceType = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_TYPE, elementNode);
                 String multiInstanceCardinality = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_CARDINALITY, elementNode);
                 String multiInstanceCollection = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_COLLECTION, elementNode);
                 String multiInstanceCondition = getPropertyValueAsString(PROPERTY_MULTIINSTANCE_CONDITION, elementNode);
@@ -323,11 +321,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
                     MultiInstanceLoopCharacteristics multiInstanceObject = new MultiInstanceLoopCharacteristics();
                     if ("sequential".equalsIgnoreCase(multiInstanceType)) {
-                        multiInstanceObject.setSequential("true");
-                    } if ("parallel".equalsIgnoreCase(multiInstanceType)) {
-                        multiInstanceObject.setSequential("false");
+                        multiInstanceObject.setSequential(true);
                     } else {
-                        multiInstanceObject.setSequential(multiInstanceType);
+                        multiInstanceObject.setSequential(false);
                     }
                     multiInstanceObject.setLoopCardinality(multiInstanceCardinality);
                     multiInstanceObject.setInputDataItem(multiInstanceCollection);

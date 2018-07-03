@@ -140,7 +140,7 @@ public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest
         assertTrue(flowElement instanceof SubProcess);
         assertEquals("subprocess1", flowElement.getId());
         SubProcess subProcess = (SubProcess) flowElement;
-        assertEquals("true", subProcess.getLoopCharacteristics().getSequential());
+        assertTrue(subProcess.getLoopCharacteristics().isSequential());
         assertEquals("10", subProcess.getLoopCharacteristics().getLoopCardinality());
         assertEquals("${assignee == \"\"}", subProcess.getLoopCharacteristics().getCompletionCondition());
         assertEquals(5, subProcess.getFlowElements().size());

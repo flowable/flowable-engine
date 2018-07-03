@@ -22,7 +22,6 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -36,7 +35,9 @@ import org.flowable.engine.runtime.Execution;
 public class AddMultiInstanceExecutionCmd implements Command<Execution>, Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    
+    protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
+    
     protected String activityId;
     protected String parentExecutionId;
     protected Map<String, Object> executionVariables;
@@ -66,13 +67,23 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
         
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(miExecution.getProcessDefinitionId());
         Activity miActivityElement = (Activity) bpmnModel.getFlowElement(miExecution.getActivityId());
-
+        MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = miActivityElement.getLoopCharacteristics();
+        
+        Integer currentNumberOfInstances = (Integer) miExecution.getVariable(NUMBER_OF_INSTANCES);
+        miExecution.setVariableLocal(NUMBER_OF_INSTANCES, currentNumberOfInstances + 1);
+        
         if (executionVariables != null) {
             childExecution.setVariablesLocal(executionVariables);
         }
-
-        ((MultiInstanceActivityBehavior) miActivityElement.getBehavior()).configureAddedExecutions(miExecution, childExecution);
-
+        
+        if (!multiInstanceLoopCharacteristics.isSequential()) {
+            miExecution.setActive(true);
+            miExecution.setScope(false);
+            
+            childExecution.setCurrentFlowElement(miActivityElement);
+            CommandContextUtil.getAgenda().planContinueMultiInstanceOperation(childExecution, miExecution, currentNumberOfInstances);
+        }
+        
         return childExecution;
     }
     

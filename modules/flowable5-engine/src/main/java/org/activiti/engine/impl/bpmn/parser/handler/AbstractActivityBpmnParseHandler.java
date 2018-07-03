@@ -50,7 +50,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
             throw new ActivitiException("Activity " + modelActivity.getId() + " needed for multi instance cannot bv found");
         }
 
-        if (Boolean.valueOf(loopCharacteristics.getSequential())) {
+        if (loopCharacteristics.isSequential()) {
             miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(
                     activity, (AbstractBpmnActivityBehavior) activity.getActivityBehavior());
         } else {
@@ -60,7 +60,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
 
         // ActivityImpl settings
         activity.setScope(true);
-        activity.setProperty("multiInstance", Boolean.valueOf(loopCharacteristics.getSequential()) ? "sequential" : "parallel");
+        activity.setProperty("multiInstance", loopCharacteristics.isSequential() ? "sequential" : "parallel");
         activity.setActivityBehavior(miActivityBehavior);
 
         ExpressionManager expressionManager = bpmnParse.getExpressionManager();

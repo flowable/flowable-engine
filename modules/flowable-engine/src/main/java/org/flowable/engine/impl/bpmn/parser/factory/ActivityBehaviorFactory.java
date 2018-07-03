@@ -70,7 +70,6 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivity
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.MailActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
-import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
@@ -166,7 +165,9 @@ public interface ActivityBehaviorFactory {
 
     public abstract EventBasedGatewayActivityBehavior createEventBasedGatewayActivityBehavior(EventGateway eventGateway);
 
-    public abstract MultiInstanceActivityBehavior createMultiInstanceActivityBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior);
+    public abstract SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior);
+
+    public abstract ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior);
 
     public abstract SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess);
 

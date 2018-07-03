@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.bpmn.model.Activity;
-import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -23,7 +22,6 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
  * @author Joram Barrez
@@ -96,17 +94,11 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
             super.leave(execution);
         } else {
-            continueMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);
+            continueSequentialMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);
         }
     }
-
-    @Override
-    public int getLoopCounterValue(ExecutionEntity execution) {
-        return getLoopVariable(execution, getCollectionElementIndexVariable());
-    }
-
-    @Override
-    public void continueMultiInstance(DelegateExecution execution, int loopCounter, ExecutionEntity multiInstanceRootExecution) {
+    
+    public void continueSequentialMultiInstance(DelegateExecution execution, int loopCounter, ExecutionEntity multiInstanceRootExecution) {
         try {
             
             if (execution.getCurrentFlowElement() instanceof SubProcess) {
@@ -128,11 +120,4 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
             throw new FlowableException("Could not execute inner activity behavior of multi instance behavior", e);
         }
     }
-
-    @Override
-    public void configureAddedExecutions(ExecutionEntity miExecution, ExecutionEntity childExecution) {
-        Integer currentNumberOfInstances = (Integer) miExecution.getVariable(NUMBER_OF_INSTANCES);
-        miExecution.setVariableLocal(NUMBER_OF_INSTANCES, currentNumberOfInstances + 1);
-    }
-
 }

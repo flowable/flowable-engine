@@ -4583,7 +4583,7 @@ To make an activity multi-instance, the activity XML element must have a +multiI
 
 [source,xml,linenums]
 ----
-<multiInstanceLoopCharacteristics isSequential="false|true|${expression}">
+<multiInstanceLoopCharacteristics isSequential="false|true">
  ...
 </multiInstanceLoopCharacteristics>
 ----
@@ -4594,7 +4594,7 @@ The number of instances are *calculated once when entering the activity*. There 
 
 [source,xml,linenums]
 ----
-<multiInstanceLoopCharacteristics isSequential="false|true|${expression}">
+<multiInstanceLoopCharacteristics isSequential="false|true">
   <loopCardinality>5</loopCardinality>
 </multiInstanceLoopCharacteristics>
 ----
@@ -4603,7 +4603,7 @@ Expressions that resolve to a positive number are also allowed:
 
 [source,xml,linenums]
 ----
-<multiInstanceLoopCharacteristics isSequential="false|true|${expression}">
+<multiInstanceLoopCharacteristics isSequential="false|true">
   <loopCardinality>${nrOfOrders-nrOfCancellations}</loopCardinality>
 </multiInstanceLoopCharacteristics>
 ----

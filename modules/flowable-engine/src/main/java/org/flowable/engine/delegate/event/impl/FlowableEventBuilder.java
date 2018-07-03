@@ -253,12 +253,6 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
 
-        initializeEventFromFlowNode(flowElement, newEvent);
-
-        return newEvent;
-    }
-
-    protected static void initializeEventFromFlowNode(FlowElement flowElement, FlowableMultiInstanceActivityEventImpl newEvent) {
         if (flowElement instanceof FlowNode) {
             FlowNode flowNode = (FlowNode) flowElement;
             newEvent.setActivityType(parseActivityType(flowNode));
@@ -266,10 +260,11 @@ public class FlowableEventBuilder {
             if (behaviour != null) {
                 newEvent.setBehaviorClass(behaviour.getClass().getCanonicalName());
             }
-            if (flowElement instanceof Activity && ((Activity) flowElement).hasMultiInstanceLoopCharacteristics()) {
-                newEvent.setSequential(((Activity) flowElement).getLoopCharacteristics().getSequential());
-            }
+
+            newEvent.setSequential(((Activity) flowNode).getLoopCharacteristics().isSequential());
         }
+
+        return newEvent;
     }
 
     public static FlowableMultiInstanceActivityCompletedEvent createMultiInstanceActivityCompletedEvent(FlowableEngineEventType type, int numberOfInstances,
@@ -286,7 +281,16 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
 
-        initializeEventFromFlowNode(flowElement, newEvent);
+        if (flowElement instanceof FlowNode) {
+            FlowNode flowNode = (FlowNode) flowElement;
+            newEvent.setActivityType(parseActivityType(flowNode));
+            Object behaviour = flowNode.getBehavior();
+            if (behaviour != null) {
+                newEvent.setBehaviorClass(behaviour.getClass().getCanonicalName());
+            }
+
+            newEvent.setSequential(((Activity) flowNode).getLoopCharacteristics().isSequential());
+        }
 
         return newEvent;
     }

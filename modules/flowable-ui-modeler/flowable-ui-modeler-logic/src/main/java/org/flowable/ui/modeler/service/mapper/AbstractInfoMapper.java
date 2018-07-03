@@ -49,7 +49,7 @@ public abstract class AbstractInfoMapper implements InfoMapper {
                 if (activity.getLoopCharacteristics() != null) {
                     MultiInstanceLoopCharacteristics multiInstanceDef = activity.getLoopCharacteristics();
                     createPropertyNode("Multi-instance activity", "");
-                    createPropertyNode("Sequential", multiInstanceDef.getSequential());
+                    createPropertyNode("Sequential", multiInstanceDef.isSequential());
 
                     if (StringUtils.isNotEmpty(multiInstanceDef.getInputDataItem())) {
                         createPropertyNode("Collection", multiInstanceDef.getInputDataItem());

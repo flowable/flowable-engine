@@ -309,7 +309,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(2, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfInstances());
         assertEquals(1, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfActiveInstances());
         assertEquals(1, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfCompletedInstances());
-        assertEquals("false", ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).isSequential());
+        assertEquals(false, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).isSequential());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
@@ -429,7 +429,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(2, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfInstances());
         assertEquals(0, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfActiveInstances());
         assertEquals(2, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfCompletedInstances());
-        assertEquals("false", ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).isSequential());
+        assertEquals(false, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).isSequential());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
@@ -1124,7 +1124,6 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED, activityEvent.getType());
         assertEquals("usertask1", activityEvent.getActivityId());
-        assertEquals("true", ((FlowableMultiInstanceActivityCompletedEvent) activityEvent).isSequential());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
