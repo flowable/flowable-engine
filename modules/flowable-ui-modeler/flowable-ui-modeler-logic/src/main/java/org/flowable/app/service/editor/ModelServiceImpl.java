@@ -241,7 +241,7 @@ public class ModelServiceImpl implements ModelService {
                 throw new InternalServerErrorException("Error creating app definition");
             }
 
-        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_CMMN).equals(model.getModelType())) {
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_CMMN).equals(modelRepresentation.getModelType())) {
             ObjectNode editorNode = objectMapper.createObjectNode();
             editorNode.put("id", "canvas");
             editorNode.put("resourceId", "canvas");
