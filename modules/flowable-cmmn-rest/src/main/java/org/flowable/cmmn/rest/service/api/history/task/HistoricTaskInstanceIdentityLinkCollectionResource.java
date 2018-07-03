@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +39,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricTaskInstanceIdentityLinkCollectionResource {
+public class HistoricTaskInstanceIdentityLinkCollectionResource extends HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -52,7 +53,9 @@ public class HistoricTaskInstanceIdentityLinkCollectionResource {
             @ApiResponse(code = 404, message = "Indicates the task instance could not be found.") })
     @GetMapping(value = "/cmmn-history/historic-task-instances/{taskId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getTaskIdentityLinks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        
+        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
 
         if (identityLinks != null) {
             return restResponseFactory.createHistoricIdentityLinkResponseList(identityLinks);

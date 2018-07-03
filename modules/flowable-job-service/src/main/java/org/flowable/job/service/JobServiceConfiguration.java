@@ -126,6 +126,14 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     
     protected Map<String, HistoryJobHandler> historyJobHandlers;
     protected List<HistoryJobProcessor> historyJobProcessors;
+    
+    protected String jobTypeAsyncHistory;
+    protected String jobTypeAsyncHistoryZipped;
+    
+    protected boolean asyncHistoryJsonGzipCompressionEnabled;
+    protected boolean asyncHistoryJsonGroupingEnabled;
+    protected boolean asyncHistoryExecutorMessageQueueMode;
+    protected int asyncHistoryJsonGroupingThreshold = 10;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -589,6 +597,54 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public InternalJobParentStateResolver getJobParentStateResolver() {
         return jobParentStateResolver;
+    }
+    
+    public String getJobTypeAsyncHistory() {
+        return jobTypeAsyncHistory;
+    }
+
+    public void setJobTypeAsyncHistory(String jobTypeAsyncHistory) {
+        this.jobTypeAsyncHistory = jobTypeAsyncHistory;
+    }
+
+    public String getJobTypeAsyncHistoryZipped() {
+        return jobTypeAsyncHistoryZipped;
+    }
+
+    public void setJobTypeAsyncHistoryZipped(String jobTypeAsyncHistoryZipped) {
+        this.jobTypeAsyncHistoryZipped = jobTypeAsyncHistoryZipped;
+    }
+
+    public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
+        return asyncHistoryJsonGzipCompressionEnabled;
+    }
+
+    public void setAsyncHistoryJsonGzipCompressionEnabled(boolean asyncHistoryJsonGzipCompressionEnabled) {
+        this.asyncHistoryJsonGzipCompressionEnabled = asyncHistoryJsonGzipCompressionEnabled;
+    }
+
+    public boolean isAsyncHistoryJsonGroupingEnabled() {
+        return asyncHistoryJsonGroupingEnabled;
+    }
+
+    public void setAsyncHistoryJsonGroupingEnabled(boolean asyncHistoryJsonGroupingEnabled) {
+        this.asyncHistoryJsonGroupingEnabled = asyncHistoryJsonGroupingEnabled;
+    }
+
+    public boolean isAsyncHistoryExecutorMessageQueueMode() {
+        return asyncHistoryExecutorMessageQueueMode;
+    }
+
+    public void setAsyncHistoryExecutorMessageQueueMode(boolean asyncHistoryExecutorMessageQueueMode) {
+        this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
+    }
+
+    public int getAsyncHistoryJsonGroupingThreshold() {
+        return asyncHistoryJsonGroupingThreshold;
+    }
+
+    public void setAsyncHistoryJsonGroupingThreshold(int asyncHistoryJsonGroupingThreshold) {
+        this.asyncHistoryJsonGroupingThreshold = asyncHistoryJsonGroupingThreshold;
     }
     
 }

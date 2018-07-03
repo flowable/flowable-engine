@@ -13,14 +13,16 @@
 
 package org.flowable.rest.service.api.repository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipInputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -31,6 +33,7 @@ import org.flowable.engine.impl.DeploymentQueryProperty;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.repository.DeploymentQuery;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,14 +44,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.ZipInputStream;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -74,6 +77,9 @@ public class DeploymentCollectionResource {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List Deployments", tags = { "Deployment" }, nickname="listDeployments")
     @ApiImplicitParams({
@@ -126,6 +132,10 @@ public class DeploymentCollectionResource {
                 deploymentQuery.deploymentWithoutTenantId();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
+        }
 
         return new DeploymentsPaginateList(restResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
@@ -150,6 +160,10 @@ public class DeploymentCollectionResource {
 
         if (!(request instanceof MultipartHttpServletRequest)) {
             throw new FlowableIllegalArgumentException("Multipart request is required");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
         }
 
         String queryString = request.getQueryString();

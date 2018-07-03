@@ -40,6 +40,9 @@ import org.apache.http.util.EntityUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.engine.delegate.BpmnError;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.http.delegate.HttpRequestHandler;
 import org.flowable.http.delegate.HttpResponseHandler;
 import org.slf4j.Logger;
@@ -205,6 +208,11 @@ public class HttpActivityExecutor {
                 httpRequestHandler.handleHttpRequest(execution, requestInfo, client);
             }
         } catch (Exception e) {
+            if (e instanceof BpmnError) {
+                ErrorPropagation.propagateError(((BpmnError) e), ((DelegateExecution) execution));
+                return null;
+            }
+
             throw new FlowableException("Exception while invoking HttpRequestHandler: " + e.getMessage(), e);
         }
 
@@ -218,14 +226,22 @@ public class HttpActivityExecutor {
                 case "POST": {
                     HttpPost post = new HttpPost(uri.toString());
                     if (requestInfo.getBody() != null) {
-                        post.setEntity(new StringEntity(requestInfo.getBody()));
+                        if (StringUtils.isNotEmpty(requestInfo.getBodyEncoding())) {
+                            post.setEntity(new StringEntity(requestInfo.getBody(), requestInfo.getBodyEncoding()));
+                        } else {
+                            post.setEntity(new StringEntity(requestInfo.getBody()));
+                        }
                     }
                     request = post;
                     break;
                 }
                 case "PUT": {
                     HttpPut put = new HttpPut(uri.toString());
-                    put.setEntity(new StringEntity(requestInfo.getBody()));
+                    if (StringUtils.isNotEmpty(requestInfo.getBodyEncoding())) {
+                        put.setEntity(new StringEntity(requestInfo.getBody(), requestInfo.getBodyEncoding()));
+                    } else {
+                        put.setEntity(new StringEntity(requestInfo.getBody()));
+                    }
                     request = put;
                     break;
                 }
@@ -274,6 +290,11 @@ public class HttpActivityExecutor {
                     httpResponseHandler.handleHttpResponse(execution, responseInfo);
                 }
             } catch (Exception e) {
+                if (e instanceof BpmnError) {
+                    ErrorPropagation.propagateError(((BpmnError) e), ((DelegateExecution) execution));
+                    return null;
+                }
+
                 throw new FlowableException("Exception while invoking HttpResponseHandler: " + e.getMessage(), e);
             }
 

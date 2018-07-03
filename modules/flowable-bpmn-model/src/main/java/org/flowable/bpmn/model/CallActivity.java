@@ -21,6 +21,7 @@ import java.util.List;
 public class CallActivity extends Activity {
 
     protected String calledElement;
+    protected String calledElementType;
     protected boolean inheritVariables;
     protected boolean sameDeployment;
     protected List<IOParameter> inParameters = new ArrayList<>();
@@ -112,6 +113,7 @@ public class CallActivity extends Activity {
     public void setValues(CallActivity otherElement) {
         super.setValues(otherElement);
         setCalledElement(otherElement.getCalledElement());
+        setCalledElementType(otherElement.getCalledElementType());
         setBusinessKey(otherElement.getBusinessKey());
         setInheritBusinessKey(otherElement.isInheritBusinessKey());
         setInheritVariables(otherElement.isInheritVariables());
@@ -132,4 +134,13 @@ public class CallActivity extends Activity {
             }
         }
     }
+
+    public void setCalledElementType(String calledElementType) {
+        this.calledElementType = calledElementType;
+    }
+
+    public String getCalledElementType() {
+        return calledElementType;
+    }
+
 }

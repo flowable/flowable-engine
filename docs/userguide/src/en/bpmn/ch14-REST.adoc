@@ -4223,7 +4223,7 @@ GET runtime/tasks/{taskId}/attachments/{attachmentId}
 
 
 *  ++externalUrl - contentUrl:++In case the attachment is a link to an external resource, the +externalUrl+ contains the URL to the external content. If the attachment content is present in the Flowable engine, the +contentUrl+ will contain an URL where the binary content can be streamed from.
-*  ++type:++Can be any arbitrary value. When a valid formatted media-type (e.g. application/xml, text/plain) is included, the binary content HTTP response content-type will be set the the given value.
+*  ++type:++Can be any arbitrary value. When a valid formatted media-type (e.g. application/xml, text/plain) is included, the binary content HTTP response content-type will be set the given value.
 
 .Get an attachment on a task - Response codes
 [options="header"]

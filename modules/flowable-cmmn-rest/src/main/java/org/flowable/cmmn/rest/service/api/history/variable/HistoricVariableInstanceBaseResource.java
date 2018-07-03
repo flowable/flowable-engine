@@ -17,14 +17,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryProperty;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -44,6 +51,9 @@ public class HistoricVariableInstanceBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<HistoricVariableInstanceResponse> getQueryResponse(HistoricVariableInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -79,8 +89,25 @@ public class HistoricVariableInstanceBaseResource {
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryVariableInfoWithQuery(query);
+        }
 
         return new HistoricVariableInstancePaginateList(restResponseFactory).paginateList(allRequestParams, query, "variableName", allowedSortProperties);
+    }
+    
+    public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId, HttpServletRequest request) {
+        HistoricVariableInstance varObject = historyService.createHistoricVariableInstanceQuery().id(varInstanceId).singleResult();
+
+        if (varObject == null) {
+            throw new FlowableObjectNotFoundException("Historic variable instance '" + varInstanceId + "' couldn't be found.", VariableInstanceEntity.class);
+        } else {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.accessHistoryVariableInfoById(varObject);
+            }
+            return restResponseFactory.createRestVariable(varObject.getVariableName(), varObject.getValue(), null, varInstanceId, CmmnRestResponseFactory.VARIABLE_HISTORY_VARINSTANCE, includeBinary);
+        }
     }
 
     protected void addVariables(HistoricVariableInstanceQuery variableInstanceQuery, List<QueryVariable> variables) {

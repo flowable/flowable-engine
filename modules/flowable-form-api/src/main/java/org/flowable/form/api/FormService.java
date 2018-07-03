@@ -87,5 +87,8 @@ public interface FormService {
     FormInstanceInfo getFormInstanceModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
             String taskId, String processInstanceId, Map<String, Object> variables, String tenantId);
 
+    FormInstanceInfo getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(String formDefinitionKey, String parentDeploymentId,
+        String scopeId, String scopeType, String tenantId);
+
     FormInstanceQuery createFormInstanceQuery();
 }

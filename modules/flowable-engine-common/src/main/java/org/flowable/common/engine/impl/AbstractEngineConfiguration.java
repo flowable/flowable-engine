@@ -611,16 +611,20 @@ public abstract class AbstractEngineConfiguration {
     protected abstract void initDbSqlSessionFactoryEntitySettings();
 
     protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder) {
-        for (Class<? extends Entity> clazz : insertOrder) {
-            dbSqlSessionFactory.getInsertionOrder().add(clazz);
-
-            if (isBulkInsertEnabled) {
-                dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
+        if (insertOrder != null) {
+            for (Class<? extends Entity> clazz : insertOrder) {
+                dbSqlSessionFactory.getInsertionOrder().add(clazz);
+    
+                if (isBulkInsertEnabled) {
+                    dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
+                }
             }
         }
 
-        for (Class<? extends Entity> clazz : deleteOrder) {
-            dbSqlSessionFactory.getDeletionOrder().add(clazz);
+        if (deleteOrder != null) {
+            for (Class<? extends Entity> clazz : deleteOrder) {
+                dbSqlSessionFactory.getDeletionOrder().add(clazz);
+            }
         }
     }
 

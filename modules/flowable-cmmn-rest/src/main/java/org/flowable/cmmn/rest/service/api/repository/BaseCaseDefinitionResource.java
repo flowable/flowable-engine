@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.repository;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class BaseCaseDefinitionResource {
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     /**
      * Returns the {@link CaseDefinition} that is requested. Throws the right exceptions when bad request was made or definition is not found.
@@ -39,6 +43,11 @@ public class BaseCaseDefinitionResource {
         if (caseDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a case definition with id '" + caseDefinitionId + "'.", CaseDefinition.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseDefinitionById(caseDefinition);
+        }
+        
         return caseDefinition;
     }
 }

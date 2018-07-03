@@ -50,7 +50,7 @@ public class SpringSecurityAuthenticationContext implements AuthenticationContex
             SecurityContextHolder.getContext().setAuthentication((Authentication) principal);
         } else {
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principal, null));
-            LOGGER.warn("Setting a principal that is not of type `org.springframework.security.core.Authentication`."
+            LOGGER.debug("Setting a principal that is not of type `org.springframework.security.core.Authentication`."
                     + " When using Spring Security you can just set the user through 'SecurityContextHolder.getContext().setAuthentication(..)'"
                     + " Using 'org.springframework.security.authentication.UsernamePasswordAuthenticationToken' to wrap the principal of type '{}'",
                 principal.getClass());

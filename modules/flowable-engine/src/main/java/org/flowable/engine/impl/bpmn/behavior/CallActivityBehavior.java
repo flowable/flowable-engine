@@ -55,34 +55,33 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
     private static final long serialVersionUID = 1L;
 
-    protected String processDefinitonKey;
-    protected Expression processDefinitionExpression;
+    public static final String CALLED_ELEMENT_TYPE_KEY = "key";
+    public static final String CALLED_ELEMENT_TYPE_ID = "id";
+
+    protected String calledElement;
+    protected String calledElementType;
+    protected Expression calledElementExpression;
     protected List<MapExceptionEntry> mapExceptions;
 
-    public CallActivityBehavior(String processDefinitionKey, List<MapExceptionEntry> mapExceptions) {
-        this.processDefinitonKey = processDefinitionKey;
+    public CallActivityBehavior(String processDefinitionKey, String calledElementType, List<MapExceptionEntry> mapExceptions) {
+        this.calledElement = processDefinitionKey;
+        this.calledElementType = calledElementType;
         this.mapExceptions = mapExceptions;
     }
 
-    public CallActivityBehavior(Expression processDefinitionExpression, List<MapExceptionEntry> mapExceptions) {
-        this.processDefinitionExpression = processDefinitionExpression;
+    public CallActivityBehavior(Expression processDefinitionExpression, String calledElementType, List<MapExceptionEntry> mapExceptions) {
+        this.calledElementExpression = processDefinitionExpression;
+        this.calledElementType = calledElementType;
         this.mapExceptions = mapExceptions;
     }
 
     @Override
     public void execute(DelegateExecution execution) {
 
-        String finalProcessDefinitonKey = null;
-        if (processDefinitionExpression != null) {
-            finalProcessDefinitonKey = (String) processDefinitionExpression.getValue(execution);
-        } else {
-            finalProcessDefinitonKey = processDefinitonKey;
-        }
-
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
 
-        ProcessDefinition processDefinition = findProcessDefinition(finalProcessDefinitonKey, execution.getProcessDefinitionId(), execution.getTenantId(), callActivity.isSameDeployment());
+        ProcessDefinition processDefinition = getProcessDefinition(execution, callActivity);
 
         // Get model from cache
         Process subProcess = ProcessDefinitionUtil.getProcess(processDefinition.getId());
@@ -177,6 +176,20 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
         }
     }
+    private ProcessDefinition getProcessDefinition(DelegateExecution execution, CallActivity callActivity) {
+        ProcessDefinition processDefinition;
+        switch (StringUtils.isNotEmpty(calledElementType) ? calledElementType : CALLED_ELEMENT_TYPE_KEY) {
+            case CALLED_ELEMENT_TYPE_ID:
+                processDefinition = getProcessDefinitionById(execution);
+                break;
+            case CALLED_ELEMENT_TYPE_KEY:
+                processDefinition = getProcessDefinitionByKey(execution, callActivity.isSameDeployment());
+                break;
+            default:
+                throw new FlowableException("Unrecognized calledElementType [" + calledElementType + "]");
+        }
+        return processDefinition;
+    }
 
     @Override
     public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
@@ -211,8 +224,27 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         leave(execution);
     }
 
+    protected ProcessDefinition getProcessDefinitionById(DelegateExecution execution) {
+        return CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager()
+            .findDeployedProcessDefinitionById(getCalledElementValue(execution));
+    }
+
+    protected ProcessDefinition getProcessDefinitionByKey(DelegateExecution execution, boolean isSameDeployment) {
+        return findProcessDefinitionByKey(getCalledElementValue(execution), execution.getProcessDefinitionId(), execution.getTenantId(), isSameDeployment);
+    }
+
+    protected String getCalledElementValue(DelegateExecution execution) {
+        String calledElementValue;
+        if (calledElementExpression != null) {
+            calledElementValue = (String) calledElementExpression.getValue(execution);
+        } else {
+            calledElementValue = calledElement;
+        }
+        return calledElementValue;
+    }
+
     // Allow subclass to determine which version of a process to start.
-    protected ProcessDefinition findProcessDefinition(String processDefinitionKey, String processDefinitionId, String tenantId, boolean sameDeployment) {
+    protected ProcessDefinition findProcessDefinitionByKey(String processDefinitionKey, String processDefinitionId, String tenantId, boolean sameDeployment) {
         if (sameDeployment) {
             String deploymentId = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId).getDeploymentId();
             ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
@@ -252,11 +284,11 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         subProcessInstance.setVariables(variables);
     }
 
-    public void setProcessDefinitonKey(String processDefinitonKey) {
-        this.processDefinitonKey = processDefinitonKey;
+    public void setCalledElement(String calledElement) {
+        this.calledElement = calledElement;
     }
 
-    public String getProcessDefinitonKey() {
-        return processDefinitonKey;
+    public String getCalledElement() {
+        return calledElement;
     }
 }

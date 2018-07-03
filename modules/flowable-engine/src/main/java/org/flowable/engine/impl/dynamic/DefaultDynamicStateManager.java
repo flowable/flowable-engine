@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -93,9 +95,27 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             throw new FlowableException("Flowable 5 process definitions are not supported");
         }
         
-        ExecutionEntity execution = getActiveExecution(activityId, processExecution, commandContext);
-        
-        return execution;
+        return getActiveExecution(activityId, processExecution, commandContext);
+    }
+
+    @Override
+    public List<ExecutionEntity> resolveActiveExecutions(String processInstanceId, String activityId, CommandContext commandContext) {
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ExecutionEntity processExecution = executionEntityManager.findById(processInstanceId);
+
+        if (processExecution == null) {
+            throw new FlowableException("Execution could not be found with id " + processInstanceId);
+        }
+
+        if (!processExecution.isProcessInstanceType()) {
+            throw new FlowableException("Execution is not a process instance type execution for id " + processInstanceId);
+        }
+
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processExecution.getProcessDefinitionId())) {
+            throw new FlowableException("Flowable 5 process definitions are not supported");
+        }
+
+        return getActiveExecutions(activityId, processExecution, commandContext);
     }
     
     @Override
@@ -222,9 +242,11 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 ExecutionEntity continueParentExecution = deleteParentExecutions(execution.getParentId(), moveToFlowElements, commandContext);
                 moveExecutionContainer.addContinueParentExecution(execution.getId(), continueParentExecution);
             }
-    
+
+            String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
             for (ExecutionEntity execution : currentExecutions) {
-                executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + printFlowElementIds(moveToFlowElements));
+                executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
+                executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine);
             }
             
             List<ExecutionEntity> newChildExecutions = createEmbeddedSubProcessExecutions(moveToFlowElements, currentExecutions, moveExecutionContainer, commandContext);
@@ -354,23 +376,36 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
     }
     
     protected ExecutionEntity getActiveExecution(String activityId, ExecutionEntity processExecution, CommandContext commandContext) {
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        
-        ExecutionEntity activeExecutionEntity = null;
-        List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processExecution.getId());
-        for (ExecutionEntity childExecution : childExecutions) {
-            if (childExecution.getCurrentActivityId().equals(activityId)) {
-                activeExecutionEntity = childExecution;
-            }
-        }
 
-        if (activeExecutionEntity == null) {
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processExecution.getId());
+
+        //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since it may not be guaranteed in the query result
+        Optional<ExecutionEntity> firstExecution = childExecutions.stream()
+            .filter(e -> e.getCurrentActivityId().equals(activityId))
+            .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
+            .findFirst();
+
+        return firstExecution.orElseThrow(() -> new FlowableException("Active execution could not be found with activity id " + activityId));
+    }
+
+    protected List<ExecutionEntity> getActiveExecutions(String activityId, ExecutionEntity processExecution, CommandContext commandContext) {
+
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processExecution.getId());
+
+        //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since it may not be guaranteed in the query result
+        List<ExecutionEntity> executions = childExecutions.stream()
+            .filter(e -> e.getCurrentActivityId().equals(activityId))
+            .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
+            .collect(Collectors.toList());
+
+        if (executions.isEmpty()) {
             throw new FlowableException("Active execution could not be found with activity id " + activityId);
         }
-        
-        return activeExecutionEntity;
+        return executions;
     }
-    
+
     protected ExecutionEntity deleteParentExecutions(String parentExecutionId, Collection<FlowElement> moveToFlowElements, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         
@@ -586,14 +621,8 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
     }
 
     protected String printFlowElementIds(Collection<FlowElement> flowElements) {
-        StringBuilder elementBuilder = new StringBuilder();
-        for (FlowElement flowElement : flowElements) {
-            if (elementBuilder.length() > 0) {
-                elementBuilder.append(", ");
-            }
-            
-            elementBuilder.append(flowElement.getId());
-        }
-        return elementBuilder.toString();
+        return flowElements.stream()
+            .map(FlowElement::getId)
+            .collect(Collectors.joining(","));
     }
 }

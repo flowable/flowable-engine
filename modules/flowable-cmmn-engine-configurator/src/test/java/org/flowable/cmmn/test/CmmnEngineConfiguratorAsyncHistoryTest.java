@@ -16,9 +16,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngines;
+import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -70,6 +73,7 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
         assertEquals(4, processEngineAsyncExecutor.getJobServiceConfiguration().getHistoryJobHandlers().size());
         
         // Deploy and start test processes/cases
+        // Trigger one plan item instance to start the process
         processEngine.getRepositoryService().createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
         cmmnEngine.getCmmnRepositoryService().createDeployment().addClasspathResource("org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessNonBlocking.cmmn").deploy();
         cmmnEngine.getCmmnRuntimeService().createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -78,8 +82,31 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
         // As async history is enabled, there should be  no historical entries yet, but there should be history jobs
         assertEquals(0, cmmnEngine.getCmmnHistoryService().createHistoricCaseInstanceQuery().count());
         assertEquals(0, processEngine.getHistoryService().createHistoricProcessInstanceQuery().count());
-        assertEquals(2, cmmnEngine.getCmmnManagementService().createHistoryJobQuery().count());
-        assertEquals(2, processEngine.getManagementService().createHistoryJobQuery().count());
+        
+        // 3 history jobs expected:
+        // - one for the case instance start
+        // - one for the plan item instance trigger
+        // - one for the process instance start
+        assertEquals(3, cmmnEngine.getCmmnManagementService().createHistoryJobQuery().count());
+        assertEquals(3, processEngine.getManagementService().createHistoryJobQuery().count());
+        
+        // Expected 2 jobs originating from the cmmn engine and 1 for the process engine
+        int cmmnHistoryJobs = 0;
+        int bpmnHistoryJobs = 0;
+        for (HistoryJob historyJob : cmmnEngine.getCmmnManagementService().createHistoryJobQuery().list()) {
+            if (historyJob.getJobHandlerType().equals(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
+                    || historyJob.getJobHandlerType().equals(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {
+                cmmnHistoryJobs++;
+            } else if (historyJob.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
+                    || historyJob.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {
+                bpmnHistoryJobs++;
+            }
+            
+            // Execution scope should be all (see the CmmnEngineConfigurator)
+            assertEquals(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL, historyJob.getScopeType());
+        }
+        assertEquals(bpmnHistoryJobs, 1);
+        assertEquals(cmmnHistoryJobs, 2);
         
         // Starting the async history executor should process all of these
         CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngine.getCmmnEngineConfiguration(), 10000L, 200L, true);

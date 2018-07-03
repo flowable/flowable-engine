@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,18 +12,16 @@
  */
 package org.flowable.examples.bpmn.scripttask;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import groovy.lang.MissingPropertyException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import groovy.lang.MissingPropertyException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -85,6 +83,40 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         } catch (FlowableException e) {
             assertTextPresent("No script provided", e.getMessage());
         }
+    }
+
+    @Deployment
+    public void testErrorInScript() {
+        try {
+            runtimeService.startProcessInstanceByKey("testErrorInScript");
+        } catch (FlowableException e) {
+            assertTextPresent("Error in Script", e.getMessage());
+        }
+    }
+
+    @Deployment
+    public void testNoErrorInScript() {
+        boolean noError = true;
+        try {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("scriptVar", "1212");
+            runtimeService.startProcessInstanceByKey("testNoErrorInScript", variables);
+        } catch (FlowableException e) {
+            noError = false;
+        }
+        assertTrue(noError);
+    }
+
+    @Deployment
+    public void testSetScriptResultToProcessVariableWithoutFormat() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("echo", "hello");
+        variables.put("existingProcessVariableName", "one");
+
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("setScriptResultToProcessVariable", variables);
+
+        assertEquals("hello", runtimeService.getVariable(pi.getId(), "existingProcessVariableName"));
+        assertEquals(pi.getId(), runtimeService.getVariable(pi.getId(), "newProcessVariableName"));
     }
 
     @Deployment

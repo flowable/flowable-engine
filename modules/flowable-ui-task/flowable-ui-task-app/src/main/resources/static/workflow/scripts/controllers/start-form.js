@@ -31,6 +31,9 @@ angular.module('flowableApp')
     });
         
     $scope.getProcessInstance = function(processInstanceId) {
+        if (processInstanceId === undefined || processInstanceId === '') {
+            return;
+        }
         $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + processInstanceId}).
             success(function(response, status, headers, config) {
                 $scope.model.processInstance = response;

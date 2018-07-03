@@ -56,6 +56,10 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
             propertiesNode.put(PROPERTY_CALLACTIVITY_CALLEDELEMENT, callActivity.getCalledElement());
         }
 
+        if (StringUtils.isNotEmpty(callActivity.getCalledElementType())) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_CALLEDELEMENTTYPE, callActivity.getCalledElementType());
+        }
+
         if (callActivity.isInheritVariables()) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_INHERIT_VARIABLES, callActivity.isInheritVariables());
         }
@@ -117,6 +121,10 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
         CallActivity callActivity = new CallActivity();
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENT, elementNode))) {
             callActivity.setCalledElement(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENT, elementNode));
+        }
+
+        if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENTTYPE, elementNode))) {
+            callActivity.setCalledElementType(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENTTYPE, elementNode));
         }
 
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_INHERIT_VARIABLES, elementNode)) {

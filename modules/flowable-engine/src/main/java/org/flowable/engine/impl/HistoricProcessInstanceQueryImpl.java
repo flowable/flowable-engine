@@ -25,6 +25,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -684,6 +685,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
+        }
+        
         return CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstanceCountByQueryCriteria(this);
     }
 
@@ -692,16 +699,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         checkQueryOk();
         ensureVariablesInitialized();
         List<HistoricProcessInstance> results = null;
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
+        }
+        
         if (includeProcessVariables) {
             results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
         } else {
             results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesByQueryCriteria(this);
         }
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
+        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization()) {
             for (HistoricProcessInstance processInstance : results) {
                 localize(processInstance, commandContext);
             }
+        }
+        
+        if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().afterHistoricProcessInstanceQueryExecute(this, results);
         }
 
         return results;

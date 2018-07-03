@@ -4,6 +4,9 @@ Flowable (V6)
 [Maven Central:  
     ![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine)
 
+[Docker Images:  
+    ![Docker Hub](https://images.microbadger.com/badges/version/flowable/flowable-rest.svg)](https://hub.docker.com/u/flowable/)
+
 [Travis CI:  
 	![build status badge](https://travis-ci.org/flowable/flowable-engine.svg?branch=master)](https://travis-ci.org/flowable/flowable-engine)
 
