@@ -12,14 +12,17 @@
  */
 package org.flowable.form.engine;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseConnection;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
@@ -68,17 +71,17 @@ import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDef
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDeploymentDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormInstanceDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormResourceDataManager;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseConnection;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class FormEngineConfiguration extends AbstractEngineConfiguration
         implements FormEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
@@ -133,6 +136,17 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     protected int formDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache;
+
+    protected boolean disableIdmEngine;
+
+    public boolean isDisableIdmEngine() {
+        return disableIdmEngine;
+    }
+
+    public FormEngineConfiguration setDisableIdmEngine(boolean disableIdmEngine) {
+        this.disableIdmEngine = disableIdmEngine;
+        return this;
+    }
 
     public static FormEngineConfiguration createFormEngineConfigurationFromResourceDefault() {
         return createFormEngineConfigurationFromResource("flowable.form.cfg.xml", "formEngineConfiguration");
@@ -445,6 +459,20 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     // //////////////////////////////////////////////////////
 
     @Override
+    protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
+        if (!disableIdmEngine) {
+            List<EngineConfigurator> specificConfigurators = new ArrayList<>();
+            if (idmEngineConfigurator != null) {
+                specificConfigurators.add(idmEngineConfigurator);
+            } else {
+                specificConfigurators.add(new IdmEngineConfigurator());
+            }
+            return specificConfigurators;
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
     public String getEngineName() {
         return formEngineName;
     }
@@ -490,6 +518,10 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     public FormEngineConfiguration getFormEngineConfiguration() {
         return this;
+    }
+
+    public IdmIdentityService getIdmIdentityService() {
+        return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
     public FormDefinitionDeployer getFormDeployer() {
