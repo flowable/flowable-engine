@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="Examples">
+  
+  <process id="miUserTask">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask" />
+    
+    <userTask id="userTask" name="userTask">
+      <multiInstanceLoopCharacteristics isSequential="{SEQUENTIAL}">
+        <loopCardinality>5</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    
+    <sequenceFlow id="flow3" sourceRef="userTask" targetRef="waitState" />
+    <receiveTask id="waitState" />
+    
+    <sequenceFlow id="flow4" sourceRef="waitState" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

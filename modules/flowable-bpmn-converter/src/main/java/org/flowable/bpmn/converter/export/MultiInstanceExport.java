@@ -38,7 +38,7 @@ public class MultiInstanceExport implements BpmnXMLConstants {
                     || StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition()) || StringUtils.isNotEmpty(multiInstanceObject.getCollectionString())) {
 
                 xtw.writeStartElement(ELEMENT_MULTIINSTANCE);
-                BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL, String.valueOf(multiInstanceObject.isSequential()).toLowerCase(), xtw);
+                BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL, multiInstanceObject.getSequential(), xtw);
                 // if a custom handler is not specified, then use the attribute
                 if (handler == null && StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem())) {
                     BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION, multiInstanceObject.getInputDataItem(), xtw);

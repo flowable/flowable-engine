@@ -125,6 +125,7 @@ public interface StencilConstants {
     final String PROPERTY_EXCLUSIVE = "exclusivedefinition";
 
     final String PROPERTY_MULTIINSTANCE_TYPE = "multiinstance_type";
+    final String PROPERTY_MULTIINSTANCE_TYPE_EXPRESSION = "multiinstance_type_expression";
     final String PROPERTY_MULTIINSTANCE_CARDINALITY = "multiinstance_cardinality";
     final String PROPERTY_MULTIINSTANCE_COLLECTION = "multiinstance_collection";
     final String PROPERTY_MULTIINSTANCE_VARIABLE = "multiinstance_variable";

@@ -670,8 +670,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 Activity activity = (Activity) flowNode;
                 MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = activity.getLoopCharacteristics();
                 if (multiInstanceLoopCharacteristics != null) {
-                    multiInstanceSequential = multiInstanceLoopCharacteristics.isSequential();
-                    multiInstanceParallel = !multiInstanceSequential;
+                    multiInstanceSequential = "true".equals(multiInstanceLoopCharacteristics.getSequential());
+                    multiInstanceParallel = "false".equals(multiInstanceLoopCharacteristics.getSequential());;
                 }
             }
 
@@ -684,6 +684,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
             }
 
             if (scaleFactor == 1.0) {
+                // todo: what to do in the case of multi instance sequential expression?
                 // Actually draw the markers
                 processDiagramCanvas.drawActivityMarkers((int) graphicInfo.getX(), (int) graphicInfo.getY(), (int) graphicInfo.getWidth(), (int) graphicInfo.getHeight(),
                         multiInstanceSequential, multiInstanceParallel, collapsed);

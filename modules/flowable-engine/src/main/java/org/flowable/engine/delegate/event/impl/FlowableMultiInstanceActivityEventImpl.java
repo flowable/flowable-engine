@@ -22,19 +22,19 @@ import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityEvent;
  */
 
 public class FlowableMultiInstanceActivityEventImpl extends FlowableActivityEventImpl implements FlowableMultiInstanceActivityEvent{
-    protected boolean sequential;
+    protected String sequential;
 
     public FlowableMultiInstanceActivityEventImpl(FlowableEngineEventType type) {
         super(type);
     }
 
-    public void setSequential(boolean sequential) {
+    public void setSequential(String sequential) {
         this.sequential = sequential;
     }
 
     @Override
-    public boolean isSequential() {
-        return false;
+    public String isSequential() {
+        return sequential;
     }
 
 }

@@ -70,31 +70,24 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
         ExecutionEntity miExecution = getMultiInstanceRootExecution(execution);
         executionEntityManager.deleteChildExecutions(execution, "Delete MI execution", false);
         executionEntityManager.deleteExecutionAndRelatedData(execution, "Delete MI execution");
-        
-        int loopCounter = 0;
-        if (multiInstanceLoopCharacteristics.isSequential()) {
-            SequentialMultiInstanceBehavior miBehavior = (SequentialMultiInstanceBehavior) miActivityElement.getBehavior();
-            loopCounter = miBehavior.getLoopVariable(execution, miBehavior.getCollectionElementIndexVariable());
-        }
-        
+
+        int loopCounter = ((MultiInstanceActivityBehavior) miActivityElement.getBehavior()).getLoopCounterValue(execution);
+
         if (executionIsCompleted) {
             Integer numberOfCompletedInstances = (Integer) miExecution.getVariable(NUMBER_OF_COMPLETED_INSTANCES);
             miExecution.setVariableLocal(NUMBER_OF_COMPLETED_INSTANCES, numberOfCompletedInstances + 1);
             loopCounter++;
-            
+
         } else {
             Integer currentNumberOfInstances = (Integer) miExecution.getVariable(NUMBER_OF_INSTANCES);
             miExecution.setVariableLocal(NUMBER_OF_INSTANCES, currentNumberOfInstances - 1);
         }
-        
+
         ExecutionEntity childExecution = executionEntityManager.createChildExecution(miExecution);
         childExecution.setCurrentFlowElement(miExecution.getCurrentFlowElement());
-        
-        if (multiInstanceLoopCharacteristics.isSequential()) {
-            SequentialMultiInstanceBehavior miBehavior = (SequentialMultiInstanceBehavior) miActivityElement.getBehavior();
-            miBehavior.continueSequentialMultiInstance(childExecution, loopCounter, childExecution);
-        }
-        
+
+        ((MultiInstanceActivityBehavior) miActivityElement.getBehavior()).continueMultiInstance(childExecution, loopCounter, childExecution);
+
         return null;
     }
     

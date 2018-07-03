@@ -1049,7 +1049,7 @@
 					<xsd:element ref="complexBehaviorDefinition" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element name="completionCondition" type="tExpression" minOccurs="0" maxOccurs="1"/>
 				</xsd:sequence>
-				<xsd:attribute name="isSequential" type="xsd:boolean" default="false"/>
+				<xsd:attribute name="isSequential" type="xsd:string" default="false"/>
 				<xsd:attribute name="behavior" type="tMultiInstanceFlowCondition" default="All"/>
 				<xsd:attribute name="oneBehaviorEventRef" type="xsd:QName" use="optional"/>
 				<xsd:attribute name="noneBehaviorEventRef" type="xsd:QName" use="optional"/>

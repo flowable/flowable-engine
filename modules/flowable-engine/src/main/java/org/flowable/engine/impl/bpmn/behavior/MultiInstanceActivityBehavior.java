@@ -93,6 +93,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected CollectionHandler collectionHandler;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
+    // expression to detect whether multiinstance Activity is sequential. Accepted expression values are 'Parallel', 'Sequential' or boolean flag to detect
+    // whether execution is sequential
+    protected Expression sequential;
 
     /**
      * @param activity
@@ -558,7 +561,27 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         this.innerActivityBehavior.setMultiInstanceActivityBehavior(this);
     }
 
+    public Expression getSequential() {
+        return sequential;
+    }
+
+    public void setSequential(Expression sequential) {
+        this.sequential = sequential;
+    }
+
     public AbstractBpmnActivityBehavior getInnerActivityBehavior() {
         return innerActivityBehavior;
     }
+
+    /**
+     * get value of the counter in the case when we want to delete multiinstance execution
+     *
+     * @param execution
+     * @return
+     */
+    public abstract int getLoopCounterValue(ExecutionEntity execution);
+
+    public abstract void continueMultiInstance(DelegateExecution execution, int loopCounter, ExecutionEntity multiInstanceRootExecution);
+
+    public abstract void configureAddedExecutions(ExecutionEntity miExecution, ExecutionEntity childExecution);
 }

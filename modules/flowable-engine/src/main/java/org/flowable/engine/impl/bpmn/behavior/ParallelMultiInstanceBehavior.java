@@ -19,6 +19,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
@@ -32,6 +33,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
  * @author Joram Barrez
@@ -178,6 +180,29 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             sendCompletedEvent(execution);
             super.leave(execution);
         }
+    }
+
+    @Override
+    public int getLoopCounterValue(ExecutionEntity execution) {
+        // loop counter value in parallel execution is always 0
+        return 0;
+    }
+
+    @Override
+    public void continueMultiInstance(DelegateExecution execution, int loopCounter, ExecutionEntity multiInstanceRootExecution) {
+        // no need to do anything in the parallel case execution will continue in the case when all parallel multiinstance executions are finished
+    }
+
+    @Override
+    public void configureAddedExecutions(ExecutionEntity miExecution, ExecutionEntity childExecution) {
+        Integer currentNumberOfInstances = (Integer) miExecution.getVariable(NUMBER_OF_INSTANCES);
+        miExecution.setVariableLocal(NUMBER_OF_INSTANCES, currentNumberOfInstances + 1);
+
+        miExecution.setActive(true);
+        miExecution.setScope(false);
+
+        childExecution.setCurrentFlowElement(miExecution.getCurrentFlowElement());
+        CommandContextUtil.getAgenda().planContinueMultiInstanceOperation(childExecution, miExecution, currentNumberOfInstances);
     }
 
     protected Activity verifyCompensation(DelegateExecution execution, ExecutionEntity executionToUse, Activity activity) {
