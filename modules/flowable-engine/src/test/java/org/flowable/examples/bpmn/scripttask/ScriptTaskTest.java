@@ -88,6 +88,15 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
     }
 
     @Deployment
+    public void testErrorInScript() {
+        try {
+            runtimeService.startProcessInstanceByKey("testErrorInScript");
+        } catch (FlowableException e) {
+            assertTextPresent("Error in Script", e.getMessage());
+        }
+    }
+
+    @Deployment
     public void testDynamicScript() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testDynamicScript", CollectionUtil.map("a", 20, "b", 22));
         assertEquals(42, ((Number) runtimeService.getVariable(processInstance.getId(), "test")).intValue());
