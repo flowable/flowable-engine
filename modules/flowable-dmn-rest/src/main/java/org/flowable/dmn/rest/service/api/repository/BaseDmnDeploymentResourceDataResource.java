@@ -23,7 +23,9 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,6 +38,9 @@ public class BaseDmnDeploymentResourceDataResource {
 
     @Autowired
     protected DmnRepositoryService dmnRepositoryService;
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     protected byte[] getDmnDeploymentResourceData(String deploymentId, String resourceName, HttpServletResponse response) {
 
@@ -47,9 +52,15 @@ public class BaseDmnDeploymentResourceDataResource {
         }
 
         // Check if deployment exists
-        DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+        DmnDeploymentQuery deploymentQuery = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId);
+        
+        DmnDeployment deployment = deploymentQuery.singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a DMN deployment with id '" + deploymentId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
         }
 
         List<String> resourceList = dmnRepositoryService.getDeploymentResourceNames(deploymentId);

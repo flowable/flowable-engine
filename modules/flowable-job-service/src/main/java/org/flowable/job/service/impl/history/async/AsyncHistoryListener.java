@@ -14,12 +14,13 @@ package org.flowable.job.service.impl.history.async;
 
 import java.util.List;
 
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public interface AsyncHistoryListener {
 
-    List<HistoryJobEntity> historyDataGenerated(List<ObjectNode> historyObjectNodes);
+    List<HistoryJobEntity> historyDataGenerated(JobServiceConfiguration jobServiceConfiguration, List<ObjectNode> historyObjectNodes);
 
 }

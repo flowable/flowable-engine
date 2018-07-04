@@ -29,6 +29,7 @@ import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.DeploymentQueryProperty;
 import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,6 +70,9 @@ public class DmnDeploymentCollectionResource {
 
     @Autowired
     protected DmnRepositoryService dmnRepositoryService;
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of decision table deployments", tags = { "Deployment" }, nickname = "listDecisionTableDeployments")
     @ApiImplicitParams({
@@ -121,6 +125,10 @@ public class DmnDeploymentCollectionResource {
                 deploymentQuery.deploymentWithoutTenantId();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
+        }
 
         return new DmnDeploymentsPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
@@ -141,6 +149,10 @@ public class DmnDeploymentCollectionResource {
 
         if (!(request instanceof MultipartHttpServletRequest)) {
             throw new FlowableIllegalArgumentException("Multipart request is required");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
         }
 
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;

@@ -16,9 +16,7 @@ package org.flowable.rest.service.api.management;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.engine.ManagementService;
 import org.flowable.job.api.Job;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,10 +34,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
-public class JobExceptionStacktraceResource {
-
-    @Autowired
-    protected ManagementService managementService;
+public class JobExceptionStacktraceResource extends JobBaseResource {
 
     @ApiOperation(value = "Get the exception stacktrace for a job", tags = { "Jobs" })
     @ApiResponses(value = {
@@ -48,10 +43,7 @@ public class JobExceptionStacktraceResource {
     })
     @GetMapping("/management/jobs/{jobId}/exception-stacktrace")
     public String getJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
-        Job job = managementService.createJobQuery().jobId(jobId).singleResult();
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
+        Job job = getJobById(jobId);
 
         String stackTrace = managementService.getJobExceptionStacktrace(job.getId());
 
@@ -70,10 +62,7 @@ public class JobExceptionStacktraceResource {
     })
     @GetMapping("/management/timer-jobs/{jobId}/exception-stacktrace")
     public String getTimerJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
-        Job job = managementService.createTimerJobQuery().jobId(jobId).singleResult();
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
+        Job job = getTimerJobById(jobId);
 
         String stackTrace = managementService.getTimerJobExceptionStacktrace(job.getId());
 
@@ -92,10 +81,7 @@ public class JobExceptionStacktraceResource {
     })
     @GetMapping("/management/suspended-jobs/{jobId}/exception-stacktrace")
     public String getSuspendedJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
-        Job job = managementService.createSuspendedJobQuery().jobId(jobId).singleResult();
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
+        Job job = getSuspendedJobById(jobId);
 
         String stackTrace = managementService.getSuspendedJobExceptionStacktrace(job.getId());
 
@@ -114,10 +100,7 @@ public class JobExceptionStacktraceResource {
     })
     @GetMapping("/management/deadletter-jobs/{jobId}/exception-stacktrace")
     public String getDeadLetterJobStacktrace(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
-        Job job = managementService.createDeadLetterJobQuery().jobId(jobId).singleResult();
-        if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
-        }
+        Job job = getDeadLetterJobById(jobId);
 
         String stackTrace = managementService.getDeadLetterJobExceptionStacktrace(job.getId());
 

@@ -30,6 +30,7 @@ import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -52,6 +53,9 @@ public class BaseExecutionVariableResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected boolean isSerializableVariableAllowed;
 
@@ -287,6 +291,11 @@ public class BaseExecutionVariableResource {
         if (execution == null) {
             throw new FlowableObjectNotFoundException("Could not find an execution with id '" + executionId + "'.", Execution.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessExecutionInfoById(execution);
+        }
+        
         return execution;
     }
 
@@ -295,6 +304,11 @@ public class BaseExecutionVariableResource {
         if (execution == null) {
             throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", ProcessInstance.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessInstanceInfoById((ProcessInstance) execution);
+        }
+        
         return execution;
     }
 

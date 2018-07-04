@@ -95,9 +95,27 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             throw new FlowableException("Flowable 5 process definitions are not supported");
         }
         
-        ExecutionEntity execution = getActiveExecution(activityId, processExecution, commandContext);
-        
-        return execution;
+        return getActiveExecution(activityId, processExecution, commandContext);
+    }
+
+    @Override
+    public List<ExecutionEntity> resolveActiveExecutions(String processInstanceId, String activityId, CommandContext commandContext) {
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ExecutionEntity processExecution = executionEntityManager.findById(processInstanceId);
+
+        if (processExecution == null) {
+            throw new FlowableException("Execution could not be found with id " + processInstanceId);
+        }
+
+        if (!processExecution.isProcessInstanceType()) {
+            throw new FlowableException("Execution is not a process instance type execution for id " + processInstanceId);
+        }
+
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processExecution.getProcessDefinitionId())) {
+            throw new FlowableException("Flowable 5 process definitions are not supported");
+        }
+
+        return getActiveExecutions(activityId, processExecution, commandContext);
     }
     
     @Override
@@ -356,23 +374,38 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         
         return newChildExecutions;
     }
-
+    
     protected ExecutionEntity getActiveExecution(String activityId, ExecutionEntity processExecution, CommandContext commandContext) {
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
-        //Find the first process child execution that matches the activityId we are looking for
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processExecution.getId());
-        //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since
-        //it may not be guaranteed in the query result
-        Optional<ExecutionEntity> activeExecutionEntity = childExecutions.stream()
-            .filter(c -> c.getCurrentActivityId().equals(activityId))
+
+        //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since it may not be guaranteed in the query result
+        Optional<ExecutionEntity> firstExecution = childExecutions.stream()
+            .filter(e -> e.getCurrentActivityId().equals(activityId))
             .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
             .findFirst();
 
-        return activeExecutionEntity
-            .orElseThrow(() -> new FlowableException("Active execution could not be found with activity id " + activityId));
+        return firstExecution.orElseThrow(() -> new FlowableException("Active execution could not be found with activity id " + activityId));
     }
-    
+
+    protected List<ExecutionEntity> getActiveExecutions(String activityId, ExecutionEntity processExecution, CommandContext commandContext) {
+
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processExecution.getId());
+
+        //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since it may not be guaranteed in the query result
+        List<ExecutionEntity> executions = childExecutions.stream()
+            .filter(e -> e.getCurrentActivityId().equals(activityId))
+            .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
+            .collect(Collectors.toList());
+
+        if (executions.isEmpty()) {
+            throw new FlowableException("Active execution could not be found with activity id " + activityId);
+        }
+        return executions;
+    }
+
     protected ExecutionEntity deleteParentExecutions(String parentExecutionId, Collection<FlowElement> moveToFlowElements, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         

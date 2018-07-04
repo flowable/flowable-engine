@@ -19,12 +19,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryProperty;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +52,9 @@ public class HistoricCaseInstanceBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<HistoricCaseInstanceResponse> getQueryResponse(HistoricCaseInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
@@ -101,8 +107,25 @@ public class HistoricCaseInstanceBaseResource {
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.caseInstanceWithoutTenantId();
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryCaseInfoWithQuery(query);
+        }
 
         return new HistoricCaseInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "caseInstanceId", allowedSortProperties);
+    }
+    
+    protected HistoricCaseInstance getHistoricCaseInstanceFromRequest(String caseInstanceId) {
+        HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.", HistoricCaseInstance.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryCaseInfoById(caseInstance);
+        }
+        
+        return caseInstance;
     }
 
     protected void addVariables(HistoricCaseInstanceQuery caseInstanceQuery, List<QueryVariable> variables) {

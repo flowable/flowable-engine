@@ -76,14 +76,17 @@ import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DefaultCandidateManager;
 import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.ExecutionQueryInterceptor;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.FormService;
+import org.flowable.engine.HistoricProcessInstanceQueryInterceptor;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.ProcessInstanceQueryInterceptor;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -326,6 +329,8 @@ import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.history.async.AsyncHistorySessionFactory;
 import org.flowable.job.service.impl.history.async.DefaultAsyncHistoryJobProducer;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
+import org.flowable.task.api.TaskQueryInterceptor;
+import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
@@ -754,6 +759,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected BusinessCalendarManager businessCalendarManager;
 
+    protected ProcessInstanceQueryInterceptor processInstanceQueryInterceptor;
+    protected ExecutionQueryInterceptor executionQueryInterceptor;
+    protected HistoricProcessInstanceQueryInterceptor historicProcessInstanceQueryInterceptor;
+    protected TaskQueryInterceptor taskQueryInterceptor;
+    protected HistoricTaskQueryInterceptor historicTaskQueryInterceptor;
     protected int executionQueryLimit = 20000;
     protected int taskQueryLimit = 20000;
     protected int historicTaskQueryLimit = 20000;
@@ -1259,11 +1269,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     protected void initDefaultAsyncHistoryListener() {
-        DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer(
-                HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
-        asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-        asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-        asyncHistoryListener = asyncHistoryJobProducer;
+        asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
     }
 
     public void initVariableServiceConfiguration() {
@@ -1342,6 +1348,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.performanceSettings.isEnableTaskRelationshipCounts());
         this.taskServiceConfiguration.setEnableLocalization(this.performanceSettings.isEnableLocalization());
+        this.taskServiceConfiguration.setTaskQueryInterceptor(this.taskQueryInterceptor);
+        this.taskServiceConfiguration.setHistoricTaskQueryInterceptor(this.historicTaskQueryInterceptor);
         this.taskServiceConfiguration.setTaskQueryLimit(this.taskQueryLimit);
         this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
 
@@ -1401,7 +1409,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             } else {
                 this.jobServiceConfiguration.setInternalJobCompatibilityManager(new DefaultInternalJobCompatibilityManager(this));
             }
-    
+            
+            // Async history job config
+            jobServiceConfiguration.setJobTypeAsyncHistory(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
+            jobServiceConfiguration.setJobTypeAsyncHistoryZipped(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
+            jobServiceConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+            jobServiceConfiguration.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+            jobServiceConfiguration.setAsyncHistoryJsonGroupingThreshold(asyncHistoryJsonGroupingThreshold);
+
             // set the job processors
             this.jobServiceConfiguration.setJobProcessors(this.jobProcessors);
             this.jobServiceConfiguration.setHistoryJobProcessors(this.historyJobProcessors);
@@ -2732,6 +2747,51 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setBusinessCalendarManager(BusinessCalendarManager businessCalendarManager) {
         this.businessCalendarManager = businessCalendarManager;
+        return this;
+    }
+
+    public ProcessInstanceQueryInterceptor getProcessInstanceQueryInterceptor() {
+        return processInstanceQueryInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessInstanceQueryInterceptor(ProcessInstanceQueryInterceptor processInstanceQueryInterceptor) {
+        this.processInstanceQueryInterceptor = processInstanceQueryInterceptor;
+        return this;
+    }
+
+    public ExecutionQueryInterceptor getExecutionQueryInterceptor() {
+        return executionQueryInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setExecutionQueryInterceptor(ExecutionQueryInterceptor executionQueryInterceptor) {
+        this.executionQueryInterceptor = executionQueryInterceptor;
+        return this;
+    }
+
+    public HistoricProcessInstanceQueryInterceptor getHistoricProcessInstanceQueryInterceptor() {
+        return historicProcessInstanceQueryInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoricProcessInstanceQueryInterceptor(HistoricProcessInstanceQueryInterceptor historicProcessInstanceQueryInterceptor) {
+        this.historicProcessInstanceQueryInterceptor = historicProcessInstanceQueryInterceptor;
+        return this;
+    }
+
+    public TaskQueryInterceptor getTaskQueryInterceptor() {
+        return taskQueryInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setTaskQueryInterceptor(TaskQueryInterceptor taskQueryInterceptor) {
+        this.taskQueryInterceptor = taskQueryInterceptor;
+        return this;
+    }
+    
+    public HistoricTaskQueryInterceptor getHistoricTaskQueryInterceptor() {
+        return historicTaskQueryInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoricTaskQueryInterceptor(HistoricTaskQueryInterceptor historicTaskQueryInterceptor) {
+        this.historicTaskQueryInterceptor = historicTaskQueryInterceptor;
         return this;
     }
 

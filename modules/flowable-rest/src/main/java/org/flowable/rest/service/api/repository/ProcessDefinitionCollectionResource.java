@@ -23,6 +23,7 @@ import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.ProcessDefinitionQueryProperty;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,6 +63,9 @@ public class ProcessDefinitionCollectionResource {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of process definitions", tags = { "Process Definitions" }, nickname = "listProcessDefinitions")
     @ApiImplicitParams({
@@ -147,6 +151,10 @@ public class ProcessDefinitionCollectionResource {
         }
         if (allRequestParams.containsKey("tenantIdLike")) {
             processDefinitionQuery.processDefinitionTenantIdLike(allRequestParams.get("tenantIdLike"));
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessDefinitionsWithQuery(processDefinitionQuery);
         }
 
         return new ProcessDefinitionsPaginateList(restResponseFactory).paginateList(allRequestParams, processDefinitionQuery, "name", properties);

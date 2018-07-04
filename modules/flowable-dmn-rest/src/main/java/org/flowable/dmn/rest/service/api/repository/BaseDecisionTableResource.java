@@ -24,7 +24,9 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +45,9 @@ public class BaseDecisionTableResource {
 
     @Autowired
     protected DmnRepositoryService dmnRepositoryService;
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     /**
      * Returns the {@link DmnDecisionTable} that is requested. Throws the right exceptions when bad request was made or decision table is not found.
@@ -53,6 +58,11 @@ public class BaseDecisionTableResource {
         if (decisionTable == null) {
             throw new FlowableObjectNotFoundException("Could not find a decision table with id '" + decisionTableId);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDecisionTableInfoById(decisionTable);
+        }
+        
         return decisionTable;
     }
 
@@ -66,9 +76,15 @@ public class BaseDecisionTableResource {
         }
 
         // Check if deployment exists
-        DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+        DmnDeploymentQuery deploymentQuery = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId);
+        
+        DmnDeployment deployment = deploymentQuery.singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
         }
 
         List<String> resourceList = dmnRepositoryService.getDeploymentResourceNames(deploymentId);

@@ -13,17 +13,19 @@
 
 package org.flowable.rest.service.api.form;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.FormService;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +36,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -51,6 +54,9 @@ public class FormDataResource {
 
     @Autowired
     protected FormService formService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get form data", tags = { "Forms" }, notes = "")
     @ApiResponses(value = {
@@ -81,6 +87,10 @@ public class FormDataResource {
         if (formData == null) {
             throw new FlowableObjectNotFoundException("Could not find a form data with id '" + id + "'.", FormData.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormData(formData);
+        }
 
         return restResponseFactory.createFormDataResponse(formData);
     }
@@ -99,6 +109,10 @@ public class FormDataResource {
 
         if (submitRequest.getTaskId() == null && submitRequest.getProcessDefinitionId() == null) {
             throw new FlowableIllegalArgumentException("The taskId or processDefinitionId property has to be provided");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.submitFormData(submitRequest);
         }
 
         Map<String, String> propertyMap = new HashMap<>();

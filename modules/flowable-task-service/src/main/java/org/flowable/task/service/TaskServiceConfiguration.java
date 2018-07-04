@@ -21,6 +21,8 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.task.api.TaskQueryInterceptor;
+import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;
 import org.flowable.task.service.impl.TaskServiceImpl;
@@ -66,6 +68,8 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected boolean enableTaskRelationshipCounts;
     protected boolean enableLocalization;
     
+    protected TaskQueryInterceptor taskQueryInterceptor;
+    protected HistoricTaskQueryInterceptor historicTaskQueryInterceptor;
     protected int taskQueryLimit;
     protected int historicTaskQueryLimit;
     
@@ -229,6 +233,24 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public TaskServiceConfiguration setEnableLocalization(boolean enableLocalization) {
         this.enableLocalization = enableLocalization;
+        return this;
+    }
+
+    public TaskQueryInterceptor getTaskQueryInterceptor() {
+        return taskQueryInterceptor;
+    }
+
+    public TaskServiceConfiguration setTaskQueryInterceptor(TaskQueryInterceptor taskQueryInterceptor) {
+        this.taskQueryInterceptor = taskQueryInterceptor;
+        return this;
+    }
+
+    public HistoricTaskQueryInterceptor getHistoricTaskQueryInterceptor() {
+        return historicTaskQueryInterceptor;
+    }
+
+    public TaskServiceConfiguration setHistoricTaskQueryInterceptor(HistoricTaskQueryInterceptor historicTaskQueryInterceptor) {
+        this.historicTaskQueryInterceptor = historicTaskQueryInterceptor;
         return this;
     }
 

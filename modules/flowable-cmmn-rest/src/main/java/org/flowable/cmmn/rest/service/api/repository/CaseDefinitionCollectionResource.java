@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryProperty;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
@@ -62,6 +63,9 @@ public class CaseDefinitionCollectionResource {
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of case definitions", tags = { "Case Definitions" }, nickname = "listCaseDefinitions")
     @ApiImplicitParams({
@@ -134,6 +138,10 @@ public class CaseDefinitionCollectionResource {
         }
         if (allRequestParams.containsKey("tenantIdLike")) {
             caseDefinitionQuery.caseDefinitionTenantIdLike(allRequestParams.get("tenantIdLike"));
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseDefinitionsWithQuery(caseDefinitionQuery);
         }
 
         return new CaseDefinitionsPaginateList(restResponseFactory).paginateList(allRequestParams, caseDefinitionQuery, "name", properties);

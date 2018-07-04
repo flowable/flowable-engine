@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.form.api.FormDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +46,8 @@ public class CaseDefinitionFormDefinitionCollectionResource extends BaseCaseDefi
             @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
             HttpServletRequest request) {
 
-        List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForCaseDefinition(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForCaseDefinition(caseDefinition.getId());
 
         return restResponseFactory.createFormDefinitionResponseList(formDefinitions, caseDefinitionId);
     }

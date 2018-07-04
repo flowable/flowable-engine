@@ -16,10 +16,8 @@ package org.flowable.cmmn.rest.service.api.repository;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,13 +38,10 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "CMMN Deployment" }, description = "Manage CMMN Deployment", authorizations = { @Authorization(value = "basicAuth") })
-public class DeploymentResource {
+public class DeploymentResource extends BaseDeploymentResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
-
-    @Autowired
-    protected CmmnRepositoryService repositoryService;
 
     @ApiOperation(value = "Get a deployment", tags = { "Deployment" })
     @ApiResponses(value = {
@@ -55,12 +50,7 @@ public class DeploymentResource {
     })
     @GetMapping(value = "/cmmn-repository/deployments/{deploymentId}", produces = "application/json")
     public CmmnDeploymentResponse getDeployment(@ApiParam(name = "deploymentId", value ="The id of the deployment to get.") @PathVariable String deploymentId, HttpServletRequest request) {
-        CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-
-        if (deployment == null) {
-            throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", CmmnDeployment.class);
-        }
-
+        CmmnDeployment deployment = getCmmnDeployment(deploymentId);
         return restResponseFactory.createDeploymentResponse(deployment);
     }
 
@@ -72,6 +62,11 @@ public class DeploymentResource {
     @DeleteMapping(value = "/cmmn-repository/deployments/{deploymentId}", produces = "application/json")
     public void deleteDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, @RequestParam(value = "cascade", required = false, defaultValue = "false") Boolean cascade,
             HttpServletResponse response) {
+        
+        CmmnDeployment deployment = getCmmnDeployment(deploymentId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteDeployment(deployment);
+        }
 
         if (cascade) {
             repositoryService.deleteDeployment(deploymentId, true);
