@@ -558,7 +558,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     public void setInnerActivityBehavior(AbstractBpmnActivityBehavior innerActivityBehavior) {
         this.innerActivityBehavior = innerActivityBehavior;
-        this.innerActivityBehavior.setMultiInstanceActivityBehavior(this);
+        if (this.innerActivityBehavior.multiInstanceActivityBehavior == null) {
+            this.innerActivityBehavior.setMultiInstanceActivityBehavior(this);
+        }
     }
 
     public Expression getSequential() {

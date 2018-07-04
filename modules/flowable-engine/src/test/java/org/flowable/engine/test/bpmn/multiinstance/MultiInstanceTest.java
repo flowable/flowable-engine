@@ -13,18 +13,6 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -47,6 +35,11 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.delegate.DelegateTask;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Joram Barrez
@@ -507,7 +500,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
-    public void testSequentialVariableChangeInTheLoop() throws IOException {
+    public void testSequentialVariableChangeToIllegalValueInTheLoop() throws IOException {
         String deploymentId = this.repositoryService.createDeployment()
             .addString("MultiInstanceTest.testScriptTasksSequentialExpression.bpmn20.xml",
                 IOUtils.resourceToString("/org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testUserTasksSequentialExpression.bpmn20.xml",
@@ -524,21 +517,203 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             );
 
             this.runtimeService.setVariable(processInstance.getId(), "isSequential", "UNSUPPORTED-VALUE");
+            try {
+                this.taskService.complete(
+                        taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
+                );
+                fail("FlowableIllegalArgumentException expected");
+            } catch (FlowableIllegalArgumentException e) {
+                assertTrue(e.getMessage().equals("isSequential value [UNSUPPORTED-VALUE] is not allowed."));
+            }
+        } finally {
+            this.repositoryService.deleteDeployment(deploymentId, true);
+        }
+    }
+
+    public void testSequentialVariableChangeFromSequentialToParallelValueInTheLoop() throws IOException {
+        String deploymentId = this.repositoryService.createDeployment()
+                .addString("MultiInstanceTest.testScriptTasksSequentialExpression.bpmn20.xml",
+                        IOUtils.resourceToString("/org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testUserTasksSequentialExpression.bpmn20.xml",
+                                Charset.defaultCharset())
+                                .replace("{SEQUENTIAL}", "${isSequential}")
+                )
+                .deploy()
+                .getId();
+
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miUserTask", Collections.singletonMap("isSequential", true));
             this.taskService.complete(
-                taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
+                    taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
             );
-            assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+
+            this.runtimeService.setVariable(processInstance.getId(), "isSequential", false);
             this.taskService.complete(
-                taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
+                    taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
+            );
+
+            List<Task> parallelTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertEquals("When sequential -> parallel, there is no new task created ", 0, parallelTasks.size());
+            assertEquals("Leave condition was not met, process instance is in the state when it can't continue",
+                    0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("waitState").count());
+        } finally {
+            this.repositoryService.deleteDeployment(deploymentId, true);
+        }
+    }
+
+    public void testSequentialVariableChangeFromParallelToSequentialInTheLoop() throws IOException {
+        String deploymentId = this.repositoryService.createDeployment()
+                .addString("MultiInstanceTest.testScriptTasksSequentialExpression.bpmn20.xml",
+                        IOUtils.resourceToString("/org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testUserTasksSequentialExpression.bpmn20.xml",
+                                Charset.defaultCharset())
+                                .replace("{SEQUENTIAL}", "${isSequential}")
+                )
+                .deploy()
+                .getId();
+
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miUserTask", Collections.singletonMap("isSequential", false));
+            List<Task> parallelTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            this.taskService.complete(
+                    parallelTasks.get(0).getId()
+            );
+
+            this.runtimeService.setVariable(processInstance.getId(), "isSequential", true);
+            this.taskService.complete(
+                    parallelTasks.get(1).getId()
+            );
+
+            for (int i = 0; i<3; i++) {
+                List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+                taskService.complete(tasks.get(0).getId());
+
+            }
+
+            assertEquals("Leave condition was met. Still amount of created sequential tasks depends " +
+                            "on the execution which was executed after the variable change",
+                    1, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("waitState").count()
+            );
+        } finally {
+            this.repositoryService.deleteDeployment(deploymentId, true);
+        }
+    }
+
+    public void testSequential2ProcessesParallelSequential() throws IOException {
+        String deploymentId = this.repositoryService.createDeployment()
+            .addString("MultiInstanceTest.testScriptTasksSequentialExpression.bpmn20.xml",
+                IOUtils.resourceToString("/org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testUserTasksSequentialExpression.bpmn20.xml",
+                    Charset.defaultCharset())
+                    .replace("{SEQUENTIAL}", "${isSequential}")
+            )
+            .deploy()
+            .getId();
+
+        try {
+            ProcessInstance processInstanceParallel = runtimeService.startProcessInstanceByKey("miUserTask", Collections.singletonMap("isSequential", false));
+            List<Task> parallelTasks = taskService.createTaskQuery().processInstanceId(processInstanceParallel.getProcessInstanceId()).list();
+            assertEquals(5, parallelTasks.size());
+
+            ProcessInstance processInstanceSequential = runtimeService.startProcessInstanceByKey("miUserTask", Collections.singletonMap("isSequential", true));
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
             );
             this.taskService.complete(
-                taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
+                parallelTasks.get(3).getId()
+            );
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
             );
             this.taskService.complete(
-                taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
+                    parallelTasks.get(0).getId()
             );
-            assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
-            assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+            assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).count());
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
+            );
+            this.taskService.complete(
+                    parallelTasks.get(2).getId()
+            );
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
+            );
+            this.taskService.complete(
+                    parallelTasks.get(1).getId()
+            );
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
+            );
+            this.taskService.complete(
+                    parallelTasks.get(4).getId()
+            );
+
+            assertEquals(0, taskService.createTaskQuery().count());
+            assertEquals(2, runtimeService.createProcessInstanceQuery().count());
+        } finally {
+            this.repositoryService.deleteDeployment(deploymentId, true);
+        }
+    }
+
+
+    public void testSequential2ProcessesSequentialParallel() throws IOException {
+        String deploymentId = this.repositoryService.createDeployment()
+            .addString("MultiInstanceTest.testScriptTasksSequentialExpression.bpmn20.xml",
+                IOUtils.resourceToString("/org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testUserTasksSequentialExpression.bpmn20.xml",
+                    Charset.defaultCharset())
+                    .replace("{SEQUENTIAL}", "${isSequential}")
+            )
+            .deploy()
+            .getId();
+
+        try {
+            ProcessInstance processInstanceSequential = runtimeService.startProcessInstanceByKey("miUserTask", Collections.singletonMap("isSequential", true));
+
+            ProcessInstance processInstanceParallel = runtimeService.startProcessInstanceByKey("miUserTask", Collections.singletonMap("isSequential", false));
+            List<Task> parallelTasks = taskService.createTaskQuery().processInstanceId(processInstanceParallel.getProcessInstanceId()).list();
+            assertEquals(5, parallelTasks.size());
+
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
+            );
+            this.taskService.complete(
+                parallelTasks.get(3).getId()
+            );
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
+            );
+            this.taskService.complete(
+                    parallelTasks.get(0).getId()
+            );
+            assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).count());
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
+            );
+            this.taskService.complete(
+                    parallelTasks.get(2).getId()
+            );
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
+            );
+            this.taskService.complete(
+                    parallelTasks.get(1).getId()
+            );
+
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstanceSequential.getId()).singleResult().getId()
+            );
+            this.taskService.complete(
+                    parallelTasks.get(4).getId()
+            );
+
+            assertEquals(0, taskService.createTaskQuery().count());
+            assertEquals(2, runtimeService.createProcessInstanceQuery().count());
         } finally {
             this.repositoryService.deleteDeployment(deploymentId, true);
         }
@@ -557,7 +732,11 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     public void testIsSequentialVariableUnexpectedStringEvaluatedToFalse() throws IOException {
-        assertIsSequential("UNEXPECTEDSTRING", 5);
+        try {
+            assertIsSequential("UNEXPECTEDSTRING", 5);
+        } catch (FlowableIllegalArgumentException e) {
+            assertEquals("isSequential value [UNEXPECTEDSTRING] is not allowed.", e.getMessage());
+        }
     }
 
     public void testIsSequentialVariableUnexpectedObjectThrowsException() throws IOException {
