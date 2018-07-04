@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,10 +13,12 @@
 package org.flowable.engine.test.bpmn.gateway;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,6 +28,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -109,7 +112,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
      * Test for ACT-1216: When merging a concurrent execution the parent is not activated correctly
      */
     @Deployment
-    public void testParentActivationOnNonJoiningEnd() throws Exception {
+    public void testParentActivationOnNonJoiningEnd() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parentActivationOnNonJoiningEnd");
 
         List<Execution> executionsBefore = runtimeService.createExecutionQuery().list();
@@ -324,7 +327,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
     /**
      * This test the isReachable() check that is done to check if upstream tokens can reach the inclusive gateway.
-     * 
+     *
      * In case of loops, special care needs to be taken in the algorithm, or else stackoverflows will happen very quickly.
      */
     @Deployment
@@ -395,29 +398,29 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
             assertTrue(e.getMessage().contains("No outgoing sequence flow"));
         }
     }
-    
+
     @Deployment
     public void testJoinAfterParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway");
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         assertEquals("Task1", task.getName());
-        
+
         taskService.complete(task.getId());
-        
+
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
                 .activityId("receiveTask1")
                 .singleResult();
-        
+
         assertNotNull(execution);
         runtimeService.trigger(execution.getId());
-        
+
         execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
                 .activityId("receiveTask1")
                 .singleResult();
-        
+
         assertNotNull(execution);
     }
 
@@ -687,7 +690,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertEquals(2, classifiedTasks.get("taskInclusive3").size());
 
         //Finish the rest of the tasks
-        classifiedTasks.values().stream().flatMap(List::stream).forEach(task -> taskService.complete(task.getId()));
+        classifiedTasks.values().stream().flatMap(List::stream).forEach(this::completeTask);
 
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(7, childExecutions.size());
@@ -703,7 +706,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         tasks.forEach(task-> assertEquals("postForkTask", task.getTaskDefinitionKey()));
 
         //Finish the remaining tasks in the SubProcess
-        tasks.forEach(task -> taskService.complete(task.getId()));
+        tasks.forEach(this::completeTask);
 
         //MultiInstance subProcess ended, only the last task of the process remains
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -773,7 +776,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         List<Task> collect = Stream.concat(classifiedTasks.get("taskInclusive1").stream(), classifiedTasks.get("taskInclusive1").stream()).collect(Collectors.toList());
 
         Stream.concat(classifiedTasks.get("taskInclusive1").stream(), classifiedTasks.get("taskInclusive2").stream())
-            .forEach(t -> taskService.complete(t.getId()));
+            .forEach(this::completeTask);
 
         //1x MultiInstance root, 1x Sequential MultiInstance, 1x User Task after the gateway join
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -813,7 +816,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertEquals(1, classifiedTasks.get("taskInclusive3").size());
 
         //Finish the inclusive gateway tasks
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(this::completeTask);
 
         //last task of the sequence
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -825,7 +828,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertEquals(5, childExecutions.size());
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(3, tasks.size());
-        tasks.forEach(t -> taskService.complete(t.getId()));
+        tasks.forEach(this::completeTask);
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("postForkTask", task.getTaskDefinitionKey());
         taskService.complete(task.getId());
@@ -834,6 +837,302 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(1, childExecutions.size());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+
+        //Finish the process
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/gateway/InclusiveGatewayTest.inSubProcessNestedInMultiInstanceParallelSubProcess.bpmn20.xml" })
+    public void testInSubProcessNestedInMultiInstanceParallelSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGatewayInsideSubProcessNestedInMultiInstanceParallelSubProcess");
+
+        List<Execution> childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        //1x MultiInstance root, 3x parallel MultiInstance, 3x NestedSubProcess and 9x UserTasks executions
+        assertEquals(16, childExecutions.size());
+        Map<String, List<Execution>> classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
+        assertNotNull(classifiedExecutions.get("multiInstanceSubProcess"));
+        assertEquals(4, classifiedExecutions.get("multiInstanceSubProcess").size());
+        assertNotNull(classifiedExecutions.get("nestedSubProcess"));
+        assertEquals(3, classifiedExecutions.get("nestedSubProcess").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive3").size());
+
+        //9x UserTasks
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(3, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(3, classifiedTasks.get("taskInclusive1").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(3, classifiedTasks.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(3, classifiedTasks.get("taskInclusive3").size());
+
+        //Finish a couple of Tasks
+        taskService.complete(classifiedTasks.get("taskInclusive1").get(1).getId());
+        taskService.complete(classifiedTasks.get("taskInclusive3").get(2).getId());
+
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        //1x MultiInstance root, 3x parallel MultiInstance, 3x NestedSubProcess and 7x UserTasks executions, 2x Gw Join executions
+        assertEquals(16, childExecutions.size());
+        classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
+        assertNotNull(classifiedExecutions.get("multiInstanceSubProcess"));
+        assertEquals(4, classifiedExecutions.get("multiInstanceSubProcess").size());
+        assertNotNull(classifiedExecutions.get("nestedSubProcess"));
+        assertEquals(3, classifiedExecutions.get("nestedSubProcess").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive3").size());
+        assertNotNull(classifiedExecutions.get("inclusiveJoin"));
+        assertEquals(2, classifiedExecutions.get("inclusiveJoin").size());
+
+        //7x UserTasks
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(3, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(2, classifiedTasks.get("taskInclusive1").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(3, classifiedTasks.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(2, classifiedTasks.get("taskInclusive3").size());
+
+        //Finish one "multiInstance subProcess"
+        Stream<Execution> tempStream = Stream.concat(classifiedExecutions.get("taskInclusive1").stream(), classifiedExecutions.get("taskInclusive2").stream());
+        Map<String, List<Execution>> taskExecutionsByParent = Stream.concat(tempStream, classifiedExecutions.get("taskInclusive3").stream())
+            .collect(Collectors.groupingBy(Execution::getParentId));
+        //Get the execution Ids of one with 3 task executions
+        boolean doneFlag = false;
+        for (List<Execution> executions : taskExecutionsByParent.values()) {
+            if (executions.size() == 3) {
+                List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
+                tasks.stream().filter(t -> executionIds.contains(t.getExecutionId())).forEach(this::completeTask);
+                doneFlag = true;
+                break;
+            }
+        }
+        if (!doneFlag) {
+            fail("Invalid test state, there should be subProcess instance with embedded gateway with all parallel tasks pending for execution");
+        }
+
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        //1x MultiInstance root, 3x parallel MultiInstance, 3x NestedSubProcess, 4x UserTasks executions, 2x Gw Join executions, 1 postFork task Execution
+        assertEquals(14, childExecutions.size());
+        classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
+        assertNotNull(classifiedExecutions.get("multiInstanceSubProcess"));
+        assertEquals(4, classifiedExecutions.get("multiInstanceSubProcess").size());
+        assertNotNull(classifiedExecutions.get("nestedSubProcess"));
+        assertEquals(3, classifiedExecutions.get("nestedSubProcess").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(1, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(1, classifiedExecutions.get("taskInclusive3").size());
+        assertNotNull(classifiedExecutions.get("inclusiveJoin"));
+        assertEquals(2, classifiedExecutions.get("inclusiveJoin").size());
+        assertNotNull(classifiedExecutions.get("postForkTask"));
+        assertEquals(1, classifiedExecutions.get("postForkTask").size());
+
+        //5x UserTasks
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(4, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(1, classifiedTasks.get("taskInclusive1").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(2, classifiedTasks.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(1, classifiedTasks.get("taskInclusive3").size());
+        assertTrue(classifiedTasks.containsKey("postForkTask"));
+        assertEquals(1, classifiedTasks.get("postForkTask").size());
+
+        //Finish all gateWayTasks
+        tasks.stream().filter(t-> !t.getTaskDefinitionKey().equals("postForkTask")).forEach(this::completeTask);
+
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        //1x MultiInstance root, 3x parallel MultiInstance, 3x NestedSubProcess, 4x postFork task Execution
+        assertEquals(10, childExecutions.size());
+        classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
+        assertNotNull(classifiedExecutions.get("multiInstanceSubProcess"));
+        assertEquals(4, classifiedExecutions.get("multiInstanceSubProcess").size());
+        assertNotNull(classifiedExecutions.get("nestedSubProcess"));
+        assertEquals(3, classifiedExecutions.get("nestedSubProcess").size());
+        assertNotNull(classifiedExecutions.get("postForkTask"));
+        assertEquals(3, classifiedExecutions.get("postForkTask").size());
+
+        //3x UserTasks
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(1, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("postForkTask"));
+        assertEquals(3, classifiedTasks.get("postForkTask").size());
+
+        //Finish the nested subprocess tasks
+        tasks.forEach(this::completeTask);
+
+        //MultiInstance subProcesses finish as the nested subProcesses end
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        //1x User task execution
+        assertEquals(1, childExecutions.size());
+        assertEquals("lastTask", childExecutions.get(0).getActivityId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(1, tasks.size());
+        assertEquals("lastTask", tasks.get(0).getTaskDefinitionKey());
+
+        //Finish the process
+        tasks.forEach(this::completeTask);
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/gateway/InclusiveGatewayTest.inCalledActivityNestedInMultiInstanceParallelSubProcess.bpmn20.xml",
+    "org/flowable/engine/test/bpmn/gateway/InclusiveGatewayTest.simpleParallelFlow.bpmn20.xml"})
+    public void testInCalledActivityNestedInMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGatewayInsideCalledActivityNestedInMultiInstanceParallelSubProcess");
+
+        //1x Process Root, 3x Call activity roots
+        List<Execution> processExecutionRoots = runtimeService.createExecutionQuery().onlyProcessInstanceExecutions().list();
+        assertEquals(4, processExecutionRoots.size());
+        Map<String, List<Execution>> classifiedRoots = processExecutionRoots.stream()
+            .collect(Collectors.toMap(e -> e.getSuperExecutionId() != null ? "callActivity" : null, Collections::singletonList, AbstractFlowableTestCase::mergeLists));
+        assertEquals(1, classifiedRoots.get(null).size());
+        assertEquals(3, classifiedRoots.get("callActivity").size());
+
+        //1x MultiInstance root, 3x parallel MultiInstance, 3x CalledActivitySubProcesses and 9x UserTasks executions
+        List<Execution> childExecutions = processExecutionRoots.stream()
+            .flatMap(rootProcess -> runtimeService.createExecutionQuery().processInstanceId(rootProcess.getId()).onlyChildExecutions().list().stream())
+            .collect(Collectors.toList());
+        assertEquals(16, childExecutions.size());
+        Map<String, List<Execution>> classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
+        assertNotNull(classifiedExecutions.get("multiInstanceSubProcess"));
+        assertEquals(4, classifiedExecutions.get("multiInstanceSubProcess").size());
+        assertNotNull(classifiedExecutions.get("callActivity"));
+        assertEquals(3, classifiedExecutions.get("callActivity").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive3").size());
+
+        //9x UserTasks
+        List<Task> tasks = taskService.createTaskQuery().list();
+        Map<String, List<Task>> classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(3, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(3, classifiedTasks.get("taskInclusive1").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(3, classifiedTasks.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(3, classifiedTasks.get("taskInclusive3").size());
+
+        //Finish a couple of Tasks
+        taskService.complete(classifiedTasks.get("taskInclusive1").get(1).getId());
+        taskService.complete(classifiedTasks.get("taskInclusive3").get(2).getId());
+
+
+
+        childExecutions = processExecutionRoots.stream()
+            .flatMap(rootProcess -> runtimeService.createExecutionQuery().processInstanceId(rootProcess.getId()).onlyChildExecutions().list().stream())
+            .collect(Collectors.toList());
+        //1x MultiInstance root, 3x parallel MultiInstance, 3x CalledActivitySubProcesses and 7x UserTasks executions
+        assertEquals(14, childExecutions.size());
+        classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
+        assertNotNull(classifiedExecutions.get("multiInstanceSubProcess"));
+        assertEquals(4, classifiedExecutions.get("multiInstanceSubProcess").size());
+        assertNotNull(classifiedExecutions.get("callActivity"));
+        assertEquals(3, classifiedExecutions.get("callActivity").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive3").size());
+
+        //7x UserTasks
+        tasks = taskService.createTaskQuery().list();
+        classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(3, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(2, classifiedTasks.get("taskInclusive1").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(3, classifiedTasks.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(2, classifiedTasks.get("taskInclusive3").size());
+
+        //Finish one "multiInstance subProcess"
+        Stream<Execution> tempStream = Stream.concat(classifiedExecutions.get("taskInclusive1").stream(), classifiedExecutions.get("taskInclusive2").stream());
+        Map<String, List<Execution>> taskExecutionsByParent = Stream.concat(tempStream, classifiedExecutions.get("taskInclusive3").stream())
+            .collect(Collectors.groupingBy(Execution::getParentId));
+        //Get the execution Ids of one with 3 task executions
+        boolean doneFlag = false;
+        Optional<List<Execution>> completeSubProcessExecutions = taskExecutionsByParent.values().stream()
+            .filter(l -> l.size() == 3)
+            .findFirst();
+
+        if (completeSubProcessExecutions.isPresent()) {
+            List<String> executionIds = completeSubProcessExecutions.get().stream()
+                .map(Execution::getId).collect(Collectors.toList());
+            tasks.stream().filter(t -> executionIds.contains(t.getExecutionId())).forEach(this::completeTask);
+        } else {
+            fail("Invalid test state, there should be subProcess instance with embedded gateway with all parallel tasks pending for execution");
+        }
+
+        childExecutions = processExecutionRoots.stream()
+            .flatMap(rootProcess -> runtimeService.createExecutionQuery().processInstanceId(rootProcess.getId()).onlyChildExecutions().list().stream())
+            .collect(Collectors.toList());
+        //1x MultiInstance root, 2x parallel MultiInstance, 2x CalledActivitySubProcesses and 4x UserTasks executions
+        assertEquals(9, childExecutions.size());
+        classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
+        assertNotNull(classifiedExecutions.get("multiInstanceSubProcess"));
+        assertEquals(3, classifiedExecutions.get("multiInstanceSubProcess").size());
+        assertNotNull(classifiedExecutions.get("callActivity"));
+        assertEquals(2, classifiedExecutions.get("callActivity").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(1, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(1, classifiedExecutions.get("taskInclusive3").size());
+
+        //4x UserTasks
+        tasks = taskService.createTaskQuery().list();
+        classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(3, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(1, classifiedTasks.get("taskInclusive1").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(2, classifiedTasks.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(1, classifiedTasks.get("taskInclusive3").size());
+
+        //Finish pending tasks
+        tasks.stream().forEach(this::completeTask);
+
+        //Called process should have ended, only the initial root process should remain
+        //1x Process Root, 3x Call activity roots
+        processExecutionRoots = runtimeService.createExecutionQuery().onlyProcessInstanceExecutions().list();
+        assertEquals(1, processExecutionRoots.size());
+        assertNull(processExecutionRoots.get(0).getSuperExecutionId());
+
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, childExecutions.size());
+        assertEquals("lastTask", childExecutions.get(0).getActivityId());
+
+        //1x UserTasks
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("lastTask", task.getTaskDefinitionKey());
 
         //Finish the process
