@@ -16,7 +16,10 @@ package org.flowable.engine.impl.test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
@@ -49,6 +52,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.HistoryJob;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Assert;
 
@@ -534,4 +538,13 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         }
     }
 
+    protected void completeTask(Task task) {
+        taskService.complete(task.getId());
+    }
+
+    protected static <T> List<T> mergeLists(List<T> list1, List<T> list2) {
+        Objects.requireNonNull(list1);
+        Objects.requireNonNull(list2);
+        return Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toList());
+    }
 }
