@@ -33,7 +33,7 @@ public class FormInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         String json = objectMapper.writeValueAsString(formRequest);
 
         String url = "form/form-instances";
-        storeFormInstace(url, json);
+        storeFormInstance(url, json);
         assertResultsPresentInDataResponse(url, USER);
 
     }

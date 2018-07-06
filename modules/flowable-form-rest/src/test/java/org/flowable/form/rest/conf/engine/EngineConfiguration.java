@@ -19,7 +19,6 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.spring.FormEngineFactoryBean;
-import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.context.annotation.Bean;
@@ -73,11 +72,10 @@ public class EngineConfiguration {
     @Bean(name = "formEngineConfiguration")
     public FormEngineConfiguration formEngineConfiguration() {
 
-        SpringFormEngineConfiguration formEngineConfiguration = new SpringFormEngineConfiguration();
+        TestSpringFormEngineConfiguration formEngineConfiguration = new TestSpringFormEngineConfiguration();
         formEngineConfiguration.setDataSource(dataSource());
         formEngineConfiguration.setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         formEngineConfiguration.setTransactionManager(annotationDrivenTransactionManager());
-
         return formEngineConfiguration;
     }
 

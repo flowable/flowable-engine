@@ -260,7 +260,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         return null;
     }
 
-    protected void storeFormInstace(String url, String body) throws IOException {
+    protected void storeFormInstance(String url, String body) throws IOException {
 
         HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
         post.setEntity(new StringEntity(body));
