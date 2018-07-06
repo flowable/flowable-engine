@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
@@ -47,7 +46,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricCaseInstanceVariableDataResource {
+public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstanceBaseResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -91,14 +90,12 @@ public class HistoricCaseInstanceVariableDataResource {
     }
 
     public RestVariable getVariableFromRequest(boolean includeBinary, String caseInstanceId, String variableName, HttpServletRequest request) {
+        HistoricCaseInstance caseObject = getHistoricCaseInstanceFromRequest(caseInstanceId);
 
-        HistoricCaseInstance caseObject = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-
-        if (caseObject == null) {
-            throw new FlowableObjectNotFoundException("Historic case instance '" + caseInstanceId + "' couldn't be found.", HistoricCaseInstanceEntity.class);
-        }
-
-        HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).variableName(variableName).singleResult();
+        HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
+                        .caseInstanceId(caseObject.getId())
+                        .variableName(variableName)
+                        .singleResult();
 
         if (variable == null || variable.getValue() == null) {
             throw new FlowableObjectNotFoundException("Historic case instance '" + caseInstanceId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);

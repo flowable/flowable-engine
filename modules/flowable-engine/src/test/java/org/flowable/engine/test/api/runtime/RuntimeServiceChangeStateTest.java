@@ -18,9 +18,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -264,7 +266,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals("secondTask", task.getTaskDefinitionKey());
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(timerJob2);
-        assertTrue(timerJob1.getExecutionId() != timerJob2.getExecutionId());
+        assertTrue(!timerJob1.getExecutionId().equals(timerJob2.getExecutionId()));
 
         Job job = managementService.moveTimerToExecutableJob(timerJob2.getId());
         managementService.executeJob(job.getId());
@@ -1402,7 +1404,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/multipleParallelSubProcesses.bpmn20.xml" })
     public void testSetCurrentActivityToMultipleActivitiesForInclusiveAndParallelSubProcesses() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess", Collections.singletonMap("var1", (Object) "test2"));
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess", Collections.singletonMap("var1", "test2"));
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("taskBefore", task.getTaskDefinitionKey());
 
@@ -1687,8 +1689,6 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals("seqTasks", task.getTaskDefinitionKey());
         assertEquals(1, taskService.getVariable(task.getId(), "loopCounter"));
 
-        //move the parent execution - otherwise the parent multi instance execution remains, although active==false.
-        Execution execution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
         runtimeService.createChangeActivityStateBuilder()
             .processInstanceId(processInstance.getId())
             .moveActivityIdTo("seqTasks", "nextTask")
@@ -1760,8 +1760,6 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         activeParallelTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
         assertEquals(2, activeParallelTasks.size());
 
-        //Fetch the parent execution of the multi instance task execution
-        String parentExecutionId = runtimeService.createExecutionQuery().executionId(activeParallelTasks.get(0).getExecutionId()).singleResult().getParentId();
         runtimeService.createChangeActivityStateBuilder()
             .processInstanceId(processInstance.getId())
             .moveActivityIdTo("parallelTasks", "nextTask")
@@ -1782,8 +1780,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
             .variable("nrOfLoops", 3)
             .start();
 
-        List<Execution> parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(parallelTasksProcInstance.getId()).onlyChildExecutions()
-            .list();
+        List<Execution> parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(parallelTasksProcInstance.getId()).onlyChildExecutions().list();
         assertEquals(4, parallelExecutions.size());
         List<Task> activeParallelTasks = taskService.createTaskQuery().processInstanceId(parallelTasksProcInstance.getId()).active().list();
         assertEquals(3, activeParallelTasks.size());
@@ -1808,6 +1805,604 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertProcessEnded(parallelTasksProcInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
+    public void testSetCurrentExecutionWithinMultiInstanceParallelSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        //One of the child executions is the parent of the multiInstance "loop"
+        long executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, executionsCount);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(3, subTask1Executions.size());
+
+        //Move one of the executions within the multiInstance subProcess
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(subTask1Executions.get(0).getId(), "subTask2")
+            .changeState();
+
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, executionsCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(2, subTask1Executions.size());
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(1, subTask2Executions.size());
+
+        //Complete one of the parallel subProcesses "subTask2"
+        Task task = taskService.createTaskQuery().executionId(subTask2Executions.get(0).getId()).singleResult();
+        taskService.complete(task.getId());
+
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(5, executionsCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(2, parallelSubProcessCount);
+        subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(2, subTask1Executions.size());
+        subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(0, subTask2Executions.size());
+
+        //Move the other two executions, one by one
+        ChangeActivityStateBuilder changeActivityStateBuilder = runtimeService.createChangeActivityStateBuilder();
+        subTask1Executions.forEach(e -> changeActivityStateBuilder.moveExecutionToActivityId(e.getId(), "subTask2"));
+        changeActivityStateBuilder.changeState();
+
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(5, executionsCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(2, parallelSubProcessCount);
+        subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(0, subTask1Executions.size());
+        subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(2, subTask2Executions.size());
+
+        //Complete the rest of the SubProcesses
+        List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
+        assertEquals(2, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        //There's no multiInstance anymore
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, executionsCount);
+
+        task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
+    public void testSetCurrentActivityWithinMultiInstanceParallelSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        //One of the child executions is the parent of the multiInstance "loop"
+        long executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, executionsCount);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(3, subTask1Executions.size());
+
+        //Move one of the executions within the multiInstance subProcess
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("subTask1", "subTask2")
+            .changeState();
+
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, executionsCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(0, subTask1Executions.size());
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(3, subTask2Executions.size());
+
+        //Complete the parallel subProcesses "subTask2"
+        List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        //There's no multiInstance anymore
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, executionsCount);
+
+        Task task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses.bpmn20.xml")
+    public void testSetCurrentExecutionWithinNestedMultiInstanceParallelSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelNestedMultiInstanceSubProcesses").start();
+
+        long totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(3, subTask1Executions.size());
+
+        //Start the nested subProcesses by completing the first task of the outer subProcess
+        List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        // 3 instances of the outerSubProcess and each have 3 instances of a nestedSubProcess, for a total of 9 nestedSubTask executions
+        // 9 nestedSubProcess instances and 3 outerSubProcesses instances -> 12 executions
+        // 1 Parent execution for the outerSubProcess and 1 parent for each nestedSubProcess -> 4 extra parent executions
+        // Grand Total ->
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        List<Execution> nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(9, nestedSubTask1Executions.size());
+
+        //Move one of the executions within of the nested multiInstance subProcesses
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(nestedSubTask1Executions.get(0).getId(), "nestedSubTask2")
+            .moveExecutionToActivityId(nestedSubTask1Executions.get(3).getId(), "nestedSubTask2")
+            .moveExecutionToActivityId(nestedSubTask1Executions.get(6).getId(), "nestedSubTask2")
+            .changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(6, nestedSubTask1Executions.size());
+        List<Execution> nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(3, nestedSubTask2Executions.size());
+
+        //Complete one of the outer subProcesses
+        Task task = taskService.createTaskQuery().executionId(nestedSubTask2Executions.get(0).getId()).singleResult();
+        taskService.complete(task.getId());
+
+        //One less task execution and one less nested instance
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(23, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(8, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(6, nestedSubTask1Executions.size());
+        nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(2, nestedSubTask2Executions.size());
+
+        //Move the rest of the nestedSubTask1 executions
+        ChangeActivityStateBuilder changeActivityStateBuilder = runtimeService.createChangeActivityStateBuilder();
+        nestedSubTask1Executions.forEach(e -> changeActivityStateBuilder.moveExecutionToActivityId(e.getId(), "nestedSubTask2"));
+        changeActivityStateBuilder.changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(23, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(8, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(0, nestedSubTask1Executions.size());
+        nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(8, nestedSubTask2Executions.size());
+
+        //Complete all the nestedSubTask2
+        tasks = taskService.createTaskQuery().taskDefinitionKey("nestedSubTask2").list();
+        assertEquals(8, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        //Nested subProcesses have completed, only outer subProcess remain
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(3, subTask2Executions.size());
+
+        //Complete the outer subProcesses
+        tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, totalChildExecutions);
+
+        task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses.bpmn20.xml")
+    public void testSetCurrentActivityWithinNestedMultiInstanceParallelSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelNestedMultiInstanceSubProcesses").start();
+
+        long totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(3, subTask1Executions.size());
+
+        //Start the nested subProcesses by completing the first task of the outer subProcess
+        List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        // 3 instances of the outerSubProcess and each have 3 instances of a nestedSubProcess, for a total of 9 nestedSubTask executions
+        // 9 nestedSubProcess instances and 3 outerSubProcesses instances -> 12 executions
+        // 1 Parent execution for the outerSubProcess and 1 parent for each nestedSubProcess -> 4 extra parent executions
+        // Grand Total ->
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        List<Execution> nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(9, nestedSubTask1Executions.size());
+
+        //Complete one task for each nestedSubProcess
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(0).getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(3).getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(6).getId()).singleResult().getId());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(6, nestedSubTask1Executions.size());
+        List<Execution> nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(3, nestedSubTask2Executions.size());
+
+        //Moving the nestedSubTask1 activity should move all its executions
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("nestedSubTask1", "nestedSubTask2")
+            .changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(0, nestedSubTask1Executions.size());
+        nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(9, nestedSubTask2Executions.size());
+
+        //Complete all the nestedSubTask2
+        tasks = taskService.createTaskQuery().taskDefinitionKey("nestedSubTask2").list();
+        assertEquals(9, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        //Nested subProcesses have completed, only outer subProcess remain
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(3, subTask2Executions.size());
+
+        //Complete the outer subProcesses
+        tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, totalChildExecutions);
+
+        Task task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
+    public void testSetCurrentMultiInstanceSubProcessParentExecutionWithinProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        //One of the child executions is the parent of the multiInstance "loop"
+        long executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, executionsCount);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(3, subTask1Executions.size());
+
+        //Complete one of the Tasks
+        Task task = taskService.createTaskQuery().executionId(subTask1Executions.get(1).getId()).singleResult();
+        taskService.complete(task.getId());
+
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, executionsCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(2, subTask1Executions.size());
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(1, subTask2Executions.size());
+
+        //Move the parallelSubProcess via the parentExecution Ids
+        String ParallelSubProcessParentExecutionId = runtimeService.createExecutionQuery()
+            .processInstanceId(processInstance.getId())
+            .activityId("parallelSubProcess")
+            .list()
+            .stream()
+            .findFirst()
+            .map(e -> e.getParentId())
+            .get();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(ParallelSubProcessParentExecutionId, "lastTask")
+            .changeState();
+
+        //There's no multiInstance anymore
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, executionsCount);
+
+        task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
+    public void testSetCurrentMultiInstanceSubProcessParentActivityWithinProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        //One of the child executions is the parent of the multiInstance "loop"
+        long executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, executionsCount);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(3, subTask1Executions.size());
+
+        //Complete one of the Tasks
+        Task task = taskService.createTaskQuery().executionId(subTask1Executions.get(1).getId()).singleResult();
+        taskService.complete(task.getId());
+
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, executionsCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(2, subTask1Executions.size());
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(1, subTask2Executions.size());
+
+        //Move the parallelSubProcess
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("parallelSubProcess", "lastTask")
+            .changeState();
+
+        //There's no multiInstance anymore
+        executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, executionsCount);
+
+        task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses.bpmn20.xml")
+    public void testSetCurrentMultiInstanceNestedSubProcessParentExecutionWithinSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelNestedMultiInstanceSubProcesses").start();
+
+        long totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(3, subTask1Executions.size());
+
+        //Start the nested subProcesses by completing the first task of the outer subProcess
+        List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        // 3 instances of the outerSubProcess and each have 3 instances of a nestedSubProcess, for a total of 9 nestedSubTask executions
+        // 9 nestedSubProcess instances and 3 outerSubProcesses instances -> 12 executions
+        // 1 Parent execution for the outerSubProcess and 1 parent for each nestedSubProcess -> 4 extra parent executions
+        // Grand Total ->
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        List<Execution> nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(9, nestedSubTask1Executions.size());
+
+        //Complete some of the Nested tasks
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(0).getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(3).getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(6).getId()).singleResult().getId());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(6, nestedSubTask1Executions.size());
+        List<Execution> nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(3, nestedSubTask2Executions.size());
+
+        //Complete one of the nested subProcesses
+        Task task = taskService.createTaskQuery().executionId(nestedSubTask2Executions.get(0).getId()).singleResult();
+        taskService.complete(task.getId());
+
+        //One less task execution and one less nested instance
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(23, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(8, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(6, nestedSubTask1Executions.size());
+        nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(2, nestedSubTask2Executions.size());
+
+        //Move each nested multiInstance parent
+        Stream<String> parallelNestedSubProcessesParentIds = runtimeService.createExecutionQuery()
+            .processInstanceId(processInstance.getId())
+            .activityId("parallelNestedSubProcess")
+            .list()
+            .stream()
+            .map(e -> e.getParentId())
+            .distinct();
+
+        parallelNestedSubProcessesParentIds.forEach(parentId -> {
+            runtimeService.createChangeActivityStateBuilder()
+                .moveExecutionToActivityId(parentId, "subTask2")
+                .changeState();
+        });
+
+        //Nested subProcesses have completed, only outer subProcess remain
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(3, subTask2Executions.size());
+
+        //Complete the outer subProcesses
+        tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, totalChildExecutions);
+
+        task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses.bpmn20.xml")
+    public void testSetCurrentMultiInstanceNestedSubProcessParentActivityWithinSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelNestedMultiInstanceSubProcesses").start();
+
+        long totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
+        assertEquals(3, subTask1Executions.size());
+
+        //Start the nested subProcesses by completing the first task of the outer subProcess
+        List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("subTask1").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        // 3 instances of the outerSubProcess and each have 3 instances of a nestedSubProcess, for a total of 9 nestedSubTask executions
+        // 9 nestedSubProcess instances and 3 outerSubProcesses instances -> 12 executions
+        // 1 Parent execution for the outerSubProcess and 1 parent for each nestedSubProcess -> 4 extra parent executions
+        // Grand Total ->
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        List<Execution> nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(9, nestedSubTask1Executions.size());
+
+        //Complete some of the Nested tasks
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(0).getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(3).getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().executionId(nestedSubTask1Executions.get(6).getId()).singleResult().getId());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(25, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(9, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(6, nestedSubTask1Executions.size());
+        List<Execution> nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(3, nestedSubTask2Executions.size());
+
+        //Complete one of the nested subProcesses
+        Task task = taskService.createTaskQuery().executionId(nestedSubTask2Executions.get(0).getId()).singleResult();
+        taskService.complete(task.getId());
+
+        //One less task execution and one less nested instance
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(23, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
+        assertEquals(8, parallelSubProcessCount);
+        nestedSubTask1Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask1").list();
+        assertEquals(6, nestedSubTask1Executions.size());
+        nestedSubTask2Executions = runtimeService.createExecutionQuery().activityId("nestedSubTask2").list();
+        assertEquals(2, nestedSubTask2Executions.size());
+
+        //Move the activity nested multiInstance parent
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("parallelNestedSubProcess", "subTask2")
+            .changeState();
+
+        //Nested subProcesses have completed, only outer subProcess remain
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> subTask2Executions = runtimeService.createExecutionQuery().activityId("subTask2").list();
+        assertEquals(3, subTask2Executions.size());
+
+        //Complete the outer subProcesses
+        tasks = taskService.createTaskQuery().taskDefinitionKey("subTask2").list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, totalChildExecutions);
+
+        task = taskService.createTaskQuery().active().singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
 
 }

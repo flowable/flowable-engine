@@ -62,6 +62,10 @@ public class PlanItemInstanceResource extends PlanItemInstanceBaseResource {
                     @RequestBody RestActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
 
         PlanItemInstance planItemInstance = getPlanItemInstanceFromRequest(planItemInstanceId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doPlanItemInstanceAction(planItemInstance, actionRequest);
+        }
 
         if (RestActionRequest.TRIGGER.equals(actionRequest.getAction())) {
             runtimeService.triggerPlanItemInstance(planItemInstance.getId());

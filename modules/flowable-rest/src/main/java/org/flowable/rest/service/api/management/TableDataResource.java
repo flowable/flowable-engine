@@ -13,6 +13,23 @@
 
 package org.flowable.rest.service.api.management;
 
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.management.TablePage;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.engine.ManagementService;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,22 +38,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.api.management.TablePage;
-import org.flowable.common.engine.api.management.TablePageQuery;
-import org.flowable.common.rest.api.DataResponse;
-import org.flowable.engine.ManagementService;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Frederik Heremans
@@ -52,6 +53,9 @@ public class TableDataResource {
 
     @Autowired
     protected ManagementService managementService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get row data for a single table", tags = { "Database tables" })
     @ApiImplicitParams({
@@ -66,6 +70,10 @@ public class TableDataResource {
     })
     @GetMapping(value = "/management/tables/{tableName}/data", produces = "application/json")
     public DataResponse<List<Map<String, Object>>> getTableData(@ApiParam(name = "tableName") @PathVariable String tableName, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTableInfo();
+        }
+        
         // Check if table exists before continuing
         if (managementService.getTableMetaData(tableName) == null) {
             throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);

@@ -31,6 +31,7 @@ import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -61,6 +62,9 @@ public class BaseVariableResource {
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
     
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
+    
     @Autowired
     protected Environment env;
     
@@ -76,6 +80,11 @@ public class BaseVariableResource {
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
+        }
+        
         return caseInstance;
     }
     

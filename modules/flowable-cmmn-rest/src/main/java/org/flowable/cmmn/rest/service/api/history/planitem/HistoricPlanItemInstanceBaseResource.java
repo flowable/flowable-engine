@@ -13,17 +13,18 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryProperty;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Tijs Rademakers
@@ -44,6 +45,9 @@ public abstract class HistoricPlanItemInstanceBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<HistoricPlanItemInstanceResponse> getQueryResponse(HistoricPlanItemInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricPlanItemInstanceQuery query = historyService.createHistoricPlanItemInstanceQuery();
@@ -89,6 +93,10 @@ public abstract class HistoricPlanItemInstanceBaseResource {
         Optional.ofNullable(queryRequest.getExitAfter()).ifPresent(query::exitAfter);
         Optional.ofNullable(queryRequest.getEndedBefore()).ifPresent(query::endedBefore);
         Optional.ofNullable(queryRequest.getEndedAfter()).ifPresent(query::endedAfter);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryPlanItemInfoWithQuery(query);
+        }
 
         return new HistoricPlanItemInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "createdTime", allowedSortProperties);
     }

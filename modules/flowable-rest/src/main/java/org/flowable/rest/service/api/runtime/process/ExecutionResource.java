@@ -61,6 +61,10 @@ public class ExecutionResource extends ExecutionBaseResource {
     public ExecutionResponse performExecutionAction(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestBody ExecutionActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequest(executionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doExecutionActionRequest(actionRequest);
+        }
 
         if (ExecutionActionRequest.ACTION_SIGNAL.equals(actionRequest.getAction())
                 || ExecutionActionRequest.ACTION_TRIGGER.equals(actionRequest.getAction())) {

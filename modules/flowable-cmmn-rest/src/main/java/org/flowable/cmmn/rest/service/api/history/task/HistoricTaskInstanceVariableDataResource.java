@@ -49,7 +49,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricTaskInstanceVariableDataResource {
+public class HistoricTaskInstanceVariableDataResource extends HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -111,6 +111,10 @@ public class HistoricTaskInstanceVariableDataResource {
 
         if (taskObject == null) {
             throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' couldn't be found.", HistoricTaskInstanceEntity.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoById(taskObject);
         }
 
         Object value = null;

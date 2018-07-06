@@ -17,10 +17,6 @@
         <tomcat.version>7.0.53</tomcat.version>
     </properties>
 
-    <prerequisites>
-        <maven>3.0.0</maven>
-    </prerequisites>
-
     <modules>
         <module>flowable-ui-idm-logic</module>
         <module>flowable-ui-idm-rest</module>

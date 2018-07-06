@@ -250,7 +250,6 @@ public class TaskCollectionResource extends TaskBaseResource {
     })
     @PostMapping(value = "/cmmn-runtime/tasks", produces = "application/json")
     public TaskResponse createTask(@RequestBody TaskRequest taskRequest, HttpServletRequest request, HttpServletResponse response) {
-
         Task task = taskService.newTask();
 
         // Populate the task properties based on the request
@@ -258,6 +257,11 @@ public class TaskCollectionResource extends TaskBaseResource {
         if (taskRequest.isTenantIdSet()) {
             ((TaskEntity) task).setTenantId(taskRequest.getTenantId());
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createTask(task);
+        }
+        
         taskService.saveTask(task);
 
         response.setStatus(HttpStatus.CREATED.value());

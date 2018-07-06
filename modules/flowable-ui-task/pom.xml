@@ -13,10 +13,6 @@
         <version>6.3.2-1</version>
     </parent>
 
-    <prerequisites>
-        <maven>3.0.0</maven>
-    </prerequisites>
-
     <modules>
         <module>flowable-ui-task-logic</module>
         <module>flowable-ui-task-rest</module>

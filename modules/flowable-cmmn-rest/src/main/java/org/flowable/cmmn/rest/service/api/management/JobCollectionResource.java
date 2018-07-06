@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -50,6 +51,9 @@ public class JobCollectionResource {
 
     @Autowired
     protected CmmnManagementService managementService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     // Fixme documentation & real parameters
     @ApiOperation(value = "List jobs", tags = { "Jobs" }, nickname = "listJobs")
@@ -141,6 +145,10 @@ public class JobCollectionResource {
             if (Boolean.valueOf(allRequestParams.get("unlocked"))) {
                 query.unlocked();
             }
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessJobInfoWithQuery(query);
         }
 
         return new JobPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES);
