@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
@@ -129,7 +130,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             // Get FlowElement objects for every move to activity id
             for (String activityId : moveExecutionContainer.getMoveToActivityIds()) {
                 
-                BpmnModel bpmnModel = null;
+                BpmnModel bpmnModel;
                 if (moveExecutionContainer.isMoveToParentProcess()) {
                     String parentProcessDefinitionId = moveExecutionContainer.getSuperExecution().getProcessDefinitionId();
                     bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentProcessDefinitionId);
@@ -228,7 +229,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             
             Collection<FlowElement> moveToFlowElements = null;
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
-                moveToFlowElements = Collections.singletonList((FlowElement) moveExecutionContainer.getCallActivity());
+                moveToFlowElements = Collections.singletonList(moveExecutionContainer.getCallActivity());
             } else {
                 moveToFlowElements = moveExecutionContainer.getMoveToFlowElements();
             }
@@ -353,12 +354,11 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         
         List<ExecutionEntity> newChildExecutions = new ArrayList<>();
         for (FlowElement newFlowElement : moveToFlowElements) {
-            ExecutionEntity newChildExecution = null;
+            ExecutionEntity newChildExecution;
             
             // Check if a sub process child execution was created for this move to flow element, otherwise use the default continue parent execution
             if (moveExecutionContainer.getSubProcessesToCreateMap().containsKey(newFlowElement.getId())) {
-                newChildExecution = moveExecutionContainer.getNewSubProcessChildExecution(
-                                moveExecutionContainer.getSubProcessesToCreateMap().get(newFlowElement.getId()).get(0).getId());
+                newChildExecution = moveExecutionContainer.getNewSubProcessChildExecution(moveExecutionContainer.getSubProcessesToCreateMap().get(newFlowElement.getId()).get(0).getId());
             } else {
                 newChildExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
             }
@@ -368,8 +368,20 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             if (newFlowElement instanceof CallActivity) {
                 CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(newChildExecution);
             }
-            
+
             newChildExecutions.add(newChildExecution);
+
+            // Parallel gateway joins needs each incoming execution to enter the gateway naturally as it checks the number of executions to be able to progress/continue
+            // If we have multiple executions going into a gateway, usually into a gateway join using xxxToSingleActivityId
+            if (newFlowElement instanceof Gateway) {
+                //Skip one that was already added
+                currentExecutions.stream().skip(1).forEach(e -> {
+                    ExecutionEntity childExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
+                    childExecution.setCurrentFlowElement(newFlowElement);
+                    newChildExecutions.add(childExecution);
+                });
+            }
+
         }
         
         return newChildExecutions;
