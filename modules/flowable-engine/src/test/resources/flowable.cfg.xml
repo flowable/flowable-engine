@@ -43,6 +43,18 @@
             <property name="mailServerPassword" value="password" />
           </bean>
         </entry>
+        <entry key="forceToEmailTenant">
+          <bean class="org.flowable.engine.cfg.MailServerInfo">
+            <property name="mailServerHost" value="localhost" />
+            <property name="mailServerPort" value="5025" />
+            <property name="mailServerUseSSL" value="false" />
+            <property name="mailServerUseTLS" value="false" />
+            <property name="mailServerDefaultFrom" value="flowable@myTenant.com" />
+            <property name="mailServerForceTo" value="no-reply@myTenant.com" />
+            <property name="mailServerUsername" value="flowable@myTenant.com" />
+            <property name="mailServerPassword" value="password" />
+          </bean>
+        </entry>
       </map>
     </property>
     
