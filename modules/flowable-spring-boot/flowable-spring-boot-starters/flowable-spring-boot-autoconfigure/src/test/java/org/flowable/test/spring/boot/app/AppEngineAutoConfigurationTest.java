@@ -146,6 +146,10 @@ public class AppEngineAutoConfigurationTest {
             ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
             assertThat(processEngineConfiguration.getIdGenerator().getNextId()).as("Process id generator must be DB id generator").doesNotContain("-");
             assertThat(processEngineConfiguration.getTaskIdGenerator().getNextId()).as("Task id generator must be DB id generator").doesNotContain("-");
+
+            AppEngine appEngine = context.getBean(AppEngine.class);
+            deleteDeployments(appEngine);
+            deleteDeployments(processEngine);
         });
     }
 
