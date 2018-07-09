@@ -85,8 +85,6 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             formProperties.isDeployResources()
         );
 
-        configuration.setDisableIdmEngine(true);
-
         if (resources != null && !resources.isEmpty()) {
             configuration.setDeploymentResources(resources.toArray(new Resource[0]));
             configuration.setDeploymentName(formProperties.getDeploymentName());
@@ -120,7 +118,6 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         public FormEngineConfigurator formEngineConfigurator(SpringFormEngineConfiguration configuration) {
             SpringFormEngineConfigurator formEngineConfigurator = new SpringFormEngineConfigurator();
             formEngineConfigurator.setFormEngineConfiguration(configuration);
-            configuration.setDisableIdmEngine(true);
             invokeConfigurers(configuration);
             
             return formEngineConfigurator;
@@ -146,8 +143,6 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         public FormEngineConfigurator formEngineConfigurator(SpringFormEngineConfiguration configuration) {
             SpringFormEngineConfigurator formEngineConfigurator = new SpringFormEngineConfigurator();
             formEngineConfigurator.setFormEngineConfiguration(configuration);
-
-            configuration.setDisableIdmEngine(true);
 
             invokeConfigurers(configuration);
             
