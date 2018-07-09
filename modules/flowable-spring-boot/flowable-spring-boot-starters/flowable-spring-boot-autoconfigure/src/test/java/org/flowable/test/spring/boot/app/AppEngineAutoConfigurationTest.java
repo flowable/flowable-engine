@@ -31,9 +31,11 @@ import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
@@ -49,6 +51,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Tijs Rademakers
@@ -131,6 +135,20 @@ public class AppEngineAutoConfigurationTest {
         });
     }
 
+    @Test
+    public void appEngineWithProcessEngineAndTaskIdGenerator() {
+        contextRunner.withUserConfiguration(CustomIdGeneratorConfiguration.class
+        ).withConfiguration(AutoConfigurations.of(
+            ProcessEngineServicesAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class
+        )).run(context -> {
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+            ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+            assertThat(processEngineConfiguration.getIdGenerator().getNextId()).as("Process id generator must be DB id generator").doesNotContain("-");
+            assertThat(processEngineConfiguration.getTaskIdGenerator().getNextId()).as("Task id generator must be DB id generator").doesNotContain("-");
+        });
+    }
+
     private void assertAllServicesPresent(ApplicationContext context, AppEngine appEngine) {
         List<Method> methods = Stream.of(AppEngine.class.getDeclaredMethods())
             .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
@@ -162,6 +180,15 @@ public class AppEngineAutoConfigurationTest {
     private static ProcessEngineConfiguration processEngine(AppEngine appEngine) {
         AppEngineConfiguration appEngineConfiguration = appEngine.getAppEngineConfiguration();
         return (ProcessEngineConfiguration) appEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+    }
+
+    @Configuration
+    static class CustomIdGeneratorConfiguration {
+
+        @Bean
+        public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> customIdGeneratorConfigurer() {
+            return engineConfiguration -> engineConfiguration.setIdGenerator(new DbIdGenerator());
+        }
     }
 
 }
