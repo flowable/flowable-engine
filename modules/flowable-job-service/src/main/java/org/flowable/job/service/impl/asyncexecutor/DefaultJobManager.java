@@ -77,7 +77,8 @@ public class DefaultJobManager implements JobManager {
 
     @Override
     public void createAsyncJob(JobEntity jobEntity, boolean exclusive) {
-        // When the async executor is activated, the job is directly passed on to the async executor thread
+        // When the async executor is activated, the job is directly passed on
+        // to the async executor thread
         if (isAsyncExecutorActive()) {
             internalCreateLockedAsyncJob(jobEntity, exclusive);
 
@@ -94,7 +95,8 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void triggerExecutorIfNeeded(JobEntity jobEntity) {
-        // When the async executor is activated, the job is directly passed on to the async executor thread
+        // When the async executor is activated, the job is directly passed on
+        // to the async executor thread
         if (isAsyncExecutorActive()) {
             hintAsyncExecutor(jobEntity);
         }
@@ -117,8 +119,7 @@ public class DefaultJobManager implements JobManager {
     private void sendTimerScheduledEvent(TimerJobEntity timerJob) {
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(
-                    FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
         }
     }
 
@@ -237,6 +238,9 @@ public class DefaultJobManager implements JobManager {
 
     @Override
     public void unacquire(JobInfo job) {
+        if (job == null) {
+            return;
+        }
 
         if (job instanceof HistoryJob) {
 
@@ -244,7 +248,8 @@ public class DefaultJobManager implements JobManager {
 
             HistoryJobEntity newJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().create();
             copyHistoryJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
+            newJobEntity.setId(null); // We want a new id to be assigned to this
+                                      // job
             newJobEntity.setLockExpirationTime(null);
             newJobEntity.setLockOwner(null);
             jobServiceConfiguration.getHistoryJobEntityManager().insert(newJobEntity);
@@ -253,21 +258,25 @@ public class DefaultJobManager implements JobManager {
         } else if (job instanceof JobEntity) {
 
             // Deleting the old job and inserting it again with another id,
-            // will avoid that the job is immediately is picked up again (for example
+            // will avoid that the job is immediately is picked up again (for
+            // example
             // when doing lots of exclusive jobs for the same process instance)
 
             JobEntity jobEntity = (JobEntity) job;
 
             JobEntity newJobEntity = jobServiceConfiguration.getJobEntityManager().create();
             copyJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
+            newJobEntity.setId(null); // We want a new id to be assigned to this
+                                      // job
             newJobEntity.setLockExpirationTime(null);
             newJobEntity.setLockOwner(null);
             jobServiceConfiguration.getJobEntityManager().insert(newJobEntity);
             jobServiceConfiguration.getJobEntityManager().delete(jobEntity.getId());
 
-            // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
-            // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
+            // We're not calling triggerExecutorIfNeeded here after the insert.
+            // The unacquire happened
+            // for a reason (eg queue full or exclusive lock failure). No need
+            // to try it immediately again,
             // as the chance of failure will be high.
 
         } else {
@@ -289,7 +298,8 @@ public class DefaultJobManager implements JobManager {
             if (historyJobEntity.getRetries() > 0) {
                 HistoryJobEntity newHistoryJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().create();
                 copyHistoryJobInfo(newHistoryJobEntity, historyJobEntity);
-                newHistoryJobEntity.setId(null); // We want a new id to be assigned to this job
+                newHistoryJobEntity.setId(null); // We want a new id to be
+                                                 // assigned to this job
                 newHistoryJobEntity.setLockExpirationTime(null);
                 newHistoryJobEntity.setLockOwner(null);
                 newHistoryJobEntity.setCreateTime(jobServiceConfiguration.getClock().getCurrentTime());
@@ -297,7 +307,7 @@ public class DefaultJobManager implements JobManager {
                 newHistoryJobEntity.setRetries(newHistoryJobEntity.getRetries() - 1);
                 jobServiceConfiguration.getHistoryJobEntityManager().insert(newHistoryJobEntity);
                 jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
-            
+
             } else {
                 jobServiceConfiguration.getHistoryJobEntityManager().delete(historyJobEntity);
             }
@@ -307,7 +317,8 @@ public class DefaultJobManager implements JobManager {
 
             JobEntity newJobEntity = jobServiceConfiguration.getJobEntityManager().create();
             copyJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
+            newJobEntity.setId(null); // We want a new id to be assigned to this
+                                      // job
             newJobEntity.setLockExpirationTime(null);
             newJobEntity.setLockOwner(null);
 
@@ -322,8 +333,10 @@ public class DefaultJobManager implements JobManager {
 
             jobServiceConfiguration.getJobEntityManager().delete(jobEntity.getId());
 
-            // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
-            // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
+            // We're not calling triggerExecutorIfNeeded here after the insert.
+            // The unacquire happened
+            // for a reason (eg queue full or exclusive lock failure). No need
+            // to try it immediately again,
             // as the chance of failure will be high.
 
         }
@@ -377,7 +390,7 @@ public class DefaultJobManager implements JobManager {
             }
         }
     }
-    
+
     protected void executeJobHandler(JobEntity jobEntity) {
         VariableScope variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(jobEntity);
 
@@ -409,13 +422,14 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected boolean isValidTime(JobEntity timerEntity, Date newTimerDate, VariableScope variableScope) {
-        BusinessCalendar businessCalendar = jobServiceConfiguration.getBusinessCalendarManager().getBusinessCalendar(
-                getBusinessCalendarName(timerEntity, variableScope));
+        BusinessCalendar businessCalendar = jobServiceConfiguration.getBusinessCalendarManager()
+                        .getBusinessCalendar(getBusinessCalendarName(timerEntity, variableScope));
         return businessCalendar.validateDuedate(timerEntity.getRepeat(), timerEntity.getMaxIterations(), timerEntity.getEndDate(), newTimerDate);
     }
 
     protected void hintAsyncExecutor(JobEntity job) {
-        // Verify that correct properties have been set when the async executor will be hinted
+        // Verify that correct properties have been set when the async executor
+        // will be hinted
         if (job.getLockOwner() == null || job.getLockExpirationTime() == null) {
             createAsyncJob(job, job.isExclusive());
         }
@@ -428,18 +442,18 @@ public class DefaultJobManager implements JobManager {
         }
         createHintListeners(getAsyncHistoryExecutor(), historyJobEntity);
     }
-    
+
     protected void createHintListeners(AsyncExecutor asyncExecutor, JobInfoEntity job) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         if (Context.getTransactionContext() != null) {
             JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, asyncExecutor,
                             CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor());
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
-            
+
         } else {
             AsyncJobAddedNotification jobAddedNotification = new AsyncJobAddedNotification(job, asyncExecutor);
             commandContext.addCloseListener(jobAddedNotification);
-            
+
         }
     }
 
@@ -465,8 +479,8 @@ public class DefaultJobManager implements JobManager {
     protected String getBusinessCalendarName(String calendarName, VariableScope variableScope) {
         String businessCalendarName = CYCLE_TYPE;
         if (StringUtils.isNotEmpty(calendarName)) {
-            businessCalendarName = (String) CommandContextUtil.getJobServiceConfiguration().getExpressionManager()
-                    .createExpression(calendarName).getValue(variableScope);
+            businessCalendarName = (String) CommandContextUtil.getJobServiceConfiguration().getExpressionManager().createExpression(calendarName)
+                            .getValue(variableScope);
         }
         return businessCalendarName;
     }
@@ -478,18 +492,19 @@ public class DefaultJobManager implements JobManager {
         triggerAsyncHistoryExecutorIfNeeded(historyJobEntity);
         return historyJobEntity;
     }
-    
+
     protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity historyJobEntity) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
         if (asyncHistorySession != null) {
             TransactionContext transactionContext = asyncHistorySession.getTransactionContext();
             if (transactionContext != null) {
-                transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncExecutorTransactionListener(commandContext, historyJobEntity)); 
+                transactionContext.addTransactionListener(TransactionState.COMMITTED,
+                                new TriggerAsyncExecutorTransactionListener(commandContext, historyJobEntity));
             }
         }
     }
-    
+
     protected void internalCreateAsyncJob(JobEntity jobEntity, boolean exclusive) {
         fillDefaultAsyncJobInfo(jobEntity, exclusive);
     }
@@ -499,7 +514,7 @@ public class DefaultJobManager implements JobManager {
         setLockTimeAndOwner(getAsyncExecutor(), jobEntity);
     }
 
-    protected void setLockTimeAndOwner(AsyncExecutor asyncExecutor , JobInfoEntity jobInfoEntity) {
+    protected void setLockTimeAndOwner(AsyncExecutor asyncExecutor, JobInfoEntity jobInfoEntity) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
         gregorianCalendar.add(Calendar.MILLISECOND, asyncExecutor.getAsyncJobLockTimeInMillis());
@@ -613,11 +628,11 @@ public class DefaultJobManager implements JobManager {
     protected boolean isAsyncExecutorActive() {
         return isExecutorActive(jobServiceConfiguration.getAsyncExecutor());
     }
-    
+
     protected boolean isAsyncHistoryExecutorActive() {
         return isExecutorActive(jobServiceConfiguration.getAsyncHistoryExecutor());
     }
-    
+
     protected boolean isExecutorActive(AsyncExecutor asyncExecutor) {
         return asyncExecutor != null && asyncExecutor.isActive();
     }
@@ -629,7 +644,7 @@ public class DefaultJobManager implements JobManager {
     protected AsyncExecutor getAsyncExecutor() {
         return jobServiceConfiguration.getAsyncExecutor();
     }
-    
+
     protected AsyncExecutor getAsyncHistoryExecutor() {
         return jobServiceConfiguration.getAsyncHistoryExecutor();
     }

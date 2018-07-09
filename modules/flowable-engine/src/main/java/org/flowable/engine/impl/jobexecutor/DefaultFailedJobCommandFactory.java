@@ -23,7 +23,7 @@ public class DefaultFailedJobCommandFactory implements FailedJobCommandFactory {
 
     @Override
     public Command<Object> getCommand(String jobId, Throwable exception) {
-        return new JobRetryCmd(jobId, exception);
+        return new RetryOnlyParallelInstanceMonitoringJobsCmd(jobId, exception);
     }
 
 }

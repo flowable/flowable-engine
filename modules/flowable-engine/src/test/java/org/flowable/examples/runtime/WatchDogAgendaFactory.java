@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.runtime;
 
+import java.util.List;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.FlowableEngineAgenda;
@@ -20,7 +22,8 @@ import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgenda;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * This class is a simple watchdog agenda implementation. It throws exception in the case when watchdog limit is exceeded for fetching operations from agenda.
+ * This class is a simple watchdog agenda implementation. It throws exception in
+ * the case when watchdog limit is exceeded for fetching operations from agenda.
  */
 public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
 
@@ -122,13 +125,19 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         @Override
         public void flush() {
             // TODO Auto-generated method stub
-            
+
         }
 
         @Override
         public void close() {
             // TODO Auto-generated method stub
-            
+
+        }
+
+        @Override
+        public void planMonitorParallelMultiInstanceOperation(ExecutionEntity executionEntity, List< ? extends ExecutionEntity> executions) {
+            // TODO Auto-generated method stub
+
         }
 
     }

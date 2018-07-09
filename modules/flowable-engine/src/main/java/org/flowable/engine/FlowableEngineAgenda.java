@@ -12,6 +12,8 @@
  */
 package org.flowable.engine;
 
+import java.util.List;
+
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
@@ -40,4 +42,7 @@ public interface FlowableEngineAgenda extends Agenda {
     void planDestroyScopeOperation(ExecutionEntity execution);
 
     void planExecuteInactiveBehaviorsOperation();
+
+    void planMonitorParallelMultiInstanceOperation(ExecutionEntity executionEntity, List<? extends ExecutionEntity> executions);
+
 }

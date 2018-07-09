@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.agenda;
 
+import java.util.List;
+
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -25,17 +27,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * For each API call (and thus {@link Command}) being executed, a new agenda instance is created. On this agenda, operations are put, which the {@link CommandExecutor} will keep executing until all
- * are executed.
+ * For each API call (and thus {@link Command}) being executed, a new agenda
+ * instance is created. On this agenda, operations are put, which the
+ * {@link CommandExecutor} will keep executing until all are executed.
  *
- * The agenda also gives easy access to methods to plan new operations when writing {@link ActivityBehavior} implementations.
+ * The agenda also gives easy access to methods to plan new operations when
+ * writing {@link ActivityBehavior} implementations.
  *
- * During a {@link Command} execution, the agenda can always be fetched using {@link Context#getAgenda()}.
+ * During a {@link Command} execution, the agenda can always be fetched using
+ * {@link Context#getAgenda()}.
  *
  * @author Joram Barrez
  */
 public class DefaultFlowableEngineAgenda extends AbstractAgenda implements FlowableEngineAgenda {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFlowableEngineAgenda.class);
 
     public DefaultFlowableEngineAgenda(CommandContext commandContext) {
@@ -105,6 +110,11 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     @Override
     public void planExecuteInactiveBehaviorsOperation() {
         planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
+    }
+
+    @Override
+    public void planMonitorParallelMultiInstanceOperation(ExecutionEntity executionEntity, List< ? extends ExecutionEntity> executions) {
+        planOperation(new MonitorParallelMultiInstanceOperation(commandContext, executionEntity, executions), executionEntity);
     }
 
 }

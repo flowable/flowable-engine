@@ -56,14 +56,10 @@ public class JobRetryCmd implements Command<Object> {
 
     @Override
     public Object execute(CommandContext commandContext) {
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
         TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
-        
-        JobEntity job = jobService.findJobById(jobId);
-        if (job == null) {
-            return null;
-        }
 
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        JobEntity job = findJob(commandContext);
         ProcessEngineConfiguration processEngineConfig = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
         ExecutionEntity executionEntity = fetchExecutionEntity(commandContext, job.getExecutionId());
@@ -114,8 +110,10 @@ public class JobRetryCmd implements Command<Object> {
 
                 newJobEntity.setDuedate(durationHelper.getDateAfter());
 
-                if (job.getExceptionMessage() == null) { // is it the first exception
-                    LOGGER.debug("Applying JobRetryStrategy '{}' the first time for job {} with {} retries", failedJobRetryTimeCycleValue, job.getId(), durationHelper.getTimes());
+                if (job.getExceptionMessage() == null) { // is it the first
+                                                         // exception
+                    LOGGER.debug("Applying JobRetryStrategy '{}' the first time for job {} with {} retries", failedJobRetryTimeCycleValue, job.getId(),
+                                    durationHelper.getTimes());
 
                 } else {
                     LOGGER.debug("Decrementing retries of JobRetryStrategy '{}' for job {}", failedJobRetryTimeCycleValue, job.getId());
@@ -141,6 +139,12 @@ public class JobRetryCmd implements Command<Object> {
         }
 
         return null;
+    }
+
+    protected JobEntity findJob(CommandContext commandContext) {
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        JobEntity job = jobService.findJobById(jobId);
+        return job == null ? null : job;
     }
 
     protected Date calculateDueDate(CommandContext commandContext, int waitTimeInSeconds, Date oldDate) {
