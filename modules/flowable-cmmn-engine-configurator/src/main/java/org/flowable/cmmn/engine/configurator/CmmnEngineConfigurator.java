@@ -172,7 +172,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
                 if (engineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
                     targetEgineConfiguration.setTaskIdGenerator(((HasTaskIdGeneratorEngineConfiguration) engineConfiguration).getTaskIdGenerator());
                 } else {
-                    targetEgineConfiguration.setTaskIdGenerator(engineConfiguration.getIdGenerator());
+                    targetEgineConfiguration.setTaskIdGenerator(targetEngineConfiguration.getIdGenerator());
                 }
             }
         }
