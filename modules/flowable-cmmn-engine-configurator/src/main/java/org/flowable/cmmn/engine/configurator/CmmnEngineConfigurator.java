@@ -116,6 +116,9 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             cmmnEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(processEngineConfiguration.isAsyncHistoryJsonGroupingEnabled());
             cmmnEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(processEngineConfiguration.getAsyncHistoryJsonGroupingThreshold());
             cmmnEngineConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(processEngineConfiguration.isAsyncHistoryJsonGzipCompressionEnabled());
+            
+            // See the beforeInit
+            ((CmmnEngineConfiguration) cmmnEngineConfiguration).setHistoryJobExecutionScope(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL);
         }
     }
     
@@ -169,7 +172,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
                 if (engineConfiguration instanceof HasTaskIdGeneratorEngineConfiguration) {
                     targetEgineConfiguration.setTaskIdGenerator(((HasTaskIdGeneratorEngineConfiguration) engineConfiguration).getTaskIdGenerator());
                 } else {
-                    targetEgineConfiguration.setTaskIdGenerator(engineConfiguration.getIdGenerator());
+                    targetEgineConfiguration.setTaskIdGenerator(targetEngineConfiguration.getIdGenerator());
                 }
             }
         }

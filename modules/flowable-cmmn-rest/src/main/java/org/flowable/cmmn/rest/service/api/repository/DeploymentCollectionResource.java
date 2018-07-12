@@ -28,6 +28,7 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryProperty;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -74,6 +75,9 @@ public class DeploymentCollectionResource {
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List Deployments", tags = { "Deployment" }, nickname="listDeployments")
     @ApiImplicitParams({
@@ -127,6 +131,10 @@ public class DeploymentCollectionResource {
                 deploymentQuery.deploymentWithoutTenantId();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
+        }
 
         return new DeploymentsPaginateList(restResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
@@ -151,6 +159,10 @@ public class DeploymentCollectionResource {
 
         if (!(request instanceof MultipartHttpServletRequest)) {
             throw new FlowableIllegalArgumentException("Multipart request is required");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
         }
 
         String queryString = request.getQueryString();

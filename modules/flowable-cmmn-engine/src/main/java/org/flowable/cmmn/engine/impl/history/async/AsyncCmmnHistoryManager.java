@@ -31,6 +31,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -58,7 +59,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             Map<String, String> data = new HashMap<>();
             addCommonCaseInstanceFields(caseInstanceEntity, data);
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_START, data, caseInstanceEntity.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_START, data, caseInstanceEntity.getTenantId());
         }
     }
 
@@ -75,7 +76,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
                 putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DURATION, endTime.getTime() - caseInstanceEntity.getStartTime().getTime());
             }
             
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_END, data, caseInstanceEntity.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_END, data, caseInstanceEntity.getTenantId());
         }
     }
     
@@ -123,7 +124,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
                 }
             }
             
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_HISTORIC_CASE_INSTANCE_DELETED, data, 
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_HISTORIC_CASE_INSTANCE_DELETED, data, 
                     historicCaseInstanceEntity != null ? historicCaseInstanceEntity.getTenantId() : null);
         }
     }
@@ -157,7 +158,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
                 addCaseDefinitionFields(data, CaseDefinitionUtil.getCaseDefinition(milestoneInstanceEntity.getCaseDefinitionId()));
             }
             
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_MILESTONE_REACHED, data, milestoneInstanceEntity.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_MILESTONE_REACHED, data, milestoneInstanceEntity.getTenantId());
         }
     }
 
@@ -174,7 +175,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
                 addCaseDefinitionFields(data, caseDefinition);
             }
             
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_IDENTITY_LINK_CREATED, data,
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_IDENTITY_LINK_CREATED, data,
                     caseDefinition != null ? caseDefinition.getTenantId() : null);
         }
     }
@@ -191,7 +192,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
                 addCaseDefinitionFields(data, caseDefinition);
             }
             
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_IDENTITY_LINK_DELETED, data,
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_IDENTITY_LINK_DELETED, data,
                     caseDefinition != null ? caseDefinition.getTenantId() : null);
         }
     }
@@ -233,7 +234,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
             Map<String, String> data = new HashMap<>();
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
             addCommonVariableFields(variable, data);
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_VARIABLE_CREATED, data);
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_CREATED, data);
         }
     }
 
@@ -242,7 +243,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) { 
             Map<String, String> data = new HashMap<>();
             addCommonVariableFields(variable, data);
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED, data);
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED, data);
         }
     }
 
@@ -251,7 +252,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             Map<String, String> data = new HashMap<>();
             addCommonVariableFields(variable, data);
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_VARIABLE_REMOVED, data);
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_VARIABLE_REMOVED, data);
         }
     }
     
@@ -291,7 +292,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             Map<String, String> data = new HashMap<>();
             addCommonTaskFields(task, data);
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_TASK_CREATED, data, task.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_CREATED, data, task.getTenantId());
         }
     }
 
@@ -300,7 +301,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             Map<String, String> data = new HashMap<>();
             addCommonTaskFields(task, data);
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_TASK_UPDATED, data, task.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_UPDATED, data, task.getTenantId());
         }
     }
     
@@ -313,7 +314,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DELETE_REASON, deleteReason);
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_END_TIME, cmmnEngineConfiguration.getClock().getCurrentTime());
             
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_TASK_REMOVED, data, task.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_REMOVED, data, task.getTenantId());
         }
     }
     
@@ -353,7 +354,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             Map<String, String> data = new HashMap<>();
             addCommonPlanItemInstanceFields(planItemInstanceEntity, data);
-            getAsyncHistorySession().addHistoricData(CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_CREATED, data, planItemInstanceEntity.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_PLAN_ITEM_INSTANCE_CREATED, data, planItemInstanceEntity.getTenantId());
         }
     }
 
@@ -438,8 +439,12 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
             for (String field : fields) {
                 putIfNotNull(data, field, time);
             }
-            getAsyncHistorySession().addHistoricData(type, data, planItemInstanceEntity.getTenantId());
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), type, data, planItemInstanceEntity.getTenantId());
         }
+    }
+    
+    protected JobServiceConfiguration getJobServiceConfiguration() {
+        return cmmnEngineConfiguration.getJobServiceConfiguration();
     }
 
 }

@@ -12,18 +12,20 @@
  */
 package org.flowable.dmn.rest.service.api.management;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.DmnEngines;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.EngineInfo;
-import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.DmnEngines;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
@@ -31,6 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(tags = { "Engine" }, description = "Manage DMN Engine", authorizations = { @Authorization(value = "basicAuth") })
 public class DmnEngineResource {
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get DMN engine info", tags = { "Engine" }, notes = "Returns a read-only view of the DMN engine that is used in this REST-service.")
     @ApiResponses(value = {
@@ -38,6 +43,10 @@ public class DmnEngineResource {
     })
     @GetMapping(value = "/dmn-management/engine", produces = "application/json")
     public DmnEngineInfoResponse getEngineInfo() {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDmnManagementInfo();
+        }
+        
         DmnEngineInfoResponse response = new DmnEngineInfoResponse();
 
         try {

@@ -16,7 +16,12 @@ package org.flowable.engine.impl.cmd;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.FlowElementsContainer;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -70,35 +75,38 @@ public class ChangeActivityStateCmd implements Command<Void> {
                 List<ExecutionEntity> executions = new ArrayList<>();
 
                 for (String activityId : activityContainer.getActivityIds()) {
+                    List<ExecutionEntity> activityExecutions = dynamicStateManager.resolveActiveExecutions(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext);
+                    if (!activityExecutions.isEmpty()) {
+                        ExecutionEntity execution = activityExecutions.get(0);
 
-                    ExecutionEntity execution = dynamicStateManager.resolveActiveExecution(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext);
+                        //Check if the activity is inside a multiInstance subProcess
+                        boolean insideMultiInstance = false;
+                        FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
+                        while (!(parentContainer instanceof Process)) {
+                            MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentContainer).getLoopCharacteristics();
+                            if (loopCharacteristics != null && !loopCharacteristics.isSequential()) {
 
-                    //Could this activity be inside a multiInstance subProcess ?
-                    ExecutionEntity parent = execution.getParent();
-                    while (parent != null) {
-                        if (parent.isMultiInstanceRoot()) {
-                            break;
+                                insideMultiInstance = true;
+                                break;
+                            }
+                            parentContainer = ((Activity) parentContainer).getParentContainer();
                         }
-                        parent = parent.getParent();
-                    }
-
-                    if (parent != null) {
-                        dynamicStateManager.resolveActiveExecutions(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext)
-                            .forEach(e -> {
-                                List<ExecutionEntity> executionEntities = Collections.singletonList(e);
-                                MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executionEntities, activityContainer.getMoveToActivityIds());
-                                completeMoveExecutionContainer(activityContainer, executionEntities, moveExecutionEntityContainer);
-                                moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
-                            });
-                    } else {
-                        executions.add(execution);
+                        //If inside a multiInstance, we create one container for each execution
+                        if (insideMultiInstance) {
+                            Stream<ExecutionEntity> executionsStream = activityExecutions.stream();
+                            //If the source activity is already a multiInstance, we need to move only the parents (filter)
+                            if (execution.isMultiInstanceRoot()) {
+                                executionsStream = executionsStream.filter(ExecutionEntity::isMultiInstanceRoot);
+                            }
+                            executionsStream.forEach(e -> moveExecutionEntityContainerList.add(createMoveExecutionContainer(activityContainer, Collections.singletonList(e))));
+                        } else {
+                            executions.add(execution);
+                        }
                     }
                 }
 
                 if (!executions.isEmpty()) {
-                    MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds());
-                    completeMoveExecutionContainer(activityContainer, executions, moveExecutionEntityContainer);
-                    moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
+                    moveExecutionEntityContainerList.add(createMoveExecutionContainer(activityContainer, executions));
                 }
             }
         }
@@ -109,7 +117,9 @@ public class ChangeActivityStateCmd implements Command<Void> {
         return null;
     }
 
-    private void completeMoveExecutionContainer(MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions, MoveExecutionEntityContainer moveExecutionEntityContainer) {
+    protected static MoveExecutionEntityContainer createMoveExecutionContainer(MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions) {
+        MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds());
+
         if (activityContainer.isMoveToParentProcess()) {
             ExecutionEntity processInstanceExecution = executions.get(0).getProcessInstance();
             ExecutionEntity superExecution = processInstanceExecution.getSuperExecution();
@@ -124,5 +134,6 @@ public class ChangeActivityStateCmd implements Command<Void> {
             moveExecutionEntityContainer.setMoveToSubProcessInstance(true);
             moveExecutionEntityContainer.setCallActivityId(activityContainer.getCallActivityId());
         }
+        return moveExecutionEntityContainer;
     }
 }

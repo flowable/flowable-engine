@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,7 +38,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricTaskInstanceResource {
+public class HistoricTaskInstanceResource extends HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -62,15 +61,13 @@ public class HistoricTaskInstanceResource {
             @ApiResponse(code = 404, message = "Indicates that the historic task instance could not be found.") })
     @DeleteMapping(value = "/cmmn-history/historic-task-instances/{taskId}")
     public void deleteTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteHistoricTask(task);
+        }
+        
         historyService.deleteHistoricTaskInstance(taskId);
         response.setStatus(HttpStatus.NO_CONTENT.value());
-    }
-
-    protected HistoricTaskInstance getHistoricTaskInstanceFromRequest(String taskId) {
-        HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-        if (taskInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task instance with id '" + taskId + "'.", HistoricTaskInstance.class);
-        }
-        return taskInstance;
     }
 }

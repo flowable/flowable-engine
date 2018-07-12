@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -50,6 +51,9 @@ public class TimerJobCollectionResource {
 
     @Autowired
     protected CmmnManagementService managementService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     // Fixme documentation & real parameters
     @ApiOperation(value = "List timer jobs", tags = { "Jobs" }, nickname = "listTimerJobs")
@@ -134,6 +138,10 @@ public class TimerJobCollectionResource {
             if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
                 query.jobWithoutTenantId();
             }
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTimerJobInfoWithQuery(query);
         }
 
         return new JobPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES);

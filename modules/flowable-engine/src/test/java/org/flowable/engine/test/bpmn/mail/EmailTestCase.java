@@ -22,11 +22,13 @@ import org.subethamail.wiser.Wiser;
 public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
     protected Wiser wiser;
+    private String initialForceTo;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
+        initialForceTo = processEngineConfiguration.getMailServerForceTo();
         boolean serverUpAndRunning = false;
         while (!serverUpAndRunning) {
             wiser = new Wiser();
@@ -51,6 +53,7 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
         Thread.sleep(250L);
 
         super.tearDown();
+        processEngineConfiguration.setMailServerForceTo(initialForceTo);
     }
 
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="inclusiveGatewayInsideCalledActivityNestedInMultiInstanceParallelSubProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="multiInstanceSubProcess"/>
+
+        <subProcess id="multiInstanceSubProcess">
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <loopCardinality>3</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+            <startEvent id="multiInstanceSubProcessStart"/>
+            <sequenceFlow id="subFlow1" sourceRef="multiInstanceSubProcessStart" targetRef="callActivity"/>
+            <callActivity id="callActivity" name="gateWayActivity" calledElement="simpleParallelFlow"/>
+            <sequenceFlow id="subflow2" sourceRef="callActivity" targetRef="multiInstanceSubProcessEnd"/>
+            <endEvent id="multiInstanceSubProcessEnd"/>
+        </subProcess>
+        <sequenceFlow id="flow2" sourceRef="multiInstanceSubProcess" targetRef="lastTask"/>
+        <userTask id="lastTask"/>
+        <sequenceFlow id="flow3" sourceRef="lastTask" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+    </process>
+
+</definitions>

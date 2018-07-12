@@ -25,6 +25,7 @@ import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -723,6 +724,12 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getProcessInstanceQueryInterceptor().beforeProcessInstanceQueryExecute(this);
+        }
+        
         return CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceCountByQueryCriteria(this);
     }
 
@@ -731,16 +738,26 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         checkQueryOk();
         ensureVariablesInitialized();
         List<ProcessInstance> processInstances = null;
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getProcessInstanceQueryInterceptor().beforeProcessInstanceQueryExecute(this);
+        }
+        
         if (includeProcessVariables) {
             processInstances = CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceAndVariablesByQueryCriteria(this);
         } else {
             processInstances = CommandContextUtil.getExecutionEntityManager(commandContext).findProcessInstanceByQueryCriteria(this);
         }
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
+        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization()) {
             for (ProcessInstance processInstance : processInstances) {
                 localize(processInstance);
             }
+        }
+        
+        if (processEngineConfiguration.getProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getProcessInstanceQueryInterceptor().afterProcessInstanceQueryExecute(this, processInstances);
         }
 
         return processInstances;

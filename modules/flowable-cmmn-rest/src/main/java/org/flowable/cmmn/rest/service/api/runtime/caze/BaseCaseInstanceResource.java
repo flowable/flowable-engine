@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
@@ -49,6 +50,9 @@ public class BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<CaseInstanceResponse> getQueryResponse(CaseInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
 
@@ -93,8 +97,25 @@ public class BaseCaseInstanceResource {
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.caseInstanceWithoutTenantId();
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceInfoWithQuery(query);
+        }
 
         return new CaseInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "id", allowedSortProperties);
+    }
+    
+    protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
+        }
+        
+        return caseInstance;
     }
 
     protected void addVariables(CaseInstanceQuery caseInstanceQuery, List<QueryVariable> variables) {
@@ -173,13 +194,5 @@ public class BaseCaseInstanceResource {
                 throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
             }
         }
-    }
-
-    protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
-        }
-        return caseInstance;
     }
 }

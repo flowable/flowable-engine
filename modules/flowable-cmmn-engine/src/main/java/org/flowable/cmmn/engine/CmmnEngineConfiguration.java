@@ -802,6 +802,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
     
     public void initAsyncHistorySessionFactory() {
+        // If another engine has set the asyncHistorySessionFactory already, there's no need to do it again.
         if (!sessionFactories.containsKey(AsyncHistorySession.class)) {
             AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
             if (asyncHistoryListener == null) {
@@ -815,13 +816,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected void initDefaultAsyncHistoryListener() {
-        DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer(
-                CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, 
-                CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED,
-                jobExecutionScope);
-        asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-        asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-        asyncHistoryListener = asyncHistoryJobProducer;
+        asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
     }
 
     protected void initServices() {
@@ -1303,6 +1298,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             } else {
                 this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalCmmnJobManager(this));
             }
+            
+            // Async history job config
+            jobServiceConfiguration.setJobTypeAsyncHistory(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
+            jobServiceConfiguration.setJobTypeAsyncHistoryZipped(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
+            jobServiceConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+            jobServiceConfiguration.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+            jobServiceConfiguration.setAsyncHistoryJsonGroupingThreshold(asyncHistoryJsonGroupingThreshold);
             
             this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
             this.jobServiceConfiguration.setHistoryJobExecutionScope(this.historyJobExecutionScope);
