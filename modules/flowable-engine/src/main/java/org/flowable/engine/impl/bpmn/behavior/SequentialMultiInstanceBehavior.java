@@ -93,7 +93,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
             else {
                 sendCompletedEvent(multiInstanceRootExecution);
             }
-
+            execution.setDynamicState(null);
             super.leave(execution);
         } else {
             continueMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);

@@ -110,6 +110,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         if (resolveNrOfInstances(execution) == 0) {
             // Empty collection, just leave.
             zeroNrOfInstances = true;
+            execution.setDynamicState(null);
             super.leave(execution); // Plan the default leave
         }
 
@@ -173,11 +174,13 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                     sendCompletedEvent(leavingExecution);
                 }
 
+                execution.setDynamicState(null);
                 super.leave(leavingExecution);
               }
 
         } else {
             sendCompletedEvent(execution);
+            execution.setDynamicState(null);
             super.leave(execution);
         }
     }
