@@ -517,14 +517,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             );
 
             this.runtimeService.setVariable(processInstance.getId(), "isSequential", "UNSUPPORTED-VALUE");
-            try {
-                this.taskService.complete(
-                        taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
-                );
-                fail("FlowableIllegalArgumentException expected");
-            } catch (FlowableIllegalArgumentException e) {
-                assertTrue(e.getMessage().equals("isSequential value [UNSUPPORTED-VALUE] is not allowed."));
-            }
+            // var change has no effect on the multinstance behavior
+            this.taskService.complete(
+                taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
+            );
         } finally {
             this.repositoryService.deleteDeployment(deploymentId, true);
         }
@@ -551,10 +547,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                     taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId()
             );
 
-            List<Task> parallelTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-            assertEquals("When sequential -> parallel, there is no new task created ", 0, parallelTasks.size());
-            assertEquals("Leave condition was not met, process instance is in the state when it can't continue",
-                    0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("waitState").count());
+            List<Task> nextTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertEquals("When sequential -> parallel, there is a new next sequential task created. Variable change has no effect on the multiinstance behavior",
+                1, nextTasks.size());
         } finally {
             this.repositoryService.deleteDeployment(deploymentId, true);
         }
@@ -588,8 +583,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
             }
 
-            assertEquals("Leave condition was met. Still amount of created sequential tasks depends " +
-                            "on the execution which was executed after the variable change",
+            assertEquals("Leave condition was met.",
                     1, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("waitState").count()
             );
         } finally {

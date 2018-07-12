@@ -49,6 +49,33 @@ public class RuntimeMultiInstanceActivityBehavior extends MultiInstanceActivityB
     protected MultiInstanceActivityBehavior getInternalBehavior(DelegateExecution delegateExecution) {
         MultiInstanceActivityBehavior multiInstanceBehavior;
 
+        if (isSequential(delegateExecution)) {
+            multiInstanceBehavior = new SequentialMultiInstanceBehavior(this.activity, this.innerActivityBehavior);
+        } else {
+            multiInstanceBehavior = new ParallelMultiInstanceBehavior(this.activity, this.innerActivityBehavior);
+        }
+        multiInstanceBehavior.loopCardinalityExpression = this.loopCardinalityExpression;
+        multiInstanceBehavior.completionCondition = this.completionCondition;
+        multiInstanceBehavior.collectionExpression = this.collectionExpression;
+        multiInstanceBehavior.collectionVariable = this.collectionVariable;
+        multiInstanceBehavior.collectionElementVariable = this.collectionElementVariable;
+        multiInstanceBehavior.collectionString = this.collectionString;
+        multiInstanceBehavior.collectionHandler = this.collectionHandler;
+        multiInstanceBehavior.collectionElementIndexVariable = this.collectionElementIndexVariable;
+        return multiInstanceBehavior;
+    }
+
+    protected boolean isSequential(DelegateExecution delegateExecution) {
+        boolean isSequential;
+        if (delegateExecution.hasVariableLocal("_isSequential")) {
+            isSequential = delegateExecution.getVariableLocal("_isSequential", Boolean.class);
+        } else {
+            isSequential = evaluateIsSequential(delegateExecution);
+            delegateExecution.setVariableLocal("_isSequential", isSequential);
+        } return isSequential;
+    }
+
+    protected boolean evaluateIsSequential(DelegateExecution delegateExecution) {
         Object sequential = getSequential() != null ? getSequential().getValue(delegateExecution) : null;
         boolean isSequential;
         if (sequential == null) {
@@ -64,21 +91,7 @@ public class RuntimeMultiInstanceActivityBehavior extends MultiInstanceActivityB
         } else {
             throw new FlowableException("unable to recognize sequential attribute " + sequential);
         }
-
-        if (isSequential) {
-            multiInstanceBehavior = new SequentialMultiInstanceBehavior(this.activity, this.innerActivityBehavior);
-        } else {
-            multiInstanceBehavior = new ParallelMultiInstanceBehavior(this.activity, this.innerActivityBehavior);
-        }
-        multiInstanceBehavior.loopCardinalityExpression = this.loopCardinalityExpression;
-        multiInstanceBehavior.completionCondition = this.completionCondition;
-        multiInstanceBehavior.collectionExpression = this.collectionExpression;
-        multiInstanceBehavior.collectionVariable = this.collectionVariable;
-        multiInstanceBehavior.collectionElementVariable = this.collectionElementVariable;
-        multiInstanceBehavior.collectionString = this.collectionString;
-        multiInstanceBehavior.collectionHandler = this.collectionHandler;
-        multiInstanceBehavior.collectionElementIndexVariable = this.collectionElementIndexVariable;
-        return multiInstanceBehavior;
+        return isSequential;
     }
 
 }
