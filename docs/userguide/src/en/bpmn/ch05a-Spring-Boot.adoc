@@ -763,6 +763,7 @@ flowable.idm.ldap.user-base-dn= # The base 'distinguished name' (DN) from which 
 
 # Flowable Mail {sc-flowable-boot}/FlowableMailProperties.java[FlowableMailProperties]
 flowable.mail.server.default-from=flowable@localhost # The default from address that needs to be used when sending emails.
+flowable.mail.server.force-to= # The force to address(es) that would be used when sending out emails. IMPORTANT: If this is send then all emails will be send to defined addresses instead of the address configured in the MailActivity.
 flowable.mail.server.host=localhost # The host of the mail server.
 flowable.mail.server.password= # The password for the mail server authentication.
 flowable.mail.server.port=1025 # The port of the mail server.
