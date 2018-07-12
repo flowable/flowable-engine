@@ -171,4 +171,14 @@ public interface DelegateExecution extends VariableScope {
      */
     void setMultiInstanceRoot(boolean isMultiInstanceRoot);
 
+    /**
+     * Returns dynamic state of the execution. Currently used to store multiinstance behavior
+     */
+    String getDynamicState();
+
+    /**
+     * Sets dynamic state of the execution. Currently used to store multiinstance behavior
+     */
+    void setDynamicState(String dynamicState);
+
 }

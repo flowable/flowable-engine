@@ -1193,6 +1193,16 @@ public class ExecutionImpl implements
 
     }
 
+    @Override
+    public String getDynamicState() {
+        return null;
+    }
+
+    @Override
+    public void setDynamicState(String dynamicState) {
+
+    }
+
     // No support for transient variables in v5
 
     @Override

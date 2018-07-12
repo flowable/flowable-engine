@@ -91,6 +91,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     protected boolean isEventScope;
     protected boolean isMultiInstanceRoot;
     protected boolean isCountEnabled;
+    protected String dynamicState;
 
     // events ///////////////////////////////////////////////////////////////////
 
@@ -265,6 +266,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         persistentState.put("identityLinkCount", identityLinkCount);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("dynamicState", dynamicState);
         return persistentState;
     }
 
@@ -1209,6 +1211,16 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    @Override
+    public String getDynamicState() {
+        return dynamicState;
+    }
+
+    @Override
+    public void setDynamicState(String dynamicState) {
+        this.dynamicState = dynamicState;
     }
 
     // toString /////////////////////////////////////////////////////////////////

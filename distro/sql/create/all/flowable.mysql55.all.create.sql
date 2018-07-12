@@ -363,6 +363,7 @@ create table ACT_RU_EXECUTION (
     ID_LINK_COUNT_ integer,
     CALLBACK_ID_ varchar(255),
     CALLBACK_TYPE_ varchar(255),
+    DYNAMIC_STATE_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

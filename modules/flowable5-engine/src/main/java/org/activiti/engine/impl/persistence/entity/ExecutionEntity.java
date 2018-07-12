@@ -1924,6 +1924,16 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     }
 
+    @Override
+    public String getDynamicState() {
+        return null;
+    }
+
+    @Override
+    public void setDynamicState(String dynamicState) {
+
+    }
+
     protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity, ProcessEngineConfigurationImpl processEngineConfiguration) {
         JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
         for (JobProcessor jobProcessor : processEngineConfiguration.getJobProcessors()) {

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="Examples">
+  
+  <process id="twoTimesMultiInstance">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask1" />
+    
+    <userTask id="userTask1" name="userTask1">
+      <multiInstanceLoopCharacteristics isSequential="{SEQUENTIAL1}">
+        <loopCardinality>5</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+
+    <sequenceFlow id="flow3" sourceRef="userTask1" targetRef="userTask2" />
+    <userTask id="userTask2" name="userTask1">
+      <multiInstanceLoopCharacteristics isSequential="{SEQUENTIAL2}">
+        <loopCardinality>5</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+
+    <sequenceFlow id="flow4" sourceRef="userTask2" targetRef="waitState" />
+    <receiveTask id="waitState" />
+    
+    <sequenceFlow id="flow5" sourceRef="waitState" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

@@ -63,6 +63,7 @@ create table ACT_RU_EXECUTION (
     ID_LINK_COUNT_ int,
     CALLBACK_ID_ nvarchar(255),
     CALLBACK_TYPE_ nvarchar(255),
+    DYNAMIC_STATE_ nvarchar(255),
     primary key (ID_)
 );
 

@@ -481,6 +481,55 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         assertIsSequential(true, 1);
     }
 
+    public void test2TimesIsSequentialTrueFalse() throws IOException {
+        String deploymentId = this.repositoryService.createDeployment()
+            .addString("MultiInstanceTest.testScriptTasksSequentialExpression.bpmn20.xml",
+                IOUtils.resourceToString("/org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testUserTasksSequentialParallel.bpmn20.xml",
+                    Charset.defaultCharset())
+                    .replace("{SEQUENTIAL1}", "true")
+                    .replace("{SEQUENTIAL2}", "false")
+            )
+            .deploy()
+            .getId();
+
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTimesMultiInstance");
+            assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+            for (int i = 0; i < 5; i++) {
+                taskService.complete( taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+            }
+            assertEquals(5, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        } finally {
+            this.repositoryService.deleteDeployment(deploymentId, true);
+        }
+    }
+
+    public void test2TimesIsSequentialFalseTrue() throws IOException {
+        String deploymentId = this.repositoryService.createDeployment()
+            .addString("MultiInstanceTest.testScriptTasksSequentialExpression.bpmn20.xml",
+                IOUtils.resourceToString("/org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testUserTasksSequentialParallel.bpmn20.xml",
+                    Charset.defaultCharset())
+                    .replace("{SEQUENTIAL1}", "false")
+                    .replace("{SEQUENTIAL2}", "true")
+            )
+            .deploy()
+            .getId();
+
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTimesMultiInstance");
+            assertEquals(5, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            for (int i = 0; i < 5; i++) {
+                taskService.complete( tasks.get(i).getId());
+            }
+            assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        } finally {
+            this.repositoryService.deleteDeployment(deploymentId, true);
+        }
+    }
+
+
+
     protected void assertIsSequential(Object sequentialVariableValue, int expectedTasks) throws IOException {
         String deploymentId = this.repositoryService.createDeployment()
             .addString("MultiInstanceTest.testScriptTasksSequentialExpression.bpmn20.xml",

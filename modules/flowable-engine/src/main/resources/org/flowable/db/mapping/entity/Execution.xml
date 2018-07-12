@@ -11,7 +11,7 @@
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                            TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                           CALLBACK_ID_, CALLBACK_TYPE_)
+                                           CALLBACK_ID_, CALLBACK_TYPE_, DYNAMIC_STATE_)
     values (
       #{id ,jdbcType=VARCHAR},
       1,
@@ -43,7 +43,8 @@
       #{variableCount, jdbcType=INTEGER},
       #{identityLinkCount, jdbcType=INTEGER},
       #{callbackId, jdbcType=VARCHAR},
-      #{callbackType, jdbcType=VARCHAR}
+      #{callbackType, jdbcType=VARCHAR},
+      #{dynamicState, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -52,7 +53,7 @@
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                            TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                           CALLBACK_ID_, CALLBACK_TYPE_)
+                                           CALLBACK_ID_, CALLBACK_TYPE_, DYNAMIC_STATE_)
     values
       <foreach collection="list" item="execution" index="index" separator=",">
         (#{execution.id ,jdbcType=VARCHAR},
@@ -85,7 +86,8 @@
          #{execution.variableCount, jdbcType=INTEGER},
          #{execution.identityLinkCount, jdbcType=INTEGER},
          #{execution.callbackId, jdbcType=VARCHAR},
-         #{execution.callbackType, jdbcType=VARCHAR}
+         #{execution.callbackType, jdbcType=VARCHAR},
+         #{execution.dynamicState, jdbcType=VARCHAR}
         )
       </foreach>
   </insert>
@@ -97,7 +99,7 @@
                                         IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                         TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                         TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                        CALLBACK_ID_, CALLBACK_TYPE_) VALUES
+                                        CALLBACK_ID_, CALLBACK_TYPE_, DYNAMIC_STATE_) VALUES
             (
              #{execution.id ,jdbcType=VARCHAR},
              1,
@@ -129,7 +131,8 @@
              #{execution.variableCount, jdbcType=INTEGER},
              #{execution.identityLinkCount, jdbcType=INTEGER},
              #{execution.callbackId, jdbcType=VARCHAR},
-             #{execution.callbackType, jdbcType=VARCHAR}
+             #{execution.callbackType, jdbcType=VARCHAR},
+             #{execution.dynamicState, jdbcType=VARCHAR}
             )
       </foreach>
     SELECT * FROM dual
@@ -212,6 +215,9 @@
             </if>
             <if test="originalPersistentState.callbackType != callbackType">
                 CALLBACK_ID_ = #{callbackType, jdbcType=VARCHAR}
+            </if>
+            <if test="originalPersistentState.dynamicState != dynamicState">
+                DYNAMIC_STATE_ = #{dynamicState, jdbcType=VARCHAR}
             </if>
         </set>
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -318,6 +324,7 @@
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
     <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+    <result property="dynamicState" column="DYNAMIC_STATE_" jdbcType="VARCHAR" />
   </resultMap>
 
   <resultMap id="processInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
@@ -360,6 +367,7 @@
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
     <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+    <result property="dynamicState" column="DYNAMIC_STATE_" jdbcType="VARCHAR" />
   </resultMap>
 
   <resultMap id="executionAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
@@ -394,6 +402,7 @@
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
     <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+    <result property="dynamicState" column="DYNAMIC_STATE_" jdbcType="VARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
@@ -447,6 +456,7 @@
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
     <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+    <result property="dynamicState" column="DYNAMIC_STATE_" jdbcType="VARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />

@@ -1,5 +1,6 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -10,6 +11,9 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  * @author martin.grofcik
  */
 public class RuntimeMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior {
+
+    public static final String SEQUENTIAL = "sequential";
+    public static final String PARALLEL = "parallel";
 
     public RuntimeMultiInstanceActivityBehavior(Activity activity,
                                                 AbstractBpmnActivityBehavior innerActivityBehavior) {
@@ -67,12 +71,20 @@ public class RuntimeMultiInstanceActivityBehavior extends MultiInstanceActivityB
 
     protected boolean isSequential(DelegateExecution delegateExecution) {
         boolean isSequential;
-        if (delegateExecution.hasVariableLocal("_isSequential")) {
-            isSequential = delegateExecution.getVariableLocal("_isSequential", Boolean.class);
+        String dynamicState = delegateExecution.getDynamicState();
+        if (StringUtils.isNotEmpty(dynamicState)) {
+            if (dynamicState.equals(SEQUENTIAL)) {
+                isSequential = true;
+            } else if (dynamicState.equals(PARALLEL)) {
+                isSequential = false;
+            } else {
+                throw new FlowableException("Unable to get sequential flag from dynamic state ["+dynamicState+"]");
+            }
         } else {
             isSequential = evaluateIsSequential(delegateExecution);
-            delegateExecution.setVariableLocal("_isSequential", isSequential);
-        } return isSequential;
+            delegateExecution.setDynamicState(isSequential ? SEQUENTIAL : PARALLEL);
+        }
+        return isSequential;
     }
 
     protected boolean evaluateIsSequential(DelegateExecution delegateExecution) {
