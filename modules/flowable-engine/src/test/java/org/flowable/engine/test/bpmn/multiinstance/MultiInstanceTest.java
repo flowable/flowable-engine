@@ -1714,6 +1714,35 @@ assertProcessEnded(procId);
         assertProcessEnded(processInstance.getId());
     }
 
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedMultiInstanceSequentialParallelTasks.bpmn20.xml" })
+    public void testNestedMultiInstanceSequentialParallelTasks() {
+        List<String> processes = Arrays.asList("process A", "process B");
+        List<String> assignees = Arrays.asList("kermit", "gonzo");
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("subProcesses", processes);
+        variableMap.put("assignees", assignees);
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
+
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
+        assertEquals(assignees.size(), tasks.size());
+
+        for (org.flowable.task.api.Task t : tasks) {
+            taskService.complete(t.getId());
+        }
+
+        tasks = taskService.createTaskQuery().list();
+        assertEquals(assignees.size(), tasks.size());
+
+        for (org.flowable.task.api.Task t : tasks) {
+            taskService.complete(t.getId());
+        }
+
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("miNestedMultiInstanceTasks").list();
+        assertEquals(0, processInstances.size());
+        assertProcessEnded(processInstance.getId());
+    }
+
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialSubprocessEmptyCollection.bpmn20.xml" })
     public void testSequentialSubprocessEmptyCollection() {
         Collection<String> collection = Collections.emptyList();
