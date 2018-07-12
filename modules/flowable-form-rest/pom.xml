@@ -137,10 +137,12 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-idm-engine</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-idm-engine-configurator</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
