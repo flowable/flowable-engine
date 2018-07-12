@@ -118,7 +118,6 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         public FormEngineConfigurator formEngineConfigurator(SpringFormEngineConfiguration configuration) {
             SpringFormEngineConfigurator formEngineConfigurator = new SpringFormEngineConfigurator();
             formEngineConfigurator.setFormEngineConfiguration(configuration);
-            
             invokeConfigurers(configuration);
             
             return formEngineConfigurator;
@@ -144,7 +143,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         public FormEngineConfigurator formEngineConfigurator(SpringFormEngineConfiguration configuration) {
             SpringFormEngineConfigurator formEngineConfigurator = new SpringFormEngineConfigurator();
             formEngineConfigurator.setFormEngineConfiguration(configuration);
-            
+
             invokeConfigurers(configuration);
             
             return formEngineConfigurator;
