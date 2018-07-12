@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -546,5 +547,9 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         Objects.requireNonNull(list1);
         Objects.requireNonNull(list2);
         return Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toList());
+    }
+
+    protected static<T> Map<String, List<T>> groupListContentBy(List<T> source, Function<T, String> classifier) {
+        return source.stream().collect(Collectors.groupingBy(classifier));
     }
 }

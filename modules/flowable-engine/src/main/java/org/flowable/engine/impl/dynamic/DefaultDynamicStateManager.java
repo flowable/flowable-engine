@@ -302,7 +302,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             }
         }
     }
-    
+
     protected List<ExecutionEntity> createEmbeddedSubProcessExecutions(Collection<FlowElement> moveToFlowElements, List<ExecutionEntity> currentExecutions, 
                     MoveExecutionEntityContainer moveExecutionContainer, CommandContext commandContext) {
         
@@ -408,6 +408,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
 
         //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since it may not be guaranteed in the query result
         List<ExecutionEntity> executions = childExecutions.stream()
+            .filter(e -> e.getCurrentActivityId() != null)
             .filter(e -> e.getCurrentActivityId().equals(activityId))
             .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
             .collect(Collectors.toList());
@@ -594,7 +595,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             
             if (executionElement.getSubProcess() != null) {
                 while (executionElement.getSubProcess() != null) {
-                    if (executionElement.getSubProcess().getId().equals(subProcessId)) {
+                    if (Optional.ofNullable(executionElement.getSubProcess().getId()).filter(s -> s.equals(subProcessId)).isPresent()) {
                         return true;
                     }
                     
@@ -610,10 +611,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
             for (FlowElement subElement : subProcess.getFlowElements()) {
                 if (subElement instanceof StartEvent) {
-                    StartEvent startEvent = (StartEvent) subElement;
-                    if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
-                        return startEvent;
-                    }
+                    return subElement;
                 }
             }
         }
