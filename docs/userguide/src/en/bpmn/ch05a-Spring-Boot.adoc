@@ -17,7 +17,7 @@ The Flowable starters are also puling spring boot starter transitively, which me
 
 ==== Getting started
 
-Spring Boot is all about convention over configuration. To get started, simply add the _flowable-spring-boot-starter_ or _flowable-spring-boot-starter-rest_ dependency to your project.
+Spring Boot is all about convention over configuration. To get started, simply add the _flowable-spring-boot-starter_ or _flowable-spring-boot-starter-rest_ dependency to your Spring Boot project.
 In case you don't need all the engines see the other <<springBootFlowableStarter, Flowable starters>>.
 For example for Maven:
 
