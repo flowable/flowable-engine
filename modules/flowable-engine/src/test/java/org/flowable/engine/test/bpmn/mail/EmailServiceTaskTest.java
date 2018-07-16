@@ -78,6 +78,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml", tenantId = "forceToEmailTenant")
     public void testSimpleTextMailWhenMultiTenantWithForceTo() throws Exception {
         String tenantId = "forceToEmailTenant";
+        addMailServer(tenantId, "flowable@myTenant.com", "no-reply@myTenant.com");
 
         String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
 
