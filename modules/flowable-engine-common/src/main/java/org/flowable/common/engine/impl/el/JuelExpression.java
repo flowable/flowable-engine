@@ -50,6 +50,8 @@ public class JuelExpression implements Expression {
             throw new FlowableException("Unknown property used in expression: " + expressionText, pnfe);
         } catch (MethodNotFoundException mnfe) {
             throw new FlowableException("Unknown method used in expression: " + expressionText, mnfe);
+        } catch (FlowableException ex) {
+            throw ex;
         } catch (Exception e) {
             throw new FlowableException("Error while evaluating expression: " + expressionText, e);
         }
