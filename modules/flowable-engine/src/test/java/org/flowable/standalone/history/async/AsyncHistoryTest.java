@@ -12,10 +12,14 @@
  */
 package org.flowable.standalone.history.async;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -25,6 +29,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.asyncexecutor.AbstractAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsRunnable;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -363,6 +369,43 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
         taskService.deleteTask(parentTask1.getId(), true);
         taskService.deleteTask(parentTask2.getId(), true);
+    }
+    
+    public void testResetExpiredJobs() {
+        
+        // Need to do this to initialize everything properly
+        processEngineConfiguration.getAsyncHistoryExecutor().start();
+        Runnable runnable = ((AbstractAsyncExecutor) processEngineConfiguration.getAsyncHistoryExecutor()).getResetExpiredJobsRunnable();
+        assertNotNull(runnable);
+        processEngineConfiguration.getAsyncHistoryExecutor().shutdown();;
+        
+        startOneTaskprocess();
+        assertEquals(1, managementService.createHistoryJobQuery().count());
+        
+        // Force job to be expired
+        managementService.executeCommand(new Command<Void>() {
+            @Override
+            public Void execute(CommandContext commandContext) {
+                HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
+                ((HistoryJobEntity) historyJob).setLockExpirationTime(new Date(Instant.now().minus(100, ChronoUnit.DAYS).toEpochMilli()));
+                return null;
+            }
+        });
+        
+        assertNotNull(((HistoryJobEntity) managementService.createHistoryJobQuery().singleResult()).getLockExpirationTime()); 
+        
+        // Manually trigger the reset
+        ResetExpiredJobsRunnable resetExpiredJobsRunnable = ((ResetExpiredJobsRunnable) runnable);
+        boolean originalState = resetExpiredJobsRunnable.isInterrupted();
+        try {
+            resetExpiredJobsRunnable.setInterrupted(false);
+            resetExpiredJobsRunnable.resetJobs();
+        } finally {
+            resetExpiredJobsRunnable.setInterrupted(originalState);
+        }
+        
+        // The lock expiration time should be null now
+        assertNull(((HistoryJobEntity) managementService.createHistoryJobQuery().singleResult()).getLockExpirationTime());
     }
 
     protected Task startOneTaskprocess() {
