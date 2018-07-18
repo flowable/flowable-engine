@@ -85,7 +85,6 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
     public void resetJobs() {
         try {
-
             List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getJobServiceConfiguration().getCommandExecutor()
                     .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
 
@@ -117,12 +116,4 @@ public class ResetExpiredJobsRunnable implements Runnable {
         }
     }
     
-    public boolean isInterrupted() {
-        return this.isInterrupted;
-    }
-    
-    public void setInterrupted(boolean isInterrupted) {
-        this.isInterrupted = isInterrupted;
-    }
-
 }

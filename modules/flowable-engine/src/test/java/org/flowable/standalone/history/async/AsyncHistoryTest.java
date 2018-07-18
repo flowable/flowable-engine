@@ -377,7 +377,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         processEngineConfiguration.getAsyncHistoryExecutor().start();
         Runnable runnable = ((AbstractAsyncExecutor) processEngineConfiguration.getAsyncHistoryExecutor()).getResetExpiredJobsRunnable();
         assertNotNull(runnable);
-        processEngineConfiguration.getAsyncHistoryExecutor().shutdown();;
+        processEngineConfiguration.getAsyncHistoryExecutor().shutdown();
         
         startOneTaskprocess();
         assertEquals(1, managementService.createHistoryJobQuery().count());
@@ -396,13 +396,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         
         // Manually trigger the reset
         ResetExpiredJobsRunnable resetExpiredJobsRunnable = ((ResetExpiredJobsRunnable) runnable);
-        boolean originalState = resetExpiredJobsRunnable.isInterrupted();
-        try {
-            resetExpiredJobsRunnable.setInterrupted(false);
-            resetExpiredJobsRunnable.resetJobs();
-        } finally {
-            resetExpiredJobsRunnable.setInterrupted(originalState);
-        }
+        resetExpiredJobsRunnable.resetJobs();
         
         // The lock expiration time should be null now
         assertNull(((HistoryJobEntity) managementService.createHistoryJobQuery().singleResult()).getLockExpirationTime());
