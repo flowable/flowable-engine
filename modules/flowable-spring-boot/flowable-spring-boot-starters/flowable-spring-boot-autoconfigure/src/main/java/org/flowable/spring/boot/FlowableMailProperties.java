@@ -50,7 +50,7 @@ public class FlowableMailProperties {
 
     /**
      * The force to address(es) that would be used when sending out emails.
-     * IMPORTANT: If this is send then all emails will be send to defined addresses instead of the address
+     * IMPORTANT: If this is set then all emails will be send to defined address(es) instead of the address
      * configured in the MailActivity.
      */
     private String forceTo;
