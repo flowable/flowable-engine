@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -218,36 +219,39 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 executionEntityManager.deleteProcessInstance(firstExecution.getProcessInstanceId(), "Change activity to parent process activity ids: " + 
                                 printFlowElementIds(moveExecutionContainer.getMoveToFlowElements()), true);
             }
-                
+
             List<ExecutionEntity> currentExecutions = null;
             if (moveExecutionContainer.isMoveToParentProcess()) {
                 currentExecutions = Collections.singletonList(moveExecutionContainer.getSuperExecution());
-                
+
             } else {
                 currentExecutions = moveExecutionContainer.getExecutions();
             }
-            
+
             Collection<FlowElement> moveToFlowElements = null;
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 moveToFlowElements = Collections.singletonList(moveExecutionContainer.getCallActivity());
             } else {
                 moveToFlowElements = moveExecutionContainer.getMoveToFlowElements();
             }
-            
+
+            String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
+            Collection<String> executionIdsNotToDelete = new HashSet<>();
+            for (ExecutionEntity execution : currentExecutions) {
+                executionIdsNotToDelete.add(execution.getId());
+                executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
+                executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, true, execution.getCurrentFlowElement());
+            }
+
             // Delete the parent executions for each current execution when the move to activity id has the same sub process scope
             for (ExecutionEntity execution : currentExecutions) {
                 if (execution.getParentId() == null) {
                     throw new FlowableException("Execution has no parent execution " + execution.getParentId());
                 }
-                
-                ExecutionEntity continueParentExecution = deleteParentExecutions(execution.getParentId(), moveToFlowElements, commandContext);
-                moveExecutionContainer.addContinueParentExecution(execution.getId(), continueParentExecution);
-            }
 
-            String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
-            for (ExecutionEntity execution : currentExecutions) {
-                executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
-                executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine);
+                ExecutionEntity continueParentExecution = deleteParentExecutions(execution.getParentId(), moveToFlowElements, executionIdsNotToDelete,
+                        commandContext);
+                moveExecutionContainer.addContinueParentExecution(execution.getId(), continueParentExecution);
             }
             
             List<ExecutionEntity> newChildExecutions = createEmbeddedSubProcessExecutions(moveToFlowElements, currentExecutions, moveExecutionContainer, commandContext);
@@ -334,6 +338,14 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                     ExecutionEntity subProcessExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
                     subProcessExecution.setCurrentFlowElement(subProcess);
                     subProcessExecution.setScope(true);
+
+                    FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+                    if (eventDispatcher.isEnabled()) {
+                        eventDispatcher.dispatchEvent(
+                                FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, subProcess.getId(), subProcess.getName(), subProcessExecution.getId(),
+                                        subProcessExecution.getProcessInstanceId(), subProcessExecution.getProcessDefinitionId(), subProcess));
+                    }
+
                     subProcessExecution.setVariablesLocal(processDataObjects(subProcess.getDataObjects()));
 
                     CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessExecution);
@@ -370,6 +382,13 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             
             if (newFlowElement instanceof CallActivity) {
                 CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(newChildExecution);
+
+                FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+                if (eventDispatcher.isEnabled()) {
+                    eventDispatcher.dispatchEvent(
+                            FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
+                                    newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement));
+                }
             }
 
             newChildExecutions.add(newChildExecution);
@@ -423,6 +442,11 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
     }
 
     protected ExecutionEntity deleteParentExecutions(String parentExecutionId, Collection<FlowElement> moveToFlowElements, CommandContext commandContext) {
+        return deleteParentExecutions(parentExecutionId, moveToFlowElements, null, commandContext);
+    }
+
+    protected ExecutionEntity deleteParentExecutions(String parentExecutionId, Collection<FlowElement> moveToFlowElements, Collection<String>
+            executionIdsNotToDelete, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         
         ExecutionEntity continueParentExecution = executionEntityManager.findById(parentExecutionId);
@@ -441,8 +465,10 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 continueParentExecution = finalDeleteExecution.getParent();
 
                 String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
-                executionEntityManager.deleteChildExecutions(finalDeleteExecution, "Change activity to " + flowElementIdsLine, true);
-                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine);
+                executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine,
+                        true, null);
+                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, true,
+                        finalDeleteExecution.getCurrentFlowElement());
             }
         }
         
