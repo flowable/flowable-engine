@@ -160,7 +160,60 @@
                 <div class="nothing-to-see" ng-show="model.completedCaseTasks.length == 0">
                     <span translate="PROCESS.MESSAGE.NO-COMPLETED-TASKS"></span>
                 </div>
-
+            </div>
+            <div class="section pack">
+                <h3 translate="CASE.SECTION.ACTIVE-MILESTONES" id="activeMilestones"></h3>
+                <ul class="simple-list checklist">
+                    <li ng-repeat="milestone in model.activeCaseMilestones" class="complete">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <div class="pull-right">
+                                <span class="badge" ng-if="milestone.timestamp">
+                                    {{'TASK.MESSAGE.CREATED-ON' | translate}} {{(milestone.timestamp | dateformat:'fromNow')}}
+                                </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div user-picture="milestone.name"></div>
+                                {{milestone.name && milestone.name || ('TASK.MESSAGE.NO-NAME' | translate)}}
+                            </div>
+                            <div class="subtle">
+                                <span/>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="nothing-to-see" ng-show="model.activeCaseMilestones.length == 0">
+                    <span translate="CASE.MESSAGE.NO-ACTIVE-MILESTONES"></span>
+                </div>
+            </div>
+            <div class="section pack">
+                <h3 translate="CASE.SECTION.REACHED-MILESTONES" id="reachedMilestones"></h3>
+                <ul class="simple-list checklist">
+                    <li ng-repeat="milestone in model.reachedCaseMilestones" class="complete">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <span class="badge">
+                                    {{'TASK.MESSAGE.REACHED-ON' | translate}} {{(milestone.timestamp | dateformat:'fromNow')}}
+                                </span>
+                            </div>
+                            <div>
+                                <div user-picture="milestone.name"></div>
+                                {{milestone.name && milestone.name || ('TASK.MESSAGE.NO-NAME' | translate)}}
+                            </div>
+                            <div class="subtle">
+                                <span ng-if="milestone.elementId">
+                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{milestone.elementId}}
+                                </span>
+                                <span ng-if="!milestone.elementId" translate="TASK.MESSAGE.NO-ASSIGNEE">
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="nothing-to-see" ng-show="model.reachedCaseMilestones.length == 0">
+                    <span translate="CASE.MESSAGE.NO-REACHED-MILESTONES"></span>
+                </div>
             </div>
         </div>
 

@@ -12,6 +12,9 @@
  */
 package org.flowable.ui.task.service.runtime;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -19,17 +22,22 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.MilestoneInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.content.api.ContentService;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.idm.api.User;
+import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.task.model.runtime.CaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.CreateCaseInstanceRepresentation;
+import org.flowable.ui.task.model.runtime.MilestoneRepresentation;
 import org.flowable.ui.task.service.api.UserCache;
 import org.flowable.ui.task.service.api.UserCache.CachedUser;
 import org.slf4j.Logger;
@@ -104,6 +112,45 @@ public class FlowableCaseInstanceService {
         return cmmnRuntimeService.getStartFormModel(caseInstance.getCaseDefinitionId(), caseInstance.getId());
     }
 
+    public ResultListDataRepresentation getCaseInstanceActiveMilestones(String caseInstanceId) {
+
+        HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+            throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
+        }
+
+        List<PlanItemInstance> milestoneInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemDefinitionType(PlanItemDefinitionType.MILESTONE)
+            .caseInstanceId(caseInstance.getId())
+            .list();
+
+        List<MilestoneRepresentation> milestoneRepresentations = milestoneInstances.stream()
+            .map(p -> new MilestoneRepresentation(p.getName(), p.getPlanItemDefinitionId(), p.getStartTime()))
+            .collect(Collectors.toList());
+
+        return new ResultListDataRepresentation(milestoneRepresentations);
+    }
+
+    public ResultListDataRepresentation getCaseInstanceReachedMilestones(String caseInstanceId) {
+
+        HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+            throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
+        }
+
+        List<MilestoneInstance> milestoneInstances = cmmnRuntimeService.createMilestoneInstanceQuery()
+            .milestoneInstanceCaseInstanceId(caseInstance.getId())
+            .list();
+
+        List<MilestoneRepresentation> milestoneRepresentations = milestoneInstances.stream()
+            .map(MilestoneRepresentation::new)
+            .collect(Collectors.toList());
+
+        return new ResultListDataRepresentation(milestoneRepresentations);
+    }
+
     public CaseInstanceRepresentation startNewCaseInstance(CreateCaseInstanceRepresentation startRequest) {
         if (StringUtils.isEmpty(startRequest.getCaseDefinitionId())) {
             throw new BadRequestException("Case definition id is required");
@@ -112,11 +159,11 @@ public class FlowableCaseInstanceService {
         CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(startRequest.getCaseDefinitionId());
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionId(startRequest.getCaseDefinitionId())
-                        .name(startRequest.getName())
-                        .outcome(startRequest.getOutcome())
-                        .variables(startRequest.getValues())
-                        .startWithForm();
+            .caseDefinitionId(startRequest.getCaseDefinitionId())
+            .name(startRequest.getName())
+            .outcome(startRequest.getOutcome())
+            .variables(startRequest.getValues())
+            .startWithForm();
 
         User user = null;
         if (caseInstance.getStartUserId() != null) {
@@ -133,9 +180,9 @@ public class FlowableCaseInstanceService {
         User currentUser = SecurityUtils.getCurrentUserObject();
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
-                .caseInstanceId(caseInstanceId)
-                .startedBy(String.valueOf(currentUser.getId())) // Permission
-                .singleResult();
+            .caseInstanceId(caseInstanceId)
+            .startedBy(String.valueOf(currentUser.getId())) // Permission
+            .singleResult();
 
         if (caseInstance == null) {
             throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not started by this user");

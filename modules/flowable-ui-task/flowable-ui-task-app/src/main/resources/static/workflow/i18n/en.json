@@ -172,6 +172,7 @@
             "DUE-ON": "Due",
             "CREATED-ON": "Created",
             "ENDED-ON": "Completed",
+            "REACHED-ON": "Reached",
             "COMPLETED-BY": "Completed by",
             "NO-DESCRIPTION": "This task has no description",
             "NO-RELATED-CONTENT": "This task has no related content yet...",
@@ -192,7 +193,6 @@
             "NO-SUCH-TASK-RETURN-TO-LIST": "Return to your list of tasks",
             "NO-TASKS-CREATE-TASK": "Create a task for yourself or assign it to someone else",
             "NO-TASKS-CREATE-PROCESS": "Start a new process and then track its progress"
-
         },
         "HELP" : {
             "DESCRIPTION": "This task has no details yet. You can change that by choosing one of these actions:",
@@ -240,6 +240,7 @@
             "NO-TASKS": "No tasks are currently active ...",
             "NO-COMPLETED-TASKS": "No tasks have been completed yet...",
             "NO-BUSINESS-KEY": "No business key set",
+            "NO-ACTIVE-MILESTONES": "No active milestones",
             "CATEGORY": "Category: {{processDefinitionCategory}}",
             "NEW-COMMENT-PLACEHOLDER": "Enter a comment to add to this process",
             "COMMENT-HEADER": "Added by {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
@@ -317,7 +318,9 @@
             "NO-CASE-DEFINITIONS": "You cannot start a case since there are no case definitions available",
             "START-CASE": "Start Case",
             "STARTED-BY": "Started by",
-            "NO-CASE-DEFINITION-SELECTED-HELP": "Please select a case definition"
+            "NO-CASE-DEFINITION-SELECTED-HELP": "Please select a case definition",
+            "NO-ACTIVE-MILESTONES": "No active milestones",
+            "NO-REACHED-MILESTONES": "No reached milestones"
         },
         "ACTION" : {
             "CREATE": "+ Start a case",
@@ -340,6 +343,8 @@
         "SECTION": {
             "ACTIVE-TASKS": "Active tasks",
             "COMPLETED-TASKS": "Completed tasks",
+            "ACTIVE-MILESTONES": "Active milestones",
+            "REACHED-MILESTONES": "Reached milestones",
             "CONTENT" : "Content"
         },
         "POPUP": {

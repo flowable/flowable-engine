@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.SimpleFormModel;
+import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.task.model.runtime.CaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.FormModelRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableCaseInstanceService;
@@ -47,6 +48,16 @@ public class CaseInstanceResource {
         FormInfo formInfo = caseInstanceService.getCaseInstanceStartForm(caseInstanceId);
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
         return new FormModelRepresentation(formInfo, formModel);
+    }
+
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/active-milestones", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getCaseInstanceActiveMilestones(@PathVariable String caseInstanceId) {
+        return caseInstanceService.getCaseInstanceActiveMilestones(caseInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/reached-milestones", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getCaseInstanceReachedMilestones(@PathVariable String caseInstanceId) {
+        return caseInstanceService.getCaseInstanceReachedMilestones(caseInstanceId);
     }
 
     @RequestMapping(value = "/rest/case-instances/{caseInstanceId}", method = RequestMethod.DELETE)
