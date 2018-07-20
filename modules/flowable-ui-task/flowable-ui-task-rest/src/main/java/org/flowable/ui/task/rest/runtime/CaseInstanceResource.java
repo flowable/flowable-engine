@@ -50,14 +50,24 @@ public class CaseInstanceResource {
         return new FormModelRepresentation(formInfo, formModel);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/active-milestones", method = RequestMethod.GET, produces = "application/json")
-    public ResultListDataRepresentation getCaseInstanceActiveMilestones(@PathVariable String caseInstanceId) {
-        return caseInstanceService.getCaseInstanceActiveMilestones(caseInstanceId);
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/active-stages", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getCaseInstanceActiveStages(@PathVariable String caseInstanceId) {
+        return caseInstanceService.getCaseInstanceActiveStages(caseInstanceId);
     }
 
-    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/reached-milestones", method = RequestMethod.GET, produces = "application/json")
-    public ResultListDataRepresentation getCaseInstanceReachedMilestones(@PathVariable String caseInstanceId) {
-        return caseInstanceService.getCaseInstanceReachedMilestones(caseInstanceId);
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/ended-stages", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getCaseInstanceEndedStages(@PathVariable String caseInstanceId) {
+        return caseInstanceService.getCaseInstanceEndedStages(caseInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/available-milestones", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getCaseInstanceAvailableMilestones(@PathVariable String caseInstanceId) {
+        return caseInstanceService.getCaseInstanceAvailableMilestones(caseInstanceId);
+    }
+
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/ended-milestones", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getCaseInstanceEndedMilestones(@PathVariable String caseInstanceId) {
+        return caseInstanceService.getCaseInstanceEndedMilestones(caseInstanceId);
     }
 
     @RequestMapping(value = "/rest/case-instances/{caseInstanceId}", method = RequestMethod.DELETE)

@@ -13,7 +13,7 @@
 'use strict';
 
 // Milestone service
-angular.module('flowableApp').service('MilestoneService', ['$http', '$q', '$rootScope',
+angular.module('flowableApp').service('StageService', ['$http', '$q', '$rootScope',
     function ($http, $q, $rootScope) {
         var httpAsPromise = function (options) {
             var deferred = $q.defer();
@@ -26,7 +26,7 @@ angular.module('flowableApp').service('MilestoneService', ['$http', '$q', '$root
             return deferred.promise;
         };
 
-        this.getCaseInstanceActiveMilestones = function (caseInstanceId) {
+        this.getCaseInstanceActiveStages = function (caseInstanceId) {
 
             var data = {
                 caseInstanceId: caseInstanceId
@@ -35,13 +35,13 @@ angular.module('flowableApp').service('MilestoneService', ['$http', '$q', '$root
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/active-milestones',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/active-stages',
                     data: data
                 }
             );
         };
 
-        this.getCaseInstanceReachedMilestones = function (caseInstanceId) {
+        this.getCaseInstanceEndedStages = function (caseInstanceId) {
 
             var data = {
                 caseInstanceId: caseInstanceId
@@ -50,7 +50,7 @@ angular.module('flowableApp').service('MilestoneService', ['$http', '$q', '$root
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/reached-milestones',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/ended-stages',
                     data: data
                 }
             );

@@ -16,27 +16,30 @@ import java.util.Date;
 
 import org.flowable.ui.common.model.AbstractRepresentation;
 
-public class MilestoneRepresentation extends AbstractRepresentation {
+public class StageRepresentation extends AbstractRepresentation {
 
     protected String name;
     protected String state;
-    protected Date timestamp;
+    protected Date startedDate;
+    protected Date endedDate;
 
-    public MilestoneRepresentation(String name, String state, Date timestamp) {
+    public StageRepresentation(String name, String state, Date startedDate, Date endedDate) {
         this.name = name;
         this.state = state;
-        this.timestamp = timestamp;
+        this.startedDate = startedDate;
+        this.endedDate = endedDate;
     }
 
     public String getName() {
         return name;
     }
-
     public String getState() {
         return state;
     }
-
-    public Date getTimestamp() {
-        return timestamp;
+    public Date getStartedDate() {
+        return startedDate;
+    }
+    public Date getEndedDate() {
+        return endedDate;
     }
 }

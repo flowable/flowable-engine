@@ -301,8 +301,17 @@
             "NO-CASE-DEFINITIONS": "No puede comenzar un case ya que no hay definiciones disponibles",
             "START-CASE": "Comenzar un Caso",
             "STARTED-BY": "Comenzado por",
+            "STAGE-STARTED": "Comenzada",
+            "STAGE-ENDED": "Terminada",
+            "STAGE-NOT-STARTED": "No comenzada aún",
+            "STATE": "Estado",
+            "STAGE-NO-NAME": "Etapa sin nombre",
+            "MILESTONE-REACHED-ON": "Alcanzado",
+            "MILESTONE-TERMINATED-ON": "Terminado",
             "NO-CASE-DEFINITION-SELECTED-HELP": "Por favor escoja una definición de caso",
-            "NO-ACTIVE-MILESTONES": "No hay hitos activos",
+            "NO-ACTIVE-STAGES": "No hay etapas activas",
+            "NO-ENDED-STAGES": "No hay etapas finalizadas",
+            "NO-AVAILABLE-MILESTONES": "No hay hitos disponibles",
             "NO-REACHED-MILESTONES": "No se han alcanzado hitos"
         },
         "ACTION" : {
@@ -326,7 +335,9 @@
         "SECTION": {
             "ACTIVE-TASKS": "Tareas activas",
             "COMPLETED-TASKS": "Tareas completadas",
-            "ACTIVE-MILESTONES": "Hitos activos",
+            "ACTIVE-STAGES": "Etapas activas",
+            "ENDED-STAGES": "Etapas finalizadas",
+            "AVAILABLE-MILESTONES": "Hitos disponibles",
             "REACHED-MILESTONES": "Hitos alcanzados",
             "CONTENT" : "Contenido"
         },

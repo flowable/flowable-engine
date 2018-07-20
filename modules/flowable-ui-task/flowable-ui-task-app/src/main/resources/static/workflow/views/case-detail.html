@@ -59,17 +59,12 @@
 
     <div class="content clearfix split" auto-height offset="6" ng-if="!newCaseInstance && model.caseInstance">
         <div class="split-right">
-            <div class="section pack" toggle-dragover="dragOverContent(over)"
-                 ng-if="!$scope.model.contentSummary.loading">
+            <div class="section pack" toggle-dragover="dragOverContent(over)"  ng-if="!$scope.model.contentSummary.loading">
                 <h3 class="toggle-content-select" ng-click="toggleCreateContent()"
                     title="{{'TASK.ACTION.ADD-CONTENT' | translate}}">{{'TASK.TITLE.CONTENT' | translate}}
                     <span class="action" ng-if="!model.caseInstance.endDate"><a>+</a></span>
                 </h3>
-
-                <div external-content on-content-upload="onContentUploaded(content)"
-                     on-upload-in-progress="uploadInProgress(status)" case-id="model.caseInstance.id"
-                     ng-if="model.contentSummary.addContent"></div>
-
+                <div external-content on-content-upload="onContentUploaded(content)" on-upload-in-progress="uploadInProgress(status)" case-id="model.caseInstance.id" ng-if="model.contentSummary.addContent"/>
                 <div class="form-group">
                     <ul id="related-content-list" class="clearfix simple-list selectable content-list">
                         <li ng-repeat="content in model.content.data" title="{{content.name}}">
@@ -79,9 +74,64 @@
                     </ul>
                 </div>
             </div>
-
         </div>
         <div class="split-left">
+            <div class="section pack" ng-show="model.caseHasStages">
+                <h3 translate="CASE.SECTION.ACTIVE-STAGES"></h3>
+                <ul class="simple-list checklist">
+                    <li ng-repeat="stage in model.caseActiveStages">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <span class="badge" ng-if="stage.state == 'active'">
+                                    {{'CASE.MESSAGE.STAGE-STARTED' | translate}} {{(stage.startedDate | dateformat:'fromNow')}}
+                                </span>
+                                <span class="badge" ng-if="stage.state == 'available'">
+                                    {{'CASE.MESSAGE.STAGE-NOT-STARTED' | translate}}
+                                </span>
+                            </div>
+                            <div>
+                                <div user-picture="stage.name"></div>
+                                {{stage.name || ('CASE.MESSAGE.STAGE-NO-NAME' | translate)}}
+                            </div>
+                            <div class="subtle">
+                                <span>
+                                    {{'CASE.MESSAGE.STATE' | translate}}: {{stage.state}}
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="nothing-to-see" ng-show="!model.caseActiveStages || model.caseActiveStages.length == 0">
+                    <span translate="CASE.MESSAGE.NO-ACTIVE-STAGES"></span>
+                </div>
+            </div>
+            <div class="section pack" ng-show="model.caseHasStages">
+                <h3 translate="CASE.SECTION.ENDED-STAGES"></h3>
+                <ul class="simple-list checklist">
+                    <li ng-repeat="stage in model.caseEndedStages">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <span class="badge">
+                                    {{'CASE.MESSAGE.STAGE-ENDED' | translate}} {{(stage.endedDate | dateformat:'fromNow')}}
+                                </span>
+                            </div>
+                            <div>
+                                <div user-picture="stage.name"></div>
+                                {{stage.name || ('CASE.MESSAGE.STAGE-NO-NAME' | translate)}}
+                            </div>
+                            <div class="subtle">
+                                <span>
+                                    {{'CASE.MESSAGE.STATE' | translate}}: {{stage.state}}
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="nothing-to-see" ng-show="!model.caseEndedStages || model.caseEndedStages.length == 0">
+                    <span translate="CASE.MESSAGE.NO-ENDED-STAGES"></span>
+                </div>
+            </div>
+
             <div class="section pack">
                 <h3 translate="PROCESS.SECTION.ACTIVE-TASKS"></h3>
                 <ul class="simple-list checklist">
@@ -112,8 +162,8 @@
                 <div class="nothing-to-see" ng-show="!model.caseTasks || model.caseTasks.length == 0">
                     <span translate="PROCESS.MESSAGE.NO-TASKS"></span>
                 </div>
-             </div>
-             <div class="section pack" ng-show="model.caseInstance.startFormDefined">
+            </div>
+            <div class="section pack" ng-show="model.caseInstance.startFormDefined">
                 <h3 translate="PROCESS.SECTION.START-FORM" id="startForm"></h3>
                 <ul class="simple-list checklist">
                     <li ng-click="openStartForm()" class="complete">
@@ -161,10 +211,10 @@
                     <span translate="PROCESS.MESSAGE.NO-COMPLETED-TASKS"></span>
                 </div>
             </div>
-            <div class="section pack">
-                <h3 translate="CASE.SECTION.ACTIVE-MILESTONES" id="activeMilestones"></h3>
+            <div class="section pack" ng-show="model.caseHasMilestones">
+                <h3 translate="CASE.SECTION.AVAILABLE-MILESTONES" id="activeMilestones"></h3>
                 <ul class="simple-list checklist">
-                    <li ng-repeat="milestone in model.activeCaseMilestones" class="complete">
+                    <li ng-repeat="milestone in model.caseAvailableMilestones" class="complete">
                         <div class="clearfix">
                             <div class="pull-right">
                                 <div class="pull-right">
@@ -183,18 +233,21 @@
                         </div>
                     </li>
                 </ul>
-                <div class="nothing-to-see" ng-show="model.activeCaseMilestones.length == 0">
-                    <span translate="CASE.MESSAGE.NO-ACTIVE-MILESTONES"></span>
+                <div class="nothing-to-see" ng-show="model.caseAvailableMilestones.length == 0">
+                    <span translate="CASE.MESSAGE.NO-AVAILABLE-MILESTONES"></span>
                 </div>
             </div>
-            <div class="section pack">
+            <div class="section pack" ng-show="model.caseHasMilestones">
                 <h3 translate="CASE.SECTION.REACHED-MILESTONES" id="reachedMilestones"></h3>
                 <ul class="simple-list checklist">
-                    <li ng-repeat="milestone in model.reachedCaseMilestones" class="complete">
+                    <li ng-repeat="milestone in model.caseEndedMilestones" class="complete">
                         <div class="clearfix">
                             <div class="pull-right">
-                                <span class="badge">
-                                    {{'TASK.MESSAGE.REACHED-ON' | translate}} {{(milestone.timestamp | dateformat:'fromNow')}}
+                                <span class="badge" ng-if="milestone.state=='completed'">
+                                    {{'CASE.MESSAGE.MILESTONE-REACHED-ON' | translate}} {{(milestone.timestamp | dateformat:'fromNow')}}
+                                </span>
+                                <span class="badge" ng-if="milestone.state!='completed'">
+                                    {{'CASE.MESSAGE.MILESTONE-TERMINATED-ON' | translate}} {{(milestone.timestamp | dateformat:'fromNow')}}
                                 </span>
                             </div>
                             <div>
@@ -202,16 +255,14 @@
                                 {{milestone.name && milestone.name || ('TASK.MESSAGE.NO-NAME' | translate)}}
                             </div>
                             <div class="subtle">
-                                <span ng-if="milestone.elementId">
-                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{milestone.elementId}}
-                                </span>
-                                <span ng-if="!milestone.elementId" translate="TASK.MESSAGE.NO-ASSIGNEE">
+                                <span>
+                                    {{'CASE.MESSAGE.STATE' | translate}}: {{milestone.state}}
                                 </span>
                             </div>
                         </div>
                     </li>
                 </ul>
-                <div class="nothing-to-see" ng-show="model.reachedCaseMilestones.length == 0">
+                <div class="nothing-to-see" ng-show="model.caseEndedMilestones.length == 0">
                     <span translate="CASE.MESSAGE.NO-REACHED-MILESTONES"></span>
                 </div>
             </div>

@@ -319,8 +319,17 @@
             "NO-CASE-DEFINITIONS": "Vous ne pouvez pas démarrer un cas car il n'y a pas de définitions de cas disponibles",
             "START-CASE": "Commencer le cas",
             "STARTED-BY": "Démarré par",
+            "STAGE-STARTED": "Commencé",
+            "STAGE-ENDED": "Terminé",
+            "STAGE-NOT-STARTED": "Pas encore commencé",
+            "STATE": "Etat",
+            "STAGE-NO-NAME": "Étape sans nom",
+            "MILESTONE-REACHED-ON": "Atteint",
+            "MILESTONE-TERMINATED-ON": "Terminé",
             "NO-CASE-DEFINITION-SELECTED-HELP": "Sélectionnez une définition de processus",
-            "NO-ACTIVE-MILESTONES": "Pas de Jalons actifs",
+            "NO-ACTIVE-STAGES": "Pas d'étapes actives",
+            "NO-ENDED-STAGES": "Étapes non terminées",
+            "NO-AVAILABLE-MILESTONES": "Pas de Jalons disponible",
             "NO-REACHED-MILESTONES": "Pas de Jalons atteints"
         },
         "ACTION" : {
@@ -344,7 +353,9 @@
         "SECTION": {
             "ACTIVE-TASKS": "Tâches actives",
             "COMPLETED-TASKS": "Tâches terminées",
-            "ACTIVE-MILESTONES": "Jalons Actifs",
+            "ACTIVE-STAGES": "Étapes actives",
+            "ENDED-STAGES": "Étapes terminées",
+            "AVAILABLE-MILESTONES": "Jalons disponible",
             "REACHED-MILESTONES": "Atteint des Jalons",
             "CONTENT" : "Contenus"
         },

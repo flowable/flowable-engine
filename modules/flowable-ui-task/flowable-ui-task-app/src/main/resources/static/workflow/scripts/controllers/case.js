@@ -37,8 +37,8 @@ angular.module('flowableApp')
         }]);
 
 angular.module('flowableApp')
-    .controller('CaseDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CaseService', 'CommentService', 'RelatedContentService', 'MilestoneService',
-        function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CaseService, CommentService, RelatedContentService, MilestoneService) {
+    .controller('CaseDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CaseService', 'CommentService', 'RelatedContentService', 'MilestoneService', 'StageService',
+        function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CaseService, CommentService, RelatedContentService, MilestoneService, StageService) {
 
             $rootScope.root.showStartForm = false;
 
@@ -67,6 +67,7 @@ angular.module('flowableApp')
                     $scope.model.caseInstance = response;
                     $scope.loadCaseTasks();
                     $scope.loadRelatedContent();
+                    $scope.loadCaseInstanceStages();
                     $scope.loadCaseInstanceMilestones();
                 }).error(function (response, status, headers, config) {
                     console.log('Something went wrong: ' + response);
@@ -97,23 +98,48 @@ angular.module('flowableApp')
                 });
             };
 
-            $rootScope.loadCaseInstanceMilestones = function () {
+            $rootScope.loadCaseInstanceStages = function () {
 
-                // Runtime milestones
-                MilestoneService.getCaseInstanceActiveMilestones($scope.model.caseInstance.id).then(function (response) {
+                $scope.model.caseHasStages = false;
+
+                StageService.getCaseInstanceActiveStages($scope.model.caseInstance.id).then(function (response) {
                     if (response.data && response.data.length > 0) {
-                        $scope.model.activeCaseMilestones = response.data;
+                        $scope.model.caseActiveStages = response.data;
+                        $scope.model.caseHasStages = true;
                     } else {
-                        $scope.model.activeCaseMilestones = [];
+                        $scope.model.caseActiveStages = [];
                     }
                 });
 
-                //History milestones
-                MilestoneService.getCaseInstanceReachedMilestones($scope.model.caseInstance.id).then(function (response) {
+                StageService.getCaseInstanceEndedStages($scope.model.caseInstance.id).then(function (response) {
                     if (response.data && response.data.length > 0) {
-                        $scope.model.reachedCaseMilestones = response.data;
+                        $scope.model.caseEndedStages = response.data;
+                        $scope.model.caseHasStages = true;
                     } else {
-                        $scope.model.reachedCaseMilestones = [];
+                        $scope.model.caseEndedStages = [];
+                    }
+                });
+            };
+
+            $rootScope.loadCaseInstanceMilestones = function () {
+
+                $scope.model.caseHasMilestones = false;
+
+                MilestoneService.getCaseInstanceAvailableMilestones($scope.model.caseInstance.id).then(function (response) {
+                    if (response.data && response.data.length > 0) {
+                        $scope.model.caseAvailableMilestones = response.data;
+                        $scope.model.caseHasMilestones = true;
+                    } else {
+                        $scope.model.caseAvailableMilestones = [];
+                    }
+                });
+
+                MilestoneService.getCaseInstanceEndedMilestones($scope.model.caseInstance.id).then(function (response) {
+                    if (response.data && response.data.length > 0) {
+                        $scope.model.caseEndedMilestones = response.data;
+                        $scope.model.caseHasMilestones = true;
+                    } else {
+                        $scope.model.caseEndedMilestones = [];
                     }
                 });
             };

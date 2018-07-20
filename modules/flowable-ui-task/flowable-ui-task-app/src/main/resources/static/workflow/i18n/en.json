@@ -318,8 +318,17 @@
             "NO-CASE-DEFINITIONS": "You cannot start a case since there are no case definitions available",
             "START-CASE": "Start Case",
             "STARTED-BY": "Started by",
+            "STAGE-STARTED": "Started",
+            "STAGE-ENDED": "Ended",
+            "STAGE-NOT-STARTED": "Not started yet",
+            "STATE": "State",
+            "STAGE-NO-NAME": "Nameless stage",
+            "MILESTONE-REACHED-ON": "Reached",
+            "MILESTONE-TERMINATED-ON": "Terminated",
             "NO-CASE-DEFINITION-SELECTED-HELP": "Please select a case definition",
-            "NO-ACTIVE-MILESTONES": "No active milestones",
+            "NO-ACTIVE-STAGES": "No active stages",
+            "NO-ENDED-STAGES": "No ended stages",
+            "NO-AVAILABLE-MILESTONES": "No active milestones",
             "NO-REACHED-MILESTONES": "No reached milestones"
         },
         "ACTION" : {
@@ -343,7 +352,9 @@
         "SECTION": {
             "ACTIVE-TASKS": "Active tasks",
             "COMPLETED-TASKS": "Completed tasks",
-            "ACTIVE-MILESTONES": "Active milestones",
+            "ACTIVE-STAGES": "Active stages",
+            "ENDED-STAGES": "Ended stages",
+            "AVAILABLE-MILESTONES": "Available milestones",
             "REACHED-MILESTONES": "Reached milestones",
             "CONTENT" : "Content"
         },
