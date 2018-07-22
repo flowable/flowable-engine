@@ -52,9 +52,10 @@ import org.flowable.form.api.FormService;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
@@ -289,17 +290,17 @@ public class CommandContextUtil {
     
     // IDM ENGINE
 
-    public static IdmEngineConfiguration getIdmEngineConfiguration() {
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration() {
         return getIdmEngineConfiguration(getCommandContext());
     }
 
-    public static IdmEngineConfiguration getIdmEngineConfiguration(CommandContext commandContext) {
-        return (IdmEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration(CommandContext commandContext) {
+        return (IdmEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
     }
 
     public static IdmIdentityService getIdmIdentityService() {
         IdmIdentityService identityService = null;
-        IdmEngineConfiguration idmEngineConfiguration = getIdmEngineConfiguration();
+        IdmEngineConfigurationApi idmEngineConfiguration = getIdmEngineConfiguration();
         if (idmEngineConfiguration != null) {
             identityService = idmEngineConfiguration.getIdmIdentityService();
         }
@@ -436,6 +437,14 @@ public class CommandContextUtil {
             throw new FlowableException("Dmn engine is not configured");
         }
         return dmnEngineConfiguration.getDmnRuleService();
+    }
+
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getTaskServiceConfiguration().getInternalTaskAssignmentManager();
+    }
+
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return getInternalTaskAssignmentManager(getCommandContext());
     }
 
 }

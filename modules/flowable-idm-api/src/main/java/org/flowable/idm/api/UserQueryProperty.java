@@ -32,6 +32,7 @@ public class UserQueryProperty implements QueryProperty {
     public static final UserQueryProperty USER_ID = new UserQueryProperty("RES.ID_");
     public static final UserQueryProperty FIRST_NAME = new UserQueryProperty("RES.FIRST_");
     public static final UserQueryProperty LAST_NAME = new UserQueryProperty("RES.LAST_");
+    public static final UserQueryProperty DISPLAY_NAME = new UserQueryProperty("RES.DISPLAY_NAME_");
     public static final UserQueryProperty EMAIL = new UserQueryProperty("RES.EMAIL_");
 
     private String name;

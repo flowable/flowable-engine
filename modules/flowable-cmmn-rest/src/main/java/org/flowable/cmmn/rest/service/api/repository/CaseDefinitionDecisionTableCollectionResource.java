@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +46,8 @@ public class CaseDefinitionDecisionTableCollectionResource extends BaseCaseDefin
             @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
             HttpServletRequest request) {
 
-        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForCaseDefinition(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        List<DmnDecisionTable> decisionTables = repositoryService.getDecisionTablesForCaseDefinition(caseDefinition.getId());
 
         return restResponseFactory.createDecisionTableResponseList(decisionTables, caseDefinitionId);
     }

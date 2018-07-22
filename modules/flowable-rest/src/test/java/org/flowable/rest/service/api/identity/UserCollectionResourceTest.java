@@ -20,6 +20,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.assertj.core.api.Assertions;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.BaseSpringRestTestCase;
@@ -47,6 +48,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             User user1 = identityService.newUser("testuser");
             user1.setFirstName("Fred");
             user1.setLastName("McDonald");
+            user1.setDisplayName("Fred McDonald");
             user1.setEmail("no-reply@activiti.org");
             identityService.saveUser(user1);
             savedUsers.add(user1);
@@ -77,6 +79,10 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?lastName=Barrez";
             assertResultsPresentInDataResponse(url, user2.getId());
 
+            // Test based on displayName
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?displayName=Fred%20McDonald";
+            assertResultsPresentInDataResponse(url, user1.getId());
+
             // Test based on email
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?email=no-reply@activiti.org";
             assertResultsPresentInDataResponse(url, user1.getId());
@@ -88,6 +94,10 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             // Test based on lastNameLike
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?lastNameLike=" + encode("%rez");
             assertResultsPresentInDataResponse(url, user2.getId());
+
+            // Test based on displayNameLike
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?displayNameLike=" + encode("%red Mc%");
+            assertResultsPresentInDataResponse(url, user1.getId());
 
             // Test based on emailLike
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?emailLike=" + encode("no-reply@activiti.org%");
@@ -115,6 +125,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             requestNode.put("id", "testuser");
             requestNode.put("firstName", "Frederik");
             requestNode.put("lastName", "Heremans");
+            requestNode.put("displayName", "Frederik Heremans");
             requestNode.put("password", "test");
             requestNode.put("email", "no-reply@activiti.org");
 
@@ -127,10 +138,17 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
             assertEquals("testuser", responseNode.get("id").textValue());
             assertEquals("Frederik", responseNode.get("firstName").textValue());
             assertEquals("Heremans", responseNode.get("lastName").textValue());
+            assertEquals("Frederik Heremans", responseNode.get("displayName").textValue());
             assertEquals("no-reply@activiti.org", responseNode.get("email").textValue());
             assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_USER, "testuser")));
 
-            assertNotNull(identityService.createUserQuery().userId("testuser").singleResult());
+            User createdUser = identityService.createUserQuery().userId("testuser").singleResult();
+            assertNotNull(createdUser);
+            Assertions.assertThat(createdUser.getFirstName()).isEqualTo("Frederik");
+            Assertions.assertThat(createdUser.getLastName()).isEqualTo("Heremans");
+            Assertions.assertThat(createdUser.getDisplayName()).isEqualTo("Frederik Heremans");
+            Assertions.assertThat(createdUser.getPassword()).isEqualTo("test");
+            Assertions.assertThat(createdUser.getEmail()).isEqualTo("no-reply@activiti.org");
         } finally {
             try {
                 identityService.deleteUser("testuser");

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -348,8 +350,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -359,9 +363,11 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
         
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-        assertEquals(processInstance.getId(),
-            historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+            assertEquals(processInstance.getId(),
+                    historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -371,9 +377,11 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
-        assertEquals(processInstance.getId(),
-            historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
+            assertEquals(processInstance.getId(),
+                    historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -382,8 +390,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
-        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
+            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -393,7 +403,9 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("nonInvolvedGroup")).count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("nonInvolvedGroup")).count());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -404,9 +416,11 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-        assertEquals(processInstance.getId(),
-            historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+            assertEquals(processInstance.getId(),
+                    historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -416,7 +430,9 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.deleteGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -424,10 +440,12 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
-
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+                or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -437,9 +455,11 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -449,9 +469,11 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
-        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
+            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -460,10 +482,12 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
-        assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
+            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -473,8 +497,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("nonInvolvedGroup")).endOr().count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("nonInvolvedGroup")).endOr().count());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -485,11 +511,13 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-        assertEquals(processInstance.getId(),
-            historyService.createHistoricProcessInstanceQuery().
-                or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+            assertEquals(processInstance.getId(),
+                    historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -499,8 +527,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.deleteGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -510,8 +540,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-            or().involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+                    or().involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -521,8 +553,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -531,8 +565,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
-            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
+                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -541,8 +577,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
-            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
+                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        }
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -551,11 +589,13 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
-        assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-            or().
-            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).
-            endOr().
-            count());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
+                    or().
+                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).
+                    endOr().
+                    count());
+        }
     }
 
     private void assertNoInvolvement(String userId) {

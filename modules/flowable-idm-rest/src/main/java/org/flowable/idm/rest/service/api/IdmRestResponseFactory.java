@@ -46,6 +46,7 @@ public class IdmRestResponseFactory {
         UserResponse response = new UserResponse();
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
+        response.setDisplayName(user.getDisplayName());
         response.setId(user.getId());
         response.setEmail(user.getEmail());
 

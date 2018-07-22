@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.UserTask;
@@ -38,6 +39,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
@@ -287,14 +289,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         
-                    } else if (value != null) {
+                    } else {
                         String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {
                             List<String> candidates = extractCandidates(strValue);
                             List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
                             IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
                         }
-                        
                     }
                 }
             }
@@ -308,7 +309,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                     if (value instanceof Collection) {
                         List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
                         IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
-                        
+
                     } else {
                         String strValue = value.toString();
                         if (StringUtils.isNotEmpty(strValue)) {

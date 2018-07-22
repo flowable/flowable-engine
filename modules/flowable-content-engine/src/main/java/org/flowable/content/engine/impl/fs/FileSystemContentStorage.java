@@ -128,9 +128,9 @@ public class FileSystemContentStorage implements ContentStorage {
             tempFileCreated = true;
 
             // Write the actual content to the file
-            FileOutputStream tempOutputStream = new FileOutputStream(tempContentFile);
-            length = IOUtils.copy(contentStream, tempOutputStream);
-            IOUtils.closeQuietly(tempOutputStream);
+            try (FileOutputStream tempOutputStream = new FileOutputStream(tempContentFile)) {
+                length = IOUtils.copy(contentStream, tempOutputStream);
+            }
 
             // Rename the content file first
             if (contentFile.renameTo(oldContentFile)) {

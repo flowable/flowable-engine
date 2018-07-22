@@ -13,6 +13,7 @@
 package org.flowable.bpmn.converter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
@@ -55,6 +56,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         CallActivity callActivity = new CallActivity();
         BpmnXMLUtil.addXMLLocation(callActivity, xtr);
         callActivity.setCalledElement(xtr.getAttributeValue(null, ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENT));
+        callActivity.setCalledElementType(BpmnXMLUtil.getAttributeValue(BpmnXMLConstants.ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENTTYPE, xtr));
         callActivity.setProcessInstanceName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_PROCESS_INSTANCE_NAME, xtr));
         callActivity.setBusinessKey(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY, xtr));
         callActivity.setInheritBusinessKey(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY, xtr)));
@@ -70,6 +72,9 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         CallActivity callActivity = (CallActivity) element;
         if (StringUtils.isNotEmpty(callActivity.getCalledElement())) {
             xtw.writeAttribute(ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENT, callActivity.getCalledElement());
+        }
+        if (StringUtils.isNotEmpty(callActivity.getCalledElementType())) {
+            writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENTTYPE, callActivity.getCalledElementType(), xtw);
         }
         if (StringUtils.isNotEmpty(callActivity.getProcessInstanceName())) {
             writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_PROCESS_INSTANCE_NAME, callActivity.getProcessInstanceName(), xtw);

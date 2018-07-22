@@ -122,7 +122,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean orActive;
     protected List<TaskQueryImpl> orQueryObjects = new ArrayList<>();
     protected TaskQueryImpl currentOrQueryObject;
-    private boolean isIdentityLinkJoinNeeded = false;
 
     private List<String> cachedCandidateGroups;
 
@@ -492,10 +491,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         if (orActive) {
-            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.candidateUser = candidateUser;
         } else {
-            this.isIdentityLinkJoinNeeded = true;
             this.candidateUser = candidateUser;
         }
 
@@ -508,10 +505,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             throw new FlowableIllegalArgumentException("Involved user is null");
         }
         if (orActive) {
-            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.involvedUser = involvedUser;
         } else {
-            isIdentityLinkJoinNeeded = true;
             this.involvedUser = involvedUser;
         }
         return this;
@@ -526,10 +521,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             throw new FlowableIllegalArgumentException("Involved groups are empty");
         }
         if (orActive) {
-            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.involvedGroups = involvedGroups;
         } else {
-            isIdentityLinkJoinNeeded = true;
             this.involvedGroups = involvedGroups;
         }
         return this;
@@ -546,10 +539,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         if (orActive) {
-            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.candidateGroup = candidateGroup;
         } else {
-            this.isIdentityLinkJoinNeeded = true;
             this.candidateGroup = candidateGroup;
         }
         return this;
@@ -566,11 +557,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
         if (orActive) {
             currentOrQueryObject.bothCandidateAndAssigned = true;
-            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.userIdForCandidateAndAssignee = userIdForCandidateAndAssignee;
         } else {
             this.bothCandidateAndAssigned = true;
-            this.isIdentityLinkJoinNeeded = true;
             this.userIdForCandidateAndAssignee = userIdForCandidateAndAssignee;
         }
 
@@ -592,10 +581,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         if (orActive) {
-            currentOrQueryObject.isIdentityLinkJoinNeeded = true;
             currentOrQueryObject.candidateGroups = candidateGroups;
         } else {
-            this.isIdentityLinkJoinNeeded = true;
             this.candidateGroups = candidateGroups;
         }
         return this;
@@ -1581,17 +1568,25 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         ensureVariablesInitialized();
         checkQueryOk();
         List<Task> tasks = null;
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
+        }
+        
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksWithRelatedEntitiesByQueryCriteria(this);
         } else {
             tasks = CommandContextUtil.getTaskEntityManager(commandContext).findTasksByQueryCriteria(this);
         }
 
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
             for (Task task : tasks) {
                 taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
+        }
+        
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().afterTaskQueryExecute(this, tasks);
         }
 
         return tasks;
@@ -1601,6 +1596,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         checkQueryOk();
+        
+        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
+        }
+        
         return CommandContextUtil.getTaskEntityManager(commandContext).findTaskCountByQueryCriteria(this);
     }
 
@@ -1908,10 +1909,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean isOrActive() {
         return orActive;
-    }
-
-    public boolean isIdentityLinkJoinNeeded() {
-        return isIdentityLinkJoinNeeded;
     }
 
     @Override

@@ -26,7 +26,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.ibatis.type.TypeAliasRegistry;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -253,21 +252,9 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
     }
 
     protected void initDbSqlSessionFactory(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
-        DbSqlSessionFactory dbSqlSessionFactory = engineConfiguration.getDbSqlSessionFactory();
         targetEngineConfiguration.setDbSqlSessionFactory(engineConfiguration.getDbSqlSessionFactory());
         targetEngineConfiguration.setSqlSessionFactory(engineConfiguration.getSqlSessionFactory());
-
-        if (getEntityInsertionOrder() != null) {
-            for (Class<? extends Entity> clazz : getEntityInsertionOrder()) {
-                dbSqlSessionFactory.getInsertionOrder().add(clazz);
-            }
-        }
-
-        if (getEntityDeletionOrder() != null) {
-            for (Class<? extends Entity> clazz : getEntityDeletionOrder()) {
-                dbSqlSessionFactory.getDeletionOrder().add(clazz);
-            }
-        }
+        targetEngineConfiguration.defaultInitDbSqlSessionFactoryEntitySettings(getEntityInsertionOrder(), getEntityDeletionOrder());
     }
 
     protected void initSessionFactories(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {

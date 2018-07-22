@@ -13,23 +13,24 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -43,6 +44,9 @@ public class EventSubscriptionResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a single event subscription", tags = { "Event subscriptions" })
     @ApiResponses(value = {
@@ -55,6 +59,10 @@ public class EventSubscriptionResource {
 
         if (eventSubscription == null) {
             throw new FlowableObjectNotFoundException("Could not find a event subscription with id '" + eventSubscriptionId + "'.", EventSubscription.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessEventSubscriptionById(eventSubscription);
         }
 
         return restResponseFactory.createEventSubscriptionResponse(eventSubscription);

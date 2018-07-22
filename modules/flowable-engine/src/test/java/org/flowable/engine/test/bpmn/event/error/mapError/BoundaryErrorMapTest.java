@@ -55,6 +55,17 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         assertTrue(FlagDelegate.isVisited());
     }
 
+    @Deployment
+    public void testRootCauseSingleDirectMap() {
+        FlagDelegate.reset();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
+        vars.put("nestedExceptionClass", IllegalArgumentException.class.getName());
+
+        runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+        assertTrue(FlagDelegate.isVisited());
+    }
+
     // exception does not match the single mapping
     @Deployment(resources = "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testClassDelegateSingleDirectMap.bpmn20.xml")
     public void testClassDelegateSingleDirectMapNotMatchingException() {
@@ -104,11 +115,58 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testRootCauseSingleDirectMap.bpmn20.xml")
+    public void testRootCauseSingleDirectMapNotMatchingException() {
+        FlagDelegate.reset();
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
+        vars.put("nestedExceptionClass", IllegalStateException.class.getName());
+        assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
+
+        try {
+            runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+            fail("exception expected, as there is no matching exception map");
+        } catch (Exception e) {
+            assertFalse(FlagDelegate.isVisited());
+        }
+    }
+
+    // exception matches by inheritance
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testClassDelegateSingleInheritedMapWithRootCause.bpmn20.xml")
+    public void testClassDelegateSingleInheritedMapWithRootCauseNotMatchingException() {
+        FlagDelegate.reset();
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryEventChildException.class.getName());
+        vars.put("nestedExceptionClass", IllegalStateException.class.getName());
+        assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
+
+        try {
+            runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+            fail("exception expected, as there is no matching exception map");
+        } catch (Exception e) {
+            assertFalse(FlagDelegate.isVisited());
+        }
+    }
+
     // exception matches by inheritance
     @Deployment
     public void testClassDelegateSingleInheritedMap() {
         Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryEventChildException.class.getName());
+        FlagDelegate.reset();
+
+        runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+        assertTrue(FlagDelegate.isVisited());
+    }
+
+    // exception matches by inheritance
+    @Deployment
+    public void testClassDelegateSingleInheritedMapWithRootCause() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryEventChildException.class.getName());
+        vars.put("nestedExceptionClass", IllegalArgumentException.class.getName());
         FlagDelegate.reset();
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);

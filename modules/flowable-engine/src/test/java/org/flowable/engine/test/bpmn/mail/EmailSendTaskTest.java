@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.bpmn.mail;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +75,20 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertEquals("mispiggy@activiti.org", recipients.get(2));
     }
 
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMailMultipleRecipients.bpmn20.xml")
+    public void testSimpleTextMailMultipleRecipientsAndForceTo() {
+        processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org, no-reply2@flowable.org");
+        runtimeService.startProcessInstanceByKey("simpleTextOnlyMultipleRecipients");
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@localhost", "no-reply@flowable.org"),
+                tuple("flowable@localhost", "no-reply2@flowable.org")
+            );
+    }
+
     @Deployment
     public void testTextMailExpressions() throws Exception {
 
@@ -103,10 +121,31 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.singletonList("kermit@activiti.org"),
                 Collections.singletonList("fozzie@activiti.org"));
 
-        // Bcc is not stored in the header (obviously)
-        // so the only way to verify the bcc, is that there are three messages
-        // send.
-        assertEquals(3, messages.size());
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@localhost", "kermit@activiti.org"),
+                tuple("flowable@localhost", "fozzie@activiti.org"),
+                tuple("flowable@localhost", "mispiggy@activiti.org")
+            );
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testCcAndBcc.bpmn20.xml")
+    public void testCcAndBccWithForceTo() throws Exception {
+        processEngineConfiguration.setMailServerForceTo("no-reply@flowable");
+        runtimeService.startProcessInstanceByKey("ccAndBcc");
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.singletonList("no-reply@flowable"),
+            Collections.singletonList("no-reply@flowable"));
+
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@localhost", "no-reply@flowable"),
+                tuple("flowable@localhost", "no-reply@flowable"),
+                tuple("flowable@localhost", "no-reply@flowable")
+            );
     }
 
     @Deployment
@@ -226,6 +265,21 @@ public class EmailSendTaskTest extends EmailTestCase {
         } catch (Exception e) {
             fail("Only a FlowableException is expected here but not: " + e);
         }
+    }
+
+    @Deployment
+    public void testMissingToAddress() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingToAddress"))
+            .isInstanceOf(FlowableException.class)
+            .hasMessage("No recipient could be found for sending email");
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testMissingToAddress.bpmn20.xml")
+    public void testMissingToAddressWithForceTo() {
+        processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org");
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingToAddress"))
+            .isInstanceOf(FlowableException.class)
+            .hasMessage("No recipient could be found for sending email");
     }
 
     @Deployment

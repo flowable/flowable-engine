@@ -94,6 +94,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean useSSL;
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
+    protected String mailServerForceTo;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
@@ -302,6 +303,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setMailServerDefaultFrom(String mailServerDefaultFrom) {
         this.mailServerDefaultFrom = mailServerDefaultFrom;
+        return this;
+    }
+
+    public String getMailServerForceTo() {
+        return mailServerForceTo;
+    }
+
+    public ProcessEngineConfiguration setMailServerForceTo(String mailServerForceTo) {
+        this.mailServerForceTo = mailServerForceTo;
         return this;
     }
 

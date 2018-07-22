@@ -154,6 +154,13 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
+    public FormInstanceInfo getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(String formDefinitionKey, String parentDeploymentId,
+        String scopeId, String scopeType, String tenantId) {
+
+        return commandExecutor.execute(new GetFormInstanceModelCmd(formDefinitionKey, parentDeploymentId, scopeId, scopeType, tenantId));
+    }
+
+    @Override
     public FormInstanceQuery createFormInstanceQuery() {
         return new FormInstanceQueryImpl(commandExecutor);
     }

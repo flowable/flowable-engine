@@ -18,4 +18,10 @@ package org.flowable.engine.test.bpmn.event.error.mapError;
 
 public class BoundaryEventChildException extends BoundaryErrorParentException {
 
+    public BoundaryEventChildException() {
+    }
+
+    public BoundaryEventChildException(Throwable cause) {
+        super(cause);
+    }
 }

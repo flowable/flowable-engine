@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.content.api.ContentService;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.idm.api.User;
@@ -90,6 +91,17 @@ public class FlowableCaseInstanceService {
         CaseInstanceRepresentation caseInstanceResult = new CaseInstanceRepresentation(caseInstance, caseDefinition, userRep);
 
         return caseInstanceResult;
+    }
+
+    public FormInfo getCaseInstanceStartForm(String caseInstanceId) {
+
+        HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+            throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
+        }
+
+        return cmmnRuntimeService.getStartFormModel(caseInstance.getCaseDefinitionId(), caseInstance.getId());
     }
 
     public CaseInstanceRepresentation startNewCaseInstance(CreateCaseInstanceRepresentation startRequest) {

@@ -39,6 +39,7 @@ public class FlowableMapExceptionParser extends BaseChildElementParser {
 
         String errorCode = xtr.getAttributeValue(null, MAP_EXCEPTION_ERRORCODE);
         String andChildren = xtr.getAttributeValue(null, MAP_EXCEPTION_ANDCHILDREN);
+        String rootCause = xtr.getAttributeValue(null, MAP_EXCEPTION_ROOTCAUSE);
         String exceptionClass = xtr.getElementText();
         boolean hasChildrenBool = false;
 
@@ -54,6 +55,6 @@ public class FlowableMapExceptionParser extends BaseChildElementParser {
             throw new XMLException("No errorCode defined mapException with errorCode=" + errorCode + " and class=" + exceptionClass);
         }
 
-        ((Activity) parentElement).getMapExceptions().add(new MapExceptionEntry(errorCode, exceptionClass, hasChildrenBool));
+        ((Activity) parentElement).getMapExceptions().add(new MapExceptionEntry(errorCode, exceptionClass, hasChildrenBool, rootCause));
     }
 }

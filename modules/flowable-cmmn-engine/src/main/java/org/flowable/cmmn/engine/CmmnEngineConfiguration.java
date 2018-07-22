@@ -171,10 +171,11 @@ import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.form.api.FormFieldHandler;
+import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.InternalJobManager;
@@ -333,6 +334,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalTaskAssignmentManager internalTaskAssignmentManager;
+    protected IdentityLinkEventHandler identityLinkEventHandler;
     protected boolean isEnableTaskRelationshipCounts = true;
     protected int taskQueryLimit = 20000;
     protected int historicTaskQueryLimit = 20000;
@@ -800,6 +802,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
     
     public void initAsyncHistorySessionFactory() {
+        // If another engine has set the asyncHistorySessionFactory already, there's no need to do it again.
         if (!sessionFactories.containsKey(AsyncHistorySession.class)) {
             AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
             if (asyncHistoryListener == null) {
@@ -813,13 +816,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected void initDefaultAsyncHistoryListener() {
-        DefaultAsyncHistoryJobProducer asyncHistoryJobProducer = new DefaultAsyncHistoryJobProducer(
-                CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY, 
-                CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED,
-                jobExecutionScope);
-        asyncHistoryJobProducer.setJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-        asyncHistoryJobProducer.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-        asyncHistoryListener = asyncHistoryJobProducer;
+        asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
     }
 
     protected void initServices() {
@@ -1135,7 +1132,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (this.internalTaskAssignmentManager != null) {
             this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
         } else {
-            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager());
         }
 
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.isEnableTaskRelationshipCounts);
@@ -1157,6 +1154,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.identityLinkServiceConfiguration.setClock(this.clock);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.identityLinkServiceConfiguration.setIdentityLinkEventHandler(this.identityLinkEventHandler);
 
         this.identityLinkServiceConfiguration.init();
 
@@ -1300,6 +1298,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             } else {
                 this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalCmmnJobManager(this));
             }
+            
+            // Async history job config
+            jobServiceConfiguration.setJobTypeAsyncHistory(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
+            jobServiceConfiguration.setJobTypeAsyncHistoryZipped(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
+            jobServiceConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
+            jobServiceConfiguration.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
+            jobServiceConfiguration.setAsyncHistoryJsonGroupingThreshold(asyncHistoryJsonGroupingThreshold);
             
             this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
             this.jobServiceConfiguration.setHistoryJobExecutionScope(this.historyJobExecutionScope);
@@ -1537,7 +1542,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public IdmIdentityService getIdmIdentityService() {
-        return ((IdmEngineConfiguration) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
+        return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
     public CmmnEngineAgendaFactory getCmmnEngineAgendaFactory() {
@@ -2472,6 +2477,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setInternalTaskAssignmentManager(InternalTaskAssignmentManager internalTaskAssignmentManager) {
         this.internalTaskAssignmentManager = internalTaskAssignmentManager;
+        return this;
+    }
+
+    public IdentityLinkEventHandler getIdentityLinkEventHandler() {
+        return identityLinkEventHandler;
+    }
+
+    public CmmnEngineConfiguration setIdentityLinkEventHandler(IdentityLinkEventHandler identityLinkEventHandler) {
+        this.identityLinkEventHandler = identityLinkEventHandler;
         return this;
     }
 

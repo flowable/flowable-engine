@@ -214,8 +214,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             Map<String, Object> rawVariables = runtimeService.getVariables(task.getScopeId());
             List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, RestVariableScope.GLOBAL);
 
-            // Overlay global variables over local ones. In case they are
-            // present the values are not overridden,
+            // Overlay global variables over local ones. In case they are present the values are not overridden,
             // since local variables get precedence over global ones at all times.
             for (RestVariable var : globalVariables) {
                 if (!variableMap.containsKey(var.getName())) {

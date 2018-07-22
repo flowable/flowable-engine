@@ -49,6 +49,13 @@ public class FlowableMailProperties {
     private String defaultFrom = "flowable@localhost";
 
     /**
+     * The force to address(es) that would be used when sending out emails.
+     * IMPORTANT: If this is set then all emails will be send to defined address(es) instead of the address
+     * configured in the MailActivity.
+     */
+    private String forceTo;
+
+    /**
      * Sets whether SSL/TLS encryption should be enabled for the SMTP transport upon connection (SMTPS/POPS).
      */
     private boolean useSsl;
@@ -96,6 +103,14 @@ public class FlowableMailProperties {
 
     public void setDefaultFrom(String defaultFrom) {
         this.defaultFrom = defaultFrom;
+    }
+
+    public String getForceTo() {
+        return forceTo;
+    }
+
+    public void setForceTo(String forceTo) {
+        this.forceTo = forceTo;
     }
 
     public boolean isUseSsl() {

@@ -69,5 +69,13 @@ public class SpringDmnExpressionManager extends DefaultExpressionManager {
         compositeElResolver.add(new CouldNotResolvePropertyELResolver());
         return compositeElResolver;
     }
+
+	public ApplicationContext getApplicationContext() {
+		return applicationContext;
+	}
+
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
     
 }

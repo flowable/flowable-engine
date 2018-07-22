@@ -21,6 +21,7 @@ import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryProperty;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,6 +51,9 @@ public class HistoricActivityInstanceBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<HistoricActivityInstanceResponse> getQueryResponse(HistoricActivityInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
@@ -106,6 +110,10 @@ public class HistoricActivityInstanceBaseResource {
 
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.activityWithoutTenantId();
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryActivityInfoWithQuery(query);
         }
 
         return new HistoricActivityInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "startTime", allowedSortProperties);

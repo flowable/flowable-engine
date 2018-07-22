@@ -86,6 +86,7 @@ public class CaseInstanceRepresentation extends AbstractRepresentation {
             this.caseDefinitionCategory = caseDefinition.getCategory();
             this.caseDefinitionVersion = caseDefinition.getVersion();
             this.caseDefinitionDeploymentId = caseDefinition.getDeploymentId();
+            this.startFormDefined = caseDefinition.hasStartFormKey();
         }
     }
 

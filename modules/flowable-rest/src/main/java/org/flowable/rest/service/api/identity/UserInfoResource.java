@@ -100,6 +100,11 @@ public class UserInfoResource extends BaseUserResource {
     @DeleteMapping("/identity/users/{userId}/info/{key}")
     public void deleteUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteUser(user);
+        }
+        
         String validKey = getValidKeyFromRequest(user, key);
 
         identityService.setUserInfo(user.getId(), validKey, null);

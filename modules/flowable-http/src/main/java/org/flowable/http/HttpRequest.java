@@ -23,6 +23,7 @@ public class HttpRequest {
     protected String url;
     protected String headers;
     protected String body;
+    protected String bodyEncoding;
     protected int timeout;
     protected boolean noRedirects;
     protected Set<String> failCodes;
@@ -64,6 +65,14 @@ public class HttpRequest {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getBodyEncoding() {
+        return bodyEncoding;
+    }
+
+    public void setBodyEncoding(String bodyEncoding) {
+        this.bodyEncoding = bodyEncoding;
     }
 
     public int getTimeout() {

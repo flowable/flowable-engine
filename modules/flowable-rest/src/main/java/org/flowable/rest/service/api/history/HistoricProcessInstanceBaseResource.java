@@ -19,11 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryProperty;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
@@ -51,6 +54,9 @@ public class HistoricProcessInstanceBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<HistoricProcessInstanceResponse> getQueryResponse(HistoricProcessInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
@@ -122,8 +128,25 @@ public class HistoricProcessInstanceBaseResource {
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.processInstanceWithoutTenantId();
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryProcessInfoWithQuery(query);
+        }
 
         return new HistoricProcessInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties);
+    }
+    
+    protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryProcessInfoById(processInstance);
+        }
+        
+        return processInstance;
     }
 
     protected void addVariables(HistoricProcessInstanceQuery processInstanceQuery, List<QueryVariable> variables) {

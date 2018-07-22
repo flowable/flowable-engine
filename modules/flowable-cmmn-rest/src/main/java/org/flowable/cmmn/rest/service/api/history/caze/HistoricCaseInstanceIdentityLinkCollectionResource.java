@@ -19,6 +19,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.history.task.HistoricIdentityLinkResponse;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -39,7 +40,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Case" }, description = "Manage History Case Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricCaseInstanceIdentityLinkCollectionResource {
+public class HistoricCaseInstanceIdentityLinkCollectionResource extends HistoricCaseInstanceBaseResource {
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -53,8 +54,9 @@ public class HistoricCaseInstanceIdentityLinkCollectionResource {
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getCaseIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-
-        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForCaseInstance(caseInstanceId);
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
+        
+        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId());
 
         if (identityLinks != null) {
             return restResponseFactory.createHistoricIdentityLinkResponseList(identityLinks);

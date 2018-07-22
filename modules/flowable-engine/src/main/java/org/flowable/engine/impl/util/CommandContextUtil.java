@@ -54,15 +54,15 @@ import org.flowable.form.api.FormService;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
 import org.flowable.job.service.HistoryJobService;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
@@ -239,17 +239,17 @@ public class CommandContextUtil {
     
     // IDM ENGINE
     
-    public static IdmEngineConfiguration getIdmEngineConfiguration() {
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration() {
         return getIdmEngineConfiguration(getCommandContext());
     }
     
-    public static IdmEngineConfiguration getIdmEngineConfiguration(CommandContext commandContext) {
-        return (IdmEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration(CommandContext commandContext) {
+        return (IdmEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
     }
     
     public static IdmIdentityService getIdmIdentityService() {
         IdmIdentityService idmIdentityService = null;
-        IdmEngineConfiguration idmEngineConfiguration = getIdmEngineConfiguration();
+        IdmEngineConfigurationApi idmEngineConfiguration = getIdmEngineConfiguration();
         if (idmEngineConfiguration != null) {
             idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
         }
@@ -481,14 +481,6 @@ public class CommandContextUtil {
         return getProcessEngineConfiguration(commandContext).getEventSubscriptionEntityManager();
     }
     
-    public static PrivilegeEntityManager getPrivilegeEntityManager() {
-        return getPrivilegeEntityManager(getCommandContext());
-    }
-    
-    public static PrivilegeEntityManager getPrivilegeEntityManager(CommandContext commandContext) {
-        return getIdmEngineConfiguration(commandContext).getPrivilegeEntityManager();
-    }
-    
     public static CommentEntityManager getCommentEntityManager() {
         return getCommentEntityManager(getCommandContext());
     }
@@ -579,6 +571,14 @@ public class CommandContextUtil {
     
     public static CommandContext getCommandContext() {
         return Context.getCommandContext();
+    }
+
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager(CommandContext commandContext) {
+        return getTaskServiceConfiguration(commandContext).getInternalTaskAssignmentManager();
+    }
+
+    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
+        return getInternalTaskAssignmentManager(getCommandContext());
     }
 
 }

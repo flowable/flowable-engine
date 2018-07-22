@@ -115,7 +115,7 @@ io.swagger                      swagger-annotations         1.5.19          Apac
 io.swagger                      swagger-models              1.5.19          Apache License 2.0
 javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
-joda-time                       joda-time                   2.9.9           Apache 2
+joda-time                       joda-time                   2.10            Apache 2
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
 org.apache.commons              commons-email               1.5             Apache License, Version 2.0
 org.apache.commons              commons-lang3               3.7             The Apache Software License, Version 2.0
@@ -149,5 +149,5 @@ org.springframework.security    spring-security-crypto      4.2.3.RELEASE   The 
 org.springframework.security    spring-security-web         4.2.3.RELEASE   The Apache Software License, Version 2.0
 org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
-xerces                          xercesImpl                  2.10.0          The Apache Software License, Version 2.0
+xerces                          xercesImpl                  2.11.0          The Apache Software License, Version 2.0
 xml-apis                        xml-apis                    1.4.01          The Apache Software License, Version 2.0-The SAX License-The W3C License

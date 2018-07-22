@@ -22,6 +22,7 @@ import org.flowable.common.rest.api.DataResponse;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryProperty;
+import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
 import org.flowable.dmn.rest.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,6 +58,9 @@ public class HistoryDecisionExecutionCollectionResource {
 
     @Autowired
     protected DmnHistoryService dmnHistoryService;
+    
+    @Autowired(required=false)
+    protected DmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of historic decision executions", nickname ="listHistoricDecisionExecutions", tags = { "Historic Decision Executions" })
     @ApiImplicitParams({
@@ -114,6 +118,10 @@ public class HistoryDecisionExecutionCollectionResource {
         }
         if (allRequestParams.containsKey("tenantIdLike")) {
             historicDecisionExecutionQuery.tenantIdLike(allRequestParams.get("tenantIdLike"));
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDecisionHistoryInfoWithQuery(historicDecisionExecutionQuery);
         }
 
         return new HistoricDecisionExecutionsDmnPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, historicDecisionExecutionQuery, "startTime", properties);

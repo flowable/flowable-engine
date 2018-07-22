@@ -30,20 +30,20 @@ import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.engine.IdmEngineConfiguration;
 
 public class EngineServiceUtil {
     
     // IDM ENGINE
     
-    public static IdmEngineConfiguration getIdmEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
-        return (IdmEngineConfiguration) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    public static IdmEngineConfigurationApi getIdmEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (IdmEngineConfigurationApi) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
     }
     
     public static IdmIdentityService getIdmIdentityService(AbstractEngineConfiguration engineConfiguration) {
         IdmIdentityService idmIdentityService = null;
-        IdmEngineConfiguration idmEngineConfiguration = getIdmEngineConfiguration(engineConfiguration);
+        IdmEngineConfigurationApi idmEngineConfiguration = getIdmEngineConfiguration(engineConfiguration);
         if (idmEngineConfiguration != null) {
             idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
         }

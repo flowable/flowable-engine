@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryProperty;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
@@ -48,6 +49,9 @@ public class PlanItemInstanceBaseResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+    
+    @Autowired(required=false)
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<PlanItemInstanceResponse> getQueryResponse(PlanItemInstanceQueryRequest queryRequest, Map<String, String> requestParams, String serverRootUrl) {
 
@@ -111,6 +115,10 @@ public class PlanItemInstanceBaseResource {
 
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.planItemInstanceWithoutTenantId();
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessPlanItemInstanceInfoWithQuery(query);
         }
 
         return new PlanItemInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "startTime", allowedSortProperties);
@@ -194,6 +202,11 @@ public class PlanItemInstanceBaseResource {
         if (planItemInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find an plan item instance with id '" + planItemInstance + "'.", PlanItemInstance.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessPlanItemInstanceInfoById(planItemInstance);
+        }
+        
         return planItemInstance;
     }
 

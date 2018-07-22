@@ -18,12 +18,14 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Hermans
+ * @author Filip Hrisafov
  */
 public class UserResponse {
 
     protected String id;
     protected String firstName;
     protected String lastName;
+    protected String displayName;
     protected String passWord;
     protected String url;
     protected String email;
@@ -73,6 +75,15 @@ public class UserResponse {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    @ApiModelProperty(example = "Fred Smith")
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

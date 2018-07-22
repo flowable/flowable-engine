@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -626,12 +625,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (childExecutions != null && childExecutions.size() > 0) {
 
             // Have a fixed ordering of child executions (important for the order in which events are sent)
-            Collections.sort(childExecutions, new Comparator<ExecutionEntity>() {
-                @Override
-                public int compare(ExecutionEntity e1, ExecutionEntity e2) {
-                    return e1.getStartTime().compareTo(e2.getStartTime());
-                }
-            });
+            Collections.sort(childExecutions, ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR);
 
             for (ExecutionEntity childExecution : childExecutions) {
                 if (!executionIdsToExclude.contains(childExecution.getId())) {

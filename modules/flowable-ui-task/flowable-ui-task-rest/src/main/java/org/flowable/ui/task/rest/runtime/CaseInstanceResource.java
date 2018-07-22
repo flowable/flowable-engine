@@ -14,8 +14,10 @@ package org.flowable.ui.task.rest.runtime;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.ui.task.model.runtime.CaseInstanceRepresentation;
+import org.flowable.ui.task.model.runtime.FormModelRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableCaseInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,9 +43,10 @@ public class CaseInstanceResource {
     }
 
     @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")
-    public SimpleFormModel getCaseInstanceStartForm(@PathVariable String caseInstanceId, HttpServletResponse response) {
-        //return caseInstanceService.getProcessInstanceStartForm(caseInstanceId, response);
-        return null;
+    public FormModelRepresentation getCaseInstanceStartForm(@PathVariable String caseInstanceId, HttpServletResponse response) {
+        FormInfo formInfo = caseInstanceService.getCaseInstanceStartForm(caseInstanceId);
+        SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+        return new FormModelRepresentation(formInfo, formModel);
     }
 
     @RequestMapping(value = "/rest/case-instances/{caseInstanceId}", method = RequestMethod.DELETE)

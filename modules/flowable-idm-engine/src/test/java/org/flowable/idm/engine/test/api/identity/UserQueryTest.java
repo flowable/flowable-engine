@@ -31,9 +31,9 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        createUser("kermit", "Kermit", "Thefrog", "kermit@muppetshow.com");
-        createUser("fozzie", "Fozzie", "Bear", "fozzie@muppetshow.com");
-        createUser("gonzo", "Gonzo", "The great", "gonzo@muppetshow.com");
+        createUser("kermit", "Kermit", "Thefrog", "Kermit Thefrog", "kermit@muppetshow.com");
+        createUser("fozzie", "Fozzie", "Bear", "Fozzie Bear", "fozzie@muppetshow.com");
+        createUser("gonzo", "Gonzo", "The great", "Gonzo The great", "gonzo@muppetshow.com");
 
         idmIdentityService.saveGroup(idmIdentityService.newGroup("muppets"));
         idmIdentityService.saveGroup(idmIdentityService.newGroup("frogs"));
@@ -44,10 +44,11 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.createMembership("gonzo", "muppets");
     }
 
-    private User createUser(String id, String firstName, String lastName, String email) {
+    private User createUser(String id, String firstName, String lastName, String displayName, String email) {
         User user = idmIdentityService.newUser(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
+        user.setDisplayName(displayName);
         user.setEmail(email);
         idmIdentityService.saveUser(user);
         return user;
@@ -208,6 +209,41 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }
+    }
+    
+    public void testQueryByDisplayName() {
+        UserQuery query = idmIdentityService.createUserQuery().userDisplayName("Fozzie Bear");
+        verifyQueryResults(query, 1);
+
+        User result = query.singleResult();
+        assertEquals("fozzie", result.getId());
+    }
+
+    public void testQueryByInvalidDisplayName() {
+        UserQuery query = idmIdentityService.createUserQuery().userDisplayName("invalid");
+        verifyQueryResults(query, 0);
+
+        try {
+            idmIdentityService.createUserQuery().userDisplayName(null).singleResult();
+            fail();
+        } catch (FlowableIllegalArgumentException e) {
+        }
+    }
+
+    public void testQueryByDisplayNameLike() {
+        UserQuery query = idmIdentityService.createUserQuery().userDisplayNameLike("%rog%");
+        verifyQueryResults(query, 1);
+
+        query = idmIdentityService.createUserQuery().userDisplayNameLike("%ea%");
+        verifyQueryResults(query, 2);
+    }
+
+    public void testQueryByDisplayNameLikeIgnoreCase() {
+        UserQuery query = idmIdentityService.createUserQuery().userDisplayNameLikeIgnoreCase("%ROg%");
+        verifyQueryResults(query, 1);
+
+        query = idmIdentityService.createUserQuery().userDisplayNameLikeIgnoreCase("%Ea%");
+        verifyQueryResults(query, 2);
     }
 
     public void testQueryByEmail() {

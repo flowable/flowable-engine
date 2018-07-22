@@ -208,6 +208,15 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
 
     }
 
+    public void migrateDecisionTables() {
+        List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.NAME_ASC);
+
+        decisionTableModels.forEach(decisionTableModel -> {
+            decisionTableModel = DecisionTableModelConversionUtil.convertModelToV3(decisionTableModel);
+            modelRepository.save(decisionTableModel);
+        });
+    }
+
     protected String makeValidFilterText(String filterText) {
         String validFilter = null;
 

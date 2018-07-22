@@ -95,14 +95,6 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-idm-spring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-idm-spring-configurator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-common</artifactId>
         </dependency>
         <dependency>
@@ -149,6 +141,16 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-spring-configurator</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

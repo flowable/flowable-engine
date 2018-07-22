@@ -54,6 +54,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected boolean withoutTaskId;
 
     public FormInstanceQueryImpl() {
     }
@@ -198,6 +199,12 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
         return this;
     }
 
+    @Override
+    public FormInstanceQueryImpl withoutTaskId() {
+        this.withoutTaskId = true;
+        return this;
+    }
+
     // sorting ////////////////////////////////////////////////////////
 
     @Override
@@ -308,5 +315,9 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public boolean isWithoutTaskId() {
+        return withoutTaskId;
     }
 }

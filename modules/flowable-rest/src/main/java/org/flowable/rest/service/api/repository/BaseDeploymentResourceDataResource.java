@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,6 +38,9 @@ public class BaseDeploymentResourceDataResource {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected byte[] getDeploymentResourceData(String deploymentId, String resourceName, HttpServletResponse response) {
 
@@ -51,6 +55,10 @@ public class BaseDeploymentResourceDataResource {
         Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", Deployment.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
         }
 
         List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);

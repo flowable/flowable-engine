@@ -44,6 +44,12 @@ public interface UserEntity extends User, Entity, HasRevision {
 
     @Override
     void setLastName(String lastName);
+    
+    @Override
+    String getDisplayName();
+
+    @Override
+    void setDisplayName(String displayName);
 
     @Override
     String getEmail();

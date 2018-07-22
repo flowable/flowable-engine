@@ -69,6 +69,19 @@ public interface UserQuery extends Query<UserQuery, User> {
      * like xxx
      */
     UserQuery userFullNameLikeIgnoreCase(String fullNameLikeIgnoreCase);
+    
+    /** Only select {@link User}s with the given displayName. */
+    UserQuery userDisplayName(String displayName);
+
+    /**
+     * Only select {@link User}s where the display name matches the given parameter. The syntax is that of SQL, eg. %name%.
+     */
+    UserQuery userDisplayNameLike(String displayNameLike);
+
+    /**
+     * Only select {@link User}s where the display name matches the given parameter (ignoring case). The syntax is that of SQL, eg. %name%.
+     */
+    UserQuery userDisplayNameLikeIgnoreCase(String displayNameLikeIgnoreCase);
 
     /** Only those {@link User}s with the given email address. */
     UserQuery userEmail(String email);

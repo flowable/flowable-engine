@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -87,6 +88,27 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     }
 
     @Deployment
+    public void testGetWithParametrizedResponseHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertEquals(2, variables.size());
+        String firstName = null;
+        String lastName = null;
+
+        for (HistoricVariableInstance historicVariableInstance : variables) {
+            if ("firstName".equals(historicVariableInstance.getVariableName())) {
+                firstName = (String) historicVariableInstance.getValue();
+            } else if ("lastName".equals(historicVariableInstance.getVariableName())) {
+                lastName = (String) historicVariableInstance.getValue();
+            }
+        }
+
+        assertEquals("John", firstName);
+        assertEquals("Doe", lastName);
+        assertProcessEnded(procId);
+    }
+
+    @Deployment
     public void testGetWithRequestHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
@@ -94,6 +116,28 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertEquals("httpGetResponseBody", variables.get(0).getVariableName());
         String variableValue = variables.get(0).getValue().toString();
         assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
+        assertProcessEnded(procId);
+    }
+
+    @Deployment
+    public void testGetWithBpmnThrowingResponseHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(procId)
+            .singleResult();
+
+        assertEquals("theEnd2", processInstance.getEndActivityId());
+        assertProcessEnded(procId);
+    }
+
+    @Deployment
+    public void testGetWithBpmnThrowingRequestHandler() {
+        String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
+        final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(procId)
+            .singleResult();
+
+        assertEquals("theEnd2", processInstance.getEndActivityId());
         assertProcessEnded(procId);
     }
 
@@ -316,6 +360,29 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         Map<String, Object> response = new HashMap<>();
         response.put("httpPostResponseStatusCode", 302);
         assertEquals(process.getId(), response);
+        continueProcess(process);
+    }
+
+    @Deployment
+    public void testHttpPostBodyEncoding() throws Exception {
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPostBodyEncoding");
+        assertFalse(process.isEnded());
+
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("httpPostRequestMethod", "POST");
+        request.put("httpPostRequestUrl", "http://localhost:9798/hello");
+        request.put("httpPostRequestHeaders", "Content-Type: application/json; charset=utf-8");
+        request.put("httpPostRequestBody", "{\"name\":\"Alen Turković\"}");
+        assertEquals(process.getId(), request);
+        // Response assertions
+        Map<String, Object> response = new HashMap<>();
+        response.put("httpPostResponseStatusCode", 200);
+        assertEquals(process.getId(), response);
+        // Response body assertions
+        String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPostResponseBody");
+        assertNotNull(responseBody);
+        assertEquals("{\"result\":\"Hello Alen Turković\"}", responseBody.trim());
         continueProcess(process);
     }
 

@@ -89,6 +89,9 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
             // After storing the stream, store the length to be accessible without having to consult the
             // underlying content storage to get file size
             contentItemEntity.setContentSize(createContentObject.getContentLength());
+
+            // Make lastModified timestamp update whenever the content changes
+            contentItemEntity.setLastModified(contentEngineConfiguration.getClock().getCurrentTime());
         }
 
         if (contentItemEntity.getLastModified() == null) {
@@ -99,9 +102,7 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
             if (contentItemEntity.getCreated() == null) {
                 contentItemEntity.setCreated(contentEngineConfiguration.getClock().getCurrentTime());
             }
-
             CommandContextUtil.getContentItemEntityManager().insert(contentItemEntity);
-
         } else {
             CommandContextUtil.getContentItemEntityManager().update(contentItemEntity);
         }

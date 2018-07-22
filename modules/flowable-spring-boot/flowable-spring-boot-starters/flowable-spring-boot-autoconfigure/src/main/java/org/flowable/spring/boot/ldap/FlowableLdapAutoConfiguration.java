@@ -19,7 +19,7 @@ import org.flowable.ldap.LDAPIdentityServiceImpl;
 import org.flowable.ldap.LDAPQueryBuilder;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
-import org.flowable.spring.boot.SecurityAutoConfiguration;
+import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnLdap;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @ConditionalOnLdap
 @AutoConfigureBefore({
-    SecurityAutoConfiguration.class,
+    FlowableSecurityAutoConfiguration.class,
     IdmEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class
 })

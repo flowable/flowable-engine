@@ -12,10 +12,9 @@
  */
 package org.flowable.spring.boot;
 
-import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.api.identity.AuthenticationContext;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.spring.boot.condition.ConditionalOnIdmEngine;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.spring.security.FlowableAuthenticationProvider;
 import org.flowable.spring.security.FlowableUserDetailsService;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -41,19 +41,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @author Josh Long
  */
 @Configuration
-@ConditionalOnIdmEngine
 @ConditionalOnClass({
     AuthenticationManager.class,
+    IdmIdentityService.class,
+    FlowableAuthenticationProvider.class,
     GlobalAuthenticationConfigurerAdapter.class
 })
+@ConditionalOnBean(IdmIdentityService.class)
 @AutoConfigureBefore(org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class)
 @AutoConfigureAfter({
     IdmEngineServicesAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class
 })
-public class SecurityAutoConfiguration {
+public class FlowableSecurityAutoConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityAutoConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableSecurityAutoConfiguration.class);
 
     @Configuration
     public static class UserDetailsServiceConfiguration
