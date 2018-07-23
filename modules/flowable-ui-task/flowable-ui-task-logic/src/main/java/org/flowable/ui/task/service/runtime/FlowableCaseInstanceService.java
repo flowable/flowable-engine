@@ -28,6 +28,7 @@ import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.content.api.ContentService;
 import org.flowable.form.api.FormInfo;
@@ -42,6 +43,7 @@ import org.flowable.ui.task.model.runtime.CaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.CreateCaseInstanceRepresentation;
 import org.flowable.ui.task.model.runtime.MilestoneRepresentation;
 import org.flowable.ui.task.model.runtime.StageRepresentation;
+import org.flowable.ui.task.model.runtime.UserEventListenerRepresentation;
 import org.flowable.ui.task.service.api.UserCache;
 import org.flowable.ui.task.service.api.UserCache.CachedUser;
 import org.slf4j.Logger;
@@ -258,6 +260,79 @@ public class FlowableCaseInstanceService {
             }
         }
         return new CaseInstanceRepresentation(caseInstance, caseDefinition, user);
+    }
+
+    public ResultListDataRepresentation getCaseInstanceAvailableUserEventListeners(String caseInstanceId) {
+        HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+            throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
+        }
+
+        List<UserEventListenerInstance> userEventListenerInstances = new ArrayList<>();
+
+        //Available UEL
+        userEventListenerInstances.addAll(cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .stateAvailable()
+            .list());
+
+        //Suspended UEL
+        userEventListenerInstances.addAll(cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .stateSuspended()
+            .list());
+
+        List<UserEventListenerRepresentation> collectedUserEventListenerRepresentations = userEventListenerInstances.stream()
+            .map(e -> new UserEventListenerRepresentation(e.getId(), e.getName(), e.getState(), null))
+            .collect(Collectors.toList());
+
+        return new ResultListDataRepresentation(collectedUserEventListenerRepresentations);
+    }
+
+    public ResultListDataRepresentation getCaseInstanceCompletedUserEventListeners(String caseInstanceId) {
+        HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+            throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
+        }
+
+        List<HistoricPlanItemInstance> completedUserEventListeners = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+            .planItemInstanceCaseInstanceId(caseInstance.getId())
+            .planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+            .planItemInstanceState(PlanItemInstanceState.COMPLETED)
+            .list();
+
+        List<UserEventListenerRepresentation> collectedUserEventListenerRepresentations = completedUserEventListeners.stream()
+            .map(e -> new UserEventListenerRepresentation(e.getId(), e.getName(), e.getState(), e.getEndedTime()))
+            .collect(Collectors.toList());
+
+        return new ResultListDataRepresentation(collectedUserEventListenerRepresentations);
+    }
+
+    public void triggerUserEventListener(String caseInstanceId, String userEventListenerId) {
+
+        HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+
+        if (!permissionService.hasReadPermissionOnCaseInstance(SecurityUtils.getCurrentUserObject(), caseInstance, caseInstanceId)) {
+            throw new NotFoundException("Case with id: " + caseInstanceId + " does not exist or is not available for this user");
+        }
+
+        if (StringUtils.isEmpty(userEventListenerId)) {
+            throw new BadRequestException("User event listener id is required");
+        }
+
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+            .caseInstanceId(caseInstanceId)
+            .id(userEventListenerId)
+            .singleResult();
+
+        if (userEventListenerInstance == null) {
+            throw new NotFoundException("User event listener not found");
+        }
+
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
     }
 
     public void deleteCaseInstance(String caseInstanceId) {

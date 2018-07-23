@@ -37,8 +37,8 @@ angular.module('flowableApp')
         }]);
 
 angular.module('flowableApp')
-    .controller('CaseDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CaseService', 'CommentService', 'RelatedContentService', 'MilestoneService', 'StageService',
-        function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CaseService, CommentService, RelatedContentService, MilestoneService, StageService) {
+    .controller('CaseDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CaseService', 'CommentService', 'RelatedContentService', 'MilestoneService', 'StageService', 'UserEventListenerService',
+        function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CaseService, CommentService, RelatedContentService, MilestoneService, StageService, UserEventListenerService) {
 
             $rootScope.root.showStartForm = false;
 
@@ -68,6 +68,7 @@ angular.module('flowableApp')
                     $scope.loadCaseTasks();
                     $scope.loadRelatedContent();
                     $scope.loadCaseInstanceStages();
+                    $scope.loadUserEventListeners();
                     $scope.loadCaseInstanceMilestones();
                 }).error(function (response, status, headers, config) {
                     console.log('Something went wrong: ' + response);
@@ -140,6 +141,29 @@ angular.module('flowableApp')
                         $scope.model.caseHasMilestones = true;
                     } else {
                         $scope.model.caseEndedMilestones = [];
+                    }
+                });
+            };
+
+            $rootScope.loadUserEventListeners = function () {
+
+                $scope.model.hasUserEventListeners = false;
+
+                UserEventListenerService.getCaseInstanceAvailableUserEventListeners($scope.model.caseInstance.id).then(function (response) {
+                    if (response.data && response.data.length > 0) {
+                        $scope.model.caseAvailableUserEventListeners = response.data;
+                        $scope.model.hasUserEventListeners = true;
+                    } else {
+                        $scope.model.caseAvailableUserEventListeners = [];
+                    }
+                });
+
+                UserEventListenerService.getCaseInstanceCompletedUserEventListeners($scope.model.caseInstance.id).then(function (response) {
+                    if (response.data && response.data.length > 0) {
+                        $scope.model.caseCompletedUserEventListeners = response.data;
+                        $scope.model.hasUserEventListeners = true;
+                    } else {
+                        $scope.model.caseCompletedUserEventListeners = [];
                     }
                 });
             };
@@ -218,6 +242,10 @@ angular.module('flowableApp')
                 $route.reload();
             });
 
+            $scope.$on('user-event-listener-triggered', function (event, data) {
+                $route.reload();
+            });
+
             $scope.openTask = function (task) {
                 $rootScope.root.selectedTaskId = task.id;
                 var path = '';
@@ -225,6 +253,10 @@ angular.module('flowableApp')
                     path = "/apps/" + $rootScope.activeAppDefinition.id;
                 }
                 $location.path(path + "/tasks");
+            };
+
+            $scope.triggerUserEventListener = function (userEventListener) {
+                UserEventListenerService.triggerCaseInstanceUserEventListener($scope.model.caseInstance.id, userEventListener.id);
             };
 
             $scope.openStartForm = function () {

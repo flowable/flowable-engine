@@ -312,7 +312,11 @@
             "NO-ACTIVE-STAGES": "No hay etapas activas",
             "NO-ENDED-STAGES": "No hay etapas finalizadas",
             "NO-AVAILABLE-MILESTONES": "No hay hitos disponibles",
-            "NO-REACHED-MILESTONES": "No se han alcanzado hitos"
+            "NO-REACHED-MILESTONES": "No se han alcanzado hitos",
+            "NO-AVAILABLE-USER-EVENT-LISTENERS":"No hay eventos de usuario disponibles",
+            "NO-COMPLETED-USER-EVENT-LISTENERS":"No hay eventos de usuario completados",
+            "USER-EVENT-LISTENER-NO-NAME": "Evento de usuario sin nombre",
+            "USER-EVENT-LISTENER-COMPLETED": "Completado"
         },
         "ACTION" : {
             "CREATE": "+ Comenzar un caso",
@@ -320,6 +324,7 @@
             "SHOW-DIAGRAM": "Mostrar digrama",
             "CANCEL": "Cancelar caso",
             "DELETE": "Borrar caso",
+            "TRIGGER-USER-EVENT-LISTENER": "Disparar",
             "AUDIT-LOG": "Bitácora de Auditoría"
         },
         "FIELD": {
@@ -339,6 +344,8 @@
             "ENDED-STAGES": "Etapas finalizadas",
             "AVAILABLE-MILESTONES": "Hitos disponibles",
             "REACHED-MILESTONES": "Hitos alcanzados",
+            "AVAILABLE-USER-EVENT-LISTENERS": "Eventos de usuario disponibles",
+            "COMPLETED-USER-EVENT-LISTENERS": "Eventos de usuario completados",
             "CONTENT" : "Contenido"
         },
         "POPUP": {

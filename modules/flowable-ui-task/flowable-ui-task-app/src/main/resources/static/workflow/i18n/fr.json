@@ -330,7 +330,11 @@
             "NO-ACTIVE-STAGES": "Pas d'étapes actives",
             "NO-ENDED-STAGES": "Étapes non terminées",
             "NO-AVAILABLE-MILESTONES": "Pas de Jalons disponible",
-            "NO-REACHED-MILESTONES": "Pas de Jalons atteints"
+            "NO-REACHED-MILESTONES": "Pas de Jalons atteints",
+            "NO-AVAILABLE-USER-EVENT-LISTENERS":"Aucun événement utilisateur disponible",
+            "NO-COMPLETED-USER-EVENT-LISTENERS":"Aucun événement utilisateur terminé",
+            "USER-EVENT-LISTENER-NO-NAME": "Evénement utilisateur sans nom",
+            "USER-EVENT-LISTENER-COMPLETED": "Terminé"
         },
         "ACTION" : {
             "CREATE": "+ Démarrer un cas",
@@ -338,6 +342,7 @@
             "SHOW-DIAGRAM": "Afficher le diagramme",
             "CANCEL": "Annuler le cas",
             "DELETE": "Supprimer le cas",
+            "TRIGGER-USER-EVENT-LISTENER": "Déclencheur",
             "AUDIT-LOG": "Audit Log"
         },
         "FIELD": {
@@ -357,6 +362,8 @@
             "ENDED-STAGES": "Étapes terminées",
             "AVAILABLE-MILESTONES": "Jalons disponible",
             "REACHED-MILESTONES": "Atteint des Jalons",
+            "AVAILABLE-USER-EVENT-LISTENERS": "Evénement utilisateur disponible",
+            "COMPLETED-USER-EVENT-LISTENERS": "Événement utilisateur terminé",
             "CONTENT" : "Contenus"
         },
         "POPUP": {

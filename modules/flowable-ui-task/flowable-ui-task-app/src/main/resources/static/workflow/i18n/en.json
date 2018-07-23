@@ -329,7 +329,11 @@
             "NO-ACTIVE-STAGES": "No active stages",
             "NO-ENDED-STAGES": "No ended stages",
             "NO-AVAILABLE-MILESTONES": "No active milestones",
-            "NO-REACHED-MILESTONES": "No reached milestones"
+            "NO-REACHED-MILESTONES": "No reached milestones",
+            "NO-AVAILABLE-USER-EVENT-LISTENERS":"No User Event Listeners available",
+            "NO-COMPLETED-USER-EVENT-LISTENERS":"No User Event Listeners completed",
+            "USER-EVENT-LISTENER-NO-NAME": "Nameless User Event Listener",
+            "USER-EVENT-LISTENER-COMPLETED": "Completed"
         },
         "ACTION" : {
             "CREATE": "+ Start a case",
@@ -337,6 +341,7 @@
             "SHOW-DIAGRAM": "Show diagram",
             "CANCEL": "Cancel case",
             "DELETE": "Delete case",
+            "TRIGGER-USER-EVENT-LISTENER": "Trigger",
             "AUDIT-LOG": "Audit Log"
         },
         "FIELD": {
@@ -356,6 +361,8 @@
             "ENDED-STAGES": "Ended stages",
             "AVAILABLE-MILESTONES": "Available milestones",
             "REACHED-MILESTONES": "Reached milestones",
+            "AVAILABLE-USER-EVENT-LISTENERS": "Available User Event Listeners",
+            "COMPLETED-USER-EVENT-LISTENERS": "Completed User Event Listeners",
             "CONTENT" : "Content"
         },
         "POPUP": {
