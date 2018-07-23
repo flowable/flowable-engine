@@ -307,7 +307,7 @@
                 "TITLE": "Assign task",
                 "MESSAGE": "Are you sure you want to assign task",
                 "NEW-ASSIGNEE": "New assignee",
-                "NEW-ASSIGNEE-HELP": "Leave the assignee field empty if you want to assign the task to nobody.",
+                "NEW-ASSIGNEE-HELP": "Leave the assignee field empty if you want to assign the task to nobody. Mind: when providing a user id make sure it exists.",
                 "CONFIRM": "Assign task"
             },
             "COMPLETE": {

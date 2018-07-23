@@ -481,7 +481,7 @@ flowableAdminApp.controller('EditTaskModalInstanceCtrl',
 			  assignee: task.assignee,
 			  dueDate: task.dueDate,
 			  priority: task.priority,
-			  category: task.category,
+			  category: task.category
 	  };
 
 	  $scope.status = {loading: false};
