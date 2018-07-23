@@ -271,8 +271,12 @@ public class DefaultJobManager implements JobManager {
             // as the chance of failure will be high.
 
         } else {
-            // It could be a v5 job, so simply unlock it.
-            jobServiceConfiguration.getJobEntityManager().resetExpiredJob(job.getId());
+            if (job != null) {
+                // It could be a v5 job, so simply unlock it.
+                jobServiceConfiguration.getJobEntityManager().resetExpiredJob(job.getId());
+            } else {
+                throw new FlowableException("Programmatic error: null job passed");
+            }
         }
 
     }
