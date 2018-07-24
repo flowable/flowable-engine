@@ -50,7 +50,7 @@ angular.module('flowableApp').service('UserEventListenerService', ['$http', '$q'
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + 'rest/case-instances/' + caseInstanceId + '/completed-user-event-listeners',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/completed-user-event-listeners',
                     data: data
                 }
             );

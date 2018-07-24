@@ -358,7 +358,7 @@
         "SECTION": {
             "ACTIVE-TASKS": "Tâches actives",
             "COMPLETED-TASKS": "Tâches terminées",
-            "ACTIVE-STAGES": "Étapes actives",
+            "ACTIVE-STAGES": "Étapes disponible/actives",
             "ENDED-STAGES": "Étapes terminées",
             "AVAILABLE-MILESTONES": "Jalons disponible",
             "REACHED-MILESTONES": "Atteint des Jalons",

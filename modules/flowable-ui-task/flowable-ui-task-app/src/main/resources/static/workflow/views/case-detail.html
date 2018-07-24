@@ -83,17 +83,12 @@
                 <ul class="simple-list checklist">
                     <li ng-repeat="userEventListener in model.caseAvailableUserEventListeners">
                         <div class="clearfix">
-                            <div class="pull-right">
-                                <button ng-if="userEventListener.state == 'available'" class="btn" ng-click="triggerUserEventListener(userEventListener)" translate="CASE.ACTION.TRIGGER-USER-EVENT-LISTENER"></button>
-                            </div>
                             <div>
-                                <div user-picture="userEventListener.name"></div>
-                                {{userEventListener.name || ('CASE.MESSAGE.STAGE-NO-NAME' | translate)}}
+                                <button ng-if="userEventListener.state == 'available'" class="btn" ng-click="triggerUserEventListener(userEventListener)" translate="{{userEventListener.name || ('CASE.MESSAGE.USER-EVENT-LISTENER-NO-NAME' | translate)}}"></button>
+                                <span ng-if="userEventListener.state != 'available'">{{userEventListener.name || ('CASE.MESSAGE.STAGE-NO-NAME' | translate)}}</span>
                             </div>
                             <div class="subtle">
-                                <span>
-                                    {{'CASE.MESSAGE.STATE' | translate}}: {{userEventListener.state}}
-                                </span>
+                                <span>{{'CASE.MESSAGE.STATE' | translate}}: {{userEventListener.state}}</span>
                             </div>
                         </div>
                     </li>
@@ -108,18 +103,13 @@
                     <li ng-repeat="userEventListener in model.caseCompletedUserEventListeners">
                         <div class="clearfix">
                             <div class="pull-right">
-                                <span class="badge">
-                                    {{'CASE.MESSAGE.USER-EVENT-LISTENER-COMPLETED' | translate}} {{(userEventListener.stateDate | dateformat:'fromNow')}}
-                                </span>
+                                <span class="badge">{{'CASE.MESSAGE.USER-EVENT-LISTENER-COMPLETED' | translate}} {{(userEventListener.stateDate | dateformat:'fromNow')}}</span>
                             </div>
                             <div>
-                                <div user-picture="userEventListener.name"></div>
-                                {{userEventListener.name || ('CASE.MESSAGE.USER-EVENT-LISTENER-NO-NAME' | translate)}}
+                                <span>{{userEventListener.name || ('CASE.MESSAGE.USER-EVENT-LISTENER-NO-NAME' | translate)}}</span>
                             </div>
                             <div class="subtle">
-                                <span>
-                                    {{'CASE.MESSAGE.STATE' | translate}}: {{userEventListener.state}}
-                                </span>
+                                <span>{{'CASE.MESSAGE.STATE' | translate}}: {{userEventListener.state}}</span>
                             </div>
                         </div>
                     </li>

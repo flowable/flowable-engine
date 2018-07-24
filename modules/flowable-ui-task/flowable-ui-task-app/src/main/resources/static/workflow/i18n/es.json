@@ -340,7 +340,7 @@
         "SECTION": {
             "ACTIVE-TASKS": "Tareas activas",
             "COMPLETED-TASKS": "Tareas completadas",
-            "ACTIVE-STAGES": "Etapas activas",
+            "ACTIVE-STAGES": "Etapas disponibles/activas",
             "ENDED-STAGES": "Etapas finalizadas",
             "AVAILABLE-MILESTONES": "Hitos disponibles",
             "REACHED-MILESTONES": "Hitos alcanzados",

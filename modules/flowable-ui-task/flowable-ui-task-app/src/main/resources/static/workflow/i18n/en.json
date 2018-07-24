@@ -357,7 +357,7 @@
         "SECTION": {
             "ACTIVE-TASKS": "Active tasks",
             "COMPLETED-TASKS": "Completed tasks",
-            "ACTIVE-STAGES": "Active stages",
+            "ACTIVE-STAGES": "Available/Active stages",
             "ENDED-STAGES": "Ended stages",
             "AVAILABLE-MILESTONES": "Available milestones",
             "REACHED-MILESTONES": "Reached milestones",
