@@ -163,6 +163,7 @@
             "DUE-ON": "Vencimiento",
             "CREATED-ON": "Creada",
             "ENDED-ON": "Completada",
+            "REACHED-ON": "Alcanzado",
             "COMPLETED-BY": "Completada por",
             "NO-DESCRIPTION": "Esta tarea no tiene descripcion",
             "NO-RELATED-CONTENT": "Esta tarea aun no tiene contenido relacionado...",
@@ -223,6 +224,7 @@
             "NO-TASKS": "No hay tareas activas actualmente ...",
             "NO-COMPLETED-TASKS": "Aun no hay tareas completadas...",
             "NO-BUSINESS-KEY": "No se fijo la Business key",
+            "NO-ACTIVE-MILESTONES": "No hay hitos por alcanzar",
             "CATEGORY": "Categoria: {{processDefinitionCategory}}",
             "NEW-COMMENT-PLACEHOLDER": "Introduce un comentario para agregarlo a este proceso",
             "COMMENT-HEADER": "Agregado por {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
@@ -264,6 +266,93 @@
             "CANCEL-DESCRIPTION": "Estas seguro que deseas cancelar el proceso {{name}}?",
             "DELETE-TITLE": "Eliminar el proceso?",
             "DELETE-DESCRIPTION": "Estas seguro que deseas borrar el proceso {{name}}? Todas las tareas, comentarios y contenido relacionado a este proceso se borrara permanentemente."
+        }
+    },
+    "CASE": {
+        "ALERT": {
+            "STARTED": "Un nuevo caso  \"{{caseDefinitionName}}\" ha comenzado",
+            "START-CASE-CONTENT-ADD-FAILED": "Fallo al agregar {{noOfFiles}} fichero(s) al caso"
+        },
+        "TITLE": {
+            "DIAGRAM": "Diagrama de Caso"
+        },
+        "FILTER": {
+            "CREATED-DESC": "Nuevo primero",
+            "CREATED-ASC": "Antiguo primero",
+            "ENDED-DESC": "Completado más reciente",
+            "ENDED-ASC": "Completado más antiguo",
+            "STATE-SUMMARY": "Mostrando {{state.title | translate}} casos",
+            "STATE": "Estado del Caso",
+            "STATE-RUNNING": "en ejecución",
+            "STATE-COMPLETED": "completado",
+            "STATE-ALL": "todos"
+        },
+        "MESSAGE": {
+            "NO-DESCRIPTION": "Esta instancia de caso no tiene descripción",
+            "NO-FILTER": "Mostrando todos los casos, sin filtro",
+            "NO-INSTANCES": "No se han encontrado instancias de caso que coincidan...",
+            "NO-INSTANCES-HELP": "No hay casos en ejecución. Los casos completados pueden encotrarse usando el filtro. Para comenzar con algo nuevo, podría:",
+            "NO-INSTANCES-HELP-START": "Comenzar un nuevo caso y seguir su progreso",
+            "NO-TASKS": "No hay tareas activas actualmente ...",
+            "NO-COMPLETED-TASKS": "No se han completado tareas aún ...",
+            "NO-BUSINESS-KEY": "No se ha especificado la clave de negocio",
+            "CATEGORY": "Categoria: {{processDefinitionCategory}}",
+            "SELECT-DEFINITION": "Seleccione un caso para comenzar de la lista",
+            "NO-CASE-DEFINITIONS": "No puede comenzar un case ya que no hay definiciones disponibles",
+            "START-CASE": "Comenzar un Caso",
+            "STARTED-BY": "Comenzado por",
+            "STAGE-STARTED": "Comenzada",
+            "STAGE-ENDED": "Terminada",
+            "STAGE-NOT-STARTED": "No comenzada aún",
+            "STATE": "Estado",
+            "STAGE-NO-NAME": "Etapa sin nombre",
+            "MILESTONE-REACHED-ON": "Alcanzado",
+            "MILESTONE-TERMINATED-ON": "Terminado",
+            "NO-CASE-DEFINITION-SELECTED-HELP": "Por favor escoja una definición de caso",
+            "NO-ACTIVE-STAGES": "No hay etapas activas",
+            "NO-ENDED-STAGES": "No hay etapas finalizadas",
+            "NO-AVAILABLE-MILESTONES": "No hay hitos disponibles",
+            "NO-REACHED-MILESTONES": "No se han alcanzado hitos",
+            "NO-AVAILABLE-USER-EVENT-LISTENERS":"No hay eventos de usuario disponibles",
+            "NO-COMPLETED-USER-EVENT-LISTENERS":"No hay eventos de usuario completados",
+            "USER-EVENT-LISTENER-NO-NAME": "Evento de usuario sin nombre",
+            "USER-EVENT-LISTENER-COMPLETED": "Completado"
+        },
+        "ACTION" : {
+            "CREATE": "+ Comenzar un caso",
+            "BACK-TO-LIST": "Regresar a las instancias de caso",
+            "SHOW-DIAGRAM": "Mostrar digrama",
+            "CANCEL": "Cancelar caso",
+            "DELETE": "Borrar caso",
+            "TRIGGER-USER-EVENT-LISTENER": "Disparar",
+            "AUDIT-LOG": "Bitácora de Auditoría"
+        },
+        "FIELD": {
+            "BUSINESS-KEY": "Business key",
+            "CATEGORY": "Categoria",
+            "CASE-DEFINITION": "Definición de caso",
+            "STARTED": "Comenzado",
+            "STARTED-BY": "Comenzado por",
+            "ENDED": "Finalizado",
+            "NAME": "Nombre de la instancia de caso",
+            "NAME-PLACEHOLDER" : "Introduzca un nombre opcional para el caso a comenzar"
+        },
+        "SECTION": {
+            "ACTIVE-TASKS": "Tareas activas",
+            "COMPLETED-TASKS": "Tareas completadas",
+            "ACTIVE-STAGES": "Etapas disponibles/activas",
+            "ENDED-STAGES": "Etapas finalizadas",
+            "AVAILABLE-MILESTONES": "Hitos disponibles",
+            "REACHED-MILESTONES": "Hitos alcanzados",
+            "AVAILABLE-USER-EVENT-LISTENERS": "Eventos de usuario disponibles",
+            "COMPLETED-USER-EVENT-LISTENERS": "Eventos de usuario completados",
+            "CONTENT" : "Contenido"
+        },
+        "POPUP": {
+            "CANCEL-TITLE": "Cancelar el caso?",
+            "CANCEL-DESCRIPTION": "Esta seguro que desea cancelar el caso {{name}}?",
+            "DELETE-TITLE": "Borrar el caso?",
+            "DELETE-DESCRIPTION": "Esta seguro que desea borrar el caso {{name}}? Todas las tareas y contenido relacionado al caso se borrarán de manera permanente."
         }
     },
     "INVOLVE-PEOPLE": {
