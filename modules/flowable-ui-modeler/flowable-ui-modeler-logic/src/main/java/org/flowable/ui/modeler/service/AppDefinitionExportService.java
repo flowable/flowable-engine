@@ -25,6 +25,7 @@ import org.flowable.ui.modeler.domain.AppDefinition;
 import org.flowable.ui.modeler.domain.AppModelDefinition;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.model.AppDefinitionRepresentation;
+import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -79,7 +80,8 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
 
             Map<String, Model> formMap = new HashMap<>();
             Map<String, Model> decisionTableMap = new HashMap<>();
-            
+            Map<String, Model> processMap = new HashMap<>();
+
             List<AppModelDefinition> modelDefinitions = appDefinition.getDefinition().getModels();
             if (CollectionUtils.isNotEmpty(modelDefinitions)) {
                 createBpmnZipEntries(modelDefinitions, zipOutputStream, formMap, decisionTableMap);
@@ -87,7 +89,12 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             
             List<AppModelDefinition> cmmnModelDefinitions = appDefinition.getDefinition().getCmmnModels();
             if (CollectionUtils.isNotEmpty(cmmnModelDefinitions)) {
-                createCmmnZipEntries(cmmnModelDefinitions, zipOutputStream, formMap, decisionTableMap);
+                createCmmnZipEntries(cmmnModelDefinitions, zipOutputStream, formMap, decisionTableMap, processMap);
+
+                if (!processMap.isEmpty()){
+                    findAndAddReferencedBpmnModels(processMap);
+                    createBpmnZipEntries(processMap, zipOutputStream, formMap, decisionTableMap);
+                }
             }
             
             for (Model formModel : formMap.values()) {
@@ -172,9 +179,31 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             createZipEntries(model, "bpmn-models", zipOutputStream);
         }
     }
+
+    protected void createBpmnZipEntries(Map<String, Model> modelDefinitions, ZipOutputStream zipOutputStream,
+                                        Map<String, Model> formMap, Map<String, Model> decisionTableMap) throws Exception {
+
+        for (Model model : modelDefinitions.values()) {
+
+            BpmnModel bpmnModel = modelService.getBpmnModel(model, formMap, decisionTableMap);
+            Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
+
+            for (Process process : bpmnModel.getProcesses()) {
+                processUserTasks(process.getFlowElements(), process, startEventMap);
+            }
+
+            byte[] modelXML = modelService.getBpmnXML(bpmnModel);
+
+            // add BPMN XML model
+            createZipEntry(zipOutputStream, "bpmn-models/" + model.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
+
+            // add JSON model
+            createZipEntries(model, "bpmn-models", zipOutputStream);
+        }
+    }
     
     protected void createCmmnZipEntries(List<AppModelDefinition> modelDefinitions, ZipOutputStream zipOutputStream, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap) throws Exception {
+                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> processMap) throws Exception {
         
         for (AppModelDefinition modelDef : modelDefinitions) {
             Model model = modelService.getModel(modelDef.getId());
@@ -186,7 +215,11 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                     decisionTableMap.put(childModel.getId(), childModel);
+
+                } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
+                    processMap.put(childModel.getId(), childModel);
                 }
+
             }
 
             CmmnModel cmmnModel = modelService.getCmmnModel(model, formMap, decisionTableMap, null, null);
@@ -249,6 +282,17 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         zipOutputStream.putNextEntry(entry);
         zipOutputStream.write(content);
         zipOutputStream.closeEntry();
+    }
+
+    protected void findAndAddReferencedBpmnModels(Map<String, Model> processMap) {
+        for (String processModelId : processMap.keySet()) {
+            if (!processMap.containsKey(processModelId)) {
+                Model procesModel = modelService.getModel(processModelId);
+                if (procesModel != null) {
+                    processMap.put(processModelId, procesModel);
+                }
+            }
+        }
     }
 
 }
