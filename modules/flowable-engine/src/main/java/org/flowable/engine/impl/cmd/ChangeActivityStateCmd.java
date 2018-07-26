@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -66,7 +65,7 @@ public class ChangeActivityStateCmd implements Command<Void> {
                 Map<String, List<ExecutionEntity>> executionsByParent = new HashMap<>();
                 for (String executionId : executionContainer.getExecutionIds()) {
                     ExecutionEntity execution = dynamicStateManager.resolveActiveExecution(executionId, commandContext);
-                    executionsByParent.compute(execution.getParentId(), addExecutionToExistingOrToNewList(execution));
+                    addValueToMapOfLists(executionsByParent, execution.getParentId(), execution);
                 }
                 executionsByParent.values().forEach(l -> moveExecutionEntityContainerList.add(new MoveExecutionEntityContainer(l, executionContainer.getMoveToActivityIds())));
             }
@@ -108,9 +107,9 @@ public class ChangeActivityStateCmd implements Command<Void> {
                             } else {
                                 idMapper = ExecutionEntity::getParentId;
                             }
-                            executionsStream.forEach(e -> activitiesExecutionsByMultiInstanceParentId.compute(idMapper.apply(e), addExecutionToExistingOrToNewList(e)));
+                            executionsStream.forEach(e -> addValueToMapOfLists(activitiesExecutionsByMultiInstanceParentId, idMapper.apply(e), e));
                         } else {
-                            activitiesExecutionsByMultiInstanceParentId.compute(null, addExecutionToExistingOrToNewList(execution));
+                            addValueToMapOfLists(activitiesExecutionsByMultiInstanceParentId, null, execution);
                         }
                     }
                 }
@@ -128,17 +127,13 @@ public class ChangeActivityStateCmd implements Command<Void> {
         return null;
     }
 
-    protected static BiFunction<String, List<ExecutionEntity>, List<ExecutionEntity>> addExecutionToExistingOrToNewList(final ExecutionEntity execution) {
-        return (s, executionEntities) -> {
-            if (executionEntities == null) {
-                ArrayList<ExecutionEntity> executionList = new ArrayList<>();
-                executionList.add(execution);
-                return executionList;
-            } else {
-                executionEntities.add(execution);
-                return executionEntities;
-            }
-        };
+    protected static <K, V> void addValueToMapOfLists(Map<K, List<V>> mapOfLists, K key, V value) {
+        List<V> listOfVs = mapOfLists.get(key);
+        if (listOfVs == null) {
+            listOfVs = new ArrayList<>();
+            mapOfLists.put(key, listOfVs);
+        }
+        listOfVs.add(value);
     }
 
     protected static MoveExecutionEntityContainer createMoveExecutionContainer(MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions) {

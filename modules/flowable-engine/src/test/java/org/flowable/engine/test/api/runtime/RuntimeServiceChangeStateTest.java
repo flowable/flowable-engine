@@ -1107,7 +1107,11 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertFalse(executionsByActivity.containsKey("parallelJoin"));
 
         //Complete one task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst().map(Task::getId).ifPresent(taskService::complete);
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
+
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
@@ -1217,7 +1221,11 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(2, tasks.size());
 
         //Complete task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).forEach(this::completeTask);
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("task1")) {
+                taskService.complete(t.getId());
+            }
+        }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
@@ -1302,7 +1310,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(2, executions.size());
 
         //Complete task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst().map(Task::getId).ifPresent(taskService::complete);
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
@@ -1357,7 +1368,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertNull(executionsByActivity.get("parallelJoin"));
 
         //Complete one task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst().map(Task::getId).ifPresent(taskService::complete);
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
@@ -1467,7 +1481,11 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(2, tasks.size());
 
         //Complete task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).forEach(this::completeTask);
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("task1")) {
+                taskService.complete(t.getId());
+            }
+        }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
@@ -1553,7 +1571,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(2, executions.size());
 
         //Complete task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst().map(Task::getId).ifPresent(taskService::complete);
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
@@ -1606,7 +1627,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertFalse(executionsByActivity.containsKey("gwJoin"));
 
         //Complete one task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst().map(Task::getId).ifPresent(taskService::complete);
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
@@ -1716,7 +1740,11 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(2, tasks.size());
 
         //Complete task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).forEach(this::completeTask);
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("task1")) {
+                taskService.complete(t.getId());
+            }
+        }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
@@ -1801,7 +1829,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(2, executions.size());
 
         //Complete task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst().map(Task::getId).ifPresent(taskService::complete);
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
@@ -1856,7 +1887,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertNull(executionsByActivity.get("gwJoin"));
 
         //Complete one task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst().map(Task::getId).ifPresent(taskService::complete);
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
@@ -1966,7 +2000,11 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(2, tasks.size());
 
         //Complete task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).forEach(this::completeTask);
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("task1")) {
+                taskService.complete(t.getId());
+            }
+        }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
@@ -2052,7 +2090,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(2, executions.size());
 
         //Complete task1
-        tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst().map(Task::getId).ifPresent(taskService::complete);
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
@@ -3511,7 +3552,11 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
             .changeState();
 
         //Complete remaining task3, the next inline test needs the task to be completed too
-        taskService.createTaskQuery().taskDefinitionKey("taskInclusive3").list().forEach(this::completeTask);
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("taskInclusive3")) {
+                taskService.complete(t.getId());
+            }
+        }
 
         //Still 3 subProcesses running, two of them past the gateway fork/join and the remaining one with a task2 pending
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();

@@ -129,8 +129,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             
             // Get FlowElement objects for every move to activity id
             for (String activityId : moveExecutionContainer.getMoveToActivityIds()) {
-                
-                BpmnModel bpmnModel;
+                BpmnModel bpmnModel = null;
                 if (moveExecutionContainer.isMoveToParentProcess()) {
                     String parentProcessDefinitionId = moveExecutionContainer.getSuperExecution().getProcessDefinitionId();
                     bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentProcessDefinitionId);
@@ -354,7 +353,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         
         List<ExecutionEntity> newChildExecutions = new ArrayList<>();
         for (FlowElement newFlowElement : moveToFlowElements) {
-            ExecutionEntity newChildExecution;
+            ExecutionEntity newChildExecution = null;
             
             // Check if a sub process child execution was created for this move to flow element, otherwise use the default continue parent execution
             if (moveExecutionContainer.getSubProcessesToCreateMap().containsKey(newFlowElement.getId())) {
@@ -436,7 +435,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 }
                 
                 continueParentExecution = finalDeleteExecution.getParent();
-                
+
                 String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
                 executionEntityManager.deleteChildExecutions(finalDeleteExecution, "Change activity to " + flowElementIdsLine, true);
                 executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine);
@@ -592,18 +591,15 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
     protected boolean hasSubProcessId(String subProcessId, List<ExecutionEntity> currentExecutions) {
         for (ExecutionEntity execution : currentExecutions) {
             FlowElement executionElement = execution.getCurrentFlowElement();
-            
-            if (executionElement.getSubProcess() != null) {
-                while (executionElement.getSubProcess() != null) {
-                    if (Optional.ofNullable(executionElement.getSubProcess().getId()).filter(s -> s.equals(subProcessId)).isPresent()) {
-                        return true;
-                    }
-                    
-                    executionElement = executionElement.getSubProcess();
+
+            while (executionElement.getSubProcess() != null) {
+                String execElemSubProcessId = executionElement.getSubProcess().getId();
+                if (execElemSubProcessId != null && execElemSubProcessId.equals(subProcessId)) {
+                    return true;
                 }
+                executionElement = executionElement.getSubProcess();
             }
         }
-        
         return false;
     }
     
