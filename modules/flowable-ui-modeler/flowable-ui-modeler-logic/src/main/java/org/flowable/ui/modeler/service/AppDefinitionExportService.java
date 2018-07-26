@@ -222,7 +222,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
 
             }
 
-            CmmnModel cmmnModel = modelService.getCmmnModel(model, formMap, decisionTableMap, null, null);
+            CmmnModel cmmnModel = modelService.getCmmnModel(model, formMap, decisionTableMap, null, processMap);
 
             byte[] modelXML = modelService.getCmmnXML(cmmnModel);
 
