@@ -65,7 +65,7 @@ public class ChangeActivityStateCmd implements Command<Void> {
                 Map<String, List<ExecutionEntity>> executionsByParent = new HashMap<>();
                 for (String executionId : executionContainer.getExecutionIds()) {
                     ExecutionEntity execution = dynamicStateManager.resolveActiveExecution(executionId, commandContext);
-                    addValueToMapOfLists(executionsByParent, execution.getParentId(), execution);
+                    addExecutionToExecutionListsByParentIdMap(executionsByParent, execution.getParentId(), execution);
                 }
                 executionsByParent.values().forEach(l -> moveExecutionEntityContainerList.add(new MoveExecutionEntityContainer(l, executionContainer.getMoveToActivityIds())));
             }
@@ -74,6 +74,7 @@ public class ChangeActivityStateCmd implements Command<Void> {
         if (changeActivityStateBuilder.getMoveActivityIdList().size() > 0) {
             for (MoveActivityIdContainer activityContainer : changeActivityStateBuilder.getMoveActivityIdList()) {
                 Map<String, List<ExecutionEntity>> activitiesExecutionsByMultiInstanceParentId = new HashMap<>();
+                List<ExecutionEntity> activitiesExecutionsNotInMultiInstanceParent = new ArrayList<>();
 
                 for (String activityId : activityContainer.getActivityIds()) {
                     List<ExecutionEntity> activityExecutions = dynamicStateManager.resolveActiveExecutions(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext);
@@ -95,45 +96,44 @@ public class ChangeActivityStateCmd implements Command<Void> {
 
                         //If inside a multiInstance, we create one container for each execution
                         if (insideMultiInstance) {
-                            Stream<ExecutionEntity> executionsStream = activityExecutions.stream();
                             //We group by the parentId (executions belonging to the same parent execution instance
                             // i.e. gateways nested in MultiInstance subprocesses, need to be in the same move container)
-                            Function<ExecutionEntity, String> idMapper;
+                            Stream<ExecutionEntity> executionEntitiesStream = activityExecutions.stream();
+
                             //If the source activity is already a multiInstance, we need to move only the parents (filter)
                             if (execution.isMultiInstanceRoot()) {
-                                executionsStream = executionsStream.filter(ExecutionEntity::isMultiInstanceRoot);
-                                //Each multiInstance execution root must be in its own container
-                                idMapper = ExecutionEntity::getId;
-                            } else {
-                                idMapper = ExecutionEntity::getParentId;
+                                executionEntitiesStream = executionEntitiesStream.filter(ExecutionEntity::isMultiInstanceRoot);
                             }
-                            executionsStream.forEach(e -> addValueToMapOfLists(activitiesExecutionsByMultiInstanceParentId, idMapper.apply(e), e));
+
+                            executionEntitiesStream.forEach(e -> {
+                                String parentId = e.isMultiInstanceRoot() ? e.getId() : e.getParentId();
+                                addExecutionToExecutionListsByParentIdMap(activitiesExecutionsByMultiInstanceParentId, parentId, e);
+                            });
                         } else {
-                            addValueToMapOfLists(activitiesExecutionsByMultiInstanceParentId, null, execution);
+                            activitiesExecutionsNotInMultiInstanceParent.add(execution);
                         }
                     }
                 }
 
-                //Create a move container for each execution group
-                activitiesExecutionsByMultiInstanceParentId.values().stream()
+                //Create a move container for each execution group (executionList)
+                Stream.concat(activitiesExecutionsByMultiInstanceParentId.values().stream(), Stream.of(activitiesExecutionsNotInMultiInstanceParent))
                     .filter(executions -> executions != null && !executions.isEmpty())
                     .forEach(executions -> moveExecutionEntityContainerList.add(createMoveExecutionContainer(activityContainer, executions)));
             }
         }
 
-        dynamicStateManager.moveExecutionState(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(),
-                        changeActivityStateBuilder.getLocalVariables(), commandContext);
+        dynamicStateManager.moveExecutionState(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), commandContext);
 
         return null;
     }
 
-    protected static <K, V> void addValueToMapOfLists(Map<K, List<V>> mapOfLists, K key, V value) {
-        List<V> listOfVs = mapOfLists.get(key);
-        if (listOfVs == null) {
-            listOfVs = new ArrayList<>();
-            mapOfLists.put(key, listOfVs);
+    protected static void addExecutionToExecutionListsByParentIdMap(Map<String, List<ExecutionEntity>> executionListsByParentIdMap, String parentId, ExecutionEntity executionEntity) {
+        List<ExecutionEntity> executionEntities = executionListsByParentIdMap.get(parentId);
+        if (executionEntities == null) {
+            executionEntities = new ArrayList<>();
+            executionListsByParentIdMap.put(parentId, executionEntities);
         }
-        listOfVs.add(value);
+        executionEntities.add(executionEntity);
     }
 
     protected static MoveExecutionEntityContainer createMoveExecutionContainer(MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions) {
