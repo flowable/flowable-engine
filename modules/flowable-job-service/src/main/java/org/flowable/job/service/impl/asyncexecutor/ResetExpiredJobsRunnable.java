@@ -58,28 +58,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
         while (!isInterrupted) {
 
-            try {
-
-                List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getJobServiceConfiguration().getCommandExecutor()
-                        .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
-
-                List<String> expiredJobIds = new ArrayList<>(expiredJobs.size());
-                for (JobInfoEntity expiredJob : expiredJobs) {
-                    expiredJobIds.add(expiredJob.getId());
-                }
-
-                if (expiredJobIds.size() > 0) {
-                    asyncExecutor.getJobServiceConfiguration().getCommandExecutor().execute(
-                            new ResetExpiredJobsCmd(expiredJobIds, jobEntityManager));
-                }
-
-            } catch (Throwable e) {
-                if (e instanceof FlowableOptimisticLockingException) {
-                    LOGGER.debug("Optimistic lock exception while resetting locked jobs", e);
-                } else {
-                    LOGGER.error("exception during resetting expired jobs: {}", e.getMessage(), e);
-                }
-            }
+            resetJobs();
 
             // Sleep
             try {
@@ -104,6 +83,30 @@ public class ResetExpiredJobsRunnable implements Runnable {
         LOGGER.info("stopped resetting expired jobs");
     }
 
+    public void resetJobs() {
+        try {
+            List<? extends JobInfoEntity> expiredJobs = asyncExecutor.getJobServiceConfiguration().getCommandExecutor()
+                    .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager));
+
+            List<String> expiredJobIds = new ArrayList<>(expiredJobs.size());
+            for (JobInfoEntity expiredJob : expiredJobs) {
+                expiredJobIds.add(expiredJob.getId());
+            }
+
+            if (expiredJobIds.size() > 0) {
+                asyncExecutor.getJobServiceConfiguration().getCommandExecutor().execute(
+                        new ResetExpiredJobsCmd(expiredJobIds, jobEntityManager));
+            }
+
+        } catch (Throwable e) {
+            if (e instanceof FlowableOptimisticLockingException) {
+                LOGGER.debug("Optimistic lock exception while resetting locked jobs", e);
+            } else {
+                LOGGER.error("exception during resetting expired jobs: {}", e.getMessage(), e);
+            }
+        }
+    }
+
     public void stop() {
         synchronized (MONITOR) {
             isInterrupted = true;
@@ -112,5 +115,5 @@ public class ResetExpiredJobsRunnable implements Runnable {
             }
         }
     }
-
+    
 }

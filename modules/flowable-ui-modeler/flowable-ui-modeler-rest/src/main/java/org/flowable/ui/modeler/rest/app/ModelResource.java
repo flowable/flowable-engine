@@ -262,7 +262,7 @@ public class ModelResource {
     protected ModelRepresentation updateModel(Model model, MultiValueMap<String, String> values, boolean forceNewVersion) {
 
         String name = values.getFirst("name");
-        String key = values.getFirst("key");
+        String key = values.getFirst("key").replaceAll(" ", "");
         String description = values.getFirst("description");
         String isNewVersionString = values.getFirst("newversion");
         String newVersionComment = null;
@@ -286,7 +286,17 @@ public class ModelResource {
         String json = values.getFirst("json_xml");
 
         try {
-            model = modelService.saveModel(model.getId(), name, key, description, json, newVersion,
+			ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(json);
+
+			ObjectNode propertiesNode = (ObjectNode) editorJsonNode.get("properties");
+			String processId = key;
+			propertiesNode.put("process_id", processId);
+			propertiesNode.put("name", name);
+			if (StringUtils.isNotEmpty(description)) {
+				propertiesNode.put("documentation", description);
+			}
+			editorJsonNode.set("properties", propertiesNode);
+            model = modelService.saveModel(model.getId(), name, key, description, editorJsonNode.toString(), newVersion,
                     newVersionComment, SecurityUtils.getCurrentUserObject());
             return new ModelRepresentation(model);
 

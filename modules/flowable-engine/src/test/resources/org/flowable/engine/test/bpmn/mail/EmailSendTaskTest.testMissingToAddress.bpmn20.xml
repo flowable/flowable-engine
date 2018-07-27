@@ -1,0 +1,23 @@
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="Examples">
+
+    <process id="missingToAddress">
+        <startEvent id="theStart"/>
+        <sequenceFlow sourceRef="theStart" targetRef="sendMail"/>
+        <sendTask id="sendMail" flowable:type="mail">
+            <extensionElements>
+                <flowable:field name="to"/>
+                <flowable:field name="subject">
+                    <flowable:string>Hello Kermit!</flowable:string>
+                </flowable:field>
+                <flowable:field name="text">
+                    <flowable:string>This a text only e-mail.</flowable:string>
+                </flowable:field>
+            </extensionElements>
+        </sendTask>
+        <sequenceFlow sourceRef="sendMail" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+    </process>
+</definitions>

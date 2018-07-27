@@ -236,7 +236,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
 		$scope.deleteTask = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/task-delete-popup.html',
-				controller: 'DeleteTaskModalInstanceCtrl',
+				controller: 'CmmnDeleteTaskModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -251,7 +251,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
 		$scope.completeTask = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/task-complete-popup.html',
-				controller: 'CompleteModalInstanceCtrl',
+				controller: 'CmmnCompleteModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -266,7 +266,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
 		$scope.delegateTask = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/task-delegate-popup.html',
-				controller: 'DelegateModalInstanceCtrl',
+				controller: 'CmmnDelegateModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -281,7 +281,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
 		$scope.resolveTask = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/task-resolve-popup.html',
-				controller: 'ResolveTaskModalInstanceCtrl',
+				controller: 'CmmnResolveTaskModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -296,7 +296,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
 		$scope.assignTask = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/task-assign-popup.html',
-				controller: 'AssignModalInstanceCtrl',
+				controller: 'CmmnAssignModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -315,7 +315,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
 		$scope.editTask = function() {
 			var modalInstance = $modal.open({
 				templateUrl: 'views/task-edit-popup.html',
-				controller: 'EditTaskModalInstanceCtrl',
+				controller: 'CmmnEditTaskModalInstanceCtrl',
 				resolve: resolve
 			});
 
@@ -330,7 +330,7 @@ flowableAdminApp.controller('CmmnTaskController', ['$scope', '$rootScope', '$htt
 
 
 // Popup controllers
-flowableAdminApp.controller('CompleteModalInstanceCtrl',
+flowableAdminApp.controller('CmmnCompleteModalInstanceCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
   $scope.task = task;
@@ -355,7 +355,7 @@ flowableAdminApp.controller('CompleteModalInstanceCtrl',
   };
 }]);
 
-flowableAdminApp.controller('ResolveTaskModalInstanceCtrl',
+flowableAdminApp.controller('CmmnResolveTaskModalInstanceCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
   $scope.task = task;
@@ -380,7 +380,7 @@ flowableAdminApp.controller('ResolveTaskModalInstanceCtrl',
   };
 }]);
 
-flowableAdminApp.controller('DeleteTaskModalInstanceCtrl',
+flowableAdminApp.controller('CmmnDeleteTaskModalInstanceCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
   $scope.task = task;
@@ -408,7 +408,7 @@ flowableAdminApp.controller('DeleteTaskModalInstanceCtrl',
 }]);
 
 
-flowableAdminApp.controller('DelegateModalInstanceCtrl',
+flowableAdminApp.controller('CmmnDelegateModalInstanceCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
   $scope.task = task;
@@ -437,7 +437,7 @@ flowableAdminApp.controller('DelegateModalInstanceCtrl',
   };
 }]);
 
-flowableAdminApp.controller('AssignModalInstanceCtrl',
+flowableAdminApp.controller('CmmnAssignModalInstanceCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
 	  $scope.task = task;
@@ -470,7 +470,7 @@ flowableAdminApp.controller('AssignModalInstanceCtrl',
 	  };
 	}]);
 
-flowableAdminApp.controller('EditTaskModalInstanceCtrl',
+flowableAdminApp.controller('CmmnEditTaskModalInstanceCtrl',
     ['$rootScope', '$scope', '$modalInstance', '$http', 'task', function ($rootScope, $scope, $modalInstance, $http, task) {
 
       $scope.task = task;

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
@@ -324,11 +325,20 @@ public class ErrorPropagation {
         for (MapExceptionEntry me : exceptionMap) {
             String exceptionClass = me.getClassName();
             String errorCode = me.getErrorCode();
+            String rootCause = me.getRootCause();
 
             // save the first mapping with no exception class as default map
             if (StringUtils.isNotEmpty(errorCode) && StringUtils.isEmpty(exceptionClass) && defaultExceptionMapping == null) {
-                defaultExceptionMapping = errorCode;
-                continue;
+                // if rootCause is set, check if it matches the exception
+                if (StringUtils.isNotEmpty(rootCause)) {
+                    if (ExceptionUtils.getRootCause(e).getClass().getName().equals(rootCause)) {
+                        defaultExceptionMapping = errorCode;
+                        continue;
+                    }
+                } else {
+                    defaultExceptionMapping = errorCode;
+                    continue;
+                }
             }
 
             // ignore if error code or class are not defined
@@ -337,13 +347,25 @@ public class ErrorPropagation {
             }
 
             if (e.getClass().getName().equals(exceptionClass)) {
+                if (StringUtils.isNotEmpty(rootCause)) {
+                    if (ExceptionUtils.getRootCause(e).getClass().getName().equals(rootCause)) {
+                        return errorCode;
+                    }
+                    continue;
+                }
                 return errorCode;
             }
-            
+
             if (me.isAndChildren()) {
                 Class<?> exceptionClassClass = ReflectUtil.loadClass(exceptionClass);
                 if (exceptionClassClass.isAssignableFrom(e.getClass())) {
-                    return errorCode;
+                    if (StringUtils.isNotEmpty(rootCause)) {
+                        if (ExceptionUtils.getRootCause(e).getClass().getName().equals(rootCause)) {
+                            return errorCode;
+                        }
+                    } else {
+                        return errorCode;
+                    }
                 }
             }
         }

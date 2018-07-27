@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.bpmn.mail;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +75,29 @@ public class EmailServiceTaskTest extends EmailTestCase {
         deleteDeployments();
     }
 
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml", tenantId = "forceToEmailTenant")
+    public void testSimpleTextMailWhenMultiTenantWithForceTo() throws Exception {
+        String tenantId = "forceToEmailTenant";
+        addMailServer(tenantId, "flowable@myTenant.com", "no-reply@myTenant.com");
+
+        String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEquals(1, messages.size());
+
+        WiserMessage message = messages.get(0);
+        assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@myTenant.com", Collections.singletonList(
+            "no-reply@myTenant.com"), null);
+
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@myTenant.com", "no-reply@myTenant.com")
+            );
+
+        assertProcessEnded(procId);
+    }
+
     public void testSimpleTextMailForNonExistentTenant() throws Exception {
         String tenantId = "nonExistentTenant";
 
@@ -85,6 +112,26 @@ public class EmailServiceTaskTest extends EmailTestCase {
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList(
                 "kermit@activiti.org"), null);
+        assertProcessEnded(procId);
+
+        deleteDeployments();
+    }
+
+    public void testSimpleTextMailForNonExistentTenantWithForceTo() throws Exception {
+        processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org");
+        String tenantId = "nonExistentTenant";
+
+        repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
+            .tenantId(tenantId).deploy();
+        String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEquals(1, messages.size());
+
+        WiserMessage message = messages.get(0);
+        assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList(
+            "no-reply@flowable.org"), null);
         assertProcessEnded(procId);
 
         deleteDeployments();
@@ -108,6 +155,20 @@ public class EmailServiceTaskTest extends EmailTestCase {
         assertEquals("fozzie@activiti.org", recipients.get(0));
         assertEquals("kermit@activiti.org", recipients.get(1));
         assertEquals("mispiggy@activiti.org", recipients.get(2));
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testSimpleTextMailMultipleRecipients.bpmn20.xml")
+    public void testSimpleTextMailMultipleRecipientsAndForceTo() {
+        processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org, no-reply2@flowable.org");
+        runtimeService.startProcessInstanceByKey("simpleTextOnlyMultipleRecipients");
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@localhost", "no-reply@flowable.org"),
+                tuple("flowable@localhost", "no-reply2@flowable.org")
+            );
     }
 
     @Deployment
@@ -142,10 +203,31 @@ public class EmailServiceTaskTest extends EmailTestCase {
         assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.singletonList(
                 "kermit@activiti.org"), Collections.singletonList("fozzie@activiti.org"));
 
-        // Bcc is not stored in the header (obviously)
-        // so the only way to verify the bcc, is that there are three messages
-        // send.
-        assertEquals(3, messages.size());
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@localhost", "kermit@activiti.org"),
+                tuple("flowable@localhost", "fozzie@activiti.org"),
+                tuple("flowable@localhost", "mispiggy@activiti.org")
+            );
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testCcAndBcc.bpmn20.xml")
+    public void testCcAndBccWithForceTo() throws Exception {
+        processEngineConfiguration.setMailServerForceTo("no-reply@flowable");
+        runtimeService.startProcessInstanceByKey("ccAndBcc");
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.singletonList("no-reply@flowable"),
+            Collections.singletonList("no-reply@flowable"));
+
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@localhost", "no-reply@flowable"),
+                tuple("flowable@localhost", "no-reply@flowable"),
+                tuple("flowable@localhost", "no-reply@flowable")
+            );
     }
 
     @Deployment
@@ -295,6 +377,21 @@ public class EmailServiceTaskTest extends EmailTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertNull(historyService.createHistoricVariableInstanceQuery().processInstanceId(piId).variableName("emailError").singleResult());
         }
+    }
+
+    @Deployment
+    public void testMissingToAddress() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingToAddress"))
+            .isInstanceOf(FlowableException.class)
+            .hasMessage("No recipient could be found for sending email");
+    }
+
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testMissingToAddress.bpmn20.xml")
+    public void testMissingToAddressWithForceTo() {
+        processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org");
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingToAddress"))
+            .isInstanceOf(FlowableException.class)
+            .hasMessage("No recipient could be found for sending email");
     }
 
     // Helper

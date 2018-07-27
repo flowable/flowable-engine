@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.bpmn.mail;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.subethamail.wiser.Wiser;
 
@@ -22,11 +26,16 @@ import org.subethamail.wiser.Wiser;
 public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
     protected Wiser wiser;
+    private String initialForceTo;
+    private Map<String, MailServerInfo> initialMailServers;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
+        initialForceTo = processEngineConfiguration.getMailServerForceTo();
+        Map<String, MailServerInfo> mailServers = processEngineConfiguration.getMailServers();
+        initialMailServers = mailServers == null ? null : new HashMap<>(mailServers);
         boolean serverUpAndRunning = false;
         while (!serverUpAndRunning) {
             wiser = new Wiser();
@@ -51,6 +60,22 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
         Thread.sleep(250L);
 
         super.tearDown();
+        processEngineConfiguration.setMailServerForceTo(initialForceTo);
+        processEngineConfiguration.setMailServers(initialMailServers);
+    }
+
+    protected void addMailServer(String tenantId, String defaultFrom, String forceTo) {
+        MailServerInfo mailServerInfo = new MailServerInfo();
+        mailServerInfo.setMailServerHost("localhost");
+        mailServerInfo.setMailServerPort(5025);
+        mailServerInfo.setMailServerUseSSL(false);
+        mailServerInfo.setMailServerUseTLS(false);
+        mailServerInfo.setMailServerDefaultFrom(defaultFrom);
+        mailServerInfo.setMailServerForceTo(forceTo);
+        mailServerInfo.setMailServerUsername(defaultFrom);
+        mailServerInfo.setMailServerPassword("password");
+
+        processEngineConfiguration.getMailServers().put(tenantId, mailServerInfo);
     }
 
 }

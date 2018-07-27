@@ -19,6 +19,7 @@ package org.flowable.engine.cfg;
 public class MailServerInfo {
 
     protected String mailServerDefaultFrom;
+    protected String mailServerForceTo;
     protected String mailServerHost;
     protected int mailServerPort;
     protected String mailServerUsername;
@@ -32,6 +33,14 @@ public class MailServerInfo {
 
     public void setMailServerDefaultFrom(String mailServerDefaultFrom) {
         this.mailServerDefaultFrom = mailServerDefaultFrom;
+    }
+
+    public String getMailServerForceTo() {
+        return mailServerForceTo;
+    }
+
+    public void setMailServerForceTo(String mailServerForceTo) {
+        this.mailServerForceTo = mailServerForceTo;
     }
 
     public String getMailServerHost() {

@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  * @author Frederik Heremans
  * @author Tim Stephenson
+ * @author Filip Hrisafov
  */
 public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
@@ -85,10 +86,10 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             getFilesFromFields(attachments, execution, files, dataSources);
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
-            addTo(email, toStr);
+            addTo(email, toStr, execution.getTenantId());
             setFrom(email, fromStr, execution.getTenantId());
-            addCc(email, ccStr);
-            addBcc(email, bccStr);
+            addCc(email, ccStr, execution.getTenantId());
+            addBcc(email, bccStr, execution.getTenantId());
             setSubject(email, subjectStr);
             setMailServerProperties(email, execution.getTenantId());
             setCharset(email, charSetStr);
@@ -156,8 +157,16 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addTo(Email email, String to) {
-        String[] tos = splitAndTrim(to);
+    protected void addTo(Email email, String to, String tenantId) {
+        if (to == null) {
+            // To has to be set, otherwise it can fallback to the forced To and then it won't be noticed early on
+            throw new FlowableException("No recipient could be found for sending email");
+        }
+        String newTo = getForceTo(tenantId);
+        if (newTo == null) {
+            newTo = to;
+        }
+        String[] tos = splitAndTrim(newTo);
         if (tos != null) {
             for (String t : tos) {
                 try {
@@ -197,8 +206,16 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addCc(Email email, String cc) {
-        String[] ccs = splitAndTrim(cc);
+    protected void addCc(Email email, String cc, String tenantId) {
+        if (cc == null) {
+            return;
+        }
+
+        String newCc = getForceTo(tenantId);
+        if (newCc == null) {
+            newCc = cc;
+        }
+        String[] ccs = splitAndTrim(newCc);
         if (ccs != null) {
             for (String c : ccs) {
                 try {
@@ -210,8 +227,15 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addBcc(Email email, String bcc) {
-        String[] bccs = splitAndTrim(bcc);
+    protected void addBcc(Email email, String bcc, String tenantId) {
+        if (bcc == null) {
+            return;
+        }
+        String newBcc = getForceTo(tenantId);
+        if (newBcc == null) {
+            newBcc = bcc;
+        }
+        String[] bccs = splitAndTrim(newBcc);
         if (bccs != null) {
             for (String b : bccs) {
                 try {
@@ -406,5 +430,22 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 throw new FlowableException(msg, e);
             }
         }
+    }
+
+    protected String getForceTo(String tenantId) {
+        String forceTo = null;
+        if (tenantId != null && tenantId.length() > 0) {
+            Map<String, MailServerInfo> mailServers = CommandContextUtil.getProcessEngineConfiguration().getMailServers();
+            if (mailServers != null && mailServers.containsKey(tenantId)) {
+                MailServerInfo mailServerInfo = mailServers.get(tenantId);
+                forceTo = mailServerInfo.getMailServerForceTo();
+            }
+        }
+
+        if (forceTo == null) {
+            forceTo = CommandContextUtil.getProcessEngineConfiguration().getMailServerForceTo();
+        }
+
+        return forceTo;
     }
 }
