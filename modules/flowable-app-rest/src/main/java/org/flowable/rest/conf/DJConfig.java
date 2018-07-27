@@ -27,13 +27,6 @@ public class DJConfig {
 	void init() {
 		
 		//Add custom event listener
-//		List<FlowableEventListener> eventListeners = springProcessEngineConfiguration.getEventListeners();
-//		if(eventListeners == null) {
-//			eventListeners = new ArrayList<>();
-//		}
-//		eventListeners.add(new CustomEventListener(defaulDjAdapterUrl));
-//		springProcessEngineConfiguration.setEventListeners(eventListeners);
-
 		//Add listener into eventDispatcher 
 		springProcessEngineConfiguration.getEventDispatcher()
 			.addEventListener(new CustomEventListener(defaulDjAdapterUrl));
