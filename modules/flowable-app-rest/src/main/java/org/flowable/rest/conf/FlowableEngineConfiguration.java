@@ -1,5 +1,9 @@
 package org.flowable.rest.conf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +26,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.form.api.FormEngineConfigurationApi;
@@ -32,10 +37,13 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.dj.flowable.CustomEventListener;
 
 @Configuration
 public class FlowableEngineConfiguration {
@@ -90,6 +98,11 @@ public class FlowableEngineConfiguration {
         return EngineServiceUtil.getContentEngineConfiguration(processEngineConfiguration);
     }
 
+    
+    @Value("${url.dj.adapter:http://localhost:8080}")
+	private String defaulDjAdapterUrl;
+	
+    
     @Bean(name = "processEngineConfiguration")
     public ProcessEngineConfigurationImpl processEngineConfiguration() {
         SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
@@ -98,6 +111,15 @@ public class FlowableEngineConfiguration {
         processEngineConfiguration.setTransactionManager(transactionManager);
         processEngineConfiguration.setAsyncExecutorActivate(Boolean.valueOf(environment.getProperty("engine.process.asyncexecutor.activate", "true")));
         processEngineConfiguration.setHistory(environment.getProperty("engine.process.history.level", "full"));
+        
+        //Added here for Intellij Problems
+        List<FlowableEventListener> listeners = processEngineConfiguration.getEventListeners();
+        if(listeners == null) {
+        	listeners = new ArrayList<>();
+        }
+        listeners.add(new CustomEventListener(defaulDjAdapterUrl));
+        processEngineConfiguration.setEventListeners(listeners);
+        
         
         String emailHost = environment.getProperty("email.host");
         if (StringUtils.isNotEmpty(emailHost)) {

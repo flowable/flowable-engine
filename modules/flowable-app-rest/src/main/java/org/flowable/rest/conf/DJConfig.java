@@ -28,8 +28,10 @@ public class DJConfig {
 		
 		//Add custom event listener
 		//Add listener into eventDispatcher 
-		springProcessEngineConfiguration.getEventDispatcher()
-			.addEventListener(new CustomEventListener(defaulDjAdapterUrl));
+		
+		//TODO: Comment for problems with IntelliJ
+//		springProcessEngineConfiguration.getEventDispatcher()
+//			.addEventListener(new CustomEventListener(defaulDjAdapterUrl));
 		
 		//Add json DDBB serializator
 		springProcessEngineConfiguration.getVariableTypes().addType(new JsonVariableType(true), 
