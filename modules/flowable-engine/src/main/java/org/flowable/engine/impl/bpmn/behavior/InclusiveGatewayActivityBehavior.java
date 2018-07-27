@@ -84,6 +84,9 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
             }
         }
 
+        // Is needed to set the endTime for all historic activity joins
+        CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(execution, null);
+
         // If no execution can reach the gateway, the gateway activates and executes fork behavior
         if (!oneExecutionCanReachGatewayInstance) {
 
@@ -100,7 +103,6 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior im
             }
 
             // Leave
-            CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(execution, null);
             CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(execution, true);
         }
     }

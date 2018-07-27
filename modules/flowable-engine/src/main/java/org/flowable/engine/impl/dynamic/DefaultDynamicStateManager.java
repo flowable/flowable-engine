@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
@@ -128,7 +129,6 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             
             // Get FlowElement objects for every move to activity id
             for (String activityId : moveExecutionContainer.getMoveToActivityIds()) {
-                
                 BpmnModel bpmnModel = null;
                 if (moveExecutionContainer.isMoveToParentProcess()) {
                     String parentProcessDefinitionId = moveExecutionContainer.getSuperExecution().getProcessDefinitionId();
@@ -228,7 +228,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             
             Collection<FlowElement> moveToFlowElements = null;
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
-                moveToFlowElements = Collections.singletonList((FlowElement) moveExecutionContainer.getCallActivity());
+                moveToFlowElements = Collections.singletonList(moveExecutionContainer.getCallActivity());
             } else {
                 moveToFlowElements = moveExecutionContainer.getMoveToFlowElements();
             }
@@ -301,7 +301,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             }
         }
     }
-    
+
     protected List<ExecutionEntity> createEmbeddedSubProcessExecutions(Collection<FlowElement> moveToFlowElements, List<ExecutionEntity> currentExecutions, 
                     MoveExecutionEntityContainer moveExecutionContainer, CommandContext commandContext) {
         
@@ -357,8 +357,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             
             // Check if a sub process child execution was created for this move to flow element, otherwise use the default continue parent execution
             if (moveExecutionContainer.getSubProcessesToCreateMap().containsKey(newFlowElement.getId())) {
-                newChildExecution = moveExecutionContainer.getNewSubProcessChildExecution(
-                                moveExecutionContainer.getSubProcessesToCreateMap().get(newFlowElement.getId()).get(0).getId());
+                newChildExecution = moveExecutionContainer.getNewSubProcessChildExecution(moveExecutionContainer.getSubProcessesToCreateMap().get(newFlowElement.getId()).get(0).getId());
             } else {
                 newChildExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
             }
@@ -368,8 +367,20 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             if (newFlowElement instanceof CallActivity) {
                 CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(newChildExecution);
             }
-            
+
             newChildExecutions.add(newChildExecution);
+
+            // Parallel gateway joins needs each incoming execution to enter the gateway naturally as it checks the number of executions to be able to progress/continue
+            // If we have multiple executions going into a gateway, usually into a gateway join using xxxToSingleActivityId
+            if (newFlowElement instanceof Gateway) {
+                //Skip one that was already added
+                currentExecutions.stream().skip(1).forEach(e -> {
+                    ExecutionEntity childExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
+                    childExecution.setCurrentFlowElement(newFlowElement);
+                    newChildExecutions.add(childExecution);
+                });
+            }
+
         }
         
         return newChildExecutions;
@@ -396,6 +407,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
 
         //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since it may not be guaranteed in the query result
         List<ExecutionEntity> executions = childExecutions.stream()
+            .filter(e -> e.getCurrentActivityId() != null)
             .filter(e -> e.getCurrentActivityId().equals(activityId))
             .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
             .collect(Collectors.toList());
@@ -423,7 +435,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 }
                 
                 continueParentExecution = finalDeleteExecution.getParent();
-                
+
                 String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
                 executionEntityManager.deleteChildExecutions(finalDeleteExecution, "Change activity to " + flowElementIdsLine, true);
                 executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine);
@@ -579,18 +591,15 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
     protected boolean hasSubProcessId(String subProcessId, List<ExecutionEntity> currentExecutions) {
         for (ExecutionEntity execution : currentExecutions) {
             FlowElement executionElement = execution.getCurrentFlowElement();
-            
-            if (executionElement.getSubProcess() != null) {
-                while (executionElement.getSubProcess() != null) {
-                    if (executionElement.getSubProcess().getId().equals(subProcessId)) {
-                        return true;
-                    }
-                    
-                    executionElement = executionElement.getSubProcess();
+
+            while (executionElement.getSubProcess() != null) {
+                String execElemSubProcessId = executionElement.getSubProcess().getId();
+                if (execElemSubProcessId != null && execElemSubProcessId.equals(subProcessId)) {
+                    return true;
                 }
+                executionElement = executionElement.getSubProcess();
             }
         }
-        
         return false;
     }
     
@@ -598,10 +607,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
             for (FlowElement subElement : subProcess.getFlowElements()) {
                 if (subElement instanceof StartEvent) {
-                    StartEvent startEvent = (StartEvent) subElement;
-                    if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
-                        return startEvent;
-                    }
+                    return subElement;
                 }
             }
         }
