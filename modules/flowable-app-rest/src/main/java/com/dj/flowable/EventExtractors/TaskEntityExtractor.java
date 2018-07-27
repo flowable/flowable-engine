@@ -10,21 +10,16 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 public class TaskEntityExtractor extends AbstractExtractor implements EntityExtractor {
 	
-	TaskEntity taskEntity;
-	
 	@Override
 	public boolean isAbleToExtract(Object event) {
-		boolean isAble = event instanceof FlowableEntityEvent && ((FlowableEntityEventImpl) event).getEntity() instanceof TaskEntity;
-		if(isAble) {
-			taskEntity = (TaskEntity) ((FlowableEntityEventImpl)event).getEntity();
-		}
-		return isAble;
+		return event instanceof FlowableEntityEvent && ((FlowableEntityEventImpl) event).getEntity() instanceof TaskEntity;
 	}
 	
 	
 	@Override
-	public Map<String, Object> getProperties(){
+	public Map<String, Object> getProperties(Object event){
 
+		TaskEntity taskEntity = (TaskEntity) ((FlowableEntityEventImpl)event).getEntity();
 		
 		HashMap<String, Object> props = new HashMap<>();
 		
@@ -46,19 +41,21 @@ public class TaskEntityExtractor extends AbstractExtractor implements EntityExtr
 
      
 	@Override
-	public Optional<String> getTaskKey() {
+	public Optional<String> getTaskKey(Object event) {
+		TaskEntity taskEntity = (TaskEntity) ((FlowableEntityEventImpl)event).getEntity();
 		return Optional.of(taskEntity.getTaskDefinitionKey());
 	}
 
 
 	@Override
-	public Optional<String> getProcessId() {
+	public Optional<String> getProcessId(Object event) {
 		return Optional.empty();
 	}
 
 
 	@Override
-	public Optional<String> getUser() {
+	public Optional<String> getUser(Object event) {
+		TaskEntity taskEntity = (TaskEntity) ((FlowableEntityEventImpl)event).getEntity();
 		return Optional.of(taskEntity.getAssignee());
 	}
 

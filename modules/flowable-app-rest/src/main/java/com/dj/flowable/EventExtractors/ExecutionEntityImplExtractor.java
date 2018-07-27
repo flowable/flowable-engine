@@ -10,22 +10,17 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 
 public class ExecutionEntityImplExtractor extends AbstractExtractor implements EntityExtractor {
 	
-	
-	ExecutionEntityImpl executionEntityImpl;
-	
 	@Override
 	public boolean isAbleToExtract(Object event) {
-		boolean isAble = event instanceof FlowableEntityEvent && ((FlowableEntityEventImpl) event).getEntity() instanceof ExecutionEntityImpl;
-		if(isAble) {
-			executionEntityImpl = (ExecutionEntityImpl) ((FlowableEntityEventImpl)event).getEntity();
-		}
-		return isAble;
+		return event instanceof FlowableEntityEvent && ((FlowableEntityEventImpl) event).getEntity() instanceof ExecutionEntityImpl;
 	}
 	
 	
 	@Override
-	public Map<String, Object> getProperties() {
+	public Map<String, Object> getProperties(Object event) {
 
+		ExecutionEntityImpl executionEntityImpl = (ExecutionEntityImpl) ((FlowableEntityEventImpl)event).getEntity();
+		
 		HashMap<String, Object> props = new HashMap<>();
 
 		putSafe(props, "activityName", executionEntityImpl.getActivityName());
@@ -39,19 +34,21 @@ public class ExecutionEntityImplExtractor extends AbstractExtractor implements E
 
 
 	@Override
-	public Optional<String> getTaskKey() {
+	public Optional<String> getTaskKey(Object event) {
 		return Optional.empty();
 	}
 
 
 	@Override
-	public Optional<String> getProcessId() {
+	public Optional<String> getProcessId(Object event) {
+		ExecutionEntityImpl executionEntityImpl = (ExecutionEntityImpl) ((FlowableEntityEventImpl)event).getEntity();
 		return Optional.of(executionEntityImpl.getProcessInstanceId());
 	}
 
 
 	@Override
-	public Optional<String> getUser() {
+	public Optional<String> getUser(Object event) {
+		ExecutionEntityImpl executionEntityImpl = (ExecutionEntityImpl) ((FlowableEntityEventImpl)event).getEntity();
 		return Optional.of(executionEntityImpl.getStartUserId());
 	}
 

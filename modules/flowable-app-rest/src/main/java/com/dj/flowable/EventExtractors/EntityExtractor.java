@@ -7,11 +7,11 @@ public interface EntityExtractor {
 
 	boolean isAbleToExtract(Object event);
 
-	Map<String, Object> getProperties();
+	Map<String, Object> getProperties(Object event);
 	
-	public Optional<String> getTaskKey();
-	public Optional<String> getProcessId();
-	public Optional<String> getUser();
+	public Optional<String> getTaskKey(Object event);
+	public Optional<String> getProcessId(Object event);
+	public Optional<String> getUser(Object event);
 
 	  
 }

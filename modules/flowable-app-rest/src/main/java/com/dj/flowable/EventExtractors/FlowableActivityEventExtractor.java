@@ -8,20 +8,17 @@ import org.flowable.engine.delegate.event.FlowableActivityEvent;
 
 public class FlowableActivityEventExtractor extends AbstractExtractor implements EntityExtractor {
 	
-	FlowableActivityEvent flowableActivityEvent;
 	
 	@Override
 	public boolean isAbleToExtract(Object event) {
-		boolean isAble = event instanceof FlowableActivityEvent;
-		if(isAble) {
-			flowableActivityEvent = (FlowableActivityEvent) event;
-		}
-		return isAble;
+		return  event instanceof FlowableActivityEvent;
 	}
 	
 	
 	@Override
-	public Map<String, Object> getProperties(){
+	public Map<String, Object> getProperties(Object event){
+	
+		FlowableActivityEvent flowableActivityEvent = (FlowableActivityEvent) event;
 		
 		HashMap<String, Object> props = new HashMap<>();
 		
@@ -33,19 +30,20 @@ public class FlowableActivityEventExtractor extends AbstractExtractor implements
 
 
 	@Override
-	public Optional<String> getTaskKey() {
+	public Optional<String> getTaskKey(Object event) {
 		return Optional.empty();
 	}
 
 
 	@Override
-	public Optional<String> getProcessId() {
+	public Optional<String> getProcessId(Object event) {
+		FlowableActivityEvent flowableActivityEvent = (FlowableActivityEvent) event;
 		return Optional.of(flowableActivityEvent.getProcessInstanceId());
 	}
 
 
 	@Override
-	public Optional<String> getUser() {
+	public Optional<String> getUser(Object event) {
 		return Optional.empty();
 	}
 

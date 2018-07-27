@@ -99,13 +99,13 @@ public class CustomEventListener implements FlowableEventListener {
 			    EntityExtractor extractor = getExtractor(event);
 
 			    //Extract data
-			    Map<String, Object> props = extractor.getProperties();
+			    Map<String, Object> props = extractor.getProperties(event);
 			    props.put("timestamp", Calendar.getInstance().getTime());
 			    
 			    body.put("properties", props);
-			    body.put("processId", extractor.getProcessId().orElse(""));
-			    body.put("user", extractor.getUser().orElse(""));
-			    body.put("taskKey", extractor.getTaskKey().orElse(""));
+			    body.put("processId", extractor.getProcessId(event).orElse(""));
+			    body.put("user", extractor.getUser(event).orElse(""));
+			    body.put("taskKey", extractor.getTaskKey(event).orElse(""));
 			    body.put("eventType", eventType);
 			    body.put("userProcessResult", OVL);
 
