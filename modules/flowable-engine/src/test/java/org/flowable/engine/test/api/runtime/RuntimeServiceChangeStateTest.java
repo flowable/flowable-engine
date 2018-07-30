@@ -14,16 +14,21 @@
 package org.flowable.engine.test.api.runtime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -1096,35 +1101,29 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+        assertFalse(executionsByActivity.containsKey("parallelJoin"));
 
-        Execution parallelJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("parallelJoin")) {
-                parallelJoinExecution = execution;
-                break;
-            }
+        //Complete one task1
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
         }
 
-        assertNull(parallelJoinExecution);
-
-        taskService.complete(tasks.get(0).getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
+        executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertFalse(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+        assertTrue(executionsByActivity.containsKey("parallelJoin"));
 
-        parallelJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("parallelJoin")) {
-                parallelJoinExecution = execution;
-                break;
-            }
-        }
-
-        assertNotNull(parallelJoinExecution);
-        assertTrue(!((ExecutionEntity) parallelJoinExecution).isActive());
+        assertFalse(((ExecutionEntity) executionsByActivity.get("parallelJoin").get(0)).isActive());
 
         taskService.complete(tasks.get(0).getId());
 
@@ -1169,6 +1168,180 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
+    public void testSetMultipleActivitiesIntoSynchronizingParallelGateway() {
+
+        //Move all parallelGateway activities to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdsToSingleActivityId(Arrays.asList("task1", "task2"), "parallelJoin")
+            .changeState();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertEquals("taskAfter", execution.getActivityId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
+    public void testSetMultipleGatewayActivitiesAndSynchronizingParallelGatewayAfterGateway() {
+
+        //Move all parallelGateway activities to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        //Complete task1
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("task1")) {
+                taskService.complete(t.getId());
+            }
+        }
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("task2"));
+        assertEquals(1, classifiedExecutions.get("task2").size());
+        assertNotNull(classifiedExecutions.get("parallelJoin"));
+        assertEquals(1, classifiedExecutions.get("parallelJoin").size());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdsToSingleActivityId(Arrays.asList("task2", "parallelJoin"), "taskAfter")
+            .changeState();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertEquals("taskAfter", execution.getActivityId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
+    public void testSetActivityIntoSynchronizingParallelGatewayFirst() {
+
+        //Move one task to the synchronizing gateway, then complete the remaining task
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("task1", "parallelJoin")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNotNull(executionsByActivity.get("parallelJoin"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("task2", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
+    public void testSetActivityIntoSynchronizingParallelGatewayLast() {
+
+        //Complete one task and then move the last remaining task to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        //Complete task1
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNotNull(executionsByActivity.get("parallelJoin"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("task2", task.getTaskDefinitionKey());
+
+        //Move task2
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("task2", "parallelJoin")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetCurrentExecutionToMultipleActivitiesForParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -1189,35 +1362,28 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNotNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNull(executionsByActivity.get("parallelJoin"));
 
-        Execution parallelJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("parallelJoin")) {
-                parallelJoinExecution = execution;
-                break;
-            }
+        //Complete one task1
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
         }
-
-        assertNull(parallelJoinExecution);
-
-        taskService.complete(tasks.get(0).getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
+        executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertFalse(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+        assertTrue(executionsByActivity.containsKey("parallelJoin"));
 
-        parallelJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("parallelJoin")) {
-                parallelJoinExecution = execution;
-                break;
-            }
-        }
-
-        assertNotNull(parallelJoinExecution);
-        assertTrue(!((ExecutionEntity) parallelJoinExecution).isActive());
+        assertFalse(((ExecutionEntity) executionsByActivity.get("parallelJoin").get(0)).isActive());
 
         taskService.complete(tasks.get(0).getId());
 
@@ -1260,6 +1426,701 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
+    public void testSetMultipleExecutionsIntoSynchronizingParallelGateway() {
+
+        //Move all gateway executions to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(executionIds, "parallelJoin")
+            .changeState();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertEquals("taskAfter", execution.getActivityId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
+    public void testSetMultipleGatewayExecutionsAndSynchronizingParallelGatewayAfterGateway() {
+
+        //Move all gateway executions to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        //Complete task1
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("task1")) {
+                taskService.complete(t.getId());
+            }
+        }
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("task2"));
+        assertEquals(1, classifiedExecutions.get("task2").size());
+        assertNotNull(classifiedExecutions.get("parallelJoin"));
+        assertEquals(1, classifiedExecutions.get("parallelJoin").size());
+
+        List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(executionIds, "taskAfter")
+            .changeState();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertEquals("taskAfter", execution.getActivityId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
+    public void testSetExecutionIntoSynchronizingParallelGatewayFirst() {
+
+        //Move one task to the synchronizing gateway, then complete the remaining task
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        String executionId = executions.stream().filter(e -> "task1".equals(e.getActivityId())).findFirst().map(Execution::getId).get();
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(executionId, "parallelJoin")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNotNull(executionsByActivity.get("parallelJoin"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("task2", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
+    public void testSetExecutionIntoSynchronizingParallelGatewayLast() {
+
+        //Complete one task and then move the last remaining task to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        //Complete task1
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNotNull(executionsByActivity.get("parallelJoin"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("task2", task.getTaskDefinitionKey());
+
+        //Move task2 execution
+        String executionId = executions.stream().filter(e -> "task2".equals(e.getActivityId())).findFirst().map(Execution::getId).get();
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(executionId, "parallelJoin")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetCurrentActivityToMultipleActivitiesForInclusiveGateway() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        List<String> newActivityIds = new ArrayList<>();
+        newActivityIds.add("task1");
+        newActivityIds.add("task2");
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
+            .changeState();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+        assertFalse(executionsByActivity.containsKey("gwJoin"));
+
+        //Complete one task1
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(1, tasks.size());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertFalse(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+        assertTrue(executionsByActivity.containsKey("gwJoin"));
+
+        assertFalse(((ExecutionEntity) executionsByActivity.get("gwJoin").get(0)).isActive());
+
+        taskService.complete(tasks.get(0).getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetMultipleActivitiesToSingleActivityAfterInclusiveGateway() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        List<String> currentActivityIds = new ArrayList<>();
+        currentActivityIds.add("task1");
+        currentActivityIds.add("task2");
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
+            .changeState();
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetMultipleActivitiesIntoSynchronizingInclusiveGateway() {
+
+        //Move all parallelGateway activities to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdsToSingleActivityId(Arrays.asList("task1", "task2"), "gwJoin")
+            .changeState();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertEquals("taskAfter", execution.getActivityId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetMultipleGatewayActivitiesAndSynchronizingInclusiveGatewayAfterGateway() {
+
+        //Move all parallelGateway activities to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        //Complete task1
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("task1")) {
+                taskService.complete(t.getId());
+            }
+        }
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("task2"));
+        assertEquals(1, classifiedExecutions.get("task2").size());
+        assertNotNull(classifiedExecutions.get("gwJoin"));
+        assertEquals(1, classifiedExecutions.get("gwJoin").size());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdsToSingleActivityId(Arrays.asList("task2", "gwJoin"), "taskAfter")
+            .changeState();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertEquals("taskAfter", execution.getActivityId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetActivityIntoSynchronizingParallelInclusiveFirst() {
+
+        //Move one task to the synchronizing gateway, then complete the remaining task
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("task1", "gwJoin")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNotNull(executionsByActivity.get("gwJoin"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("task2", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetActivityIntoSynchronizingParallelInclusiveLast() {
+
+        //Complete one task and then move the last remaining task to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        //Complete task1
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNotNull(executionsByActivity.get("gwJoin"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("task2", task.getTaskDefinitionKey());
+
+        //Move task2
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("task2", "gwJoin")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetCurrentExecutionToMultipleActivitiesForInclusiveGateway() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        Execution taskBeforeExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+
+        List<String> newActivityIds = new ArrayList<>();
+        newActivityIds.add("task1");
+        newActivityIds.add("task2");
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveSingleExecutionToActivityIds(taskBeforeExecution.getId(), newActivityIds)
+            .changeState();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNotNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNull(executionsByActivity.get("gwJoin"));
+
+        //Complete one task1
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(1, tasks.size());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertFalse(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+        assertTrue(executionsByActivity.containsKey("gwJoin"));
+
+        assertFalse(((ExecutionEntity) executionsByActivity.get("gwJoin").get(0)).isActive());
+
+        taskService.complete(tasks.get(0).getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetMultipleExecutionsToSingleActivityAfterInclusiveGateway() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        List<String> currentExecutionIds = new ArrayList<>();
+        currentExecutionIds.add(executions.get(0).getId());
+        currentExecutionIds.add(executions.get(1).getId());
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(currentExecutionIds, "taskAfter")
+            .changeState();
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetMultipleExecutionsIntoSynchronizingInclusiveGateway() {
+
+        //Move all gateway executions to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(executionIds, "gwJoin")
+            .changeState();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertEquals("taskAfter", execution.getActivityId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetMultipleGatewayExecutionsAndSynchronizingInclusiveGatewayAfterGateway() {
+
+        //Move all gateway executions to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertTrue(executionsByActivity.containsKey("task1"));
+        assertTrue(executionsByActivity.containsKey("task2"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        //Complete task1
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("task1")) {
+                taskService.complete(t.getId());
+            }
+        }
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("task2"));
+        assertEquals(1, classifiedExecutions.get("task2").size());
+        assertNotNull(classifiedExecutions.get("gwJoin"));
+        assertEquals(1, classifiedExecutions.get("gwJoin").size());
+
+        List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(executionIds, "taskAfter")
+            .changeState();
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertEquals("taskAfter", execution.getActivityId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetExecutionIntoSynchronizingInclusiveGatewayFirst() {
+
+        //Move one task to the synchronizing gateway, then complete the remaining task
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        String executionId = executions.stream().filter(e -> "task1".equals(e.getActivityId())).findFirst().map(Execution::getId).get();
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(executionId, "gwJoin")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNotNull(executionsByActivity.get("gwJoin"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("task2", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
+    public void testSetExecutionIntoSynchronizingInclusiveGatewayLast() {
+
+        //Complete one task and then move the last remaining task to the synchronizing gateway
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+
+        //Complete task1
+        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        if (task1.isPresent()) {
+            taskService.complete(task1.get().getId());
+        }
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executions.size());
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertNull(executionsByActivity.get("task1"));
+        assertNotNull(executionsByActivity.get("task2"));
+        assertNotNull(executionsByActivity.get("gwJoin"));
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("task2", task.getTaskDefinitionKey());
+
+        //Move task2 execution
+        String executionId = executions.stream().filter(e -> "task2".equals(e.getActivityId())).findFirst().map(Execution::getId).get();
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(executionId, "gwJoin")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executions.size());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
     @Deployment(resources = { "org/flowable/engine/test/api/parallelSubProcesses.bpmn20.xml" })
     public void testSetCurrentActivityToMultipleActivitiesForParallelSubProcesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -1280,15 +2141,8 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(4, executions.size());
 
-        Execution parallelJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("parallelJoin")) {
-                parallelJoinExecution = execution;
-                break;
-            }
-        }
-
-        assertNull(parallelJoinExecution);
+        Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
+        assertFalse(parallelJoinExecution.isPresent());
 
         taskService.complete(tasks.get(0).getId());
 
@@ -1298,16 +2152,9 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(3, executions.size());
 
-        parallelJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("parallelJoin")) {
-                parallelJoinExecution = execution;
-                break;
-            }
-        }
-
-        assertNotNull(parallelJoinExecution);
-        assertTrue(!((ExecutionEntity) parallelJoinExecution).isActive());
+        parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
+        assertTrue(parallelJoinExecution.isPresent());
+        assertFalse(((ExecutionEntity) parallelJoinExecution.get()).isActive());
 
         taskService.complete(tasks.get(0).getId());
 
@@ -1423,15 +2270,8 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(5, executions.size());
 
-        Execution parallelJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("parallelJoin")) {
-                parallelJoinExecution = execution;
-                break;
-            }
-        }
-
-        assertNull(parallelJoinExecution);
+        Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
+        assertFalse(parallelJoinExecution.isPresent());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").singleResult();
         taskService.complete(task.getId());
@@ -1448,16 +2288,9 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(4, executions.size());
 
-        parallelJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("parallelJoin")) {
-                parallelJoinExecution = execution;
-                break;
-            }
-        }
-
-        assertNotNull(parallelJoinExecution);
-        assertTrue(!((ExecutionEntity) parallelJoinExecution).isActive());
+        parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
+        assertTrue(parallelJoinExecution.isPresent());
+        assertFalse(((ExecutionEntity) parallelJoinExecution.get()).isActive());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
         taskService.complete(task.getId());
@@ -1573,16 +2406,9 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(5, executions.size());
 
-        Execution inclusiveJoinExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getActivityId().equals("inclusiveJoin")) {
-                inclusiveJoinExecution = execution;
-                break;
-            }
-        }
-
-        assertNotNull(inclusiveJoinExecution);
-        assertTrue(!((ExecutionEntity) inclusiveJoinExecution).isActive());
+        Optional<Execution> inclusiveJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("inclusiveJoin")).findFirst();
+        assertTrue(inclusiveJoinExecution.isPresent());
+        assertFalse(((ExecutionEntity) inclusiveJoinExecution.get()).isActive());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
         taskService.complete(task.getId());
@@ -2154,7 +2980,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
             .list()
             .stream()
             .findFirst()
-            .map(e -> e.getParentId())
+            .map(Execution::getParentId)
             .get();
 
         runtimeService.createChangeActivityStateBuilder()
@@ -2283,7 +3109,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
             .activityId("parallelNestedSubProcess")
             .list()
             .stream()
-            .map(e -> e.getParentId())
+            .map(Execution::getParentId)
             .distinct();
 
         parallelNestedSubProcessesParentIds.forEach(parentId -> {
@@ -2405,4 +3231,1376 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivitiesUsingParallelGatewayNestedInMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayInsideMultiInstanceSubProcess");
+
+        long totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> preForkTaskExecutions = runtimeService.createExecutionQuery().activityId("preForkTask").list();
+        assertEquals(3, preForkTaskExecutions.size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        assertEquals("preForkTask", tasks.get(0).getTaskDefinitionKey());
+
+        //Move a task before the fork within the multiInstance subProcess
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveSingleActivityIdToActivityIds("preForkTask", Arrays.asList("forkTask1", "forkTask2"))
+            .changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(10, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> forkTask1Executions = runtimeService.createExecutionQuery().activityId("forkTask1").list();
+        assertEquals(3, forkTask1Executions.size());
+        List<Execution> forkTask2Executions = runtimeService.createExecutionQuery().activityId("forkTask2").list();
+        assertEquals(3, forkTask2Executions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(6, tasks.size());
+        Map<String, List<Task>> taskGroups = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, taskGroups.keySet().size());
+        assertEquals(new HashSet<>(Arrays.asList("forkTask1", "forkTask2")), taskGroups.keySet());
+        assertEquals(3, taskGroups.get("forkTask1").size());
+        assertEquals(3, taskGroups.get("forkTask2").size());
+
+        //Move the parallel gateway task forward
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdsToSingleActivityId(Arrays.asList("forkTask1", "forkTask2"), "parallelJoin")
+            .changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
+        assertEquals(3, postForkTaskExecutions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Complete one of the tasks
+        taskService.complete(tasks.get(1).getId());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(5, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(2, parallelSubProcessCount);
+        postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
+        assertEquals(2, postForkTaskExecutions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Finish the rest since we cannot move out of a multiInstance subProcess
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, totalChildExecutions);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml" })
+    public void testSetCurrentExecutionsUsingParallelGatewayNestedInMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayInsideMultiInstanceSubProcess");
+
+        long totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        long parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> preForkTaskExecutions = runtimeService.createExecutionQuery().activityId("preForkTask").list();
+        assertEquals(3, preForkTaskExecutions.size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        assertEquals("preForkTask", tasks.get(0).getTaskDefinitionKey());
+
+        //Move a task before the fork within the multiInstance subProcess
+        preForkTaskExecutions.forEach(e -> runtimeService.createChangeActivityStateBuilder()
+            .moveSingleExecutionToActivityIds(e.getId(), Arrays.asList("forkTask1", "forkTask2"))
+            .changeState());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(10, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> forkTask1Executions = runtimeService.createExecutionQuery().activityId("forkTask1").list();
+        assertEquals(3, forkTask1Executions.size());
+        List<Execution> forkTask2Executions = runtimeService.createExecutionQuery().activityId("forkTask2").list();
+        assertEquals(3, forkTask2Executions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(6, tasks.size());
+        Map<String, List<Task>> taskGroups = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, taskGroups.keySet().size());
+        assertEquals(new HashSet<>(Arrays.asList("forkTask1", "forkTask2")), taskGroups.keySet());
+        assertEquals(3, taskGroups.get("forkTask1").size());
+        assertEquals(3, taskGroups.get("forkTask2").size());
+
+        //Move the parallel gateway task forward
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(
+                Stream.concat(forkTask1Executions.stream().map(Execution::getId), forkTask2Executions.stream().map(Execution::getId)).collect(Collectors.toList()), "postForkTask")
+            .changeState();
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(7, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(3, parallelSubProcessCount);
+        List<Execution> postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
+        assertEquals(3, postForkTaskExecutions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Complete one of the tasks
+        taskService.complete(tasks.get(1).getId());
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(5, totalChildExecutions);
+        parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
+        assertEquals(2, parallelSubProcessCount);
+        postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
+        assertEquals(2, postForkTaskExecutions.size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Finish the rest since we cannot move out of a multiInstance subProcess
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
+        assertEquals(1, totalChildExecutions);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayNestedInsideMultiInstanceSubProcess.bpmn20.xml" })
+    public void testCompleteSetCurrentActivitiesUsingInclusiveGatewayNestedInMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGatewayInsideMultiInstanceSubProcess");
+
+        //1x MI subProc root, 3x parallel MI subProc, 9x Task executions (3 tasks per Gw path)
+        List<Execution> childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(13, childExecutions.size());
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(childExecutions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("parallelSubProcess"));
+        assertEquals(4, classifiedExecutions.get("parallelSubProcess").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive3").size());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(3, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+
+        //Move all activities
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdsToSingleActivityId(Arrays.asList("taskInclusive1", "taskInclusive2", "taskInclusive3"), "inclusiveJoin")
+            .changeState();
+
+        //Still 3 subProcesses running, all of them past the gateway fork/join
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(7, childExecutions.size());
+        classifiedExecutions = groupListContentBy(childExecutions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("parallelSubProcess"));
+        assertEquals(4, classifiedExecutions.get("parallelSubProcess").size());
+        assertNotNull(classifiedExecutions.get("postForkTask"));
+        assertEquals(3, classifiedExecutions.get("postForkTask").size());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Finish the remaining subProcesses tasks
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        //Only one execution and task remaining
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, childExecutions.size());
+        assertEquals("lastTask", childExecutions.get(0).getActivityId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+
+        //Complete the process
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayNestedInsideMultiInstanceSubProcess.bpmn20.xml" })
+    public void testCompleteSetCurrentExecutionsUsingInclusiveGatewayNestedInMultiInstanceSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGatewayInsideMultiInstanceSubProcess");
+
+        //1x MI subProc root, 3x parallel MI subProc, 9x Task executions (3 tasks per Gw path)
+        List<Execution> childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(13, childExecutions.size());
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(childExecutions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("parallelSubProcess"));
+        assertEquals(4, classifiedExecutions.get("parallelSubProcess").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive3").size());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(3, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+
+        //Finish one activity in two MI subProcesses
+        taskService.complete(classifiedTasks.get("taskInclusive1").get(1).getId());
+        taskService.complete(classifiedTasks.get("taskInclusive2").get(2).getId());
+
+        //1x MI subProc root, 3x parallel MI subProc, 7x Gw Task executions, 2x Gw join executions
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(13, childExecutions.size());
+        classifiedExecutions = groupListContentBy(childExecutions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("parallelSubProcess"));
+        assertEquals(4, classifiedExecutions.get("parallelSubProcess").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive3").size());
+        assertNotNull(classifiedExecutions.get("inclusiveJoin"));
+        assertEquals(2, classifiedExecutions.get("inclusiveJoin").size());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(3, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive1").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(3, classifiedExecutions.get("taskInclusive3").size());
+
+        //TEST 1 (move all)... change state of "all" executions in a gateway at once
+        //Move the executions of the gateway that still contains 3 tasks in execution
+        Stream<Execution> tempStream = Stream.concat(classifiedExecutions.get("taskInclusive1").stream(), classifiedExecutions.get("taskInclusive2").stream());
+        Map<String, List<Execution>> taskExecutionsByParent = Stream.concat(tempStream, classifiedExecutions.get("taskInclusive3").stream())
+            .collect(Collectors.groupingBy(Execution::getParentId));
+
+        List<String> ids = taskExecutionsByParent.values().stream()
+            .filter(l -> l.size() == 3)
+            .findFirst().orElseGet(ArrayList::new)
+            .stream().map(Execution::getId)
+            .collect(Collectors.toList());
+
+        //Move into the synchronizing gateway
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
+            .changeState();
+
+        //There'll be still 3 subProcesses running, 2 with "gateways" still in execution, one with task3 & task1 & join, one with task3, task2 and join
+        // the 3rd subProcess should be past the gateway fork/join
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(11, childExecutions.size());
+        classifiedExecutions = groupListContentBy(childExecutions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("parallelSubProcess"));
+        assertEquals(4, classifiedExecutions.get("parallelSubProcess").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive1"));
+        assertEquals(1, classifiedExecutions.get("taskInclusive1").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(1, classifiedExecutions.get("taskInclusive2").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive3"));
+        assertEquals(2, classifiedExecutions.get("taskInclusive3").size());
+        assertNotNull(classifiedExecutions.get("inclusiveJoin"));
+        assertEquals(2, classifiedExecutions.get("inclusiveJoin").size());
+        assertNotNull(classifiedExecutions.get("postForkTask"));
+        assertEquals(1, classifiedExecutions.get("postForkTask").size());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(4, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive1"));
+        assertEquals(1, classifiedTasks.get("taskInclusive1").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(1, classifiedTasks.get("taskInclusive2").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive3"));
+        assertEquals(2, classifiedTasks.get("taskInclusive3").size());
+        assertTrue(classifiedTasks.containsKey("postForkTask"));
+        assertEquals(1, classifiedTasks.get("postForkTask").size());
+
+        //TEST 2 (complete last execution)... complete the last execution of a gateway were a task execution was already moved into the synchronizing join
+        ids = classifiedExecutions.get("taskInclusive1").stream().map(Execution::getId).collect(Collectors.toList());
+        //Move into the synchronizing gateway
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
+            .changeState();
+
+        //Complete remaining task3, the next inline test needs the task to be completed too
+        for (Task t : tasks) {
+            if (t.getTaskDefinitionKey().equals("taskInclusive3")) {
+                taskService.complete(t.getId());
+            }
+        }
+
+        //Still 3 subProcesses running, two of them past the gateway fork/join and the remaining one with a task2 pending
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(9, childExecutions.size());
+        classifiedExecutions = groupListContentBy(childExecutions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("parallelSubProcess"));
+        assertEquals(4, classifiedExecutions.get("parallelSubProcess").size());
+        assertNotNull(classifiedExecutions.get("postForkTask"));
+        assertEquals(2, classifiedExecutions.get("postForkTask").size());
+        assertNotNull(classifiedExecutions.get("inclusiveJoin"));
+        assertEquals(2, classifiedExecutions.get("inclusiveJoin").size());
+        assertNotNull(classifiedExecutions.get("taskInclusive2"));
+        assertEquals(1, classifiedExecutions.get("taskInclusive2").size());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, classifiedTasks.size());
+        assertTrue(classifiedTasks.containsKey("postForkTask"));
+        assertEquals(2, classifiedTasks.get("postForkTask").size());
+        assertTrue(classifiedTasks.containsKey("taskInclusive2"));
+        assertEquals(1, classifiedTasks.get("taskInclusive2").size());
+
+        //TEST 3 (move last execution)... move the remaining execution of a gateway with previously completed executions into the synchronizing join
+        ids = classifiedExecutions.get("taskInclusive2").stream().map(Execution::getId).collect(Collectors.toList());
+        //Move into the synchronizing gateway
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionsToSingleActivityId(ids, "inclusiveJoin")
+            .changeState();
+
+        //Still 3 subProcesses running, all of them past the gateway fork/join
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(7, childExecutions.size());
+        classifiedExecutions = groupListContentBy(childExecutions, Execution::getActivityId);
+        assertNotNull(classifiedExecutions.get("parallelSubProcess"));
+        assertEquals(4, classifiedExecutions.get("parallelSubProcess").size());
+        assertNotNull(classifiedExecutions.get("postForkTask"));
+        assertEquals(3, classifiedExecutions.get("postForkTask").size());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, tasks.size());
+        tasks.forEach(t -> assertEquals("postForkTask", t.getTaskDefinitionKey()));
+
+        //Finish the remaining subProcesses tasks
+        tasks.forEach(t -> taskService.complete(t.getId()));
+
+        //Only one execution and task remaining
+        childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, childExecutions.size());
+        assertEquals("lastTask", childExecutions.get(0).getActivityId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("lastTask", task.getTaskDefinitionKey());
+
+        //Complete the process
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
+    public void testSetCurrentActivityToIntermediateSignalCatchEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertNotNull(classifiedExecutions.get("beforeCatchEvent"));
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertTrue(classifiedEventSubscriptions.isEmpty());
+
+        //Move to catchEvent
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("beforeCatchEvent", "intermediateCatchEvent")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        assertEquals("signal", classifiedEventSubscriptions.get("intermediateCatchEvent").get(0).getEventType());
+
+        //Trigger the event
+        runtimeService.signalEventReceived("someSignal");
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
+    public void testSetCurrentExecutionToIntermediateSignalCatchEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertNotNull(classifiedExecutions.get("beforeCatchEvent"));
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertTrue(classifiedEventSubscriptions.isEmpty());
+
+        //Move to catchEvent
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(classifiedExecutions.get("beforeCatchEvent").get(0).getId(), "intermediateCatchEvent")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        assertEquals("signal", classifiedEventSubscriptions.get("intermediateCatchEvent").get(0).getEventType());
+
+        //Trigger the event
+        runtimeService.signalEventReceived("someSignal");
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
+    public void testSetCurrentActivityFromIntermediateSignalCatchEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        assertEquals("beforeCatchEvent", task.getTaskDefinitionKey());
+
+        //Complete initial task
+        taskService.complete(task.getId());
+
+        //Process is waiting for event invocation
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+
+        //Move back to the initial task
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("intermediateCatchEvent", "beforeCatchEvent")
+            .changeState();
+
+        //Process is in the initial state, no subscriptions exists
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("beforeCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.size());
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the task once more
+        taskService.complete(tasks.get(0).getId());
+
+        //Process is waiting for signal again
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        assertEquals("signal", classifiedEventSubscriptions.get("intermediateCatchEvent").get(0).getEventType());
+
+        //Move forward from the event catch
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("intermediateCatchEvent", "afterCatchEvent")
+            .changeState();
+
+        //Process is on the last task
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
+    public void testSetCurrentExecutionFromIntermediateSignalCatchEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        assertEquals("beforeCatchEvent", task.getTaskDefinitionKey());
+
+        //Complete initial task
+        taskService.complete(task.getId());
+
+        //Process is waiting for event invocation
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+
+        //Move back to the initial task
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(classifiedExecutions.get("intermediateCatchEvent").get(0).getId(), "beforeCatchEvent")
+            .changeState();
+
+        //Process is in the initial state, no subscriptions exists
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("beforeCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.size());
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the task once more
+        taskService.complete(tasks.get(0).getId());
+
+        //Process is waiting for signal again
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        assertEquals("signal", classifiedEventSubscriptions.get("intermediateCatchEvent").get(0).getEventType());
+
+        //Move forward from the event catch
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(classifiedExecutions.get("intermediateCatchEvent").get(0).getId(), "afterCatchEvent")
+            .changeState();
+
+        //Process is on the last task
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml" })
+    public void testSetCurrentActivityToIntermediateMessageCatchEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertNotNull(classifiedExecutions.get("beforeCatchEvent"));
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        List<Execution> messageCatchEvents = runtimeService.createExecutionQuery().messageEventSubscriptionName("intermediateCatchEvent").list();
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertTrue(classifiedEventSubscriptions.isEmpty());
+
+        //Move to catchEvent
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("beforeCatchEvent", "intermediateCatchEvent")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        assertEquals("message", classifiedEventSubscriptions.get("intermediateCatchEvent").get(0).getEventType());
+
+        //Trigger the event
+        String messageCatchingExecutionId = classifiedExecutions.get("intermediateCatchEvent").get(0).getId();
+        runtimeService.messageEventReceived("someMessage", messageCatchingExecutionId);
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml" })
+    public void testSetCurrentExecutionToIntermediateMessageCatchEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertNotNull(classifiedExecutions.get("beforeCatchEvent"));
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertTrue(classifiedEventSubscriptions.isEmpty());
+
+        //Move to catchEvent
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(classifiedExecutions.get("beforeCatchEvent").get(0).getId(), "intermediateCatchEvent")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        assertEquals("message", classifiedEventSubscriptions.get("intermediateCatchEvent").get(0).getEventType());
+
+        //Trigger the event
+        String messageCatchingExecutionId = classifiedExecutions.get("intermediateCatchEvent").get(0).getId();
+        runtimeService.messageEventReceived("someMessage", messageCatchingExecutionId);
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml" })
+    public void testSetCurrentActivityFromIntermediateMessageCatchEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        assertEquals("beforeCatchEvent", task.getTaskDefinitionKey());
+
+        //Complete initial task
+        taskService.complete(task.getId());
+
+        //Process is waiting for event invocation
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+
+        //Move back to the initial task
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("intermediateCatchEvent", "beforeCatchEvent")
+            .changeState();
+
+        //Process is in the initial state, no subscriptions exists
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("beforeCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.size());
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the task once more
+        taskService.complete(tasks.get(0).getId());
+
+        //Process is waiting for signal again
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        assertEquals("message", classifiedEventSubscriptions.get("intermediateCatchEvent").get(0).getEventType());
+
+        //Move forward from the event catch
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("intermediateCatchEvent", "afterCatchEvent")
+            .changeState();
+
+        //Process is on the last task
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml" })
+    public void testSetCurrentExecutionFromIntermediateMessageCatchEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+        assertEquals("beforeCatchEvent", task.getTaskDefinitionKey());
+
+        //Complete initial task
+        taskService.complete(task.getId());
+
+        //Process is waiting for event invocation
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+
+        //Move back to the initial task
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(classifiedExecutions.get("intermediateCatchEvent").get(0).getId(), "beforeCatchEvent")
+            .changeState();
+
+        //Process is in the initial state, no subscriptions exists
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("beforeCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.size());
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the task once more
+        taskService.complete(tasks.get(0).getId());
+
+        //Process is waiting for signal again
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        assertEquals("message", classifiedEventSubscriptions.get("intermediateCatchEvent").get(0).getEventType());
+
+        //Move forward from the event catch
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(classifiedExecutions.get("intermediateCatchEvent").get(0).getId(), "afterCatchEvent")
+            .changeState();
+
+        //Process is on the last task
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    protected void checkInitialStateForMultipleProcessesWithSimpleEventCatch(Map<String, List<Execution>> executionsByProcessInstance) {
+        executionsByProcessInstance.forEach((processId, executions) -> {
+            Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+            assertEquals(1, classifiedExecutions.size());
+            assertNotNull(classifiedExecutions.get("beforeCatchEvent"));
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+            Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+            assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+            List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+            Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+            assertTrue(classifiedEventSubscriptions.isEmpty());
+        });
+    }
+
+    protected void checkWaitStateForMultipleProcessesWithSimpleEventCatch(Map<String, List<Execution>> executionsByProcessInstance) {
+        executionsByProcessInstance.forEach((processId, executions) -> {
+            Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+            assertEquals(1, classifiedExecutions.size());
+            assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+            assertTrue(tasks.isEmpty());
+            List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+            Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+            assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+        });
+    }
+
+    protected void checkFinalStateForMultipleProcessesWithSimpleEventCatch(Map<String, List<Execution>> executionsByProcessInstance) {
+        executionsByProcessInstance.forEach((processId, executions) -> {
+            Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+            assertEquals(1, classifiedExecutions.size());
+            assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+            Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+            assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+            List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+            assertTrue(eventSubscriptions.isEmpty());
+        });
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
+    public void testSetCurrentActivityToIntermediateCatchEventForMultipleProcessesTriggerSimultaneously() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        List<Execution> allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        Map<String, List<Execution>> executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkInitialStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Move both processes to the eventCatch
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance1.getId())
+            .moveActivityIdTo("beforeCatchEvent", "intermediateCatchEvent")
+            .changeState();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance2.getId())
+            .moveActivityIdTo("beforeCatchEvent", "intermediateCatchEvent")
+            .changeState();
+
+        allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkWaitStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Trigger signal
+        runtimeService.signalEventReceived("someSignal");
+
+        //Both processes should be on the final task execution
+        allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkFinalStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Complete the remaining tasks for both processes
+        taskService.createTaskQuery().list().forEach(this::completeTask);
+        assertProcessEnded(processInstance1.getId());
+        assertProcessEnded(processInstance2.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
+    public void testSetCurrentExecutionToIntermediateCatchEventForMultipleProcessesTriggerSimultaneously() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        List<Execution> allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        Map<String, List<Execution>> executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkInitialStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Move both processes to the eventCatch
+        ChangeActivityStateBuilder changeActivityStateBuilder = runtimeService.createChangeActivityStateBuilder();
+        allExecutions.stream()
+            .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+            .map(Execution::getId)
+            .forEach(id -> changeActivityStateBuilder.moveExecutionToActivityId(id, "intermediateCatchEvent"));
+        changeActivityStateBuilder.changeState();
+
+        allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkWaitStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Trigger signal
+        runtimeService.signalEventReceived("someSignal");
+
+        //Both processes should be on the final task execution
+        allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkFinalStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Complete the remaining tasks for both processes
+        taskService.createTaskQuery().list().forEach(this::completeTask);
+        assertProcessEnded(processInstance1.getId());
+        assertProcessEnded(processInstance2.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
+    public void testSetCurrentActivityToIntermediateCatchEventForMultipleProcessesTriggerDiffered() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        List<Execution> allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        Map<String, List<Execution>> executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkInitialStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Move one process to the eventCatch
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance1.getId())
+            .moveActivityIdTo("beforeCatchEvent", "intermediateCatchEvent")
+            .changeState();
+
+        allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        //ProcessInstance1 waiting for event
+        String processId = processInstance1.getId();
+        List<Execution> executions = executionsByProcessInstance.get(processId);
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+        assertTrue(tasks.isEmpty());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+
+        //processInstance2 Execution still on initial state
+        processId = processInstance2.getId();
+        executions = executionsByProcessInstance.get(processId);
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertNotNull(classifiedExecutions.get("beforeCatchEvent"));
+        tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertTrue(classifiedEventSubscriptions.isEmpty());
+
+        //Trigger signal
+        runtimeService.signalEventReceived("someSignal");
+
+        //Move the second process to the eventCatch
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance2.getId())
+            .moveActivityIdTo("beforeCatchEvent", "intermediateCatchEvent")
+            .changeState();
+
+        //ProcessInstance1 is on the postEvent task
+        processId = processInstance1.getId();
+        executions = runtimeService.createExecutionQuery().processInstanceId(processId).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //ProcessInstance2 is waiting for the event
+        processId = processInstance2.getId();
+        executions = runtimeService.createExecutionQuery().processInstanceId(processId).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+
+        //Fire the event once more
+        runtimeService.signalEventReceived("someSignal");
+
+        //Both process should be on the postEvent task execution
+        allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkFinalStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Complete the remaining tasks for both processes
+        taskService.createTaskQuery().list().forEach(this::completeTask);
+        assertProcessEnded(processInstance1.getId());
+        assertProcessEnded(processInstance2.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
+    public void testSetCurrentExecutionToIntermediateCatchEventForMultipleProcessesTriggerDiffered() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
+
+        List<Execution> allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        Map<String, List<Execution>> executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkInitialStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Move one execution to the event catch
+        String executionId = executionsByProcessInstance.get(processInstance1.getId()).stream()
+            .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+            .findFirst()
+            .map(Execution::getId)
+            .get();
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(executionId, "intermediateCatchEvent")
+            .changeState();
+
+        allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        //ProcessInstance1 waiting for event
+        String processId = processInstance1.getId();
+        List<Execution> executions = executionsByProcessInstance.get(processId);
+        Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+        assertTrue(tasks.isEmpty());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+        Map<String, List<EventSubscription>> classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+
+        //processInstance2 Execution still on initial state
+        processId = processInstance2.getId();
+        executions = executionsByProcessInstance.get(processId);
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertNotNull(classifiedExecutions.get("beforeCatchEvent"));
+        tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+        Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("beforeCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertTrue(classifiedEventSubscriptions.isEmpty());
+
+        //Trigger signal
+        runtimeService.signalEventReceived("someSignal");
+
+        //Move the second process to the eventCatch
+        executionId = executionsByProcessInstance.get(processInstance2.getId()).stream()
+            .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+            .findFirst()
+            .map(Execution::getId)
+            .get();
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(executionId, "intermediateCatchEvent")
+            .changeState();
+
+        //ProcessInstance1 is on the postEvent task
+        processId = processInstance1.getId();
+        executions = runtimeService.createExecutionQuery().processInstanceId(processId).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("afterCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+        classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
+        assertEquals(1, classifiedTasks.get("afterCatchEvent").size());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //ProcessInstance2 is waiting for the event
+        processId = processInstance2.getId();
+        executions = runtimeService.createExecutionQuery().processInstanceId(processId).onlyChildExecutions().list();
+        classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(1, classifiedExecutions.size());
+        assertEquals(1, classifiedExecutions.get("intermediateCatchEvent").size());
+        tasks = taskService.createTaskQuery().processInstanceId(processId).list();
+        assertTrue(tasks.isEmpty());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processId).list();
+        classifiedEventSubscriptions = groupListContentBy(eventSubscriptions, EventSubscription::getActivityId);
+        assertEquals(1, classifiedEventSubscriptions.get("intermediateCatchEvent").size());
+
+        //Fire the event once more
+        runtimeService.signalEventReceived("someSignal");
+
+        //Both process should be on the postEvent task execution
+        allExecutions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        executionsByProcessInstance = groupListContentBy(allExecutions, Execution::getProcessInstanceId);
+        assertEquals(2, executionsByProcessInstance.size());
+
+        checkFinalStateForMultipleProcessesWithSimpleEventCatch(executionsByProcessInstance);
+
+        //Complete the remaining tasks for both processes
+        taskService.createTaskQuery().list().forEach(this::completeTask);
+        assertProcessEnded(processInstance1.getId());
+        assertProcessEnded(processInstance2.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleMessageEventSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityFromMessageEventSubProcessStart() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(2, executionsByActivity.size());
+        assertEquals(1, executionsByActivity.get("processTask").size());
+        assertEquals(1, executionsByActivity.get("eventSubProcessStart").size());
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        Map<String, List<Task>> tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(1, tasksByKey.size());
+        assertEquals(1, tasksByKey.get("processTask").size());
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertEquals("eventSubProcessStart", eventSubscription.getActivityId());
+        assertEquals("message", eventSubscription.getEventType());
+        assertEquals("eventMessage", eventSubscription.getEventName());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("eventSubProcessStart", "eventSubProcessTask")
+            .changeState();
+
+        tasks = taskService.createTaskQuery().list();
+        tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, tasksByKey.size());
+        assertEquals(1, tasksByKey.get("processTask").size());
+        assertEquals(1, tasksByKey.get("eventSubProcessTask").size());
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertNull(eventSubscription);
+
+        taskService.complete(tasksByKey.get("eventSubProcessTask").get(0).getId());
+        taskService.complete(tasksByKey.get("processTask").get(0).getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleMessageEventSubProcess.bpmn20.xml" })
+    public void testSetCurrentExecutionFromMessageEventSubProcessStart() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(2, executionsByActivity.size());
+        assertEquals(1, executionsByActivity.get("processTask").size());
+        assertEquals(1, executionsByActivity.get("eventSubProcessStart").size());
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        Map<String, List<Task>> tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(1, tasksByKey.size());
+        assertEquals(1, tasksByKey.get("processTask").size());
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertEquals("eventSubProcessStart", eventSubscription.getActivityId());
+        assertEquals("message", eventSubscription.getEventType());
+        assertEquals("eventMessage", eventSubscription.getEventName());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(executionsByActivity.get("eventSubProcessStart").get(0).getId(), "eventSubProcessTask")
+            .changeState();
+
+        tasks = taskService.createTaskQuery().list();
+        tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, tasksByKey.size());
+        assertEquals(1, tasksByKey.get("processTask").size());
+        assertEquals(1, tasksByKey.get("eventSubProcessTask").size());
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertNull(eventSubscription);
+
+        taskService.complete(tasksByKey.get("eventSubProcessTask").get(0).getId());
+        taskService.complete(tasksByKey.get("processTask").get(0).getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleSignalEventSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityFromSignalEventSubProcessStart() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(2, executionsByActivity.size());
+        assertEquals(1, executionsByActivity.get("processTask").size());
+        assertEquals(1, executionsByActivity.get("eventSubProcessStart").size());
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        Map<String, List<Task>> tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(1, tasksByKey.size());
+        assertEquals(1, tasksByKey.get("processTask").size());
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertEquals("eventSubProcessStart", eventSubscription.getActivityId());
+        assertEquals("signal", eventSubscription.getEventType());
+        assertEquals("eventSignal", eventSubscription.getEventName());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("eventSubProcessStart", "eventSubProcessTask")
+            .changeState();
+
+        tasks = taskService.createTaskQuery().list();
+        tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, tasksByKey.size());
+        assertEquals(1, tasksByKey.get("processTask").size());
+        assertEquals(1, tasksByKey.get("eventSubProcessTask").size());
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertNull(eventSubscription);
+
+        taskService.complete(tasksByKey.get("eventSubProcessTask").get(0).getId());
+        taskService.complete(tasksByKey.get("processTask").get(0).getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleSignalEventSubProcess.bpmn20.xml" })
+    public void testSetCurrentExecutionFromSignalEventSubProcessStart() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        assertEquals(2, executionsByActivity.size());
+        assertEquals(1, executionsByActivity.get("processTask").size());
+        assertEquals(1, executionsByActivity.get("eventSubProcessStart").size());
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        Map<String, List<Task>> tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(1, tasksByKey.size());
+        assertEquals(1, tasksByKey.get("processTask").size());
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertEquals("eventSubProcessStart", eventSubscription.getActivityId());
+        assertEquals("signal", eventSubscription.getEventType());
+        assertEquals("eventSignal", eventSubscription.getEventName());
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(executionsByActivity.get("eventSubProcessStart").get(0).getId(), "eventSubProcessTask")
+            .changeState();
+
+        tasks = taskService.createTaskQuery().list();
+        tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        assertEquals(2, tasksByKey.size());
+        assertEquals(1, tasksByKey.get("processTask").size());
+        assertEquals(1, tasksByKey.get("eventSubProcessTask").size());
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertNull(eventSubscription);
+
+        taskService.complete(tasksByKey.get("eventSubProcessTask").get(0).getId());
+        taskService.complete(tasksByKey.get("processTask").get(0).getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
 }
