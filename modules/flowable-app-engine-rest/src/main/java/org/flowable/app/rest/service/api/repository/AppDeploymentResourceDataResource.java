@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -45,6 +46,9 @@ public class AppDeploymentResourceDataResource {
 
     @Autowired
     protected AppRepositoryService appRepositoryService;
+    
+    @Autowired(required=false)
+    protected AppRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get an app deployment resource content", tags = {"App Deployments" }, nickname = "getAppDeploymentResource",
             notes = "The response body will contain the binary resource-content for the requested resource. The response content-type will be the same as the type returned in the resources mimeType property. Also, a content-disposition header is set, allowing browsers to download the file instead of displaying it.")
@@ -68,6 +72,10 @@ public class AppDeploymentResourceDataResource {
         AppDeployment deployment = appRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find an app deployment with id '" + deploymentId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
         }
 
         List<String> resourceList = appRepositoryService.getDeploymentResourceNames(deploymentId);

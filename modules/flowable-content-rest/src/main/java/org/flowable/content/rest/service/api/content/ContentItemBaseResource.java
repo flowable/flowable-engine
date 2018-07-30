@@ -23,6 +23,7 @@ import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentItemQuery;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.impl.ContentItemQueryProperty;
+import org.flowable.content.rest.ContentRestApiInterceptor;
 import org.flowable.content.rest.ContentRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,6 +46,9 @@ public class ContentItemBaseResource {
 
     @Autowired
     protected ContentService contentService;
+    
+    @Autowired(required=false)
+    protected ContentRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<ContentItemResponse> getContentItemsFromQueryRequest(ContentItemQueryRequest request, Map<String, String> requestParams) {
 
@@ -182,6 +186,10 @@ public class ContentItemBaseResource {
         if (Boolean.TRUE.equals(request.getWithoutTenantId())) {
             contentItemQuery.withoutTenantId();
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessContentItemInfoWithQuery(contentItemQuery);
+        }
 
         return new ContentItemPaginateList(restResponseFactory).paginateList(requestParams, request, contentItemQuery, "created", properties);
     }
@@ -191,6 +199,11 @@ public class ContentItemBaseResource {
         if (contentItem == null) {
             throw new FlowableObjectNotFoundException("Could not find a content item with id '" + contentItemId + "'.", ContentItem.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessContentItemInfoById(contentItem);
+        }
+        
         return contentItem;
     }
 }

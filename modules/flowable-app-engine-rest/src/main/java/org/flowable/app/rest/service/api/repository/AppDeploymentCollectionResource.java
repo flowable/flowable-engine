@@ -28,6 +28,7 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.api.repository.AppDeploymentQuery;
 import org.flowable.app.engine.impl.repository.AppDeploymentQueryProperty;
+import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.app.rest.AppRestResponseFactory;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -72,6 +73,9 @@ public class AppDeploymentCollectionResource {
 
     @Autowired
     protected AppRepositoryService appRepositoryService;
+    
+    @Autowired(required=false)
+    protected AppRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of App Deployments", nickname = "listAppDeployments", tags = { "Form Deployments" })
     @ApiImplicitParams({
@@ -116,6 +120,10 @@ public class AppDeploymentCollectionResource {
                 deploymentQuery.deploymentWithoutTenantId();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
+        }
 
         return new AppDeploymentsPaginateList(appRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
@@ -132,6 +140,10 @@ public class AppDeploymentCollectionResource {
     @PostMapping(value = "/app-repository/deployments", produces = "application/json", consumes = "multipart/form-data")
     public AppDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
+        }
+        
         if (!(request instanceof MultipartHttpServletRequest)) {
             throw new FlowableIllegalArgumentException("Multipart request is required");
         }

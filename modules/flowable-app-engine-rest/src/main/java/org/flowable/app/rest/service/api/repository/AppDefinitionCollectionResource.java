@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinitionQuery;
 import org.flowable.app.engine.impl.repository.AppDefinitionQueryProperty;
+import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.app.rest.AppRestResponseFactory;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
@@ -61,6 +62,9 @@ public class AppDefinitionCollectionResource {
 
     @Autowired
     protected AppRepositoryService appRepositoryService;
+    
+    @Autowired(required=false)
+    protected AppRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of app definitions",  nickname = "listAppDefinitions", tags = { "App Definitions" })
     @ApiImplicitParams({
@@ -156,6 +160,10 @@ public class AppDefinitionCollectionResource {
             if (latest) {
                 appDefinitionQuery.latestVersion();
             }
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessAppDefinitionInfoWithQuery(appDefinitionQuery);
         }
 
         return new AppDefinitionPaginateList(appRestResponseFactory).paginateList(allRequestParams, appDefinitionQuery, "name", properties);
