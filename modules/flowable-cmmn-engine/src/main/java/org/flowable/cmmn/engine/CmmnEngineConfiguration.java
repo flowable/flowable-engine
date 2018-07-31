@@ -1080,7 +1080,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public void initVariableServiceConfiguration() {
-        this.variableServiceConfiguration = new VariableServiceConfiguration();
+        this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
 
         this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
@@ -1103,8 +1103,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
     }
 
+    protected VariableServiceConfiguration instantiateVariableServiceConfiguration() {
+        return new VariableServiceConfiguration();
+    }
+
     public void initTaskServiceConfiguration() {
-        this.taskServiceConfiguration = new TaskServiceConfiguration();
+        this.taskServiceConfiguration = instantiateTaskServiceConfiguration();
         this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1148,8 +1152,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         addServiceConfiguration(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG, this.taskServiceConfiguration);
     }
 
+    protected TaskServiceConfiguration instantiateTaskServiceConfiguration() {
+        return new TaskServiceConfiguration();
+    }
+
     public void initIdentityLinkServiceConfiguration() {
-        this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration();
+        this.identityLinkServiceConfiguration = instantiateIdentityLinkServiceConfiguration();
         this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.identityLinkServiceConfiguration.setClock(this.clock);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1159,6 +1167,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.identityLinkServiceConfiguration.init();
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG, this.identityLinkServiceConfiguration);
+    }
+
+    protected IdentityLinkServiceConfiguration instantiateIdentityLinkServiceConfiguration() {
+        return new IdentityLinkServiceConfiguration();
     }
 
     public void initBusinessCalendarManager() {
@@ -1259,7 +1271,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initJobServiceConfiguration() {
         if (jobServiceConfiguration == null) {
-            this.jobServiceConfiguration = new JobServiceConfiguration();
+            this.jobServiceConfiguration = instantiateJobServiceConfiguration();
             this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1325,6 +1337,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, this.jobServiceConfiguration);
+    }
+
+    protected JobServiceConfiguration instantiateJobServiceConfiguration() {
+        return new JobServiceConfiguration();
     }
     
     public void addJobHandler(JobHandler jobHandler) {

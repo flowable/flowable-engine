@@ -220,5 +220,15 @@ public interface CmmnManagementService {
      * Returns a new HistoryJobQuery implementation, that can be used to dynamically query the history jobs.
      */
     HistoryJobQuery createHistoryJobQuery();
+    
+    /**
+     * Forced synchronous execution of a historyJob (eg. for administration or testing).
+     * 
+     * @param historyJobId
+     *            id of the historyjob to execute, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no historyJob with the given id.
+     */
+    void executeHistoryJob(String historyJobId);
 
 }

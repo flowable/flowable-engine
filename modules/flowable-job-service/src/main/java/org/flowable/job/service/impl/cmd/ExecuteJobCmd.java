@@ -47,7 +47,7 @@ public class ExecuteJobCmd implements Command<Object>, Serializable {
     public Object execute(CommandContext commandContext) {
 
         if (jobId == null) {
-            throw new FlowableIllegalArgumentException("jobId and job is null");
+            throw new FlowableIllegalArgumentException("jobId is null");
         }
 
         Job job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);

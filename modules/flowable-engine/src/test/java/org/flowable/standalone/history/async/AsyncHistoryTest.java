@@ -128,6 +128,22 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             }
         }
     }
+    
+    public void testExecuteThroughManagementService() {
+        deployOneTaskTestProcess();
+        
+        String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+        List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
+        assertEquals(1, jobs.size());
+        assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).count());
+        
+        managementService.executeHistoryJob(jobs.get(0).getId());
+        
+        jobs = managementService.createHistoryJobQuery().list();
+        assertEquals(0, jobs.size());
+        assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).count());
+    }
 
     @Deployment
     public void testSimpleStraightThroughProcess() {
