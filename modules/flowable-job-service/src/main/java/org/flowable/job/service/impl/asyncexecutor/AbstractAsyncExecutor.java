@@ -372,5 +372,17 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     public void setAsyncRunnableExecutionExceptionHandler(AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
         this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
     }
+
+    public AcquireTimerJobsRunnable getTimerJobRunnable() {
+        return timerJobRunnable;
+    }
+
+    public AcquireAsyncJobsDueRunnable getAsyncJobsDueRunnable() {
+        return asyncJobsDueRunnable;
+    }
+
+    public ResetExpiredJobsRunnable getResetExpiredJobsRunnable() {
+        return resetExpiredJobsRunnable;
+    }
     
 }

@@ -12,23 +12,24 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -42,6 +43,9 @@ public class FormDefinitionResource {
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a form definition", tags = { "Form Definitions" })
     @ApiResponses(value = {
@@ -54,6 +58,10 @@ public class FormDefinitionResource {
 
         if (formDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormDefinitionInfoById(formDefinition);
         }
 
         return formRestResponseFactory.createFormDefinitionResponse(formDefinition);

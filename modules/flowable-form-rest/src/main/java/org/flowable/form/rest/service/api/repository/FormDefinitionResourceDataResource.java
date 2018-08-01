@@ -12,12 +12,11 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.io.InputStream;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -25,15 +24,19 @@ import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -47,6 +50,9 @@ public class FormDefinitionResourceDataResource {
 
     @Autowired
     protected ContentTypeResolver contentTypeResolver;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a form definition resource content", nickname = "getFormDefinitionContent", tags = { "Form Definitions" })
     @ApiResponses(value = {
@@ -55,8 +61,7 @@ public class FormDefinitionResourceDataResource {
     })
     @GetMapping(value = "/form-repository/form-definitions/{formDefinitionId}/resourcedata", produces = "application/json")
     @ResponseBody
-    //FIXME Name of the method ?
-    public byte[] getDecisionTableResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId, HttpServletResponse response) {
+    public byte[] getFormDefinitionResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId, HttpServletResponse response) {
         FormDefinition formDefinition = formRepositoryService.getFormDefinition(formDefinitionId);
 
         if (formDefinition == null) {
@@ -67,6 +72,10 @@ public class FormDefinitionResourceDataResource {
         }
         if (formDefinition.getResourceName() == null) {
             throw new FlowableException("No resource name available");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormDefinitionInfoById(formDefinition);
         }
 
         // Check if deployment exists

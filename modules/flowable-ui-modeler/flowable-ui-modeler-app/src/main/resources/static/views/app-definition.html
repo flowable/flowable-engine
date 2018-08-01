@@ -65,7 +65,7 @@
     <h2>{{'APP.DETAILS.TITLE' | translate:model.app}}</h2>
     <div class="content-canvas-wrapper">
         <div class="content-canvas">
-            <div class="row" ng-if="model.appDefinition.definition.models && model.appDefinition.definition.models.length > 0">
+            <div class="row" ng-if="model.appDefinition.definition.models && (model.appDefinition.definition.models.length > 0 || model.appDefinition.definition.cmmnModels.length > 0)">
                 <div class="col-xs-4">
                     <div class="preview-wrapper active">
                         <h3>{{'APP.TITLE.PREVIEW' | translate}}</h3>
@@ -92,7 +92,7 @@
                     <h3>{{'APP.DETAILS.MODELS-TITLE' | translate}}
 
                     </h3>
-                    <div class="no-results" ng-show="!model.appDefinition.definition.models.length">
+                    <div class="no-results" ng-show="!model.appDefinition.definition.models.length && !model.appDefinition.definition.cmmnModels.length">
                         {{'APP.DETAILS.NO-MODELS-SELECTED' | translate}}
                     </div>
                 </div>

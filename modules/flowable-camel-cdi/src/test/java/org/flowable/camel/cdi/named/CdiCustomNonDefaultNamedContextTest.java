@@ -60,7 +60,7 @@ public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTe
                 from("direct:start").to("flowable:camelProcess");
 
                 from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody()
-                                .properties();
+                                .exchangeProperties();
 
                 from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
 

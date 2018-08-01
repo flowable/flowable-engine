@@ -12,16 +12,12 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +26,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -44,6 +45,9 @@ public class FormDeploymentResource {
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a form deployment", tags = { "Form Deployments" })
     @ApiResponses(value = {
@@ -57,6 +61,10 @@ public class FormDeploymentResource {
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a form deployment with id '" + deploymentId);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
+        }
 
         return formRestResponseFactory.createFormDeploymentResponse(deployment);
     }
@@ -68,6 +76,16 @@ public class FormDeploymentResource {
     })
     @DeleteMapping(value = "/form-repository/deployments/{deploymentId}", produces = "application/json")
     public void deleteFormDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
+        FormDeployment deployment = formRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find a Form deployment with id '" + deploymentId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteDeployment(deployment);
+        }
+        
         formRepositoryService.deleteDeployment(deploymentId);
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

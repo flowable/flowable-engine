@@ -454,6 +454,10 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     public String getSuperExecutionId() {
         return superExecutionId;
     }
+    
+    public void setSuperExecutionId(String superExecutionId) {
+        this.superExecutionId = superExecutionId;
+    }
 
     @Override
     public ExecutionEntityImpl getSuperExecution() {
@@ -878,6 +882,10 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     @Override
     public String getActivityId() {
         return activityId;
+    }
+    
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
     }
 
     @Override

@@ -1077,7 +1077,6 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         Map<String, List<Execution>> taskExecutionsByParent = Stream.concat(tempStream, classifiedExecutions.get("taskInclusive3").stream())
             .collect(Collectors.groupingBy(Execution::getParentId));
         //Get the execution Ids of one with 3 task executions
-        boolean doneFlag = false;
         Optional<List<Execution>> completeSubProcessExecutions = taskExecutionsByParent.values().stream()
             .filter(l -> l.size() == 3)
             .findFirst();

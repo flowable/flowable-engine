@@ -53,7 +53,7 @@ public class CallActivityWithElementType extends PluggableFlowableTestCase {
     @Deployment(resources =
         "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml")
     public void testCallSimpleSubProcessByKeyExpression() throws IOException {
-        String subProcessDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("simpleSubProcess").singleResult().getId();
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("simpleSubProcess").singleResult().getId();
 
         assertThatSubProcessIsCalled(
             createCallProcess("key", "${subProcessDefinitionKey}"),

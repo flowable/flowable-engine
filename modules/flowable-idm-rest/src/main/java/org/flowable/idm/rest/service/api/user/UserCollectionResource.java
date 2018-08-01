@@ -27,6 +27,7 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
 import org.flowable.idm.api.UserQueryProperty;
+import org.flowable.idm.rest.service.api.IdmRestApiInterceptor;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,6 +70,9 @@ public class UserCollectionResource {
 
     @Autowired
     protected IdmIdentityService identityService;
+    
+    @Autowired(required=false)
+    protected IdmRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List users", nickname = "listUsers", tags = { "Users" })
     @ApiImplicitParams({
@@ -121,6 +125,10 @@ public class UserCollectionResource {
         if (allRequestParams.containsKey("memberOfGroup")) {
             query.memberOfGroup(allRequestParams.get("memberOfGroup"));
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessUserInfoWithQuery(query);
+        }
 
         return new UserPaginateList(idmRestResponseFactory).paginateList(allRequestParams, query, "id", properties);
     }
@@ -148,6 +156,11 @@ public class UserCollectionResource {
         created.setLastName(userRequest.getLastName());
         created.setDisplayName(userRequest.getDisplayName());
         created.setPassword(userRequest.getPassword());
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createNewUser(created);
+        }
+        
         identityService.saveUser(created);
 
         response.setStatus(HttpStatus.CREATED.value());

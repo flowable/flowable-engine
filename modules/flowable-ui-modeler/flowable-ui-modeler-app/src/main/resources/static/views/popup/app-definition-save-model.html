@@ -25,8 +25,11 @@
 				    <label for="appDescription">{{'APP.DESCRIPTION' | translate}}</label>
 					<textarea ng-disabled="model.loading" class="form-control" id="appDescription" rows="5" ng-model="saveDialog.description"></textarea>
 				</div>
-				<div class="checkbox" ng-if="currentAppDefinition.definition && currentAppDefinition.definition.models && currentAppDefinition.definition.models.length > 0">
-                    <label>
+                <div class="checkbox" ng-if="currentAppDefinition.definition &&
+				    ((currentAppDefinition.definition.models && currentAppDefinition.definition.models.length > 0)
+				            || (currentAppDefinition.definition.cmmnModels && currentAppDefinition.definition.cmmnModels.length > 0)) ">
+
+                <label>
                         <input type="checkbox" ng-model="saveDialog.publish">
                             {{'APP.POPUP.PUBLISH-FIELD' | translate}}
                     </label>

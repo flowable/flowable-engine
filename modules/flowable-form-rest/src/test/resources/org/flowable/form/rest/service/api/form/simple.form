@@ -1,0 +1,30 @@
+{
+    "key": "form1",
+    "name": "My first form",
+    "fields":[  
+             {  
+                "fieldType":"FormField",
+                "id":"user",
+                "name":"User",
+                "type":"text",
+                "value":null,
+                "required":false,
+                "readOnly":false,
+                "overrideId":false,
+                "placeholder":null,
+                "layout":null
+             },
+             {  
+                "fieldType":"FormField",
+                "id":"number",
+                "name":"Number",
+                "type":"integer",
+                "value":null,
+                "required":false,
+                "readOnly":false,
+                "overrideId":false,
+                "placeholder":null,
+                "layout":null
+             }
+      ]
+}

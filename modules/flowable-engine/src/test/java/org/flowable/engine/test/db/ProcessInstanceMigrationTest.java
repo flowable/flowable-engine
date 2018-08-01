@@ -156,7 +156,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertNotNull(execution);
 
         // deploy new version of the process definition
-        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS).deploy();
+        repositoryService.createDeployment().addClasspathResource(TEST_PROCESS).deploy();
         assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
         // migrate process instance to new process definition version
@@ -253,7 +253,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             assertEquals(1, taskService.createTaskQuery().processInstanceId(pi.getId()).count());
 
             // deploy new version of the process definition
-            org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_USER_TASK_V2).deploy();
+            repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_USER_TASK_V2).deploy();
             assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").count());
 
             ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").processDefinitionVersion(2).singleResult();

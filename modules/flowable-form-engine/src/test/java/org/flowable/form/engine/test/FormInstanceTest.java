@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceInfo;
@@ -85,6 +86,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
     @FormDeploymentAnnotation(resources = "org/flowable/form/engine/test/deployment/simple.form")
     public void saveSimpleForm() throws Exception {
         String taskId = "123456";
+        Authentication.setAuthenticatedUserId("User");
         FormInfo formInfo = repositoryService.getFormModelByKey("form1");
 
         Map<String, Object> valuesMap = new HashMap<>();
@@ -117,6 +119,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
 
         formInstanceModel = formService.getFormInstanceModelById(formInstance.getId(), null);
         assertEquals("form1", formInstanceModel.getKey());
+        assertEquals("User", formInstanceModel.getSubmittedBy());
         formModel = (SimpleFormModel) formInstanceModel.getFormModel();
         assertEquals(1, formModel.getFields().size());
         formField = formModel.getFields().get(0);
