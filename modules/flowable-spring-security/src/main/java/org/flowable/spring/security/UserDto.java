@@ -17,6 +17,8 @@ import java.io.Serializable;
 import org.flowable.idm.api.User;
 
 /**
+ * An immutable serializable implementation of {@link User}. This implementation allows mutation only for the password,
+ * in order for it to be removed by Spring Security when the credentials are erased.
  * @author Filip Hrisafov
  */
 public class UserDto implements User, Serializable {

@@ -19,7 +19,7 @@ import org.flowable.idm.api.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Provides core core user information within a Flowable application.
+ * Provides core user information within a Flowable application.
  *
  * @author Filip Hrisafov
  * @see UserDetails
