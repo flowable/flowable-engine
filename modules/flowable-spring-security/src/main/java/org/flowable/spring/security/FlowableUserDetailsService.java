@@ -85,6 +85,6 @@ public class FlowableUserDetailsService
             }
         }
 
-        return new FlowableUser(user, true, groups, userPrivileges, grantedAuthorities);
+        return new FlowableUser(UserDto.create(user), true, GroupDetails.create(groups), userPrivileges, grantedAuthorities);
     }
 }
