@@ -85,8 +85,7 @@ public class ChangeActivityStateCmd implements Command<Void> {
                         FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
                         while (!(parentContainer instanceof Process)) {
                             MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentContainer).getLoopCharacteristics();
-                            if (loopCharacteristics != null && !loopCharacteristics.isSequential()) {
-
+                            if (loopCharacteristics != null) {
                                 insideMultiInstance = true;
                                 break;
                             }
