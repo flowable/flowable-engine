@@ -12,13 +12,11 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
@@ -28,7 +26,6 @@ import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
 
 /**
@@ -43,36 +40,11 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public ExecutionEntity findById(String executionId) {
-       return transformToEntity(getMongoDbSession().findOne(COLLECTION_EXECUTIONS, executionId));
+       return getMongoDbSession().findOne(COLLECTION_EXECUTIONS, executionId);
     }
 
     public void insert(ExecutionEntity executionEntity) {
-        Document executionDocument = new Document();
-        executionDocument.append("processInstanceId", executionEntity.getProcessInstanceId());
-        executionDocument.append("businessKey", executionEntity.getBusinessKey());
-        executionDocument.append("processDefinitionId", executionEntity.getProcessDefinitionId());
-        executionDocument.append("activityId", executionEntity.getActivityId());
-        executionDocument.append("isActive", executionEntity.isActive());
-        executionDocument.append("isConcurrent", executionEntity.isConcurrent());
-        executionDocument.append("isScope", executionEntity.isScope());
-        executionDocument.append("isEventScope", executionEntity.isEventScope());
-        executionDocument.append("isMultiInstanceRoot", executionEntity.isMultiInstanceRoot());
-        executionDocument.append("parentId", executionEntity.getParentId());
-        executionDocument.append("superExecutionId", executionEntity.getSuperExecutionId());
-        executionDocument.append("rootProcessInstanceId", executionEntity.getRootProcessInstanceId());
-        executionDocument.append("suspensionState", executionEntity.getSuspensionState());
-        executionDocument.append("tenantId", executionEntity.getTenantId());
-        executionDocument.append("name", executionEntity.getName());
-        executionDocument.append("startActivityId", executionEntity.getStartActivityId());
-        executionDocument.append("startTime", executionEntity.getStartTime());
-        executionDocument.append("startUserId", executionEntity.getStartUserId());
-        
-        // TODO: performance settings
-        
-        executionDocument.append("callbackId", executionEntity.getCallbackId());
-        executionDocument.append("callbackType", executionEntity.getCallbackType());
-        
-        getMongoDbSession().insertOne(executionEntity, COLLECTION_EXECUTIONS, executionDocument);
+        getMongoDbSession().insertOne(executionEntity);
     }
 
     public ExecutionEntity update(ExecutionEntity entity) {
@@ -93,12 +65,7 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
 
     public List<ExecutionEntity> findChildExecutionsByParentExecutionId(String parentExecutionId) {
         Bson filter = Filters.eq("parentExecutionId", parentExecutionId);
-        FindIterable<Document> documents = getMongoDbSession().find(COLLECTION_EXECUTIONS, filter);
-        List<ExecutionEntity> executions = new ArrayList<>();
-        for (Document document : documents) {
-            executions.add(transformToEntity(document));
-        }
-        return executions;
+        return getMongoDbSession().find(COLLECTION_EXECUTIONS, filter);
     }
 
     public List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId) {
@@ -178,34 +145,4 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
         throw new UnsupportedOperationException();        
     }
     
-    protected ExecutionEntityImpl transformToEntity(Document document) {
-        ExecutionEntityImpl executionEntity = new ExecutionEntityImpl();
-        executionEntity.setId(document.getString("_id"));
-        executionEntity.setProcessInstanceId(document.getString("processInstanceId"));
-        executionEntity.setBusinessKey(document.getString("businessKey"));
-        executionEntity.setProcessDefinitionId(document.getString("processDefinitionId"));
-        executionEntity.setActivityId(document.getString("activityId"));
-        executionEntity.setActive(document.getBoolean("isActive", false));
-        executionEntity.setConcurrent(document.getBoolean("isConcurrent", false));
-        executionEntity.setScope(document.getBoolean("isScope", false));
-        executionEntity.setEventScope(document.getBoolean("isEventScope", false));
-        executionEntity.setMultiInstanceRoot(document.getBoolean("isMultiInstanceRoot", false));
-        executionEntity.setParentId(document.getString("parentId"));
-        executionEntity.setSuperExecutionId(document.getString("superExecutionId"));
-        executionEntity.setRootProcessInstanceId(document.getString("rootProcessInstanceId"));
-        executionEntity.setSuspensionState(document.getInteger("suspensionState"));
-        executionEntity.setTenantId(document.getString("tenantId"));
-        executionEntity.setName(document.getString("name"));
-        executionEntity.setStartActivityId(document.getString("startActivityId"));
-        executionEntity.setStartTime(document.getDate("startTime"));
-        executionEntity.setStartUserId(document.getString("startUserId"));
-        
-        // TODO: performance settings
-
-        executionEntity.setCallbackId(document.getString("callBackId"));
-        executionEntity.setCallbackType(document.getString("callbackType"));
-        
-        return executionEntity;
-    }
-
 }

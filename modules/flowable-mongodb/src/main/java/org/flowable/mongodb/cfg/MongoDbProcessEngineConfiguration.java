@@ -19,7 +19,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -157,6 +160,9 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
         if (this.customSessionFactories == null) {
             this.customSessionFactories = new ArrayList<>();
         }
+        
+        this.customSessionFactories.add(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+        
         initMongoDbSessionFactory();
         this.customSessionFactories.add(mongoDbSessionFactory);    
         

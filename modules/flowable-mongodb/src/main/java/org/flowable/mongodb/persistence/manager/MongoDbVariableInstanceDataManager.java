@@ -12,7 +12,6 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +21,6 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
 
 /**
@@ -64,12 +62,7 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
 
     @Override
     public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
-        FindIterable<Document> variableDocuments = getMongoDbSession().find(COLLECTION_VARIABLES, Filters.eq("taskId", taskId));
-        List<VariableInstanceEntity> variableInstanceEntities = new ArrayList<>();
-        for (Document variableDocument : variableDocuments) {
-            variableInstanceEntities.add(transformToEntity(variableDocument));
-        }
-        return variableInstanceEntities;
+        return getMongoDbSession().find(COLLECTION_VARIABLES, Filters.eq("taskId", taskId));
     }
 
     @Override

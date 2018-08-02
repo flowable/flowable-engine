@@ -12,7 +12,6 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +20,6 @@ import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 
 import com.mongodb.client.FindIterable;
@@ -42,31 +40,12 @@ public class MongoDbProcessDefinitionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public ProcessDefinitionEntity findById(String id) {
-        FindIterable<Document> result = getMongoDbSession().find(COLLECTION_PROCESS_DEFINITIONS, Filters.eq("_id", id));
-        Document processDefinitionDocument = result.first();
-        return transformToEntity(processDefinitionDocument);
+        return getMongoDbSession().findOne(COLLECTION_PROCESS_DEFINITIONS, id);
     }
 
     @Override
     public void insert(ProcessDefinitionEntity processDefinitionEntity) {
-        Document processDefinitionDocument = new Document();
-        processDefinitionDocument.append("name", processDefinitionEntity.getName());
-        processDefinitionDocument.append("description", processDefinitionEntity.getDescription());
-        processDefinitionDocument.append("key", processDefinitionEntity.getKey());
-        processDefinitionDocument.append("version", processDefinitionEntity.getVersion());
-        processDefinitionDocument.append("category", processDefinitionEntity.getCategory());
-        processDefinitionDocument.append("deploymentId", processDefinitionEntity.getDeploymentId());
-        processDefinitionDocument.append("resourceName", processDefinitionEntity.getResourceName());
-        processDefinitionDocument.append("tenantId", processDefinitionEntity.getTenantId());
-        processDefinitionDocument.append("historyLevel", processDefinitionEntity.getHistoryLevel());
-        processDefinitionDocument.append("diagramResourceName", processDefinitionEntity.getDiagramResourceName());
-        processDefinitionDocument.append("isGraphicalNotationDefined", processDefinitionEntity.isGraphicalNotationDefined());
-        processDefinitionDocument.append("hasStartFormKey", processDefinitionEntity.getHasStartFormKey());
-        processDefinitionDocument.append("suspensionState", processDefinitionEntity.getSuspensionState());
-        processDefinitionDocument.append("derivedFrom", processDefinitionEntity.getDerivedFrom());
-        processDefinitionDocument.append("derivedFromRoot", processDefinitionEntity.getDerivedFromRoot());
-        processDefinitionDocument.append("derivedVersion", processDefinitionEntity.getDerivedVersion());
-        getMongoDbSession().insertOne(processDefinitionEntity, COLLECTION_PROCESS_DEFINITIONS, processDefinitionDocument);
+        getMongoDbSession().insertOne(processDefinitionEntity);
     }
 
     @Override
@@ -88,11 +67,11 @@ public class MongoDbProcessDefinitionDataManager extends AbstractMongoDbDataMana
     public ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
         // TODO. Not all properties included yet. Check the mybatis query for all details.
         // TODO: More performant way possible?
-        FindIterable<Document> documents = getMongoDbSession().find(COLLECTION_PROCESS_DEFINITIONS, 
+        FindIterable<Document> documents = getMongoDbSession().findDocuments(COLLECTION_PROCESS_DEFINITIONS, 
                 Filters.eq("key", processDefinitionKey))
                 .sort(Sorts.descending("version"))
                 .limit(1);
-        return transformToEntity(documents.first());
+        return getMongoDbSession().mapToEntity(COLLECTION_PROCESS_DEFINITIONS, documents);
     }
 
     @Override
@@ -118,12 +97,7 @@ public class MongoDbProcessDefinitionDataManager extends AbstractMongoDbDataMana
     @Override
     public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
         // TODO: extract and do properly
-        FindIterable<Document> processDefinitionDocuments = getMongoDbSession().find(COLLECTION_PROCESS_DEFINITIONS, null);
-        List<ProcessDefinition> processDefinitions = new ArrayList<>();
-        for (Document document : processDefinitionDocuments) {
-            processDefinitions.add(transformToEntity(document));
-        }
-        return processDefinitions;
+        return getMongoDbSession().find(COLLECTION_PROCESS_DEFINITIONS, null);
     }
 
     @Override
@@ -167,31 +141,4 @@ public class MongoDbProcessDefinitionDataManager extends AbstractMongoDbDataMana
         throw new UnsupportedOperationException();        
     }
     
-    protected ProcessDefinitionEntity transformToEntity(Document document) {
-        
-        if (document == null) {
-            return null;
-        }
-        
-        ProcessDefinitionEntityImpl processDefinitionEntity = new ProcessDefinitionEntityImpl();
-        processDefinitionEntity.setId(document.getString("_id"));
-        processDefinitionEntity.setName(document.getString("name"));
-        processDefinitionEntity.setDescription(document.getString("description"));
-        processDefinitionEntity.setKey(document.getString("key"));
-        processDefinitionEntity.setVersion(document.getInteger("version", 1));
-        processDefinitionEntity.setCategory(document.getString("category"));
-        processDefinitionEntity.setDeploymentId(document.getString("deploymentId"));
-        processDefinitionEntity.setResourceName(document.getString("resourceName"));
-        processDefinitionEntity.setTenantId(document.getString("tenantId"));
-        processDefinitionEntity.setHistoryLevel(document.getInteger("historyLevel"));
-        processDefinitionEntity.setDiagramResourceName(document.getString("diagramResourceName"));
-        processDefinitionEntity.setGraphicalNotationDefined(document.getBoolean("isGraphicalNotationDefined", false));
-        processDefinitionEntity.setHasStartFormKey(document.getBoolean("hasStartFormKey"));
-        processDefinitionEntity.setSuspensionState(document.getInteger("suspensionState"));
-        processDefinitionEntity.setDerivedFrom(document.getString("derivedFrom"));
-        processDefinitionEntity.setDerivedFromRoot(document.getString("derivedFromRoot"));
-        processDefinitionEntity.setDerivedVersion(document.getInteger("derivedVersion"));
-        return processDefinitionEntity;
-    }
-
 }

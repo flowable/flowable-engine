@@ -14,7 +14,6 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.List;
 
-import org.bson.Document;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
@@ -38,13 +37,7 @@ public class MongoDbResourceDataManager extends AbstractMongoDbDataManager imple
 
     @Override
     public void insert(ResourceEntity resourceEntity) {
-        Document resourceDocument = new Document();
-        resourceDocument.append("name", resourceEntity.getName());
-        resourceDocument.append("bytes", resourceEntity.getBytes());
-        resourceDocument.append("deploymentId", resourceEntity.getDeploymentId());
-        resourceDocument.append("generated", resourceEntity.isGenerated());
-        
-        getMongoDbSession().insertOne(resourceEntity, COLLECTION_BYTE_ARRAY, resourceDocument);
+        getMongoDbSession().insertOne(resourceEntity);
     }
 
     @Override

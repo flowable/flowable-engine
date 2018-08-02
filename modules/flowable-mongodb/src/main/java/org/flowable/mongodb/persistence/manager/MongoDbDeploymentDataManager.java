@@ -12,18 +12,14 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.Document;
 import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
 import org.flowable.engine.repository.Deployment;
-
-import com.mongodb.client.FindIterable;
 
 /**
  * @author Joram Barrez
@@ -44,18 +40,7 @@ public class MongoDbDeploymentDataManager extends AbstractMongoDbDataManager imp
     
     @Override
     public void insert(DeploymentEntity deploymentEntity) {
-        Document deploymentDocument = new Document();
-        deploymentDocument.append("name", deploymentEntity.getName());
-        deploymentDocument.append("key", deploymentEntity.getName());
-        deploymentDocument.append("parentDeploymentId", deploymentEntity.getParentDeploymentId());
-        
-        deploymentDocument.append("deploymentTime", deploymentEntity.getDeploymentTime());
-        deploymentDocument.append("derivedFrom", deploymentEntity.getDerivedFrom());
-        deploymentDocument.append("derivedFromRoot", deploymentEntity.getDerivedFromRoot());
-
-        deploymentDocument.append("tenantId", deploymentEntity.getTenantId());
-        
-        getMongoDbSession().insertOne(deploymentEntity, COLLECTION_DEPLOYMENT, deploymentDocument);
+        getMongoDbSession().insertOne(deploymentEntity);
     }
 
     @Override
@@ -81,13 +66,7 @@ public class MongoDbDeploymentDataManager extends AbstractMongoDbDataManager imp
 
     @Override
     public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
-        // TODO: extract and do properly
-        FindIterable<Document> deploymentDocuments = getMongoDbSession().find(COLLECTION_DEPLOYMENT, null);
-        List<Deployment> deployments = new ArrayList<>();
-        for (Document document : deploymentDocuments) {
-            deployments.add(transformToEntity(document));
-        }
-        return deployments;
+        return getMongoDbSession().find(COLLECTION_DEPLOYMENT, null);
     }
 
     @Override
@@ -105,17 +84,4 @@ public class MongoDbDeploymentDataManager extends AbstractMongoDbDataManager imp
         throw new UnsupportedOperationException();
     }
     
-    protected DeploymentEntity transformToEntity(Document document) {
-        DeploymentEntityImpl deploymentEntity = new DeploymentEntityImpl();
-        deploymentEntity.setId(document.getString("_id"));
-        deploymentEntity.setName(document.getString("name"));
-        deploymentEntity.setKey(document.getString("key"));
-        deploymentEntity.setParentDeploymentId(document.getString("parentDeployment"));
-        deploymentEntity.setDeploymentTime(document.getDate("deploymentTime"));
-        deploymentEntity.setDerivedFrom(document.getString("derivedFrom"));
-        deploymentEntity.setDerivedFromRoot(document.getString("derivedFromRoot"));
-        deploymentEntity.setTenantId(document.getString("tenantId"));
-        return deploymentEntity;
-    }
-
 }

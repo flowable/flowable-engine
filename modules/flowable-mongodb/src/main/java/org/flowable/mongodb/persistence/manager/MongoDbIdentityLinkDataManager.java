@@ -12,15 +12,12 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.bson.Document;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
 
 /**
@@ -42,19 +39,7 @@ public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager i
 
     @Override
     public void insert(IdentityLinkEntity identityLinkEntity) {
-        Document identityLinkDocument = new Document();
-        
-        identityLinkDocument.append("type", identityLinkEntity.getType());
-        identityLinkDocument.append("userId", identityLinkEntity.getUserId());
-        identityLinkDocument.append("groupId", identityLinkEntity.getGroupId());
-        identityLinkDocument.append("taskId", identityLinkEntity.getTaskId());
-        identityLinkDocument.append("processInstanceId", identityLinkEntity.getProcessInstanceId());
-        identityLinkDocument.append("processDefinitionId", identityLinkEntity.getProcessDefinitionId());
-        identityLinkDocument.append("scopeId", identityLinkEntity.getScopeId());
-        identityLinkDocument.append("scopeType", identityLinkEntity.getScopeType());
-        identityLinkDocument.append("scopeDefinitionId", identityLinkEntity.getScopeDefinitionId());
-        
-        getMongoDbSession().insertOne(identityLinkEntity, COLLECTION_IDENTITY_LINKS, identityLinkDocument);
+        getMongoDbSession().insertOne(identityLinkEntity);
     }
 
     @Override
@@ -74,12 +59,7 @@ public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager i
 
     @Override
     public List<IdentityLinkEntity> findIdentityLinksByTaskId(String taskId) {
-        FindIterable<Document> identityLinkDocuments = getMongoDbSession().find(COLLECTION_IDENTITY_LINKS, Filters.eq("taskId"));
-        List<IdentityLinkEntity> identityLinkEntities = new ArrayList<>();
-        for (Document identityLinkDocument : identityLinkDocuments) {
-            identityLinkEntities.add(transformToEntity(identityLinkDocument));
-        }
-        return identityLinkEntities;
+        return getMongoDbSession().find(COLLECTION_IDENTITY_LINKS, Filters.eq("taskId"));
     }
 
     @Override
@@ -151,18 +131,4 @@ public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager i
         throw new UnsupportedOperationException();        
     }
     
-    public IdentityLinkEntityImpl transformToEntity(Document document) {
-        IdentityLinkEntityImpl IdentityLinkEntity = new IdentityLinkEntityImpl();
-        IdentityLinkEntity.setType(document.getString("type"));
-        IdentityLinkEntity.setUserId(document.getString("userId"));
-        IdentityLinkEntity.setGroupId(document.getString("groupId"));
-        IdentityLinkEntity.setTaskId(document.getString("taskId"));
-        IdentityLinkEntity.setProcessInstanceId(document.getString("processInstanceId"));
-        IdentityLinkEntity.setProcessDefId(document.getString("processDefinitionId"));
-        IdentityLinkEntity.setScopeId(document.getString("scopeId"));
-        IdentityLinkEntity.setScopeType(document.getString("scopeType"));
-        IdentityLinkEntity.setScopeDefinitionId(document.getString("scopeDefinitionId"));
-        return IdentityLinkEntity;
-    }
-
 }

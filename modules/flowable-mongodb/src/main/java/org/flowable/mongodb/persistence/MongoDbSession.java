@@ -12,10 +12,18 @@
  */
 package org.flowable.mongodb.persistence;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Session;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 import com.mongodb.MongoClient;
@@ -36,10 +44,15 @@ public class MongoDbSession implements Session {
     
     protected ClientSession clientSession;
     
-    public MongoDbSession(MongoDbSessionFactory mongoDbSessionFactory, MongoClient mongoClient, MongoDatabase mongoDatabase) {
+    protected EntityCache entityCache;
+    protected Map<Class<? extends Entity>, Map<String, Entity>> insertedObjects = new HashMap<>();
+    protected Map<Class<? extends Entity>, Map<String, Entity>> deletedObjects = new HashMap<>();
+    
+    public MongoDbSession(MongoDbSessionFactory mongoDbSessionFactory, MongoClient mongoClient, MongoDatabase mongoDatabase, EntityCache entityCache) {
         this.mongoDbSessionFactory = mongoDbSessionFactory;
         this.mongoClient = mongoClient;
         this.mongoDatabase = mongoDatabase;
+        this.entityCache = entityCache;
         
         // TODO: transaction shouldn't be started when externally managed
         startTransaction();
@@ -51,30 +64,96 @@ public class MongoDbSession implements Session {
     }
 
     @Override
-    public void flush() {
-        
-    }
-
-    @Override
     public void close() {
         if (clientSession != null) {
             clientSession.close();
         }
     }
     
-    public void insertOne(Entity entity, String collection, Document document) {
-        if (!document.containsKey("_id")) {
+    public void insertOne(Entity entity) {
+        if (entity.getId() == null) {
             String id = Context.getCommandContext().getCurrentEngineConfiguration().getIdGenerator().getNextId();
-            document.append("_id", id);
-            
             entity.setId(id);
         }
         
-        MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(collection);
-        mongoDbCollection.insertOne(clientSession, document);
+        Class<? extends Entity> clazz = entity.getClass();
+        if (!insertedObjects.containsKey(clazz)) {
+            insertedObjects.put(clazz, new LinkedHashMap<>()); // order of insert is important, hence LinkedHashMap
+        }
+
+        insertedObjects.get(clazz).put(entity.getId(), entity);
+        entityCache.put(entity, false); // False -> entity is inserted, so always changed
+        entity.setInserted(true);
     }
     
-    public FindIterable<Document> find(String collection, Bson bsonFilter) {
+    @Override
+    public void flush() {
+        flushInserts();
+        flushDeletes();
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void flushInserts() {
+        if (insertedObjects.size() == 0) {
+            return;
+        }
+        
+        for (Class<? extends Entity> clazz : insertedObjects.keySet()) {
+            
+            MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(clazz));
+            
+            Map<String, ? extends Entity> entities = insertedObjects.get(clazz);
+            EntityMapper entityMapper = mongoDbSessionFactory.getMapperForEntityClass(clazz);
+            for (Entity entity : entities.values()) {
+                Document document = entityMapper.toDocument(entity);
+                mongoDbCollection.insertOne(clientSession, document);
+            }
+        }
+    }
+    
+    protected void flushDeletes() {
+        if (deletedObjects.size() == 0) {
+            return;
+        }
+        
+        for (Class<? extends Entity> clazz : deletedObjects.keySet()) {
+            
+            MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(clazz));
+            Map<String, ? extends Entity> entities = deletedObjects.get(clazz);
+            EntityMapper entityMapper = mongoDbSessionFactory.getMapperForEntityClass(clazz);
+            for (Entity entity : entities.values()) {
+                mongoDbCollection.deleteOne(Filters.eq("_id", entity.getId()));
+            }
+        }
+    }
+    
+    public <T> List<T> find(String collection, Bson bsonFilter) {
+        FindIterable<Document> documents = findDocuments(collection, bsonFilter);
+        return mapToEntities(collection, documents);
+    }
+    
+    public <T> T mapToEntity(String collection, FindIterable<Document> documents) {
+        Iterator<Document> iterator = documents.iterator();
+        if (iterator.hasNext()) {
+            Document document = iterator.next();
+            if (document != null) {
+                EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
+                return (T) entityMapper.fromDocument(document);
+            }
+        }
+        return null;
+    }
+    
+    public <T> List<T> mapToEntities(String collection, FindIterable<Document> documents) {
+        EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
+        List<T> entities = new ArrayList<>();
+        for (Document document : documents) {
+            entities.add((T) entityMapper.fromDocument(document));
+        }
+        return entities;
+    }
+    
+    public FindIterable<Document> findDocuments(String collection, Bson bsonFilter) {
         MongoCollection<Document> mongoDbCollection = getCollection(collection);
         if (bsonFilter != null) {
             return mongoDbCollection.find(clientSession, bsonFilter);
@@ -83,9 +162,25 @@ public class MongoDbSession implements Session {
         }
     }
     
-    public Document findOne(String collection, String id) {
+    @SuppressWarnings("unchecked")
+    public <T> T findOne(String collection, String id) {
+        
+        T entity = (T) entityCache.findInCache(mongoDbSessionFactory.getClassForCollection(collection), id);
+        if (entity != null) {
+            return entity;
+        }
+        
+        Document document = findOneDocument(collection, id);
+        EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
+        entity = (T) entityMapper.fromDocument(document);
+        
+        entityCache.put((Entity) entity, true); // true -> store state so we can see later if it is updated later on
+        return entity;
+    }
+    
+    public Document findOneDocument(String collection, String id) {
         Bson filter = Filters.eq("_id", id);
-        FindIterable<Document> documents = find(collection, filter);
+        FindIterable<Document> documents = findDocuments(collection, filter);
         if (documents != null) {
             // TODO: caching
             return documents.first();
@@ -102,9 +197,13 @@ public class MongoDbSession implements Session {
         }
     }
     
-    public void delete(String collection, String id) {
-        MongoCollection<Document> mongoDbCollection = getCollection(collection);
-        mongoDbCollection.deleteOne(Filters.eq("_id", id));
+    public void delete(String collection, Entity entity) {
+        Class<? extends Entity> clazz = entity.getClass();
+        if (!deletedObjects.containsKey(clazz)) {
+            deletedObjects.put(clazz, new LinkedHashMap<>()); // order of insert is important, hence LinkedHashMap
+        }
+        deletedObjects.get(clazz).put(entity.getId(), entity);
+        entity.setDeleted(true);
     }
     
     protected MongoCollection<Document> getCollection(String collection) {
