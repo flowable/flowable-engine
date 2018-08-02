@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>Flowable - MongoDB</name>
+    <artifactId>flowable-mongodb</artifactId>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-root</artifactId>
+        <relativePath>../..</relativePath>
+        <version>6.3.2-SNAPSHOT</version>
+    </parent>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-engine</artifactId>
+            <version>6.3.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <version>3.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.1.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>distro</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
