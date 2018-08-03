@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
+import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.Signal;
@@ -114,9 +115,19 @@ public class ProcessInstanceHelper {
 
         // Get model from cache
         Process process = ProcessDefinitionUtil.getProcess(processDefinition.getId());
-        if (process == null) {
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
+        if (process == null || bpmnModel == null) {
             throw new FlowableException("Cannot start process instance. Process model " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") could not be found");
         }
+
+        // Map message name to message id
+        String messageId = bpmnModel.getMessages()
+                .stream()
+                .filter(message -> message.getName().equals(messageName))
+                .findFirst()
+                .map(Message::getId)
+                // Compatibility with previous behavior, in case the message id does not exist.
+                .orElse(messageName);
 
         FlowElement initialFlowElement = null;
         for (FlowElement flowElement : process.getFlowElements()) {
@@ -125,7 +136,7 @@ public class ProcessInstanceHelper {
                 if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
 
                     MessageEventDefinition messageEventDefinition = (MessageEventDefinition) startEvent.getEventDefinitions().get(0);
-                    if (messageEventDefinition.getMessageRef().equals(messageName)) {
+                    if (messageEventDefinition.getMessageRef().equals(messageId)) {
                         initialFlowElement = flowElement;
                         break;
                     }
