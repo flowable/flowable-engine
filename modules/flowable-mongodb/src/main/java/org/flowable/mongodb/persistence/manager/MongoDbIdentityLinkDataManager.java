@@ -64,7 +64,7 @@ public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager i
 
     @Override
     public List<IdentityLinkEntity> findIdentityLinksByProcessInstanceId(String processInstanceId) {
-        throw new UnsupportedOperationException();
+        return getMongoDbSession().find(COLLECTION_IDENTITY_LINKS, Filters.eq("processInstanceId", processInstanceId));
     }
 
     @Override

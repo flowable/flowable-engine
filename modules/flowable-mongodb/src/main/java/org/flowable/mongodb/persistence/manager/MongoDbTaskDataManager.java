@@ -127,7 +127,11 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
 
     @Override
     public void deleteTasksByExecutionId(String executionId) {
-        throw new UnsupportedOperationException();        
+        // TODO: add support for bulkDelete operation (cfr relational logic)
+        List<TaskEntity> tasksEntities = findTasksByExecutionId(executionId);
+        for (TaskEntity taskEntity : tasksEntities) {
+            getMongoDbSession().delete(COLLECTION_TASKS, taskEntity);
+        }
     }
     
 }

@@ -120,7 +120,7 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecution(String executionId) {
-        throw new UnsupportedOperationException();
+        return Collections.emptyList();
     }
 
     @Override

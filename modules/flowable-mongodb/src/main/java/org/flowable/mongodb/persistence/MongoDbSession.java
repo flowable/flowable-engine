@@ -144,13 +144,15 @@ public class MongoDbSession implements Session {
         return null;
     }
     
+    @SuppressWarnings("unchecked")
     public <T> List<T> mapToEntities(String collection, FindIterable<Document> documents) {
         EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
-        List<T> entities = new ArrayList<>();
+        List<Object> entities = new ArrayList<>();
         for (Document document : documents) {
             entities.add((T) entityMapper.fromDocument(document));
         }
-        return entities;
+        
+        return cacheLoadOrStore(entities);
     }
     
     public FindIterable<Document> findDocuments(String collection, Bson bsonFilter) {
@@ -204,6 +206,40 @@ public class MongoDbSession implements Session {
         }
         deletedObjects.get(clazz).put(entity.getId(), entity);
         entity.setDeleted(true);
+    }
+    
+    /**
+     * TODO: copied from DbSqlSession, could be extracted in a common place.
+     */
+    protected List cacheLoadOrStore(List<Object> loadedObjects) {
+        if (loadedObjects.isEmpty()) {
+            return loadedObjects;
+        }
+        if (!(loadedObjects.get(0) instanceof Entity)) {
+            return loadedObjects;
+        }
+
+        List<Entity> filteredObjects = new ArrayList<>(loadedObjects.size());
+        for (Object loadedObject : loadedObjects) {
+            Entity cachedEntity = cacheLoadOrStore((Entity) loadedObject);
+            filteredObjects.add(cachedEntity);
+        }
+        return filteredObjects;
+    }
+    
+    /**
+     * TODO: copied from DbSqlSession, could be extracted in a common place.,
+     * 
+     * Returns the object in the cache. If this object was loaded before, then the original object is returned (the cached version is more recent). 
+     * If this is the first time this object is loaded, then the loadedObject is added to the cache.
+     */
+    protected Entity cacheLoadOrStore(Entity entity) {
+        Entity cachedEntity = entityCache.findInCache(entity.getClass(), entity.getId());
+        if (cachedEntity != null) {
+            return cachedEntity;
+        }
+        entityCache.put(entity, true);
+        return entity;
     }
     
     protected MongoCollection<Document> getCollection(String collection) {

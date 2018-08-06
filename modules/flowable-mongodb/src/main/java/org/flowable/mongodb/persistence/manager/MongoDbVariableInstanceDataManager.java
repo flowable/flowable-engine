@@ -72,7 +72,7 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
 
     @Override
     public List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
-        throw new UnsupportedOperationException();
+        return getMongoDbSession().find(COLLECTION_VARIABLES, Filters.eq("executionId", executionId));
     }
 
     @Override

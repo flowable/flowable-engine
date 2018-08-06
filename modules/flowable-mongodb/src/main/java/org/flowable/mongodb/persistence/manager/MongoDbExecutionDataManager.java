@@ -13,11 +13,13 @@
 package org.flowable.mongodb.persistence.manager;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.bson.conversions.Bson;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -55,12 +57,19 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
         throw new UnsupportedOperationException();
     }
 
-    public void delete(ExecutionEntity entity) {
-        throw new UnsupportedOperationException();        
+    public void delete(ExecutionEntity executionEntity) {
+        getMongoDbSession().delete(COLLECTION_EXECUTIONS, executionEntity);    
     }
 
     public ExecutionEntity findSubProcessInstanceBySuperExecutionId(String superExecutionId) {
-       throw new UnsupportedOperationException();
+       List<ExecutionEntity> executionEntities = getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("superExecution", superExecutionId));
+       if (executionEntities.size() > 1) {
+           throw new FlowableException("Programmatics error: multiple super executions found");
+       } 
+       if (!executionEntities.isEmpty()) {
+           executionEntities.get(0);
+       }
+       return null;
     }
 
     public List<ExecutionEntity> findChildExecutionsByParentExecutionId(String parentExecutionId) {
@@ -69,7 +78,7 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId) {
-       throw new UnsupportedOperationException();
+       return getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("processInstanceId", processInstanceId));
     }
 
     public List<ExecutionEntity> findExecutionsByParentExecutionAndActivityIds(String parentExecutionId,

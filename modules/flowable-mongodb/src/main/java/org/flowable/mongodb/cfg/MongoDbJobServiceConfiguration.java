@@ -13,7 +13,10 @@
 package org.flowable.mongodb.cfg;
 
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.mongodb.persistence.manager.MongoDbJobDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbTimerJobDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDeadLetterJobDataManager;
+import org.flowable.mongodb.persistence.manager.MongoSuspendedJobDataManager;
 
 /**
  * @author Joram Barrez
@@ -23,8 +26,17 @@ public class MongoDbJobServiceConfiguration extends JobServiceConfiguration {
     @Override
     public void initDataManagers() {
         // TODO: other data managers
+        if (jobDataManager == null) {
+            jobDataManager = new MongoDbJobDataManager();
+        }
         if (timerJobDataManager == null) {
             timerJobDataManager = new MongoDbTimerJobDataManager();
+        }
+        if (suspendedJobDataManager == null) {
+            suspendedJobDataManager = new MongoSuspendedJobDataManager();
+        }
+        if (deadLetterJobDataManager == null) {
+            deadLetterJobDataManager = new MongoDeadLetterJobDataManager();
         }
     }
 

@@ -12,6 +12,7 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.Page;
@@ -57,37 +58,37 @@ public class MongoDbTimerJobDataManager extends AbstractMongoDbDataManager imple
 
     @Override
     public List<TimerJobEntity> findTimerJobsToExecute(Page page) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<TimerJobEntity> findJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyNoTenantId(String jobHandlerType, String processDefinitionKey) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<TimerJobEntity> findJobsByExecutionId(String executionId) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<TimerJobEntity> findJobsByProcessInstanceId(String processInstanceId) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

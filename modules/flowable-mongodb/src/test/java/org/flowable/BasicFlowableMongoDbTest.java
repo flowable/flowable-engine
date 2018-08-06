@@ -61,7 +61,6 @@ public class BasicFlowableMongoDbTest {
         mongoDbProcessEngineConfiguration.getMongoDatabase().drop();
     }
     
-    
     @Test
     public void testDeployProcess() {
         repositoryService.createDeployment().addClasspathResource("oneTaskProcess.bpmn20.xml").deploy();
