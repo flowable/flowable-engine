@@ -47,6 +47,9 @@
           case "specfile/dmn/flowable.json":
               api = "dmn";
               break;
+          case "specfile/cmmn/flowable.json":
+              api = "cmmn";
+              break;
           case "specfile/form/flowable.json":
               api = "form";
               break;
@@ -114,6 +117,9 @@
               case "dmn":
                   specFile = "specfile/dmn/flowable.json";
                   break;
+              case "cmmn":
+                  specFile = "specfile/cmmn/flowable.json";
+                  break;
               case "form":
                   specFile = "specfile/form/flowable.json";
                   break;
@@ -147,6 +153,7 @@
           <option value="process">Process</option>
           <option value="idm">IDM</option>
           <option value="dmn">DMN</option>
+          <option value="cmmn">CMMN</option>
           <option value="form">Form</option>
           <option value="content">Content</option>
           <option value="app">App</option>
