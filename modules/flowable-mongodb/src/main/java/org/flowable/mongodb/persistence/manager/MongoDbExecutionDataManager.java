@@ -95,7 +95,7 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
-        return 0;
+        return getMongoDbSession().count(COLLECTION_EXECUTIONS, Filters.eq("parentId", null));
     }
 
     public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {

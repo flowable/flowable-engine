@@ -10,10 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable;
+package org.flowable.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 
@@ -27,6 +28,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.mongodb.cfg.MongoDbProcessEngineConfiguration;
 import org.flowable.task.api.Task;
+import org.flowable.test.delegate.ThrowsExceptionTestJavaDelegate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,6 +102,28 @@ public class BasicFlowableMongoDbTest {
         assertEquals(task.getProcessDefinitionId(),processInstance.getProcessDefinitionId());
         
         taskService.complete(task.getId());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+    
+    @Test
+    public void testJavaDelegate() {
+        repositoryService.createDeployment().addClasspathResource("javadelegate.bpmn20.xml").deploy();
+        
+        ThrowsExceptionTestJavaDelegate.FAIL = false;
+        runtimeService.startProcessInstanceByKey("delegateProcess");
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    }
+    
+    @Test
+    public void testJavaDelegateExceptionCausesRollback() {
+        repositoryService.createDeployment().addClasspathResource("javadelegate.bpmn20.xml").deploy();
+        
+        ThrowsExceptionTestJavaDelegate.FAIL = true;
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        try {
+            runtimeService.startProcessInstanceByKey("delegateProcess");
+            fail("Should throw an exception");
+        } catch (Exception e) { }
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
