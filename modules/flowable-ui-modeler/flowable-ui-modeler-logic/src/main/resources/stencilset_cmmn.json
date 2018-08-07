@@ -319,136 +319,6 @@
       "popular" : true
     } ]
   }, {
-    "name" : "httptaskrequestmethodpackage",
-    "properties" : [ {
-      "id" : "httptaskrequestmethod",
-      "type" : "String",
-      "title" : "Request method",
-      "value" : "",
-      "description" : "Request method (For example - GET,POST,PUT etc).",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskrequesturlpackage",
-    "properties" : [ {
-      "id" : "httptaskrequesturl",
-      "type" : "Text",
-      "title" : "Request URL",
-      "value" : "",
-      "description" : "Request URL (For example - http://flowable.org).",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskrequestheaderspackage",
-    "properties" : [ {
-      "id" : "httptaskrequestheaders",
-      "type" : "Text",
-      "title" : "Request headers",
-      "value" : "",
-      "description" : "Line separated HTTP request headers (For example - Content-Type: application/json).",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskrequestbodypackage",
-    "properties" : [ {
-      "id" : "httptaskrequestbody",
-      "type" : "Text",
-      "title" : "Request body",
-      "value" : "",
-      "description" : "Request body (For example- ${sampleBody}).",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskrequesttimeoutpackage",
-    "properties" : [ {
-      "id" : "httptaskrequesttimeout",
-      "type" : "String",
-      "title" : "Request timeout",
-      "value" : "",
-      "description" : "Timeout in milliseconds for the request (For example - 5000).",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskdisallowredirectspackage",
-    "properties" : [ {
-      "id" : "httptaskdisallowredirects",
-      "type" : "String",
-      "title" : "Disallow redirects",
-      "value" : "",
-      "description" : "Flag to disallow HTTP redirects.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskfailstatuscodespackage",
-    "properties" : [ {
-      "id" : "httptaskfailstatuscodes",
-      "type" : "String",
-      "title" : "Fail status codes",
-      "value" : "",
-      "description" : "Comma separated list of HTTP response status codes to retry, for example 400,5XX.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskhandlestatuscodespackage",
-    "properties" : [ {
-      "id" : "httptaskhandlestatuscodes",
-      "type" : "String",
-      "title" : "Handle status codes",
-      "value" : "",
-      "description" : "Comma separated list of HTTP response status codes to ignore, for example 404,3XX.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskignoreexceptionpackage",
-    "properties" : [ {
-      "id" : "httptaskignoreexception",
-      "type" : "String",
-      "title" : "Ignore exception",
-      "value" : "",
-      "description" : "Flag to ignore exceptions.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskresponsevariablenamepackage",
-    "properties" : [ {
-      "id" : "httptaskresponsevariablename",
-      "type" : "String",
-      "title" : "Response variable name",
-      "value" : "",
-      "description" : "Define the variable name to store the http response.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptasksaverequestvariablespackage",
-    "properties" : [ {
-      "id" : "httptasksaverequestvariables",
-      "type" : "String",
-      "title" : "Save request variables",
-      "value" : "",
-      "description" : "Flag to save request variables.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptasksaveresponseparameterspackage",
-    "properties" : [ {
-      "id" : "httptasksaveresponseparameters",
-      "type" : "String",
-      "title" : "Save response status, headers",
-      "value" : "",
-      "description" : "Flag to save response status, headers etc.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "httptaskresultvariableprefixpackage",
-    "properties" : [ {
-      "id" : "httptaskresultvariableprefix",
-      "type" : "String",
-      "title" : "Result variable prefix",
-      "value" : "",
-      "description" : "Prefix for the execution variable names.",
-      "popular" : true
-    } ]
-  }, {
     "name" : "textpackage",
     "properties" : [ {
       "id" : "text",
@@ -538,6 +408,19 @@
           "value": "",
           "description": "Request body (For example- ${sampleBody}).",
           "popular": true
+        }
+      ]
+    },
+    {
+      "name" : "httptaskrequestbodyencodingpackage",
+      "properties" : [
+        {
+          "id" : "httptaskrequestbodyencoding",
+          "type" : "Text",
+          "title" : "Request body encoding",
+          "value" : "",
+          "description" : "Request body encoding (For example- ISO-8859-1).",
+          "popular" : true
         }
       ]
     },
@@ -1076,6 +959,7 @@
         "httptaskrequesturlpackage",
         "httptaskrequestheaderspackage",
         "httptaskrequestbodypackage",
+        "httptaskrequestbodyencodingpackage",
         "httptaskrequesttimeoutpackage",
         "httptaskdisallowredirectspackage",
         "httptaskfailstatuscodespackage",
