@@ -130,6 +130,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
     String PROPERTY_HTTPTASK_REQ_HEADERS = "httptaskrequestheaders";
     String PROPERTY_HTTPTASK_REQ_BODY  = "httptaskrequestbody";
+    String PROPERTY_HTTPTASK_REQ_BODY_ENCODING  = "httptaskrequestbodyencoding";
     String PROPERTY_HTTPTASK_REQ_TIMEOUT = "httptaskrequesttimeout";
     String PROPERTY_HTTPTASK_REQ_DISALLOW_REDIRECTS = "httptaskdisallowredirects";
     String PROPERTY_HTTPTASK_REQ_FAIL_STATUS_CODES = "httptaskfailstatuscodes";

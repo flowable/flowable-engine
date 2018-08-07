@@ -605,6 +605,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "httptaskrequestbodyencodingpackage",
+    "properties" : [ {
+      "id" : "httptaskrequestbodyencoding",
+      "type" : "Text",
+      "title" : "Request body encoding",
+      "value" : "",
+      "description" : "Request body encoding (For example- ISO-8859-1).",
+      "popular" : true
+    } ]
+  }, {
     "name" : "httptaskrequesttimeoutpackage",
     "properties" : [ {
       "id" : "httptaskrequesttimeout",
