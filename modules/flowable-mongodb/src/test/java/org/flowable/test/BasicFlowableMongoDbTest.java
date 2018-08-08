@@ -17,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ProcessEngine;
@@ -125,6 +127,34 @@ public class BasicFlowableMongoDbTest {
             fail("Should throw an exception");
         } catch (Exception e) { }
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+    
+    @Test
+    public void testBasicVariables() {
+        repositoryService.createDeployment().addClasspathResource("oneTaskProcess.bpmn20.xml").deploy();
+        
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
+        runtimeService.setVariable(processInstance.getId(), "simpleText", "test");
+        runtimeService.setVariable(processInstance.getId(), "simpleNumber", 10);
+        
+        Map<String, Object> variableMap = runtimeService.getVariables(processInstance.getId());
+        assertEquals("test", variableMap.get("simpleText"));
+        assertEquals(10, variableMap.get("simpleNumber"));
+    }
+    
+    @Test
+    public void testBasicExclusiveGateway() {
+        repositoryService.createDeployment().addClasspathResource("basicExclusiveGatewayProcess.bpmn20.xml").deploy();
+        
+        runtimeService.startProcessInstanceByKey("gateway", Collections.singletonMap("gotoFirstTask", true));
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("my task", task.getName());
+        taskService.complete(task.getId());
+        
+        runtimeService.startProcessInstanceByKey("gateway", Collections.singletonMap("gotoFirstTask", false));
+        task = taskService.createTaskQuery().singleResult();
+        assertEquals("my task2", task.getName());
+        taskService.complete(task.getId());
     }
 
 }

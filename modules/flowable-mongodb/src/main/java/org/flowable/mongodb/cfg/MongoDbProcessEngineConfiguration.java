@@ -126,12 +126,29 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
     
     @Override
     public void initDataManagers() {
-        this.deploymentDataManager = new MongoDbDeploymentDataManager();
-        this.resourceDataManager = new MongoDbResourceDataManager();
-        this.processDefinitionDataManager = new MongoDbProcessDefinitionDataManager();
-        this.executionDataManager = new MongoDbExecutionDataManager();
-        this.processDefinitionInfoDataManager = new MongoDbProcessDefinitionInfoDataManager();
-        this.eventSubscriptionDataManager = new MongoDbEventSubscriptionDataManager();
+        MongoDbDeploymentDataManager mongoDeploymentDataManager = new MongoDbDeploymentDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbDeploymentDataManager.COLLECTION_DEPLOYMENT, mongoDeploymentDataManager);
+        this.deploymentDataManager = mongoDeploymentDataManager;
+        
+        MongoDbResourceDataManager mongoDbResourceDataManager = new MongoDbResourceDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbResourceDataManager.COLLECTION_BYTE_ARRAY, mongoDbResourceDataManager);
+        this.resourceDataManager = mongoDbResourceDataManager;
+        
+        MongoDbProcessDefinitionDataManager mongoDbProcessDefinitionDataManager = new MongoDbProcessDefinitionDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbProcessDefinitionDataManager.COLLECTION_PROCESS_DEFINITIONS, mongoDbProcessDefinitionDataManager);
+        this.processDefinitionDataManager = mongoDbProcessDefinitionDataManager;
+        
+        MongoDbExecutionDataManager mongoDbExecutionDataManager = new MongoDbExecutionDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbExecutionDataManager.COLLECTION_EXECUTIONS, mongoDbExecutionDataManager);
+        this.executionDataManager = mongoDbExecutionDataManager;
+        
+        MongoDbProcessDefinitionInfoDataManager mongoDbProcessDefinitionInfoDataManager = new MongoDbProcessDefinitionInfoDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbProcessDefinitionInfoDataManager.COLLECTION_PROCESS_DEFINITION_INFO, mongoDbProcessDefinitionInfoDataManager);
+        this.processDefinitionInfoDataManager = mongoDbProcessDefinitionInfoDataManager;
+        
+        MongoDbEventSubscriptionDataManager mongoDbEventSubscriptionDataManager = new MongoDbEventSubscriptionDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION, mongoDbEventSubscriptionDataManager);
+        this.eventSubscriptionDataManager = mongoDbEventSubscriptionDataManager;
     }
     
     @Override

@@ -26,19 +26,23 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.mongodb.persistence.manager.AbstractMongoDbDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbDeploymentDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbExecutionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbIdentityLinkDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbResourceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbTaskDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbVariableInstanceDataManager;
 import org.flowable.mongodb.persistence.mapper.DeploymentEntityMapper;
 import org.flowable.mongodb.persistence.mapper.ExecutionEntityMapper;
 import org.flowable.mongodb.persistence.mapper.IdentityLinkEntityMapper;
 import org.flowable.mongodb.persistence.mapper.ProcessDefinitionEntityMapper;
 import org.flowable.mongodb.persistence.mapper.ResourceEntityMapper;
 import org.flowable.mongodb.persistence.mapper.TaskEntityMapper;
+import org.flowable.mongodb.persistence.mapper.VariableInstanceEntityMapper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -55,6 +59,7 @@ public class MongoDbSessionFactory implements SessionFactory {
     protected Map<String, EntityMapper<? extends Entity>> collectionToMapper = new HashMap<>();
     protected Map<String, Class<? extends Entity>> collectionToClass = new HashMap<>();
     protected Map<Class<? extends Entity>, EntityMapper<? extends Entity>> entityMappers = new HashMap<>();
+    protected Map<String, AbstractMongoDbDataManager> collectionToDataManager = new HashMap<>();
     
     public MongoDbSessionFactory(MongoClient mongoClient, MongoDatabase mongoDatabase) {
         this.mongoClient = mongoClient;
@@ -70,6 +75,7 @@ public class MongoDbSessionFactory implements SessionFactory {
         registerEntityMapper(ExecutionEntityImpl.class, new ExecutionEntityMapper(), MongoDbExecutionDataManager.COLLECTION_EXECUTIONS);
         registerEntityMapper(IdentityLinkEntityImpl.class, new IdentityLinkEntityMapper(), MongoDbIdentityLinkDataManager.COLLECTION_IDENTITY_LINKS);
         registerEntityMapper(TaskEntityImpl.class, new TaskEntityMapper(), MongoDbTaskDataManager.COLLECTION_TASKS);
+        registerEntityMapper(VariableInstanceEntityImpl.class, new VariableInstanceEntityMapper(), MongoDbVariableInstanceDataManager.COLLECTION_VARIABLES);
     }
 
     @Override
@@ -87,6 +93,10 @@ public class MongoDbSessionFactory implements SessionFactory {
         collections.put(clazz, collection);
         collectionToClass.put(collection, clazz);
         collectionToMapper.put(collection, mapper);
+    }
+    
+    public void registerDataManager(String collection, AbstractMongoDbDataManager dataManager) {
+        collectionToDataManager.put(collection, dataManager);
     }
 
     public MongoClient getMongoClient() {
@@ -131,6 +141,10 @@ public class MongoDbSessionFactory implements SessionFactory {
     
     public Class<? extends Entity> getClassForCollection(String collection) {
         return collectionToClass.get(collection);
+    }
+    
+    public AbstractMongoDbDataManager getDataManagerForCollection(String collection) {
+        return collectionToDataManager.get(collection);
     }
     
     public Map<String, Class<? extends Entity>> getCollectionToClass() {

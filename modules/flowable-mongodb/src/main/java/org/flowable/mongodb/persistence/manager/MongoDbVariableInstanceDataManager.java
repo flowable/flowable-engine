@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
@@ -42,7 +43,7 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
 
     @Override
     public void insert(VariableInstanceEntity entity) {
-        throw new UnsupportedOperationException();        
+        getMongoDbSession().insertOne(entity);
     }
 
     @Override
@@ -82,7 +83,8 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
 
     @Override
     public VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName) {
-        throw new UnsupportedOperationException();
+        Bson filter = Filters.and(Filters.eq("executionId", executionId), Filters.eq("name", variableName));
+        return getMongoDbSession().findOne(COLLECTION_VARIABLES, filter);
     }
 
     @Override
@@ -143,7 +145,12 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
 
     @Override
     public void deleteVariablesByExecutionId(String executionId) {
-        throw new UnsupportedOperationException();        
+        List<VariableInstanceEntity> variables = findVariableInstancesByExecutionId(executionId);
+        if (variables != null) {
+            for (VariableInstanceEntity variableInstanceEntity : variables) {
+                getMongoDbSession().delete(COLLECTION_VARIABLES, variableInstanceEntity);
+            }
+        }
     }
 
     @Override

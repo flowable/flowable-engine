@@ -13,6 +13,7 @@
 package org.flowable.mongodb.persistence.manager;
 
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.mongodb.persistence.MongoDbSession;
 
 /**
@@ -24,4 +25,7 @@ public abstract class AbstractMongoDbDataManager {
         return Context.getCommandContext().getSession(MongoDbSession.class);
     }
 
+    public void updateEntity(Entity entity) {
+        
+    }
 }

@@ -13,18 +13,27 @@
 package org.flowable.mongodb.persistence;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.interceptor.Session;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntity;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.persistence.entity.AlwaysUpdatedPersistentObject;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;
@@ -32,12 +41,15 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.UpdateResult;
 
 /**
  * @author Joram Barrez
  */
 public class MongoDbSession implements Session {
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoDbSession.class);
+
     protected MongoDbSessionFactory mongoDbSessionFactory;
     protected MongoClient mongoClient;
     protected MongoDatabase mongoDatabase;
@@ -47,6 +59,7 @@ public class MongoDbSession implements Session {
     protected EntityCache entityCache;
     protected Map<Class<? extends Entity>, Map<String, Entity>> insertedObjects = new HashMap<>();
     protected Map<Class<? extends Entity>, Map<String, Entity>> deletedObjects = new HashMap<>();
+    protected List<Entity> updatedObjects = new ArrayList<>();
     
     public MongoDbSession(MongoDbSessionFactory mongoDbSessionFactory, MongoClient mongoClient, MongoDatabase mongoDatabase, EntityCache entityCache) {
         this.mongoDbSessionFactory = mongoDbSessionFactory;
@@ -88,7 +101,11 @@ public class MongoDbSession implements Session {
     
     @Override
     public void flush() {
+        determineUpdatedObjects(); // Needs to be done before the removeUnnecessaryOperations, as removeUnnecessaryOperations will remove stuff from the cache
+        removeUnnecessaryOperations();
+        
         flushInserts();
+        flushUpdates();
         flushDeletes();
     }
 
@@ -111,6 +128,25 @@ public class MongoDbSession implements Session {
         }
     }
     
+    protected void flushUpdates() {
+        for (Entity updatedObject : updatedObjects) {
+            
+            LOGGER.debug("updating: {}", updatedObject);
+
+            String collection = mongoDbSessionFactory.getCollections().get(updatedObject.getClass());
+            mongoDbSessionFactory.getDataManagerForCollection(collection).updateEntity(updatedObject);
+            /*if (updatedRecords == 0) {
+                throw new FlowableOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
+            }*/
+
+            if (updatedObject instanceof HasRevision) {
+                ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
+            }
+
+        }
+        updatedObjects.clear();
+    }
+    
     protected void flushDeletes() {
         if (deletedObjects.size() == 0) {
             return;
@@ -130,6 +166,81 @@ public class MongoDbSession implements Session {
     public <T> List<T> find(String collection, Bson bsonFilter) {
         FindIterable<Document> documents = findDocuments(collection, bsonFilter);
         return mapToEntities(collection, documents);
+    }
+    
+    public <T> List<T> find(String collection, Bson bsonFilter, Object parameter, Class<? extends Entity> entityClass, CachedEntityMatcher<Entity> cachedEntityMatcher, boolean checkDatabase) {
+        return find(collection, bsonFilter, parameter, entityClass, cachedEntityMatcher, checkDatabase, true);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T> List<T> find(String collection, Bson bsonFilter, Object parameter, Class<? extends Entity> entityClass, CachedEntityMatcher<Entity> cachedEntityMatcher, boolean checkDatabase, boolean checkCache) {
+        FindIterable<Document> documents = findDocuments(collection, bsonFilter);
+        Collection<Entity> dbEntities = mapToEntitiesType(collection, documents);
+
+        if (checkCache) {
+
+            Collection<CachedEntity> cachedObjects = getEntityCache().findInCacheAsCachedObjects(entityClass);
+
+            if ((cachedObjects != null && cachedObjects.size() > 0)) {
+
+                HashMap<String, Entity> entityMap = new HashMap<>(dbEntities.size());
+
+                // Database entities
+                for (Entity entity : dbEntities) {
+                    entityMap.put(entity.getId(), entity);
+                }
+
+                // Cache entities
+                if (cachedObjects != null && cachedEntityMatcher != null) {
+                    for (CachedEntity cachedObject : cachedObjects) {
+                        Entity cachedEntity = cachedObject.getEntity();
+                        if (cachedEntityMatcher.isRetained(dbEntities, cachedObjects, cachedEntity, parameter)) {
+                            entityMap.put(cachedEntity.getId(), cachedEntity); // will overwrite db version with newer version
+                        }
+                    }
+                }
+
+                dbEntities = entityMap.values();
+
+            }
+
+        }
+
+        // Remove entries which are already deleted
+        if (dbEntities.size() > 0) {
+            Iterator<Entity> resultIterator = dbEntities.iterator();
+            while (resultIterator.hasNext()) {
+                if (isEntityToBeDeleted(resultIterator.next())) {
+                    resultIterator.remove();
+                }
+            }
+        }
+
+        return (List<T>) new ArrayList<>(dbEntities);
+    }
+    
+    public <T> List<T> findFromCache(CachedEntityMatcher<Entity> entityMatcher, Object parameter, Class<? extends Entity> entityClass) {
+        Collection<CachedEntity> cachedObjects = getEntityCache().findInCacheAsCachedObjects(entityClass);
+
+        List<Entity> result = new ArrayList<>(cachedObjects != null ? cachedObjects.size() : 1);
+        if (cachedObjects != null && entityMatcher != null) {
+            for (CachedEntity cachedObject : cachedObjects) {
+                Entity cachedEntity = cachedObject.getEntity();
+                if (entityMatcher.isRetained(null, cachedObjects, cachedEntity, parameter) && !isEntityToBeDeleted(cachedEntity)) {
+                    result.add(cachedEntity);
+                }
+            }
+        }
+
+        return (List<T>) result;
+    }
+    
+    public <T> T findOne(String collection, Bson bsonFilter) {
+        FindIterable<Document> documents = findDocuments(collection, bsonFilter);
+        if (documents != null) {
+            return mapToEntity(collection, documents);
+        }
+        return null;
     }
     
     public <T> T mapToEntity(String collection, FindIterable<Document> documents) {
@@ -155,6 +266,16 @@ public class MongoDbSession implements Session {
         return cacheLoadOrStore(entities);
     }
     
+    public List<Entity> mapToEntitiesType(String collection, FindIterable<Document> documents) {
+        EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
+        List<Object> entities = new ArrayList<>();
+        for (Document document : documents) {
+            entities.add(entityMapper.fromDocument(document));
+        }
+        
+        return cacheLoadOrStore(entities);
+    }
+    
     public FindIterable<Document> findDocuments(String collection, Bson bsonFilter) {
         MongoCollection<Document> mongoDbCollection = getCollection(collection);
         if (bsonFilter != null) {
@@ -173,6 +294,10 @@ public class MongoDbSession implements Session {
         }
         
         Document document = findOneDocument(collection, id);
+        if (document == null) {
+            return null;
+        }
+        
         EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
         entity = (T) entityMapper.fromDocument(document);
         
@@ -199,6 +324,11 @@ public class MongoDbSession implements Session {
         }
     }
     
+    public UpdateResult performUpdate(String collection, Entity entity, Document updateObject) {
+        MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(entity.getClass()));
+        return mongoDbCollection.updateOne(Filters.eq("_id", entity.getId()), updateObject);
+    }
+    
     public void delete(String collection, Entity entity) {
         Class<? extends Entity> clazz = entity.getClass();
         if (!deletedObjects.containsKey(clazz)) {
@@ -206,6 +336,71 @@ public class MongoDbSession implements Session {
         }
         deletedObjects.get(clazz).put(entity.getId(), entity);
         entity.setDeleted(true);
+    }
+    
+    public void determineUpdatedObjects() {
+        updatedObjects = new ArrayList<>();
+        Map<Class<?>, Map<String, CachedEntity>> cachedObjects = entityCache.getAllCachedEntities();
+        for (Class<?> clazz : cachedObjects.keySet()) {
+
+            Map<String, CachedEntity> classCache = cachedObjects.get(clazz);
+            for (CachedEntity cachedObject : classCache.values()) {
+
+                Entity cachedEntity = cachedObject.getEntity();
+
+                // Executions are stored as a hierarchical tree, and updates are important to execute
+                // even when the execution are deleted, as they can change the parent-child relationships.
+                // For the other entities, this is not applicable and an update can be discarded when an update follows.
+
+                if (!isEntityInserted(cachedEntity) &&
+                        (cachedEntity instanceof AlwaysUpdatedPersistentObject || !isEntityToBeDeleted(cachedEntity)) &&
+                        cachedObject.hasChanged()) {
+
+                    updatedObjects.add(cachedEntity);
+                }
+            }
+        }
+    }
+    
+    protected void removeUnnecessaryOperations() {
+
+        for (Class<? extends Entity> entityClass : deletedObjects.keySet()) {
+
+            // Collect ids of deleted entities + remove duplicates
+            Set<String> ids = new HashSet<>();
+            Iterator<Entity> entitiesToDeleteIterator = deletedObjects.get(entityClass).values().iterator();
+            while (entitiesToDeleteIterator.hasNext()) {
+                Entity entityToDelete = entitiesToDeleteIterator.next();
+                if (!ids.contains(entityToDelete.getId())) {
+                    ids.add(entityToDelete.getId());
+                } else {
+                    entitiesToDeleteIterator.remove(); // Removing duplicate deletes
+                }
+            }
+
+            // Now we have the deleted ids, we can remove the inserted objects (as they cancel each other)
+            for (String id : ids) {
+                if (insertedObjects.containsKey(entityClass) && insertedObjects.get(entityClass).containsKey(id)) {
+                    insertedObjects.get(entityClass).remove(id);
+                    deletedObjects.get(entityClass).remove(id);
+                }
+            }
+
+        }
+    }
+    
+    public boolean isEntityInserted(Entity entity) {
+        return isEntityInserted(entity.getClass(), entity.getId());
+    }
+    
+    public boolean isEntityInserted(Class<?> entityClass, String entityId) {
+        return insertedObjects.containsKey(entityClass)
+                && insertedObjects.get(entityClass).containsKey(entityId);
+    }
+    
+    public boolean isEntityToBeDeleted(Entity entity) {
+        return (deletedObjects.containsKey(entity.getClass())
+                && deletedObjects.get(entity.getClass()).containsKey(entity.getId())) || entity.isDeleted();
     }
     
     /**
@@ -277,7 +472,13 @@ public class MongoDbSession implements Session {
     public void setClientSession(ClientSession clientSession) {
         this.clientSession = clientSession;
     }
-    
-    
+
+    public EntityCache getEntityCache() {
+        return entityCache;
+    }
+
+    public void setEntityCache(EntityCache entityCache) {
+        this.entityCache = entityCache;
+    }
     
 }
