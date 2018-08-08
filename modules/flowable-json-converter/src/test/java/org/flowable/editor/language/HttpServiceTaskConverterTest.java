@@ -55,6 +55,6 @@ public class HttpServiceTaskConverterTest extends AbstractConverterTest {
         assertEquals("REST", serviceTask.getName());
 
         List<FieldExtension> fields = serviceTask.getFieldExtensions();
-        assertEquals(2, fields.size());
+        assertEquals(3, fields.size());
     }
 }
