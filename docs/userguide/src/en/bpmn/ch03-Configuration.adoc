@@ -497,18 +497,13 @@ public class MyEventListener implements FlowableEventListener {
 
   @Override
   public void onEvent(FlowableEvent event) {
-    switch (event.getType()) {
 
-      case JOB_EXECUTION_SUCCESS:
-        System.out.println("A job well done!");
-        break;
-
-      case JOB_EXECUTION_FAILURE:
-        System.out.println("A job has failed...");
-        break;
-
-      default:
-        System.out.println("Event received: " + event.getType());
+    if(event.getType() == FlowableEngineEventType.JOB_EXECUTION_SUCCESS) {
+      System.out.println("A job well done!");
+    } else if (event.getType() == FlowableEngineEventType.JOB_EXECUTION_FAILURE) {
+      System.out.println("A job has failed...");
+    } else {
+      System.out.println("Event received: " + event.getType());
     }
   }
 
@@ -518,11 +513,25 @@ public class MyEventListener implements FlowableEventListener {
     // can be ignored if logging fails...
     return false;
   }
+
+  @Override
+  public boolean isFireOnTransactionLifecycleEvent() {
+    return false;
+  }
+
+  @Override
+  public String getOnTransaction() {
+    return null;
+  }
 }
 ----
 
 
 The +isFailOnException()+ method determines the behavior when the +onEvent(..)+ method throws an exception when an event is dispatched. When +false+ is returned, the exception is ignored. When +true+ is returned, the exception is not ignored and bubbles up, effectively failing the current ongoing command. If the event was part of an API-call (or any other transactional operation, for example, job-execution), the transaction will be rolled back. If the behavior in the event-listener is not business-critical, it's recommended to return +false+.
+
+The +isFireOnTransactionLifecycleEvent()+ method determines whether this event listener fires immediately when the event occurs or on a
+transaction lifecycle event determined by +getOnTransaction()+ method.
+Supported values of the transaction life cycle event are: COMMITTED, ROLLED_BACK, COMMITTING, ROLLINGBACK.
 
 There are a few base implementations provided by Flowable to facilitate common use cases of event-listeners. These can be used as base-class or as an example listener implementation:
 
