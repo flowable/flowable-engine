@@ -12,6 +12,7 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,12 +55,12 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
     @Override
     public void delete(String id) {
         TaskEntityImpl taskEntity = (TaskEntityImpl) findById(id);
-        getMongoDbSession().delete(COLLECTION_TASKS, taskEntity);
+        delete(taskEntity);
     }
 
     @Override
     public void delete(TaskEntity taskEntity) {
-        delete(taskEntity.getId());
+        getMongoDbSession().delete(COLLECTION_TASKS, taskEntity);
     }
 
     @Override
@@ -85,14 +86,40 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
 
     @Override
     public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
-        // TODO: extract and implement properly
-        return getMongoDbSession().find(COLLECTION_TASKS, null);
+        List<Bson> andFilters = new ArrayList<>();
+        if (taskQuery.getExecutionId() != null) {
+            andFilters.add(Filters.eq("executionId", taskQuery.getExecutionId()));
+        }
+        
+        if (taskQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", taskQuery.getProcessInstanceId()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return getMongoDbSession().find(COLLECTION_TASKS, filter);
     }
 
     @Override
     public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
-        // TODO: extract and implement properly
-        return getMongoDbSession().count(COLLECTION_TASKS, null);
+        List<Bson> andFilters = new ArrayList<>();
+        if (taskQuery.getExecutionId() != null) {
+            andFilters.add(Filters.eq("executionId", taskQuery.getExecutionId()));
+        }
+        
+        if (taskQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", taskQuery.getProcessInstanceId()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return getMongoDbSession().count(COLLECTION_TASKS, filter);
     }
     
     @Override

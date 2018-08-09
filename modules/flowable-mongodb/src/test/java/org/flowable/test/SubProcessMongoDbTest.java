@@ -14,51 +14,17 @@ package org.flowable.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.mongodb.cfg.MongoDbProcessEngineConfiguration;
 import org.flowable.task.api.Task;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.mongodb.ServerAddress;
-
 /**
- * @author Joram Barrez
+ * @author Tijs Rademakers
  */
-public class SubProcessMongoDbTest {
-    
-    private MongoDbProcessEngineConfiguration mongoDbProcessEngineConfiguration;
-    private ProcessEngine processEngine;
-    private RepositoryService repositoryService;
-    private RuntimeService runtimeService;
-    private TaskService taskService;
-    
-    @BeforeEach
-    public void setup() {
-        this.mongoDbProcessEngineConfiguration = (MongoDbProcessEngineConfiguration) new MongoDbProcessEngineConfiguration()
-                .setServerAddresses(Arrays.asList(new ServerAddress("localhost", 27017), new ServerAddress("localhost", 27018), new ServerAddress("localhost", 27019)))
-                .setDisableIdmEngine(true)
-                .setHistoryLevel(HistoryLevel.NONE);
-        this.processEngine = mongoDbProcessEngineConfiguration.buildProcessEngine();
-        this.repositoryService = processEngine.getRepositoryService();
-        this.runtimeService = processEngine.getRuntimeService();
-        this.taskService = processEngine.getTaskService();
-    }
-    
-    @AfterEach
-    public void cleanup() {
-        mongoDbProcessEngineConfiguration.getMongoDatabase().drop();
-    }
+public class SubProcessMongoDbTest extends AbstractMongoDbTest {
     
     @Test
     public void testNestedSubProcess() {

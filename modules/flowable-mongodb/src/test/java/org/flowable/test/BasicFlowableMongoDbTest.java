@@ -16,54 +16,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.mongodb.cfg.MongoDbProcessEngineConfiguration;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.test.delegate.ThrowsExceptionTestJavaDelegate;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.mongodb.ServerAddress;
 
 /**
  * @author Joram Barrez
  */
-public class BasicFlowableMongoDbTest {
-    
-    private MongoDbProcessEngineConfiguration mongoDbProcessEngineConfiguration;
-    private ProcessEngine processEngine;
-    private RepositoryService repositoryService;
-    private RuntimeService runtimeService;
-    private TaskService taskService;
-    
-    @BeforeEach
-    public void setup() {
-        this.mongoDbProcessEngineConfiguration = (MongoDbProcessEngineConfiguration) new MongoDbProcessEngineConfiguration()
-                .setServerAddresses(Arrays.asList(new ServerAddress("localhost", 27017), new ServerAddress("localhost", 27018), new ServerAddress("localhost", 27019)))
-                .setDisableIdmEngine(true)
-                .setHistoryLevel(HistoryLevel.NONE);
-        this.processEngine = mongoDbProcessEngineConfiguration.buildProcessEngine();
-        this.repositoryService = processEngine.getRepositoryService();
-        this.runtimeService = processEngine.getRuntimeService();
-        this.taskService = processEngine.getTaskService();
-    }
-    
-    @AfterEach
-    public void cleanup() {
-        mongoDbProcessEngineConfiguration.getMongoDatabase().drop();
-    }
+public class BasicFlowableMongoDbTest extends AbstractMongoDbTest {
     
     @Test
     public void testDeployProcess() {
@@ -104,6 +71,8 @@ public class BasicFlowableMongoDbTest {
         assertEquals(task.getProcessDefinitionId(),processInstance.getProcessDefinitionId());
         
         taskService.complete(task.getId());
+        
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
     
@@ -155,6 +124,23 @@ public class BasicFlowableMongoDbTest {
         task = taskService.createTaskQuery().singleResult();
         assertEquals("my task2", task.getName());
         taskService.complete(task.getId());
+    }
+    
+    @Test
+    public void testAsyncServiceTask() {
+        repositoryService.createDeployment().addClasspathResource("async.bpmn20.xml").deploy();
+        
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncProcess");
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(job);
+        
+        managementService.executeJob(job.getId());
+        
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals("theUserTask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+        
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
 }

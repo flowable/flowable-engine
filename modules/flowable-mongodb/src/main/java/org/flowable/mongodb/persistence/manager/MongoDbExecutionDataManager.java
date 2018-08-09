@@ -29,6 +29,8 @@ import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
+import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsByParentExecutionIdEntityMatcher;
+import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsByProcessInstanceIdEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsWithSameRootProcessInstanceIdMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.InactiveExecutionsInActivityAndProcInstMatcher;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -45,7 +47,10 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     
     public static final String COLLECTION_EXECUTIONS = "executions";
     
-    @SuppressWarnings("unchecked")
+    protected CachedEntityMatcher<Entity> executionsByParentIdMatcher = (CachedEntityMatcher) new ExecutionsByParentExecutionIdEntityMatcher();
+
+    protected CachedEntityMatcher<Entity> executionsByProcessInstanceIdMatcher = (CachedEntityMatcher) new ExecutionsByProcessInstanceIdEntityMatcher();
+    
     protected CachedEntityMatcher<Entity> executionsWithSameRootProcessInstanceIdMatcher = (CachedEntityMatcher) new ExecutionsWithSameRootProcessInstanceIdMatcher();
     
     protected CachedEntityMatcher<Entity> inactiveExecutionsInActivityAndProcInstMatcher = (CachedEntityMatcher) new InactiveExecutionsInActivityAndProcInstMatcher();
@@ -74,6 +79,7 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
         updateObject = setBooleanUpdateProperty("isActive", executionEntity.isActive(), persistentState, updateObject);
         updateObject = setBooleanUpdateProperty("isScope", executionEntity.isScope(), persistentState, updateObject);
         updateObject = setStringUpdateProperty("activityId", executionEntity.getActivityId(), persistentState, updateObject);
+        updateObject = setStringUpdateProperty("parentId", executionEntity.getParentId(), persistentState, updateObject);
         
         if (updateObject != null) {
             getMongoDbSession().performUpdate(COLLECTION_EXECUTIONS, entity, new Document().append("$set", updateObject));
@@ -100,12 +106,13 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public List<ExecutionEntity> findChildExecutionsByParentExecutionId(String parentExecutionId) {
-        Bson filter = Filters.eq("parentExecutionId", parentExecutionId);
-        return getMongoDbSession().find(COLLECTION_EXECUTIONS, filter);
+        Bson filter = Filters.eq("parentId", parentExecutionId);
+        return getMongoDbSession().find(COLLECTION_EXECUTIONS, filter, parentExecutionId, ExecutionEntityImpl.class, executionsByParentIdMatcher, true);
     }
 
     public List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId) {
-       return getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("processInstanceId", processInstanceId));
+       return getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("processInstanceId", processInstanceId),
+               processInstanceId, ExecutionEntityImpl.class, executionsByProcessInstanceIdMatcher, true);
     }
 
     public List<ExecutionEntity> findExecutionsByParentExecutionAndActivityIds(String parentExecutionId,
@@ -114,7 +121,17 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery) {
-        return 0;
+        List<Bson> andFilters = new ArrayList<>();
+        if (executionQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", executionQuery.getProcessInstanceId()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return getMongoDbSession().count(COLLECTION_EXECUTIONS, filter);
     }
 
     public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery) {
@@ -226,27 +243,5 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
                 executionId, ExecutionEntity.class, executionsWithSameRootProcessInstanceIdMatcher, true);
         
         return true;
-    }
-    
-    protected BasicDBObject setStringUpdateProperty(String propertyName, String value, Map<String, Object> persistentState, BasicDBObject updateObject) {
-        if (persistentState.get(propertyName) != null && (String) persistentState.get(propertyName) != value) {
-            if (updateObject == null) {
-                updateObject = new BasicDBObject();
-            }
-            updateObject.append(propertyName, value);
-        }
-        
-        return updateObject;
-    }
-    
-    protected BasicDBObject setBooleanUpdateProperty(String propertyName, Boolean value, Map<String, Object> persistentState, BasicDBObject updateObject) {
-        if (persistentState.get(propertyName) != null && (Boolean) persistentState.get(propertyName) != value) {
-            if (updateObject == null) {
-                updateObject = new BasicDBObject();
-            }
-            updateObject.append(propertyName, value);
-        }
-        
-        return updateObject;
     }
 }

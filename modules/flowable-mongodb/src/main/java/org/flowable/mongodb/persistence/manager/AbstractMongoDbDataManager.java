@@ -12,9 +12,13 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import java.util.Map;
+
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.mongodb.persistence.MongoDbSession;
+
+import com.mongodb.BasicDBObject;
 
 /**
  * @author Joram Barrez
@@ -27,5 +31,27 @@ public abstract class AbstractMongoDbDataManager {
 
     public void updateEntity(Entity entity) {
         
+    }
+    
+    protected BasicDBObject setStringUpdateProperty(String propertyName, String value, Map<String, Object> persistentState, BasicDBObject updateObject) {
+        if (persistentState.get(propertyName) != null && (String) persistentState.get(propertyName) != value) {
+            if (updateObject == null) {
+                updateObject = new BasicDBObject();
+            }
+            updateObject.append(propertyName, value);
+        }
+        
+        return updateObject;
+    }
+    
+    protected BasicDBObject setBooleanUpdateProperty(String propertyName, Boolean value, Map<String, Object> persistentState, BasicDBObject updateObject) {
+        if (persistentState.get(propertyName) != null && (Boolean) persistentState.get(propertyName) != value) {
+            if (updateObject == null) {
+                updateObject = new BasicDBObject();
+            }
+            updateObject.append(propertyName, value);
+        }
+        
+        return updateObject;
     }
 }

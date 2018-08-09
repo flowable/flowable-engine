@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:flowable="http://flowable.org/bpmn" 
+    targetNamespace="http://flowable.org/bpmn">
+    <process id="asyncProcess">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+        <serviceTask id="theTask" flowable:async="true" flowable:class="org.flowable.test.delegate.BasicTestJavaDelegate" />
+        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theUserTask" />
+        <userTask id="theUserTask" />
+        <sequenceFlow id="flow3" sourceRef="theUserTask" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+</definitions>

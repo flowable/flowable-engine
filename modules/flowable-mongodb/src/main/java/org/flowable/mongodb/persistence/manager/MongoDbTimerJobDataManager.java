@@ -12,33 +12,40 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.TimerJobDataManager;
+
+import com.mongodb.client.model.Filters;
 
 /**
  * @author Joram Barrez
  */
 public class MongoDbTimerJobDataManager extends AbstractMongoDbDataManager implements TimerJobDataManager {
+    
+    public static final String COLLECTION_TIMER_JOBS = "timerJobs";
 
     @Override
     public TimerJobEntity create() {
-        return null;
+        return new TimerJobEntityImpl();
     }
 
     @Override
-    public TimerJobEntity findById(String entityId) {
-        return null;
+    public TimerJobEntity findById(String jobId) {
+        return getMongoDbSession().findOne(COLLECTION_TIMER_JOBS, jobId);
     }
 
     @Override
     public void insert(TimerJobEntity entity) {
-        
+        getMongoDbSession().insertOne(entity);
     }
 
     @Override
@@ -48,12 +55,13 @@ public class MongoDbTimerJobDataManager extends AbstractMongoDbDataManager imple
 
     @Override
     public void delete(String id) {
-        
+        TimerJobEntity jobEntity = findById(id);
+        delete(jobEntity);
     }
 
     @Override
-    public void delete(TimerJobEntity entity) {
-        
+    public void delete(TimerJobEntity jobEntity) {
+        getMongoDbSession().delete(COLLECTION_TIMER_JOBS, jobEntity);
     }
 
     @Override
@@ -78,22 +86,52 @@ public class MongoDbTimerJobDataManager extends AbstractMongoDbDataManager imple
 
     @Override
     public List<TimerJobEntity> findJobsByExecutionId(String executionId) {
-        return Collections.emptyList();
+        Bson filter = Filters.eq("executionId", executionId);
+        return getMongoDbSession().find(COLLECTION_TIMER_JOBS, filter);
     }
 
     @Override
     public List<TimerJobEntity> findJobsByProcessInstanceId(String processInstanceId) {
-        return Collections.emptyList();
+        Bson filter = Filters.eq("processInstanceId", processInstanceId);
+        return getMongoDbSession().find(COLLECTION_TIMER_JOBS, filter);
     }
 
     @Override
     public List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery) {
-        return Collections.emptyList();
+        List<Bson> andFilters = new ArrayList<>();
+        if (jobQuery.getExecutionId() != null) {
+            andFilters.add(Filters.eq("executionId", jobQuery.getExecutionId()));
+        }
+        
+        if (jobQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", jobQuery.getProcessInstanceId()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return getMongoDbSession().find(COLLECTION_TIMER_JOBS, filter);
     }
 
     @Override
     public long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery) {
-        return 0;
+        List<Bson> andFilters = new ArrayList<>();
+        if (jobQuery.getExecutionId() != null) {
+            andFilters.add(Filters.eq("executionId", jobQuery.getExecutionId()));
+        }
+        
+        if (jobQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", jobQuery.getProcessInstanceId()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return getMongoDbSession().count(COLLECTION_TIMER_JOBS, filter);
     }
 
     @Override

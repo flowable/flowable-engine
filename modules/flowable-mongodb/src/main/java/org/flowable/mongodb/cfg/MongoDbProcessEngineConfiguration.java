@@ -31,10 +31,12 @@ import org.flowable.mongodb.persistence.manager.MongoDbDeploymentDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbEventSubscriptionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbExecutionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbIdentityLinkDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbJobDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionInfoDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbResourceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbTaskDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbTimerJobDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbVariableInstanceDataManager;
 import org.flowable.mongodb.transaction.MongoDbTransactionContextFactory;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -101,7 +103,9 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
                     MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION,
                     MongoDbTaskDataManager.COLLECTION_TASKS,
                     MongoDbIdentityLinkDataManager.COLLECTION_IDENTITY_LINKS,
-                    MongoDbVariableInstanceDataManager.COLLECTION_VARIABLES);
+                    MongoDbVariableInstanceDataManager.COLLECTION_VARIABLES,
+                    MongoDbJobDataManager.COLLECTION_JOBS,
+                    MongoDbTimerJobDataManager.COLLECTION_TIMER_JOBS);
             for (String name : this.collectionNames) {
                 if (!collections.contains(name)) {
                     this.mongoDatabase.createCollection(name);

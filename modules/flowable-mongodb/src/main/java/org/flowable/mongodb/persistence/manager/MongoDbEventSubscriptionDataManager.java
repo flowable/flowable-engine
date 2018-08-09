@@ -12,16 +12,23 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bson.conversions.Bson;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.EventSubscriptionDataManager;
 import org.flowable.engine.runtime.EventSubscription;
+
+import com.mongodb.client.model.Filters;
 
 /**
  * @author Joram Barrez
@@ -32,17 +39,17 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public EventSubscriptionEntity create() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public EventSubscriptionEntity findById(String entityId) {
-        return null;
+    public EventSubscriptionEntity findById(String eventId) {
+        return getMongoDbSession().findOne(COLLECTION_EVENT_SUBSCRIPTION, eventId);
     }
 
     @Override
     public void insert(EventSubscriptionEntity entity) {
-        throw new UnsupportedOperationException();
+        getMongoDbSession().insertOne(entity);
     }
 
     @Override
@@ -52,43 +59,64 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public void delete(String id) {
-        throw new UnsupportedOperationException();        
+        EventSubscriptionEntity eventEntity = findById(id);
+        delete(eventEntity);
     }
 
     @Override
     public void delete(EventSubscriptionEntity entity) {
-        throw new UnsupportedOperationException();        
+        getMongoDbSession().delete(COLLECTION_EVENT_SUBSCRIPTION, entity);
     }
 
     @Override
     public MessageEventSubscriptionEntity createMessageEventSubscription() {
-        throw new UnsupportedOperationException();
+        return new MessageEventSubscriptionEntityImpl();
     }
 
     @Override
     public SignalEventSubscriptionEntity createSignalEventSubscription() {
-        throw new UnsupportedOperationException();
+        return new SignalEventSubscriptionEntityImpl();
     }
 
     @Override
     public CompensateEventSubscriptionEntity createCompensateEventSubscription() {
-        throw new UnsupportedOperationException();
+        return new CompensateEventSubscriptionEntityImpl();
     }
 
     @Override
-    public long findEventSubscriptionCountByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
-        throw new UnsupportedOperationException();
+    public long findEventSubscriptionCountByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQuery) {
+        List<Bson> andFilters = new ArrayList<>();
+        if (eventSubscriptionQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", eventSubscriptionQuery.getProcessInstanceId()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return getMongoDbSession().count(COLLECTION_EVENT_SUBSCRIPTION, filter);
     }
 
     @Override
-    public List<EventSubscription> findEventSubscriptionsByQueryCriteria(
-            EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
-        throw new UnsupportedOperationException();
+    public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQuery) {
+        List<Bson> andFilters = new ArrayList<>();
+        if (eventSubscriptionQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", eventSubscriptionQuery.getProcessInstanceId()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return getMongoDbSession().find(COLLECTION_EVENT_SUBSCRIPTION, filter);
     }
 
     @Override
     public List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(
             String processInstanceId, String eventName) {
+        
         throw new UnsupportedOperationException();
     }
 
@@ -105,7 +133,8 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(String name, String executionId) {
-        throw new UnsupportedOperationException();
+        Bson filter = Filters.and(Filters.eq("eventType", "signal"), Filters.eq("eventName", name), Filters.eq("executionId", executionId));
+        return getMongoDbSession().find(COLLECTION_EVENT_SUBSCRIPTION, filter);
     }
 
     @Override
@@ -120,7 +149,7 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecution(String executionId) {
-        return Collections.emptyList();
+        return getMongoDbSession().find(COLLECTION_EVENT_SUBSCRIPTION, Filters.eq("executionId", executionId));
     }
 
     @Override
@@ -137,7 +166,8 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName, String executionId) {
-        throw new UnsupportedOperationException();
+        Bson filter = Filters.and(Filters.eq("eventType", type), Filters.eq("eventName", eventName), Filters.eq("executionId", executionId));
+        return getMongoDbSession().find(COLLECTION_EVENT_SUBSCRIPTION, filter);
     }
 
     @Override
@@ -157,7 +187,10 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public void deleteEventSubscriptionsByExecutionId(String executionId) {
-        throw new UnsupportedOperationException();        
+        List<EventSubscriptionEntity> eventSubscriptions = findEventSubscriptionsByExecution(executionId);
+        for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
+            delete(eventSubscriptionEntity);
+        }
     }
 
 }
