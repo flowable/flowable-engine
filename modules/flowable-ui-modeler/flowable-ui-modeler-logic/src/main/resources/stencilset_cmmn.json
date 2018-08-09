@@ -419,7 +419,7 @@
           "type" : "Text",
           "title" : "Request body encoding",
           "value" : "",
-          "description" : "Request body encoding (For example- ISO-8859-1).",
+          "description" : "Request body encoding (For example- UTF-8).",
           "popular" : true
         }
       ]
