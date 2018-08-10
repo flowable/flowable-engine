@@ -187,7 +187,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);
         } catch (ClassNotFoundException ioe) {
-            throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class not found found: " + ioe.getMessage());
+            throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class is not found: " + ioe.getMessage());
         }
 
     }
