@@ -57,6 +57,7 @@ public class HttpTaskJsonConverter extends BaseBpmnJsonConverter {
         addField("requestUrl", PROPERTY_HTTPTASK_REQ_URL, elementNode, task);
         addField("requestHeaders", PROPERTY_HTTPTASK_REQ_HEADERS, elementNode, task);
         addField("requestBody", PROPERTY_HTTPTASK_REQ_BODY, elementNode, task);
+        addField("requestBodyEncoding", PROPERTY_HTTPTASK_REQ_BODY_ENCODING, elementNode, task);
         addField("requestTimeout", PROPERTY_HTTPTASK_REQ_TIMEOUT, elementNode, task);
         addField("disallowRedirects", PROPERTY_HTTPTASK_REQ_DISALLOW_REDIRECTS, elementNode, task);
         addField("failStatusCodes", PROPERTY_HTTPTASK_REQ_FAIL_STATUS_CODES, elementNode, task);
