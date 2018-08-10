@@ -33,19 +33,10 @@ public abstract class AbstractMongoDbDataManager {
         
     }
     
-    protected BasicDBObject setStringUpdateProperty(String propertyName, String value, Map<String, Object> persistentState, BasicDBObject updateObject) {
-        if (persistentState.get(propertyName) != null && (String) persistentState.get(propertyName) != value) {
-            if (updateObject == null) {
-                updateObject = new BasicDBObject();
-            }
-            updateObject.append(propertyName, value);
-        }
-        
-        return updateObject;
-    }
-    
-    protected BasicDBObject setBooleanUpdateProperty(String propertyName, Boolean value, Map<String, Object> persistentState, BasicDBObject updateObject) {
-        if (persistentState.get(propertyName) != null && (Boolean) persistentState.get(propertyName) != value) {
+    protected BasicDBObject setUpdateProperty(String propertyName, Object value, Map<String, Object> persistentState, BasicDBObject updateObject) {
+        if ((persistentState.get(propertyName) == null && value != null) ||
+            (persistentState.get(propertyName) != null && !persistentState.get(propertyName).equals(value))) {
+            
             if (updateObject == null) {
                 updateObject = new BasicDBObject();
             }

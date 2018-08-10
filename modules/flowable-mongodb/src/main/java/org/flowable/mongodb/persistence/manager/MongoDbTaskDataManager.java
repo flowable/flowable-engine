@@ -16,13 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 
 /**
@@ -49,7 +52,22 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
 
     @Override
     public TaskEntity update(TaskEntity entity) {
-        throw new UnsupportedOperationException();
+        getMongoDbSession().update(entity);
+        return entity;
+    }
+    
+
+    @Override
+    public void updateEntity(Entity entity) {
+        TaskEntity taskEntity = (TaskEntity) entity;
+        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
+        BasicDBObject updateObject = null;
+        updateObject = setUpdateProperty("assignee", taskEntity.getAssignee(), persistentState, updateObject);
+        updateObject = setUpdateProperty("owner", taskEntity.getOwner(), persistentState, updateObject);
+        
+        if (updateObject != null) {
+            getMongoDbSession().performUpdate(COLLECTION_TASKS, entity, new Document().append("$set", updateObject));
+        }
     }
 
     @Override
@@ -86,39 +104,13 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
 
     @Override
     public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
-        List<Bson> andFilters = new ArrayList<>();
-        if (taskQuery.getExecutionId() != null) {
-            andFilters.add(Filters.eq("executionId", taskQuery.getExecutionId()));
-        }
-        
-        if (taskQuery.getProcessInstanceId() != null) {
-            andFilters.add(Filters.eq("processInstanceId", taskQuery.getProcessInstanceId()));
-        }
-        
-        Bson filter = null;
-        if (andFilters.size() > 0) {
-            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
-        }
-        
+        Bson filter = createFilter(taskQuery);
         return getMongoDbSession().find(COLLECTION_TASKS, filter);
     }
 
     @Override
     public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
-        List<Bson> andFilters = new ArrayList<>();
-        if (taskQuery.getExecutionId() != null) {
-            andFilters.add(Filters.eq("executionId", taskQuery.getExecutionId()));
-        }
-        
-        if (taskQuery.getProcessInstanceId() != null) {
-            andFilters.add(Filters.eq("processInstanceId", taskQuery.getProcessInstanceId()));
-        }
-        
-        Bson filter = null;
-        if (andFilters.size() > 0) {
-            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
-        }
-        
+        Bson filter = createFilter(taskQuery);
         return getMongoDbSession().count(COLLECTION_TASKS, filter);
     }
     
@@ -161,4 +153,29 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
         }
     }
     
+    protected Bson createFilter(TaskQueryImpl taskQuery) {
+        List<Bson> andFilters = new ArrayList<>();
+        if (taskQuery.getExecutionId() != null) {
+            andFilters.add(Filters.eq("executionId", taskQuery.getExecutionId()));
+        }
+        
+        if (taskQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", taskQuery.getProcessInstanceId()));
+        }
+        
+        if (taskQuery.getAssignee() != null) {
+            andFilters.add(Filters.eq("assignee", taskQuery.getAssignee()));
+        }
+        
+        if (taskQuery.getUnassigned()) {
+            andFilters.add(Filters.eq("assignee", null));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return filter;
+    }
 }

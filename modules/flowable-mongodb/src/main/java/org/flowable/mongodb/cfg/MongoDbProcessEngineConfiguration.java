@@ -157,12 +157,16 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
     
     @Override
     protected JobServiceConfiguration instantiateJobServiceConfiguration() {
-        return new MongoDbJobServiceConfiguration();
+        MongoDbJobServiceConfiguration mongoDbJobServiceConfiguration = new MongoDbJobServiceConfiguration();
+        mongoDbJobServiceConfiguration.setMongoDbSessionFactory(mongoDbSessionFactory);
+        return mongoDbJobServiceConfiguration;
     }
     
     @Override
     protected TaskServiceConfiguration instantiateTaskServiceConfiguration() {
-        return new MongoDbTaskServiceConfiguration();
+        MongoDbTaskServiceConfiguration mongoDbTaskServiceConfiguration = new MongoDbTaskServiceConfiguration();
+        mongoDbTaskServiceConfiguration.setMongoDbSessionFactory(mongoDbSessionFactory);
+        return mongoDbTaskServiceConfiguration;
     }
     
     @Override

@@ -25,6 +25,8 @@ import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataMa
  */
 public class MongoDeadLetterJobDataManager extends AbstractMongoDbDataManager implements DeadLetterJobDataManager {
 
+    public static final String COLLECTION_DEADLETTER_JOBS = "deadLetterJobs";
+    
     @Override
     public DeadLetterJobEntity create() {
         throw new UnsupportedOperationException();

@@ -33,8 +33,8 @@ public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager i
     }
 
     @Override
-    public IdentityLinkEntity findById(String entityId) {
-        throw new UnsupportedOperationException();
+    public IdentityLinkEntity findById(String identityLinkId) {
+        return getMongoDbSession().findOne(COLLECTION_IDENTITY_LINKS, identityLinkId);
     }
 
     @Override
@@ -49,12 +49,13 @@ public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager i
 
     @Override
     public void delete(String id) {
-        throw new UnsupportedOperationException();        
+        IdentityLinkEntity identityLinkEntity = findById(id);
+        delete(identityLinkEntity);
     }
 
     @Override
     public void delete(IdentityLinkEntity entity) {
-        throw new UnsupportedOperationException();        
+        getMongoDbSession().delete(COLLECTION_IDENTITY_LINKS, entity);
     }
 
     @Override
@@ -123,7 +124,10 @@ public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager i
 
     @Override
     public void deleteIdentityLinksByProcessInstanceId(String processInstanceId) {
-        throw new UnsupportedOperationException();        
+        List<IdentityLinkEntity> identityLinks = findIdentityLinksByProcessInstanceId(processInstanceId);
+        for (IdentityLinkEntity identityLinkEntity : identityLinks) {
+            delete(identityLinkEntity);
+        }
     }
 
     @Override

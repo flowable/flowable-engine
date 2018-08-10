@@ -324,6 +324,11 @@ public class MongoDbSession implements Session {
         }
     }
     
+    public void update(Entity entity) {
+        entityCache.put(entity, false); // false -> we don't store state, meaning it will always be seen as changed
+        entity.setUpdated(true);
+    }
+    
     public UpdateResult performUpdate(String collection, Entity entity, Document updateObject) {
         MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(entity.getClass()));
         return mongoDbCollection.updateOne(Filters.eq("_id", entity.getId()), updateObject);

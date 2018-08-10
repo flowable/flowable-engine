@@ -25,6 +25,8 @@ import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataMan
  */
 public class MongoSuspendedJobDataManager extends AbstractMongoDbDataManager implements SuspendedJobDataManager {
 
+    public static final String COLLECTION_SUSPENDED_JOBS = "suspendedJobs";
+    
     @Override
     public SuspendedJobEntity create() {
         throw new UnsupportedOperationException();

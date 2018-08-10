@@ -13,6 +13,7 @@
 package org.flowable.mongodb.cfg;
 
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.mongodb.persistence.MongoDbSessionFactory;
 import org.flowable.mongodb.persistence.manager.MongoDbJobDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbTimerJobDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDeadLetterJobDataManager;
@@ -23,21 +24,38 @@ import org.flowable.mongodb.persistence.manager.MongoSuspendedJobDataManager;
  */
 public class MongoDbJobServiceConfiguration extends JobServiceConfiguration {
     
+    protected MongoDbSessionFactory mongoDbSessionFactory;
+    
     @Override
     public void initDataManagers() {
         // TODO: other data managers
         if (jobDataManager == null) {
-            jobDataManager = new MongoDbJobDataManager();
+            MongoDbJobDataManager mongoDbJobDataManager = new MongoDbJobDataManager();
+            mongoDbSessionFactory.registerDataManager(MongoDbJobDataManager.COLLECTION_JOBS, mongoDbJobDataManager);
+            jobDataManager = mongoDbJobDataManager;
         }
         if (timerJobDataManager == null) {
-            timerJobDataManager = new MongoDbTimerJobDataManager();
+            MongoDbTimerJobDataManager mongoDbTimerJobDataManager = new MongoDbTimerJobDataManager();
+            mongoDbSessionFactory.registerDataManager(MongoDbTimerJobDataManager.COLLECTION_TIMER_JOBS, mongoDbTimerJobDataManager);
+            timerJobDataManager = mongoDbTimerJobDataManager;
         }
         if (suspendedJobDataManager == null) {
-            suspendedJobDataManager = new MongoSuspendedJobDataManager();
+            MongoSuspendedJobDataManager mongoSuspendedJobDataManager = new MongoSuspendedJobDataManager();
+            mongoDbSessionFactory.registerDataManager(MongoSuspendedJobDataManager.COLLECTION_SUSPENDED_JOBS, mongoSuspendedJobDataManager);
+            suspendedJobDataManager = mongoSuspendedJobDataManager;
         }
         if (deadLetterJobDataManager == null) {
-            deadLetterJobDataManager = new MongoDeadLetterJobDataManager();
+            MongoDeadLetterJobDataManager mongoDeadLetterJobDataManager = new MongoDeadLetterJobDataManager();
+            mongoDbSessionFactory.registerDataManager(MongoDeadLetterJobDataManager.COLLECTION_DEADLETTER_JOBS, mongoDeadLetterJobDataManager);
+            deadLetterJobDataManager = mongoDeadLetterJobDataManager;
         }
     }
 
+    public MongoDbSessionFactory getMongoDbSessionFactory() {
+        return mongoDbSessionFactory;
+    }
+
+    public void setMongoDbSessionFactory(MongoDbSessionFactory mongoDbSessionFactory) {
+        this.mongoDbSessionFactory = mongoDbSessionFactory;
+    }
 }

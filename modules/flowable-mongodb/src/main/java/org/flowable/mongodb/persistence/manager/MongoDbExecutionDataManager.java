@@ -76,10 +76,10 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
         ExecutionEntity executionEntity = (ExecutionEntity) entity;
         Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
         BasicDBObject updateObject = null;
-        updateObject = setBooleanUpdateProperty("isActive", executionEntity.isActive(), persistentState, updateObject);
-        updateObject = setBooleanUpdateProperty("isScope", executionEntity.isScope(), persistentState, updateObject);
-        updateObject = setStringUpdateProperty("activityId", executionEntity.getActivityId(), persistentState, updateObject);
-        updateObject = setStringUpdateProperty("parentId", executionEntity.getParentId(), persistentState, updateObject);
+        updateObject = setUpdateProperty("isActive", executionEntity.isActive(), persistentState, updateObject);
+        updateObject = setUpdateProperty("isScope", executionEntity.isScope(), persistentState, updateObject);
+        updateObject = setUpdateProperty("activityId", executionEntity.getActivityId(), persistentState, updateObject);
+        updateObject = setUpdateProperty("parentId", executionEntity.getParentId(), persistentState, updateObject);
         
         if (updateObject != null) {
             getMongoDbSession().performUpdate(COLLECTION_EXECUTIONS, entity, new Document().append("$set", updateObject));

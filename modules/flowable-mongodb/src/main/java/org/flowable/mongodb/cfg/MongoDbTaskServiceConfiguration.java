@@ -12,6 +12,7 @@
  */
 package org.flowable.mongodb.cfg;
 
+import org.flowable.mongodb.persistence.MongoDbSessionFactory;
 import org.flowable.mongodb.persistence.manager.MongoDbTaskDataManager;
 import org.flowable.task.service.TaskServiceConfiguration;
 
@@ -20,10 +21,21 @@ import org.flowable.task.service.TaskServiceConfiguration;
  */
 public class MongoDbTaskServiceConfiguration extends TaskServiceConfiguration {
     
+    protected MongoDbSessionFactory mongoDbSessionFactory;
+    
     @Override
     public void initDataManagers() {
         // TODO: history
-        this.taskDataManager = new MongoDbTaskDataManager();
+        MongoDbTaskDataManager mongoDbTaskDataManager = new MongoDbTaskDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbTaskDataManager.COLLECTION_TASKS, mongoDbTaskDataManager);
+        this.taskDataManager = mongoDbTaskDataManager;
     }
 
+    public MongoDbSessionFactory getMongoDbSessionFactory() {
+        return mongoDbSessionFactory;
+    }
+
+    public void setMongoDbSessionFactory(MongoDbSessionFactory mongoDbSessionFactory) {
+        this.mongoDbSessionFactory = mongoDbSessionFactory;
+    }
 }

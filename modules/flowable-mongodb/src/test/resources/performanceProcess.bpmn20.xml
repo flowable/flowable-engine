@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/bpmn" 
+    targetNamespace="http://flowable.org/bpmn">
+    <process id="gateway">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="gateway1" />
+        <exclusiveGateway id="gateway1" />
+        <sequenceFlow id="flow2" sourceRef="gateway1" targetRef="theTask">
+        	<conditionExpression xsi:type="tFormalExpression">${gotoFirstTask}</conditionExpression>
+        </sequenceFlow>
+        <userTask id="theTask" name="my task" flowable:assignee="johndoe" />
+        <sequenceFlow id="flow3" sourceRef="theTask" targetRef="nextTask" />
+        <userTask id="nextTask" name="next task" flowable:assignee="janedoe" />
+        
+        <sequenceFlow id="flow4" sourceRef="gateway1" targetRef="theTask2">
+        	<conditionExpression xsi:type="tFormalExpression">${!gotoFirstTask}</conditionExpression>
+        </sequenceFlow>
+        <userTask id="theTask2" name="my task2" flowable:candidateUsers="janedoe" />
+        <sequenceFlow id="flow5" sourceRef="theTask2" targetRef="nextTask2" />
+        <userTask id="nextTask2" name="next task2" flowable:assignee="johndoe" />
+        
+        <exclusiveGateway id="gateway2" />
+        <sequenceFlow id="flow6" sourceRef="nextTask" targetRef="gateway2" />
+        <sequenceFlow id="flow7" sourceRef="nextTask2" targetRef="gateway2" />
+        <sequenceFlow id="flow8" sourceRef="gateway2" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+</definitions>
