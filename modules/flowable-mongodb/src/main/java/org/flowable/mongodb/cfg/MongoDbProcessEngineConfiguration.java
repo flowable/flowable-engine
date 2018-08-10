@@ -27,9 +27,15 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.mongodb.persistence.MongoDbSessionFactory;
+import org.flowable.mongodb.persistence.manager.MongoDbCommentDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbDeploymentDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbEventSubscriptionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbExecutionDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricActivityInstanceDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricIdentityLinkDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricProcessInstanceDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricTaskInstanceDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricVariableInstanceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbIdentityLinkDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbJobDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionDataManager;
@@ -101,9 +107,15 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
                     MongoDbExecutionDataManager.COLLECTION_EXECUTIONS,
                     MongoDbProcessDefinitionInfoDataManager.COLLECTION_PROCESS_DEFINITION_INFO,
                     MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION,
+                    MongoDbHistoricProcessInstanceDataManager.COLLECTION_HISTORIC_PROCESS_INSTANCES,
+                    MongoDbHistoricActivityInstanceDataManager.COLLECTION_HISTORIC_ACTIVITY_INSTANCES,
+                    MongoDbCommentDataManager.COLLECTION_COMMENTS,
                     MongoDbTaskDataManager.COLLECTION_TASKS,
+                    MongoDbHistoricTaskInstanceDataManager.COLLECTION_HISTORIC_TASK_INSTANCES,
                     MongoDbIdentityLinkDataManager.COLLECTION_IDENTITY_LINKS,
+                    MongoDbHistoricIdentityLinkDataManager.COLLECTION_HISTORIC_IDENTITY_LINKS,
                     MongoDbVariableInstanceDataManager.COLLECTION_VARIABLES,
+                    MongoDbHistoricVariableInstanceDataManager.COLLECTION_HISTORIC_VARIABLE_INSTANCES,
                     MongoDbJobDataManager.COLLECTION_JOBS,
                     MongoDbTimerJobDataManager.COLLECTION_TIMER_JOBS);
             for (String name : this.collectionNames) {
@@ -153,6 +165,18 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
         MongoDbEventSubscriptionDataManager mongoDbEventSubscriptionDataManager = new MongoDbEventSubscriptionDataManager();
         mongoDbSessionFactory.registerDataManager(MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION, mongoDbEventSubscriptionDataManager);
         this.eventSubscriptionDataManager = mongoDbEventSubscriptionDataManager;
+        
+        MongoDbHistoricProcessInstanceDataManager mongoDbHistoricProcessInstanceDataManager = new MongoDbHistoricProcessInstanceDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbHistoricProcessInstanceDataManager.COLLECTION_HISTORIC_PROCESS_INSTANCES, mongoDbHistoricProcessInstanceDataManager);
+        this.historicProcessInstanceDataManager = mongoDbHistoricProcessInstanceDataManager;
+        
+        MongoDbHistoricActivityInstanceDataManager mongoDbHistoricActivityInstanceDataManager = new MongoDbHistoricActivityInstanceDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbHistoricActivityInstanceDataManager.COLLECTION_HISTORIC_ACTIVITY_INSTANCES, mongoDbHistoricActivityInstanceDataManager);
+        this.historicActivityInstanceDataManager = mongoDbHistoricActivityInstanceDataManager;
+        
+        MongoDbCommentDataManager mongoDbCommentDataManager = new MongoDbCommentDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbCommentDataManager.COLLECTION_COMMENTS, mongoDbCommentDataManager);
+        this.commentDataManager = mongoDbCommentDataManager;
     }
     
     @Override
@@ -171,12 +195,16 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
     
     @Override
     protected IdentityLinkServiceConfiguration instantiateIdentityLinkServiceConfiguration() {
-        return new MongoDbIdentityLinkServiceConfiguration();
+        MongoDbIdentityLinkServiceConfiguration mongoDbIdentityLinkServiceConfiguration = new MongoDbIdentityLinkServiceConfiguration();
+        mongoDbIdentityLinkServiceConfiguration.setMongoDbSessionFactory(mongoDbSessionFactory);
+        return mongoDbIdentityLinkServiceConfiguration;
     }
     
     @Override
     protected VariableServiceConfiguration instantiateVariableServiceConfiguration() {
-        return new MongoDbVariableServiceConfiguration();
+        MongoDbVariableServiceConfiguration mongoDbVariableServiceConfiguration = new MongoDbVariableServiceConfiguration();
+        mongoDbVariableServiceConfiguration.setMongoDbSessionFactory(mongoDbSessionFactory);
+        return mongoDbVariableServiceConfiguration;
     }
     
     @Override

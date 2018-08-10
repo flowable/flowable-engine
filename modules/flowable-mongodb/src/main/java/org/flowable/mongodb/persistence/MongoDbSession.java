@@ -117,6 +117,8 @@ public class MongoDbSession implements Session {
         
         for (Class<? extends Entity> clazz : insertedObjects.keySet()) {
             
+            LOGGER.debug("inserting type: {}", clazz);
+            
             MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(clazz));
             
             Map<String, ? extends Entity> entities = insertedObjects.get(clazz);

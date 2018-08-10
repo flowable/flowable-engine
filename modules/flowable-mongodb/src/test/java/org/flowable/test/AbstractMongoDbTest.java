@@ -43,7 +43,7 @@ public class AbstractMongoDbTest {
         this.mongoDbProcessEngineConfiguration = (MongoDbProcessEngineConfiguration) new MongoDbProcessEngineConfiguration()
                 .setServerAddresses(Arrays.asList(new ServerAddress("localhost", 27017), new ServerAddress("localhost", 27018), new ServerAddress("localhost", 27019)))
                 .setDisableIdmEngine(true)
-                .setHistoryLevel(HistoryLevel.NONE);
+                .setHistoryLevel(HistoryLevel.AUDIT);
         this.processEngine = mongoDbProcessEngineConfiguration.buildProcessEngine();
         this.repositoryService = processEngine.getRepositoryService();
         this.runtimeService = processEngine.getRuntimeService();

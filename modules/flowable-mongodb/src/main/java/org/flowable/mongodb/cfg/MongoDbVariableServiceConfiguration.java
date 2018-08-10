@@ -12,6 +12,8 @@
  */
 package org.flowable.mongodb.cfg;
 
+import org.flowable.mongodb.persistence.MongoDbSessionFactory;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricVariableInstanceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbVariableInstanceDataManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 
@@ -20,10 +22,25 @@ import org.flowable.variable.service.VariableServiceConfiguration;
  */
 public class MongoDbVariableServiceConfiguration extends VariableServiceConfiguration {
     
+    protected MongoDbSessionFactory mongoDbSessionFactory;
+    
     @Override
     public void initDataManagers() {
-        // TODO: other datamanager
-        this.variableInstanceDataManager = new MongoDbVariableInstanceDataManager();
+        MongoDbVariableInstanceDataManager mongoDbVariableInstanceDataManager = new MongoDbVariableInstanceDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbVariableInstanceDataManager.COLLECTION_VARIABLES, mongoDbVariableInstanceDataManager);
+        this.variableInstanceDataManager = mongoDbVariableInstanceDataManager;
+        
+        MongoDbHistoricVariableInstanceDataManager mongoDbHistoricVariableInstanceDataManager = new MongoDbHistoricVariableInstanceDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbHistoricVariableInstanceDataManager.COLLECTION_HISTORIC_VARIABLE_INSTANCES, mongoDbHistoricVariableInstanceDataManager);
+        this.historicVariableInstanceDataManager = mongoDbHistoricVariableInstanceDataManager;
+        
     }
 
+    public MongoDbSessionFactory getMongoDbSessionFactory() {
+        return mongoDbSessionFactory;
+    }
+
+    public void setMongoDbSessionFactory(MongoDbSessionFactory mongoDbSessionFactory) {
+        this.mongoDbSessionFactory = mongoDbSessionFactory;
+    }
 }

@@ -13,6 +13,8 @@
 package org.flowable.mongodb.cfg;
 
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.mongodb.persistence.MongoDbSessionFactory;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricIdentityLinkDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbIdentityLinkDataManager;
 
 /**
@@ -20,10 +22,24 @@ import org.flowable.mongodb.persistence.manager.MongoDbIdentityLinkDataManager;
  */
 public class MongoDbIdentityLinkServiceConfiguration extends IdentityLinkServiceConfiguration {
     
+    protected MongoDbSessionFactory mongoDbSessionFactory;
+    
     @Override
     public void initDataManagers() {
-        // TODO: history
-        this.identityLinkDataManager = new MongoDbIdentityLinkDataManager();
+        MongoDbIdentityLinkDataManager mongoDbIdentityLinkDataManager = new MongoDbIdentityLinkDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbIdentityLinkDataManager.COLLECTION_IDENTITY_LINKS, mongoDbIdentityLinkDataManager);
+        this.identityLinkDataManager = mongoDbIdentityLinkDataManager;
+        
+        MongoDbHistoricIdentityLinkDataManager mongoDbHistoricIdentityLinkDataManager = new MongoDbHistoricIdentityLinkDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbHistoricIdentityLinkDataManager.COLLECTION_HISTORIC_IDENTITY_LINKS, mongoDbHistoricIdentityLinkDataManager);
+        this.historicIdentityLinkDataManager = mongoDbHistoricIdentityLinkDataManager;
     }
 
+    public MongoDbSessionFactory getMongoDbSessionFactory() {
+        return mongoDbSessionFactory;
+    }
+
+    public void setMongoDbSessionFactory(MongoDbSessionFactory mongoDbSessionFactory) {
+        this.mongoDbSessionFactory = mongoDbSessionFactory;
+    }
 }

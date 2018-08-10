@@ -13,6 +13,7 @@
 package org.flowable.mongodb.cfg;
 
 import org.flowable.mongodb.persistence.MongoDbSessionFactory;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricTaskInstanceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbTaskDataManager;
 import org.flowable.task.service.TaskServiceConfiguration;
 
@@ -25,10 +26,13 @@ public class MongoDbTaskServiceConfiguration extends TaskServiceConfiguration {
     
     @Override
     public void initDataManagers() {
-        // TODO: history
         MongoDbTaskDataManager mongoDbTaskDataManager = new MongoDbTaskDataManager();
         mongoDbSessionFactory.registerDataManager(MongoDbTaskDataManager.COLLECTION_TASKS, mongoDbTaskDataManager);
         this.taskDataManager = mongoDbTaskDataManager;
+        
+        MongoDbHistoricTaskInstanceDataManager mongoDbHistoricTaskInstanceDataManager = new MongoDbHistoricTaskInstanceDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbHistoricTaskInstanceDataManager.COLLECTION_HISTORIC_TASK_INSTANCES, mongoDbHistoricTaskInstanceDataManager);
+        this.historicTaskInstanceDataManager = mongoDbHistoricTaskInstanceDataManager;
     }
 
     public MongoDbSessionFactory getMongoDbSessionFactory() {
