@@ -13,21 +13,27 @@
 
 package org.flowable.engine.test.bpmn.event.timer;
 
-import org.flowable.common.engine.api.FlowableException;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
-
-import java.util.Arrays;
-import java.util.HashSet;
+import org.flowable.job.api.Job;
 
 /**
  * @author Saeid Mirzaei Test case for ACT-4066
  */
 
-public class StartTimerEventRepeatWithoutN extends PluggableFlowableTestCase {
+public class StartTimerEventRepeatWithoutEndTest extends PluggableFlowableTestCase {
 
     protected long counter;
     protected StartEventListener startEventListener;
@@ -68,13 +74,25 @@ public class StartTimerEventRepeatWithoutN extends PluggableFlowableTestCase {
     public void testStartTimerEventRepeatWithoutN() {
         counter = 0;
 
-        try {
-            waitForJobExecutorToProcessAllJobs(5500, 500);
-            fail("job is finished sooner than expected");
-        } catch (FlowableException e) {
-            assertTrue(e.getMessage().startsWith("time limit"));
-            assertTrue(counter >= 2);
-        }
+        List<Job> initialTimers = managementService.createTimerJobQuery().list();
+        assertThat(initialTimers)
+            .as("Timers before execution")
+            .hasSize(1);
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().plus(35, ChronoUnit.SECONDS)));
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5500, 500);
+        List<Job> newTimers = managementService.createTimerJobQuery().list();
+        List<Job> jobs = managementService.createJobQuery().list();
+
+        assertThat(newTimers)
+            .as("Timers after execution")
+            .hasSize(1);
+
+        assertThat(newTimers.get(0).getId())
+            .as("Timer after execution vs before")
+            .isNotEqualTo(initialTimers.get(0).getId());
+        assertThat(jobs)
+            .as("jobs")
+            .isEmpty();
     }
 
 }
