@@ -29,7 +29,6 @@ import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.task.service.impl.util.CommandContextUtil;
-import org.flowable.task.service.impl.util.CountingTaskUtil;
 
 /**
  * @author Tom Baeyens
@@ -53,7 +52,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public TaskEntity create() {
         TaskEntity taskEntity = super.create();
         taskEntity.setCreateTime(getClock().getCurrentTime());
-        if (CountingTaskUtil.isTaskRelatedEntityCountEnabledGlobally()) {
+        if (taskServiceConfiguration.isEnableTaskRelationshipCounts()) {
             ((CountingTaskEntity) taskEntity).setCountEnabled(true);
         }
         return taskEntity;
