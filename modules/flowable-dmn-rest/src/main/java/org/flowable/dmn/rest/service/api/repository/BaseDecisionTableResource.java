@@ -50,7 +50,7 @@ public class BaseDecisionTableResource {
     protected DmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link DmnDecisionTable} that is requested. Throws the right exceptions when bad request was made or decision table is not found.
+     * Returns the {@link DmnDecisionTable} that is requested. Throws the right exceptions when bad request was made or decision table was not found.
      */
     protected DmnDecisionTable getDecisionTableFromRequest(String decisionTableId) {
         DmnDecisionTable decisionTable = dmnRepositoryService.getDecisionTable(decisionTableId);
