@@ -31,8 +31,6 @@ import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.engine.test.FormTestHelper;
 import org.junit.Assert;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -83,7 +81,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
             super.runBare();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;

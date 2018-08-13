@@ -50,8 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * This class is supper class for all Playback tests
  *
@@ -121,7 +119,7 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
             simDebugger.runContinue();
 
             _checkStatus();
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.warn("Playback simulation {} has failed", getName());
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
@@ -206,7 +204,7 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
                 throw exception;
 
             _checkStatus();
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
