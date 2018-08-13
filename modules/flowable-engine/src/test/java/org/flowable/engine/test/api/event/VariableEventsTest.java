@@ -240,7 +240,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
      * Test variable events when done within a process (eg. execution-listener)
      */
     @Deployment
-    public void FlowableEventType() throws Exception {
+    public void testProcessInstanceVariableEventsWithinProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcess");
         assertNotNull(processInstance);
 
@@ -274,7 +274,8 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertNull(event.getTaskId());
         assertEquals("variable", event.getVariableName());
-        assertEquals(456, event.getVariableValue());
+        // deleted values are always null
+        assertNull(event.getVariableValue());
     }
 
     /**
