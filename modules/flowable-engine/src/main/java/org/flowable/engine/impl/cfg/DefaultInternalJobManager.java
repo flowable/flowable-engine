@@ -104,7 +104,7 @@ public class DefaultInternalJobManager implements InternalJobManager {
                 }
 
             } else {
-                // In case the job has an executionId, but the Execution is not found,
+                // In case the job has an executionId, but the Execution was not found,
                 // it means that for example for a boundary timer event on a user task,
                 // the task has been completed and the Execution and job have been removed.
                 return false;

@@ -240,7 +240,7 @@ public class BeanELResolver extends ELResolver {
      * If the base object is not null, returns the current value of the given property on this bean. If the base is not null, the propertyResolved property of the ELContext object must be set to true
      * by this resolver, before returning. If this property is not true after this method is called, the caller should ignore the return value. The provided property name will first be coerced to a
      * String. If the property is a readable property of the base object, as per the JavaBeans specification, then return the result of the getter call. If the getter throws an exception, it is
-     * propagated to the caller. If the property is not found or is not readable, a PropertyNotFoundException is thrown.
+     * propagated to the caller. If the property was not found or is not readable, a PropertyNotFoundException is thrown.
      *
      * @param context  The context of this evaluation.
      * @param base     The bean to analyze.

@@ -1679,7 +1679,7 @@ assertProcessEnded(procId);
             runtimeService.startProcessInstanceByKey("simple_multi");
             fail("Should have failed with missing collection variable");
         } catch (FlowableIllegalArgumentException e) {
-            assertEquals("Variable 'elements' is not found", e.getMessage());
+            assertEquals("Variable 'elements' was not found", e.getMessage());
         }
     }
 

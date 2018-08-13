@@ -268,6 +268,7 @@ public interface StencilConstants {
     final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
     final String PROPERTY_HTTPTASK_REQ_HEADERS = "httptaskrequestheaders";
     final String PROPERTY_HTTPTASK_REQ_BODY  = "httptaskrequestbody";
+    final String PROPERTY_HTTPTASK_REQ_BODY_ENCODING  = "httptaskrequestbodyencoding";
     final String PROPERTY_HTTPTASK_REQ_TIMEOUT = "httptaskrequesttimeout";
     final String PROPERTY_HTTPTASK_REQ_DISALLOW_REDIRECTS = "httptaskdisallowredirects";
     final String PROPERTY_HTTPTASK_REQ_FAIL_STATUS_CODES = "httptaskfailstatuscodes";
