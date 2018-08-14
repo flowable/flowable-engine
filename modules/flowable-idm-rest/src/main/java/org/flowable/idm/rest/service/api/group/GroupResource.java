@@ -84,6 +84,11 @@ public class GroupResource extends BaseGroupResource {
     @DeleteMapping("/groups/{groupId}")
     public void deleteGroup(@ApiParam(name = "groupId") @PathVariable String groupId, HttpServletResponse response) {
         Group group = getGroupFromRequest(groupId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteGroup(group);
+        }
+        
         identityService.deleteGroup(group.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

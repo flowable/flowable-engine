@@ -61,7 +61,6 @@ public class BpmnParseTest extends PluggableFlowableTestCase {
         // Graphical information is not yet exposed publicly, so we need to do some plumbing
 
         BpmnModel bpmnModel = repositoryService.getBpmnModel(repositoryService.createProcessDefinitionQuery().singleResult().getId());
-        Process process = bpmnModel.getMainProcess();
 
         // Check if diagram has been created based on Diagram Interchange when it's not a headless instance
         List<String> resourceNames = repositoryService.getDeploymentResourceNames(repositoryService.createProcessDefinitionQuery().singleResult().getDeploymentId());

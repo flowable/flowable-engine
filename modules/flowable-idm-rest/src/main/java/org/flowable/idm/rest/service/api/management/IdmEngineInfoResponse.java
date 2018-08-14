@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.rest.service.api.managemet;
+package org.flowable.idm.rest.service.api.management;
 
 import io.swagger.annotations.ApiModelProperty;
 

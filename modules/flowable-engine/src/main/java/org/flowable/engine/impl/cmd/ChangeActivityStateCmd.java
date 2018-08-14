@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.flowable.bpmn.model.Activity;
@@ -86,8 +85,7 @@ public class ChangeActivityStateCmd implements Command<Void> {
                         FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
                         while (!(parentContainer instanceof Process)) {
                             MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentContainer).getLoopCharacteristics();
-                            if (loopCharacteristics != null && !loopCharacteristics.isSequential()) {
-
+                            if (loopCharacteristics != null) {
                                 insideMultiInstance = true;
                                 break;
                             }

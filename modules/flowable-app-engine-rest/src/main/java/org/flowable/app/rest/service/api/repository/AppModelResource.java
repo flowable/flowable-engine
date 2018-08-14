@@ -13,6 +13,8 @@
 package org.flowable.app.rest.service.api.repository;
 
 import org.flowable.app.api.AppRepositoryService;
+import org.flowable.app.api.repository.AppDefinition;
+import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +37,9 @@ public class AppModelResource {
     
     @Autowired
     protected AppRepositoryService appRepositoryService;
+    
+    @Autowired(required=false)
+    protected AppRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get an App model", tags = { "App Definitions" }, nickname = "getAppModel")
     @ApiResponses(value = {
@@ -43,6 +48,16 @@ public class AppModelResource {
     })
     @GetMapping(value = "/app-repository/app-definitions/{appDefinitionId}/model", produces = "application/json")
     public String getModelJsonResource(@ApiParam(name = "appDefinitionId") @PathVariable String appDefinitionId) {
+        AppDefinition appDefinition = appRepositoryService.getAppDefinition(appDefinitionId);
+
+        if (appDefinition == null) {
+            throw new FlowableObjectNotFoundException("Could not find an app definition with id '" + appDefinitionId + "'.", AppDefinition.class);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessAppDefinitionInfoById(appDefinition);
+        }
+        
         String appModelJson = appRepositoryService.convertAppModelToJson(appDefinitionId);
 
         if (appModelJson == null) {

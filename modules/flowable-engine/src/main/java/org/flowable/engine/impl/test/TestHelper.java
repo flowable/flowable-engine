@@ -42,8 +42,6 @@ import org.flowable.engine.test.mock.NoOpServiceTasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -64,7 +62,7 @@ public abstract class TestHelper {
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (processInstance != null) {
-            throw new AssertionFailedError("expected finished process instance '" + processInstanceId + "' but it was still in the db");
+            throw new AssertionError("expected finished process instance '" + processInstanceId + "' but it was still in the db");
         }
     }
 

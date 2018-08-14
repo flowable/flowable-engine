@@ -14,8 +14,10 @@ package org.flowable.app.rest.service.api.management;
 
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngines;
+import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +33,9 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Engine" }, description = "Manage App Engine", authorizations = { @Authorization(value = "basicAuth") })
 public class AppEngineResource {
+    
+    @Autowired(required=false)
+    protected AppRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get app engine info", tags = { "Engine" }, notes = "Returns a read-only view of the engine that is used in this REST-service.")
     @ApiResponses(value = {
@@ -38,6 +43,10 @@ public class AppEngineResource {
     })
     @GetMapping(value = "/app-management/engine", produces = "application/json")
     public AppEngineInfoResponse getEngineInfo() {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessAppManagementInfo();
+        }
+        
         AppEngineInfoResponse response = new AppEngineInfoResponse();
 
         try {

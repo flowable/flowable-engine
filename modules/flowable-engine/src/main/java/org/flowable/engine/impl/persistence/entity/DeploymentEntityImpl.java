@@ -109,6 +109,9 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
+        if (deployedArtifacts == null) {
+            return null;
+        }
         for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
             if (clazz.isAssignableFrom(deployedArtifactsClass)) {
                 return (List<T>) deployedArtifacts.get(deployedArtifactsClass);

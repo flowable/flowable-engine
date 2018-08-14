@@ -890,7 +890,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testCompleteWithExecutionBaseNewPropertyExpressionTask() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        runtimeService.startProcessInstanceByKey("twoTasksProcess");
 
         // Fetch first task
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();

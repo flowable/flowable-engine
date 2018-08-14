@@ -21,8 +21,6 @@ import org.flowable.engine.impl.bpmn.webservice.MessageDefinition;
 import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
 import org.flowable.engine.impl.bpmn.webservice.Operation;
 import org.flowable.engine.impl.bpmn.webservice.OperationImplementation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents a WS implementation of a {@link Operation}
@@ -30,8 +28,6 @@ import org.slf4j.LoggerFactory;
  * @author Esteban Robles Luna
  */
 public class WSOperation implements OperationImplementation {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WSOperation.class);
 
     protected String id;
 

@@ -36,7 +36,7 @@ public class BaseModelResource {
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link Model} that is requested. Throws the right exceptions when bad request was made or model is not found.
+     * Returns the {@link Model} that is requested. Throws the right exceptions when bad request was made or model was not found.
      */
     protected Model getModelFromRequest(String modelId) {
         Model model = repositoryService.createModelQuery().modelId(modelId).singleResult();

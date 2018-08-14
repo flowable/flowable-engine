@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.app.rest.AppRestResponseFactory;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class AppDeploymentResource {
 
     @Autowired
     protected AppRepositoryService appRepositoryService;
+    
+    @Autowired(required=false)
+    protected AppRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get an app deployment", tags = { "App Deployments" })
     @ApiResponses(value = {
@@ -57,6 +61,10 @@ public class AppDeploymentResource {
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find an app deployment with id '" + deploymentId);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
+        }
 
         return appRestResponseFactory.createAppDeploymentResponse(deployment);
     }
@@ -68,6 +76,16 @@ public class AppDeploymentResource {
     })
     @DeleteMapping(value = "/app-repository/deployments/{deploymentId}", produces = "application/json")
     public void deleteAppDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
+        AppDeployment deployment = appRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+
+        if (deployment == null) {
+            throw new FlowableObjectNotFoundException("Could not find an app deployment with id '" + deploymentId);
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteDeployment(deployment);
+        }
+        
         appRepositoryService.deleteDeployment(deploymentId, true);
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

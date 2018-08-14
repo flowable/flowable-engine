@@ -74,7 +74,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 public abstract class BaseSpringRestTestCase extends TestCase {
@@ -171,7 +170,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
 
             super.runTest();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             throw e;
@@ -196,7 +195,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
 
             super.runBare();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
@@ -357,7 +356,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         CaseInstance caseInstance = cmmnEngine.getCmmnRuntimeService().createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 
         if (caseInstance != null) {
-            throw new AssertionFailedError("Expected finished case instance '" + caseInstanceId + "' but it was still in the db");
+            throw new AssertionError("Expected finished case instance '" + caseInstanceId + "' but it was still in the db");
         }
     }
 

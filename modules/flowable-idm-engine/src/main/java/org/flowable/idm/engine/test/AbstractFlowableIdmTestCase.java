@@ -29,8 +29,6 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 import org.junit.Assert;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
@@ -63,7 +61,7 @@ public abstract class AbstractFlowableIdmTestCase extends AbstractTestCase {
         try {
             super.runBare();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;

@@ -61,8 +61,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import junit.framework.AssertionFailedError;
-
 public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringDmnRestTestCase.class);
@@ -139,7 +137,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
             deploymentId = DmnTestHelper.annotationDeploymentSetUp(dmnEngine, getClass(), getName());
 
             super.runBare();
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;

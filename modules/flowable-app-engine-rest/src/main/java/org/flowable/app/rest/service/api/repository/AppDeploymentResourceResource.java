@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.http.entity.ContentType;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.app.rest.AppRestResponseFactory;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
@@ -50,6 +51,9 @@ public class AppDeploymentResourceResource {
 
     @Autowired
     protected AppRepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected AppRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a deployment resource", tags = { "Deployment" }, notes = "Replace ** by ResourceId")
     /*
@@ -74,6 +78,10 @@ public class AppDeploymentResourceResource {
         AppDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentById(deployment);
         }
 
         String pathInfo = request.getPathInfo();

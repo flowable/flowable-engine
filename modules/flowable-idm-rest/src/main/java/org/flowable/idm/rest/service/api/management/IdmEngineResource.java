@@ -10,12 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.rest.service.api.managemet;
+package org.flowable.idm.rest.service.api.management;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineInfo;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
+import org.flowable.idm.rest.service.api.IdmRestApiInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +33,9 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Engine" }, description = "Manage IDM Engine", authorizations = { @Authorization(value = "basicAuth") })
 public class IdmEngineResource {
+    
+    @Autowired(required=false)
+    protected IdmRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get IDM engine info", tags = { "Engine" }, notes = "Returns a read-only view of the engine that is used in this REST-service.")
     @ApiResponses(value = {
@@ -38,6 +43,10 @@ public class IdmEngineResource {
     })
     @GetMapping(value = "/idm-management/engine", produces = "application/json")
     public IdmEngineInfoResponse getEngineInfo() {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessIdmManagementInfo();
+        }
+        
         IdmEngineInfoResponse response = new IdmEngineInfoResponse();
 
         try {

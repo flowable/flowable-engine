@@ -12,6 +12,7 @@
  */
 package org.flowable.standalone.deploy;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
@@ -26,7 +27,7 @@ public class CustomDeploymentCacheTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/deploy/custom.deployment.cache.test.flowable.cfg.xml");
     }
 
-    public void testCustomDeploymentCacheUsed() {
+    public void testCustomDeploymentCacheUsed() throws IOException {
         CustomDeploymentCache customCache = (CustomDeploymentCache) processEngineConfiguration.getProcessDefinitionCache();
         assertNull(customCache.getCachedProcessDefinition());
 

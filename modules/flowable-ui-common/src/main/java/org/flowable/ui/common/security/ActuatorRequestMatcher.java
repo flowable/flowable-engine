@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
-import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletPathProvider;
+import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletPath;
 import org.springframework.boot.security.servlet.ApplicationContextRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -54,12 +54,19 @@ public class ActuatorRequestMatcher extends ApplicationContextRequestMatcher<Web
 
     private RequestMatcher createDelegate(WebApplicationContext context) {
         try {
-            RequestMatcherFactory requestMatcherFactory = new RequestMatcherFactory(
-                context.getBean(DispatcherServletPathProvider.class)
-                    .getServletPath());
+            String pathPrefix = getPathPrefix(context);
+            RequestMatcherFactory requestMatcherFactory = new RequestMatcherFactory(pathPrefix);
             return createDelegate(context, requestMatcherFactory);
         } catch (NoSuchBeanDefinitionException ex) {
             return EMPTY_MATCHER;
+        }
+    }
+
+    private String getPathPrefix(WebApplicationContext context) {
+        try {
+            return context.getBean(DispatcherServletPath.class).getPrefix();
+        } catch (NoSuchBeanDefinitionException ex) {
+            return "";
         }
     }
 

@@ -85,6 +85,9 @@ public class FlowableUserDetailsService
             }
         }
 
-        return new FlowableUser(user, true, groups, userPrivileges, grantedAuthorities);
+        // We have to create new UserDto as the User returned by IDM is not serialized properly
+        // (it extends AbstractEntity which is not serializable) and leads to the id not being serialized
+        // We have to create new GroupDetails as Group returned bby IDM is not serialized properly. Same reasoning as with the User
+        return new FlowableUser(UserDto.create(user), true, GroupDetails.create(groups), userPrivileges, grantedAuthorities);
     }
 }

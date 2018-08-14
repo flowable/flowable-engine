@@ -148,12 +148,12 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
         identityService.deleteGroup(group.getId());
     }
 
-    public void findUserByUnexistingId() {
+    public void testFindUserByUnexistingId() {
         User user = identityService.createUserQuery().userId("unexistinguser").singleResult();
         assertNull(user);
     }
 
-    public void findGroupByUnexistingId() {
+    public void testFindGroupByUnexistingId() {
         Group group = identityService.createGroupQuery().groupId("unexistinggroup").singleResult();
         assertNull(group);
     }

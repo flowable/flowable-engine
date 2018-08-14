@@ -28,6 +28,7 @@ import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormDeploymentQuery;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.impl.DeploymentQueryProperty;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,6 +69,9 @@ public class FormDeploymentCollectionResource {
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of Form Deployments", nickname = "listFormDeployments", tags = { "Form Deployments" })
     @ApiImplicitParams({
@@ -120,6 +124,10 @@ public class FormDeploymentCollectionResource {
                 deploymentQuery.deploymentWithoutTenantId();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
+        }
 
         return new FormDeploymentsPaginateList(formRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
@@ -138,6 +146,10 @@ public class FormDeploymentCollectionResource {
 
         if (!(request instanceof MultipartHttpServletRequest)) {
             throw new FlowableIllegalArgumentException("Multipart request is required");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
         }
 
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
