@@ -1081,6 +1081,69 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
     }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityInUnstartedSubProcessWithModeledDataObject() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdTo("taskBefore","subTask")
+                .changeState();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTask", task.getTaskDefinitionKey());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, executions.size());
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess").singleResult();
+        assertNotNull(runtimeService.getVariableLocal(subProcessExecution.getId(), "name", String.class));
+
+        DataObject nameDataObject = runtimeService.getDataObjectLocal(subProcessExecution.getId(), "name");
+        assertNotNull(nameDataObject);
+        assertEquals("John", nameDataObject.getValue());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityInUnstartedSubProcessWithLocalVariableOnSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdTo("taskBefore","subTask")
+                .localVariable("subProcess", "name", "Joe")
+                .changeState();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTask", task.getTaskDefinitionKey());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, executions.size());
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess").singleResult();
+        assertNotNull(runtimeService.getVariableLocal(subProcessExecution.getId(), "name", String.class));
+
+        DataObject nameDataObject = runtimeService.getDataObjectLocal(subProcessExecution.getId(), "name");
+        assertNotNull(nameDataObject);
+        assertEquals("Joe", nameDataObject.getValue());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
 
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetCurrentActivityToMultipleActivitiesForParallelGateway() {

@@ -47,7 +47,7 @@ public class ProcessDefinitionResourceDataResource extends BaseDeploymentResourc
     }
 
     /**
-     * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition is not found.
+     * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
      */
     protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();

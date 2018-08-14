@@ -16,7 +16,6 @@ package org.flowable.content.engine.impl.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 /**
@@ -35,7 +34,7 @@ public abstract class AbstractContentTestCase extends TestCase {
      */
     public void assertTextPresent(String expected, String actual) {
         if ((actual == null) || (!actual.contains(expected))) {
-            throw new AssertionFailedError("expected presence of [" + expected + "], but was [" + actual + "]");
+            throw new AssertionError("expected presence of [" + expected + "], but was [" + actual + "]");
         }
     }
 
@@ -59,7 +58,7 @@ public abstract class AbstractContentTestCase extends TestCase {
 
             super.runTest();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             throw e;

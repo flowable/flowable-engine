@@ -65,8 +65,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import junit.framework.AssertionFailedError;
-
 public abstract class BaseSpringContentRestTestCase extends AbstractContentTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringContentRestTestCase.class);
@@ -139,7 +137,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         try {
             super.runBare();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;

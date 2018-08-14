@@ -66,6 +66,7 @@ public class HttpTaskJsonConverterTest extends AbstractConverterTest {
         fieldExtensions.add(createFieldExtension("requestMethod", "httptaskrequestmethod"));
         fieldExtensions.add(createFieldExtension("requestUrl", "httptaskrequesturl"));
         fieldExtensions.add(createFieldExtension("requestHeaders", "httptaskrequestheaders"));
+        fieldExtensions.add(createFieldExtension("requestBodyEncoding", "httptaskrequestbodyencoding"));
         fieldExtensions.add(createFieldExtension("requestTimeout", "httptaskrequesttimeout"));
         fieldExtensions.add(createFieldExtension("disallowRedirects", "httptaskdisallowredirects"));
         fieldExtensions.add(createFieldExtension("failStatusCodes", "httptaskfailstatuscodes"));

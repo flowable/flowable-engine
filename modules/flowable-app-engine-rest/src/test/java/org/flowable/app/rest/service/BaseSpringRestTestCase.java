@@ -71,7 +71,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 public class BaseSpringRestTestCase extends TestCase {
@@ -160,7 +159,7 @@ public class BaseSpringRestTestCase extends TestCase {
 
             super.runTest();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             throw e;
@@ -183,7 +182,7 @@ public class BaseSpringRestTestCase extends TestCase {
 
             super.runBare();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;

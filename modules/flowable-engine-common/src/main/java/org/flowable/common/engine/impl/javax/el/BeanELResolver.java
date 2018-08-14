@@ -295,7 +295,7 @@ public class BeanELResolver extends ELResolver {
 	 * called, the caller should ignore the return value. The provided property name will first be
 	 * coerced to a String. If the property is a readable property of the base object, as per the
 	 * JavaBeans specification, then return the result of the getter call. If the getter throws an
-	 * exception, it is propagated to the caller. If the property is not found or is not readable, a
+	 * exception, it is propagated to the caller. If the property was not found or is not readable, a
 	 * PropertyNotFoundException is thrown.
 	 * 
 	 * @param context
