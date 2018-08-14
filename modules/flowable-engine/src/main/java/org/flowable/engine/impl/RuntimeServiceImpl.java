@@ -66,8 +66,11 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceWithFormCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentBuilderImpl;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -673,5 +676,20 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
         commandExecutor.execute(new ChangeActivityStateCmd(changeActivityStateBuilder));
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder createProcessInstanceMigrationDocumentBuilder(String processDefinitionId) {
+        return new ProcessInstanceMigrationDocumentBuilderImpl(processDefinitionId);
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder createProcessInstanceMigrationDocumentBuilder(String processDefinitionKey, String processDefinitionVersion) {
+        return new ProcessInstanceMigrationDocumentBuilderImpl(processDefinitionKey, processDefinitionVersion);
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocument createProcessInstanceMigrationDocumentFromJson(String processInstanceMigrationDocumentJson) {
+        return ProcessInstanceMigrationDocumentBuilderImpl.buildFromJson(processInstanceMigrationDocumentJson);
     }
 }

@@ -25,6 +25,8 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -1319,5 +1321,11 @@ public interface RuntimeService {
 
     /** The all events related to the given Process Instance. */
     List<Event> getProcessInstanceEvents(String processInstanceId);
+
+    ProcessInstanceMigrationDocumentBuilder createProcessInstanceMigrationDocumentBuilder(String processDefinitionId);
+
+    ProcessInstanceMigrationDocumentBuilder createProcessInstanceMigrationDocumentBuilder(String processDefinitionKey, String processDefinitionVersion);
+
+    ProcessInstanceMigrationDocument createProcessInstanceMigrationDocumentFromJson(String processInstanceMigrationDocumentJson);
 
 }
