@@ -23,8 +23,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * @author Wendel Kerr
  */
@@ -104,7 +102,7 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
                 return event;
             }
         }
-        throw new AssertionFailedError("no process instance event found with action " + action);
+        throw new AssertionError("no process instance event found with action " + action);
     }
 
     @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")

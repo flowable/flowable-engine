@@ -57,8 +57,6 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Assert;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -127,7 +125,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
             validateHistoryData();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
@@ -309,7 +307,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (processInstance != null) {
-            throw new AssertionFailedError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
+            throw new AssertionError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
         }
 
         // Verify historical data if end times are correctly set

@@ -23,10 +23,8 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
-
-import junit.framework.AssertionFailedError;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 
 /**
  * @author Tom Baeyens
@@ -444,6 +442,6 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                 return event;
             }
         }
-        throw new AssertionFailedError("no task event found with action " + action);
+        throw new AssertionError("no task event found with action " + action);
     }
 }
