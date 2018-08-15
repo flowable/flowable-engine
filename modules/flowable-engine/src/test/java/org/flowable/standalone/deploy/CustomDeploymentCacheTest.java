@@ -17,6 +17,7 @@ import java.text.MessageFormat;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -27,6 +28,7 @@ public class CustomDeploymentCacheTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/deploy/custom.deployment.cache.test.flowable.cfg.xml");
     }
 
+    @Test
     public void testCustomDeploymentCacheUsed() throws IOException {
         CustomDeploymentCache customCache = (CustomDeploymentCache) processEngineConfiguration.getProcessDefinitionCache();
         assertNull(customCache.getCachedProcessDefinition());

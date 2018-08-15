@@ -19,6 +19,8 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.webservice.WebServiceMock;
 import org.flowable.engine.impl.webservice.WebServiceMockImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Esteban Robles Luna
@@ -29,9 +31,8 @@ public abstract class AbstractWebServiceTaskTest extends
     protected WebServiceMock webServiceMock;
     private Server server;
 
-    @Override
-    protected void initializeProcessEngine() {
-        super.initializeProcessEngine();
+    @BeforeEach
+    protected void setUp() {
 
         webServiceMock = new WebServiceMockImpl();
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
@@ -44,9 +45,8 @@ public abstract class AbstractWebServiceTaskTest extends
         server.start();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         server.stop();
         server.destroy();
     }

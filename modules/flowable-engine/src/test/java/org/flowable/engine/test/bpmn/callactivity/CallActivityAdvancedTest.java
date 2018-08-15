@@ -36,6 +36,7 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery; 
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -45,6 +46,7 @@ import org.flowable.task.api.TaskQuery;
  */
 public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testCallSimpleSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
@@ -90,6 +92,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithExpressions.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testCallSimpleSubProcessWithExpressions() {
@@ -125,6 +128,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     /**
      * Test case for a possible tricky case: reaching the end event of the subprocess leads to an end event in the super process instance.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testSubProcessEndsSuperProcess.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testSubProcessEndsSuperProcess() {
@@ -143,6 +147,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().list().size());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallParallelSubProcess.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/simpleParallelSubProcess.bpmn20.xml" })
     public void testCallParallelSubProcess() {
@@ -168,6 +173,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSequentialSubProcess.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithExpressions.bpmn20.xml", "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess2.bpmn20.xml" })
@@ -221,6 +227,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testTimerOnCallActivity.bpmn20.xml", "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testTimerOnCallActivity() {
         Date startTime = processEngineConfiguration.getClock().getCurrentTime();
@@ -256,6 +263,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     /**
      * Test case for handing over process variables to a sub process
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testSubProcessWithDataInputOutput() {
@@ -323,6 +331,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     /**
      * Test case for deleting a sub process
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcesses.bpmn20.xml", "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testTwoSubProcesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
@@ -346,6 +355,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertEquals(0, taskList.size());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/callactivity/CallActivity.testStartUserIdSetWhenLooping.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
@@ -376,6 +386,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testAuthenticatedStartUserInCallActivity() {
         final String authenticatedUser = "user1";
@@ -397,6 +408,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertEquals(authenticatedUser, subProcessIdentityLinks.get(0).getUserId());
     }
     
+    @Test
     @Deployment(resources = { 
             "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", 
             "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" 

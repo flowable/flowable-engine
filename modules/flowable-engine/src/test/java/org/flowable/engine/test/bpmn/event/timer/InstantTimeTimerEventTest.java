@@ -22,6 +22,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
@@ -32,6 +33,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         super("org/flowable/engine/test/bpmn/event/timer/InstantTimeTimerEventTest.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testExpressionStartTimerEvent() throws Exception {
         TimerJobQuery jobQuery = managementService.createTimerJobQuery();
@@ -42,7 +44,8 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         jobQuery = managementService.createTimerJobQuery();
         assertEquals(0, jobQuery.count());
     }
-    
+
+    @Test
     @Deployment
     public void testVariableExpressionBoundaryTimerEvent() {
         HashMap<String, Object> variables = new HashMap<>();
@@ -63,6 +66,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         processEngineConfiguration.getClock().reset();
     }
 
+    @Test
     @Deployment
     public void testBeanExpressionBoundaryTimerEvent() {
         processEngineConfiguration.getClock().setCurrentTime(new Date(0));

@@ -17,6 +17,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.event.FlowableIdmEventType;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to users.
@@ -30,6 +33,7 @@ public class UserEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of users.
      */
+    @Test
     public void testUserEntityEvents() throws Exception {
         User user = null;
         try {
@@ -79,16 +83,14 @@ public class UserEventsTest extends PluggableFlowableTestCase {
         }
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         listener = new TestFlowableEntityEventListener(User.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

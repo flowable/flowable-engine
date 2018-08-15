@@ -19,10 +19,10 @@ import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -33,7 +33,7 @@ public class DisabledSchemaValidationTest {
 
     protected RepositoryService repositoryService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.processEngine = new StandaloneInMemProcessEngineConfiguration()
                 .setEngineName(this.getClass().getName())
@@ -42,7 +42,7 @@ public class DisabledSchemaValidationTest {
         this.repositoryService = processEngine.getRepositoryService();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId());

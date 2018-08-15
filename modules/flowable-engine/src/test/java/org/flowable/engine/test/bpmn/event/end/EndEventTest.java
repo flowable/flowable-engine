@@ -16,6 +16,7 @@ import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -23,6 +24,7 @@ import org.flowable.engine.test.Deployment;
 public class EndEventTest extends PluggableFlowableTestCase {
 
     // Test case for ACT-1259
+    @Test
     @Deployment
     public void testConcurrentEndOfSameProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithDelay");

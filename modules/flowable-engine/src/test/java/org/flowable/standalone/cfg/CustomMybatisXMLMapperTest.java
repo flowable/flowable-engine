@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Bassam Al-Sarori
@@ -29,6 +30,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/cfg/custom-mybatis-xml-mappers-flowable.cfg.xml");
     }
 
+    @Test
     public void testSelectOneTask() {
         // Create test data
         for (int i = 0; i < 4; i++) {
@@ -57,6 +59,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         deleteTasks(taskService.createTaskQuery().list());
     }
 
+    @Test
     public void testSelectTaskList() {
         // Create test data
         for (int i = 0; i < 5; i++) {
@@ -78,6 +81,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         deleteCustomTasks(tasks);
     }
 
+    @Test
     public void testSelectTasksByCustomQuery() {
         // Create test data
         for (int i = 0; i < 5; i++) {
@@ -96,6 +100,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         deleteCustomTasks(tasks);
     }
 
+    @Test
     public void testSelectTaskByCustomQuery() {
         // Create test data
         for (int i = 0; i < 5; i++) {
@@ -112,6 +117,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         deleteCustomTasks(tasks);
     }
 
+    @Test
     public void testCustomQueryListPage() {
         // Create test data
         for (int i = 0; i < 15; i++) {
@@ -128,6 +134,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         deleteCustomTasks(tasks);
     }
 
+    @Test
     public void testCustomQueryOrderBy() {
         // Create test data
         for (int i = 0; i < 5; i++) {
@@ -155,6 +162,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         deleteCustomTasks(tasks);
     }
 
+    @Test
     public void testAttachmentQuery() {
         String taskId = createTask("task1", null, null, 0);
 

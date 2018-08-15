@@ -27,66 +27,57 @@ import javax.persistence.EntityManagerFactory;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
  */
-public class JPAVariableTest extends AbstractFlowableTestCase {
+@Tag("jpa")
+public class JPAVariableTest extends ResourceFlowableTestCase {
 
-    protected static ProcessEngine cachedProcessEngine;
+    private FieldAccessJPAEntity simpleEntityFieldAccess;
+    private PropertyAccessJPAEntity simpleEntityPropertyAccess;
+    private SubclassFieldAccessJPAEntity subclassFieldAccess;
+    private SubclassPropertyAccessJPAEntity subclassPropertyAccess;
 
-    private static FieldAccessJPAEntity simpleEntityFieldAccess;
-    private static PropertyAccessJPAEntity simpleEntityPropertyAccess;
-    private static SubclassFieldAccessJPAEntity subclassFieldAccess;
-    private static SubclassPropertyAccessJPAEntity subclassPropertyAccess;
+    private ByteIdJPAEntity byteIdJPAEntity;
+    private ShortIdJPAEntity shortIdJPAEntity;
+    private IntegerIdJPAEntity integerIdJPAEntity;
+    private LongIdJPAEntity longIdJPAEntity;
+    private FloatIdJPAEntity floatIdJPAEntity;
+    private DoubleIdJPAEntity doubleIdJPAEntity;
+    private CharIdJPAEntity charIdJPAEntity;
+    private StringIdJPAEntity stringIdJPAEntity;
+    private DateIdJPAEntity dateIdJPAEntity;
+    private SQLDateIdJPAEntity sqlDateIdJPAEntity;
+    private BigDecimalIdJPAEntity bigDecimalIdJPAEntity;
+    private BigIntegerIdJPAEntity bigIntegerIdJPAEntity;
+    private CompoundIdJPAEntity compoundIdJPAEntity;
 
-    private static ByteIdJPAEntity byteIdJPAEntity;
-    private static ShortIdJPAEntity shortIdJPAEntity;
-    private static IntegerIdJPAEntity integerIdJPAEntity;
-    private static LongIdJPAEntity longIdJPAEntity;
-    private static FloatIdJPAEntity floatIdJPAEntity;
-    private static DoubleIdJPAEntity doubleIdJPAEntity;
-    private static CharIdJPAEntity charIdJPAEntity;
-    private static StringIdJPAEntity stringIdJPAEntity;
-    private static DateIdJPAEntity dateIdJPAEntity;
-    private static SQLDateIdJPAEntity sqlDateIdJPAEntity;
-    private static BigDecimalIdJPAEntity bigDecimalIdJPAEntity;
-    private static BigIntegerIdJPAEntity bigIntegerIdJPAEntity;
-    private static CompoundIdJPAEntity compoundIdJPAEntity;
+    private FieldAccessJPAEntity entityToQuery;
+    private FieldAccessJPAEntity entityToUpdate;
 
-    private static FieldAccessJPAEntity entityToQuery;
-    private static FieldAccessJPAEntity entityToUpdate;
+    private EntityManagerFactory entityManagerFactory;
 
-    private static boolean entitiesInitialized;
+    public JPAVariableTest() {
+        super("org/flowable/standalone/jpa/flowable.cfg.xml");
+    }
 
-    private static EntityManagerFactory entityManagerFactory;
-
-    @Override
-    protected void initializeProcessEngine() {
-        if (cachedProcessEngine == null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-                    .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/flowable.cfg.xml");
-
-            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
-
-            EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class);
-
-            entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
-        }
-        processEngine = cachedProcessEngine;
+    @BeforeEach
+    protected void setUp() {
+        entityManagerFactory = ((EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class))
+            .getEntityManagerFactory();
+        setupJPAEntities();
     }
 
     public void setupJPAEntities() {
-
-        if (!entitiesInitialized) {
 
             EntityManager manager = entityManagerFactory.createEntityManager();
             manager.getTransaction().begin();
@@ -165,8 +156,6 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
             manager.getTransaction().commit();
             manager.close();
 
-            entitiesInitialized = true;
-        }
     }
 
     public void setupIllegalJPAEntities() {
@@ -210,9 +199,9 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         manager.close();
     }
 
+    @Test
     @Deployment
     public void testStoreJPAEntityAsVariable() {
-        setupJPAEntities();
         // -----------------------------------------------------------------------------
         // Simple test, Start process with JPA entities as variables
         // -----------------------------------------------------------------------------
@@ -336,9 +325,9 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         assertEquals(bigIntegerIdJPAEntity.getBigIntegerId(), ((BigIntegerIdJPAEntity) bigIntegerIdResult).getBigIntegerId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
     public void testStoreJPAEntityListAsVariable() {
-        setupJPAEntities();
         // -----------------------------------------------------------------------------
         // Simple test, Start process with lists of JPA entities as variables
         // -----------------------------------------------------------------------------
@@ -385,9 +374,9 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         assertEquals(((SubclassPropertyAccessJPAEntity) list.get(0)).getId(), simpleEntityPropertyAccess.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
     public void testStoreJPAEntityListAsVariableEdgeCases() {
-        setupJPAEntities();
 
         // Test using mixed JPA-entities which are not serializable, should not
         // be picked up by JPA list type en therefor fail
@@ -434,6 +423,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
     }
 
     // https://activiti.atlassian.net/browse/ACT-995
+    @Test
     @Deployment(resources = "org/flowable/standalone/jpa/JPAVariableTest.testQueryJPAVariable.bpmn20.xml")
     public void testReplaceExistingJPAEntityWithAnotherOfSameType() {
         EntityManager manager = entityManagerFactory.createEntityManager();
@@ -467,6 +457,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         assertEquals(newVariable.getId(), ((FieldAccessJPAEntity) variable).getId());
     }
 
+    @Test
     @Deployment
     public void testIllegalEntities() {
         setupIllegalJPAEntities();
@@ -529,6 +520,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testQueryJPAVariable() {
         setupQueryJPAEntity();
@@ -584,6 +576,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testUpdateJPAEntityValues() {
         setupJPAEntityToUpdate();

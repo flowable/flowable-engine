@@ -16,6 +16,7 @@ package org.flowable.engine.test.bpmn.event.message;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -23,6 +24,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSingleNonInterruptingBoundaryMessageEvent() {
         runtimeService.startProcessInstanceByKey("process");

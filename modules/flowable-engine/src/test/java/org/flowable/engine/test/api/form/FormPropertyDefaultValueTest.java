@@ -22,9 +22,11 @@ import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testDefaultValue() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormPropertyDefaultValueTest.testDefaultValue");
@@ -59,6 +61,7 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
         assertEquals(1L, runtimeService.getVariable(processInstance.getId(), "longExpressionProperty"));
     }
 
+    @Test
     @Deployment
     public void testStartFormDefaultValue() throws Exception {
         String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("FormPropertyDefaultValueTest.testDefaultValue").latestVersion().singleResult().getId();

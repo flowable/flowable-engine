@@ -18,12 +18,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Saeid Mirzaei
  */
 public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/cmd/FailedJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
     public void testFailedServiceTask() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");

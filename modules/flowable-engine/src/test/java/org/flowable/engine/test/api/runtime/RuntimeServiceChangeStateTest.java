@@ -52,6 +52,9 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -60,18 +63,17 @@ import org.flowable.variable.api.event.FlowableVariableEvent;
 public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
     private ChangeStateEventListener changeStateEventListener = new ChangeStateEventListener();
-    @Override
-    protected void initializeProcessEngine() {
-        super.initializeProcessEngine();
+    @BeforeEach
+    protected void setUp() {
         processEngine.getRuntimeService().addEventListener(changeStateEventListener);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        changeStateEventListener.clear();
+    @AfterEach
+    protected void tearDown() {
+        processEngine.getRuntimeService().removeEventListener(changeStateEventListener);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testSetCurrentActivityBackwardForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -115,6 +117,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testSetCurrentExecutionBackwardForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -157,6 +160,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testSetCurrentActivityForwardForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -192,6 +196,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testSetCurrentExecutionForwardForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -226,6 +231,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentActivityWithTimerForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -279,6 +285,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentExecutionWithTimerForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -328,6 +335,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentActivityToActivityWithTimerForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -388,6 +396,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentExecutionToActivityWithTimerForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -447,6 +456,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcessWithTimers.bpmn20.xml" })
     public void testSetCurrentActivityWithTimerToActivityWithTimerSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcessWithTimers");
@@ -510,6 +520,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityOutOfSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -565,6 +576,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionOutOfSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -619,6 +631,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityIntoSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -674,6 +687,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionIntoSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -728,6 +742,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityIntoSubProcessWithModeledDataObject() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -790,6 +805,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionIntoSubProcessWithModeledDataObject() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -852,6 +868,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentActivityOutOfSubProcessWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -923,6 +940,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentExecutionOutOfSubProcessWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -993,6 +1011,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentActivityToTaskInSubProcessWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1050,6 +1069,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentExecutionToTaskInSubProcessWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1106,6 +1126,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcessWithTimer.bpmn20.xml" })
     public void testSetCurrentActivityToTaskInSubProcessAndExecuteTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1157,6 +1178,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityOutOfSubProcessTaskWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1216,6 +1238,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionOutOfSubProcessTaskWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1275,6 +1298,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
     }
 
     // TODO
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityToTaskWithTimerInSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1334,6 +1358,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionToTaskWithTimerInSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1394,6 +1419,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityToTaskWithTimerInSubProcessAndExecuteTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1451,6 +1477,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityOutOfNestedSubProcessExecution() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
@@ -1506,6 +1533,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionOutOfNestedSubProcessExecution() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
@@ -1560,6 +1588,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityOutOfNestedSubProcessExecutionIntoContainingSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
@@ -1622,6 +1651,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionOutOfNestedSubProcessExecutionIntoContainingSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
@@ -1683,6 +1713,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/taskTwoSubProcesses.bpmn20.xml" })
     public void testSetCurrentActivityFromSubProcessToAnotherSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoSubProcesses");
@@ -1739,6 +1770,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/taskTwoSubProcesses.bpmn20.xml" })
     public void testSetCurrentExecutionFromSubProcessToAnotherSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoSubProcesses");
@@ -1794,6 +1826,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityForSubProcessWithVariables() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1888,6 +1921,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionForSubProcessWithVariables() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -1981,6 +2015,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityInUnstartedSubProcessWithModeledDataObject() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -2012,6 +2047,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityInUnstartedSubProcessWithLocalVariableOnSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
@@ -2044,6 +2080,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetCurrentActivityToMultipleActivitiesForParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -2118,6 +2155,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetMultipleActivitiesToSingleActivityAfterParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -2174,6 +2212,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetMultipleActivitiesIntoSynchronizingParallelGateway() {
 
@@ -2208,6 +2247,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetMultipleGatewayActivitiesAndSynchronizingParallelGatewayAfterGateway() {
 
@@ -2257,6 +2297,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetActivityIntoSynchronizingParallelGatewayFirst() {
 
@@ -2300,6 +2341,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetActivityIntoSynchronizingParallelGatewayLast() {
 
@@ -2348,6 +2390,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetCurrentExecutionToMultipleActivitiesForParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -2404,6 +2447,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetMultipleExecutionsToSingleActivityAfterParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -2436,6 +2480,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetMultipleExecutionsIntoSynchronizingParallelGateway() {
 
@@ -2471,6 +2516,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetMultipleGatewayExecutionsAndSynchronizingParallelGatewayAfterGateway() {
 
@@ -2521,6 +2567,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetExecutionIntoSynchronizingParallelGatewayFirst() {
 
@@ -2564,6 +2611,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelTask.bpmn20.xml" })
     public void testSetExecutionIntoSynchronizingParallelGatewayLast() {
 
@@ -2613,6 +2661,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetCurrentActivityToMultipleActivitiesForInclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
@@ -2667,6 +2716,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetMultipleActivitiesToSingleActivityAfterInclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
@@ -2703,6 +2753,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetMultipleActivitiesIntoSynchronizingInclusiveGateway() {
 
@@ -2738,6 +2789,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetMultipleGatewayActivitiesAndSynchronizingInclusiveGatewayAfterGateway() {
 
@@ -2787,6 +2839,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetActivityIntoSynchronizingParallelInclusiveFirst() {
 
@@ -2831,6 +2884,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetActivityIntoSynchronizingParallelInclusiveLast() {
 
@@ -2880,6 +2934,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetCurrentExecutionToMultipleActivitiesForInclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
@@ -2933,6 +2988,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetMultipleExecutionsToSingleActivityAfterInclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
@@ -2965,6 +3021,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetMultipleExecutionsIntoSynchronizingInclusiveGateway() {
 
@@ -3000,6 +3057,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetMultipleGatewayExecutionsAndSynchronizingInclusiveGatewayAfterGateway() {
 
@@ -3050,6 +3108,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetExecutionIntoSynchronizingInclusiveGatewayFirst() {
 
@@ -3093,6 +3152,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetExecutionIntoSynchronizingInclusiveGatewayLast() {
 
@@ -3141,6 +3201,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelSubProcesses.bpmn20.xml" })
     public void testSetCurrentActivityToMultipleActivitiesForParallelSubProcesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -3185,6 +3246,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelSubProcesses.bpmn20.xml" })
     public void testSetMultipleActivitiesToSingleActivityAfterParallelSubProcesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -3218,6 +3280,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelSubProcessesMultipleTasks.bpmn20.xml" })
     public void testMoveCurrentActivityInParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
@@ -3269,6 +3332,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/multipleParallelSubProcesses.bpmn20.xml" })
     public void testSetCurrentActivityToMultipleActivitiesForInclusiveAndParallelSubProcesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess", Collections.singletonMap("var1", "test2"));
@@ -3331,6 +3395,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/multipleParallelSubProcesses.bpmn20.xml" })
     public void testSetCurrentActivitiesToSingleActivityForInclusiveAndParallelSubProcesses() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -3378,6 +3443,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/multipleParallelSubProcesses.bpmn20.xml" })
     public void testSetCurrentActivitiesToSingleActivityInInclusiveGateway() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -3446,6 +3512,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcess.bpmn20.xml", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetCurrentActivityInParentProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
@@ -3479,6 +3546,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcess.bpmn20.xml", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetCurrentActivityInSubProcessInstance() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
@@ -3513,6 +3581,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceSequential.bpmn20.xml")
     public void testSetCurrentActivityOfSequentialMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("sequentialMultiInstance")
@@ -3550,6 +3619,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceSequential.bpmn20.xml")
     public void testSetCurrentParentExecutionOfSequentialMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("sequentialMultiInstance")
@@ -3588,6 +3658,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallel.bpmn20.xml")
     public void testSetCurrentActivityOfParallelMultiInstanceTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstance")
@@ -3620,6 +3691,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallel.bpmn20.xml")
     public void testSetCurrentParentExecutionOfParallelMultiInstanceTask() {
         ProcessInstance parallelTasksProcInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstance")
@@ -3653,6 +3725,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(parallelTasksProcInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
     public void testSetCurrentExecutionWithinMultiInstanceParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
@@ -3724,6 +3797,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
     public void testSetCurrentActivityWithinMultiInstanceParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
@@ -3769,6 +3843,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses.bpmn20.xml")
     public void testSetCurrentExecutionWithinNestedMultiInstanceParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelNestedMultiInstanceSubProcesses").start();
@@ -3876,6 +3951,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses.bpmn20.xml")
     public void testSetCurrentActivityWithinNestedMultiInstanceParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelNestedMultiInstanceSubProcesses").start();
@@ -3966,6 +4042,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
     public void testSetCurrentMultiInstanceSubProcessParentExecutionWithinProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
@@ -4018,6 +4095,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
     public void testSetCurrentMultiInstanceSubProcessParentActivityWithinProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstanceSubProcess")
@@ -4062,6 +4140,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses.bpmn20.xml")
     public void testSetCurrentMultiInstanceNestedSubProcessParentExecutionWithinSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelNestedMultiInstanceSubProcesses").start();
@@ -4161,6 +4240,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceNestedParallelSubProcesses.bpmn20.xml")
     public void testSetCurrentMultiInstanceNestedSubProcessParentActivityWithinSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelNestedMultiInstanceSubProcesses").start();
@@ -4251,6 +4331,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml" })
     public void testSetCurrentActivitiesUsingParallelGatewayNestedInMultiInstanceSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayInsideMultiInstanceSubProcess");
@@ -4329,6 +4410,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/parallelGatewayInsideMultiInstanceSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionsUsingParallelGatewayNestedInMultiInstanceSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGatewayInsideMultiInstanceSubProcess");
@@ -4406,6 +4488,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayNestedInsideMultiInstanceSubProcess.bpmn20.xml" })
     public void testCompleteSetCurrentActivitiesUsingInclusiveGatewayNestedInMultiInstanceSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGatewayInsideMultiInstanceSubProcess");
@@ -4464,6 +4547,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayNestedInsideMultiInstanceSubProcess.bpmn20.xml" })
     public void testCompleteSetCurrentExecutionsUsingInclusiveGatewayNestedInMultiInstanceSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("inclusiveGatewayInsideMultiInstanceSubProcess");
@@ -4634,6 +4718,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
     public void testSetCurrentActivityToIntermediateSignalCatchEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -4685,6 +4770,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
     public void testSetCurrentExecutionToIntermediateSignalCatchEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -4735,6 +4821,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
     public void testSetCurrentActivityFromIntermediateSignalCatchEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -4812,6 +4899,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
     public void testSetCurrentExecutionFromIntermediateSignalCatchEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -4887,6 +4975,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml" })
     public void testSetCurrentActivityToIntermediateMessageCatchEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -4940,6 +5029,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml" })
     public void testSetCurrentExecutionToIntermediateMessageCatchEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -4991,6 +5081,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml" })
     public void testSetCurrentActivityFromIntermediateMessageCatchEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -5068,6 +5159,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml" })
     public void testSetCurrentExecutionFromIntermediateMessageCatchEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -5183,6 +5275,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         });
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
     public void testSetCurrentActivityToIntermediateCatchEventForMultipleProcessesTriggerSimultaneously() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -5227,6 +5320,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance2.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
     public void testSetCurrentExecutionToIntermediateCatchEventForMultipleProcessesTriggerSimultaneously() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -5268,6 +5362,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance2.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
     public void testSetCurrentActivityToIntermediateCatchEventForMultipleProcessesTriggerDiffered() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -5363,6 +5458,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance2.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml" })
     public void testSetCurrentExecutionToIntermediateCatchEventForMultipleProcessesTriggerDiffered() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("changeStateForSimpleIntermediateEvent");
@@ -5466,6 +5562,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance2.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleMessageEventSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityFromMessageEventSubProcessStart() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
@@ -5506,6 +5603,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleMessageEventSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionFromMessageEventSubProcessStart() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
@@ -5545,6 +5643,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleSignalEventSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityFromSignalEventSubProcessStart() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
@@ -5585,6 +5684,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleSignalEventSubProcess.bpmn20.xml" })
     public void testSetCurrentExecutionFromSignalEventSubProcessStart() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");

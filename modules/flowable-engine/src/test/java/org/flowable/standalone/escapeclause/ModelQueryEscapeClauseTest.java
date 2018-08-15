@@ -14,6 +14,9 @@ package org.flowable.standalone.escapeclause;
 
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -21,7 +24,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
     private String modelTwoId;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         Model model = repositoryService.newModel();
         model.setTenantId("mytenant%");
@@ -42,16 +45,15 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         repositoryService.addModelEditorSource(modelOneId, "bytes".getBytes("utf-8"));
         repositoryService.addModelEditorSource(modelTwoId, "bytes".getBytes("utf-8"));
 
-        super.setUp();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         repositoryService.deleteModel(modelOneId);
         repositoryService.deleteModel(modelTwoId);
     }
 
+    @Test
     public void testQueryByNameLike() throws Exception {
         ModelQuery query = repositoryService.createModelQuery().modelNameLike("%\\%%");
         Model model = query.singleResult();
@@ -70,6 +72,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByCategoryLike() throws Exception {
         ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%\\%%");
         Model model = query.singleResult();
@@ -88,6 +91,7 @@ public class ModelQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByTenantIdLike() throws Exception {
         ModelQuery query = repositoryService.createModelQuery().modelTenantIdLike("%\\%%");
         Model model = query.singleResult();

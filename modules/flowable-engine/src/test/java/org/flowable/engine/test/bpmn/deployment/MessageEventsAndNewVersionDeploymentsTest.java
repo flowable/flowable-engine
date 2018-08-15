@@ -21,6 +21,7 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * A test specifically written to test how events (start/boundary) are handled when deploying a new version of a process definition.
@@ -43,6 +44,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
      * BOUNDARY MESSAGE EVENT
      */
 
+    @Test
     public void testMessageBoundaryEvent() {
         String deploymentId1 = deployBoundaryMessageTestProcess();
         runtimeService.startProcessInstanceByKey("messageTest");
@@ -67,6 +69,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
     /**
      * Verifying that the event subscriptions do get removed when removing a deployment.
      */
+    @Test
     public void testBoundaryEventSubscriptionDeletedOnDeploymentDelete() {
         String deploymentId = deployBoundaryMessageTestProcess();
         runtimeService.startProcessInstanceByKey("messageTest");
@@ -88,6 +91,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
     /**
      * Verifying that the event subscriptions do get removed when removing a process instance.
      */
+    @Test
     public void testBoundaryEventSubscriptionsDeletedOnProcessInstanceDelete() {
         String deploymentId1 = deployBoundaryMessageTestProcess();
         runtimeService.startProcessInstanceByKey("messageTest");
@@ -114,6 +118,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
      * START MESSAGE EVENT
      */
 
+    @Test
     public void testStartMessageEvent() {
         String deploymentId1 = deployStartMessageTestProcess();
         assertEquals(1, getAllEventSubscriptions().size());
@@ -132,6 +137,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId1, deploymentId2);
     }
 
+    @Test
     public void testMessageStartEventSubscriptionAfterDeploymentDelete() {
 
         // Deploy two version of process definition, delete latest and check if all is good
@@ -167,6 +173,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
     /**
      * v1 -> has start message event v2 -> has no start message event v3 -> has start message event
      */
+    @Test
     public void testDeployIntermediateVersionWithoutMessageStartEvent() {
         String deploymentId1 = deployStartMessageTestProcess();
         assertEquals(1, getAllEventSubscriptions().size());
@@ -200,6 +207,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId1, deploymentId2, deploymentId3);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartMessageEvents1() {
         String deploymentId1;
         String deploymentId2;
@@ -212,6 +220,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId1, deploymentId2);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartMessageEvents2() {
         String deploymentId1 = deployStartMessageTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -224,6 +233,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId1, deploymentId3);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartMessageEvents3() {
         String deploymentId1 = deployStartMessageTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -236,6 +246,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId2, deploymentId3);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartMessageEvents4() {
         String deploymentId1 = deployStartMessageTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -249,6 +260,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId1);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartMessageEvents5() {
         String deploymentId1 = deployStartMessageTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -267,6 +279,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId1);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartMessageEvents6() {
         String deploymentId1 = deployStartMessageTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -298,6 +311,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId4);
     }
 
+    @Test
     public void testDeleteDeploymentWithStartMessageEvents7() {
         String deploymentId1 = deployStartMessageTestProcess();
         String deploymentId2 = deployProcessWithoutEvents();
@@ -329,6 +343,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
      * BOTH BOUNDARY AND START MESSAGE
      */
 
+    @Test
     public void testBothBoundaryAndStartEvent() {
 
         // Deploy process with both boundary and start event
@@ -381,6 +396,7 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
         cleanup(deploymentId1);
     }
 
+    @Test
     public void testBothBoundaryAndStartSameMessageId() {
 
         // Deploy process with both boundary and start event

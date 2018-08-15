@@ -22,12 +22,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
  */
 public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersProcess.bpmn20.xml" })
     public void testExecutionListenersOnAllPossibleElements() {
         RecorderExecutionListener.clear();
@@ -80,6 +82,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("End Process Listener", event.getParameter());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersStartEndEvent.bpmn20.xml" })
     public void testExecutionListenersOnStartEndEvents() {
         RecorderExecutionListener.clear();
@@ -112,6 +115,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersFieldInjectionProcess.bpmn20.xml" })
     public void testExecutionListenerFieldInjection() {
         Map<String, Object> variables = new HashMap<>();
@@ -128,6 +132,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("Yes, I am listening!", varSetByListener);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersCurrentActivity.bpmn20.xml" })
     public void testExecutionListenerCurrentActivity() {
 
@@ -149,6 +154,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("End Event", currentActivities.get(2).getActivityName());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersForSubprocessStartEndEvent.bpmn20.xml" })
     public void testExecutionListenersForSubprocessStartEndEvents() {
         RecorderExecutionListener.clear();

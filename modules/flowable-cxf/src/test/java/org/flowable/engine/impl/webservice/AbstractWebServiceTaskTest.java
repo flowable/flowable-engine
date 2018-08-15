@@ -17,6 +17,9 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 
 /**
  * An abstract class for unit test of web-service task
@@ -24,6 +27,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
  * @author <a href="mailto:gnodet@gmail.com">Guillaume Nodet</a>
  * @author Christophe DENEUX
  */
+@Tag("webservice")
 public abstract class AbstractWebServiceTaskTest extends PluggableFlowableTestCase {
 
     public static final String WEBSERVICE_MOCK_ADDRESS = "http://localhost:63081/webservicemock";
@@ -32,9 +36,8 @@ public abstract class AbstractWebServiceTaskTest extends PluggableFlowableTestCa
 
     protected Server server;
 
-    @Override
-    protected void initializeProcessEngine() {
-        super.initializeProcessEngine();
+    @BeforeEach
+    protected void setUp() {
 
         webServiceMock = new WebServiceMockImpl();
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
@@ -47,9 +50,8 @@ public abstract class AbstractWebServiceTaskTest extends PluggableFlowableTestCa
         server.start();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         server.stop();
     }
 

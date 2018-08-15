@@ -22,6 +22,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CallActivityTest extends PluggableFlowableTestCase {
 
@@ -29,9 +32,10 @@ public class CallActivityTest extends PluggableFlowableTestCase {
 
     protected EventLogger databaseEventLogger;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
+        listener = new CallActivityEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 
         // Database event logger setup
         databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(),
@@ -39,7 +43,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         runtimeService.addEventListener(databaseEventLogger);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         if (listener != null) {
@@ -55,17 +59,9 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         // Database event logger teardown
         runtimeService.removeEventListener(databaseEventLogger);
 
-        super.tearDown();
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
-
-        listener = new CallActivityEventListener();
-        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-    }
-
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
@@ -249,6 +245,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(26, mylistener.getEventsReceived().size());
     }
     
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
@@ -371,6 +368,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(17, mylistener.getEventsReceived().size());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityTerminateEnd.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivityTerminateEnd.bpmn20.xml" })
@@ -554,6 +552,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals(idx, mylistener.getEventsReceived().size());
     }
     
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml" })
@@ -596,6 +595,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         System.out.println("the end");
     }
     
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityProcessInstanceName.bpmn20.xml",
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml"

@@ -17,7 +17,7 @@ import java.util.Date;
 
 import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AsyncHistoryDateUtilTest {
   

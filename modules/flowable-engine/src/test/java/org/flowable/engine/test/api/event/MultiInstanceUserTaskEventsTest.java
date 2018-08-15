@@ -38,17 +38,15 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
 
     private MultiInstanceUserActivityEventListener testListener;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         if (testListener != null) {
@@ -56,12 +54,10 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getEventDispatcher().removeEventListener(testListener);
         }
 
-        super.tearDown();
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
+    @BeforeEach
+    protected void setUp() {
         testListener = new MultiInstanceUserActivityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(testListener);
     }
@@ -69,6 +65,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
     /**
      * Multi-instance user task cancelled by terminate end event.
      */
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.bpmn20.xml"})
     public void testMultiInstanceCancelledWhenFlowToTerminateEnd() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceUserTaskEvents");
@@ -223,6 +220,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
     /**
      * Multi-instance user task cancelled by terminate end event.
      */
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testMultiInstanceCompleteCondition.bpmn20.xml"})
     public void testMultiInstanceCompleteCondition() throws Exception {
         Map<String,Object> variables = new HashMap<>();
@@ -327,6 +325,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
     /**
      * Multi-instance user task cancelled by terminate end event.
      */
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testMultiInstanceCompleteCondition.bpmn20.xml"})
     public void testMultiInstanceComplete() throws Exception {
         Map<String,Object> variables = new HashMap<>();
@@ -444,6 +443,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
      * Multi-instance user task cancelled by message boundary event defined on
      * multi-instance user task.
      */
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.bpmn20.xml"})
     public void testMultiInstanceCancelledByMessageBoundaryEvent() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceUserTaskEvents");
@@ -591,6 +591,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
      * Multi-instance user task defined in external subprocess. The multi-instance user tasks
      * are cancelled by message boundary event defined on multi-instance user task.
      */
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testCallActivityTerminateEnd.bpmn20.xml",
             "org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testCalledActivityTerminateEnd.bpmn20.xml"})
@@ -736,6 +737,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
      * Multi-instance user task defined in external subprocess. The external subprocess and
      * the multi-instance user tasks are cancelled when parent flows to terminate end event.
      */
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testCallActivityTerminateEnd.bpmn20.xml",
             "org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testCalledActivityTerminateEnd.bpmn20.xml"})
@@ -899,6 +901,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(idx, testListener.getEventsReceived().size());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testEmbeddedSubprocess.bpmn20.xml"})
     public void testMultiInstanceInSubprocessCancelledWhenFlowToTerminateEnd() throws Exception {
@@ -1061,6 +1064,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(idx, testListener.getEventsReceived().size());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/MultiInstanceUserTaskEventsTest.testMultiInstanceSequentialUserTaskEventsWithNormalCompletion.bpmn20.xml"})
     public void testMultiInstanceSequentialUserTaskEventsWithNormalCompletion() {

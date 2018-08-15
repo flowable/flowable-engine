@@ -26,6 +26,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -33,6 +34,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testHistoricActivityInstanceNoop() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noopProcess");
@@ -50,6 +52,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertTrue(historicActivityInstance.getDurationInMillis() >= 0);
     }
 
+    @Test
     @Deployment
     public void testHistoricActivityInstanceReceive() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("receiveProcess");
@@ -82,6 +85,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(historicActivityInstance.getStartTime());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml")
     public void testHistoricActivityInstanceUnfinished() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -98,6 +102,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals("One active (unfinished) User org.flowable.task.service.Task", 1, unfinishedActivityInstanceCount);
     }
 
+    @Test
     @Deployment
     public void testHistoricActivityInstanceQuery() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noopProcess");
@@ -153,6 +158,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testHistoricActivityInstanceForEventsQuery() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("eventProcess");
@@ -185,6 +191,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(endEvent.getEndTime());
     }
 
+    @Test
     @Deployment
     public void testHistoricActivityInstanceProperties() {
         // Start process instance
@@ -200,6 +207,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals("kermit", historicActivityInstance.getAssignee());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/calledProcess.bpmn20.xml", "org/flowable/engine/test/history/HistoricActivityInstanceTest.testCallSimpleSubProcess.bpmn20.xml" })
     public void testHistoricActivityInstanceCalledProcessId() {
         runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
@@ -213,6 +221,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(oldInstance.getId(), historicActivityInstance.getCalledProcessInstanceId());
     }
 
+    @Test
     @Deployment
     public void testSorting() {
         runtimeService.startProcessInstanceByKey("process");
@@ -257,6 +266,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals(expectedActivityInstances, historyService.createHistoricActivityInstanceQuery().orderByProcessInstanceId().desc().count());
     }
 
+    @Test
     public void testInvalidSorting() {
         try {
             historyService.createHistoricActivityInstanceQuery().asc().list();
@@ -283,6 +293,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     /**
      * Test to validate fix for ACT-1399: Boundary-event and event-based auditing
      */
+    @Test
     @Deployment
     public void testBoundaryEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryEventProcess");
@@ -321,6 +332,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     /**
      * Test to validate fix for ACT-1399: Boundary-event and event-based auditing
      */
+    @Test
     @Deployment
     public void testEventBasedGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignal");
@@ -340,6 +352,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     /**
      * Test to validate fix for ACT-1549: endTime of joining parallel gateway is not set
      */
+    @Test
     @Deployment
     public void testParallelJoinEndTime() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkJoin");
@@ -364,6 +377,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(historicActivityInstance.get(1).getEndTime());
     }
 
+    @Test
     @Deployment
     public void testLoop() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("historic-activity-loops", CollectionUtil.singletonMap("input", 0));

@@ -14,20 +14,18 @@ package org.flowable.examples.runtime;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * This test shows that bpmn endless loop with activiti6 is not only fiction
  */
 public class StandardAgendaFailingTest extends PluggableFlowableTestCase {
 
-    @Ignore("Endless loop with the standard agenda implementation can run 'forever'.")
+    @Test
+    @Disabled("Endless loop with the standard agenda implementation can run 'forever'.")
     @Deployment(resources = "org/flowable/examples/runtime/WatchDogAgendaTest-endlessloop.bpmn20.xml")
     public void ignoreStandardAgendaWithEndLessLoop() {
         this.runtimeService.startProcessInstanceByKey("endlessloop");
-    }
-
-    public void testEmpty() {
-        // empty test to let maven build pass through
     }
 }

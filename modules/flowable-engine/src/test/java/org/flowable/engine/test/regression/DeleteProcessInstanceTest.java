@@ -23,6 +23,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 //SLF4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteProcessInstanceTest.class);
 
+    @Test
     @Deployment
     public void testNoEndTimeSet() {
 

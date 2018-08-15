@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Simple process test to validate the current implementation prototype.
@@ -25,6 +26,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskAssigneeTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testTaskAssignee() {
 

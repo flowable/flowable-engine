@@ -17,6 +17,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobProcessor;
 import org.flowable.job.service.JobProcessorContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,12 +41,12 @@ public class JobProcessorTest extends ResourceFlowableTestCase {
         super("org/flowable/engine/test/jobexecutor/JobProcessorTest.flowable.cfg.xml");
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
-        super.tearDown();
         CHECK_SUM.set(0);
     }
 
+    @Test
     @Deployment
     public void testIntermediateTimer() {
         // Arrange
@@ -62,6 +64,7 @@ public class JobProcessorTest extends ResourceFlowableTestCase {
         assertCheckSum(2);
     }
 
+    @Test
     @Deployment
     public void testAsyncTask() {
         // Arrange

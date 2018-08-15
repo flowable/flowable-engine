@@ -18,6 +18,8 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.validation.ProcessValidator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * From http://forums.activiti.org/content/skip-parse-validation-while-fetching- startformdata
@@ -42,10 +44,9 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableT
         processEngineConfiguration.getProcessDefinitionCache().clear();
     }
 
-    @Override
+    @BeforeEach
     protected void tearDown() throws Exception {
         enableValidation();
-        super.tearDown();
     }
 
     private ProcessDefinition getLatestProcessDefinitionVersionByKey(String processDefinitionKey) {
@@ -61,6 +62,7 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableT
         return definitions.get(0);
     }
 
+    @Test
     public void testGetLatestProcessDefinitionTextByKey() {
 
         disableValidation();
@@ -84,6 +86,7 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableT
         }
     }
 
+    @Test
     public void testGetStartFormData() {
 
         disableValidation();

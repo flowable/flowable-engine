@@ -17,16 +17,20 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class SimpleCamelCallTest extends SpringFlowableTestCase {
 
     @Autowired
     protected CamelContext camelContext;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -37,6 +41,7 @@ public class SimpleCamelCallTest extends SpringFlowableTestCase {
         });
     }
 
+    @Test
     @Deployment
     public void testSimpleCamelCall() {
         runtimeService.startProcessInstanceByKey("SimpleCamelCallProcess");

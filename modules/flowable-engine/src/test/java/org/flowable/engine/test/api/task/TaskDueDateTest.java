@@ -19,25 +19,27 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class TaskDueDateTest extends PluggableFlowableTestCase {
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId(), true);
         }
 
-        super.tearDown();
     }
 
     /**
      * See https://activiti.atlassian.net/browse/ACT-2089
      */
+    @Test
     public void testDueDateSortingWithNulls() {
         Date now = processEngineConfiguration.getClock().getCurrentTime();
 

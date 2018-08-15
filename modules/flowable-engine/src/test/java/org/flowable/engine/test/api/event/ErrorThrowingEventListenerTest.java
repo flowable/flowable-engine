@@ -19,6 +19,7 @@ import org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEventListener}s that throws an error BPMN event when an {@link FlowableEvent} has been dispatched.
@@ -27,6 +28,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testThrowError() throws Exception {
         ErrorThrowingEventListener listener = null;
@@ -55,6 +57,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testThrowErrorDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");
@@ -74,6 +77,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
+    @Test
     @Deployment
     public void testThrowErrorWithErrorcode() throws Exception {
         ErrorThrowingEventListener listener = null;
@@ -118,6 +122,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testThrowErrorWithErrorcodeDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testError");

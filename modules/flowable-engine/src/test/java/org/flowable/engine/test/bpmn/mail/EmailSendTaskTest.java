@@ -36,6 +36,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 import org.subethamail.wiser.WiserMessage;
 
 /**
@@ -44,6 +45,7 @@ import org.subethamail.wiser.WiserMessage;
  */
 public class EmailSendTaskTest extends EmailTestCase {
 
+    @Test
     @Deployment
     public void testSimpleTextMail() throws Exception {
         runtimeService.startProcessInstanceByKey("simpleTextOnly");
@@ -55,6 +57,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@activiti.org"), null);
     }
 
+    @Test
     @Deployment
     public void testSimpleTextMailMultipleRecipients() {
         runtimeService.startProcessInstanceByKey("simpleTextOnlyMultipleRecipients");
@@ -75,6 +78,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertEquals("mispiggy@activiti.org", recipients.get(2));
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMailMultipleRecipients.bpmn20.xml")
     public void testSimpleTextMailMultipleRecipientsAndForceTo() {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org, no-reply2@flowable.org");
@@ -89,6 +93,7 @@ public class EmailSendTaskTest extends EmailTestCase {
             );
     }
 
+    @Test
     @Deployment
     public void testTextMailExpressions() throws Exception {
 
@@ -113,6 +118,7 @@ public class EmailSendTaskTest extends EmailTestCase {
                 Collections.singletonList(recipient), null);
     }
 
+    @Test
     @Deployment
     public void testCcAndBcc() throws Exception {
         runtimeService.startProcessInstanceByKey("ccAndBcc");
@@ -130,6 +136,7 @@ public class EmailSendTaskTest extends EmailTestCase {
             );
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testCcAndBcc.bpmn20.xml")
     public void testCcAndBccWithForceTo() throws Exception {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable");
@@ -148,6 +155,7 @@ public class EmailSendTaskTest extends EmailTestCase {
             );
     }
 
+    @Test
     @Deployment
     public void testHtmlMail() throws Exception {
         runtimeService.startProcessInstanceByKey("htmlMail", CollectionUtil.singletonMap("gender", "male"));
@@ -157,6 +165,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "flowable@localhost", Collections.singletonList("kermit@activiti.org"), null);
     }
 
+    @Test
     @Deployment
     public void testTextMailWithFileAttachment() throws Exception {
         HashMap<String, Object> vars = new HashMap<>();
@@ -172,6 +181,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertEquals(new AttachmentsBean().getFile().getName(), attachmentFileName);
     }
 
+    @Test
     @Deployment
     public void testTextMailWithFileAttachments() throws Exception {
         HashMap<String, Object> vars = new HashMap<>();
@@ -190,6 +200,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testTextMailWithFileAttachmentsByPath() throws Exception {
         HashMap<String, Object> vars = new HashMap<>();
@@ -208,6 +219,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testTextMailWithDataSourceAttachment() throws Exception {
         String fileName = "file-name-to-be-displayed";
@@ -227,6 +239,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertEquals(fileName, attachmentFileName);
     }
 
+    @Test
     @Deployment
     public void testTextMailWithNotExistingFileAttachment() throws Exception {
         HashMap<String, Object> vars = new HashMap<>();
@@ -239,6 +252,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertFalse(message.getMimeMessage().getContent() instanceof MimeMultipart);
     }
 
+    @Test
     @Deployment
     public void testHtmlMailWithFileAttachment() throws Exception {
         HashMap<String, Object> vars = new HashMap<>();
@@ -255,6 +269,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         assertEquals(new AttachmentsBean().getFile().getName(), attachmentFileName);
     }
 
+    @Test
     @Deployment
     public void testInvalidAddress() throws Exception {
         try {
@@ -267,6 +282,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testMissingToAddress() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingToAddress"))
@@ -274,6 +290,7 @@ public class EmailSendTaskTest extends EmailTestCase {
             .hasMessage("No recipient could be found for sending email");
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testMissingToAddress.bpmn20.xml")
     public void testMissingToAddressWithForceTo() {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org");
@@ -282,6 +299,7 @@ public class EmailSendTaskTest extends EmailTestCase {
             .hasMessage("No recipient could be found for sending email");
     }
 
+    @Test
     @Deployment
     public void testInvalidAddressWithoutException() throws Exception {
         String piId = runtimeService.startProcessInstanceByKey("invalidAddressWithoutException").getId();
@@ -290,6 +308,7 @@ public class EmailSendTaskTest extends EmailTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testInvalidAddressWithoutExceptionVariableName() throws Exception {
         String piId = runtimeService.startProcessInstanceByKey("invalidAddressWithoutException").getId();

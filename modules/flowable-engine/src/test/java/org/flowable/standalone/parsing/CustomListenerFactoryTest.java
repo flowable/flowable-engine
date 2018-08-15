@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -29,12 +31,12 @@ public class CustomListenerFactoryTest extends ResourceFlowableTestCase {
     // The custom activity factory will change this value
     public static AtomicInteger COUNTER = new AtomicInteger(0);
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         COUNTER.set(0);
     }
 
+    @Test
     @Deployment
     public void testCustomListenerFactory() {
         int nrOfProcessInstances = 4;

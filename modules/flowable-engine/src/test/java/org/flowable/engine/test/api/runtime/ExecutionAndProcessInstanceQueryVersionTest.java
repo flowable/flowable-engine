@@ -13,6 +13,9 @@
 package org.flowable.engine.test.api.runtime;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowableTestCase {
 
@@ -22,9 +25,8 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowab
     private org.flowable.engine.repository.Deployment oldDeployment;
     private org.flowable.engine.repository.Deployment newDeployment;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         oldDeployment = repositoryService.createDeployment()
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
                 .deploy();
@@ -38,12 +40,13 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowab
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         repositoryService.deleteDeployment(oldDeployment.getId(), true);
         repositoryService.deleteDeployment(newDeployment.getId(), true);
     }
 
+    @Test
     public void testProcessInstanceQueryByProcessDefinitionVersion() {
         assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionVersion(1).count());
         assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionVersion(2).count());
@@ -53,6 +56,7 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowab
         assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionVersion(3).list().size());
     }
 
+    @Test
     public void testProcessInstanceQueryByProcessDefinitionVersionAndKey() {
         assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(1).count());
         assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(2).count());
@@ -64,6 +68,7 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowab
         assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("undefined").processDefinitionVersion(2).list().size());
     }
 
+    @Test
     public void testProcessInstanceOrQueryByProcessDefinitionVersion() {
         assertEquals(1, runtimeService.createProcessInstanceQuery().or().processDefinitionVersion(1).processDefinitionId("undefined").endOr().count());
         assertEquals(1, runtimeService.createProcessInstanceQuery().or().processDefinitionVersion(2).processDefinitionId("undefined").endOr().count());
@@ -73,6 +78,7 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowab
         assertEquals(0, runtimeService.createProcessInstanceQuery().or().processDefinitionVersion(3).processDefinitionId("undefined").endOr().list().size());
     }
 
+    @Test
     public void testExecutionQueryByProcessDefinitionVersion() {
         assertEquals(2, runtimeService.createExecutionQuery().processDefinitionVersion(1).count());
         assertEquals(2, runtimeService.createExecutionQuery().processDefinitionVersion(2).count());
@@ -82,6 +88,7 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowab
         assertEquals(0, runtimeService.createExecutionQuery().processDefinitionVersion(3).list().size());
     }
 
+    @Test
     public void testExecutionQueryByProcessDefinitionVersionAndKey() {
         assertEquals(2, runtimeService.createExecutionQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(1).count());
         assertEquals(2, runtimeService.createExecutionQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(2).count());

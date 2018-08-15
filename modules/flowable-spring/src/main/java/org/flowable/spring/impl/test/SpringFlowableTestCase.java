@@ -12,58 +12,23 @@
  */
 package org.flowable.spring.impl.test;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContextManager;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author Joram Barrez
  * @author Josh Long
  */
-@TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
+@ExtendWith(InternalFlowableSpringExtension.class)
+@ExtendWith(SpringExtension.class)
 public abstract class SpringFlowableTestCase extends AbstractFlowableTestCase implements ApplicationContextAware {
-
-    // we need a data structure to store all the resolved ProcessEngines and map them to something
-    protected Map<Object, ProcessEngine> cachedProcessEngines = new ConcurrentHashMap<>();
-
-    // protected static Map<String, ProcessEngine> cachedProcessEngines = new
-    // HashMap<String, ProcessEngine>();
-
-    protected TestContextManager testContextManager;
 
     @Autowired
     protected ApplicationContext applicationContext;
-
-    public SpringFlowableTestCase() {
-        this.testContextManager = new TestContextManager(getClass());
-    }
-
-    @Override
-    public void runBare() throws Throwable {
-        testContextManager.prepareTestInstance(this); // this will initialize all dependencies
-        super.runBare();
-    }
-
-    @Override
-    protected void initializeProcessEngine() {
-        ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
-        String[] value = contextConfiguration.value();
-        boolean hasOneArg = value != null && value.length == 1;
-        String key = hasOneArg ? value[0] : ProcessEngine.class.getName();
-        ProcessEngine engine = this.cachedProcessEngines.containsKey(key) ? this.cachedProcessEngines.get(key) : this.applicationContext.getBean(ProcessEngine.class);
-
-        this.cachedProcessEngines.put(key, engine);
-        this.processEngine = engine;
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {

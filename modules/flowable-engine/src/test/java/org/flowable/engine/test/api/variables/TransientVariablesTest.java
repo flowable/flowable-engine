@@ -29,12 +29,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class TransientVariablesTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSetTransientVariableInServiceTask() {
 
@@ -50,6 +52,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "response"));
     }
 
+    @Test
     @Deployment
     public void testUseTransientVariableInExclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest");
@@ -60,6 +63,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "response"));
     }
 
+    @Test
     @Deployment
     public void testTaskCompleteWithTransientVariables() {
         Map<String, Object> persistentVars = new HashMap<>();
@@ -89,6 +93,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "thirdTransientVar"));
     }
 
+    @Test
     @Deployment
     public void testTaskResolveWithTransientVariables() {
         Map<String, Object> persistentVars = new HashMap<>();
@@ -118,6 +123,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "thirdTransientVar"));
     }
 
+    @Test
     @Deployment
     public void testTaskListenerWithTransientVariables() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest");
@@ -129,6 +135,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("transientVar01transientVar02transientVar03", mergedResult);
     }
 
+    @Test
     @Deployment
     public void testTransientVariableShadowsPersistentVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest", CollectionUtil.singletonMap("theVar", "Hello World"));
@@ -137,6 +144,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals("I am shadowed", varValue);
     }
 
+    @Test
     @Deployment
     public void testTriggerWithTransientVars() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transientVarsTest");
@@ -154,6 +162,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), "transientVar"));
     }
 
+    @Test
     @Deployment
     public void testStartProcessInstanceByKey() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
@@ -181,6 +190,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
     }
 
+    @Test
     @Deployment
     public void testStartProcessInstanceById() {
 
@@ -211,6 +221,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
     }
 
+    @Test
     @Deployment
     public void testStartProcessInstanceByMessage() {
 
@@ -239,6 +250,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.getVariables(processInstance.getId()).size());
     }
 
+    @Test
     @Deployment
     public void testLoopingExclusiveGateway() {
 

@@ -69,7 +69,6 @@ public abstract class TestHelper {
     // Test annotation support /////////////////////////////////////////////
 
     public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
-        String deploymentId = null;
         Method method = null;
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
@@ -77,7 +76,17 @@ public abstract class TestHelper {
             LOGGER.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
             return null;
         }
+        return annotationDeploymentSetUp(processEngine, testClass, method);
+    }
+
+    public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, Method method) {
         Deployment deploymentAnnotation = method.getAnnotation(Deployment.class);
+        return annotationDeploymentSetUp(processEngine, testClass, method, deploymentAnnotation);
+    }
+
+    public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, Method method, Deployment deploymentAnnotation) {
+        String deploymentId = null;
+        String methodName = method.getName();
         if (deploymentAnnotation != null) {
             LOGGER.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
             String[] resources = deploymentAnnotation.resources();

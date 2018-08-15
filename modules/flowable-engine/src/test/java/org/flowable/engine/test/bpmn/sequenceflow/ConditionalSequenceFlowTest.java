@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testUelExpression() {
         Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
@@ -39,6 +41,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         assertEquals("task right", task.getName());
     }
 
+    @Test
     @Deployment
     public void testSkipExpression() {
         Map<String, Object> variables = new HashMap<>();
@@ -53,6 +56,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         assertEquals("task left", task.getName());
     }
 
+    @Test
     @Deployment
     public void testDynamicExpression() {
         Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");

@@ -15,12 +15,14 @@ package org.flowable.engine.test.bpmn.usertask;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class InitiatorTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testInitiator() {
         try {
@@ -34,6 +36,7 @@ public class InitiatorTest extends PluggableFlowableTestCase {
     }
 
     // See ACT-1372
+    @Test
     @Deployment
     public void testInitiatorWithWhiteSpaceInExpression() {
         try {

@@ -21,12 +21,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class CallActivityTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/orderProcess.bpmn20.xml", "org/flowable/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml" })
     public void testOrderProcessWithCallActivity() {
         // After the process has started, the 'verify credit history' task
@@ -48,6 +50,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals("Prepare and Ship", prepareAndShipTask.getName());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/mainProcess.bpmn20.xml", "org/flowable/examples/bpmn/callactivity/childProcess.bpmn20.xml" })
     public void testCallActivityWithModeledDataObjectsInSubProcess() {
         // After the process has started, the 'verify credit history' task should be active
@@ -64,6 +67,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals("Batman", runtimeService.getVariable(subProcessInstance.getId(), "Name"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/mainProcess.bpmn20.xml",
             "org/flowable/examples/bpmn/callactivity/childProcess.bpmn20.xml",
             "org/flowable/examples/bpmn/callactivity/mainProcessBusinessKey.bpmn20.xml",

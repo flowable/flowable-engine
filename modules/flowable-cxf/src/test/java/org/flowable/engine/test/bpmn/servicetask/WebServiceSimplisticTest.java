@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Esteban Robles Luna
@@ -28,6 +29,7 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
         return false;
     }
 
+    @Test
     @Deployment
     public void testWebServiceInvocationWithSimplisticDataFlow() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -41,6 +43,7 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
         assertEquals("The counter has the value -1. Good news", response);
     }
 
+    @Test
     @Deployment
     public void testWebResponseNoName() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -54,6 +57,7 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
         assertEquals("The counter has the value -1. Good news (NO NAME)", response);
     }
 
+    @Test
     @Deployment
     public void testWebResponseKeywordName() throws Exception {
         Map<String, Object> variables = new HashMap<>();

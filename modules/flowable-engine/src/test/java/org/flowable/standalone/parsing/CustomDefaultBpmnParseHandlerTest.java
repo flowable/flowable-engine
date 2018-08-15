@@ -14,6 +14,7 @@ package org.flowable.standalone.parsing;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -25,6 +26,7 @@ public class CustomDefaultBpmnParseHandlerTest extends ResourceFlowableTestCase 
         super("org/flowable/standalone/parsing/custom.default.parse.handler.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testCustomDefaultUserTaskParsing() throws Exception {
         // The task which is created after process instance start should be

@@ -20,12 +20,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class CallServiceInServiceTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testStartProcessFromDelegate() {
         runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
@@ -50,6 +52,7 @@ public class CallServiceInServiceTaskTest extends PluggableFlowableTestCase {
         assertTrue(oneTaskProcessFound);
     }
 
+    @Test
     @Deployment
     public void testRollBackOnException() {
         Exception expectedException = null;
@@ -65,6 +68,7 @@ public class CallServiceInServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment
     public void testMultipleServiceInvocationsFromDelegate() {
         runtimeService.startProcessInstanceByKey("multipleServiceInvocations");

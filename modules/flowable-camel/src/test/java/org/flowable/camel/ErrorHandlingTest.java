@@ -20,6 +20,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -27,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
  *
  * @author stefan.schulze@accelsis.biz
  */
+@Tag("camel")
 @ContextConfiguration("classpath:error-camel-flowable-context.xml")
 public class ErrorHandlingTest extends SpringFlowableTestCase {
 
@@ -40,6 +43,7 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
      *
      * @throws Exception
      */
+    @Test
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testCamelRouteWorksAsIntended() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -61,6 +65,7 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
      *
      * @throws Exception
      */
+    @Test
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testRollbackOnException() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -78,6 +83,7 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
      *
      * @throws Exception
      */
+    @Test
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testErrorHandledByCamel() throws Exception {
         Map<String, Object> variables = new HashMap<>();

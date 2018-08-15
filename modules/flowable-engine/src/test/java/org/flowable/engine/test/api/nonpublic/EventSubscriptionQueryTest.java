@@ -29,12 +29,14 @@ import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daniel Meyer
  */
 public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testQueryByEventName() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
@@ -67,6 +69,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testQueryByEventType() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
@@ -99,6 +102,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testQueryByActivityId() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
@@ -134,6 +138,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testQueryByEventSubscriptionId() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
@@ -167,6 +172,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testQueryByExecutionId() {
 

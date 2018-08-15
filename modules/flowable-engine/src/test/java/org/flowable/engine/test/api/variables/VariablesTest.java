@@ -29,6 +29,9 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testing various constructs with variables. Created to test the changes done in https://jira.codehaus.org/browse/ACT-1900.
@@ -39,9 +42,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     protected String processInstanceId;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/variables/VariablesTest.bpmn20.xml").deploy();
 
@@ -90,16 +92,16 @@ public class VariablesTest extends PluggableFlowableTestCase {
         return vars;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
 
-        super.tearDown();
     }
 
+    @Test
     public void testGetVariables() {
 
         // Regular getVariables after process instance start
@@ -184,6 +186,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfSerializable);
     }
 
+    @Test
     public void testGetVariablesLocal() {
 
         // Regular getVariables after process instance start
@@ -236,6 +239,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, vars.size());
     }
 
+    @Test
     public void testGetVariable() {
 
         // This actually does a specific select. Before, this was not the case
@@ -246,6 +250,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("stringVarValue-3", value);
     }
 
+    @Test
     public void testGetVariablesLocal2() {
 
         // Trying the same after moving the process
@@ -344,6 +349,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testGetVariablesWithCollectionThroughRuntimeService() {
 
         Map<String, Object> vars = runtimeService.getVariables(processInstanceId, Arrays.asList("intVar1", "intVar3", "intVar5", "intVar9"));
@@ -367,6 +373,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableAllVariableFetchingDefault() {
 
@@ -386,6 +393,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("HELLO world", varValue);
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableAllVariableFetchingDisabled() {
 
@@ -400,6 +408,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("HELLO world!", varValue);
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableInDelegateMixed() {
 
@@ -413,6 +422,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("Hiya", (String) runtimeService.getVariable(processInstanceId, "testVar2"));
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableInDelegateMixed2() {
 
@@ -426,6 +436,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("1234", (String) runtimeService.getVariable(processInstanceId, "testVar"));
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testGetVariableInDelegateMixed3() {
 
@@ -446,6 +457,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstanceId, "testVar3"));
     }
 
+    @Test
     public void testTaskGetVariables() {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
@@ -518,6 +530,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("Override", taskService.getVariables(task.getId(), varNames).get("stringVar1"));
     }
 
+    @Test
     public void testLocalDateVariable() {
 
         Calendar todayCal = new GregorianCalendar();
@@ -552,6 +565,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(processInstanceId, processInstance.getId());
     }
 
+    @Test
     public void testLocalDateTimeVariable() {
 
         Calendar todayCal = new GregorianCalendar();

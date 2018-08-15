@@ -26,6 +26,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -35,6 +36,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
     public static boolean INVOCATION;
 
+    @Test
     @Deployment
     public void testAsyncServiceNoListeners() {
         INVOCATION = false;
@@ -53,6 +55,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceListeners() {
         String pid = runtimeService.startProcessInstanceByKey("asyncService").getProcessInstanceId();
@@ -65,6 +68,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceConcurrent() {
         INVOCATION = false;
@@ -83,6 +87,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceMultiInstance() {
         INVOCATION = false;
@@ -101,6 +106,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testFailingAsyncServiceTimer() {
         // start process
@@ -164,6 +170,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceSubProcessTimer() {
         INVOCATION = false;
@@ -184,6 +191,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceSubProcess() {
         // start process
@@ -198,6 +206,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testAsyncTask() {
         // start process
@@ -211,6 +220,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testAsyncEndEvent() {
         // start process
@@ -242,6 +252,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testAsyncScript() {
         // start process
@@ -269,6 +280,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         runtimeService.trigger(eid);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncCallActivity.bpmn20.xml",
             "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncServiceNoListeners.bpmn20.xml" })
     public void testAsyncCallActivity() throws Exception {
@@ -283,6 +295,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testBasicAsyncCallActivity.bpmn20.xml", "org/flowable/engine/test/bpmn/StartToEndTest.testStartToEnd.bpmn20.xml" })
     public void testBasicAsyncCallActivity() {
         runtimeService.startProcessInstanceByKey("myProcess");
@@ -291,6 +304,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testAsyncUserTask() {
         // start process
@@ -320,6 +334,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceAsyncTask() {
         // start process
@@ -371,6 +386,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceTask() {
         // start process
@@ -405,6 +421,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceAsyncSequentialTask() {
         // start process
@@ -456,6 +473,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceSequentialTask() {
         // start process

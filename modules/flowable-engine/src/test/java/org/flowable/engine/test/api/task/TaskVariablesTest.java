@@ -25,12 +25,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class TaskVariablesTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testStandaloneTaskVariables() {
         org.flowable.task.api.Task task = taskService.newTask();
         task.setName("gonzoTask");
@@ -43,6 +45,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         taskService.deleteTask(taskId, true);
     }
 
+    @Test
     @Deployment
     public void testTaskExecutionVariables() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
@@ -93,6 +96,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
     }
 
+    @Test
     public void testSerializableTaskVariable() {
         org.flowable.task.api.Task task = taskService.newTask();
         task.setName("MyTask");
@@ -112,6 +116,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         taskService.deleteTask(task.getId(), true);
     }
 
+    @Test
     @Deployment
     public void testGetVariablesLocalByTaskIds() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("twoTaskProcess");
@@ -183,6 +188,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         fail();
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/task/TaskVariablesTest.testTaskExecutionVariables.bpmn20.xml"
     })
@@ -205,6 +211,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         assertEquals(serializableTypeVar, variables.get(0).getValue());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/runtime/variableScope.bpmn20.xml"
     })

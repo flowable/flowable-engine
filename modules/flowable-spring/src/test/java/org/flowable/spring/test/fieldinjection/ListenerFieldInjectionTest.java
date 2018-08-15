@@ -19,6 +19,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/fieldinjection/fieldInjectionSpringTest-context.xml")
 public class ListenerFieldInjectionTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment
     public void testDelegateExpressionListenerFieldInjection() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("listenerFieldInjection", CollectionUtil.singletonMap("startValue", 42));

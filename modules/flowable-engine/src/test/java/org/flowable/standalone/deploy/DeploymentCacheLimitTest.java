@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -29,6 +30,7 @@ public class DeploymentCacheLimitTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/deploy/deployment.cache.limit.test.flowable.cfg.xml");
     }
 
+    @Test
     public void testDeploymentCacheLimit() throws IOException {
         int processDefinitionCacheLimit = 3; // This is set in the configuration
                                              // above

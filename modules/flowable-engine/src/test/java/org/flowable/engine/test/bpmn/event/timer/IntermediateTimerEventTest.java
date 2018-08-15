@@ -27,10 +27,12 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.Test;
 
 public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
+    @Test
     @Deployment
     public void testCatchingTimerEvent() throws Exception {
 
@@ -51,6 +53,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testTimerEventWithStartAndDuration() throws Exception {
 
@@ -98,6 +101,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().reset();
     }
 
+    @Test
     @Deployment
     public void testExpression() {
         // Set the clock fixed
@@ -136,6 +140,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi3.getProcessInstanceId());
     }
 
+    @Test
     @Deployment
     public void testLoop() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testLoop");
@@ -150,6 +155,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testLoopWithCycle() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testLoop");
@@ -164,6 +170,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testRescheduleTimer() {
         // startDate variable set to one hour from now
@@ -223,6 +230,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         assertNull(timerJob);
     }
 
+    @Test
     @Deployment
     public void testParallelTimerEvents() throws Exception {
         // Set the clock fixed
