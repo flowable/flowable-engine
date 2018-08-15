@@ -148,8 +148,21 @@ public abstract class TestHelper {
         }
     }
 
-    protected static void handleMockServiceTaskAnnotation(FlowableMockSupport mockSupport, MockServiceTask mockedServiceTask) {
-        mockSupport.mockServiceTaskWithClassDelegate(mockedServiceTask.originalClassName(), mockedServiceTask.mockedClassName());
+    public static void handleMockServiceTaskAnnotation(FlowableMockSupport mockSupport, MockServiceTask mockedServiceTask) {
+        String originalClassName = mockedServiceTask.originalClassName();
+        mockSupport.mockServiceTaskWithClassDelegate(originalClassName, mockedServiceTask.mockedClassName());
+        Class<?> mockedClass = mockedServiceTask.mockedClass();
+        if (!Void.class.equals(mockedClass)) {
+            mockSupport.mockServiceTaskWithClassDelegate(originalClassName, mockedClass);
+        }
+
+        String id = mockedServiceTask.id();
+        if (!id.isEmpty()) {
+            mockSupport.mockServiceTaskByIdWithClassDelegate(id, mockedServiceTask.mockedClassName());
+            if (!Void.class.equals(mockedClass)) {
+                mockSupport.mockServiceTaskByIdWithClassDelegate(id, mockedClass);
+            }
+        }
     }
 
     protected static void handleMockServiceTasksAnnotation(FlowableMockSupport mockSupport, Method method) {
@@ -164,7 +177,12 @@ public abstract class TestHelper {
     protected static void handleNoOpServiceTasksAnnotation(FlowableMockSupport mockSupport, Method method) {
         NoOpServiceTasks noOpServiceTasks = method.getAnnotation(NoOpServiceTasks.class);
         if (noOpServiceTasks != null) {
+            handleNoOpServiceTasksAnnotation(mockSupport, noOpServiceTasks);
+        }
+    }
 
+    public static void handleNoOpServiceTasksAnnotation(FlowableMockSupport mockSupport, NoOpServiceTasks noOpServiceTasks) {
+        if (noOpServiceTasks != null) {
             String[] ids = noOpServiceTasks.ids();
             Class<?>[] classes = noOpServiceTasks.classes();
             String[] classNames = noOpServiceTasks.classNames();
@@ -192,7 +210,6 @@ public abstract class TestHelper {
                 }
 
             }
-
         }
     }
 
