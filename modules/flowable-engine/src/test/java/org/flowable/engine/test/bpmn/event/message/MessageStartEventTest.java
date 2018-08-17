@@ -127,7 +127,21 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
+        
+        // start process instance again after clearing the process definition cache (force deployment)
+        
+        processEngineConfiguration.getProcessDefinitionCache().clear();
+        
+        processInstance = runtimeService.startProcessInstanceByMessage("newInvoiceMessage");
 
+        assertFalse(processInstance.isEnded());
+
+        task = taskService.createTaskQuery().singleResult();
+        assertNotNull(task);
+
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
     
     @Deployment
