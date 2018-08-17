@@ -18,6 +18,8 @@ import java.util.List;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.MultiInstanceCompletionConditionEvaluator;
+import org.flowable.engine.impl.bpmn.helper.MultiInstanceRootCleaner;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -86,7 +88,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             multiInstanceRootExecution.setActive(false);
         }
 
-        scheduleMonitor(multiInstanceRootExecution, concurrentExecutions);
+        if (isCurrentFlowElementCallActivity(multiInstanceRootExecution)) {
+            scheduleMonitor(multiInstanceRootExecution, concurrentExecutions);
+        }
 
         return nrOfInstances;
     }
@@ -112,7 +116,11 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         DelegateExecution miRootExecution = getMultiInstanceRootExecution(execution);
         if (miRootExecution != null) { // will be null in case of empty
                                        // collection
-            setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 1);
+            if (!isCurrentFlowElementCallActivity(miRootExecution)) {
+                setLoopVariable(miRootExecution, NUMBER_OF_COMPLETED_INSTANCES, retrieveNumberOfCompletedInstances(miRootExecution) + 1);
+            } else {
+                setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 1);
+            }
         }
         CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
         callActivityEndListeners(execution);
@@ -127,10 +135,24 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                 return;
             }
             executionEntity.inactivate();
+            if (!isCurrentFlowElementCallActivity(miRootExecution)) {
+                int nrOfCompletedInstances = retrieveNumberOfCompletedInstances(miRootExecution);
+                int nrOfInstances = getLoopVariable(miRootExecution, NUMBER_OF_INSTANCES);
+                boolean isCompletionConditionSatisfied = new MultiInstanceCompletionConditionEvaluator()
+                                .evaluateCompletionCondition((ExecutionEntity) miRootExecution);
+                if (nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) {
+                    new MultiInstanceRootCleaner(isCompletionConditionSatisfied).finishMultiInstanceRootExecution((ExecutionEntity) miRootExecution);
+                }
+            }
+
         } else {
             sendCompletedEvent(execution);
             super.leave(execution);
         }
+    }
+
+    private Integer retrieveNumberOfCompletedInstances(DelegateExecution miRootExecution) {
+        return getLoopVariable(miRootExecution, NUMBER_OF_COMPLETED_INSTANCES);
     }
 
 }
