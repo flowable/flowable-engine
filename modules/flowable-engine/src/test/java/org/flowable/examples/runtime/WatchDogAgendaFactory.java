@@ -136,7 +136,7 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
 
         @Override
         public void planMonitorParallelMultiInstanceOperation(ExecutionEntity executionEntity, List< ? extends ExecutionEntity> executions) {
-            // TODO Auto-generated method stub
+            agenda.planMonitorParallelMultiInstanceOperation(executionEntity, executions);
 
         }
 
