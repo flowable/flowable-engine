@@ -4,9 +4,13 @@ import java.util.Map;
 
 public interface ProcessInstanceMigrationDocumentBuilder {
 
-//    ProcessInstanceMigrationDocumentBuilder toProcessDefinitionId(String processDefinitionId);
-//
-//    ProcessInstanceMigrationDocumentBuilder toProcessDefinitionVersion(String processDefinitionKey, String processDefinitionVersion);
+    ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId);
+
+    ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, String processDefinitionVersion);
+
+    ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId);
+
+    ProcessInstanceMigrationDocumentBuilder setTenantOfProcessDefinitionToMigrateTo(String processDefinitionTenantId);
 
     ProcessInstanceMigrationDocumentBuilder addProcessInstanceIdToMigrate(String processInstanceId);
 

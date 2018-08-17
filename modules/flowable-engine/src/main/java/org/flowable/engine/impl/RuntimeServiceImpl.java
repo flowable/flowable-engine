@@ -55,6 +55,7 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
+import org.flowable.engine.impl.cmd.ProcessInstanceMigrationCmd;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
@@ -66,11 +67,11 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceWithFormCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
-import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentBuilderImpl;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
-import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -679,17 +680,16 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder createProcessInstanceMigrationDocumentBuilder(String processDefinitionId) {
-        return new ProcessInstanceMigrationDocumentBuilderImpl(processDefinitionId);
+    public ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilder() {
+        return new ProcessInstanceMigrationBuilderImpl(this);
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder createProcessInstanceMigrationDocumentBuilder(String processDefinitionKey, String processDefinitionVersion) {
-        return new ProcessInstanceMigrationDocumentBuilderImpl(processDefinitionKey, processDefinitionVersion);
+    public ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilderFromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
+        return ProcessInstanceMigrationBuilderImpl.fromProcessInstanceMigrationDocument(this, document);
     }
 
-    @Override
-    public ProcessInstanceMigrationDocument createProcessInstanceMigrationDocumentFromJson(String processInstanceMigrationDocumentJson) {
-        return ProcessInstanceMigrationDocumentBuilderImpl.buildFromJson(processInstanceMigrationDocumentJson);
+    public void migrateProcessInstance(ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+        commandExecutor.execute(new ProcessInstanceMigrationCmd(processInstanceMigrationDocument));
     }
 }

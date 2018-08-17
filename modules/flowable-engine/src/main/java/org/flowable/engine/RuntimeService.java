@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,8 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
-import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
@@ -45,7 +45,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
- * 
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Daniel Meyer
@@ -59,7 +59,7 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the latest version of the process definition with the given key.
-     * 
+     *
      * @param processDefinitionKey
      *            key of process definition, cannot be null.
      * @throws FlowableObjectNotFoundException
@@ -69,11 +69,11 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the latest version of the process definition with the given key.
-     * 
+     *
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
-     * 
+     *
      * @param processDefinitionKey
      *            key of process definition, cannot be null.
      * @param businessKey
@@ -85,7 +85,7 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the latest version of the process definition with the given key
-     * 
+     *
      * @param processDefinitionKey
      *            key of process definition, cannot be null.
      * @param variables
@@ -97,11 +97,11 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the latest version of the process definition with the given key.
-     * 
+     *
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
-     * 
+     *
      * @param processDefinitionKey
      *            key of process definition, cannot be null.
      * @param variables
@@ -135,7 +135,7 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
-     * 
+     *
      * @param processDefinitionId
      *            the id of the process definition, cannot be null.
      * @throws FlowableObjectNotFoundException
@@ -145,11 +145,11 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
-     * 
+     *
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
-     * 
+     *
      * @param processDefinitionId
      *            the id of the process definition, cannot be null.
      * @param businessKey
@@ -161,7 +161,7 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
-     * 
+     *
      * @param processDefinitionId
      *            the id of the process definition, cannot be null.
      * @param variables
@@ -173,11 +173,11 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
-     * 
+     *
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
-     * 
+     *
      * @param processDefinitionId
      *            the id of the process definition, cannot be null.
      * @param variables
@@ -189,14 +189,14 @@ public interface RuntimeService {
 
     /**
      * Starts a new process instance in the exactly specified version of the process definition with the given id.
-     * 
+     *
      * A business key can be provided to associate the process instance with a certain identifier that has a clear business meaning. For example in an order process, the business key could be an order
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
-     * 
+     *
      * Only use this method when a form definition is attached to the start event of the provided process definition. This will expect the Flowable Form Engine to be enabled. A new form instance will
      * be created after successfully starting a new process instance.
-     * 
+     *
      * @param processDefinitionId
      *            the id of the process definition, cannot be null.
      * @param outcome
@@ -214,7 +214,7 @@ public interface RuntimeService {
      * <p>
      * Signals the process engine that a message is received and starts a new {@link ProcessInstance}.
      * </p>
-     * 
+     *
      * <p>
      * Calling this method can have two different outcomes:
      * <ul>
@@ -222,15 +222,15 @@ public interface RuntimeService {
      * <li>If no subscription to a message with the given name exists, {@link FlowableException} is thrown</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param messageName
      *            the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
-     * 
+     *
      * @return the {@link ProcessInstance} object representing the started process instance
-     * 
+     *
      * @throws FlowableException
      *             if no subscription to a message with the given name exists
-     * 
+     *
      * @since 5.9
      */
     ProcessInstance startProcessInstanceByMessage(String messageName);
@@ -244,17 +244,17 @@ public interface RuntimeService {
      * <p>
      * Signals the process engine that a message is received and starts a new {@link ProcessInstance}.
      * </p>
-     * 
+     *
      * See {@link #startProcessInstanceByMessage(String, Map)}. This method allows specifying a business key.
-     * 
+     *
      * @param messageName
      *            the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
      * @param businessKey
      *            the business key which is added to the started process instance
-     * 
+     *
      * @throws FlowableException
      *             if no subscription to a message with the given name exists
-     * 
+     *
      * @since 5.10
      */
     ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey);
@@ -268,18 +268,18 @@ public interface RuntimeService {
      * <p>
      * Signals the process engine that a message is received and starts a new {@link ProcessInstance}.
      * </p>
-     * 
+     *
      * See {@link #startProcessInstanceByMessage(String)}. In addition, this method allows specifying a the payload of the message as a map of process variables.
-     * 
+     *
      * @param messageName
      *            the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
      * @param processVariables
      *            the 'payload' of the message. The variables are added as processes variables to the started process instance.
      * @return the {@link ProcessInstance} object representing the started process instance
-     * 
+     *
      * @throws FlowableException
      *             if no subscription to a message with the given name exists
-     * 
+     *
      * @since 5.9
      */
     ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables);
@@ -293,9 +293,9 @@ public interface RuntimeService {
      * <p>
      * Signals the process engine that a message is received and starts a new {@link ProcessInstance}.
      * </p>
-     * 
+     *
      * See {@link #startProcessInstanceByMessage(String, Map)}. In addition, this method allows specifying a business key.
-     * 
+     *
      * @param messageName
      *            the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
      * @param businessKey
@@ -303,10 +303,10 @@ public interface RuntimeService {
      * @param processVariables
      *            the 'payload' of the message. The variables are added as processes variables to the started process instance.
      * @return the {@link ProcessInstance} object representing the started process instance
-     * 
+     *
      * @throws FlowableException
      *             if no subscription to a message with the given name exists
-     * 
+     *
      * @since 5.9
      */
     ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables);
@@ -318,7 +318,7 @@ public interface RuntimeService {
 
     /**
      * Gets a Form model instance of the start form of a specific process definition or process instance
-     * 
+     *
      * @param processDefinitionId
      *            id of process definition for which the start form should be retrieved.
      * @param processInstanceId
@@ -328,7 +328,7 @@ public interface RuntimeService {
 
     /**
      * Delete an existing runtime process instance.
-     * 
+     *
      * @param processInstanceId
      *            id of process instance to delete, cannot be null.
      * @param deleteReason
@@ -340,7 +340,7 @@ public interface RuntimeService {
 
     /**
      * Finds the activity ids for all executions that are waiting in activities. This is a list because a single activity can be active multiple times.
-     * 
+     *
      * @param executionId
      *            id of the execution, cannot be null.
      * @throws FlowableObjectNotFoundException
@@ -350,7 +350,7 @@ public interface RuntimeService {
 
     /**
      * Sends an external trigger to an activity instance that is waiting inside the given execution.
-     * 
+     *
      * @param executionId
      *            id of execution to signal, cannot be null.
      * @throws FlowableObjectNotFoundException
@@ -371,7 +371,7 @@ public interface RuntimeService {
 
     /**
      * Sends an external trigger to an activity instance that is waiting inside the given execution.
-     * 
+     *
      * @param executionId
      *            id of execution to signal, cannot be null.
      * @param processVariables
@@ -401,7 +401,7 @@ public interface RuntimeService {
 
     /**
      * Updates the business key for the provided process instance
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance to set the business key, cannot be null
      * @param businessKey
@@ -414,7 +414,7 @@ public interface RuntimeService {
 
     /**
      * Involves a user with a process instance. The type of identity link is defined by the given identityLinkType.
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance, cannot be null.
      * @param userId
@@ -428,7 +428,7 @@ public interface RuntimeService {
 
     /**
      * Involves a group with a process instance. The type of identityLink is defined by the given identityLink.
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance, cannot be null.
      * @param groupId
@@ -442,7 +442,7 @@ public interface RuntimeService {
 
     /**
      * Convenience shorthand for {@link #addUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance, cannot be null.
      * @param userId
@@ -454,7 +454,7 @@ public interface RuntimeService {
 
     /**
      * Convenience shorthand for {@link #addGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance, cannot be null.
      * @param groupId
@@ -466,7 +466,7 @@ public interface RuntimeService {
 
     /**
      * Convenience shorthand for {@link #deleteUserIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance, cannot be null.
      * @param userId
@@ -478,7 +478,7 @@ public interface RuntimeService {
 
     /**
      * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#PARTICIPANT}
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance, cannot be null.
      * @param groupId
@@ -490,7 +490,7 @@ public interface RuntimeService {
 
     /**
      * Removes the association between a user and a process instance for the given identityLinkType.
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance, cannot be null.
      * @param userId
@@ -504,7 +504,7 @@ public interface RuntimeService {
 
     /**
      * Removes the association between a group and a process instance for the given identityLinkType.
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance, cannot be null.
      * @param groupId
@@ -526,7 +526,7 @@ public interface RuntimeService {
 
     /**
      * All variables visible from the given execution scope (including parent scopes).
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @return the variables or an empty map if no such variables are found.
@@ -548,7 +548,7 @@ public interface RuntimeService {
 
     /**
      * All variables visible from the given execution scope (including parent scopes).
-     * 
+     *
      * @param executionIds
      *            ids of execution, cannot be null.
      * @return the variables.
@@ -558,7 +558,7 @@ public interface RuntimeService {
     /**
      * All variable values that are defined in the execution scope, without taking outer scopes into account. If you have many task local variables and you only need a few, consider using
      * {@link #getVariablesLocal(String, Collection)} for better performance.
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @return the variables or an empty map if no such variables are found.
@@ -581,7 +581,7 @@ public interface RuntimeService {
 
     /**
      * The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @param variableNames
@@ -594,7 +594,7 @@ public interface RuntimeService {
 
     /**
      * The variable values for all given variableNames, takes all variables into account which are visible from the given execution scope (including parent scopes).
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @param variableNames
@@ -607,7 +607,7 @@ public interface RuntimeService {
 
     /**
      * The variable values for the given variableNames only taking the given execution scope into account, not looking in outer scopes.
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @param variableNames
@@ -634,7 +634,7 @@ public interface RuntimeService {
     /**
      * The variable value. Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes). Returns null when no variable value is found with the
      * given name or when the value is set to null.
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @param variableName
@@ -662,7 +662,7 @@ public interface RuntimeService {
     /**
      * The variable value. Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes). Returns null when no variable value is found with the
      * given name or when the value is set to null. Throws ClassCastException when cannot cast variable to given class
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @param variableName
@@ -713,12 +713,12 @@ public interface RuntimeService {
 
     /**
      * Update or create a variable for an execution.
-     * 
+     *
      * <p>
      * The variable is set according to the algorithm as documented for {@link VariableScope#setVariable(String, Object)}.
-     * 
+     *
      * @see VariableScope#setVariable(String, Object) {@link VariableScope#setVariable(String, Object)}
-     * 
+     *
      * @param executionId
      *            id of execution to set variable in, cannot be null.
      * @param variableName
@@ -732,7 +732,7 @@ public interface RuntimeService {
 
     /**
      * Update or create a variable for an execution (not considering parent scopes). If the variable is not already existing, it will be created in the given execution.
-     * 
+     *
      * @param executionId
      *            id of execution to set variable in, cannot be null.
      * @param variableName
@@ -748,9 +748,9 @@ public interface RuntimeService {
      * Update or create given variables for an execution (including parent scopes).
      * <p>
      * Variables are set according to the algorithm as documented for {@link VariableScope#setVariables(Map)}, applied separately to each variable.
-     * 
+     *
      * @see VariableScope#setVariables(Map) {@link VariableScope#setVariables(Map)}
-     * 
+     *
      * @param executionId
      *            id of the execution, cannot be null.
      * @param variables
@@ -762,7 +762,7 @@ public interface RuntimeService {
 
     /**
      * Update or create given variables for an execution (not considering parent scopes). If the variables are not already existing, it will be created in the given execution.
-     * 
+     *
      * @param executionId
      *            id of the execution, cannot be null.
      * @param variables
@@ -774,7 +774,7 @@ public interface RuntimeService {
 
     /**
      * Removes a variable for an execution.
-     * 
+     *
      * @param executionId
      *            id of execution to remove variable in.
      * @param variableName
@@ -784,7 +784,7 @@ public interface RuntimeService {
 
     /**
      * Removes a variable for an execution (not considering parent scopes).
-     * 
+     *
      * @param executionId
      *            id of execution to remove variable in.
      * @param variableName
@@ -794,7 +794,7 @@ public interface RuntimeService {
 
     /**
      * Removes variables for an execution.
-     * 
+     *
      * @param executionId
      *            id of execution to remove variable in.
      * @param variableNames
@@ -804,7 +804,7 @@ public interface RuntimeService {
 
     /**
      * Remove variables for an execution (not considering parent scopes).
-     * 
+     *
      * @param executionId
      *            id of execution to remove variable in.
      * @param variableNames
@@ -868,7 +868,7 @@ public interface RuntimeService {
 
     /**
      * The DataObjects for all given dataObjectNames, takes all dataObjects into account which are visible from the given execution scope (including parent scopes).
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @param dataObjectNames
@@ -881,7 +881,7 @@ public interface RuntimeService {
 
     /**
      * The DataObjects for all given dataObjectNames, takes all dataObjects into account which are visible from the given execution scope (including parent scopes).
-     * 
+     *
      * @param executionId
      *            id of execution, cannot be null.
      * @param dataObjectNames
@@ -1019,11 +1019,11 @@ public interface RuntimeService {
 
     /**
      * Suspends the process instance with the given id.
-     * 
+     *
      * If a process instance is in state suspended, flowable will not execute jobs (timers, messages) associated with this instance.
-     * 
+     *
      * If you have a process instance hierarchy, suspending one process instance form the hierarchy will not suspend other process instances form that hierarchy.
-     * 
+     *
      * @throws FlowableObjectNotFoundException
      *             if no such processInstance can be found.
      * @throws FlowableException
@@ -1033,9 +1033,9 @@ public interface RuntimeService {
 
     /**
      * Activates the process instance with the given id.
-     * 
+     *
      * If you have a process instance hierarchy, suspending one process instance form the hierarchy will not suspend other process instances form that hierarchy.
-     * 
+     *
      * @throws FlowableObjectNotFoundException
      *             if no such processInstance can be found.
      * @throws FlowableException
@@ -1049,9 +1049,9 @@ public interface RuntimeService {
     /**
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to all executions waiting on the signal.
      * <p/>
-     * 
+     *
      * <strong>NOTE:</strong> The waiting executions are notified synchronously.
-     * 
+     *
      * @param signalName
      *            the name of the signal event
      */
@@ -1065,7 +1065,7 @@ public interface RuntimeService {
     /**
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to all executions waiting on the signal.
      * <p/>
-     * 
+     *
      * @param signalName
      *            the name of the signal event
      */
@@ -1079,9 +1079,9 @@ public interface RuntimeService {
     /**
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to all executions waiting on the signal.
      * <p/>
-     * 
+     *
      * <strong>NOTE:</strong> The waiting executions are notified synchronously.
-     * 
+     *
      * @param signalName
      *            the name of the signal event
      * @param processVariables
@@ -1097,7 +1097,7 @@ public interface RuntimeService {
     /**
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to a single execution, being the execution referenced by 'executionId'.
      * The waiting execution is notified synchronously.
-     * 
+     *
      * @param signalName
      *            the name of the signal event
      * @param executionId
@@ -1112,7 +1112,7 @@ public interface RuntimeService {
     /**
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to a single execution, being the execution referenced by 'executionId'.
      * The waiting execution is notified synchronously.
-     * 
+     *
      * @param signalName
      *            the name of the signal event
      * @param executionId
@@ -1129,7 +1129,7 @@ public interface RuntimeService {
     /**
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to a single execution, being the execution referenced by 'executionId'.
      * The waiting execution is notified <strong>asynchronously</strong>.
-     * 
+     *
      * @param signalName
      *            the name of the signal event
      * @param executionId
@@ -1143,9 +1143,9 @@ public interface RuntimeService {
 
     /**
      * Notifies the process engine that a message event with name 'messageName' has been received and has been correlated to an execution with id 'executionId'.
-     * 
+     *
      * The waiting execution is notified synchronously.
-     * 
+     *
      * @param messageName
      *            the name of the message event
      * @param executionId
@@ -1159,9 +1159,9 @@ public interface RuntimeService {
 
     /**
      * Notifies the process engine that a message event with the name 'messageName' has been received and has been correlated to an execution with id 'executionId'.
-     * 
+     *
      * The waiting execution is notified synchronously.
-     * 
+     *
      * <p>
      * Variables are set for the scope of the execution of the message event subscribed to the message name. For example:
      * <p>
@@ -1170,9 +1170,9 @@ public interface RuntimeService {
      * <li>The scope for a boundary message event is that of the execution for the Activity the event is attached to</li>
      * <p>
      * Variables are set according to the algorithm as documented for {@link VariableScope#setVariables(Map)}, applied separately to each variable.
-     * 
+     *
      * @see VariableScope#setVariables(Map) {@link VariableScope#setVariables(Map)}
-     * 
+     *
      * @param messageName
      *            the name of the message event
      * @param executionId
@@ -1188,9 +1188,9 @@ public interface RuntimeService {
 
     /**
      * Notifies the process engine that a message event with the name 'messageName' has been received and has been correlated to an execution with id 'executionId'.
-     * 
+     *
      * The waiting execution is notified <strong>asynchronously</strong>.
-     * 
+     *
      * @param messageName
      *            the name of the message event
      * @param executionId
@@ -1204,7 +1204,7 @@ public interface RuntimeService {
 
     /**
      * Adds an event-listener which will be notified of ALL events by the dispatcher.
-     * 
+     *
      * @param listenerToAdd
      *            the listener to add
      */
@@ -1212,7 +1212,7 @@ public interface RuntimeService {
 
     /**
      * Adds an event-listener which will only be notified when an event occurs, which type is in the given types.
-     * 
+     *
      * @param listenerToAdd
      *            the listener to add
      * @param types
@@ -1222,7 +1222,7 @@ public interface RuntimeService {
 
     /**
      * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
-     * 
+     *
      * @param listenerToRemove
      *            listener to remove
      */
@@ -1230,10 +1230,10 @@ public interface RuntimeService {
 
     /**
      * Dispatches the given event to any listeners that are registered.
-     * 
+     *
      * @param event
      *            event to dispatch.
-     * 
+     *
      * @throws FlowableException
      *             if an exception occurs when dispatching the event or when the {@link FlowableEventDispatcher} is disabled.
      * @throws FlowableIllegalArgumentException
@@ -1243,7 +1243,7 @@ public interface RuntimeService {
 
     /**
      * Sets the name for the process instance with the given id.
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance to update
      * @param name
@@ -1255,7 +1255,7 @@ public interface RuntimeService {
 
     /**
      * Gets executions with an adhoc sub process as current flow element
-     * 
+     *
      * @param processInstanceId
      *            id of the process instance that is used to search for child executions
      * @return a list of executions
@@ -1264,7 +1264,7 @@ public interface RuntimeService {
 
     /**
      * Gets enabled activities from ad-hoc sub process
-     * 
+     *
      * @param executionId
      *            id of the execution that has an ad-hoc sub process as current flow element
      * @return a list of enabled activities
@@ -1273,7 +1273,7 @@ public interface RuntimeService {
 
     /**
      * Executes an activity in a ad-hoc sub process
-     * 
+     *
      * @param executionId
      *            id of the execution that has an ad-hoc sub process as current flow element
      * @param activityId
@@ -1284,7 +1284,7 @@ public interface RuntimeService {
 
     /**
      * Completes the ad-hoc sub process
-     * 
+     *
      * @param executionId
      *            id of the execution that has an ad-hoc sub process as current flow element
      */
@@ -1294,24 +1294,24 @@ public interface RuntimeService {
      * Create a {@link ChangeActivityStateBuilder}, that allows to set various options for changing the state of a process instance.
      */
     ChangeActivityStateBuilder createChangeActivityStateBuilder();
-    
+
     /**
      * Adds a new execution to a running multi-instance parent execution
-     * 
+     *
      * @param activityId
      *            id of the multi-instance activity (id attribute in the BPMN XML)
      * @param parentExecutionId
-     *            can be the process instance id, in case there's one multi-instance execution for the provided activity id. 
+     *            can be the process instance id, in case there's one multi-instance execution for the provided activity id.
      *            In case of multiple multi-instance executions with the same activity id this can be a specific parent execution id.
      * @param executionVariables
      *            variables to be set on as local variable on the newly created multi-instance execution
      * @return the newly created multi-instance execution
-     */                       
+     */
     Execution addMultiInstanceExecution(String activityId, String parentExecutionId, Map<String, Object> executionVariables);
-    
+
     /**
      * Deletes a multi-instance execution
-     * 
+     *
      * @param executionId
      *            id of the multi-instance execution to be deleted
      * @param executionIsCompleted
@@ -1322,10 +1322,8 @@ public interface RuntimeService {
     /** The all events related to the given Process Instance. */
     List<Event> getProcessInstanceEvents(String processInstanceId);
 
-    ProcessInstanceMigrationDocumentBuilder createProcessInstanceMigrationDocumentBuilder(String processDefinitionId);
+    ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilder();
 
-    ProcessInstanceMigrationDocumentBuilder createProcessInstanceMigrationDocumentBuilder(String processDefinitionKey, String processDefinitionVersion);
-
-    ProcessInstanceMigrationDocument createProcessInstanceMigrationDocumentFromJson(String processInstanceMigrationDocumentJson);
+    ProcessInstanceMigrationBuilder createProcessInstanceMigrationBuilderFromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document);
 
 }

@@ -1,6 +1,5 @@
 package org.flowable.engine.impl.migration;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,44 +8,59 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInstanceMigrationDocumentBuilder {
 
     protected String migrateToProcessDefinitionId;
     protected String migrateToProcessDefinitionKey;
     protected String migrateToProcessDefinitionVersion;
+    protected String migrateToProcessDefinitionTenantId;
     protected Set<String> processInstancesIdsToMigrate = new HashSet<>();
     protected Map<String, String> activityMigrationMappings = new HashMap<>();
 
-    public ProcessInstanceMigrationDocumentBuilderImpl(String processDefinitionId) {
-        Objects.requireNonNull(processDefinitionId, "Process definition id cannot be null");
-        this.migrateToProcessDefinitionId = processDefinitionId;
+    public static ProcessInstanceMigrationDocumentBuilder fromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
+        ProcessInstanceMigrationDocumentBuilderImpl builder = new ProcessInstanceMigrationDocumentBuilderImpl();
+        builder.migrateToProcessDefinitionId = document.getMigrateToProcessDefinitionId();
+        builder.migrateToProcessDefinitionKey = document.getMigrateToProcessDefinitionKey();
+        builder.migrateToProcessDefinitionVersion = document.getMigrateToProcessDefinitionVersion();
+        builder.processInstancesIdsToMigrate = new HashSet<>(document.getProcessInstancesIdsToMigrate());
+        builder.activityMigrationMappings = document.getActivityMigrationMappings();
+        return builder;
     }
 
-    public ProcessInstanceMigrationDocumentBuilderImpl(String processDefinitionKey, String processDefinitionVersion) {
-        Objects.requireNonNull(processDefinitionKey, "Process definition key cannot be null");
-        Objects.requireNonNull(processDefinitionVersion, "Process definition version cannot be null");
+    public static ProcessInstanceMigrationDocumentBuilder fromProcessInstanceMigrationDocumentJson(String processInstanceMigrationDocumentJson) {
+        ProcessInstanceMigrationDocument document = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(processInstanceMigrationDocumentJson);
+        return fromProcessInstanceMigrationDocument(document);
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId) {
+        this.migrateToProcessDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, String processDefinitionVersion) {
         this.migrateToProcessDefinitionKey = processDefinitionKey;
         this.migrateToProcessDefinitionVersion = processDefinitionVersion;
+        return this;
     }
 
-    //    @Override
-    //    public ProcessInstanceMigrationDocumentBuilder toProcessDefinitionId(String processDefinitionId) {
-    //        this.migrateToProcessDefinitionId = processDefinitionId;
-    //        return this;
-    //    }
-    //
-    //    @Override
-    //    public ProcessInstanceMigrationDocumentBuilder toProcessDefinitionVersion(String processDefinitionKey, String processDefinitionVersion) {
-    //        this.migrateToProcessDefinitionKey = processDefinitionKey;
-    //        this.migrateToProcessDefinitionVersion = processDefinitionVersion;
-    //        return this;
-    //    }
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId) {
+        this.migrateToProcessDefinitionKey = processDefinitionKey;
+        this.migrateToProcessDefinitionVersion = processDefinitionVersion;
+        this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setTenantOfProcessDefinitionToMigrateTo(String processDefinitionTenantId) {
+        this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
+        return this;
+    }
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder addProcessInstanceIdToMigrate(String processInstanceId) {
@@ -57,6 +71,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder addProcessInstancesIdsToMigrate(String... processInstancesIds) {
+        Objects.requireNonNull(processInstancesIds);
         this.processInstancesIdsToMigrate.addAll(Arrays.asList(processInstancesIds));
         return this;
     }
@@ -78,23 +93,18 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     @Override
     public ProcessInstanceMigrationDocument build() {
 
+        if (migrateToProcessDefinitionId == null) {
+            Objects.requireNonNull(migrateToProcessDefinitionKey, "Process definition key cannot be null");
+            Objects.requireNonNull(migrateToProcessDefinitionVersion, "Process definition version cannot be null");
+        }
+
         ProcessInstanceMigrationDocumentImpl document = new ProcessInstanceMigrationDocumentImpl();
         document.setMigrateToProcessDefinitionId(migrateToProcessDefinitionId);
-        document.setMigrateToProcessDefinitionKey(migrateToProcessDefinitionKey);
-        document.setMigrateToProcessDefinitionVersion(migrateToProcessDefinitionVersion);
+        document.setMigrateToProcessDefinition(migrateToProcessDefinitionKey, migrateToProcessDefinitionVersion, migrateToProcessDefinitionTenantId);
         document.setActivityMigrationMappings(activityMigrationMappings);
         document.setProcessInstancesIdsToMigrate(new ArrayList<>(processInstancesIdsToMigrate));
 
         return document;
-    }
-
-    public static ProcessInstanceMigrationDocument buildFromJson(String processInstanceMigrationDocumentJson) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(processInstanceMigrationDocumentJson, ProcessInstanceMigrationDocumentImpl.class);
-        } catch (IOException e) {
-            throw new FlowableIllegalArgumentException("Low level I/O problem with Json argument", e);
-        }
     }
 
 }
