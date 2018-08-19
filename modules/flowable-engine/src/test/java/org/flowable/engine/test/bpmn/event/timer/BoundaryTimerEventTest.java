@@ -140,7 +140,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     }
     
     @Deployment
-    public void testExpressionOnTimer2() {
+    public void testExpressionWithJavaDurationOnTimer() {
         // Set the clock fixed
         Date startTime = new Date();
 

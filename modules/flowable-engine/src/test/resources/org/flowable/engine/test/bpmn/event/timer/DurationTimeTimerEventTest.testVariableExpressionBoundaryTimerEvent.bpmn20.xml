@@ -3,7 +3,7 @@
 	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
 	targetNamespace="Examples">
 
-	<process id="testExpressionOnBoundaryTimer">
+	<process id="testDurationExpressionOnBoundaryTimer">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
@@ -12,7 +12,7 @@
 		<sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd" />
    
 
-		<boundaryEvent id="boundaryTimer" cancelActivity="true" attachedToRef="task">
+		<boundaryEvent id="boundaryTimer" attachedToRef="task">
 			<timerEventDefinition>
 			  <timeDuration>${duration}</timeDuration>
 			</timerEventDefinition>

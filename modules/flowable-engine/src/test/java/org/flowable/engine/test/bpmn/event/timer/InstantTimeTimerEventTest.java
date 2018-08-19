@@ -12,17 +12,16 @@
  */
 package org.flowable.engine.test.bpmn.event.timer;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * @author martin.grofcik
@@ -48,26 +47,6 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
     public void testVariableExpressionBoundaryTimerEvent() {
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("duration", Instant.ofEpochSecond(100));
-
-        processEngineConfiguration.getClock().setCurrentTime(new Date(0));
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnBoundaryTimer", variables);
-
-        TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
-        List<Job> jobs = jobQuery.list();
-        assertEquals(1, jobs.size());
-
-        processEngineConfiguration.getClock().setCurrentTime(new Date(200*1000));
-        waitForJobExecutorToProcessAllJobs(10000L, 25L);
-        assertEquals(0L, jobQuery.count());
-        
-        assertProcessEnded(pi.getId());
-        processEngineConfiguration.getClock().reset();
-    }
-    
-    @Deployment
-    public void testVariableExpressionBoundaryTimerEvent2() {
-        HashMap<String, Object> variables = new HashMap<>();
-        variables.put("duration", Duration.ofSeconds(100));
 
         processEngineConfiguration.getClock().setCurrentTime(new Date(0));
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnBoundaryTimer", variables);

@@ -116,6 +116,7 @@ The recurring time duration is better suited for handling relative timers, which
 
 You can use expressions for timer event definitions, and by doing so, you can influence the timer definition
 based on process variables. The process variables must contain the ISO 8601 (or cron for cycle type) string for appropriate timer type.
+Additionally, for durations variables of type or expressions that return `java.time.Duration` can be used.
 
 [source,xml,linenums]
 ----
