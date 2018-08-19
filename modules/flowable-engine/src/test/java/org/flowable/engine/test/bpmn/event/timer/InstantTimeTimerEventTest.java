@@ -43,11 +43,11 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         jobQuery = managementService.createTimerJobQuery();
         assertEquals(0, jobQuery.count());
     }
-
+    
     @Deployment
-    public void testVariableExpressionDurationBoundaryTimerEvent() {
+    public void testVariableExpressionBoundaryTimerEvent() {
         HashMap<String, Object> variables = new HashMap<>();
-        variables.put("duration", Duration.ofSeconds(150));
+        variables.put("duration", Instant.ofEpochSecond(100));
 
         processEngineConfiguration.getClock().setCurrentTime(new Date(0));
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnBoundaryTimer", variables);
@@ -65,9 +65,9 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
     }
     
     @Deployment
-    public void testVariableExpressionBoundaryTimerEvent() {
+    public void testVariableExpressionBoundaryTimerEvent2() {
         HashMap<String, Object> variables = new HashMap<>();
-        variables.put("duration", Instant.ofEpochSecond(100));
+        variables.put("duration", Duration.ofSeconds(100));
 
         processEngineConfiguration.getClock().setCurrentTime(new Date(0));
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnBoundaryTimer", variables);

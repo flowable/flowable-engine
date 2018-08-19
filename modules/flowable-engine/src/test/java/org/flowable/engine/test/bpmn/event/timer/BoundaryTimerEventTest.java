@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.event.timer;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -115,6 +116,39 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // After process start, there should be a timer created
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnTimer", variables);
+
+        TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
+        List<Job> jobs = jobQuery.list();
+        assertEquals(1, jobs.size());
+
+        // After setting the clock to time '1 hour and 5 seconds', the second
+        // timer should fire
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
+        waitForJobExecutorToProcessAllJobs(5000L, 25L);
+        assertEquals(0L, jobQuery.count());
+
+        // start execution listener is not executed
+        assertFalse(listenerExecutedStartEvent);
+        assertTrue(listenerExecutedEndEvent);
+
+        // which means the process has ended
+        assertProcessEnded(pi.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertNotNull(historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).activityId("boundaryTimer").singleResult());
+        }
+    }
+    
+    @Deployment
+    public void testExpressionOnTimer2() {
+        // Set the clock fixed
+        Date startTime = new Date();
+
+        HashMap<String, Object> variables = new HashMap<>();
+        variables.put("duration", Duration.ofHours(1));
+
+        // After process start, there should be a timer created
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOfTypeDurationOnTimer", variables);
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();
