@@ -16,8 +16,6 @@ services:
             - FLOWABLE.REST.APP.ADMIN.LAST-NAME=Admin
         ports:
             - 8080:8080
-        depends_on:
-            - flowable-rest-db
         entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
     flowable-rest-db:
         image: postgres:9.6-alpine
