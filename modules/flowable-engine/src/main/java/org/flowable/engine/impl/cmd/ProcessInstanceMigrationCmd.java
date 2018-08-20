@@ -20,8 +20,10 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.RuntimeServiceImpl;
+import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -29,6 +31,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
@@ -88,13 +91,14 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
                 if (execution.getCurrentActivityId() != null) {
                     //If there's no specific mapping, we check if the new process definition contains it already
                     if (processInstanceMigrationDocument.getActivityMigrationMappings().containsKey(execution.getCurrentActivityId())) {
-                        LOGGER.debug(">>>> Found mapping for activity '" + execution.getCurrentActivityId() + "' -> '" + processInstanceMigrationDocument.getActivityMigrationMappings().get(execution.getCurrentActivityId() + "' <<<<<"));
-                        changeActivityStateBuilder.moveExecutionToActivityId(execution.getId(), processInstanceMigrationDocument.getActivityMigrationMappings().get(execution.getCurrentActivityId()));
+                        String toActivityId = processInstanceMigrationDocument.getActivityMigrationMappings().get(execution.getCurrentActivityId());
+                        LOGGER.debug(">>>> Found mapping for activity '" + execution.getCurrentActivityId() + "' -> '" + toActivityId + "' <<<<<");
+                        changeActivityStateBuilder.moveExecutionToActivityId(execution.getId(), toActivityId);
                     } else if (isActivityInProcessDefinitionModel(execution.getCurrentActivityId(), bpmnModelOfProcessDefinitionToMigrateTo)) {
                         LOGGER.debug(">>>> Auto mapping activity '" + execution.getCurrentActivityId() + "' <<<<<");
                         changeActivityStateBuilder.moveExecutionToActivityId(execution.getId(), execution.getCurrentActivityId());
                     } else {
-                        throw new FlowableException(String.format("Migration Activity mapping missing for activityId:'%s'"));
+                        throw new FlowableException(String.format("Migration Activity mapping missing for activity definition Id:'%s'", execution.getProcessDefinitionKey()));
                     }
                 } else {
                     //SPECIAL EXECUTION - NOT A LEAF (eg concurrent parent)
@@ -102,16 +106,14 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
                 //Update processDefinition reference on the fly
                 LOGGER.debug(">>>> Update processDefinitionId of execution to'" + processDefinitionIdOfProcessDefinitionToMigrateTo + "' <<<<<");
                 execution.setProcessDefinitionId(processDefinitionIdOfProcessDefinitionToMigrateTo);
-                execution.forceUpdate();
+                //execution.forceUpdate();
             }
             //Update root processExecution
             processExecution.setProcessDefinitionId(processDefinitionIdOfProcessDefinitionToMigrateTo);
-            processExecution.forceUpdate();
+            //processExecution.forceUpdate();
 
-            //Update process definition reference for TASKS
             changeProcessDefinitionReferenceOfTasks(commandContext, processInstanceId, processDefinitionIdOfProcessDefinitionToMigrateTo);
-
-            //TODO UPDATE REFERENCE IN HISTORY
+            changeProcessDefinitionReferenceOfHistory(commandContext, processExecution, processDefinitionIdOfProcessDefinitionToMigrateTo);
             //TODO VARIABLES?
             //TODO JOBS?
             //TODO TIMERS?
@@ -189,6 +191,13 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
             t.setProcessDefinitionId(processDefinitionId);
             t.forceUpdate();
         });
+    }
+
+    protected static void changeProcessDefinitionReferenceOfHistory(CommandContext commandContext, ProcessInstance processInstance, String processDefinitionId) {
+        HistoryManager historyManager = CommandContextUtil.getHistoryManager(commandContext);
+        //TODO pass the processDefinitionEntity as argument instead? only if it can be reused in the migrate logic
+        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
+        historyManager.updateProcessDefinitionIdInHistory((ProcessDefinitionEntity) processDefinition, (ExecutionEntity) processInstance);
     }
 
 }
