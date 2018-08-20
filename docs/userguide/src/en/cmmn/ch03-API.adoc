@@ -221,7 +221,7 @@ public class MyTest extends FlowableCmmnTestCase {
 }
 ----
 
-Alernatively, the _FlowableCmmnRule_ is available and allows to set a custom configuration:
+Alternatively, the _FlowableCmmnRule_ is available and allows to set a custom configuration:
 
 [source,java,linenums]
 ----
