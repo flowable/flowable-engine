@@ -40,12 +40,12 @@ public class MoveExecutionEntityContainer {
     protected Map<String, FlowElement> moveToFlowElementMap = new HashMap<>();
     protected Map<String, List<SubProcess>> subProcessesToCreateMap = new HashMap<>();
     protected Map<String, ExecutionEntity> newSubProcessChildExecutionMap = new HashMap<>();
-    
+
     public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
         this.executions = executions;
         this.moveToActivityIds = moveToActivityIds;
     }
-    
+
     public List<ExecutionEntity> getExecutions() {
         return executions;    
     }
@@ -53,7 +53,7 @@ public class MoveExecutionEntityContainer {
     public List<String> getMoveToActivityIds() {
         return moveToActivityIds;
     }
-    
+
     public boolean isMoveToParentProcess() {
         return moveToParentProcess;
     }

@@ -1,27 +1,44 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.flowable.engine.impl.migration;
 
 import java.util.Map;
 
-import org.flowable.engine.impl.RuntimeServiceImpl;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
-import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 
+/**
+ * @author Dennis Federico
+ */
 public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigrationBuilder {
 
-    protected RuntimeServiceImpl runtimeService;
-    protected ProcessInstanceMigrationDocumentBuilder migrationDocumentBuilder;
+    protected RuntimeService runtimeService;
+    protected ProcessInstanceMigrationDocumentBuilderImpl migrationDocumentBuilder = new ProcessInstanceMigrationDocumentBuilderImpl();
 
-    public static ProcessInstanceMigrationBuilder fromProcessInstanceMigrationDocument(RuntimeServiceImpl runtimeService, ProcessInstanceMigrationDocument document) {
-        ProcessInstanceMigrationDocumentBuilder documentBuilder = ProcessInstanceMigrationDocumentBuilderImpl.fromProcessInstanceMigrationDocument(document);
-        ProcessInstanceMigrationBuilderImpl migrationBuilder = new ProcessInstanceMigrationBuilderImpl(runtimeService);
-        migrationBuilder.migrationDocumentBuilder = documentBuilder;
-        return migrationBuilder;
+    public ProcessInstanceMigrationBuilderImpl(RuntimeService runtimeService) {
+        this.runtimeService = runtimeService;
     }
 
-    public ProcessInstanceMigrationBuilderImpl(RuntimeServiceImpl runtimeService) {
-        this.runtimeService = runtimeService;
-        this.migrationDocumentBuilder = new ProcessInstanceMigrationDocumentBuilderImpl();
+    @Override
+    public ProcessInstanceMigrationBuilder fromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
+        document.getMigrateToProcessDefinitionId().ifPresent(v -> migrationDocumentBuilder.migrateToProcessDefinitionId = v);
+        document.getMigrateToProcessDefinitionKey().ifPresent(v -> migrationDocumentBuilder.migrateToProcessDefinitionKey = v);
+        document.getMigrateToProcessDefinitionVersion().ifPresent(v -> migrationDocumentBuilder.migrateToProcessDefinitionVersion = v);
+        document.getMigrateToProcessDefinitionTenantId().ifPresent(v -> migrationDocumentBuilder.migrateToProcessDefinitionTenantId = v);
+        migrationDocumentBuilder.addActivityMigrationMappings(document.getActivityMigrationMappings());
+        return this;
     }
 
     @Override
@@ -49,18 +66,6 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessInstanceMigrationBuilder addProcessInstanceToMigrate(String processInstanceId) {
-        this.migrationDocumentBuilder.addProcessInstanceIdToMigrate(processInstanceId);
-        return this;
-    }
-
-    @Override
-    public ProcessInstanceMigrationBuilder addProcessInstancesToMigrate(String... processInstanceIds) {
-        this.migrationDocumentBuilder.addProcessInstancesIdsToMigrate(processInstanceIds);
-        return this;
-    }
-
-    @Override
     public ProcessInstanceMigrationBuilder addActivityMigrationMapping(String fromActivityId, String toActivityId) {
         this.migrationDocumentBuilder.addActivityMigrationMapping(fromActivityId, toActivityId);
         return this;
@@ -78,9 +83,21 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public void migrate() {
-        ProcessInstanceMigrationDocument document = this.migrationDocumentBuilder.build();
-        runtimeService.migrateProcessInstance(document);
+    public void migrate(String processInstanceId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        runtimeService.migrateProcessInstance(processInstanceId, document);
+    }
+
+    @Override
+    public void migrateProcessInstancesOf(String processDefinitionId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        runtimeService.migrateProcessInstancesOfProcessDefinition(processDefinitionId, document);
+    }
+
+    @Override
+    public void migrateProcessInstancesOf(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        runtimeService.migrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }
 
 }

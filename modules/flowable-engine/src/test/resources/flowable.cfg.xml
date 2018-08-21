@@ -6,10 +6,13 @@
 
   <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+    <!--<property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />-->
+    <property name="jdbcUrl" value="jdbc:h2:tcp://localhost/~/flowable-db-test/db" />
     <property name="jdbcDriver" value="org.h2.Driver" />
-    <property name="jdbcUsername" value="sa" />
-    <property name="jdbcPassword" value="" />
+    <!--<property name="jdbcUsername" value="sa" />-->
+    <!--<property name="jdbcPassword" value="" />-->
+    <property name="jdbcUsername" value="flowable" />
+    <property name="jdbcPassword" value="flowable" />
     
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />

@@ -18,6 +18,7 @@ import java.util.Objects;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
@@ -25,7 +26,7 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 /**
  * @author Dennis Federico
  */
-public class ProcessInstanceMigrationCmd implements Command<Void> {
+public class ProcessInstanceMigrationValidationCmd implements Command<ProcessInstanceMigrationValidationResult> {
 
     protected ProcessInstanceMigrationDocument processInstanceMigrationDocument;
     protected String processInstanceId;
@@ -36,33 +37,33 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
 
     //TODO Cannot use simple constructors because processInstanceId and processDefinitionId are of the same type
     //TODO Can we avoid a telescopic constructor or these many methods by grouping the processDefinition attributes in a processDefinitionIdentifier pojo?
-    public static ProcessInstanceMigrationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public static ProcessInstanceMigrationValidationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
         Objects.requireNonNull(processInstanceId);
         Objects.requireNonNull(processInstanceMigrationDocument);
-        ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
+        ProcessInstanceMigrationValidationCmd cmd = new ProcessInstanceMigrationValidationCmd();
         cmd.processInstanceId = processInstanceId;
         cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
         return cmd;
     }
 
-    public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public static ProcessInstanceMigrationValidationCmd forProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
         Objects.requireNonNull(processDefinitionId);
         Objects.requireNonNull(processInstanceMigrationDocument);
-        ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
+        ProcessInstanceMigrationValidationCmd cmd = new ProcessInstanceMigrationValidationCmd();
         cmd.processDefinitionId = processDefinitionId;
         cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
         return cmd;
     }
 
-    public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId,
+    public static ProcessInstanceMigrationValidationCmd forProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId,
         ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
         Objects.requireNonNull(processDefinitionKey);
         Objects.requireNonNull(processDefinitionVersion);
         Objects.requireNonNull(processInstanceMigrationDocument);
-        ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
+        ProcessInstanceMigrationValidationCmd cmd = new ProcessInstanceMigrationValidationCmd();
         cmd.processDefinitionKey = processDefinitionKey;
         cmd.processDefinitionVersion = processDefinitionVersion;
         cmd.processDefinitionTenantId = processDefinitionTenantId;
@@ -71,19 +72,23 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
     }
 
     @Override
-    public Void execute(CommandContext commandContext) {
+    public ProcessInstanceMigrationValidationResult execute(CommandContext commandContext) {
+
         ProcessInstanceMigrationManager migrationManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceMigrationManager();
 
         if (processInstanceId != null) {
-            migrationManager.migrateProcessInstance(processInstanceId, processInstanceMigrationDocument, commandContext);
-        } else if (processDefinitionId != null) {
-            migrationManager.migrateProcessInstancesOfProcessDefinition(processDefinitionId, processInstanceMigrationDocument, commandContext);
-        } else if (processDefinitionKey != null && processDefinitionVersion != null) {
-            migrationManager.migrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument, commandContext);
-        } else {
-            throw new FlowableException("Cannot migrate process(es), not enough information");
+            return migrationManager.validateMigrateProcessInstance(processInstanceId, processInstanceMigrationDocument, commandContext);
         }
-        return null;
+
+        if (processDefinitionId != null) {
+            return migrationManager.validateMigrateProcessInstancesOfProcessDefinition(processDefinitionId, processInstanceMigrationDocument, commandContext);
+        }
+
+        if (processDefinitionKey != null && processDefinitionVersion != null) {
+            return migrationManager.validateMigrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument, commandContext);
+        }
+
+        throw new FlowableException("Cannot validate process migration, not enough information");
     }
 
 }

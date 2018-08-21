@@ -229,6 +229,7 @@ import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandle
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationManagerImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
@@ -297,6 +298,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisPropertyData
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
@@ -460,6 +462,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Dynamic state manager
     
     protected DynamicStateManager dynamicStateManager;
+
+    protected ProcessInstanceMigrationManager processInstanceMigrationManager;
     
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
@@ -932,6 +936,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initCandidateManager();
         initHistoryManager();
         initDynamicStateManager();
+        initProcessInstanceMigrationValidationManager();
         initJpa();
         initDeployers();
         initEventHandlers();
@@ -1203,6 +1208,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initDynamicStateManager() {
         if (dynamicStateManager == null) {
             dynamicStateManager = new DefaultDynamicStateManager();
+        }
+    }
+
+    public void initProcessInstanceMigrationValidationManager() {
+        if (processInstanceMigrationManager == null) {
+            processInstanceMigrationManager = new ProcessInstanceMigrationManagerImpl();
         }
     }
 
@@ -3694,6 +3705,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setDynamicStateManager(DynamicStateManager dynamicStateManager) {
         this.dynamicStateManager = dynamicStateManager;
+        return this;
+    }
+
+    public ProcessInstanceMigrationManager getProcessInstanceMigrationManager() {
+        return processInstanceMigrationManager;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessInstanceMigrationManager(ProcessInstanceMigrationManager processInstanceMigrationValidationMananger) {
+        this.processInstanceMigrationManager = processInstanceMigrationValidationMananger;
         return this;
     }
 

@@ -1,4 +1,17 @@
-package org.flowable.engine.test.api.migration;
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.flowable.engine.test.api.runtime.migration;
 
 import java.util.List;
 
@@ -10,6 +23,9 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 
+/**
+ * @author Dennis Federico
+ */
 public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
     public void testSimpleMigrationWithActivityAutoMapping() {
@@ -54,8 +70,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         //Migrate process
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addProcessInstanceToMigrate(processInstanceToMigrate.getId())
-            .migrate();
+            .migrate(processInstanceToMigrate.getId());
 
         executions = runtimeService.createExecutionQuery().list();
         assertEquals(2, executions.size()); //includes root execution
@@ -80,7 +95,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(twoActivitiesProcessDeployment.getId(), true);
     }
 
-    public void testSimpleMigrationWithExplicitActivityMapping() {
+    public void testSimpleMigrationWithExplicitActivityMapping1() {
         //Deploy first version of the process
         Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
             .name("My Process Deployment")
@@ -122,9 +137,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         //Migrate process - moving the current execution explicitly
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addProcessInstanceToMigrate(processInstanceToMigrate.getId())
             .addActivityMigrationMapping("userTask1Id", "userTask1Id")
-            .migrate();
+            .migrate(processInstanceToMigrate.getId());
 
         executions = runtimeService.createExecutionQuery().list();
         assertEquals(2, executions.size()); //includes root execution
@@ -192,9 +206,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         //Migrate process - moving the current execution explicitly
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addProcessInstanceToMigrate(processInstanceToMigrate.getId())
             .addActivityMigrationMapping("userTask1Id", "userTask2Id")
-            .migrate();
+            .migrate(processInstanceToMigrate.getId());
 
         executions = runtimeService.createExecutionQuery().list();
         assertEquals(2, executions.size()); //includes root execution
@@ -264,9 +277,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         //Migrate process - moving the current execution explicitly
         runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(version2ProcessDef.getId())
-            .addProcessInstanceToMigrate(processInstanceToMigrate.getId())
             .addActivityMigrationMapping("userTask2Id", "userTask1Id")
-            .migrate();
+            .migrate(processInstanceToMigrate.getId());
 
         executions = runtimeService.createExecutionQuery().list();
         assertEquals(2, executions.size()); //includes root execution
@@ -276,8 +288,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
-        assertEquals(version2ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        assertEquals(version2ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
 
         //This new process version only have one activity
         taskService.complete(tasks.get(0).getId());

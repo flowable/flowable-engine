@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 
 /**
  * @author Tijs Rademakers
@@ -26,12 +27,17 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 public interface DynamicStateManager {
 
     ExecutionEntity resolveActiveExecution(String executionId, CommandContext commandContext);
-    
+
     ExecutionEntity resolveActiveExecution(String processInstanceId, String activityId, CommandContext commandContext);
 
     List<ExecutionEntity> resolveActiveExecutions(String processInstanceId, String activityId, CommandContext commandContext);
 
-    void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, 
-                    Map<String, Map<String, Object>> localVariables, CommandContext commandContext);
+    List<MoveExecutionEntityContainer> resolveMoveExecutionEntityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext);
+
+    void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables,
+        Map<String, Map<String, Object>> localVariables, CommandContext commandContext);
+
+    void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables,
+        Map<String, Map<String, Object>> localVariables, String overrideProcessDefinitionId, CommandContext commandContext);
 
 }
