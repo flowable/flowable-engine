@@ -21,7 +21,7 @@ From a high level point of view:
 
 * A *CmmnEngine* instance is created from a *CmmnEngineConfiguration*. The configuration instance can be created from a configuration file or programmatically.
 * The _CmmnEngine_ gives access the Flowable CMMN API's in the form of services: *CmmnRepositoryService*, *CmmnRuntimeService*, *CmmnTaskService*, *CmmnHistoryService*, *CmmnManagementService*. The naming of the services and their responsibilities is similar to the other engines.
-* Every API method is transformed into a *Command* instance. This _Command_ instance is passed into the *CommandExecutor* which, amongst others, makes it pass a stack of *CommandInterceptors*. These interceptors have various responsabilities, including handling transactions.
+* Every API method is transformed into a *Command* instance. This _Command_ instance is passed into the *CommandExecutor* which, amongst others, makes it pass a stack of *CommandInterceptors*. These interceptors have various responsibilities, including handling transactions.
 * Eventually, the _Command_ typically (unless it's a pure data modification _Command_) plans a *CmmnOperation* on the *CmmnEngineAgenda*.
 * Operations will be taken from the _CmmnEngineAgenda_ until no more operations are left. Typically, an operation will plan new operations as part of its logic.
 * The logic in the operations will call out to lower-level services and/or entity managers.
