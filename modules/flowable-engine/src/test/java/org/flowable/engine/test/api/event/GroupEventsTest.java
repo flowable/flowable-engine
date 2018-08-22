@@ -19,6 +19,9 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to groups.
@@ -32,6 +35,7 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of Groups.
      */
+    @Test
     public void testGroupEntityEvents() throws Exception {
         Group group = null;
         try {
@@ -84,6 +88,7 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of Groups.
      */
+    @Test
     public void testGroupMembershipEvents() throws Exception {
         TestFlowableEventListener membershipListener = new TestFlowableEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(membershipListener);
@@ -141,16 +146,14 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
         }
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         listener = new TestFlowableEntityEventListener(Group.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

@@ -15,7 +15,7 @@ package org.flowable.engine.test.impl;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 
 /**
  * Reads the default flowable.cfg.xml from the test classpath, but allows to change the settings before the engine is built.
@@ -26,26 +26,20 @@ import org.flowable.engine.impl.test.AbstractFlowableTestCase;
  * 
  * @author Joram Barrez
  */
-public abstract class CustomConfigurationFlowableTestCase extends AbstractFlowableTestCase {
-    
+public abstract class CustomConfigurationFlowableTestCase extends ResourceFlowableTestCase {
+
     protected String cfgResource = "flowable.cfg.xml";
-    
+
+    public CustomConfigurationFlowableTestCase(String engineName) {
+        super("flowable.cfg.xml", engineName);
+    }
+
     @Override
-    protected void initializeProcessEngine() {
-        ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.cfg.xml");
-        processEngineConfiguration.setEngineName(getEngineName()); // to distinguish between different engines in different tests
+    protected final void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
         processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         configureConfiguration((ProcessEngineConfigurationImpl) processEngineConfiguration);
-        this.processEngine = processEngineConfiguration.buildProcessEngine();
     }
-    
-    @Override
-    protected void closeDownProcessEngine() {
-        this.processEngine.close();
-    }
-    
-    protected abstract String getEngineName();
-    
+
     protected abstract void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration);
 
     public String getCfgResource() {

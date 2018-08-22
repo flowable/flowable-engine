@@ -26,12 +26,14 @@ import org.flowable.job.api.Job;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Vasile Dirla
  */
 public class BoundaryTimerEventRepeatWithEndTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testRepeatWithEnd() throws Throwable {
 

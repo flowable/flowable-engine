@@ -19,6 +19,8 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Tom Baeyens
@@ -27,12 +29,12 @@ public abstract class JobExecutorTestCase extends PluggableFlowableTestCase {
 
     protected TweetHandler tweetHandler = new TweetHandler();
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         processEngineConfiguration.addJobHandler(tweetHandler);
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         processEngineConfiguration.removeJobHandler(tweetHandler.getType());
     }

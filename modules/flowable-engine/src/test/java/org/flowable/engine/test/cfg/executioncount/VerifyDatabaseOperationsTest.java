@@ -36,6 +36,9 @@ import org.flowable.engine.test.profiler.TotalExecutionTimeCommandInterceptor;
 import org.flowable.job.api.Job;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -51,9 +54,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     protected DbSqlSessionFactory oldDbSqlSessionFactory;
     protected HistoryLevel oldHistoryLevel;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         // Enable flags
         this.oldIsBulkInsertableValue = processEngineConfiguration.isBulkInsertEnabled();
@@ -101,7 +103,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         processEngineConfiguration.addSessionFactory(newDbSqlSessionFactory);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         processEngineConfiguration.setBulkInsertEnabled(oldIsBulkInsertableValue);
@@ -131,9 +133,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
-        super.tearDown();
     }
 
+    @Test
     public void testStartToEnd() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process01.bpmn20.xml", "process01");
@@ -152,6 +154,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testVariablesAndPassthrough() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-variables-servicetask01.bpmn20.xml", "process-variables-servicetask01");
@@ -169,6 +172,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testManyVariablesViaServiceTaskAndPassthroughs() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-variables-servicetask02.bpmn20.xml", "process-variables-servicetask02");
@@ -186,6 +190,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testOnlyPassThroughs() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process02.bpmn20.xml", "process02");
@@ -202,6 +207,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testParallelForkAndJoin() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process03.bpmn20.xml", "process03");
@@ -218,6 +224,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testNestedParallelForkAndJoin() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process04.bpmn20.xml", "process04");
@@ -235,6 +242,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testExclusiveGateway() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process05.bpmn20.xml", "process05");
@@ -252,6 +260,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testAsyncJob() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process06.bpmn20.xml", "process06", false);
@@ -284,6 +293,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testOneTaskProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
@@ -341,6 +351,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testOneTaskWithBoundaryTimerProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-usertask-02.bpmn20.xml", "process-usertask-02", false);
@@ -371,6 +382,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testRemoveTaskVariables() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
@@ -404,6 +416,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testClaimTask() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
@@ -423,6 +436,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testTaskCandidateUsers() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
@@ -474,6 +488,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testTaskCandidateGroups() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class

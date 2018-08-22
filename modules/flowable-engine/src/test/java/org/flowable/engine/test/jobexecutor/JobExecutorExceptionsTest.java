@@ -21,12 +21,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.TimerJobQuery;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class JobExecutorExceptionsTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
     public void testQueryByExceptionWithRealJobExecutor() {
         TimerJobQuery query = managementService.createTimerJobQuery().withException();

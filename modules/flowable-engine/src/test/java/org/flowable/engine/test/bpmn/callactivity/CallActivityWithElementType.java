@@ -13,12 +13,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link org.flowable.engine.impl.bpmn.behavior.CallActivityBehavior} with calledElementType id
  */
 public class CallActivityWithElementType extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources =
         "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml")
     public void testCallSimpleSubProcessByKey() throws IOException {
@@ -28,6 +30,7 @@ public class CallActivityWithElementType extends PluggableFlowableTestCase {
         );
     }
 
+    @Test
     @Deployment(resources =
         "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml")
     public void testCallSimpleSubProcessById() throws IOException {
@@ -39,6 +42,7 @@ public class CallActivityWithElementType extends PluggableFlowableTestCase {
         );
     }
 
+    @Test
     @Deployment(resources =
         "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml")
     public void testCallSimpleSubProcessByIdExpression() throws IOException {
@@ -50,6 +54,7 @@ public class CallActivityWithElementType extends PluggableFlowableTestCase {
         );
     }
 
+    @Test
     @Deployment(resources =
         "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml")
     public void testCallSimpleSubProcessByKeyExpression() throws IOException {
@@ -61,6 +66,7 @@ public class CallActivityWithElementType extends PluggableFlowableTestCase {
         );
     }
 
+    @Test
     @Deployment(resources =
         "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml")
     public void testCallSimpleSubProcessWithUnrecognizedElementType() throws IOException {

@@ -18,9 +18,11 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.Test;
 
 public class ExclusiveTimerEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testCatchingTimerEvent() throws Exception {
 

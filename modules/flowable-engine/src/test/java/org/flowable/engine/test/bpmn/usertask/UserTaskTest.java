@@ -26,12 +26,14 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class UserTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testTaskPropertiesNotNull() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -53,12 +55,14 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testQuerySortingWithParameter() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().size());
     }
 
+    @Test
     @Deployment
     public void testCompleteAfterParallelGateway() throws InterruptedException {
         // related to https://activiti.atlassian.net/browse/ACT-1054
@@ -78,6 +82,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
     }
 
+    @Test
     @Deployment
     public void testTaskCategory() {
         runtimeService.startProcessInstanceByKey("testTaskCategory");
@@ -121,6 +126,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
     }
 
     // See https://activiti.atlassian.net/browse/ACT-4041
+    @Test
     public void testTaskFormKeyWhenUsingIncludeVariables() {
         deployOneTaskTestProcess();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -146,6 +152,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertEquals("test123", task.getFormKey());
     }
     
+    @Test
     @Deployment
     public void testEmptyAssignmentExpression() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -175,6 +182,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, identityLinks.size());
     }
     
+    @Test
     @Deployment
     public void testNonStringProperties() {
         Map<String, Object> vars = new HashMap<>();

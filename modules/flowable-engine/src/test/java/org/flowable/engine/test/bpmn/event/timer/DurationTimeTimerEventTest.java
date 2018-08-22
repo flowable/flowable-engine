@@ -27,6 +27,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
@@ -35,9 +38,8 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
 
     private Map<Object, Object> initialBeans;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         initialBeans = processEngineConfiguration.getExpressionManager().getBeans();
 
         Map<Object, Object> newBeans = new HashMap<>();
@@ -46,12 +48,12 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getExpressionManager().setBeans(newBeans);
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
-        super.tearDown();
         processEngineConfiguration.getExpressionManager().setBeans(initialBeans);
     }
 
+    @Test
     public void testExpressionStartTimerEvent() {
         Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday));
@@ -73,6 +75,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
         assertThat(jobQuery.count()).isEqualTo(0);
     }
 
+    @Test
     @Deployment
     public void testVariableExpressionBoundaryTimerEvent() {
         HashMap<String, Object> variables = new HashMap<>();
@@ -96,6 +99,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().reset();
     }
 
+    @Test
     @Deployment
     public void testBeanExpressionBoundaryTimerEvent() {
         Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);

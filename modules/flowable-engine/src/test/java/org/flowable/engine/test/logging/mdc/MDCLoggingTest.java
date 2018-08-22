@@ -23,6 +23,7 @@ import org.apache.log4j.PatternLayout;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.logging.LogMDC;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class MDCLoggingTest extends PluggableFlowableTestCase {
 
@@ -67,6 +68,7 @@ public class MDCLoggingTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testLogger() {
         setCustomLogger();

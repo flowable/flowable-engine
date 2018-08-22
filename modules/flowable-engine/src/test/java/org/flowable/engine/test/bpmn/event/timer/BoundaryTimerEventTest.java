@@ -32,6 +32,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -62,6 +63,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
      *
      * See process image next to the process xml resource
      */
+    @Test
     @Deployment
     public void testMultipleTimersOnUserTask() {
 
@@ -85,6 +87,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals("Third Task", task.getName());
     }
 
+    @Test
     @Deployment
     public void testTimerOnNestingOfSubprocesses() {
 
@@ -106,6 +109,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals("task outside subprocess", task.getName());
     }
 
+    @Test
     @Deployment
     public void testExpressionOnTimer() {
         // Set the clock fixed
@@ -138,7 +142,8 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
             assertNotNull(historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).activityId("boundaryTimer").singleResult());
         }
     }
-    
+
+    @Test
     @Deployment
     public void testExpressionWithJavaDurationOnTimer() {
         // Set the clock fixed
@@ -172,6 +177,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testNullExpressionOnTimer() {
 
@@ -188,6 +194,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment
     public void testNullDueDateWithRepetition() {
 
@@ -205,6 +212,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(1, jobs.size());
     }
     
+    @Test
     @Deployment
     public void testNullDueDateWithWrongRepetition() {
 
@@ -223,6 +231,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testTimerInSingleTransactionProcess() {
         // make sure that if a PI completes in single transaction, JobEntities
@@ -232,6 +241,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testRepeatingTimerWithCancelActivity() {
         runtimeService.startProcessInstanceByKey("repeatingTimerAndCallActivity");
@@ -250,6 +260,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(1, taskService.createTaskQuery().count());
     }
 
+    @Test
     @Deployment
     public void testInfiniteRepeatingTimer() throws Exception {
 
@@ -284,6 +295,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testRepeatTimerDuration() throws Exception {
 
@@ -315,6 +327,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testBoundaryTimerEvent() throws Exception {
 
@@ -382,6 +395,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0, jobList.size());
     }
 
+    @Test
     @Deployment
     public void testBoundaryTimerEvent2() throws Exception {
 
@@ -426,6 +440,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0, jobList.size());
     }
 
+    @Test
     @Deployment
     public void testRescheduleBoundaryTimerOnUserTask() {
         // startDate variable set to one hour from now
@@ -486,6 +501,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertNull(timerJob);
     }
 
+    @Test
     @Deployment
     public void testRescheduleRepeatBoundaryTimer() {
         // startDate variable set to one hour from now
@@ -547,6 +563,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertNull(timerJob);
     }
 
+    @Test
     @Deployment
     public void testRescheduleBoundaryTimerOnSubProcess() {
         // startDate variable set to one hour from now
@@ -604,6 +621,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertNull(timerJob);
     }
 
+    @Test
     @Deployment
     public void test3BoundaryTimerEvents() throws Exception {
 
@@ -681,6 +699,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().reset();
     }
 
+    @Test
     @Deployment
     public void test2Boundary1IntermediateTimerEvents() throws Exception {
 

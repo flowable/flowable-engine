@@ -20,9 +20,11 @@ import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 public class CycleBusinessCalendarTest extends AbstractTestCase {
 
+    @Test
     public void testSimpleCron() throws Exception {
         Clock testingClock = new DefaultClockImpl();
         CycleBusinessCalendar businessCalendar = new CycleBusinessCalendar(testingClock);
@@ -38,6 +40,7 @@ public class CycleBusinessCalendarTest extends AbstractTestCase {
         assertEquals(expectedDuedate, duedate);
     }
 
+    @Test
     public void testSimpleDuration() throws Exception {
         Clock testingClock = new DefaultClockImpl();
         CycleBusinessCalendar businessCalendar = new CycleBusinessCalendar(testingClock);

@@ -34,6 +34,9 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CancelCallActivityTest extends PluggableFlowableTestCase {
 
@@ -41,9 +44,10 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
 
     protected EventLogger databaseEventLogger;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
+        listener = new CallActivityEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 
         // Database event logger setup
         databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(),
@@ -51,7 +55,7 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         runtimeService.addEventListener(databaseEventLogger);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         if (listener != null) {
@@ -67,17 +71,9 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         // Database event logger teardown
         runtimeService.removeEventListener(databaseEventLogger);
 
-        super.tearDown();
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
-
-        listener = new CallActivityEventListener();
-        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-    }
-
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/event/CancelCallActivityTest.testActivityMessageBoundaryEventsOnCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/event/CancelCallActivityTest.testActivityMessageBoundaryEventsCalledActivity.bpmn20.xml" })

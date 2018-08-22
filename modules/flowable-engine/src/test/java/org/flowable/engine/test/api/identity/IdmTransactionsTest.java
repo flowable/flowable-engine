@@ -24,13 +24,15 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class IdmTransactionsTest extends PluggableFlowableTestCase {
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         List<User> allUsers = identityService.createUserQuery().list();
@@ -42,10 +44,9 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
         for (Group group : allGroups) {
             identityService.deleteGroup(group.getId());
         }
-
-        super.tearDown();
     }
 
+    @Test
     @Deployment
     public void testCommitOnNoException() {
 
@@ -60,6 +61,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testTransactionRolledBackOnException() {
 
@@ -87,6 +89,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testMultipleIdmCallsInDelegate() {
         runtimeService.startProcessInstanceByKey("multipleServiceInvocations");

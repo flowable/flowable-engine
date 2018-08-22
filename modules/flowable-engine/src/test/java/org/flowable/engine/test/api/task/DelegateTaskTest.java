@@ -22,6 +22,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Falko Menge
@@ -31,6 +32,7 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-380">https://activiti.atlassian.net/browse/ACT-380</a>
      */
+    @Test
     @Deployment
     public void testGetCandidates() {
         runtimeService.startProcessInstanceByKey("DelegateTaskTest.testGetCandidates");
@@ -51,6 +53,7 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
         assertTrue(candidateGroups.contains("accountancy"));
     }
 
+    @Test
     @Deployment
     public void testChangeCategoryInDelegateTask() {
 

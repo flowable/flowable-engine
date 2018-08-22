@@ -26,6 +26,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -33,6 +34,7 @@ import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
 @EnableVerboseExecutionTreeLogging
 public class CompensateEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testCompensateSubprocess() {
 
@@ -45,6 +47,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testCompensateSubprocessWithoutActivityRef() {
 
@@ -57,6 +60,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testCompensateSubprocessWithUserTask() {
 
@@ -71,6 +75,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testCompensateSubprocessWithUserTask2() {
 
@@ -88,6 +93,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testCompensateMiSubprocess() {
 
@@ -101,6 +107,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testCompensateScope() {
 
@@ -115,6 +122,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess1.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.SubProcess2.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateTwoSubprocesses.bpmn20.xml" })
@@ -150,6 +158,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertEquals("compensated1", testVariable1.toString());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml" })
     public void testCallActivityCompensationHandler() {
@@ -172,6 +181,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testMultipleCompensationCatchEventsFails() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml").deploy();
@@ -180,6 +190,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testInvalidActivityRefFails() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testInvalidActivityRefFails.bpmn20.xml").deploy();
@@ -191,6 +202,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationStepEndRecorded.bpmn20.xml" })
     public void testCompensationStepEndTimeRecorded() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationStepEndRecordedProcess");
@@ -207,6 +219,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testCompensateWithSubprocess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
@@ -241,6 +254,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateWithSubprocess.bpmn20.xml" })
     public void testCompensateWithSubprocess2() {
 
@@ -257,6 +271,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testCompensateNestedSubprocess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");

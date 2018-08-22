@@ -27,12 +27,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/concurrency/CompetingJoinTest.testCompetingJoins.bpmn20.xml" })
     public void testOptimisticLockExceptionForConcurrentJoin() throws Exception {
 

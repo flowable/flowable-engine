@@ -24,12 +24,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by P3700487 on 2/19/2015.
  */
 public class LaneExtensionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testLaneExtensionElement() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("swimlane-extension").singleResult();

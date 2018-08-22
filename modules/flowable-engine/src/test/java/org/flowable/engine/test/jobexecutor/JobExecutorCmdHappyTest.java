@@ -25,12 +25,14 @@ import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
 import org.flowable.job.service.impl.cmd.ExecuteAsyncJobCmd;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
+    @Test
     public void testJobCommandsWithMessage() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
 
@@ -59,6 +61,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
     static final long SOME_TIME = 928374923546L;
     static final long SECOND = 1000;
 
+    @Test
     public void testJobCommandsWithTimer() {
         // clock gets automatically reset in LogTestCase.runTest
         processEngineConfiguration.getClock().setCurrentTime(new Date(SOME_TIME));

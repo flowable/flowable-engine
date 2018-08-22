@@ -26,12 +26,14 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class JobExecutorTest extends JobExecutorTestCase {
 
+    @Test
     public void testBasicJobExecutorOperation() throws Exception {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {

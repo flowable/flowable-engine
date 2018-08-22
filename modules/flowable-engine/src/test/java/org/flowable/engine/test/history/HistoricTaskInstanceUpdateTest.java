@@ -17,12 +17,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
  */
 public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceUpdate() {
         runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();

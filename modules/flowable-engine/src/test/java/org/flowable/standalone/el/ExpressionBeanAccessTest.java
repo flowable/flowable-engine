@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -30,6 +31,7 @@ public class ExpressionBeanAccessTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/el/flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testConfigurationBeanAccess() {
         // Exposed bean returns 'I'm exposed' when to-string is called in first

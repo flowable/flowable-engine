@@ -27,12 +27,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class AdhocSubProcessTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSimpleAdhocSubProcess() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
@@ -64,6 +66,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment
     public void testSimpleAdhocSubProcessViaExecution() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
@@ -101,6 +104,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment
     public void testSimpleCompletionCondition() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -161,6 +165,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment
     public void testParallelAdhocSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -192,6 +197,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment
     public void testSequentialAdhocSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -234,6 +240,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment
     public void testFlowsInAdhocSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -273,6 +280,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/subprocess/adhoc/AdhocSubProcessTest.testFlowsInAdhocSubProcess.bpmn20.xml")
     public void testCompleteFlowBeforeEndInAdhocSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -300,6 +308,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment
     public void testParallelFlowsInAdhocSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -340,6 +349,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment
     public void testKeepRemainingInstancesAdhocSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();
@@ -378,6 +388,7 @@ public class AdhocSubProcessTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
 
+    @Test
     @Deployment
     public void testParallelFlowsWithKeepRemainingInstancesAdhocSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();

@@ -25,6 +25,8 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -50,14 +52,14 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         this.repositoryService = applicationContext.getBean(RepositoryService.class);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         removeAllDeployments();
         this.applicationContext = null;
         this.repositoryService = null;
-        super.tearDown();
     }
 
+    @Test
     public void testBasicActivitiSpringIntegration() {
         createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
@@ -75,6 +77,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         assertEquals(expectedProcessDefinitionKeys, processDefinitionKeys);
     }
 
+    @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContext(CTX_PATH);
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
@@ -91,6 +94,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
 
     // Updating the bpmn20 file should lead to a new deployment when restarting
     // the Spring container
+    @Test
     public void testResourceRedeploymentAfterProcessDefinitionChange() throws Exception {
         createAppContext(CTX_PATH);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
@@ -126,24 +130,28 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         assertEquals(6, repositoryService.createProcessDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithCreateDropOnCleanDb() {
         createAppContext(CTX_CREATE_DROP_CLEAN_DB);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContext(CTX_DEPLOYMENT_MODE_DEFAULT);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContext(CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE);
         assertEquals(3, repositoryService.createDeploymentQuery().count());
         assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContext(CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER);
         assertEquals(2, repositoryService.createDeploymentQuery().count());

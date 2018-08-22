@@ -19,6 +19,9 @@ import java.util.Map;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -32,9 +35,8 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml")
@@ -57,14 +59,14 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
-        super.tearDown();
     }
 
+    @Test
     public void testQuery() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().variableValueEquals("anothertest", 123).singleResult();
         Map<String, Object> variableMap = processInstance.getProcessVariables();
@@ -131,6 +133,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         assertEquals(0, instanceList.size());
     }
 
+    @Test
     public void testOrQuery() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .or().variableValueEquals("undefined", 999).variableValueEquals("anothertest", 123).endOr().singleResult();
@@ -159,6 +162,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         assertEquals(123, variableMap.get("anothertest"));
     }
 
+    @Test
     public void testOrQueryMultipleVariableValues() {
         ProcessInstanceQuery query0 = runtimeService.createProcessInstanceQuery().includeProcessVariables().or();
         for (int i = 0; i < 20; i++) {
@@ -204,6 +208,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         assertEquals(123, variableMap.get("anothertest"));
     }
 
+    @Test
     public void testOrProcessVariablesLikeIgnoreCase() {
         List<ProcessInstance> instanceList = runtimeService
                 .createProcessInstanceQuery().or()

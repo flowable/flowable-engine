@@ -28,6 +28,7 @@ import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * An integration test for CXF based web services
@@ -36,6 +37,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
 
+    @Test
     @Deployment
     public void testWebServiceInvocation() throws Exception {
 
@@ -48,6 +50,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         assertTrue(processInstance.isEnded());
     }
 
+    @Test
     @Deployment
     public void testWebServiceInvocationDataStructure() throws Exception {
 
@@ -63,6 +66,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         assertTrue(processInstance.isEnded());
     }
 
+    @Test
     @Deployment
     public void testFaultManagement() throws Exception {
 
@@ -103,6 +107,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         }
     }
 
+    @Test
     @Deployment
     public void testFaultManagementREatWSClientLevel() throws Exception {
 
@@ -116,6 +121,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         }
     }
 
+    @Test
     @Deployment
     public void testWebServiceInvocationWithEndpointAddressConfigured() throws Exception {
 

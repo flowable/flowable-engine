@@ -28,12 +28,17 @@ import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Saeid Mirzaei
  */
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class CamelExceptionTest extends SpringFlowableTestCase {
 
@@ -46,7 +51,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     @Autowired
     protected ManagementService managementService;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         ExceptionServiceMock.reset();
         NoExceptionServiceMock.reset();
@@ -59,7 +64,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
         });
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
@@ -69,6 +74,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     }
 
     // check happy path in synchronouse camel call
+    @Test
     @Deployment(resources = { "org/flowable/camel/exception/bpmnExceptionInRouteSynchronous.bpmn20.xml" })
     public void testHappyPathSynchronous() {
         // Signal ThrowBpmnExceptionBean to throw no exception
@@ -80,6 +86,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     }
 
     // Check Non BPMN error in synchronouse camel call
+    @Test
     @Deployment(resources = { "org/flowable/camel/exception/bpmnExceptionInRouteSynchronous.bpmn20.xml" })
     public void testNonBpmnExceptionInCamel() {
         // Signal ThrowBpmnExceptionBean to throw a non BPMN Exception
@@ -100,6 +107,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     }
 
     // check Bpmn Exception in synchronous camel call
+    @Test
     @Deployment(resources = { "org/flowable/camel/exception/bpmnExceptionInRouteSynchronous.bpmn20.xml" })
     public void testBpmnExceptionInCamel() {
         // Signal ThrowBpmnExceptionBean to throw a BPMN Exception
@@ -116,6 +124,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     }
 
     // check happy path in asynchronous camel call
+    @Test
     @Deployment(resources = { "org/flowable/camel/exception/bpmnExceptionInRouteAsynchronous.bpmn20.xml" })
     public void testHappyPathAsynchronous() {
 
@@ -133,6 +142,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     }
 
     // check non bpmn exception in asynchronouse camel call
+    @Test
     @Deployment(resources = { "org/flowable/camel/exception/bpmnExceptionInRouteAsynchronous.bpmn20.xml" })
     public void testNonBpmnPathAsynchronous() {
 

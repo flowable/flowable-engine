@@ -22,6 +22,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ public class MetaDataTest extends PluggableFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataTest.class);
 
+    @Test
     public void testMetaData() {
         ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor().execute(new Command<Object>() {
             @Override

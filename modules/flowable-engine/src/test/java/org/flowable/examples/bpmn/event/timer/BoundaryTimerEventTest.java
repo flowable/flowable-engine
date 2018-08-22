@@ -16,12 +16,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testInterruptingTimerDuration() {
 

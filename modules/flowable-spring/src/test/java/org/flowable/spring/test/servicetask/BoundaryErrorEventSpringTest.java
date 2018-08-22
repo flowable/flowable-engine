@@ -16,6 +16,7 @@ package org.flowable.spring.test.servicetask;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -26,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/servicetask/serviceraskSpringTestCatchError-context.xml")
 public class BoundaryErrorEventSpringTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByJavaDelegateOnServiceTask() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByExpressionDelegateOnServiceTask").getId();

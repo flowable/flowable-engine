@@ -17,6 +17,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to deployments.
@@ -30,6 +33,7 @@ public class DeploymentEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of deployment entities.
      */
+    @Test
     public void testDeploymentEvents() throws Exception {
         Deployment deployment = null;
         try {
@@ -80,16 +84,14 @@ public class DeploymentEventsTest extends PluggableFlowableTestCase {
         }
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         listener = new TestFlowableEntityEventListener(Deployment.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

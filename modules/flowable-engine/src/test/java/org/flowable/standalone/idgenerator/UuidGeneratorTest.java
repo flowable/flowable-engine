@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -29,6 +30,7 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/idgenerator/uuidgenerator.test.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testUuidGeneratorUsage() {
 

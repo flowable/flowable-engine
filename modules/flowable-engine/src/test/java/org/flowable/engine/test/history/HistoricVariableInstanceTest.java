@@ -33,12 +33,14 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/callactivity/orderProcess.bpmn20.xml", "org/flowable/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml" })
     public void testOrderProcessWithCallActivity() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -60,6 +62,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testSimple() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -85,6 +88,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testSimpleNoWaitState() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -104,6 +108,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testParallel() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -137,6 +142,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testParallelNoWaitState() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -158,6 +164,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testTwoSubProcessInParallelWithinSubProcess() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -184,6 +191,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/HistoricVariableInstanceTest.testCallSimpleSubProcess.bpmn20.xml", "org/flowable/engine/test/history/simpleSubProcess.bpmn20.xml" })
     public void testHistoricVariableInstanceQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -223,6 +231,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testHistoricVariableQuery2() {
         deployTwoTasksTestProcess();
         
@@ -294,6 +303,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testHistoricVariableQueryByExecutionIds() {
         deployTwoTasksTestProcess();
 
@@ -332,6 +342,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         assertEquals("hello", historicVariableInstances.get(2).getValue());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/runtime/variableScope.bpmn20.xml"
     })
@@ -371,6 +382,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         assertEquals("executionVar", historicVariableInstances.get(1).getValue());
     }
 
+    @Test
     public void testHistoricVariableQueryByTaskIds() {
         deployTwoTasksTestProcess();
         // Generate data
@@ -401,6 +413,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         assertEquals("hello1", historicVariableInstances.get(0).getValue());
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/runtime/variableScope.bpmn20.xml"
     })
@@ -433,6 +446,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         assertEquals("taskVar", historicVariableInstances.get(1).getValue());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessVariableOnDeletion() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -447,6 +461,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/history/FullHistoryTest.testVariableUpdatesAreLinkedToActivity.bpmn20.xml" })
     public void testVariableUpdatesLinkedToActivity() throws Exception {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -504,6 +519,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
     // Test for ACT-1528, which (correctly) reported that deleting any
     // historic process instance would remove ALL historic variables.
     // Yes. Real serious bug.
+    @Test
     @Deployment
     public void testHistoricProcessInstanceDeleteCascadesCorrectly() {
 
@@ -551,6 +567,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/history/HistoricVariableInstanceTest.testSimple.bpmn20.xml")
     public void testNativeHistoricVariableInstanceQuery() {
 
@@ -586,6 +603,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/history/HistoricVariableInstanceTest.testSimple.bpmn20.xml")
     public void testNativeHistoricDetailQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -630,6 +648,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testChangeType() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
@@ -676,6 +695,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         return historyService.createHistoricVariableInstanceQuery().variableName(variableName).singleResult();
     }
 
+    @Test
     @Deployment
     public void testRestrictByExecutionId() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {

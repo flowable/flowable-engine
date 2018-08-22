@@ -25,6 +25,7 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.joda.time.Period;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -35,6 +36,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         super("org/flowable/engine/test/bpmn/usertask/TaskDueDateExtensionsTest.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testDueDateExtension() throws Exception {
 
@@ -51,6 +53,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         assertEquals(date, task.getDueDate());
     }
 
+    @Test
     @Deployment
     public void testDueDateStringExtension() throws Exception {
 
@@ -67,6 +70,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         assertEquals(date, task.getDueDate());
     }
 
+    @Test
     @Deployment
     public void testRelativeDueDateStringExtension() throws Exception {
         Clock clock = processEngineConfiguration.getClock();
@@ -88,6 +92,7 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         clock.reset();
     }
 
+    @Test
     @Deployment
     public void testRelativeDueDateStringWithCalendarNameExtension() throws Exception {
 

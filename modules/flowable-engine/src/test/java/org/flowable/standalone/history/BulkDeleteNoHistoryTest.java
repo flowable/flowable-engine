@@ -18,6 +18,7 @@ import java.util.Map;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
 
@@ -28,6 +29,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/history/nohistory.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testLargeAmountOfVariableBulkDelete() throws Exception {
         Map<String, Object> variables = new HashMap<>();
