@@ -22,12 +22,14 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CollectionHandler;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -61,10 +63,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * Implementation of the multi-instance functionality as described in the BPMN 2.0 spec.
  * 
- * Multi instance functionality is implemented as an {@link ActivityBehavior} that wraps the original {@link ActivityBehavior} of the activity.
+ * Multi instance functionality is implemented as an {@link ActivityBehavior} that wraps the original {@link ActivityBehavior} of the
+ * activity.
  * 
- * Only subclasses of {@link AbstractBpmnActivityBehavior} can have multi-instance behavior. As such, special logic is contained in the {@link AbstractBpmnActivityBehavior} to delegate to the
- * {@link MultiInstanceActivityBehavior} if needed.
+ * Only subclasses of {@link AbstractBpmnActivityBehavior} can have multi-instance behavior. As such, special logic is contained in the
+ * {@link AbstractBpmnActivityBehavior} to delegate to the {@link MultiInstanceActivityBehavior} if needed.
  * 
  * @author Joram Barrez
  * @author Tijs Rademakers
@@ -96,8 +99,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     /**
      * @param activity
-     * @param innerActivityBehavior
-     *            The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
+     * @param innerActivityBehavior The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
      */
     public MultiInstanceActivityBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
         this.activity = activity;
@@ -125,14 +127,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             // for synchronous, history was created already in ContinueMultiInstanceOperation,
             // but that would lead to wrong timings for asynchronous which is why it's here
             if (activity.isAsynchronous()) {
-                CommandContextUtil.getHistoryManager().recordActivityStart((ExecutionEntity) execution);
+                CommandContextUtil.getHistoryManager()
+                    .recordActivityStart((ExecutionEntity) execution);
             }
             innerActivityBehavior.execute(execution);
         }
     }
 
     protected abstract int createInstances(DelegateExecution execution);
-    
+
     @Override
     public void leave(DelegateExecution execution) {
         cleanupMiRoot(execution);
@@ -141,14 +144,16 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected void cleanupMiRoot(DelegateExecution execution) {
         // Delete multi instance root and all child executions.
         // Create a fresh execution to continue
-        
+
         ExecutionEntity multiInstanceRootExecution = (ExecutionEntity) getMultiInstanceRootExecution(execution);
         FlowElement flowElement = multiInstanceRootExecution.getCurrentFlowElement();
         ExecutionEntity parentExecution = multiInstanceRootExecution.getParent();
-        
+
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
-        Collection<String> executionIdsNotToSendCancelledEventsFor = execution.isMultiInstanceRoot() ? null : Collections.singletonList(execution.getId());
-        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, null, executionIdsNotToSendCancelledEventsFor, DELETE_REASON_END, true, flowElement);
+        Collection<String> executionIdsNotToSendCancelledEventsFor = execution.isMultiInstanceRoot() ? null
+            : Collections.singletonList(execution.getId());
+        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, null, executionIdsNotToSendCancelledEventsFor,
+            DELETE_REASON_END, true, flowElement);
         executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, DELETE_REASON_END);
         executionEntityManager.delete(multiInstanceRootExecution);
 
@@ -170,9 +175,10 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                     continue;
                 }
 
-                if (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
+                if (boundaryEvent.getEventDefinitions()
+                    .get(0) instanceof CompensateEventDefinition) {
                     ExecutionEntity childExecutionEntity = CommandContextUtil.getExecutionEntityManager()
-                            .createChildExecution((ExecutionEntity) execution);
+                        .createChildExecution((ExecutionEntity) execution);
                     childExecutionEntity.setParentId(execution.getId());
                     childExecutionEntity.setCurrentFlowElement(boundaryEvent);
                     childExecutionEntity.setScope(false);
@@ -191,7 +197,8 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         List<BoundaryEvent> results = new ArrayList<>(1);
         Collection<BoundaryEvent> boundaryEvents = process.findFlowElementsOfType(BoundaryEvent.class, true);
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
-            if (boundaryEvent.getAttachedToRefId() != null && boundaryEvent.getAttachedToRefId().equals(flowElement.getId())) {
+            if (boundaryEvent.getAttachedToRefId() != null && boundaryEvent.getAttachedToRefId()
+                .equals(flowElement.getId())) {
                 results.add(boundaryEvent);
             }
         }
@@ -224,27 +231,32 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     public void completed(DelegateExecution execution) throws Exception {
         leave(execution);
     }
-    
+
     public boolean completionConditionSatisfied(DelegateExecution execution) {
         if (completionCondition != null) {
-            
+
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-            
+
             String activeCompletionCondition = null;
 
-            if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-                ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(activity.getId(), execution.getProcessDefinitionId());
-                activeCompletionCondition = getActiveValue(completionCondition, DynamicBpmnConstants.MULTI_INSTANCE_COMPLETION_CONDITION, taskElementProperties);
+            if (CommandContextUtil.getProcessEngineConfiguration()
+                .isEnableProcessDefinitionInfoCache()) {
+                ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(activity.getId(),
+                    execution.getProcessDefinitionId());
+                activeCompletionCondition = getActiveValue(completionCondition, DynamicBpmnConstants.MULTI_INSTANCE_COMPLETION_CONDITION,
+                    taskElementProperties);
 
             } else {
                 activeCompletionCondition = completionCondition;
             }
-            
-            Object value = expressionManager.createExpression(activeCompletionCondition).getValue(execution);
-            
+
+            Object value = expressionManager.createExpression(activeCompletionCondition)
+                .getValue(execution);
+
             if (!(value instanceof Boolean)) {
-                throw new FlowableIllegalArgumentException("completionCondition '" + activeCompletionCondition + "' does not evaluate to a boolean value");
+                throw new FlowableIllegalArgumentException(
+                    "completionCondition '" + activeCompletionCondition + "' does not evaluate to a boolean value");
             }
 
             Boolean booleanValue = (Boolean) value;
@@ -255,7 +267,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         }
         return false;
     }
-    
+
     public Integer getLoopVariable(DelegateExecution execution, String variableName) {
         Object value = execution.getVariableLocal(variableName);
         DelegateExecution parent = execution.getParent();
@@ -269,25 +281,36 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     // Helpers
     // //////////////////////////////////////////////////////////////////////
 
+    protected boolean isCurrentFlowElementCallActivity(DelegateExecution multiInstanceRootExecution) {
+        return getCurrentFlowElement(multiInstanceRootExecution) instanceof CallActivity;
+    }
+
+    protected boolean isCurrentFlowElementSubProcess(DelegateExecution multiInstanceRootExecution) {
+        return getCurrentFlowElement(multiInstanceRootExecution) instanceof SubProcess;
+    }
+
+    private FlowElement getCurrentFlowElement(DelegateExecution multiInstanceRootExecution) {
+        return multiInstanceRootExecution.getCurrentFlowElement();
+    }
+
     protected void sendCompletedWithConditionEvent(DelegateExecution execution) {
-        CommandContextUtil.getEventDispatcher(CommandContextUtil.getCommandContext()).dispatchEvent(
-                buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION));
+        CommandContextUtil.getEventDispatcher(CommandContextUtil.getCommandContext())
+            .dispatchEvent(buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION));
     }
 
     protected void sendCompletedEvent(DelegateExecution execution) {
-        CommandContextUtil.getEventDispatcher(CommandContextUtil.getCommandContext()).dispatchEvent(
-                buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED));
+        CommandContextUtil.getEventDispatcher(CommandContextUtil.getCommandContext())
+            .dispatchEvent(buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED));
     }
 
-    protected FlowableMultiInstanceActivityCompletedEvent buildCompletedEvent(DelegateExecution execution, FlowableEngineEventType eventType) {
+    protected FlowableMultiInstanceActivityCompletedEvent buildCompletedEvent(DelegateExecution execution,
+        FlowableEngineEventType eventType) {
         FlowElement flowNode = execution.getCurrentFlowElement();
 
-        return FlowableEventBuilder.createMultiInstanceActivityCompletedEvent(eventType,
-                (int) execution.getVariable(NUMBER_OF_INSTANCES),
-                (int) execution.getVariable(NUMBER_OF_ACTIVE_INSTANCES),
-                (int) execution.getVariable(NUMBER_OF_COMPLETED_INSTANCES),
-                flowNode.getId(),
-                flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode);
+        return FlowableEventBuilder.createMultiInstanceActivityCompletedEvent(eventType, (int) execution.getVariable(NUMBER_OF_INSTANCES),
+            (int) execution.getVariable(NUMBER_OF_ACTIVE_INSTANCES), (int) execution.getVariable(NUMBER_OF_COMPLETED_INSTANCES),
+            flowNode.getId(), flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(),
+            flowNode);
     }
 
     @SuppressWarnings("rawtypes")
@@ -320,21 +343,22 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         }
 
         execution.setCurrentFlowElement(activity);
-        CommandContextUtil.getAgenda().planContinueMultiInstanceOperation((ExecutionEntity) execution, multiInstanceRootExecution, loopCounter);
+        CommandContextUtil.getAgenda()
+            .planContinueMultiInstanceOperation((ExecutionEntity) execution, multiInstanceRootExecution, loopCounter);
     }
 
     @SuppressWarnings("rawtypes")
     protected Collection resolveAndValidateCollection(DelegateExecution execution) {
         Object obj = resolveCollection(execution);
-        if (collectionHandler != null ) {           
+        if (collectionHandler != null) {
             return createFlowableCollectionHandler(collectionHandler, execution).resolveCollection(obj, execution);
         } else {
             if (obj instanceof Collection) {
                 return (Collection) obj;
-                
+
             } else if (obj instanceof Iterable) {
                 return iterableToCollection((Iterable) obj);
-                
+
             } else if (obj instanceof String) {
                 Object collectionVariable = execution.getVariable((String) obj);
                 if (collectionVariable instanceof Collection) {
@@ -346,14 +370,14 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 } else {
                     throw new FlowableIllegalArgumentException("Variable '" + obj + "':" + collectionVariable + " is not a Collection");
                 }
-                
+
             } else {
                 throw new FlowableIllegalArgumentException("Couldn't resolve collection expression, variable reference or string");
-                
+
             }
         }
     }
-    
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Collection iterableToCollection(Iterable iterable) {
         List result = new ArrayList();
@@ -368,7 +392,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
         } else if (collectionVariable != null) {
             collection = execution.getVariable(collectionVariable);
-            
+
         } else if (collectionString != null) {
             collection = collectionString;
         }
@@ -393,7 +417,8 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             return Integer.valueOf((String) value);
 
         } else {
-            throw new FlowableIllegalArgumentException("Could not resolve loopCardinality expression '" + loopCardinalityExpression.getExpressionText() + "': not a number nor number String");
+            throw new FlowableIllegalArgumentException("Could not resolve loopCardinality expression '"
+                + loopCardinalityExpression.getExpressionText() + "': not a number nor number String");
         }
     }
 
@@ -405,21 +430,21 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         Map<String, Object> localVariables = execution.getVariablesLocal();
         if (localVariables.containsKey(variableName)) {
             return (Integer) execution.getVariableLocal(variableName);
-            
+
         } else if (!execution.isMultiInstanceRoot()) {
             DelegateExecution parentExecution = execution.getParent();
             localVariables = parentExecution.getVariablesLocal();
             if (localVariables.containsKey(variableName)) {
                 return (Integer) parentExecution.getVariableLocal(variableName);
-                
+
             } else if (!parentExecution.isMultiInstanceRoot()) {
                 DelegateExecution superExecution = parentExecution.getParent();
                 return (Integer) superExecution.getVariableLocal(variableName);
-                
+
             } else {
                 return null;
             }
-            
+
         } else {
             return null;
         }
@@ -429,15 +454,19 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
      * Since no transitions are followed when leaving the inner activity, it is needed to call the end listeners yourself.
      */
     protected void callActivityEndListeners(DelegateExecution execution) {
-        CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
-                .executeExecutionListeners(activity, execution, ExecutionListener.EVENTNAME_END);
+        CommandContextUtil.getProcessEngineConfiguration()
+            .getListenerNotificationHelper()
+            .executeExecutionListeners(activity, execution, ExecutionListener.EVENTNAME_END);
     }
 
-    protected void logLoopDetails(DelegateExecution execution, String custom, int loopCounter, int nrOfCompletedInstances, int nrOfActiveInstances, int nrOfInstances) {
+    protected void logLoopDetails(DelegateExecution execution, String custom, int loopCounter, int nrOfCompletedInstances,
+        int nrOfActiveInstances, int nrOfInstances) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Multi-instance '{}' {}. Details: loopCounter={}, nrOrCompletedInstances={},nrOfActiveInstances={},nrOfInstances={}",
-                    execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : "", custom, loopCounter,
-                    nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
+            LOGGER.debug(
+                "Multi-instance '{}' {}. Details: loopCounter={}, nrOrCompletedInstances={},nrOfActiveInstances={},nrOfInstances={}",
+                execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement()
+                    .getId() : "",
+                custom, loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
         }
     }
 
@@ -453,7 +482,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         }
         return multiInstanceRootExecution;
     }
-    
+
     protected String getActiveValue(String originalValue, String propertyName, ObjectNode taskElementProperties) {
         String activeValue = originalValue;
         if (taskElementProperties != null) {
@@ -470,22 +499,27 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
 
     protected FlowableCollectionHandler createFlowableCollectionHandler(CollectionHandler handler, DelegateExecution execution) {
-    	FlowableCollectionHandler collectionHandler = null;
+        FlowableCollectionHandler collectionHandler = null;
 
         if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(handler.getImplementationType())) {
-        	collectionHandler = new ClassDelegateCollectionHandler(handler.getImplementation(), null);
-        
+            collectionHandler = new ClassDelegateCollectionHandler(handler.getImplementation(), null);
+
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(handler.getImplementationType())) {
-        	Object delegate = DelegateExpressionUtil.resolveDelegateExpression(CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(handler.getImplementation()), execution);
+            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(CommandContextUtil.getProcessEngineConfiguration()
+                .getExpressionManager()
+                .createExpression(handler.getImplementation()), execution);
             if (delegate instanceof FlowableCollectionHandler) {
-                collectionHandler = new DelegateExpressionCollectionHandler(execution, CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(handler.getImplementation()));   
+                collectionHandler = new DelegateExpressionCollectionHandler(execution, CommandContextUtil.getProcessEngineConfiguration()
+                    .getExpressionManager()
+                    .createExpression(handler.getImplementation()));
             } else {
-                throw new FlowableIllegalArgumentException("Delegate expression " + handler.getImplementation() + " did not resolve to an implementation of " + FlowableCollectionHandler.class);
+                throw new FlowableIllegalArgumentException("Delegate expression " + handler.getImplementation()
+                    + " did not resolve to an implementation of " + FlowableCollectionHandler.class);
             }
         }
         return collectionHandler;
     }
-    
+
     // Getters and Setters
     // ///////////////////////////////////////////////////////////
 
@@ -537,15 +571,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         this.collectionString = collectionString;
     }
 
-	public CollectionHandler getHandler() {
-		return collectionHandler;
-	}
+    public CollectionHandler getHandler() {
+        return collectionHandler;
+    }
 
-	public void setHandler(CollectionHandler collectionHandler) {
-		this.collectionHandler = collectionHandler;
-	}
+    public void setHandler(CollectionHandler collectionHandler) {
+        this.collectionHandler = collectionHandler;
+    }
 
-	public String getCollectionElementIndexVariable() {
+    public String getCollectionElementIndexVariable() {
         return collectionElementIndexVariable;
     }
 

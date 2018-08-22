@@ -35,7 +35,7 @@
       <extensionElements>
         <activiti:in source="element" target="element"/>
       </extensionElements>
-      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="#{list}" activiti:elementVariable="element" />      
+      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="#{list}" activiti:elementVariable="element" />      
     </callActivity>
     
     <sequenceFlow id="flow2" sourceRef="miCallActivity" targetRef="task1" />

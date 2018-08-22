@@ -20,6 +20,7 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -224,7 +225,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 16; i++) {
                 taskService.complete(tasks.get(i).getId());
             }
-            
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000L, 500L);
             assertProcessEnded(procId);
         }
     }
@@ -257,7 +258,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 12; i++) {
                 taskService.complete(tasks.get(i).getId());
             }
-            
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000L, 500L);
             assertProcessEnded(procId);
         }
     }
