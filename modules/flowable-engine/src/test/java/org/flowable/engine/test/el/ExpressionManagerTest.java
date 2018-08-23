@@ -25,23 +25,21 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.hamcrest.core.Is;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
  */
 public class ExpressionManagerTest extends PluggableFlowableTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
+    @Test
     public void testExpressionEvaluationWithoutProcessContext() {
         Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{1 == 1}");
         Object value = expression.getValue(new NoExecutionVariableScope());
         assertThat(value, Is.<Object>is(true));
     }
 
+    @Test
     @Deployment
     public void testMethodExpressions() {
         // Process contains 2 service tasks. one containing a method with no
@@ -56,6 +54,7 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("methodExpressionProcess").count());
     }
 
+    @Test
     @Deployment
     public void testExecutionAvailable() {
         Map<String, Object> vars = new HashMap<>();
@@ -69,6 +68,7 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         assertEquals("myValue", value);
     }
 
+    @Test
     @Deployment
     public void testAuthenticatedUserIdAvailable() {
         try {

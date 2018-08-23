@@ -23,6 +23,9 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to activities.
@@ -34,28 +37,26 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
 
     private TestHistoricActivityEventListener listener;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         this.listener = new TestHistoricActivityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         if (listener != null) {
             listener.clearEventsReceived();
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
-
-        super.tearDown();
     }
 
     /**
      * Test added to assert the historic activity instance event
      */
+    @Test
     @Deployment
     public void testHistoricActivityEventDispatched() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {

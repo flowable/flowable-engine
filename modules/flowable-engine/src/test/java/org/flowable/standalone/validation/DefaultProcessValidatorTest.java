@@ -32,8 +32,8 @@ import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorSetNames;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author jbarrez
@@ -42,7 +42,7 @@ public class DefaultProcessValidatorTest {
 
     protected ProcessValidator processValidator;
 
-    @Before
+    @BeforeEach
     public void setupProcessValidator() {
         ProcessValidatorFactory processValidatorFactory = new ProcessValidatorFactory();
         this.processValidator = processValidatorFactory.createDefaultProcessValidator();

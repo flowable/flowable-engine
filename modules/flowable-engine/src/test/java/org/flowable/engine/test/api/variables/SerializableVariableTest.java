@@ -21,12 +21,14 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class SerializableVariableTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testUpdateSerializableInServiceTask() {
         Map<String, Object> vars = new HashMap<>();

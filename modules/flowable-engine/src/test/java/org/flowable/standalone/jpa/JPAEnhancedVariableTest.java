@@ -21,14 +21,14 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,34 +37,28 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="mailto:eugene.khrustalev@gmail.com">Eugene Khrustalev</a>
  */
-public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
+@Tag("jpa")
+public class JPAEnhancedVariableTest extends ResourceFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JPAEnhancedVariableTest.class);
-    private static EntityManagerFactory entityManagerFactory;
-    protected static ProcessEngine cachedProcessEngine;
+    private EntityManagerFactory entityManagerFactory;
 
-    private static FieldAccessJPAEntity fieldEntity;
-    private static FieldAccessJPAEntity fieldEntity2;
-    private static PropertyAccessJPAEntity propertyEntity;
+    private FieldAccessJPAEntity fieldEntity;
+    private FieldAccessJPAEntity fieldEntity2;
+    private PropertyAccessJPAEntity propertyEntity;
 
-    @Override
-    protected void initializeProcessEngine() {
-        if (cachedProcessEngine == null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-                    .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/flowable.cfg.xml");
-
-            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
-
-            EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class);
-
-            entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
-
-            setupJPAVariables();
-        }
-        processEngine = cachedProcessEngine;
+    public JPAEnhancedVariableTest() {
+        super("org/flowable/standalone/jpa/flowable.cfg.xml");
     }
 
-    private static void setupJPAVariables() {
+    @BeforeEach
+    protected void setUp() {
+        entityManagerFactory = ((EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class))
+            .getEntityManagerFactory();
+        setupJPAVariables();
+    }
+
+    private void setupJPAVariables() {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
@@ -104,6 +98,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         return processEngine.getTaskService().createTaskQuery().processInstanceId(instance.getProcessInstanceId()).includeProcessVariables().singleResult();
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
     public void testEnhancedEntityVariables() throws Exception {
         // test if enhancement is used
@@ -132,6 +127,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
     public void testEnhancedEntityListVariables() throws Exception {
         // test if enhancement is used

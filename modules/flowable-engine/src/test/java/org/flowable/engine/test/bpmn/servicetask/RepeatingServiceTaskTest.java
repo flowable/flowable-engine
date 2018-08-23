@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.servicetask;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -21,6 +22,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 public class RepeatingServiceTaskTest extends PluggableFlowableTestCase {
 
     // @Deployment
+    @Test
     public void testMultipleInvocationsInSameTransation() {
         // ProcessInstance processInstance =
         // runtimeService.startProcessInstanceByKey("repeating",

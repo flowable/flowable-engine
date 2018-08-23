@@ -21,6 +21,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test timer expression according to act-865
@@ -44,6 +45,7 @@ public class TimeExpressionTest extends PluggableFlowableTestCase {
         return jobs.get(0).getDuedate();
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml" })
     public void testTimeExpressionComplete() throws Exception {
         Date dt = new Date();
@@ -52,6 +54,7 @@ public class TimeExpressionTest extends PluggableFlowableTestCase {
         assertEquals(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dt), new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dueDate));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml" })
     public void testTimeExpressionWithoutSeconds() throws Exception {
         Date dt = new Date();
@@ -60,6 +63,7 @@ public class TimeExpressionTest extends PluggableFlowableTestCase {
         assertEquals(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(dt), new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(dueDate));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml" })
     public void testTimeExpressionWithoutMinutes() throws Exception {
         Date dt = new Date();
@@ -68,6 +72,7 @@ public class TimeExpressionTest extends PluggableFlowableTestCase {
         assertEquals(new SimpleDateFormat("yyyy-MM-dd'T'HH").format(dt), new SimpleDateFormat("yyyy-MM-dd'T'HH").format(dueDate));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml" })
     public void testTimeExpressionWithoutTime() throws Exception {
         Date dt = new Date();
@@ -76,6 +81,7 @@ public class TimeExpressionTest extends PluggableFlowableTestCase {
         assertEquals(new SimpleDateFormat("yyyy-MM-dd").format(dt), new SimpleDateFormat("yyyy-MM-dd").format(dueDate));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml" })
     public void testTimeExpressionWithoutDay() throws Exception {
         Date dt = new Date();
@@ -84,6 +90,7 @@ public class TimeExpressionTest extends PluggableFlowableTestCase {
         assertEquals(new SimpleDateFormat("yyyy-MM").format(dt), new SimpleDateFormat("yyyy-MM").format(dueDate));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpression.bpmn20.xml" })
     public void testTimeExpressionWithoutMonth() throws Exception {
         Date dt = new Date();

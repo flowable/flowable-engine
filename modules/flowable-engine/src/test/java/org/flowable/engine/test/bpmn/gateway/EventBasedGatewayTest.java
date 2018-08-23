@@ -23,6 +23,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daniel Meyer
@@ -30,6 +31,7 @@ import org.flowable.job.api.Job;
  */
 public class EventBasedGatewayTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml",
             "org/flowable/engine/test/bpmn/gateway/EventBasedGatewayTest.throwAlertSignal.bpmn20.xml" })
     public void testCatchSignalCancelsTimer() {
@@ -56,6 +58,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi1, DeleteReason.EVENT_BASED_GATEWAY_CANCEL, "timerEvent");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml" })
     public void testCatchTimerCancelsSignal() {
 
@@ -86,6 +89,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.EVENT_BASED_GATEWAY_CANCEL, "signalEvent");
     }
 
+    @Test
     @Deployment
     public void testCatchSignalAndMessageAndTimer() {
 
@@ -124,6 +128,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.EVENT_BASED_GATEWAY_CANCEL, "timerEvent");
     }
 
+    @Test
     public void testConnectedToActivity() {
 
         try {
@@ -137,6 +142,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testAsyncEventBasedGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncEventBasedGateway");

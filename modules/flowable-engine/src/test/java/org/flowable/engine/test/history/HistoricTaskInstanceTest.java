@@ -30,6 +30,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -37,6 +38,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
  */
 public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testHistoricTaskInstance() throws Exception {
         Map<String, Object> varMap = new HashMap<>();
@@ -113,12 +115,14 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().count());
     }
 
+    @Test
     public void testDeleteHistoricTaskInstance() throws Exception {
         // deleting unexisting historic task instance should be silently ignored
         historyService.deleteHistoricTaskInstance("unexistingId");
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceQuery() throws Exception {
         Calendar start = Calendar.getInstance();
@@ -291,6 +295,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().unfinished().count());
     }
 
+    @Test
     @Deployment
     public void testHistoricIdentityLinksForTaskOwner() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
@@ -341,6 +346,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertNotNull(historicIdentityLinksForTask.get(0).getCreateTime());
     }
 
+    @Test
     @Deployment
     public void testHistoricIdentityLinksOnTaskClaim() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
@@ -452,6 +458,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals("newKid", historicIdentityLinksForTask.get(0).getUserId());
     }
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceOrQuery() throws Exception {
         Calendar start = Calendar.getInstance();
@@ -662,6 +669,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().or().unfinished().endOr().count());
     }
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceQueryProcessFinished() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoTaskHistoricTaskQueryTest");
@@ -691,6 +699,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(2, historyService.createHistoricTaskInstanceQuery().processFinished().count());
     }
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceQuerySorting() {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("HistoricTaskQueryTest");
@@ -727,6 +736,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().desc().count());
     }
 
+    @Test
     @Deployment
     public void testHistoricIdentityLinksOnTask() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("historicIdentityLinks");
@@ -792,6 +802,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testInvalidSorting() {
         try {
             historyService.createHistoricTaskInstanceQuery().asc();
@@ -818,6 +829,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     /**
      * Test to validate fix for ACT-1939: HistoryService loads invalid task local variables for completed task
      */
+    @Test
     @Deployment
     public void testVariableUpdateOrderHistoricTaskInstance() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("historicTask");

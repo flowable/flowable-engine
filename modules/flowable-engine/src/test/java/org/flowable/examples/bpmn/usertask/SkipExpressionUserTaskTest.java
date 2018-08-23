@@ -30,9 +30,11 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void test() {
         runtimeService.startProcessInstanceByKey("skipExpressionUserTask");
@@ -58,6 +60,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, tasks3.size());
     }
 
+    @Test
     @Deployment
     public void testWithCandidateGroups() {
         Map<String, Object> vars = new HashMap<>();
@@ -67,6 +70,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().list().size());
     }
 
+    @Test
     @Deployment
     public void testSkipMultipleTasks() {
         Map<String, Object> variables = new HashMap<>();
@@ -81,6 +85,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         assertEquals("Task3", tasks.get(0).getName());
     }
     
+    @Test
     @Deployment
     public void testEvents() {
         SkipFlowableEventListener eventListener = new SkipFlowableEventListener();

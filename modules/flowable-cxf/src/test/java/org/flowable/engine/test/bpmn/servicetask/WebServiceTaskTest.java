@@ -13,12 +13,14 @@
 package org.flowable.engine.test.bpmn.servicetask;
 
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Esteban Robles Luna
  */
 public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
 
+    @Test
     @Deployment
     public void testWebServiceInvocationWithoutDataFlow() throws Exception {
         assertEquals(-1, webServiceMock.getCount());

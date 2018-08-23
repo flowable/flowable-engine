@@ -24,6 +24,10 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.test.Deployment;
+import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to attachments.
@@ -37,6 +41,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of attachments on a task/process.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testAttachmentEntityEvents() throws Exception {
 
@@ -116,6 +121,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of users.
      */
+    @Test
     public void testAttachmentEntityEventsStandaloneTask() throws Exception {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = null;
@@ -189,6 +195,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testAttachmentEntityEventsOnHistoricTaskDelete() throws Exception {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             org.flowable.task.api.Task task = null;
@@ -223,16 +230,14 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
         }
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         listener = new TestFlowableEntityEventListener(Attachment.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

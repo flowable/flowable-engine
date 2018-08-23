@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.bpmn.mail.EmailServiceTaskTest;
 import org.flowable.engine.test.bpmn.mail.EmailTestCase;
+import org.junit.jupiter.api.Test;
 import org.subethamail.wiser.WiserMessage;
 
 /**
@@ -27,6 +28,7 @@ import org.subethamail.wiser.WiserMessage;
  */
 public class AsyncEmailTaskTest extends EmailTestCase {
 
+    @Test
     @Deployment
     public void testSimpleTextMail() throws Exception {
         String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly").getId();
@@ -44,6 +46,7 @@ public class AsyncEmailTaskTest extends EmailTestCase {
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testSimpleTextMailSendTask() throws Exception {
         runtimeService.startProcessInstanceByKey("simpleTextOnly");

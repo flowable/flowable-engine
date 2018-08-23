@@ -21,6 +21,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -29,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/executionListener/TransactionDependentListenerTest-context.xml")
 public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithRollback() {
 
@@ -62,6 +64,7 @@ public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
         assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
     }
 
+    @Test
     @Deployment
     public void testOnCloseFailureExecutionListenersWithRollback() {
 
@@ -95,6 +98,7 @@ public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
         assertEquals("Service Task 3", currentActivities.get(1).getActivityName());
     }
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithExecutionVariables() {
 
@@ -120,6 +124,7 @@ public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
         assertEquals("test2", currentActivities.get(2).getExecutionVariables().get("injectedExecutionVariable"));
     }
 
+    @Test
     @Deployment
     public void testOnCloseFailureExecutionListenersWithTransactionalOperation() {
 
@@ -151,6 +156,7 @@ public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
         assertEquals("Service Task 1", currentActivities.get(0).getActivityName());
     }
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithCustomPropertiesResolver() {
 

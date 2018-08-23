@@ -28,6 +28,9 @@ import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Saeid Mirzaei Test case for ACT-4066
@@ -56,20 +59,19 @@ public class StartTimerEventRepeatWithoutEndTest extends PluggableFlowableTestCa
 
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         startEventListener = new StartEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(startEventListener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         processEngineConfiguration.getEventDispatcher().removeEventListener(startEventListener);
-        super.tearDown();
     }
 
+    @Test
     @Deployment
     public void testStartTimerEventRepeatWithoutN() {
         counter = 0;

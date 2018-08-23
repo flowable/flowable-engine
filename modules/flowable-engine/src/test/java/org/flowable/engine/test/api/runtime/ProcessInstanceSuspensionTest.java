@@ -26,6 +26,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,6 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceActiveByDefault() {
 
@@ -47,6 +49,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testSuspendActivateProcessInstance() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -66,6 +69,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertFalse(processInstance.isSuspended());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testCannotActivateActiveProcessInstance() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -84,6 +88,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testCannotSuspendSuspendedProcessInstance() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -103,6 +108,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/superProcessWithMultipleNestedSubProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
             "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml" })
     public void testQueryForActiveAndSuspendedProcessInstances() {
@@ -122,6 +128,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testTaskSuspendedAfterProcessInstanceSuspension() {
 
@@ -147,6 +154,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testTaskQueryAfterProcessInstanceSuspend() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -176,6 +184,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment
     public void testChildExecutionsSuspendedAfterProcessInstanceSuspend() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testChildExecutionsSuspended");
@@ -202,6 +211,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSubmitTaskFormAfterProcessInstanceSuspend() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -216,6 +226,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceOperationsFailAfterSuspend() {
 
@@ -337,6 +348,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testSignalEventReceivedAfterProcessInstanceSuspended() {
 
@@ -363,6 +375,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/runtime/ProcessInstanceSuspensionTest.testSignalEventReceivedAfterProcessInstanceSuspended.bpmn20.xml")
     public void testSignalEventReceivedAfterMultipleProcessInstancesSuspended() {
 
@@ -392,6 +405,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testTaskOperationsFailAfterProcessInstanceSuspend() {
 
@@ -567,6 +581,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testJobNotExecutedAfterProcessInstanceSuspend() {
 
@@ -596,6 +611,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/runtime/ProcessInstanceSuspensionTest.testJobNotExecutedAfterProcessInstanceSuspend.bpmn20.xml")
     public void testJobActivationAfterProcessInstanceSuspend() {
 

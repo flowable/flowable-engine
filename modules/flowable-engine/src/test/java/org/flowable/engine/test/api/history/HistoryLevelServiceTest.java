@@ -26,6 +26,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -33,6 +34,7 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
 
   @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelNoneProcess.bpmn20.xml" })
+  @Test
   public void testNoneHistoryLevel() {
     // With a clean ProcessEngine, no instances should be available
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -62,6 +64,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
   }
   
   @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelActivityProcess.bpmn20.xml" })
+  @Test
   public void testActivityHistoryLevel() {
     // With a clean ProcessEngine, no instances should be available
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -119,6 +122,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
   }
   
   @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelAuditProcess.bpmn20.xml" })
+  @Test
   public void testAuditHistoryLevel() {
     // With a clean ProcessEngine, no instances should be available
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -184,6 +188,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
   }
   
   @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelFullProcess.bpmn20.xml" })
+  @Test
   public void testFullHistoryLevel() {
     // With a clean ProcessEngine, no instances should be available
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

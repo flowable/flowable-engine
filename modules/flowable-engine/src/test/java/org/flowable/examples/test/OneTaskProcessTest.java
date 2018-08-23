@@ -30,6 +30,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class provides examples how to test one task process
@@ -38,16 +41,15 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
 
     protected EventLogger databaseEventLogger;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         // Database event logger setup
         databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper());
         runtimeService.addEventListener(databaseEventLogger);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         // Cleanup
         for (EventLogEntry eventLogEntry : managementService.getEventLogEntries(null, null)) {
@@ -57,9 +59,9 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         // Database event logger teardown
         runtimeService.removeEventListener(databaseEventLogger);
 
-        super.tearDown();
     }
 
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testStandardJUnitOneTaskProcess() {
         // Arrange -> start process
@@ -72,6 +74,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(oneTaskProcess.getId()).count(), is(0L));
     }
 
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testProcessModelByAnotherProcess() {
         testProcessModelByAnotherProcess(
@@ -89,6 +92,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(pUnitTestProcessInstance.getId()).count(), is(0L));
     }
 
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testProcessModelFailure() {
         // deploy different process - test should fail
@@ -100,6 +104,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"})
     public void testGenerateProcessTestSemiAutomatically() {
         // Generate "user" events

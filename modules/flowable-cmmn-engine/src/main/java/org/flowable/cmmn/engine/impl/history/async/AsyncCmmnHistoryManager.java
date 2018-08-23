@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.history.async;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.convertToBase64;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,9 +38,6 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.convertToBase64;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
 
 /**
  * @author Joram Barrez
@@ -187,7 +187,7 @@ public class AsyncCmmnHistoryManager implements CmmnHistoryManager {
             Map<String, String> data = new HashMap<>();
             addCommonIdentityLinkFields(identityLink, data);
             
-            CaseDefinition caseDefinition = getCaseDefinition(identityLink);;
+            CaseDefinition caseDefinition = getCaseDefinition(identityLink);
             if (caseDefinition != null) {
                 addCaseDefinitionFields(data, caseDefinition);
             }

@@ -50,7 +50,7 @@ public class DynamicSubProcessJoinInjectUtil extends BaseDynamicSubProcessInject
         
         TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
         FlowElement taskFlowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
-        if (taskFlowElement == null || !(taskFlowElement instanceof UserTask)) {
+        if (!(taskFlowElement instanceof UserTask)) {
             throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
         }
         UserTask userTask = (UserTask) taskFlowElement;

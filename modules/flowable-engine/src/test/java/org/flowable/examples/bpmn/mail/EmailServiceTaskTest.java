@@ -22,6 +22,9 @@ import javax.mail.internet.MimeMessage;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
 
@@ -33,20 +36,19 @@ public class EmailServiceTaskTest extends PluggableFlowableTestCase {
     /* Wiser is a fake email server for unit testing */
     private Wiser wiser;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         wiser = new Wiser();
         wiser.setPort(5025);
         wiser.start();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         wiser.stop();
-        super.tearDown();
     }
 
+    @Test
     @Deployment
     public void testSendEmail() throws Exception {
 

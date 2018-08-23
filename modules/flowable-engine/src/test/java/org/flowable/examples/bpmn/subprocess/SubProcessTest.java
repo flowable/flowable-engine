@@ -19,12 +19,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class SubProcessTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testSimpleSubProcess() {
 
         Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/examples/bpmn/subprocess/SubProcessTest.fixSystemFailureProcess.bpmn20.xml").deploy();

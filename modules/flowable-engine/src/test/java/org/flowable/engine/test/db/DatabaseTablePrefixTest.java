@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.db;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -23,15 +25,15 @@ import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public class DatabaseTablePrefixTest extends TestCase {
+public class DatabaseTablePrefixTest {
 
+    @Test
     public void testPerformDatabaseSchemaOperationCreate() throws Exception {
 
         DataSource dataSource = createDataSourceAndSchema();
@@ -98,6 +100,7 @@ public class DatabaseTablePrefixTest extends TestCase {
     }
     
     
+    @Test
     public void testProcessEngineReboot() throws Exception {
         
         ProcessEngine processEngine1 = null;

@@ -16,6 +16,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -23,6 +24,7 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
  */
 public class ExclusiveTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testNonExclusiveService() {
         // start process
@@ -38,6 +40,7 @@ public class ExclusiveTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testExclusiveService() {
         // start process
@@ -53,6 +56,7 @@ public class ExclusiveTaskTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testExclusiveServiceConcurrent() {
         // start process

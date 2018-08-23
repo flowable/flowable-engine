@@ -32,6 +32,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -39,6 +40,7 @@ import org.flowable.identitylink.api.history.HistoricIdentityLink;
  */
 public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricDataCreatedForProcessExecution() {
 
@@ -94,6 +96,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testDeleteProcessInstanceHistoryCreated() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -109,6 +112,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
     }
 
     /*
+     * @Test
      * @Deployment(resources = {"org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml"}) public void testHistoricProcessInstanceVariables() { Map<String,Object> vars = new
      * HashMap<String,Object>(); vars.put("foo", "bar"); vars.put("baz", "boo");
      * 
@@ -119,6 +123,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
      * "boo").count()); }
      */
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessInstanceQuery() {
         Calendar startTime = Calendar.getInstance();
@@ -198,6 +203,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().involvedUser("gonzo").count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessInstanceOrQuery() {
         Calendar startTime = Calendar.getInstance();
@@ -298,6 +304,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().or().involvedUser("gonzo").processDefinitionId("undefined").endOr().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessInstanceSorting() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -393,6 +400,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertTrue(processInstance.contains(processInstance2.getId()));
     }
 
+    @Test
     public void testInvalidSorting() {
         try {
             historyService.createHistoricProcessInstanceQuery().asc();
@@ -416,6 +424,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     // ACT-1098
     public void testDeleteReason() {
@@ -431,6 +440,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricIdentityLinksOnProcessInstance() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -468,6 +478,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
     /**
      * Validation for ACT-821
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/HistoricProcessInstanceTest.testDeleteHistoricProcessInstanceWithCallActivity.bpmn20.xml",
             "org/flowable/engine/test/history/HistoricProcessInstanceTest.testDeleteHistoricProcessInstanceWithCallActivity-subprocess.bpmn20.xml" })
     public void testDeleteHistoricProcessInstanceWithCallActivity() {
@@ -490,6 +501,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricProcessInstanceName() {
         String piName = "Customized Process Instance Name";
@@ -508,6 +520,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
     /**
      * Validation for https://jira.codehaus.org/browse/ACT-2182
      */
+    @Test
     public void testNameAndTenantIdSetWhenFetchingVariables() {
 
         String tenantId = "testTenantId";

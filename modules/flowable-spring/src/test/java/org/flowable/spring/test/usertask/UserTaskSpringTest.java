@@ -24,6 +24,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -32,6 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:flowable-context.xml")
 public class UserTaskSpringTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment(resources = "org/flowable/spring/test/usertask/VacationRequest.bpmn20.xml")
     public void testFormProperties() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("vacationRequest").singleResult();

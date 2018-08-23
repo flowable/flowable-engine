@@ -30,6 +30,7 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.ProcessEngine;
@@ -81,6 +82,7 @@ public class ProcessEngineAutoConfigurationTest {
             assertThat(context).as("Process engine").hasSingleBean(ProcessEngine.class);
             assertThat(context)
                 .doesNotHaveBean(AppEngine.class)
+                .doesNotHaveBean(IdGenerator.class)
                 .doesNotHaveBean("processAppEngineConfigurationConfigurer");
 
             ProcessEngine processEngine = context.getBean(ProcessEngine.class);
@@ -145,6 +147,7 @@ public class ProcessEngineAutoConfigurationTest {
         contextRunner.withUserConfiguration(CustomIdGeneratorConfiguration.class)
             .run(context -> {
                 assertThat(context).as("Process engine").hasSingleBean(ProcessEngine.class);
+                assertThat(context).as("IdGenerator").doesNotHaveBean(IdGenerator.class);
 
                 ProcessEngine processEngine = context.getBean(ProcessEngine.class);
 
@@ -156,6 +159,28 @@ public class ProcessEngineAutoConfigurationTest {
                         assertThat(dbIdGenerator.getCommandConfig())
                             .isEqualToComparingFieldByField(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
                     });
+            });
+    }
+
+    @Test
+    public void processEngineWithCustomIdGeneratorAsBean() {
+        contextRunner.withUserConfiguration(CustomBeanIdGeneratorConfiguration.class)
+            .run(context -> {
+                assertThat(context)
+                    .as("Process engine").hasSingleBean(ProcessEngine.class)
+                    .as("Id generator").hasSingleBean(IdGenerator.class);
+
+                ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+                ProcessEngineConfiguration engineConfiguration = processEngine.getProcessEngineConfiguration();
+                assertThat(engineConfiguration.getIdGenerator())
+                    .isInstanceOfSatisfying(DbIdGenerator.class, dbIdGenerator -> {
+                        assertThat(dbIdGenerator.getIdBlockSize()).isEqualTo(engineConfiguration.getIdBlockSize());
+                        assertThat(dbIdGenerator.getCommandExecutor()).isEqualTo(engineConfiguration.getCommandExecutor());
+                        assertThat(dbIdGenerator.getCommandConfig())
+                            .isEqualToComparingFieldByField(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
+                    })
+                    .isEqualTo(context.getBean(IdGenerator.class));
             });
     }
 
@@ -237,6 +262,15 @@ public class ProcessEngineAutoConfigurationTest {
         @Bean
         public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> customIdGeneratorConfigurer() {
             return engineConfiguration -> engineConfiguration.setIdGenerator(new DbIdGenerator());
+        }
+    }
+
+    @Configuration
+    static class CustomBeanIdGeneratorConfiguration {
+
+        @Bean
+        public IdGenerator customIdGenerator() {
+            return new DbIdGenerator();
         }
     }
 }

@@ -18,12 +18,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Rich Kroll, Tijs Rademakers
  */
 public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/ScriptTaskListenerTest.bpmn20.xml" })
     public void testScriptTaskListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess");

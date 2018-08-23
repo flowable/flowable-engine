@@ -32,6 +32,9 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -41,7 +44,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
     private List<String> taskIds;
     private List<String> multipleTaskIds;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
 
         identityService.saveUser(identityService.newUser("kermit"));
@@ -58,7 +61,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         taskIds = generateTestTasks();
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");
@@ -68,6 +71,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         taskService.deleteTasks(taskIds, true);
     }
 
+    @Test
     @Deployment
     public void testQuery() {
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeTaskLocalVariables().taskAssignee("gonzo").singleResult();
@@ -145,6 +149,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         assertEquals("This is a binary process variable", new String((byte[]) task.getProcessVariables().get("binaryVariable")));
     }
     
+    @Test
     @Deployment
     public void testVariableExistsQuery() {
         Map<String, Object> startMap = new HashMap<>();
@@ -193,6 +198,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         assertNull(task);
     }
 
+    @Test
     public void testQueryWithPagingAndVariables() {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().includeProcessVariables().includeTaskLocalVariables().orderByTaskPriority().desc().listPage(0, 1);
         assertEquals(1, tasks.size());
@@ -226,6 +232,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
     }
 
     // Unit test for https://activiti.atlassian.net/browse/ACT-4152
+    @Test
     public void testQueryWithIncludeTaskVariableAndTaskCategory() {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("gonzo").list();
         for (org.flowable.task.api.Task task : tasks) {
@@ -246,6 +253,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryWithLimitAndVariables() throws Exception {
 
         int taskVariablesLimit = 2000;
@@ -280,6 +288,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testOrQuery() {
         Map<String, Object> startMap = new HashMap<>();
@@ -309,6 +318,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
     }
 
+    @Test
     @Deployment
     public void testOrQueryMultipleVariableValues() {
         Map<String, Object> startMap = new HashMap<>();
@@ -333,6 +343,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
     }
 
+    @Test
     public void testQueryTaskDefinitionId() {
         Task taskWithDefinitionId = createTaskWithDefinitionId("testTaskId");
         try {
@@ -355,6 +366,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     public void testQueryTaskDefinitionId_multipleResults() {
         Task taskWithDefinitionId1 = createTaskWithDefinitionId("testTaskId1");
         Task taskWithDefinitionId2 = createTaskWithDefinitionId("testTaskId2");

@@ -18,20 +18,23 @@ import java.util.Map;
 
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.subethamail.wiser.Wiser;
 
 /**
  * @author Joram Barrez
  */
+@Tag("email")
 public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
     protected Wiser wiser;
     private String initialForceTo;
     private Map<String, MailServerInfo> initialMailServers;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         initialForceTo = processEngineConfiguration.getMailServerForceTo();
         Map<String, MailServerInfo> mailServers = processEngineConfiguration.getMailServers();
@@ -52,14 +55,13 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
         }
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         wiser.stop();
 
         // Fix for slow Jenkins
         Thread.sleep(250L);
 
-        super.tearDown();
         processEngineConfiguration.setMailServerForceTo(initialForceTo);
         processEngineConfiguration.setMailServers(initialMailServers);
     }

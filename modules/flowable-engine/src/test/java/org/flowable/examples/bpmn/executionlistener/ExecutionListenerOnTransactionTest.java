@@ -22,12 +22,14 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
 public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithRollback() {
 
@@ -61,6 +63,7 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
     }
 
+    @Test
     @Deployment
     public void testOnCloseFailureExecutionListenersWithRollback() {
 
@@ -94,6 +97,7 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         assertEquals("Service Task 3", currentActivities.get(1).getActivityName());
     }
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithExecutionVariables() {
 
@@ -119,6 +123,7 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         assertEquals("test2", currentActivities.get(2).getExecutionVariables().get("injectedExecutionVariable"));
     }
 
+    @Test
     @Deployment
     public void testOnCloseFailureExecutionListenersWithTransactionalOperation() {
 
@@ -150,6 +155,7 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         assertEquals("Service Task 1", currentActivities.get(0).getActivityName());
     }
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithCustomPropertiesResolver() {
 

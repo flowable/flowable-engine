@@ -28,6 +28,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -35,6 +36,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
  */
 public class SubProcessTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSimpleSubProcess() {
 
@@ -52,6 +54,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * Same test case as before, but now with all automatic steps
      */
+    @Test
     @Deployment
     public void testSimpleAutomaticSubProcess() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcessAutomatic");
@@ -59,6 +62,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testSimpleSubProcessWithTimer() {
 
@@ -121,6 +125,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * Test case where the simple sub process of previous test cases is nested within another subprocess.
      */
+    @Test
     @Deployment
     public void testNestedSimpleSubProcess() {
 
@@ -144,6 +149,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testNestedSimpleSubprocessWithTimerOnInnerSubProcess() {
         Date startTime = new Date();
@@ -172,6 +178,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * Test case where the simple sub process of previous test cases is nested within two other sub processes
      */
+    @Test
     @Deployment
     public void testDoubleNestedSimpleSubProcess() {
         // After staring the process, the task in the inner subprocess must be active
@@ -187,6 +194,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertEquals("Task after subprocesses", taskAfterSubProcesses.getName());
     }
 
+    @Test
     @Deployment
     public void testSimpleParallelSubProcess() {
 
@@ -208,6 +216,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertEquals("Task after sub process", taskAfterSubProcess.getName());
     }
 
+    @Test
     @Deployment
     public void testSimpleParallelSubProcessWithTimer() {
 
@@ -236,6 +245,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testTwoSubProcessInParallel() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoSubProcessInParallel");
@@ -268,6 +278,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testTwoSubProcessInParallelWithinSubProcess() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoSubProcessInParallelWithinSubProcess");
@@ -292,6 +303,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testTwoNestedSubProcessesInParallelWithTimer() {
 
@@ -326,6 +338,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-1072">https://activiti.atlassian.net/browse/ACT-1072</a>
      */
+    @Test
     @Deployment
     public void testNestedSimpleSubProcessWithoutEndEvent() {
         testNestedSimpleSubProcess();
@@ -334,6 +347,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-1072">https://activiti.atlassian.net/browse/ACT-1072</a>
      */
+    @Test
     @Deployment
     public void testSimpleSubProcessWithoutEndEvent() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testSimpleSubProcessWithoutEndEvent");
@@ -343,6 +357,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-1072">https://activiti.atlassian.net/browse/ACT-1072</a>
      */
+    @Test
     @Deployment
     public void testNestedSubProcessesWithoutEndEvents() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testNestedSubProcessesWithoutEndEvents");
@@ -352,6 +367,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     /**
      * @see <a href="https://activiti.atlassian.net/browse/ACT-1847">https://activiti.atlassian.net/browse/ACT-1847</a>
      */
+    @Test
     @Deployment
     public void testDataObjectScope() {
 

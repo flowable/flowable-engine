@@ -21,12 +21,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class GroovyScriptTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testScriptExecution() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
@@ -36,6 +38,7 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
         assertEquals(15, result.intValue());
     }
 
+    @Test
     @Deployment
     public void testSetVariableThroughExecutionInScript() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("setScriptVariableThroughExecution");
@@ -46,6 +49,7 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
         assertEquals("test123", runtimeService.getVariable(pi.getId(), "myVar"));
     }
 
+    @Test
     @Deployment
     public void testAsyncScript() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testAsyncScript");

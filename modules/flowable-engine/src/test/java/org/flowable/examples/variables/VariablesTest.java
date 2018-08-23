@@ -32,6 +32,7 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -40,6 +41,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class VariablesTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testBasicVariableOperations() {
         processEngineConfiguration.getVariableTypes().addType(CustomVariableType.instance);
@@ -182,6 +184,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testLocalizeVariables() {
         // Start process instance with different types of variables
@@ -261,6 +264,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("pepsi-cola", variableInstance.getValue());
     }
 
+    @Test
     @Deployment
     public void testLocalizeDataObjects() {
         // Start process instance with different types of variables
@@ -1676,6 +1680,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     // Test case for ACT-1839
+    @Test
     @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testChangeTypeSerializable.bpmn20.xml" })
     public void testChangeTypeSerializable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variable-type-change-test");
@@ -1692,6 +1697,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     // test case for ACT-1082
+    @Test
     @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml" })
     public void testChangeVariableType() {
 
@@ -1755,6 +1761,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     // test case for ACT-1428
+    @Test
     @Deployment
     public void testNullVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
@@ -1805,6 +1812,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     /**
      * Test added to validate UUID variable type + querying (ACT-1665)
      */
+    @Test
     @Deployment
     public void testUUIDVariableAndQuery() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

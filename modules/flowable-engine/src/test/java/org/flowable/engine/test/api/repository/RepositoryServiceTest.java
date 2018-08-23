@@ -33,6 +33,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -40,6 +41,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class RepositoryServiceTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceById() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
@@ -50,6 +52,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         assertNotNull(processDefinition.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testFindProcessDefinitionById() {
         List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().list();
@@ -65,6 +68,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         assertEquals("This is a process for testing purposes", processDefinition.getDescription());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testDeleteDeploymentWithRunningInstances() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
@@ -82,6 +86,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeleteDeploymentNullDeploymentId() {
         try {
             repositoryService.deleteDeployment(null);
@@ -91,6 +96,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeleteDeploymentCascadeNullDeploymentId() {
         try {
             repositoryService.deleteDeployment(null, true);
@@ -100,6 +106,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeleteDeploymentNonExistentDeploymentId() {
         try {
             repositoryService.deleteDeployment("foobar");
@@ -111,6 +118,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeleteDeploymentCascadeNonExistentDeploymentId() {
         try {
             repositoryService.deleteDeployment("foobar", true);
@@ -122,6 +130,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testDeleteDeploymentCascadeWithRunningInstances() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
@@ -134,6 +143,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(processDefinition.getDeploymentId(), true);
     }
 
+    @Test
     public void testFindDeploymentResourceNamesNullDeploymentId() {
         try {
             repositoryService.getDeploymentResourceNames(null);
@@ -143,6 +153,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeploymentWithDelayedProcessDefinitionActivation() {
 
         Date startTime = new Date();
@@ -185,6 +196,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetResourceAsStreamUnexistingResourceInExistingDeployment() {
         // Get hold of the deployment id
@@ -199,6 +211,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetResourceAsStreamUnexistingDeployment() {
 
@@ -211,6 +224,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testGetResourceAsStreamNullArguments() {
         try {
             repositoryService.getResourceAsStream(null, "resource");
@@ -227,6 +241,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testNewModelPersistence() {
         Model model = repositoryService.newModel();
         assertNotNull(model);
@@ -248,6 +263,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         repositoryService.deleteModel(model.getId());
     }
 
+    @Test
     public void testNewModelWithSource() throws Exception {
         Model model = repositoryService.newModel();
         model.setName("Test model");
@@ -267,6 +283,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         repositoryService.deleteModel(model.getId());
     }
 
+    @Test
     public void testUpdateModelPersistence() throws Exception {
         Model model = repositoryService.newModel();
         assertNotNull(model);
@@ -303,6 +320,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         repositoryService.deleteModel(model.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testProcessDefinitionEntitySerializable() {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -320,6 +338,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testGetBpmnModel() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -373,6 +392,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
      * 
      * See https://blogs.oracle.com/xuemingshen/entry/non_utf_8_encoding_in
      */
+    @Test
     public void testDeployZipFile() {
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/api/repository/test-processes.zip");
         assertNotNull(inputStream);

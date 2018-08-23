@@ -23,12 +23,14 @@ import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testSimpleCase.bpmn20.xml" })
     public void testSimpleCaseTxSuccessful() {
 
@@ -76,6 +78,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testSimpleCase.bpmn20.xml" })
     public void testSimpleCaseTxCancelled() {
 
@@ -122,6 +125,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment
     public void testCancelEndConcurrent() {
 
@@ -165,6 +169,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment
     public void testNestedCancelInner() {
 
@@ -218,6 +223,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().count());
     }
 
+    @Test
     @Deployment
     public void testNestedCancelOuter() {
 
@@ -266,6 +272,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
      * 
      * see spec page 470: "If the cancelActivity attribute is set, the Activity the Event is attached to is then cancelled (in case of a multi-instance, all its instances are cancelled);"
      */
+    @Test
     @Deployment
     public void testMultiInstanceTx() {
 
@@ -294,6 +301,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testMultiInstanceTx.bpmn20.xml" })
     public void testMultiInstanceTxSuccessful() {
 
@@ -326,6 +334,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testMultipleCancelBoundaryFails() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testMultipleCancelBoundaryFails.bpmn20.xml").deploy();
@@ -337,6 +346,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testCancelBoundaryNoTransactionFails() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCancelBoundaryNoTransactionFails.bpmn20.xml")
@@ -349,6 +359,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testCancelEndNoTransactionFails() {
         try {
             repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCancelEndNoTransactionFails.bpmn20.xml").deploy();
@@ -364,6 +375,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         return runtimeService.createEventSubscriptionQuery();
     }
 
+    @Test
     @Deployment
     public void testParseWithDI() {
 

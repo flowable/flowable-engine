@@ -13,12 +13,10 @@
 
 package org.flowable.rest.service.api.repository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -31,9 +29,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -57,7 +58,7 @@ public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcess
             notes = "It's possible to add either a user or a group.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the process definition was found and the identity link was created."),
-            @ApiResponse(code = 400, message = "Indicates the body doesn't contains the correct information."),
+            @ApiResponse(code = 400, message = "Indicates the body does not contain the correct information."),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
     @PostMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks", produces = "application/json")

@@ -21,6 +21,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableTestCase {
 
@@ -28,9 +31,8 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
     private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1 = "JobErrorCheck";
     private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_2 = "JobErrorDoubleCheck";
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/JobErrorCheck.bpmn20.xml")
@@ -38,12 +40,12 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
                 .deploy();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         deleteDeployments();
-        super.tearDown();
     }
 
+    @Test
     public void testQueryWithException() throws InterruptedException {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             ProcessInstance processNoException = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_NO_EXCEPTION);

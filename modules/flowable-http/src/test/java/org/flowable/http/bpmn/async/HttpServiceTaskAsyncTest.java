@@ -18,12 +18,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestCase;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
 
+    @Test
     @Deployment
     public void testAsyncSimpleGetOnly() {
         String procId = runtimeService.startProcessInstanceByKey("asyncSimpleGetOnly").getId();
@@ -34,6 +36,7 @@ public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testFailedJobRetryTimeCycle() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncFailedJobRetryTimeCycle");

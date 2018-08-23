@@ -18,6 +18,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
@@ -134,6 +135,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @Bean
     @ConditionalOnMissingBean
     public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+            ObjectProvider<IdGenerator> processIdGenerator,
             @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider, 
             @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider) throws IOException {
 
@@ -186,7 +188,12 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
 
-        conf.setIdGenerator(new StrongUuidGenerator());
+        // We can't use the getIfAvailable(Supplier<T>) method because we need 4.3 and 5.0 support
+        IdGenerator idGenerator = processIdGenerator.getIfAvailable();
+        if (idGenerator == null) {
+            idGenerator = new StrongUuidGenerator();
+        }
+        conf.setIdGenerator(idGenerator);
 
         return conf;
     }

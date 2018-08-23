@@ -24,12 +24,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class DeleteReasonTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testDeleteProcessInstance() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
@@ -60,6 +62,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testDeleteProcessInstanceWithCustomDeleteReason() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
@@ -94,6 +97,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testRegularProcessInstanceEnd() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
@@ -122,6 +126,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testDeleteProcessInstanceWithReceiveTask() {
         // First case: one receive task
@@ -166,6 +171,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testInterruptingBoundaryEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
@@ -186,6 +192,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(processInstance, DeleteReason.BOUNDARY_EVENT_INTERRUPTING, "B", "C", "D", "theSubprocess");
     }
 
+    @Test
     @Deployment
     public void testInterruptingBoundaryEvent2() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonReceiveTask");

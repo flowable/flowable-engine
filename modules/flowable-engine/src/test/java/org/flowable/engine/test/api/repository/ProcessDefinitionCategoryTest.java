@@ -18,12 +18,14 @@ import java.util.List;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class ProcessDefinitionCategoryTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testQueryByCategoryNotEquals() {
         Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/repository/processCategoryOne.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/repository/processCategoryTwo.bpmn20.xml").addClasspathResource("org/flowable/engine/test/api/repository/processCategoryThree.bpmn20.xml")
@@ -52,6 +54,7 @@ public class ProcessDefinitionCategoryTest extends PluggableFlowableTestCase {
         return processDefinitionNames;
     }
 
+    @Test
     @org.flowable.engine.test.Deployment
     public void testSetProcessDefinitionCategory() {
 

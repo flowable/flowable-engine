@@ -17,17 +17,20 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.User;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:flowable-context.xml")
 public class LdapIntegrationTest extends LDAPTestCase {
 
+    @Test
     public void testAuthenticationThroughLdap() {
         assertTrue(identityService.checkPassword("kermit", "pass"));
         assertTrue(identityService.checkPassword("bunsen", "pass"));
         assertFalse(identityService.checkPassword("kermit", "blah"));
     }
 
+    @Test
     public void testAuthenticationThroughLdapEmptyPassword() {
         try {
             identityService.checkPassword("kermit", null);
@@ -41,6 +44,7 @@ public class LdapIntegrationTest extends LDAPTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testCandidateGroupFetchedThroughLdap() {
         runtimeService.startProcessInstanceByKey("testCandidateGroup");
@@ -57,6 +61,7 @@ public class LdapIntegrationTest extends LDAPTestCase {
         assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
     }
 
+    @Test
     public void testUserQueryById() {
         List<User> users = identityService.createUserQuery().userId("kermit").list();
         assertEquals(1, users.size());
@@ -72,6 +77,7 @@ public class LdapIntegrationTest extends LDAPTestCase {
         assertEquals("Bear", user.getLastName());
     }
 
+    @Test
     public void testUserQueryByFullNameLike() {
         List<User> users = identityService.createUserQuery().userFullNameLike("ermi").list();
         assertEquals(1, users.size());

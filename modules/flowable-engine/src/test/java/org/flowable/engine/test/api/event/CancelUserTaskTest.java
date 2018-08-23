@@ -33,30 +33,25 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CancelUserTaskTest extends PluggableFlowableTestCase {
 
     private UserActivityEventListener testListener;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
+    @AfterEach
+    public void tearDown() throws Exception {
 
         if (testListener != null) {
             testListener.clearEventsReceived();
             processEngineConfiguration.getEventDispatcher().removeEventListener(testListener);
         }
-
-        super.tearDown();
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
+    @BeforeEach
+    protected void setUp() {
         testListener = new UserActivityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(testListener);
     }
@@ -64,6 +59,7 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
     /**
      * User task cancelled by terminate end event.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/event/CancelUserTaskEventsTest.bpmn20.xml" })
     public void testUserTaskCancelledWhenFlowToTerminateEnd() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("cancelUserTaskEvents");
@@ -164,6 +160,7 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
     /**
      * User task cancelled by message boundary event.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/event/CancelUserTaskEventsTest.bpmn20.xml" })
     public void testUserTaskCancelledByMessageBoundaryEvent() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("cancelUserTaskEvents");

@@ -23,6 +23,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -39,11 +40,7 @@ public class JsonTest extends PluggableFlowableTestCase {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
+    @Test
     @Deployment
     public void testJsonObjectAvailable() {
         Map<String, Object> vars = new HashMap<>();
@@ -121,6 +118,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertNull(runtimeService.getVariable(processInstance.getId(), BIG_JSON_OBJ));
     }
 
+    @Test
     @Deployment
     public void testDirectJsonPropertyAccess() {
         Map<String, Object> vars = new HashMap<>();
@@ -156,6 +154,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         assertEquals("userTaskSuccess", task.getTaskDefinitionKey());
     }
 
+    @Test
     @Deployment
     public void testJsonArrayAvailable() {
         Map<String, Object> vars = new HashMap<>();

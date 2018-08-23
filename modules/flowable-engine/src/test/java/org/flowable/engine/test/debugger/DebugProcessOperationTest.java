@@ -20,6 +20,7 @@ import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -36,6 +37,7 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
         super("/org/flowable/engine/impl/agenda/DebugProcessOperationTest.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     public void testDebugOneTaskProcess() {
         ProcessInstance oneTaskProcess = this.runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -57,6 +59,7 @@ public class DebugProcessOperationTest extends ResourceFlowableTestCase {
         assertThat("No process instance is running.", this.runtimeService.createExecutionQuery().count(), is(0L));
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/impl/agenda/oneFailureScriptTask.bpmn20.xml")
     public void testDebuggerExecutionFailure() {
         ProcessInstance oneTaskProcess = this.runtimeService.startProcessInstanceByKey("oneTaskFailingProcess");

@@ -31,12 +31,17 @@
             	            <div ng-repeat="eventDefinition in selectedListener.events">
             	            	  <select id="eventField" class="form-control" ng-model="eventDefinition.event" ng-change="listenerDetailsChanged()"
                                           style="display:inline-block; width:80%;margin-bottom: 10px;">
+                                  <option>ACTIVITY_CANCELLED</option>
                                   <option title="{{'EVENT_TYPE.ACTIVITY.COMPENSATE.TOOLTIP' | translate}}">ACTIVITY_COMPENSATE</option>
                                   <option title="{{'EVENT_TYPE.ACTIVITY.COMPLETED.TOOLTIP' | translate}}">ACTIVITY_COMPLETED</option>
                                   <option title="bla">ACTIVITY_ERROR_RECEIVED</option>
+                                  <option>ACTIVITY_MESSAGE_CANCELLED</option>
                                   <option>ACTIVITY_MESSAGE_RECEIVED</option>
+                                  <option>ACTIVITY_MESSAGE_WAITING</option>
                                   <option>ACTIVITY_SIGNALED</option>
+                                  <option>ACTIVITY_SIGNAL_WAITING</option>
                                   <option>ACTIVITY_STARTED</option>
+                                  <option>CUSTOM</option>
                                   <option>ENGINE_CLOSED</option>
                                   <option>ENGINE_CREATED</option>
                                   <option>ENTITY_ACTIVATED</option>
@@ -45,15 +50,34 @@
                                   <option>ENTITY_INITIALIZED</option>
                                   <option>ENTITY_SUSPENDED</option>
                                   <option>ENTITY_UPDATED</option>
+                                  <option>HISTORIC_ACTIVITY_INSTANCE_CREATED</option>
+                                  <option>HISTORIC_ACTIVITY_INSTANCE_ENDED</option>
+                                  <option>HISTORIC_PROCESS_INSTANCE_CREATED</option>
+                                  <option>HISTORIC_PROCESS_INSTANCE_ENDED</option>
+                                  <option>JOB_CANCELED</option>
                                   <option>JOB_EXECUTION_FAILURE</option>
                                   <option>JOB_EXECUTION_SUCCESS</option>
+                                  <option>JOB_RESCHEDULED</option>
                                   <option>JOB_RETRIES_DECREMENTED</option>
                                   <option title="{{'EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP' | translate}}">MEMBERSHIP_CREATED</option>
                                   <option title="{{'EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP' | translate}}">MEMBERSHIP_DELETED</option>
                                   <option title="{{'EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP' | translate}}">MEMBERSHIPS_DELETED</option>
+                                  <option>MULTI_INSTANCE_ACTIVITY_CANCELLED</option>
+                                  <option>MULTI_INSTANCE_ACTIVITY_COMPLETED</option>
+                                  <option>MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION</option>
+                                  <option>MULTI_INSTANCE_ACTIVITY_STARTED</option>
+                                  <option>PROCESS_CANCELLED</option>
+                                  <option>PROCESS_COMPLETED</option>
+                                  <option>PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT</option>
+                                  <option>PROCESS_COMPLETED_WITH_ERROR_END_EVENT</option>
+                                  <option>PROCESS_CREATED</option>
+                                  <option>PROCESS_STARTED</option>
+                                  <option>SEQUENCEFLOW_TAKEN</option>
                                   <option title="{{'EVENT_TYPE.TASK.ASSIGNED.TOOLTIP' | translate}}">TASK_ASSIGNED</option>
                                   <option title="{{'EVENT_TYPE.TASK.COMPLETED.TOOLTIP' | translate}}">TASK_COMPLETED</option>
+                                  <option>TASK_CREATED</option>
                                   <option>TIMER_FIRED</option>
+                                  <option>TIMER_SCHEDULED</option>
                                   <option title="{{'EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP' | translate}}">UNCAUGHT_BPMN_ERROR</option>
                                   <option title="{{'EVENT_TYPE.VARIABLE.CREATED.TOOLTIP' | translate}}">VARIABLE_CREATED</option>
                                   <option title="{{'EVENT_TYPE.VARIABLE.DELETED.TOOLTIP' | translate}}">VARIABLE_DELETED</option>

@@ -29,6 +29,9 @@ import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -37,7 +40,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
     private List<String> taskIds;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
 
         identityService.saveUser(identityService.newUser("kermit"));
@@ -54,7 +57,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         taskIds = generateTestTasks();
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");
@@ -64,6 +67,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         taskService.deleteTasks(taskIds, true);
     }
 
+    @Test
     @Deployment
     public void testQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -179,6 +183,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
 
+    @Test
     @Deployment
     public void testOrQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -339,6 +344,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
 
+    @Test
     @Deployment
     public void testOrQueryMultipleVariableValues() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -371,6 +377,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
 
+    @Test
     @Deployment
     public void testCandidate() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -432,6 +439,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml" })
     public void testIgnoreAssigneeValue() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -475,6 +483,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
 
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml"})
     public void testIgnoreAssigneeValueOr() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -510,6 +519,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
 
+    @Test
     public void testQueryWithPagingAndVariables() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().includeTaskLocalVariables().orderByTaskPriority().desc().listPage(0, 1);
@@ -541,6 +551,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
 
+    @Test
     public void testQueryWithPagingVariablesAndIdentityLinks() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             
@@ -594,6 +605,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml" })
     public void testQueryVariableExists() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -656,6 +668,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testWithoutDueDateQuery() throws Exception {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -690,6 +703,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
     }
 
     // Unit test for https://activiti.atlassian.net/browse/ACT-4152
+    @Test
     public void testQueryWithIncludeTaskVariableAndTaskCategory() {
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("gonzo").list();
         for (HistoricTaskInstance task : tasks) {

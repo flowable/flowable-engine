@@ -23,12 +23,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daisuke Yoshimoto
  */
 public class RuntimeVariablesTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testGetVariablesByExecutionIds() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -63,6 +65,7 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
         checkVariable(processInstance2.getId(), "executionVar2", "helloWorld2", variables);
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/runtime/RuntimeVariablesTest.testGetVariablesByExecutionIds.bpmn20.xml"
     })
@@ -97,6 +100,7 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
         fail();
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/runtime/variableScope.bpmn20.xml"
     })

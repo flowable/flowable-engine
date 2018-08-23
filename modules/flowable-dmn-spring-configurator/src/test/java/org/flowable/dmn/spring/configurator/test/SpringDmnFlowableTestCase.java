@@ -12,57 +12,31 @@
  */
 package org.flowable.dmn.spring.configurator.test;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.EnsureCleanDb;
+import org.flowable.spring.impl.test.InternalFlowableSpringExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContextManager;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author Joram Barrez
  * @author Josh Long
  */
+@EnsureCleanDb(excludeTables = {
+    "ACT_GE_PROPERTY",
+    "ACT_ID_PROPERTY",
+    "ACT_DMN_DATABASECHANGELOGLOCK",
+    "ACT_DMN_DATABASECHANGELOG"
+})
+@ExtendWith(InternalFlowableSpringExtension.class)
+@ExtendWith(SpringExtension.class)
 public abstract class SpringDmnFlowableTestCase extends AbstractFlowableTestCase implements ApplicationContextAware {
-
-    // we need a data structure to store all the resolved ProcessEngines and map them to something
-    protected Map<Object, ProcessEngine> cachedProcessEngines = new ConcurrentHashMap<>();
-    
-    static {
-        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOGLOCK");
-        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOG");
-    }
-
-    protected TestContextManager testContextManager;
 
     @Autowired
     protected ApplicationContext applicationContext;
-
-    public SpringDmnFlowableTestCase() {
-        this.testContextManager = new TestContextManager(getClass());
-    }
-
-    @Override
-    public void runBare() throws Throwable {
-        testContextManager.prepareTestInstance(this); // this will initialize all dependencies
-        super.runBare();
-    }
-
-    @Override
-    protected void initializeProcessEngine() {
-        ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
-        String[] value = contextConfiguration.value();
-        boolean hasOneArg = value != null && value.length == 1;
-        String key = hasOneArg ? value[0] : ProcessEngine.class.getName();
-        ProcessEngine engine = this.cachedProcessEngines.containsKey(key) ? this.cachedProcessEngines.get(key) : this.applicationContext.getBean(ProcessEngine.class);
-
-        this.cachedProcessEngines.put(key, engine);
-        this.processEngine = engine;
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {

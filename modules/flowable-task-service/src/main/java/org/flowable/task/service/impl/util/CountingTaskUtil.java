@@ -56,6 +56,10 @@ public class CountingTaskUtil {
      * Check if the Task Relationship Count performance improvement is enabled.
      */
     public static boolean isTaskRelatedEntityCountEnabledGlobally() {
+        if (CommandContextUtil.getTaskServiceConfiguration() == null) {
+            return false;
+        }
+        
         return CommandContextUtil.getTaskServiceConfiguration().isEnableTaskRelationshipCounts();
     }
 
