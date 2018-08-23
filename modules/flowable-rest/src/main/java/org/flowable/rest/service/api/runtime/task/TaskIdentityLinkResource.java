@@ -13,12 +13,10 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -32,9 +30,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -46,7 +47,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
     @ApiOperation(value = "Get a single identity link on a task", tags = { "Task Identity Links" }, nickname = "getTaskInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task and identity link was found and returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have the requested identityLink. The status contains additional information about this error.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested identityLink. The status contains additional information about this error.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/identitylinks/{family}/{identityId}/{type}", produces = "application/json")
     public RestIdentityLink getIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family,
@@ -64,7 +65,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
     @ApiOperation(value = "Delete an identity link on a task", tags = { "Task Identity Links" }, nickname = "deleteTaskInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task and identity link were found and the link has been deleted. Response-body is intentionally empty."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have the requested identityLink. The status contains additional information about this error.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested identityLink. The status contains additional information about this error.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}/identitylinks/{family}/{identityId}/{type}")
     public void deleteIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,

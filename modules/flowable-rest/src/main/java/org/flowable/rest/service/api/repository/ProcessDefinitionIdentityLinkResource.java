@@ -48,7 +48,7 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
     @ApiOperation(value = "Get a candidate starter from a process definition", tags = { "Process Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process definition was found and the identity link was returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition does not have an identity-link that matches the url.")
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", produces = "application/json")
     public RestIdentityLink getIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
@@ -68,7 +68,7 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
     @ApiOperation(value = "Delete a candidate starter from a process definition", tags = { "Process Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was removed. The response body is intentionally empty."),
-            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
+            @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition does not have an identity-link that matches the url.")
     })
     @DeleteMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}")
     public void deleteIdentityLink(@ApiParam(name = "processDefinitionId") @PathVariable("processDefinitionId") String processDefinitionId,
