@@ -23,7 +23,6 @@ import java.util.Map;
 import javax.activation.DataSource;
 import javax.naming.NamingException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
@@ -112,7 +111,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     }
 
     protected void addHeader(Email email, String headersStr) {
-        if (StringUtils.isEmpty(headersStr)) {
+        if (headersStr == null) {
             return;
         }
         for (String headerEntry : headersStr.split(NEWLINE_REGEX)) {
