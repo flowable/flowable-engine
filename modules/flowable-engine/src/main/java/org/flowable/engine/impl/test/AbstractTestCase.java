@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.test;
 
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.junit.Assert;
 import org.junit.jupiter.api.extension.ExtendWith;
 
