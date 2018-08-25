@@ -12,6 +12,10 @@
  */
 package org.flowable.idm.engine.test.api.identity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,16 +26,17 @@ import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntity;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class PrivilegesTest extends PluggableFlowableIdmTestCase {
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         createGroup("admins", "Admins", "user");
         createGroup("sales", "Sales", "user");
         createGroup("engineering", "Engineering", "user");
@@ -62,12 +67,12 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.addGroupPrivilegeMapping(startProcessesPrivilege.getId(), "sales");
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         clearAllUsersAndGroups();
-        super.tearDown();
     }
 
+    @Test
     public void testCreateDuplicatePrivilege() {
         try {
             idmIdentityService.createPrivilege("access admin application");
@@ -76,6 +81,7 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testGetUsers() {
         String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName("access admin application").singleResult().getId();
         List<User> users = idmIdentityService.getUsersWithPrivilege(privilegeId);
@@ -91,6 +97,7 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testGetGroups() {
         String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult().getId();
         List<Group> groups = idmIdentityService.getGroupsWithPrivilege(privilegeId);
@@ -107,12 +114,14 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryAll() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().list();
         assertEquals(3, privileges.size());
         assertEquals(3L, idmIdentityService.createPrivilegeQuery().count());
     }
 
+    @Test
     public void testQueryByName() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().privilegeName("access admin application").list();
         assertEquals(1, privileges.size());
@@ -121,10 +130,12 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         assertEquals(1, idmIdentityService.getGroupsWithPrivilege(privileges.get(0).getId()).size());
     }
 
+    @Test
     public void testQueryByInvalidName() {
         assertEquals(0, idmIdentityService.createPrivilegeQuery().privilegeName("does not exist").list().size());
     }
 
+    @Test
     public void testQueryByUserId() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().userId("kermit").list();
         assertEquals(1, privileges.size());
@@ -133,19 +144,23 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         assertEquals("access modeler application", privilege.getName());
     }
 
+    @Test
     public void testQueryByInvalidUserId() {
         assertEquals(0, idmIdentityService.createPrivilegeQuery().userId("does not exist").list().size());
     }
 
+    @Test
     public void testQueryByGroupId() {
         List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().groupId("admins").list();
         assertEquals(2, privileges.size());
     }
 
+    @Test
     public void testQueryByInvalidGroupId() {
         assertEquals(0, idmIdentityService.createPrivilegeQuery().groupId("does not exist").list().size());
     }
 
+    @Test
     public void testNativeQuery() {
         assertEquals("ACT_ID_PRIV", idmManagementService.getTableName(Privilege.class));
         assertEquals("ACT_ID_PRIV", idmManagementService.getTableName(PrivilegeEntity.class));
@@ -156,27 +171,29 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         assertEquals(1, idmIdentityService.createNativeUserQuery().sql(baseQuerySql).parameter("name", "access admin application").list().size());
     }
 
+    @Test
     public void testGetPrivilegeMappings() {
         Privilege modelerPrivilege = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult();
         List<PrivilegeMapping> privilegeMappings = idmIdentityService.getPrivilegeMappingsByPrivilegeId(modelerPrivilege.getId());
         assertEquals(3, privilegeMappings.size());
         List<String> users = new ArrayList<>();
         List<String> groups = new ArrayList<>();
-        
+
         for (PrivilegeMapping privilegeMapping : privilegeMappings) {
             if (privilegeMapping.getUserId() != null) {
                 users.add(privilegeMapping.getUserId());
-            
+
             } else if (privilegeMapping.getGroupId() != null) {
                 groups.add(privilegeMapping.getGroupId());
             }
         }
-        
+
         assertTrue(users.contains("kermit"));
         assertTrue(groups.contains("admins"));
         assertTrue(groups.contains("engineering"));
     }
-    
+
+    @Test
     public void testPrivilegeUniqueName() {
         Privilege privilege = idmIdentityService.createPrivilege("test");
         
