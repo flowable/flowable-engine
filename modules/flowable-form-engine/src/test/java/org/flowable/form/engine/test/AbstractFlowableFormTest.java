@@ -12,12 +12,13 @@
  */
 package org.flowable.form.engine.test;
 
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Parent class for internal Flowable Form tests.
@@ -29,27 +30,23 @@ import org.junit.Rule;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
+@ExtendWith(FlowableFormExtension.class)
+@ExtendWith(LoggingExtension.class)
 public class AbstractFlowableFormTest {
 
     public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowableform;DB_CLOSE_DELAY=1000";
 
-    @Rule
-    public FlowableFormRule flowableRule = new FlowableFormRule();
-
-    protected static FormEngine cachedFormEngine;
+    protected FormEngine formEngine;
     protected FormEngineConfiguration formEngineConfiguration;
     protected FormRepositoryService repositoryService;
     protected FormService formService;
 
-    @Before
-    public void initFormEngine() {
-        if (cachedFormEngine == null) {
-            cachedFormEngine = flowableRule.getFormEngine();
-        }
-
-        this.formEngineConfiguration = cachedFormEngine.getFormEngineConfiguration();
-        this.repositoryService = cachedFormEngine.getFormRepositoryService();
-        this.formService = cachedFormEngine.getFormService();
+    @BeforeEach
+    public void initFormEngine(FormEngine formEngine) {
+        this.formEngine = formEngine;
+        this.formEngineConfiguration = formEngine.getFormEngineConfiguration();
+        this.repositoryService = formEngine.getFormRepositoryService();
+        this.formService = formEngine.getFormService();
     }
 
 }

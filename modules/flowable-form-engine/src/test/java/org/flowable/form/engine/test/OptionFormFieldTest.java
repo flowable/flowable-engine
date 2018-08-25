@@ -28,7 +28,7 @@ import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.form.model.Option;
 import org.flowable.form.model.OptionFormField;
 import org.flowable.form.model.SimpleFormModel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class OptionFormFieldTest extends AbstractFlowableFormTest {
 

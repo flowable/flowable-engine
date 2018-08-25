@@ -25,7 +25,7 @@ import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.joda.time.LocalDate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
