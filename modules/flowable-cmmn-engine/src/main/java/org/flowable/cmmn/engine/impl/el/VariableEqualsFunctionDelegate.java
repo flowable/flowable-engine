@@ -15,14 +15,14 @@ package org.flowable.cmmn.engine.impl.el;
 import java.lang.reflect.Method;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.common.engine.impl.el.AbstractFlowableFunctionDelegate;
+import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
-public class VariableEqualsFunctionDelegate extends AbstractFlowableFunctionDelegate {
+public class VariableEqualsFunctionDelegate implements FlowableFunctionDelegate {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(VariableEqualsFunctionDelegate.class);
     
@@ -46,11 +46,6 @@ public class VariableEqualsFunctionDelegate extends AbstractFlowableFunctionDele
         return "equals";
     }
     
-    @Override
-    public Class<?> functionClass() {
-        return ElVariablesUtil.class;
-    }
-
     @Override
     public Method functionMethod() {
         return METHOD;
