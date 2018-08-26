@@ -61,6 +61,13 @@ public class VariableEqualsExpressionEnhancerTest {
         assertRegexCorrect("${variables:equals    (     \"myVar\"   ,123)}", "${variables:equals(planItemInstance,'myVar',123)}");
     }
     
+    @Test
+    public void testRegexMultipleUsages() {
+        assertRegexCorrect("${variables:equals(myVar,123) && var:eq ( otherVar , 456)}", "${variables:equals(planItemInstance,'myVar',123) && variables:equals(planItemInstance,'otherVar', 456)}");
+        assertRegexCorrect("${(var:eq(myVar,123) && var:eq(otherVar,456)) || var:eq(myVar,789)}", 
+                "${(variables:equals(planItemInstance,'myVar',123) && variables:equals(planItemInstance,'otherVar',456)) || variables:equals(planItemInstance,'myVar',789)}");
+    }
+    
     public void assertRegexCorrect(String in, String out) {
         assertEquals(out, expressionEnhancer.enhance(in));
     }

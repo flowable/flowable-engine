@@ -39,10 +39,8 @@ public class VariableEqualsExpressionEnhancer implements FlowableExpressionEnhan
     @Override
     public String enhance(String expressionText) {
         Matcher matcher = PATTERN.matcher(expressionText);
-        int start = 0;
-        while (matcher.find(start)) {
-            expressionText = matcher.replaceFirst(REPLACE_PATTERN);
-            start = matcher.end();
+        if (matcher.find()) {
+            return matcher.replaceAll(REPLACE_PATTERN);
         }
         return expressionText;
     }
