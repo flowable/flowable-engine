@@ -55,6 +55,8 @@ import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
+import org.flowable.cmmn.engine.impl.el.VariableEqualsExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableEqualsFunctionDelegate;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
@@ -142,6 +144,7 @@ import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
+import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
@@ -296,8 +299,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
 
     protected ExpressionManager expressionManager;
-    protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
-    protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
+    protected List<FlowableFunctionDelegate> functionDelegates;
+    protected List<FlowableFunctionDelegate> customFunctionDelegates;
+    protected List<FlowableExpressionEnhancer> expressionEnhancers;
+    protected List<FlowableExpressionEnhancer> customExpressionEnhancers;
 
     protected ScriptingEngines scriptingEngines;
     protected List<ResolverFactory> resolverFactories;
@@ -667,6 +672,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initFunctionDelegates();
+        initExpressionEnhancers();
         initExpressionManager();
         initCmmnEngineAgendaFactory();
 
@@ -764,18 +771,38 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initMybatisTypeHandlers(Configuration configuration) {
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
+    
+    public void initFunctionDelegates() {
+        if (functionDelegates == null) {
+            functionDelegates = new ArrayList<>();
+            
+            functionDelegates.add(new VariableEqualsFunctionDelegate());
+        }
+        
+        if (customFunctionDelegates != null) {
+            functionDelegates.addAll(customFunctionDelegates);
+        }
+    }
+    
+    public void initExpressionEnhancers() {
+        if (expressionEnhancers == null) {
+            expressionEnhancers = new ArrayList<>();
+            
+            expressionEnhancers.add(new VariableEqualsExpressionEnhancer());
+        }
+        
+        if (customExpressionEnhancers != null) {
+            expressionEnhancers.addAll(customExpressionEnhancers);
+        }
+    }
 
     public void initExpressionManager() {
         if (expressionManager == null) {
             expressionManager = new CmmnExpressionManager(beans);
         }
-        if (flowableFunctionDelegates == null) {
-            flowableFunctionDelegates = new ArrayList<>();
-        }
-        if (customFlowableFunctionDelegates != null) {
-            flowableFunctionDelegates.addAll(customFlowableFunctionDelegates);
-        }
-        expressionManager.setFunctionDelegates(flowableFunctionDelegates);
+        
+        expressionManager.setFunctionDelegates(functionDelegates);
+        expressionManager.setExpressionEnhancers(expressionEnhancers);
     }
 
     public void initCmmnEngineAgendaFactory() {
@@ -1910,22 +1937,38 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public List<FlowableFunctionDelegate> getFlowableFunctionDelegates() {
-        return flowableFunctionDelegates;
+    public List<FlowableFunctionDelegate> getFunctionDelegates() {
+        return functionDelegates;
     }
 
-    public CmmnEngineConfiguration setFlowableFunctionDelegates(List<FlowableFunctionDelegate> flowableFunctionDelegates) {
-        this.flowableFunctionDelegates = flowableFunctionDelegates;
+    public CmmnEngineConfiguration setFunctionDelegates(List<FlowableFunctionDelegate> flowableFunctionDelegates) {
+        this.functionDelegates = flowableFunctionDelegates;
         return this;
     }
 
-    public List<FlowableFunctionDelegate> getCustomFlowableFunctionDelegates() {
-        return customFlowableFunctionDelegates;
+    public List<FlowableFunctionDelegate> getCustomFunctionDelegates() {
+        return customFunctionDelegates;
     }
 
-    public CmmnEngineConfiguration setCustomFlowableFunctionDelegates(List<FlowableFunctionDelegate> customFlowableFunctionDelegates) {
-        this.customFlowableFunctionDelegates = customFlowableFunctionDelegates;
+    public CmmnEngineConfiguration setCustomFunctionDelegates(List<FlowableFunctionDelegate> customFlowableFunctionDelegates) {
+        this.customFunctionDelegates = customFlowableFunctionDelegates;
         return this;
+    }
+    
+    public List<FlowableExpressionEnhancer> getExpressionEnhancers() {
+        return expressionEnhancers;
+    }
+
+    public void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
+        this.expressionEnhancers = expressionEnhancers;
+    }
+
+    public List<FlowableExpressionEnhancer> getCustomExpressionEnhancers() {
+        return customExpressionEnhancers;
+    }
+
+    public void setCustomExpressionEnhancers(List<FlowableExpressionEnhancer> customExpressionEnhancers) {
+        this.customExpressionEnhancers = customExpressionEnhancers;
     }
 
     public DbSchemaManager getIdentityLinkDbSchemaManager() {

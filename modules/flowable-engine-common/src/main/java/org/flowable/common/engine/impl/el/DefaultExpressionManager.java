@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
@@ -43,6 +44,7 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
+    protected List<FlowableExpressionEnhancer> expressionEnhancers;
 
     protected ELContext parsingElContext;
     protected Map<Object, Object> beans;
@@ -64,7 +66,14 @@ public class DefaultExpressionManager implements ExpressionManager {
             ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionDelegates(functionDelegates);
         }
 
-        ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
+        String expressionText = expression.trim();
+        if (expressionEnhancers != null) {
+            for (FlowableExpressionEnhancer expressionEnhancer : expressionEnhancers) {
+                expressionText = expressionEnhancer.enhance(expressionText);
+            }
+        }
+        
+        ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expressionText, Object.class);
         return createJuelExpression(expression, valueExpression);
     }
 
@@ -138,4 +147,15 @@ public class DefaultExpressionManager implements ExpressionManager {
     public void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates) {
         this.functionDelegates = functionDelegates;
     }
+    
+    @Override
+    public List<FlowableExpressionEnhancer> getExpressionEnhancers() {
+        return expressionEnhancers;
+    }
+    
+    @Override
+    public void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
+        this.expressionEnhancers = expressionEnhancers;
+    }
+    
 }
