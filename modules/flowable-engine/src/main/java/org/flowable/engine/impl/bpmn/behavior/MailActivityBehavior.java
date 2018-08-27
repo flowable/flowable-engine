@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,11 +51,13 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     private static final Logger LOGGER = LoggerFactory.getLogger(MailActivityBehavior.class);
 
     private static final Class<?>[] ALLOWED_ATT_TYPES = new Class<?>[] { File.class, File[].class, String.class, String[].class, DataSource.class, DataSource[].class };
+    private static final String NEWLINE_REGEX = "\\r?\\n";
 
     protected Expression to;
     protected Expression from;
     protected Expression cc;
     protected Expression bcc;
+    protected Expression headers;
     protected Expression subject;
     protected Expression text;
     protected Expression textVar;
@@ -73,6 +75,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         String exceptionVariable = getStringFromField(exceptionVariableName, execution);
         Email email = null;
         try {
+            String headersStr = getStringFromField(headers, execution);
             String toStr = getStringFromField(to, execution);
             String fromStr = getStringFromField(from, execution);
             String ccStr = getStringFromField(cc, execution);
@@ -86,6 +89,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             getFilesFromFields(attachments, execution, files, dataSources);
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
+            addHeader(email, headersStr);
             addTo(email, toStr, execution.getTenantId());
             setFrom(email, fromStr, execution.getTenantId());
             addCc(email, ccStr, execution.getTenantId());
@@ -104,6 +108,21 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         leave(execution);
+    }
+
+    protected void addHeader(Email email, String headersStr) {
+        if (headersStr == null) {
+            return;
+        }
+        for (String headerEntry : headersStr.split(NEWLINE_REGEX)) {
+            String[] split = headerEntry.split(":");
+            if (split.length != 2) {
+                throw new FlowableIllegalArgumentException("When using email headers name and value must be defined colon separated. (e.g. X-Attribute: value");
+            }
+            String name = split[0].trim();
+            String value = split[1].trim();
+            email.addHeader(name, value);
+        }
     }
 
     private boolean attachmentsExist(List<File> files, List<DataSource> dataSources) {
