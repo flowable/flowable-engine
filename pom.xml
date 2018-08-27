@@ -1676,15 +1676,6 @@
                 </plugins>
             </build>
 		</profile>
-        <profile>
-            <id>java9+</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <properties>
-                <argLine>--add-modules java.xml.bind -XX:+UseParallelGC</argLine>
-            </properties>
-        </profile>
 	</profiles>
 
     <reporting>
