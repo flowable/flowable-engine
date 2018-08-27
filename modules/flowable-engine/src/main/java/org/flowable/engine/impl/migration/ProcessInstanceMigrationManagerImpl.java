@@ -151,12 +151,12 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
     }
 
     protected static ProcessDefinition resolveProcessDefinition(ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        if (document.getMigrateToProcessDefinitionId().isPresent()) {
+        if (document.getMigrateToProcessDefinitionId() != null) {
             ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
-            return processDefinitionEntityManager.findById(document.getMigrateToProcessDefinitionId().get());
+            return processDefinitionEntityManager.findById(document.getMigrateToProcessDefinitionId());
         } else {
-            String nullableTenantId = document.getMigrateToProcessDefinitionTenantId().orElse(null);
-            return resolveProcessDefinition(document.getMigrateToProcessDefinitionKey().get(), document.getMigrateToProcessDefinitionVersion().get(), nullableTenantId, commandContext);
+            String nullableTenantId = document.getMigrateToProcessDefinitionTenantId();
+            return resolveProcessDefinition(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
         }
     }
 
@@ -273,10 +273,10 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
     }
 
     protected static String printProcessDefinitionIdentifierMessage(ProcessInstanceMigrationDocument document) {
-        String id = document.getMigrateToProcessDefinitionId().orElse(null);
-        String key = document.getMigrateToProcessDefinitionKey().orElse(null);
-        String version = document.getMigrateToProcessDefinitionVersion().orElse(null);
-        String tenantId = document.getMigrateToProcessDefinitionTenantId().orElse(null);
+        String id = document.getMigrateToProcessDefinitionId();
+        String key = document.getMigrateToProcessDefinitionKey();
+        String version = document.getMigrateToProcessDefinitionVersion();
+        String tenantId = document.getMigrateToProcessDefinitionTenantId();
 
         return "process definition identified by [id:'" + id + "'] or [key:'" + key + "', version:'" + version + "', tenantId:'" + tenantId + "']";
     }

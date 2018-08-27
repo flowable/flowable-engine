@@ -22,12 +22,21 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dennis Federico
  */
 public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
+
+    @AfterEach
+    protected void tearDown() throws Exception {
+        deleteDeployments();
+    }
+
+    @Test
     public void testSimpleMigrationWithActivityAutoMapping() {
         //Deploy first version of the process
         Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
@@ -91,10 +100,9 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstanceToMigrate.getId());
 
-        repositoryService.deleteDeployment(oneActivityProcessDeployment.getId(), true);
-        repositoryService.deleteDeployment(twoActivitiesProcessDeployment.getId(), true);
     }
 
+    @Test
     public void testSimpleMigrationWithExplicitActivityMapping1() {
         //Deploy first version of the process
         Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
@@ -160,10 +168,9 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstanceToMigrate.getId());
 
-        repositoryService.deleteDeployment(oneActivityProcessDeployment.getId(), true);
-        repositoryService.deleteDeployment(twoActivitiesProcessDeployment.getId(), true);
     }
 
+    @Test
     public void testSimpleMigrationWithExplicitActivityMapping2() {
         //Deploy first version of the process
         Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
@@ -224,10 +231,9 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstanceToMigrate.getId());
 
-        repositoryService.deleteDeployment(oneActivityProcessDeployment.getId(), true);
-        repositoryService.deleteDeployment(twoActivitiesProcessDeployment.getId(), true);
     }
 
+    @Test
     public void testSimpleMigrationWithExplicitActivityMapping3() {
         //Deploy first version of the process
         Deployment twoActivitiesProcessDeployment = repositoryService.createDeployment()
@@ -295,8 +301,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstanceToMigrate.getId());
 
-        repositoryService.deleteDeployment(oneActivityProcessDeployment.getId(), true);
-        repositoryService.deleteDeployment(twoActivitiesProcessDeployment.getId(), true);
     }
 
 }

@@ -15,7 +15,6 @@ package org.flowable.engine.impl.migration;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
@@ -23,7 +22,6 @@ import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
  * @author Dennis Federico
@@ -39,7 +37,6 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     public static ProcessInstanceMigrationDocument fromProcessInstanceMigrationDocumentJson(String processInstanceMigrationDocumentJson) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new Jdk8Module());
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper.readValue(processInstanceMigrationDocumentJson, ProcessInstanceMigrationDocumentImpl.class);
         } catch (IOException e) {
@@ -52,8 +49,8 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     @Override
-    public Optional<String> getMigrateToProcessDefinitionId() {
-        return Optional.ofNullable(migrateToProcessDefinitionId);
+    public String getMigrateToProcessDefinitionId() {
+        return migrateToProcessDefinitionId;
     }
 
     public void setMigrateToProcessDefinition(String processDefinitionKey, String processDefinitionVersion) {
@@ -68,18 +65,18 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     @Override
-    public Optional<String> getMigrateToProcessDefinitionKey() {
-        return Optional.ofNullable(migrateToProcessDefinitionKey);
+    public String getMigrateToProcessDefinitionKey() {
+        return migrateToProcessDefinitionKey;
     }
 
     @Override
-    public Optional<String> getMigrateToProcessDefinitionVersion() {
-        return Optional.ofNullable(migrateToProcessDefinitionVersion);
+    public String getMigrateToProcessDefinitionVersion() {
+        return migrateToProcessDefinitionVersion;
     }
 
     @Override
-    public Optional<String> getMigrateToProcessDefinitionTenantId() {
-        return Optional.ofNullable(migrateToProcessDefinitionTenantId);
+    public String getMigrateToProcessDefinitionTenantId() {
+        return migrateToProcessDefinitionTenantId;
     }
 
     public void setActivityMigrationMappings(Map<String, String> activityMigrationMappings) {
@@ -95,7 +92,6 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     public String asJsonString() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new Jdk8Module());
             return objectMapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

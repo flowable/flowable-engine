@@ -14,20 +14,19 @@
 package org.flowable.engine.migration;
 
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Dennis Federico
  */
 public interface ProcessInstanceMigrationDocument {
 
-    Optional<String> getMigrateToProcessDefinitionId();
+    String getMigrateToProcessDefinitionId();
 
-    Optional<String> getMigrateToProcessDefinitionKey();
+    String getMigrateToProcessDefinitionKey();
 
-    Optional<String> getMigrateToProcessDefinitionVersion();
+    String getMigrateToProcessDefinitionVersion();
 
-    Optional<String> getMigrateToProcessDefinitionTenantId();
+    String getMigrateToProcessDefinitionTenantId();
 
     Map<String, String> getActivityMigrationMappings();
 

@@ -33,10 +33,8 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
 
     @Override
     public ProcessInstanceMigrationBuilder fromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
-        document.getMigrateToProcessDefinitionId().ifPresent(v -> migrationDocumentBuilder.migrateToProcessDefinitionId = v);
-        document.getMigrateToProcessDefinitionKey().ifPresent(v -> migrationDocumentBuilder.migrateToProcessDefinitionKey = v);
-        document.getMigrateToProcessDefinitionVersion().ifPresent(v -> migrationDocumentBuilder.migrateToProcessDefinitionVersion = v);
-        document.getMigrateToProcessDefinitionTenantId().ifPresent(v -> migrationDocumentBuilder.migrateToProcessDefinitionTenantId = v);
+        migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionId());
+        migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId());
         migrationDocumentBuilder.addActivityMigrationMappings(document.getActivityMigrationMappings());
         return this;
     }

@@ -26,12 +26,14 @@ import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dennis Federico
  */
 public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testDeSerializeProcessInstanceMigrationDocument() {
 
         String definitionId = "someProcessId";
@@ -47,14 +49,15 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
 
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(jsonAsStr);
 
-        assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId().get());
-        assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey().get());
-        assertEquals(definitionVer, migrationDocument.getMigrateToProcessDefinitionVersion().get());
-        assertEquals(definitionTenantId, migrationDocument.getMigrateToProcessDefinitionTenantId().get());
+        assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
+        assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey());
+        assertEquals(definitionVer, migrationDocument.getMigrateToProcessDefinitionVersion());
+        assertEquals(definitionTenantId, migrationDocument.getMigrateToProcessDefinitionTenantId());
         assertThat(migrationDocument.getActivityMigrationMappings(), is(activityMappings));
 
     }
 
+    @Test
     public void testSerializeDeSerializeProcessInstanceMigrationDocumentForDefinitionId() {
 
         String definitionId = "someProcessId";
@@ -76,13 +79,14 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
         //DeSerialize the document
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(serializedDocument);
 
-        assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId().get());
-        assertFalse(migrationDocument.getMigrateToProcessDefinitionKey().isPresent());
-        assertFalse(migrationDocument.getMigrateToProcessDefinitionVersion().isPresent());
-        assertFalse(migrationDocument.getMigrateToProcessDefinitionTenantId().isPresent());
+        assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
+        assertNull(migrationDocument.getMigrateToProcessDefinitionKey());
+        assertNull(migrationDocument.getMigrateToProcessDefinitionVersion());
+        assertNull(migrationDocument.getMigrateToProcessDefinitionTenantId());
         assertThat(migrationDocument.getActivityMigrationMappings(), is(activityMappings));
     }
 
+    @Test
     public void testSerializeDeSerializeProcessInstanceMigrationDocumentForDefinitionKeyVersion() {
 
         String definitionKey = "MyProcessKey";
@@ -107,10 +111,10 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
         //DeSerialize the document
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromProcessInstanceMigrationDocumentJson(serializedDocument);
 
-        assertFalse(migrationDocument.getMigrateToProcessDefinitionId().isPresent());
-        assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey().get());
-        assertEquals(definitionVer, migrationDocument.getMigrateToProcessDefinitionVersion().get());
-        assertEquals(definitionTenantId, migrationDocument.getMigrateToProcessDefinitionTenantId().get());
+        assertNull(migrationDocument.getMigrateToProcessDefinitionId());
+        assertEquals(definitionKey, migrationDocument.getMigrateToProcessDefinitionKey());
+        assertEquals(definitionVer, migrationDocument.getMigrateToProcessDefinitionVersion());
+        assertEquals(definitionTenantId, migrationDocument.getMigrateToProcessDefinitionTenantId());
         assertThat(migrationDocument.getActivityMigrationMappings(), is(activityMappings));
     }
 }
