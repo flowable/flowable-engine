@@ -20,7 +20,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
-import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -49,11 +48,12 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
 
         ProcessInstanceMigrationValidationResult result = new ProcessInstanceMigrationValidationResult();
         //Must first resolve the Id of the processDefinition
-        //TODO what if there's no processDefinition to migrateFrom?
         ProcessDefinition processDefinition = resolveProcessDefinition(procDefKey, procDefVer, procDefTenantId, commandContext);
         if (processDefinition != null) {
             ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = validateMigrateProcessInstancesOfProcessDefinition(processDefinition.getId(), document, commandContext);
             result.addValidationResult(processInstanceMigrationValidationResult);
+        } else {
+            result.addValidationMessage("Cannot find the process definition to migrate from");
         }
         return result;
     }
@@ -198,9 +198,7 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
             throw new FlowableException("Tenant mismatch between Process Instance ('" + processExecution.getTenantId() + "') and Process Definition ('" + procDefTenantId + "') to migrate to");
         }
 
-        //TODO is it really necessary to inject the runtimeService to the builder? can't we use it as an argument to the "changeState()" method?
-        RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) CommandContextUtil.getProcessEngineConfiguration().getRuntimeService();
-        ChangeActivityStateBuilderImpl changeActivityStateBuilder = new ChangeActivityStateBuilderImpl(runtimeService);
+        ChangeActivityStateBuilderImpl changeActivityStateBuilder = new ChangeActivityStateBuilderImpl();
         changeActivityStateBuilder.processInstanceId(processInstanceId);
 
         List<ExecutionEntity> executions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);

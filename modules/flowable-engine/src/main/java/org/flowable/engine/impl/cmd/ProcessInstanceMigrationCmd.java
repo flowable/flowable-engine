@@ -34,8 +34,6 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
     protected String processDefinitionVersion;
     protected String processDefinitionTenantId;
 
-    //TODO Cannot use simple constructors because processInstanceId and processDefinitionId are of the same type
-    //TODO Can we avoid a telescopic constructor or these many methods by grouping the processDefinition attributes in a processDefinitionIdentifier pojo?
     public static ProcessInstanceMigrationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
         Objects.requireNonNull(processInstanceId);
