@@ -48,6 +48,7 @@ public class AppDbSchemaManager implements DbSchemaManager {
     }
     
     public void initSchema(AppEngineConfiguration appEngineConfiguration, String databaseSchemaUpdate) {
+        Liquibase liquibase = null;
         try {
             if (AppEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
                 dbSchemaCreate();
@@ -60,12 +61,14 @@ public class AppDbSchemaManager implements DbSchemaManager {
                 dbSchemaUpdate();
                 
             } else if (AppEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                Liquibase liquibase = createLiquibaseInstance(appEngineConfiguration);
+                liquibase = createLiquibaseInstance(appEngineConfiguration);
                 liquibase.validate();
                 
             }
         } catch (Exception e) {
             throw new FlowableException("Error initialising app data model", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
@@ -116,26 +119,32 @@ public class AppDbSchemaManager implements DbSchemaManager {
 
     @Override
     public void dbSchemaCreate() {
+        Liquibase liquibase = null;
         try {
             
             getCommonDbSchemaManager().dbSchemaCreate();
             getIdentityLinkDbSchemaManager().dbSchemaCreate();
             getVariableDbSchemaManager().dbSchemaCreate();
             
-            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
+            liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
             liquibase.update("app");
         } catch (Exception e) {
             throw new FlowableException("Error creating App engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
     @Override
     public void dbSchemaDrop() {
+        Liquibase liquibase = null;
         try {
-            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
+            liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
             liquibase.dropAll();
         } catch (Exception e) {
             LOGGER.info("Error dropping App engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
         
         try {
@@ -159,6 +168,7 @@ public class AppDbSchemaManager implements DbSchemaManager {
 
     @Override
     public String dbSchemaUpdate() {
+        Liquibase liquibase = null;
         try {
             
             getCommonDbSchemaManager().dbSchemaUpdate();
@@ -168,11 +178,13 @@ public class AppDbSchemaManager implements DbSchemaManager {
                 getVariableDbSchemaManager().dbSchemaUpdate();
             }
             
-            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
+            liquibase = createLiquibaseInstance(CommandContextUtil.getAppEngineConfiguration());
             liquibase.update("cmmn");
 
         } catch (Exception e) {
             throw new FlowableException("Error updating App engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
         return null;
     }
@@ -189,4 +201,19 @@ public class AppDbSchemaManager implements DbSchemaManager {
         return CommandContextUtil.getAppEngineConfiguration().getVariableDbSchemaManager();
     }
     
+    private void closeDatabase(Liquibase liquibase) {
+        if (liquibase != null) {
+            Database database = liquibase.getDatabase();
+            if (database != null) {
+                // do not close the shared connection if a command context is currently active
+                if (CommandContextUtil.getCommandContext() == null) {
+                    try {
+                        database.close();
+                    } catch (DatabaseException e) {
+                        LOGGER.warn("Error closing database", e);
+                    }
+                }
+            }
+        }
+    }
 }

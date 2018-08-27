@@ -27,6 +27,7 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class ContentDbSchemaManager implements DbSchemaManager {
@@ -42,6 +43,8 @@ public class ContentDbSchemaManager implements DbSchemaManager {
             liquibase.update("content");
         } catch (Exception e) {
             throw new FlowableException("Error creating content engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
@@ -52,6 +55,8 @@ public class ContentDbSchemaManager implements DbSchemaManager {
             liquibase.dropAll();
         } catch (Exception e) {
             throw new FlowableException("Error dropping content engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
     
@@ -89,8 +94,9 @@ public class ContentDbSchemaManager implements DbSchemaManager {
     }
     
     public void initSchema(ContentEngineConfiguration configuration, String databaseSchemaUpdate) {
+        Liquibase liquibase = null;
         try {
-            Liquibase liquibase = createLiquibaseInstance(configuration);
+            liquibase = createLiquibaseInstance(configuration);
             if (ContentEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
                 LOGGER.debug("Dropping and creating schema Content");
                 liquibase.dropAll();
@@ -104,8 +110,24 @@ public class ContentDbSchemaManager implements DbSchemaManager {
             }
         } catch (Exception e) {
             throw new FlowableException("Error initialising Content schema", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
-
+    private void closeDatabase(Liquibase liquibase) {
+        if (liquibase != null) {
+            Database database = liquibase.getDatabase();
+            if (database != null) {
+                // do not close the shared connection if a command context is currently active
+                if (CommandContextUtil.getCommandContext() == null) {
+                    try {
+                        database.close();
+                    } catch (DatabaseException e) {
+                        LOGGER.warn("Error closing database", e);
+                    }
+                }
+            }
+        }
+    }
 }

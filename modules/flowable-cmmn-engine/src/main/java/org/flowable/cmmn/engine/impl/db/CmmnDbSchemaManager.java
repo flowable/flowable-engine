@@ -48,6 +48,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
     }
     
     public void initSchema(CmmnEngineConfiguration cmmnEngineConfiguration, String databaseSchemaUpdate) {
+        Liquibase liquibase = null;
         try {
             if (CmmnEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
                 dbSchemaCreate();
@@ -60,12 +61,14 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
                 dbSchemaUpdate();
                 
             } else if (CmmnEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                Liquibase liquibase = createLiquibaseInstance(cmmnEngineConfiguration);
+                liquibase = createLiquibaseInstance(cmmnEngineConfiguration);
                 liquibase.validate();
                 
             }
         } catch (Exception e) {
             throw new FlowableException("Error initialising cmmn data model", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
@@ -116,6 +119,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
 
     @Override
     public void dbSchemaCreate() {
+        Liquibase liquibase = null;
         try {
             
             getCommonDbSchemaManager().dbSchemaCreate();
@@ -124,20 +128,25 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
             getVariableDbSchemaManager().dbSchemaCreate();
             getJobDbSchemaManager().dbSchemaCreate();
             
-            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
+            liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.update("cmmn");
         } catch (Exception e) {
             throw new FlowableException("Error creating CMMN engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
     @Override
     public void dbSchemaDrop() {
+        Liquibase liquibase = null;
         try {
-            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
+            liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.dropAll();
         } catch (Exception e) {
             LOGGER.info("Error dropping CMMN engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
         
         try {
@@ -173,6 +182,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
 
     @Override
     public String dbSchemaUpdate() {
+        Liquibase liquibase = null;
         try {
             
             getCommonDbSchemaManager().dbSchemaUpdate();
@@ -184,11 +194,13 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
                 getJobDbSchemaManager().dbSchemaUpdate();
             }
             
-            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
+            liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.update("cmmn");
 
         } catch (Exception e) {
             throw new FlowableException("Error updating CMMN engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
         return null;
     }
@@ -213,4 +225,19 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         return CommandContextUtil.getCmmnEngineConfiguration().getJobDbSchemaManager();
     }
     
+    private void closeDatabase(Liquibase liquibase) {
+        if (liquibase != null) {
+            Database database = liquibase.getDatabase();
+            if (database != null) {
+                // do not close the shared connection if a command context is currently active
+                if (CommandContextUtil.getCommandContext() == null) {
+                    try {
+                        database.close();
+                    } catch (DatabaseException e) {
+                        LOGGER.warn("Error closing database", e);
+                    }
+                }
+            }
+        }
+    }
 }
