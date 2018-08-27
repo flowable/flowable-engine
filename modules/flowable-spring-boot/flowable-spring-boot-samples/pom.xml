@@ -34,7 +34,7 @@
     <dependencies>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
+            <artifactId>groovy-jsr223</artifactId>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
