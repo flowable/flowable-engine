@@ -167,10 +167,9 @@
 				<version>1.6.2</version>
 			</dependency>
 			<dependency>
-				<!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
-				<groupId>org.hibernate.javax.persistence</groupId>
-				<artifactId>hibernate-jpa-2.1-api</artifactId>
-				<version>1.0.0.Final</version>
+				<groupId>javax.persistence</groupId>
+				<artifactId>javax.persistence-api</artifactId>
+				<version>2.2</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
@@ -690,7 +689,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.2.16.Final</version>
+				<version>5.3.5.Final</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
