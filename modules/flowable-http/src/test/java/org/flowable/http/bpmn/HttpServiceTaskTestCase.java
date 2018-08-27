@@ -12,8 +12,8 @@
  */
 package org.flowable.http.bpmn;
 
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.test.EnsureCleanDb;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 

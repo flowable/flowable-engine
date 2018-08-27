@@ -26,6 +26,9 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,10 +42,8 @@ public class FlowableUserDetailsServiceTest extends PluggableFlowableIdmTestCase
 
     private UserDetailsService userDetailsService;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         createGroup("admins", "Admins", "user");
         createGroup("sales", "Sales", "user");
         createGroup("engineering", "Engineering", "tech");
@@ -83,24 +84,26 @@ public class FlowableUserDetailsServiceTest extends PluggableFlowableIdmTestCase
         return user;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         clearAllUsersAndGroups();
-        super.tearDown();
     }
 
+    @Test
     public void testLoadingByUnknownUserShouldThrowException() {
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername("unknown"))
             .isInstanceOf(UsernameNotFoundException.class)
             .hasMessage("user (unknown) could not be found");
     }
 
+    @Test
     public void testLoadingByNullUserShouldIgnoreFlowableException() {
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername(null))
             .isInstanceOf(UsernameNotFoundException.class)
             .hasMessage("user (null) could not be found");
     }
 
+    @Test
     public void testLoadingKnownUserWithAllPrivileges() {
         UserDetails kermit = userDetailsService.loadUserByUsername("kermit");
 
@@ -175,12 +178,14 @@ public class FlowableUserDetailsServiceTest extends PluggableFlowableIdmTestCase
         assertThat(kermitFlowable.getUser().getPassword()).as("User password after erase").isNull();
     }
 
+    @Test
     public void testLoadingUserShouldBeCaseSensitive() {
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername("kErMiT"))
             .isInstanceOf(UsernameNotFoundException.class)
             .hasMessage("user (kErMiT) could not be found");
     }
 
+    @Test
     public void testLoadingKnownUserWithSomePrivileges() {
         UserDetails fozzie = userDetailsService.loadUserByUsername("fozzie");
 
@@ -230,6 +235,7 @@ public class FlowableUserDetailsServiceTest extends PluggableFlowableIdmTestCase
             );
     }
 
+    @Test
     public void testSerializingUserDetailsShouldWorkCorrectly() throws IOException, ClassNotFoundException {
         UserDetails kermit = userDetailsService.loadUserByUsername("kermit");
 

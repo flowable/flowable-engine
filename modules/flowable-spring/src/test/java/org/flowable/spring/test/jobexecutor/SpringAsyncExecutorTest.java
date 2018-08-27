@@ -14,11 +14,11 @@ package org.flowable.spring.test.jobexecutor;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.test.CleanTest;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.impl.test.CleanTest;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;

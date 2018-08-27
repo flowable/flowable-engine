@@ -13,6 +13,11 @@
 
 package org.flowable.idm.engine.test.api.identity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -21,15 +26,17 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         createGroup("muppets", "Muppet show characters", "user");
         createGroup("frogs", "Famous frogs", "user");
@@ -53,7 +60,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         idmIdentityService.deleteUser("kermit");
         idmIdentityService.deleteUser("fozzie");
@@ -63,15 +70,15 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.deleteGroup("mammals");
         idmIdentityService.deleteGroup("frogs");
         idmIdentityService.deleteGroup("admin");
-
-        super.tearDown();
     }
 
+    @Test
     public void testQueryById() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupId("muppets");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidId() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupId("invalid");
         verifyQueryResults(query, 0);
@@ -83,6 +90,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByName() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupName("Muppet show characters");
         verifyQueryResults(query, 1);
@@ -91,6 +99,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidName() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupName("invalid");
         verifyQueryResults(query, 0);
@@ -102,6 +111,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByNameLike() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%Famous%");
         verifyQueryResults(query, 2);
@@ -113,6 +123,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidNameLike() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%invalid%");
         verifyQueryResults(query, 0);
@@ -124,6 +135,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByNameLikeIgnoreCase() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase("%FAMOus%");
         verifyQueryResults(query, 2);
@@ -135,6 +147,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByType() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupType("user");
         verifyQueryResults(query, 3);
@@ -143,6 +156,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 0);
     }
 
+    @Test
     public void testQueryByInvalidType() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupType("invalid");
         verifyQueryResults(query, 0);
@@ -154,6 +168,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQueryByMember() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupMember("fozzie");
         verifyQueryResults(query, 2);
@@ -175,6 +190,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("muppets", groups.get(1).getId());
     }
 
+    @Test
     public void testQueryByInvalidMember() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupMember("invalid");
         verifyQueryResults(query, 0);
@@ -186,6 +202,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testQuerySorting() {
         // asc
         assertEquals(4, idmIdentityService.createGroupQuery().orderByGroupId().asc().count());
@@ -213,6 +230,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals("frogs", groups.get(3).getId());
     }
 
+    @Test
     public void testQueryInvalidSortingUsage() {
         try {
             idmIdentityService.createGroupQuery().orderByGroupId().list();
@@ -248,6 +266,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         }
     }
 
+    @Test
     public void testNativeQuery() {
         assertEquals("ACT_ID_GROUP", idmManagementService.getTableName(Group.class));
         assertEquals("ACT_ID_GROUP", idmManagementService.getTableName(GroupEntity.class));
@@ -259,13 +278,13 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         assertEquals(1, idmIdentityService.createNativeGroupQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "admin").list().size());
 
         assertEquals(
-                3,
-                idmIdentityService
-                        .createNativeGroupQuery()
-                        .sql(
-                                "SELECT aig.* from " + tableName + " aig" + " inner join ACT_ID_MEMBERSHIP aim on aig.ID_ = aim.GROUP_ID_ "
-                                        + " inner join ACT_ID_USER aiu on aiu.ID_ = aim.USER_ID_ where aiu.ID_ = #{id}")
-                        .parameter("id", "kermit").list().size());
+            3,
+            idmIdentityService
+                .createNativeGroupQuery()
+                .sql(
+                    "SELECT aig.* from " + tableName + " aig" + " inner join ACT_ID_MEMBERSHIP aim on aig.ID_ = aim.GROUP_ID_ "
+                        + " inner join ACT_ID_USER aiu on aiu.ID_ = aim.USER_ID_ where aiu.ID_ = #{id}")
+                .parameter("id", "kermit").list().size());
 
         // paging
         assertEquals(2, idmIdentityService.createNativeGroupQuery().sql(baseQuerySql).listPage(0, 2).size());
