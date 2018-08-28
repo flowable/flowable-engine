@@ -49,8 +49,9 @@ public class DmnDbSchemaManager implements DbSchemaManager {
     }
     
     public void initSchema(DmnEngineConfiguration dmnEngineConfiguration, String databaseSchemaUpdate) {
+        Liquibase liquibase = null;
         try {
-            Liquibase liquibase = createLiquibaseInstance(dmnEngineConfiguration);
+            liquibase = createLiquibaseInstance(dmnEngineConfiguration);
             if (DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
                 LOGGER.debug("Dropping and creating schema DMN");
                 liquibase.dropAll();
@@ -64,6 +65,8 @@ public class DmnDbSchemaManager implements DbSchemaManager {
             }
         } catch (Exception e) {
             throw new FlowableException("Error initialising dmn data model", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
@@ -105,21 +108,27 @@ public class DmnDbSchemaManager implements DbSchemaManager {
     
     @Override
     public void dbSchemaCreate() {
+        Liquibase liquibase = null;
         try {
-            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
+            liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
             liquibase.update("dmn");
         } catch (Exception e) {
             throw new FlowableException("Error creating DMN engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
     @Override
     public void dbSchemaDrop() {
+        Liquibase liquibase = null;
         try {
-            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
+            liquibase = createLiquibaseInstance(CommandContextUtil.getDmnEngineConfiguration());
             liquibase.dropAll();
         } catch (Exception e) {
             throw new FlowableException("Error dropping DMN engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
@@ -129,4 +138,19 @@ public class DmnDbSchemaManager implements DbSchemaManager {
         return null;
     }
 
+    private void closeDatabase(Liquibase liquibase) {
+        if (liquibase != null) {
+            Database database = liquibase.getDatabase();
+            if (database != null) {
+                // do not close the shared connection if a command context is currently active
+                if (CommandContextUtil.getCommandContext() == null) {
+                    try {
+                        database.close();
+                    } catch (DatabaseException e) {
+                        LOGGER.warn("Error closing database", e);
+                    }
+                }
+            }
+        }
+    }
 }

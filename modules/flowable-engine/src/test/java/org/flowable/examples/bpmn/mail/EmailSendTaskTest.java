@@ -32,6 +32,7 @@ import org.subethamail.wiser.WiserMessage;
 /**
  * @author Joram Barrez
  * @author Falko Menge
+ * @author Simon Amport
  */
 @Tag("email")
 public class EmailSendTaskTest extends PluggableFlowableTestCase {
@@ -92,6 +93,62 @@ public class EmailSendTaskTest extends PluggableFlowableTestCase {
         assertEquals("Your order " + orderId + " has been shipped", mimeMessage.getHeader("Subject", null));
         assertEquals(from, mimeMessage.getHeader("From", null));
         assertTrue(mimeMessage.getHeader("To", null).contains(recipient));
+    }
+
+    @Test
+    @Deployment
+    public void testSendEmailWithStaticHeader() throws Exception {
+
+        String from = "ordershipping@flowable.org";
+        String recipient = "johndoe@flowable.com";
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("sender", from);
+        vars.put("recipient", recipient);
+
+        runtimeService.startProcessInstanceByKey("sendMailWithStaticHeaderExample", vars);
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEquals(1, messages.size());
+
+        WiserMessage message = messages.get(0);
+        MimeMessage mimeMessage = message.getMimeMessage();
+
+        assertEquals(from, mimeMessage.getHeader("From", null));
+        assertTrue(mimeMessage.getHeader("To", null).contains(recipient));
+        assertEquals("value1", mimeMessage.getHeader("X-Attribute1", null));
+        assertEquals("value2", mimeMessage.getHeader("X-Attribute2", null));
+        assertEquals("value3", mimeMessage.getHeader("X-Attribute3", null));
+    }
+
+    @Test
+    @Deployment
+    public void testSendEmailWithVariableHeader() throws Exception {
+
+        String from = "ordershipping@flowable.org";
+        String recipient = "johndoe@flowable.com";
+        String headers = "X-Attribute1: value1\n"
+            + "X-Attribute2: value2\n"
+            + "X-Attribute3: value3";
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("sender", from);
+        vars.put("recipient", recipient);
+        vars.put("headers", headers);
+
+        runtimeService.startProcessInstanceByKey("sendMailWithVariableHeaderExample", vars);
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEquals(1, messages.size());
+
+        WiserMessage message = messages.get(0);
+        MimeMessage mimeMessage = message.getMimeMessage();
+
+        assertEquals(from, mimeMessage.getHeader("From", null));
+        assertTrue(mimeMessage.getHeader("To", null).contains(recipient));
+        assertEquals("value1", mimeMessage.getHeader("X-Attribute1", null));
+        assertEquals("value2", mimeMessage.getHeader("X-Attribute2", null));
+        assertEquals("value3", mimeMessage.getHeader("X-Attribute3", null));
     }
 
 }
