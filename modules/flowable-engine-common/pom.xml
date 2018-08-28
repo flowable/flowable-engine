@@ -29,12 +29,14 @@
             org.flowable.common.engine.impl.persistence,
             org.flowable.common.engine.impl.persistence.entity,
             org.flowable.common.engine.impl.persistence.entity.data,
+            org.flowable.common.engine.impl.test,
             org.flowable.common.engine.impl.transaction,
             org.flowable.common.engine.impl.util,
             org.flowable.common.engine.impl.util.io,
             org.flowable.common.engine.impl.runtime,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
+            org.junit.jupiter.api*;resolution:=optional,
             org.springframework*;resolution:=optional,
             javax.transaction;resolution:=optional,
             org.flowable.idm.engine.impl.persistence;resolution:=optional,
@@ -179,6 +181,11 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

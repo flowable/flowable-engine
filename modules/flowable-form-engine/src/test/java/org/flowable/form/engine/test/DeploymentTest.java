@@ -21,7 +21,7 @@ import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.SimpleFormModel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DeploymentTest extends AbstractFlowableFormTest {
 

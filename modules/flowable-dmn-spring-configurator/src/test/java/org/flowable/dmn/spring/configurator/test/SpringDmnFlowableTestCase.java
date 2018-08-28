@@ -12,8 +12,8 @@
  */
 package org.flowable.dmn.spring.configurator.test;
 
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
-import org.flowable.engine.impl.test.EnsureCleanDb;
 import org.flowable.spring.impl.test.InternalFlowableSpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

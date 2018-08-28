@@ -15,14 +15,11 @@ package org.flowable.idm.engine.test;
 
 import java.util.List;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.IdmEngine;
-import org.flowable.idm.engine.IdmEngines;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Base class for the test cases.
@@ -34,28 +31,9 @@ import org.slf4j.LoggerFactory;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
+@Tag("pluggable")
+@ExtendWith(PluggableFlowableIdmExtension.class)
 public abstract class PluggableFlowableIdmTestCase extends AbstractFlowableIdmTestCase {
-
-    private static final Logger pluggabledImTestCaseLogger = LoggerFactory.getLogger(PluggableFlowableIdmTestCase.class);
-
-    protected static IdmEngine cachedIdmEngine;
-
-    @Override
-    protected void initializeIdmEngine() {
-        if (cachedIdmEngine == null) {
-
-            pluggabledImTestCaseLogger.info("No cached idm engine found for test. Retrieving the default engine.");
-            IdmEngines.destroy(); // Just to be sure we're not getting any previously cached version
-
-            cachedIdmEngine = IdmEngines.getDefaultIdmEngine();
-            if (cachedIdmEngine == null) {
-                throw new FlowableException("no default idm engine available");
-            }
-        }
-
-        idmEngine = cachedIdmEngine;
-        idmEngineConfiguration = idmEngine.getIdmEngineConfiguration();
-    }
 
     protected Group createGroup(String id, String name, String type) {
         Group group = idmIdentityService.newGroup(id);
