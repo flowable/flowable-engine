@@ -299,8 +299,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
 
     protected ExpressionManager expressionManager;
-    protected List<FlowableFunctionDelegate> functionDelegates;
-    protected List<FlowableFunctionDelegate> customFunctionDelegates;
+    protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
+    protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
     protected List<FlowableExpressionEnhancer> expressionEnhancers;
     protected List<FlowableExpressionEnhancer> customExpressionEnhancers;
 
@@ -773,14 +773,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
     
     public void initFunctionDelegates() {
-        if (functionDelegates == null) {
-            functionDelegates = new ArrayList<>();
+        if (flowableFunctionDelegates == null) {
+            flowableFunctionDelegates = new ArrayList<>();
             
-            functionDelegates.add(new VariableEqualsFunctionDelegate());
+            flowableFunctionDelegates.add(new VariableEqualsFunctionDelegate());
         }
         
-        if (customFunctionDelegates != null) {
-            functionDelegates.addAll(customFunctionDelegates);
+        if (customFlowableFunctionDelegates != null) {
+            flowableFunctionDelegates.addAll(customFlowableFunctionDelegates);
         }
     }
     
@@ -801,7 +801,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             expressionManager = new CmmnExpressionManager(beans);
         }
         
-        expressionManager.setFunctionDelegates(functionDelegates);
+        expressionManager.setFunctionDelegates(flowableFunctionDelegates);
         expressionManager.setExpressionEnhancers(expressionEnhancers);
     }
 
@@ -1937,38 +1937,40 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public List<FlowableFunctionDelegate> getFunctionDelegates() {
-        return functionDelegates;
+    public List<FlowableFunctionDelegate> getFlowableFunctionDelegates() {
+        return flowableFunctionDelegates;
     }
 
-    public CmmnEngineConfiguration setFunctionDelegates(List<FlowableFunctionDelegate> flowableFunctionDelegates) {
-        this.functionDelegates = flowableFunctionDelegates;
+    public CmmnEngineConfiguration setFlowableFunctionDelegates(List<FlowableFunctionDelegate> flowableFunctionDelegates) {
+        this.flowableFunctionDelegates = flowableFunctionDelegates;
         return this;
     }
 
-    public List<FlowableFunctionDelegate> getCustomFunctionDelegates() {
-        return customFunctionDelegates;
+    public List<FlowableFunctionDelegate> getCustomFlowableFunctionDelegates() {
+        return customFlowableFunctionDelegates;
     }
 
-    public CmmnEngineConfiguration setCustomFunctionDelegates(List<FlowableFunctionDelegate> customFlowableFunctionDelegates) {
-        this.customFunctionDelegates = customFlowableFunctionDelegates;
+    public CmmnEngineConfiguration setCustomFlowableFunctionDelegates(List<FlowableFunctionDelegate> customFlowableFunctionDelegates) {
+        this.customFlowableFunctionDelegates = customFlowableFunctionDelegates;
         return this;
     }
-    
+
     public List<FlowableExpressionEnhancer> getExpressionEnhancers() {
         return expressionEnhancers;
     }
 
-    public void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
+    public CmmnEngineConfiguration setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
         this.expressionEnhancers = expressionEnhancers;
+        return this;
     }
 
     public List<FlowableExpressionEnhancer> getCustomExpressionEnhancers() {
         return customExpressionEnhancers;
     }
 
-    public void setCustomExpressionEnhancers(List<FlowableExpressionEnhancer> customExpressionEnhancers) {
+    public CmmnEngineConfiguration setCustomExpressionEnhancers(List<FlowableExpressionEnhancer> customExpressionEnhancers) {
         this.customExpressionEnhancers = customExpressionEnhancers;
+        return this;
     }
 
     public DbSchemaManager getIdentityLinkDbSchemaManager() {
