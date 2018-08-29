@@ -19,12 +19,14 @@ import java.util.Map;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thilo-Alexander Ginkel
  */
 public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testPriorityExtension() throws Exception {
         testPriorityExtension(25);
@@ -44,6 +46,7 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
         assertEquals(priority, task.getPriority());
     }
 
+    @Test
     @Deployment
     public void testPriorityExtensionString() throws Exception {
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtensionString");

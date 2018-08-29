@@ -13,10 +13,11 @@
 package org.flowable.engine.impl.webservice;
 
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.PluggableFlowableExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * An abstract class for unit test of web-service task
@@ -24,7 +25,11 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
  * @author <a href="mailto:gnodet@gmail.com">Guillaume Nodet</a>
  * @author Christophe DENEUX
  */
-public abstract class AbstractWebServiceTaskTest extends PluggableFlowableTestCase {
+@Tag("webservice")
+@Tag("pluggable")
+@ExtendWith(MockWebServiceExtension.class)
+@ExtendWith(PluggableFlowableExtension.class)
+public abstract class AbstractWebServiceTaskTest extends AbstractFlowableTestCase {
 
     public static final String WEBSERVICE_MOCK_ADDRESS = "http://localhost:63081/webservicemock";
 
@@ -32,25 +37,10 @@ public abstract class AbstractWebServiceTaskTest extends PluggableFlowableTestCa
 
     protected Server server;
 
-    @Override
-    protected void initializeProcessEngine() {
-        super.initializeProcessEngine();
-
-        webServiceMock = new WebServiceMockImpl();
-        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        svrFactory.setServiceClass(WebServiceMock.class);
-        svrFactory.setAddress(WEBSERVICE_MOCK_ADDRESS);
-        svrFactory.setServiceBean(webServiceMock);
-        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
-        svrFactory.getOutInterceptors().add(new LoggingOutInterceptor());
-        server = svrFactory.create();
-        server.start();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        server.stop();
+    @BeforeEach
+    protected void setUp(WebServiceMock webServiceMock, Server server) {
+        this.webServiceMock = webServiceMock;
+        this.server = server;
     }
 
 }

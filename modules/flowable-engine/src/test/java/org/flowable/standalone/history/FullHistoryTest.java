@@ -44,6 +44,7 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -57,6 +58,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/history/fullhistory.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testVariableUpdates() {
         Map<String, Object> variables = new HashMap<>();
@@ -234,6 +236,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertNull(historicVariable);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricVariableInstanceQueryTaskVariables() {
         Map<String, Object> variables = new HashMap<>();
@@ -277,6 +280,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = "org/flowable/standalone/history/FullHistoryTest.testVariableUpdates.bpmn20.xml")
     public void testHistoricVariableInstanceQuery() {
         Map<String, Object> variables = new HashMap<>();
@@ -313,6 +317,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testHistoricVariableUpdatesAllTypes() throws Exception {
 
@@ -450,6 +455,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(processInstance.getId(), historicVariable.getProcessInstanceId());
     }
 
+    @Test
     @Deployment
     public void testHistoricFormProperties() throws Exception {
         Date startedDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS").parse("01/01/2001 01:23:46 000");
@@ -534,6 +540,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(4, props.size());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricVariableQuery() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -567,6 +574,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId("unexisting").count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricVariableQueryExcludeTaskRelatedDetails() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -590,6 +598,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(1, historyService.createHistoricDetailQuery().variableUpdates().processInstanceId(processInstance.getId()).excludeTaskDetails().taskId(task.getId()).count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricFormPropertiesQuery() throws Exception {
         Map<String, String> formProperties = new HashMap<>();
@@ -618,6 +627,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(0, historyService.createHistoricDetailQuery().formProperties().processInstanceId("unexisting").count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricVariableQuerySorting() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -651,6 +661,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(2, historyService.createHistoricDetailQuery().variableUpdates().orderByVariableType().desc().list().size());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testHistoricFormPropertySorting() throws Exception {
 
@@ -678,6 +689,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(2, historyService.createHistoricDetailQuery().formProperties().orderByFormPropertyId().desc().list().size());
     }
 
+    @Test
     @Deployment
     public void testHistoricDetailQueryMixed() throws Exception {
 
@@ -715,6 +727,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(12345L, varUpdate2.getValue());
     }
 
+    @Test
     public void testHistoricDetailQueryInvalidSorting() throws Exception {
         try {
             historyService.createHistoricDetailQuery().asc().list();
@@ -766,6 +779,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceVariableUpdates() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();
@@ -794,6 +808,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     }
 
     // ACT-592
+    @Test
     @Deployment
     public void testSetVariableOnProcessInstanceWithTimer() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerVariablesProcess");
@@ -801,6 +816,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(123456L, runtimeService.getVariable(processInstance.getId(), "myVar"));
     }
 
+    @Test
     @Deployment
     public void testDeleteHistoricProcessInstance() {
         // Start process-instance with some variables set
@@ -845,6 +861,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testDeleteRunningHistoricProcessInstance() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
@@ -863,6 +880,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     /**
      * Test created to validate ACT-621 fix.
      */
+    @Test
     @Deployment
     public void testHistoricFormPropertiesOnReEnteringActivity() {
         Map<String, Object> variables = new HashMap<>();
@@ -902,6 +920,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(historicActInst1.getActivityId(), historicActInst2.getActivityId());
     }
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceQueryTaskVariableValueEquals() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
@@ -967,6 +986,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("nullVar", null).count());
     }
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceQueryProcessVariableValueEquals() throws Exception {
         // Set some variables on the process instance
@@ -1035,6 +1055,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("longVar", 67890L).count());
     }
 
+    @Test
     @Deployment
     public void testHistoricProcessInstanceVariableValueEquals() throws Exception {
         // Set some variables on the process instance
@@ -1097,6 +1118,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("nullVar", null).count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/history/FullHistoryTest.testHistoricProcessInstanceVariableValueEquals.bpmn20.xml" })
     public void testHistoricProcessInstanceVariableValueNotEquals() throws Exception {
         // Set some variables on the process instance
@@ -1166,6 +1188,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("nullVar", null).count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/history/FullHistoryTest.testHistoricProcessInstanceVariableValueEquals.bpmn20.xml" })
     public void testHistoricProcessInstanceVariableValueLessThanAndGreaterThan() throws Exception {
         // Set some variables on the process instance
@@ -1208,6 +1231,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // 12344L).count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/history/FullHistoryTest.testVariableUpdatesAreLinkedToActivity.bpmn20.xml" })
     public void testVariableUpdatesLinkedToActivity() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("ProcessWithSubProcess");
@@ -1257,6 +1281,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertFalse(historicActivityInstance2.getExecutionId().equals(update2.getExecutionId()));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testQueryJPAVariable.bpmn20.xml" })
     public void testReadJpaVariableValueFromHistoricVariableUpdate() {
 
@@ -1296,6 +1321,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     /**
      * Test confirming fix for ACT-1731
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testQueryHistoricTaskIncludeBinaryVariable() throws Exception {
         // Start process with a binary variable
@@ -1325,6 +1351,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     /**
      * Test confirming fix for ACT-1731
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
     public void testQueryHistoricProcessInstanceIncludeBinaryVariable() throws Exception {
         // Start process with a binary variable
@@ -1345,6 +1372,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
     }
 
     // Test for https://activiti.atlassian.net/browse/ACT-2186
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoricVariableRemovedWhenRuntimeVariableIsRemoved()
             throws Exception {

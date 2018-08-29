@@ -78,6 +78,7 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class FormEngineConfiguration extends AbstractEngineConfiguration
@@ -266,6 +267,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     }
 
     public void initDbSchema() {
+        Liquibase liquibase = null;
         try {
             DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
@@ -282,7 +284,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
                 database.setLiquibaseCatalogName(databaseCatalog);
             }
 
-            Liquibase liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
 
             if (DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
                 LOGGER.debug("Dropping and creating schema FORM");
@@ -297,6 +299,21 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
             }
         } catch (Exception e) {
             throw new FlowableException("Error initialising form data schema", e);
+        } finally {
+            closeDatabase(liquibase);
+        }
+    }
+
+    private void closeDatabase(Liquibase liquibase) {
+        if (liquibase != null) {
+            Database database = liquibase.getDatabase();
+            if (database != null) {
+                try {
+                    database.close();
+                } catch (DatabaseException e) {
+                    LOGGER.warn("Error closing database", e);
+                }
+            }
         }
     }
 

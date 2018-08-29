@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.event.timer;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -61,6 +63,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
      *
      * See process image next to the process xml resource
      */
+    @Test
     @Deployment
     public void testMultipleTimersOnUserTask() {
 
@@ -84,6 +87,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals("Third Task", task.getName());
     }
 
+    @Test
     @Deployment
     public void testTimerOnNestingOfSubprocesses() {
 
@@ -105,6 +109,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals("task outside subprocess", task.getName());
     }
 
+    @Test
     @Deployment
     public void testExpressionOnTimer() {
         // Set the clock fixed
@@ -138,6 +143,41 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
+    @Deployment
+    public void testExpressionWithJavaDurationOnTimer() {
+        // Set the clock fixed
+        Date startTime = new Date();
+
+        HashMap<String, Object> variables = new HashMap<>();
+        variables.put("duration", Duration.ofHours(1));
+
+        // After process start, there should be a timer created
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnTimer", variables);
+
+        TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
+        List<Job> jobs = jobQuery.list();
+        assertEquals(1, jobs.size());
+
+        // After setting the clock to time '1 hour and 5 seconds', the second
+        // timer should fire
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
+        waitForJobExecutorToProcessAllJobs(5000L, 25L);
+        assertEquals(0L, jobQuery.count());
+
+        // start execution listener is not executed
+        assertFalse(listenerExecutedStartEvent);
+        assertTrue(listenerExecutedEndEvent);
+
+        // which means the process has ended
+        assertProcessEnded(pi.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertNotNull(historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).activityId("boundaryTimer").singleResult());
+        }
+    }
+
+    @Test
     @Deployment
     public void testNullExpressionOnTimer() {
 
@@ -154,6 +194,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment
     public void testNullDueDateWithRepetition() {
 
@@ -171,6 +212,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(1, jobs.size());
     }
     
+    @Test
     @Deployment
     public void testNullDueDateWithWrongRepetition() {
 
@@ -189,6 +231,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testTimerInSingleTransactionProcess() {
         // make sure that if a PI completes in single transaction, JobEntities
@@ -198,6 +241,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
     }
 
+    @Test
     @Deployment
     public void testRepeatingTimerWithCancelActivity() {
         runtimeService.startProcessInstanceByKey("repeatingTimerAndCallActivity");
@@ -216,6 +260,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(1, taskService.createTaskQuery().count());
     }
 
+    @Test
     @Deployment
     public void testInfiniteRepeatingTimer() throws Exception {
 
@@ -250,6 +295,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testRepeatTimerDuration() throws Exception {
 
@@ -281,6 +327,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testBoundaryTimerEvent() throws Exception {
 
@@ -348,6 +395,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0, jobList.size());
     }
 
+    @Test
     @Deployment
     public void testBoundaryTimerEvent2() throws Exception {
 
@@ -392,6 +440,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0, jobList.size());
     }
 
+    @Test
     @Deployment
     public void testRescheduleBoundaryTimerOnUserTask() {
         // startDate variable set to one hour from now
@@ -452,6 +501,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertNull(timerJob);
     }
 
+    @Test
     @Deployment
     public void testRescheduleRepeatBoundaryTimer() {
         // startDate variable set to one hour from now
@@ -513,6 +563,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertNull(timerJob);
     }
 
+    @Test
     @Deployment
     public void testRescheduleBoundaryTimerOnSubProcess() {
         // startDate variable set to one hour from now
@@ -570,6 +621,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertNull(timerJob);
     }
 
+    @Test
     @Deployment
     public void test3BoundaryTimerEvents() throws Exception {
 
@@ -647,6 +699,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().reset();
     }
 
+    @Test
     @Deployment
     public void test2Boundary1IntermediateTimerEvents() throws Exception {
 

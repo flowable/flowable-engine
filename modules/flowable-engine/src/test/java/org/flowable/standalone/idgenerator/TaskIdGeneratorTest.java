@@ -14,6 +14,7 @@ package org.flowable.standalone.idgenerator;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +30,7 @@ public class TaskIdGeneratorTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/idgenerator/taskidgenerator.test.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment(resources = "org/flowable/standalone/idgenerator/UuidGeneratorTest.testUuidGeneratorUsage.bpmn20.xml")
     public void testUuidGeneratorUsage() {
 

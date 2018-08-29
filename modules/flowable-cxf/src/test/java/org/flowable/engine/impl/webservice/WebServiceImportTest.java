@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.webservice;
 
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * An integration test for CXF based web services
@@ -21,6 +22,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class WebServiceImportTest extends AbstractWebServiceTaskTest {
 
+    @Test
     @Deployment
     public void testImport() throws Exception {
 
@@ -29,6 +31,7 @@ public class WebServiceImportTest extends AbstractWebServiceTaskTest {
 
     }
 
+    @Test
     @Deployment
     public void testImport_DifferentDirectories() throws Exception {
 

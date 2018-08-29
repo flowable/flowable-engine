@@ -22,8 +22,9 @@ import java.io.InputStream;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormDeploymentBuilder;
 import org.flowable.form.api.FormRepositoryService;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
@@ -31,6 +32,7 @@ import org.springframework.core.io.Resource;
 /**
  * @author Tiese Barrell
  */
+@MockitoSettings
 public class AbstractAutoDeploymentStrategyTest {
 
     @Mock
@@ -69,7 +71,7 @@ public class AbstractAutoDeploymentStrategyTest {
     protected final String resourceName2 = "resourceName2.form";
     protected final String resourceName3 = "resourceName2.test";
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
 
         when(resourceMock1.getPathWithinContext()).thenReturn(resourceName1);

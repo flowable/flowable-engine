@@ -50,6 +50,11 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-engine-common</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

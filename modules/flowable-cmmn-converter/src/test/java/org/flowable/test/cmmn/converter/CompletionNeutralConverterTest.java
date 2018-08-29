@@ -12,18 +12,19 @@
  */
 package org.flowable.test.cmmn.converter;
 
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.Stage;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.Stage;
+import org.junit.Test;
 
 /**
  * @author Dennis Federico
@@ -52,6 +53,13 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
             assertNotNull(planItem.getItemControl());
             assertNotNull(planItem.getItemControl().getCompletionNeutralRule());
             assertNull(planItem.getItemControl().getCompletionNeutralRule().getCondition());
+            
+            assertEquals(1, planItem.getExtensionElements().size());
+            List<ExtensionElement> extensionElements = planItem.getExtensionElements().get("planItemTest");
+            assertEquals(1, extensionElements.size());
+            ExtensionElement extensionElement = extensionElements.get(0);
+            assertEquals("planItemTest", extensionElement.getName());
+            assertEquals("hello", extensionElement.getElementText());
         };
 
         validateModel(cmmnResource, modelValidator);
@@ -71,7 +79,14 @@ public class CompletionNeutralConverterTest extends AbstractConverterTest {
                 assertNotNull(definition.getDefaultControl().getCompletionNeutralRule().getCondition());
                 assertEquals("${" + definition.getId() + "}", definition.getDefaultControl().getCompletionNeutralRule().getCondition());
             });
-
+            
+            PlanItemDefinition planItemDef = cmmnModel.findPlanItemDefinition("taskTwo");
+            assertEquals(1, planItemDef.getExtensionElements().size());
+            List<ExtensionElement> extensionElements = planItemDef.getExtensionElements().get("taskTest");
+            assertEquals(1, extensionElements.size());
+            ExtensionElement extensionElement = extensionElements.get(0);
+            assertEquals("taskTest", extensionElement.getName());
+            assertEquals("hello", extensionElement.getElementText());
         };
 
         validateModel(cmmnResource, modelValidator);

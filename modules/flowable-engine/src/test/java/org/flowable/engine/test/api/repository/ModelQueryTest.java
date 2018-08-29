@@ -21,6 +21,9 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -29,7 +32,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
 
     private String modelOneId;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         Model model = repositoryService.newModel();
         model.setName("my model");
@@ -40,15 +43,14 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
 
         repositoryService.addModelEditorSource(modelOneId, "bytes".getBytes("utf-8"));
 
-        super.setUp();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         repositoryService.deleteModel(modelOneId);
     }
 
+    @Test
     public void testModelProperties() {
         ModelQuery query = repositoryService.createModelQuery();
         Model model = query.singleResult();
@@ -61,12 +63,14 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertNotNull(model.getLastUpdateTime());
     }
 
+    @Test
     public void testQueryNoCriteria() {
         ModelQuery query = repositoryService.createModelQuery();
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByName() throws Exception {
         ModelQuery query = repositoryService.createModelQuery().modelName("my model");
         Model model = query.singleResult();
@@ -76,6 +80,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByInvalidName() {
         ModelQuery query = repositoryService.createModelQuery().modelName("invalid");
         assertNull(query.singleResult());
@@ -83,6 +88,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, query.count());
     }
 
+    @Test
     public void testQueryByNameLike() throws Exception {
         ModelQuery query = repositoryService.createModelQuery().modelNameLike("%model%");
         Model model = query.singleResult();
@@ -92,6 +98,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByInvalidNameLike() {
         ModelQuery query = repositoryService.createModelQuery().modelNameLike("%invalid%");
         assertNull(query.singleResult());
@@ -99,6 +106,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, query.count());
     }
 
+    @Test
     public void testQueryByKey() {
         ModelQuery query = repositoryService.createModelQuery().modelName("my model").modelKey("someKey");
         Model model = query.singleResult();
@@ -107,6 +115,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByNameAndKey() {
         ModelQuery query = repositoryService.createModelQuery().modelKey("someKey");
         Model model = query.singleResult();
@@ -115,6 +124,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByInvalidKey() {
         ModelQuery query = repositoryService.createModelQuery().modelKey("invalid");
         assertNull(query.singleResult());
@@ -122,12 +132,14 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, query.count());
     }
 
+    @Test
     public void testQueryByCategory() {
         ModelQuery query = repositoryService.createModelQuery().modelCategory("test");
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByInvalidCategory() {
         ModelQuery query = repositoryService.createModelQuery().modelCategory("invalid");
         assertNull(query.singleResult());
@@ -135,12 +147,14 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, query.count());
     }
 
+    @Test
     public void testQueryByCategoryLike() {
         ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%te%");
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByInvalidCategoryLike() {
         ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%invalid%");
         assertNull(query.singleResult());
@@ -148,18 +162,21 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, query.count());
     }
 
+    @Test
     public void testQueryByCategoryNotEquals() {
         ModelQuery query = repositoryService.createModelQuery().modelCategoryNotEquals("aap");
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByVersion() {
         ModelQuery query = repositoryService.createModelQuery().modelVersion(1);
         assertEquals(1, query.list().size());
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testByDeploymentId() {
         Deployment deployment = repositoryService.createDeployment().addString("test", "test").deploy();
 
@@ -185,18 +202,21 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, repositoryService.createModelQuery().count());
     }
 
+    @Test
     public void testByInvalidDeploymentId() {
         ModelQuery query = repositoryService.createModelQuery().deploymentId("invalid");
         assertNull(query.singleResult());
         assertEquals(0, query.count());
     }
 
+    @Test
     public void testNotDeployed() {
         ModelQuery query = repositoryService.createModelQuery().notDeployed();
         assertEquals(1, query.count());
         assertEquals(1, query.list().size());
     }
 
+    @Test
     public void testOrderBy() {
         ModelQuery query = repositoryService.createModelQuery();
         assertEquals(1, query.orderByCreateTime().asc().count());
@@ -208,6 +228,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.orderByModelKey().desc().count());
     }
 
+    @Test
     public void testByLatestVersion() {
         ModelQuery query = repositoryService.createModelQuery().latestVersion().modelKey("someKey");
         Model model = query.singleResult();
@@ -230,6 +251,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         repositoryService.deleteModel(model.getId());
     }
 
+    @Test
     public void testVerifyModelProperties() {
         List<Model> models = repositoryService.createModelQuery().orderByModelName().asc().list();
 
@@ -245,6 +267,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, repositoryService.createModelQuery().orderByModelId().asc().list().size());
     }
 
+    @Test
     public void testNativeQuery() {
         assertEquals("ACT_RE_MODEL", managementService.getTableName(Model.class));
         assertEquals("ACT_RE_MODEL", managementService.getTableName(ModelEntity.class));
@@ -260,6 +283,7 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertEquals(0, repositoryService.createNativeProcessDefinitionQuery().sql(baseQuerySql).listPage(1, 5).size());
     }
 
+    @Test
     public void testKeyAndLatest() throws Exception {
 
         ModelEntity model1 = null;

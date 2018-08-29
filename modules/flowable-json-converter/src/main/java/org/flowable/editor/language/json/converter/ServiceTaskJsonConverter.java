@@ -61,6 +61,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         setPropertyValue(PROPERTY_SKIP_EXPRESSION, serviceTask.getSkipExpression(), propertiesNode);
 
         if ("mail".equalsIgnoreCase(serviceTask.getType())) {
+            setPropertyFieldValue(PROPERTY_MAILTASK_HEADERS, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_TO, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_FROM, serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_MAILTASK_SUBJECT, serviceTask, propertiesNode);

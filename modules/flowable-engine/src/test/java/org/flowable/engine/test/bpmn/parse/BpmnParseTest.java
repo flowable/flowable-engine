@@ -24,6 +24,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -31,6 +32,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class BpmnParseTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testInvalidProcessDefinition() {
         try {
             String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidProcessDefinition");
@@ -41,6 +43,7 @@ public class BpmnParseTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testParseWithBpmnNamespacePrefix() {
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/parse/BpmnParseTest.testParseWithBpmnNamespacePrefix.bpmn20.xml").deploy();
         assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
@@ -48,6 +51,7 @@ public class BpmnParseTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
 
+    @Test
     public void testParseWithMultipleDocumentation() {
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/parse/BpmnParseTest.testParseWithMultipleDocumentation.bpmn20.xml").deploy();
         assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
@@ -55,6 +59,7 @@ public class BpmnParseTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
 
+    @Test
     @Deployment
     public void testParseDiagramInterchangeElements() {
 
@@ -84,6 +89,7 @@ public class BpmnParseTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testParseNamespaceInConditionExpressionType() {
 
@@ -99,6 +105,7 @@ public class BpmnParseTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testParseDiagramInterchangeElementsForUnknownModelElements() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("TestAnnotation").singleResult();
@@ -107,6 +114,7 @@ public class BpmnParseTest extends PluggableFlowableTestCase {
         assertEquals(0, mainProcess.getExtensionElements().size());
     }
 
+    @Test
     public void testParseSwitchedSourceAndTargetRefsForAssociations() {
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/parse/BpmnParseTest.testParseSwitchedSourceAndTargetRefsForAssociations.bpmn20.xml").deploy();
 

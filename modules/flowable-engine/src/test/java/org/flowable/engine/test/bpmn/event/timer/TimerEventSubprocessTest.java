@@ -19,12 +19,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testInterruptingUnderProcessDefinition() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -57,6 +59,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
 
+    @Test
     @Deployment
     public void testNonInterruptingUnderProcessDefinition() {
 
@@ -122,6 +125,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
 
+    @Test
     @Deployment
     public void testNonInterruptingSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -169,6 +173,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
 
+    @Test
     @Deployment
     public void testInterruptingSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -193,6 +198,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
     
+    @Test
     @Deployment
     public void testStartingAdditionalTasks() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
@@ -250,6 +256,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
     
+    @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/event/timer/TimerEventSubprocessTest.testStartingAdditionalTasks.bpmn20.xml")
     public void testStartingAdditionalTasksNoNestedEventSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
@@ -283,6 +290,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
     
+    @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/event/timer/TimerEventSubprocessTest.testStartingAdditionalTasks.bpmn20.xml")
     public void testStartingAdditionalTasksWithNestedEventSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
@@ -343,6 +351,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
     
+    @Test
     @Deployment
     public void testStartingAdditionalTasksInterrupting() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
@@ -385,6 +394,7 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
     }
     
+    @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/event/timer/TimerEventSubprocessTest.testStartingAdditionalTasksInterrupting.bpmn20.xml")
     public void testStartingAdditionalTasksInterruptingWithMainEventSubProcessInterrupt() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");

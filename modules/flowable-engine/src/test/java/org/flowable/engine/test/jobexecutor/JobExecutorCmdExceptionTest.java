@@ -20,6 +20,9 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -30,17 +33,18 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
     private CommandExecutor commandExecutor;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         processEngineConfiguration.addJobHandler(tweetExceptionHandler);
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         processEngineConfiguration.removeJobHandler(tweetExceptionHandler.getType());
     }
 
+    @Test
     public void testJobCommandsWith2Exceptions() {
         commandExecutor.execute(new Command<String>() {
 
@@ -80,6 +84,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
         managementService.executeJob(job.getId());
     }
 
+    @Test
     public void testJobCommandsWith3Exceptions() {
         tweetExceptionHandler.setExceptionsRemaining(3);
 

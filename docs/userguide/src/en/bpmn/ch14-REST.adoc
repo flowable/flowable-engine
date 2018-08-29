@@ -1833,8 +1833,8 @@ When using +POST+, all variables that are passed are created. In case one of the
 ----
 [
    {
-      "name":"intProcVar"
-      "type":"integer"
+      "name":"intProcVar",
+      "type":"integer",
       "value":123
    },
 

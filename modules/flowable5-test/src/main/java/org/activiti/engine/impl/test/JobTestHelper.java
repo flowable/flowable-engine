@@ -192,7 +192,12 @@ public class JobTestHelper {
     }
 
     public static boolean areJobsAvailable(ManagementService managementService) {
-        return !managementService.createJobQuery().list().isEmpty();
+        boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
+        if (emptyJobs) {
+            return !managementService.createTimerJobQuery().executable().list().isEmpty();
+        } else {
+            return true;
+        }
     }
 
     public static boolean areJobsAvailable(org.activiti.engine.ManagementService managementService) {

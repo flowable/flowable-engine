@@ -22,6 +22,9 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -31,22 +34,21 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
     private Date testStartTime;
     private String processInstanceId;
     
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         this.testStartTime = new Date();
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/mgmt/TimerJobQueryTest.bpmn20.xml").deploy();
         this.processInstanceId = runtimeService.startProcessInstanceByKey("timerJobQueryTest").getId();
     }
     
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
-        super.tearDown();
     }
     
+    @Test
     public void testByJobId() {
         List<Job> timerJobs = managementService.createTimerJobQuery().list();
         assertEquals(3, timerJobs.size());
@@ -58,10 +60,12 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     public void testByProcessInstanceId() {
         assertEquals(3, managementService.createTimerJobQuery().processInstanceId(processInstanceId).list().size());
     }
     
+    @Test
     public void testByExecutionId() {
         for (String id : Arrays.asList("timerA", "timerB", "timerC")) {
             Execution execution = runtimeService.createExecutionQuery().activityId(id).singleResult();
@@ -70,12 +74,14 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     public void testByProcessDefinitionId() {
         String processDefinitionid = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         assertEquals(3, managementService.createTimerJobQuery().processDefinitionId(processDefinitionid).count());
         assertEquals(3, managementService.createTimerJobQuery().processDefinitionId(processDefinitionid).list().size());
     }
     
+    @Test
     public void testByExecutable() {
         assertEquals(0, managementService.createTimerJobQuery().executable().count());
         assertEquals(0, managementService.createTimerJobQuery().executable().list().size());
@@ -84,12 +90,14 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         assertEquals(3, managementService.createTimerJobQuery().executable().list().size());
     }
     
+    @Test
     public void testByHandlerType() {
         assertEquals(3, managementService.createTimerJobQuery().handlerType(TriggerTimerEventJobHandler.TYPE).count());
         assertEquals(3, managementService.createTimerJobQuery().handlerType(TriggerTimerEventJobHandler.TYPE).list().size());
         assertEquals(0, managementService.createTimerJobQuery().handlerType("invalid").count());
     }
     
+    @Test
     public void testByJobType() {
         assertEquals(3, managementService.createTimerJobQuery().timers().count());
         assertEquals(3, managementService.createTimerJobQuery().timers().list().size());
@@ -114,12 +122,14 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, managementService.createTimerJobQuery().withException().list().size());
     }
     
+    @Test
     public void testByduedateLowerThan() {
         Date date = new Date(testStartTime.getTime() + (10 * 60 * 1000 * 1000));
         assertEquals(3, managementService.createTimerJobQuery().timers().duedateLowerThan(date).count());
         assertEquals(3, managementService.createTimerJobQuery().timers().duedateLowerThan(date).list().size());
     }
     
+    @Test
     public void testByDuedateHigherThan() {
         assertEquals(0, managementService.createTimerJobQuery().timers().duedateLowerThan(testStartTime).count());
         assertEquals(0, managementService.createTimerJobQuery().timers().duedateLowerThan(testStartTime).list().size());

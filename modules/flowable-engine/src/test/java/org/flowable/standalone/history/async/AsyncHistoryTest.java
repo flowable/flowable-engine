@@ -34,12 +34,13 @@ import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsRunnable;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
-    @Override
-    protected String getEngineName() {
-        return "asyncHistoryTest";
+    public AsyncHistoryTest() {
+        super("asyncHistoryTest");
     }
     
     @Override
@@ -55,9 +56,13 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         processEngineConfiguration.setAsyncExecutorActivate(false);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
+        // The tests are doing deployments, which trigger async history. Therefore, we need to invoke them manually and then wait for the jobs to finish
+        // so there can be clean data in the DB
+        cleanDeployments();
+        waitForHistoryJobExecutorToProcessAllJobs(5500, 100);
         for (Job job : managementService.createJobQuery().list()) {
             if (job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
                     || job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {
@@ -65,9 +70,9 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             }
         }
 
-        super.tearDown();
     }
 
+    @Test
     public void testOneTaskProcess() {
         deployOneTaskTestProcess();
         for (int i = 0; i < 10; i++) { // Run this multiple times, as order of jobs processing can be different each run
@@ -129,6 +134,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         }
     }
     
+    @Test
     public void testExecuteThroughManagementService() {
         deployOneTaskTestProcess();
         
@@ -145,6 +151,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).count());
     }
 
+    @Test
     @Deployment
     public void testSimpleStraightThroughProcess() {
         String processInstanceId = runtimeService
@@ -160,6 +167,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertEquals(1002, historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count());
     }
 
+    @Test
     public void testTaskAssigneeChange() {
         Task task = startOneTaskprocess();
 
@@ -177,6 +185,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testTaskAssigneeChangeToNull() {
         Task task = startOneTaskprocess();
 
@@ -194,6 +203,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testClaimTask() {
         Task task = startOneTaskprocess();
         taskService.setAssignee(task.getId(), null);
@@ -211,6 +221,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testSetTaskOwner() {
         Task task = startOneTaskprocess();
         assertNull(task.getOwner());
@@ -233,6 +244,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testSetTaskName() {
         Task task = startOneTaskprocess();
         assertEquals("The Task", task.getName());
@@ -251,6 +263,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testSetTaskDescription() {
         Task task = startOneTaskprocess();
         assertNull(task.getDescription());
@@ -277,6 +290,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testSetTaskDueDate() {
         Task task = startOneTaskprocess();
         assertNull(task.getDueDate());
@@ -299,6 +313,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testSetTaskPriority() {
         Task task = startOneTaskprocess();
         assertEquals(Task.DEFAULT_PRIORITY, task.getPriority());
@@ -316,6 +331,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testSetTaskCategory() {
         Task task = startOneTaskprocess();
         assertNull(task.getCategory());
@@ -334,6 +350,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testSetTaskFormKey() {
         Task task = startOneTaskprocess();
         assertNull(task.getFormKey());
@@ -351,6 +368,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         finishOneTaskProcess(task);
     }
 
+    @Test
     public void testSetTaskParentId() {
         Task parentTask1 = taskService.newTask();
         parentTask1.setName("Parent task 1");
@@ -387,6 +405,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         taskService.deleteTask(parentTask2.getId(), true);
     }
     
+    @Test
     public void testResetExpiredJobs() {
         
         // Need to do this to initialize everything properly

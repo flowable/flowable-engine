@@ -21,6 +21,9 @@ import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -31,7 +34,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
 
     private String deploymentTwoId;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         deploymentOneId = repositoryService.createDeployment().name("org/flowable/engine/test/repository/one.bpmn20.xml").category("testCategory")
                 .addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml").deploy().getId();
@@ -39,16 +42,15 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         deploymentTwoId = repositoryService.createDeployment().name("org/flowable/engine/test/repository/two.bpmn20.xml").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml")
                 .deploy().getId();
 
-        super.setUp();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         repositoryService.deleteDeployment(deploymentOneId, true);
         repositoryService.deleteDeployment(deploymentTwoId, true);
     }
 
+    @Test
     public void testQueryNoCriteria() {
         DeploymentQuery query = repositoryService.createDeploymentQuery();
         assertEquals(2, query.list().size());
@@ -61,6 +63,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByDeploymentId() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId(deploymentOneId);
         assertNotNull(query.singleResult());
@@ -68,6 +71,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByInvalidDeploymentId() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId("invalid");
         assertNull(query.singleResult());
@@ -81,6 +85,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByName() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("org/flowable/engine/test/repository/two.bpmn20.xml");
         assertNotNull(query.singleResult());
@@ -88,6 +93,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByInvalidName() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("invalid");
         assertNull(query.singleResult());
@@ -101,6 +107,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByNameLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("%flowable%");
         assertEquals(2, query.list().size());
@@ -113,6 +120,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByInvalidNameLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("invalid");
         assertNull(query.singleResult());
@@ -126,6 +134,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testQueryByNameAndCategory() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentCategory("testCategory").deploymentNameLike("%flowable%");
         assertEquals(1, query.list().size());
@@ -133,6 +142,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         assertNotNull(query.singleResult());
     }
 
+    @Test
     public void testQueryByProcessDefinitionKey() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKey("one");
         assertEquals(1, query.list().size());
@@ -140,18 +150,21 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         assertNotNull(query.singleResult());
     }
 
+    @Test
     public void testQueryByProcessDefinitionKeyLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("%o%");
         assertEquals(2, query.list().size());
         assertEquals(2, query.count());
     }
 
+    @Test
     public void testQueryByInvalidProcessDefinitionKeyLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("invalid");
         assertEquals(0, query.list().size());
         assertEquals(0, query.count());
     }
 
+    @Test
     public void testVerifyDeploymentProperties() {
         List<Deployment> deployments = repositoryService.createDeploymentQuery().orderByDeploymentName().asc().list();
 
@@ -174,6 +187,7 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testNativeQuery() {
         assertEquals("ACT_RE_DEPLOYMENT", managementService.getTableName(Deployment.class));
         assertEquals("ACT_RE_DEPLOYMENT", managementService.getTableName(DeploymentEntity.class));

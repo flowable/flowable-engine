@@ -33,6 +33,7 @@
                     <flowable:field name="fieldD">
                         <expression>test</expression>
                     </flowable:field>
+                    <flowable:taskTest>hello</flowable:taskTest>
                 </extensionElements>
             </task>
             

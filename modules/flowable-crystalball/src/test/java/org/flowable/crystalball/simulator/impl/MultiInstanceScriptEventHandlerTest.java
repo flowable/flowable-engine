@@ -6,6 +6,7 @@ import static org.hamcrest.core.Is.is;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests ScriptEventHandler with multi instance simulation run.
@@ -18,6 +19,7 @@ public class MultiInstanceScriptEventHandlerTest extends ResourceFlowableTestCas
         super("org/flowable/crystalball/simulator/impl/MultiInstanceScriptEventHandlerTest.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testSequentialSimulationRun() throws Exception {
         ProcessInstance simulationExperiment = runtimeService.startProcessInstanceByKey("multiInstanceResultVariablesSimulationRun");

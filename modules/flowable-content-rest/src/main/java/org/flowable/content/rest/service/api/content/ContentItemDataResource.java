@@ -13,14 +13,11 @@
 
 package org.flowable.content.rest.service.api.content;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.io.InputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -39,9 +36,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -57,7 +59,7 @@ public class ContentItemDataResource extends ContentItemBaseResource {
             notes = "The response body contains the binary content. By default, the content-type of the response is set to application/octet-stream unless the content item type contains a valid mime type.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the content item was found and the requested content is returned."),
-            @ApiResponse(code = 404, message = "Indicates the content item was not found or the content item doesn’t have a binary stream available. Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the content item was not found or the content item does not have a binary stream available. Status message provides additional information.")
     })
     @GetMapping(value = "/content-service/content-items/{contentItemId}/data")
     public ResponseEntity<byte[]> getContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId, HttpServletResponse response) {

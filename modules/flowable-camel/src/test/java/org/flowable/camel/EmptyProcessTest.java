@@ -23,18 +23,21 @@ import org.apache.camel.builder.RouteBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class EmptyProcessTest extends SpringFlowableTestCase {
 
     @Autowired
     protected CamelContext camelContext;
 
-    @BeforeClass
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -47,7 +50,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
         });
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
@@ -56,6 +59,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "process/empty.bpmn20.xml" })
     public void testRunProcessWithHeader() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);
@@ -75,6 +79,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
         assertEquals("Foo", var.getValue());
     }
 
+    @Test
     @Deployment(resources = { "process/empty.bpmn20.xml" })
     public void testObjectAsVariable() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);
@@ -90,6 +95,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
         assertEquals(expectedObj, var.getValue());
     }
 
+    @Test
     @Deployment(resources = { "process/empty.bpmn20.xml" })
     public void testObjectAsStringVariable() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);

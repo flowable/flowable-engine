@@ -53,10 +53,14 @@
 
                 <planItem id="withoutCondition" name="Completion Neutral without condition" definitionRef="taskTwo"/>
                 <task id="taskTwo">
+                    <extensionElements>
+                        <flowable:taskTest>hello</flowable:taskTest>
+                    </extensionElements>
                     <defaultControl>
                         <extensionElements>
                             <flowable:completionNeutralRule/>
                         </extensionElements>
+                        <requiredRule/>
                     </defaultControl>
                 </task>
             </stage>

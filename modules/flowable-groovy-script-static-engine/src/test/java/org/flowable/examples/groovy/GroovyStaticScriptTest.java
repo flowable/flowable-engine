@@ -17,12 +17,14 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Grochowski
  */
 public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testGroovyStaticScriptEngine() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
@@ -34,6 +36,7 @@ public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
         assertEquals(15, sum.intValue());
     }
     
+    @Test
     @Deployment
     public void testGroovyScriptEngine() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };

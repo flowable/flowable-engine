@@ -20,15 +20,20 @@ import org.flowable.common.engine.impl.db.DbSchemaManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class FormDbSchemaManager implements DbSchemaManager {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormDbSchemaManager.class);
     
     public static String LIQUIBASE_CHANGELOG = "org/flowable/form/db/liquibase/flowable-form-db-changelog.xml";
     
@@ -39,6 +44,8 @@ public class FormDbSchemaManager implements DbSchemaManager {
             liquibase.update("form");
         } catch (Exception e) {
             throw new FlowableException("Error creating form engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
@@ -49,6 +56,8 @@ public class FormDbSchemaManager implements DbSchemaManager {
             liquibase.dropAll();
         } catch (Exception e) {
             throw new FlowableException("Error dropping form engine tables", e);
+        } finally {
+            closeDatabase(liquibase);
         }
     }
     
@@ -92,6 +101,22 @@ public class FormDbSchemaManager implements DbSchemaManager {
 
         } catch (Exception e) {
             throw new FlowableException("Error creating liquibase instance", e);
+        }
+    }
+
+    private void closeDatabase(Liquibase liquibase) {
+        if (liquibase != null) {
+            Database database = liquibase.getDatabase();
+            if (database != null) {
+                // do not close the shared connection if a command context is currently active
+                if (CommandContextUtil.getCommandContext() == null) {
+                    try {
+                        database.close();
+                    } catch (DatabaseException e) {
+                        LOGGER.warn("Error closing database", e);
+                    }
+                }
+            }
         }
     }
 

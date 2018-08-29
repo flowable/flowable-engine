@@ -26,21 +26,26 @@
     <cmmndi:CMMNDiagram id="CMMNDiagram_CaseWithDi">
       <cmmndi:CMMNShape id="DI_myPlanModel" cmmnElementRef="myPlanModel">
         <dc:Bounds x="1" y="19" width="400" height="300" />
+        <cmmndi:CMMNLabel />
       </cmmndi:CMMNShape>
       <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
         <dc:Bounds x="70" y="65" width="80" height="60" />
+        <cmmndi:CMMNLabel />
       </cmmndi:CMMNShape>
       <cmmndi:CMMNShape id="CMMNShape_criterion1" cmmnElementRef="criterion1">
         <dc:Bounds x="268" y="216" width="20" height="28" />
+        <cmmndi:CMMNLabel />
       </cmmndi:CMMNShape>
       <cmmndi:CMMNEdge id="CMMNEdge_onPart1" cmmnElementRef="onPart1" targetCMMNElementRef="criterion1">
         <di:waypoint x="170" y="95" />
         <di:waypoint x="220" y="95" />
         <di:waypoint x="220" y="130" />
         <di:waypoint x="250" y="130" />
+        <cmmndi:CMMNLabel />
       </cmmndi:CMMNEdge>
       <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
         <dc:Bounds x="250" y="100" width="80" height="60" />
+        <cmmndi:CMMNLabel />
       </cmmndi:CMMNShape>
     </cmmndi:CMMNDiagram>
   </cmmndi:CMMNDI>

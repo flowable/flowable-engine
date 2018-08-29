@@ -711,6 +711,41 @@ function _drawFlow(flow){
             "stroke" : "#000000"
 	});
 
+    if (flow.name) {
+        var firstLine = polyline.getLine(0);
+
+        var angle;
+        if (firstLine.x1 !== firstLine.x2) {
+            angle = Math.atan((firstLine.y2 - firstLine.y1) / (firstLine.x2 - firstLine.x1));
+        } else if (firstLine.y1 < firstLine.y2) {
+            angle = Math.PI / 2;
+        } else {
+            angle = -Math.PI / 2;
+        }
+        var flowName = paper.text(firstLine.x1, firstLine.y1, flow.name).attr({
+            "text-anchor": "middle",
+            "font-family" : "Arial",
+            "font-size" : "12",
+            "fill" : "#000000"
+        });
+
+        var offsetX = (flowName.getBBox().width / 2 + 5);
+        var offsetY = -(flowName.getBBox().height / 2 + 5);
+
+        if (firstLine.x1 > firstLine.x2) {
+            offsetX = -offsetX;
+        }
+        var rotatedOffsetX = offsetX * Math.cos(angle) - offsetY * Math.sin(angle);
+        var rotatedOffsetY = offsetX * Math.sin(angle) + offsetY * Math.cos(angle);
+
+        flowName.attr({
+            x: firstLine.x1 + rotatedOffsetX,
+            y: firstLine.y1 + rotatedOffsetY
+        });
+
+        flowName.transform("r" + ((angle) * 180) / Math.PI);
+    }
+
 	_showTip(jQuery(polylineInvisible.element.node), flow);
 
 	polylineInvisible.element.mouseover(function() {

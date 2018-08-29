@@ -20,51 +20,41 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.flowable.common.engine.api.history.HistoricData;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daisuke Yoshimoto
  */
-public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
+@Tag("jpa")
+public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
 
-    protected static ProcessEngine cachedProcessEngine;
+    private EntityManagerFactory entityManagerFactory;
 
-    private static EntityManagerFactory entityManagerFactory;
-
-    private static FieldAccessJPAEntity simpleEntityFieldAccess;
-    private static boolean entitiesInitialized;
+    private FieldAccessJPAEntity simpleEntityFieldAccess;
 
     protected String processInstanceId;
 
-    @Override
-    protected void initializeProcessEngine() {
-        if (cachedProcessEngine == null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-                    .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/flowable.cfg.xml");
+    public HistoricJPAVariableTest() {
+        super("org/flowable/standalone/jpa/flowable.cfg.xml");
+    }
 
-            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
-
-            EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) processEngineConfiguration
-                    .getSessionFactories()
-                    .get(EntityManagerSession.class);
-
-            entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
-        }
-        processEngine = cachedProcessEngine;
+    @BeforeEach
+    protected void setUp() {
+        entityManagerFactory = ((EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class))
+            .getEntityManagerFactory();
     }
 
     public void setupJPAEntities() {
-        if (!entitiesInitialized) {
             EntityManager manager = entityManagerFactory.createEntityManager();
             manager.getTransaction().begin();
 
@@ -77,10 +67,9 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
             manager.flush();
             manager.getTransaction().commit();
             manager.close();
-            entitiesInitialized = true;
-        }
     }
 
+    @Test
     @Deployment
     public void testGetJPAEntityAsHistoricVariable() {
         setupJPAEntities();
@@ -106,6 +95,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
     }
 
+    @Test
     @Deployment
     public void testGetJPAEntityAsHistoricLog() {
         setupJPAEntities();
@@ -136,6 +126,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/HistoricJPAVariableTest.testGetJPAEntityAsHistoricLog.bpmn20.xml" })
     public void testGetJPAUpdateEntityAsHistoricLog() {
         setupJPAEntities();

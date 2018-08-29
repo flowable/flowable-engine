@@ -12,43 +12,29 @@
  */
 package org.flowable.engine.test.bpmn.servicetask;
 
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.PluggableFlowableExtension;
+import org.flowable.engine.impl.webservice.MockWebServiceExtension;
 import org.flowable.engine.impl.webservice.WebServiceMock;
-import org.flowable.engine.impl.webservice.WebServiceMockImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Esteban Robles Luna
  */
+@Tag("webservice")
+@Tag("pluggable")
+@ExtendWith(MockWebServiceExtension.class)
+@ExtendWith(PluggableFlowableExtension.class)
 public abstract class AbstractWebServiceTaskTest extends
-        PluggableFlowableTestCase {
+    AbstractFlowableTestCase {
 
     protected WebServiceMock webServiceMock;
-    private Server server;
 
-    @Override
-    protected void initializeProcessEngine() {
-        super.initializeProcessEngine();
-
-        webServiceMock = new WebServiceMockImpl();
-        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        svrFactory.setServiceClass(WebServiceMock.class);
-        svrFactory.setAddress("http://localhost:63081/webservicemock");
-        svrFactory.setServiceBean(webServiceMock);
-        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
-        svrFactory.getOutInterceptors().add(new LoggingOutInterceptor());
-        server = svrFactory.create();
-        server.start();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        server.stop();
-        server.destroy();
+    @BeforeEach
+    protected void setUp(WebServiceMock webServiceMock) {
+        this.webServiceMock = webServiceMock;
     }
 
     // @Override

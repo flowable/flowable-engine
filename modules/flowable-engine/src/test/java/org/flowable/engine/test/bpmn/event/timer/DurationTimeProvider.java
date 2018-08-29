@@ -10,24 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.spring.authentication;
+package org.flowable.engine.test.bpmn.event.timer;
 
-import org.flowable.idm.api.PasswordSaltProvider;
-import org.springframework.security.authentication.dao.SystemWideSaltSource;
+import java.time.Duration;
 
 /**
- * @author faizal-manan
+ * @author Filip Hrisafov
  */
-public class SpringSaltProvider implements PasswordSaltProvider {
+public class DurationTimeProvider {
 
-    private SystemWideSaltSource salt;
-
-    public SpringSaltProvider(SystemWideSaltSource salt) {
-        this.salt = salt;
-    }
-
-    @Override
-    public String getSalt() {
-        return (String) salt.getSalt(null);
+    public Duration getDuration() {
+        return Duration.ofSeconds(100);
     }
 }

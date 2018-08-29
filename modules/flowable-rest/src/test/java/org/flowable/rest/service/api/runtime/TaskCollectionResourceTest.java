@@ -240,6 +240,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Candidate group filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales";
             assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            // Candidate user with group filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=aSalesUser";
+            assertResultsPresentInDataResponse(url, processTask.getId());
 
             // Involved user filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";

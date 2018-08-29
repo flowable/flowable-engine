@@ -12,12 +12,14 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.model.IOParameter;
-import org.flowable.cmmn.model.ProcessTask;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
-import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.IOParameter;
+import org.flowable.cmmn.model.ProcessTask;
 
 public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessTask> {
 
@@ -38,8 +40,8 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport<ProcessT
     }
 
     @Override
-    protected void writePlanItemDefinitionBody(ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
-        super.writePlanItemDefinitionBody(processTask, xtw);
+    protected void writePlanItemDefinitionBody(CmmnModel model, ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionBody(model, processTask, xtw);
         boolean didWriteParameterStartElement = false;
         if (null != processTask.getInParameters() || null != processTask.getOutParameters()) {
             didWriteParameterStartElement = writeIOParameters(ELEMENT_PROCESS_TASK_IN_PARAMETERS,

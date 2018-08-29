@@ -25,6 +25,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml" })
     public void testAddSequentialUserTask() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -67,6 +69,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml" })
     public void testDeleteSequentialUserTask() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -93,6 +96,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml" })
     public void testDeleteSequentialUserTaskWithCompletion() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -119,6 +123,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testParallelUserTasks() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -147,6 +152,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/DynamicMultiInstanceTest.testParallelUserTasks.bpmn20.xml" })
     public void testDeleteParallelUserTasks() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -171,6 +177,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment
     public void testParallelUserTasksBasedOnCollection() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -207,6 +214,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivity.bpmn20.xml",
         "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
     public void testAddNestedParallelCallActivity() {
@@ -229,6 +237,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
         
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivity.bpmn20.xml",
         "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
     public void testDeleteNestedParallelCallActivity() {
@@ -262,6 +271,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment
     public void testSequentialSubProcessCompletionCondition() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -285,6 +295,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/bpmn/multiinstance/DynamicMultiInstanceTest.testSequentialSubProcessCompletionCondition.bpmn20.xml"})
     public void testDeleteSequentialSubProcessCompletionCondition() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -321,6 +332,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/bpmn/multiinstance/DynamicMultiInstanceTest.testSequentialSubProcessCompletionCondition.bpmn20.xml"})
     public void testDeleteSequentialSubProcessAsCompleted() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -357,6 +369,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/bpmn/multiinstance/DynamicMultiInstanceTest.testSequentialSubProcessCompletionCondition.bpmn20.xml"})
     public void testChangeCompletionConditionSequentialSubProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -384,6 +397,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
     @Deployment
     public void testMultipleParallelSubProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {

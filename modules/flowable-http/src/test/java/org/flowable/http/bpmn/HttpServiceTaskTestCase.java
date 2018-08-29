@@ -12,23 +12,27 @@
  */
 package org.flowable.http.bpmn;
 
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 
 /**
  * Http Server and API to test HTTP Activity
  *
  * @author Harsha Teja Kanna
  */
+@EnsureCleanDb(excludeTables = {
+    "ACT_GE_PROPERTY",
+    "ACT_ID_PROPERTY",
+    "ACT_CMMN_DATABASECHANGELOG",
+    "ACT_CMMN_DATABASECHANGELOGLOCK"
+})
+@Tag("http")
 public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase {
     
-    static {
-        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_CMMN_DATABASECHANGELOG");
-        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_CMMN_DATABASECHANGELOGLOCK");
-    }
-
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         HttpServiceTaskTestServer.setUp();
     }
 }

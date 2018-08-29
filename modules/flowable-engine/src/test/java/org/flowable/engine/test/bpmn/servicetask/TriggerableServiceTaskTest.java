@@ -23,9 +23,11 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testClassDelegate() {
         String processId = runtimeService.startProcessInstanceByKey("process").getProcessInstanceId();
@@ -44,6 +46,7 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals(3, runtimeService.getVariable(processId, "count"));
     }
 
+    @Test
     @Deployment
     public void testDelegateExpression() {
         Map<String, Object> varMap = new HashMap<>();
@@ -65,6 +68,7 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals(3, runtimeService.getVariable(processId, "count"));
     }
 
+    @Test
     @Deployment
     public void testAsyncJobs() {
         String processId = runtimeService.startProcessInstanceByKey("process").getProcessInstanceId();

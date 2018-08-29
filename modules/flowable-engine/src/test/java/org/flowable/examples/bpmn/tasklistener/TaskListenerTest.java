@@ -17,12 +17,14 @@ import java.util.List;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class TaskListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskCreateListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
@@ -42,6 +44,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerInSubProcessTest.bpmn20.xml" })
     public void testTaskCreateListenerInSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerInSubProcess");
@@ -52,6 +55,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskAssignmentListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
@@ -71,6 +75,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     /**
      * Validate fix for ACT-1627: Not throwing assignment event on every update
      */
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskAssignmentListenerNotCalledWhenAssigneeNotUpdated() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
@@ -117,6 +122,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskUnassignListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
@@ -144,6 +150,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskCompleteListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
@@ -158,6 +165,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         assertEquals("Act", runtimeService.getVariable(processInstance.getId(), "shortName"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testTaskListenerWithExpression() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
@@ -170,6 +178,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         assertEquals("Write meeting notes", runtimeService.getVariable(processInstance.getId(), "greeting2"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
     public void testAllEventsTaskListener() {
         runtimeService.startProcessInstanceByKey("taskListenerProcess");
@@ -186,6 +195,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.testTaskListenersOnDelete.bpmn20.xml" })
     public void testTaskListenersOnDeleteByComplete() {
         TaskDeleteListener.clear();
@@ -215,6 +225,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         assertEquals("Complete Task Listener executed.", TaskSimpleCompleteListener.getCurrentMessages().get(0));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.testTaskListenersOnDelete.bpmn20.xml" })
     public void testTaskListenersOnDeleteByDeleteProcessInstance() {
         TaskDeleteListener.clear();

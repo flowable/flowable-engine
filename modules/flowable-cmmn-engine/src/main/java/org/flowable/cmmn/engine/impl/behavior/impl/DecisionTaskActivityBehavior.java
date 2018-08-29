@@ -12,6 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +33,6 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import liquibase.util.StringUtils;
 
@@ -105,7 +105,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
                 Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(throwErrorFieldValue);
                 Object expressionValue = expression.getValue(planItemInstanceEntity);
                 
-                if (expressionValue != null && expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
+                if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
                     throw new FlowableException("DMN decision table with key " + externalRef + " did not hit any rules for the provided input.");
                 }
             }

@@ -21,11 +21,13 @@ import org.flowable.common.engine.impl.calendar.AdvancedCycleBusinessCalendar;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
 
     private static final Clock testingClock = new DefaultClockImpl();
 
+    @Test
     public void testDaylightSavingFallIso() throws Exception {
         AdvancedCycleBusinessCalendar businessCalendar = new AdvancedCycleBusinessCalendar(testingClock);
 
@@ -34,6 +36,7 @@ public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
         assertEquals(parseCalendar("20131104-05:00:00", TimeZone.getTimeZone("UTC")).getTime(), businessCalendar.resolveDuedate("R2/2013-11-03T00:00:00-04:00/P1D DSTZONE:US/Eastern"));
     }
 
+    @Test
     public void testDaylightSavingSpringIso() throws Exception {
         AdvancedCycleBusinessCalendar businessCalendar = new AdvancedCycleBusinessCalendar(testingClock);
 
@@ -42,6 +45,7 @@ public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
         assertEquals(parseCalendar("20140310-04:00:00", TimeZone.getTimeZone("UTC")).getTime(), businessCalendar.resolveDuedate("R2/2014-03-09T00:00:00-05:00/P1D DSTZONE:US/Eastern"));
     }
 
+    @Test
     public void testIsoString() throws Exception {
         AdvancedCycleBusinessCalendar businessCalendar = new AdvancedCycleBusinessCalendar(testingClock);
 
@@ -50,6 +54,7 @@ public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
         assertEquals(parseCalendar("20140311-04:00:00", TimeZone.getTimeZone("UTC")).getTime(), businessCalendar.resolveDuedate("R2/2014-03-10T04:00:00/P1D DSTZONE:US/Eastern"));
     }
 
+    @Test
     public void testLegacyIsoString() throws Exception {
         AdvancedCycleBusinessCalendar businessCalendar = new AdvancedCycleBusinessCalendar(testingClock);
 
@@ -58,6 +63,7 @@ public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
         assertEquals(parseCalendar("20140311-00:00:00", TimeZone.getDefault()).getTime(), businessCalendar.resolveDuedate("R2/2014-03-10T00:00:00/P1D"));
     }
 
+    @Test
     public void testDaylightSavingFallCron() throws Exception {
         AdvancedCycleBusinessCalendar businessCalendar = new AdvancedCycleBusinessCalendar(testingClock);
 
@@ -66,6 +72,7 @@ public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
         assertEquals(parseCalendar("20131103-17:00:00", TimeZone.getTimeZone("UTC")).getTime(), businessCalendar.resolveDuedate("0 0 12 1/1 * ? * DSTZONE:US/Eastern"));
     }
 
+    @Test
     public void testDaylightSavingSpringCron() throws Exception {
         AdvancedCycleBusinessCalendar businessCalendar = new AdvancedCycleBusinessCalendar(testingClock);
 
@@ -74,6 +81,7 @@ public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
         assertEquals(parseCalendar("20140309-16:00:00", TimeZone.getTimeZone("UTC")).getTime(), businessCalendar.resolveDuedate("0 0 12 1/1 * ? * DSTZONE:US/Eastern"));
     }
 
+    @Test
     public void testCronString() throws Exception {
         AdvancedCycleBusinessCalendar businessCalendar = new AdvancedCycleBusinessCalendar(testingClock);
 
@@ -82,6 +90,7 @@ public class AdvancedCycleBusinessCalendarTest extends AbstractTestCase {
         assertEquals(parseCalendar("20140310-16:00:00", TimeZone.getTimeZone("UTC")).getTime(), businessCalendar.resolveDuedate("0 0 12 1/1 * ? * DSTZONE:US/Eastern"));
     }
 
+    @Test
     public void testLegacyCronString() throws Exception {
         AdvancedCycleBusinessCalendar businessCalendar = new AdvancedCycleBusinessCalendar(testingClock);
 

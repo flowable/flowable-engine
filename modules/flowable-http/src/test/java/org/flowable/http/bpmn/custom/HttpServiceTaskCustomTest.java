@@ -14,12 +14,14 @@ package org.flowable.http.bpmn.custom;
 
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskCustomTest extends HttpServiceTaskTestCase {
 
+    @Test
     @Deployment
     public void testCustomBehaviorImpl() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();

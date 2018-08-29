@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.idm.spring.authentication.SpringEncoder;
 import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractEngineAutoConfiguration;
@@ -95,7 +96,7 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
         @ConditionalOnBean(PasswordEncoder.class)
         @ConditionalOnMissingBean(name = "passwordEncoderIdmEngineConfigurationConfigurer")
         public EngineConfigurationConfigurer<SpringIdmEngineConfiguration> passwordEncoderIdmEngineConfigurationConfigurer(PasswordEncoder passwordEncoder) {
-            return idmEngineConfiguration -> idmEngineConfiguration.setPasswordEncoder(new SpringPasswordEncoder(passwordEncoder));
+            return idmEngineConfiguration -> idmEngineConfiguration.setPasswordEncoder(new SpringEncoder(passwordEncoder));
         }
 
     }

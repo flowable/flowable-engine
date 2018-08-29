@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 import org.flowable.engine.delegate.event.impl.FlowableProcessTerminatedEventImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**

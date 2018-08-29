@@ -17,12 +17,14 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
 
     /**
      * Test for https://activiti.atlassian.net/browse/ACT-4035.
      */
+    @Test
     @Deployment
     public void testExclusiveJobs() {
 

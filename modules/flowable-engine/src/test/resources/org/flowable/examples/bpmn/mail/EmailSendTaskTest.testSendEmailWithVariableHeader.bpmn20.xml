@@ -1,0 +1,35 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="sendMailWithVariableHeaderExample" >
+
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="sendMail" />
+    
+    <sendTask id="sendMail" flowable:type="mail">
+      <extensionElements>
+        <flowable:field name="headers" expression="${headers}" />
+        <flowable:field name="from" expression="${sender}" />
+        <flowable:field name="to" expression="${recipient}" />
+        <flowable:field name="html">
+          <flowable:expression>
+            <![CDATA[
+              <html>
+                <body>
+                  Hi flowable.
+                </body>
+              </html>
+            ]]>
+          </flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </sendTask>
+    <sequenceFlow sourceRef="sendMail" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

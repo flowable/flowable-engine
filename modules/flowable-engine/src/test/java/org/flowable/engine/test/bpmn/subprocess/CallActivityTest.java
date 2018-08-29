@@ -32,6 +32,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class CallActivityTest extends ResourceFlowableTestCase {
 
@@ -50,6 +52,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/parsing/encoding.flowable.cfg.xml");
     }
 
+    @Test
     public void testInstantiateProcessByMessage() throws Exception {
         BpmnModel messageTriggeredBpmnModel = loadBPMNModel(MESSAGE_TRIGGERED_PROCESS_RESOURCE);
 
@@ -60,6 +63,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertNotNull(childProcessInstance);
     }
 
+    @Test
     public void testInstantiateSuspendedProcessByMessage() throws Exception {
         BpmnModel messageTriggeredBpmnModel = loadBPMNModel(MESSAGE_TRIGGERED_PROCESS_RESOURCE);
 
@@ -77,6 +81,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
     }
 
+    @Test
     public void testInstantiateChildProcess() throws Exception {
         BpmnModel childBpmnModel = loadBPMNModel(CHILD_PROCESS_RESOURCE);
 
@@ -86,6 +91,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertNotNull(childProcessInstance);
     }
 
+    @Test
     public void testInstantiateSuspendedChildProcess() throws Exception {
         BpmnModel childBpmnModel = loadBPMNModel(CHILD_PROCESS_RESOURCE);
 
@@ -102,6 +108,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
     }
 
+    @Test
     public void testInstantiateSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(CHILD_PROCESS_RESOURCE);
@@ -121,6 +128,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
     }
 
+    @Test
     public void testInheritVariablesSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(INHERIT_VARIABLES_CHILD_PROCESS_RESOURCE);
@@ -158,6 +166,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Test
     public void testNotInheritVariablesSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(NOT_INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(INHERIT_VARIABLES_CHILD_PROCESS_RESOURCE);
@@ -193,6 +202,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals(0, variableInstances.size());
     }
 
+    @Test
     public void testSameDeploymentSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
@@ -220,6 +230,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the child process within the same deployment", "User Task", task.getName());
     }
     
+    @Test
     public void testSameDeploymentSubprocessWithTenant() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
@@ -249,6 +260,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the child process within the same deployment", "User Task", task.getName());
     }
 
+    @Test
     public void testNotSameDeploymentSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(NOT_SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
@@ -276,6 +288,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the newest child process deployment", "User Task V2", task.getName());
     }
     
+    @Test
     public void testNotSameDeploymentSubprocessWithTenant() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(NOT_SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
@@ -305,6 +318,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the newest child process deployment", "User Task V2", task.getName());
     }
 
+    @Test
     public void testSameDeploymentSubprocessNotInSameDeployment() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
@@ -337,6 +351,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
                 "is no deployed child process in the same deployment", "User Task V2", task.getName());
     }
     
+    @Test
     public void testSameDeploymentSubprocessNotInSameDeploymentWithTenant() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
@@ -380,12 +395,11 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         }
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
-        super.tearDown();
     }
 
     protected BpmnModel loadBPMNModel(String bpmnModelFilePath) throws Exception {

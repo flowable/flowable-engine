@@ -239,6 +239,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "mailtaskheaderspackage",
+    "properties" : [ {
+      "id" : "mailtaskheaders",
+      "type" : "Text",
+      "title" : "Headers",
+      "value" : "",
+      "description" : "Line separated Mail headers (For example - X-Attribute: value).",
+      "popular" : true
+    } ]
+  }, {
     "name" : "mailtasktopackage",
     "properties" : [ {
       "id" : "mailtaskto",

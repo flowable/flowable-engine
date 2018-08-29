@@ -13,13 +13,16 @@
 package org.flowable.standalone.escapeclause;
 
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ProcessDefinitionQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
     private String deploymentOneId;
     private String deploymentTwoId;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         deploymentOneId = repositoryService
                 .createDeployment()
@@ -38,16 +41,15 @@ public class ProcessDefinitionQueryEscapeClauseTest extends AbstractEscapeClause
                 .deploy()
                 .getId();
 
-        super.setUp();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         repositoryService.deleteDeployment(deploymentOneId, true);
         repositoryService.deleteDeployment(deploymentTwoId, true);
     }
 
+    @Test
     public void testQueryByNameLike() {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike("%\\%%");
         assertEquals("One%", query.singleResult().getName());
@@ -60,6 +62,7 @@ public class ProcessDefinitionQueryEscapeClauseTest extends AbstractEscapeClause
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByCategoryLike() {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionCategoryLike("%\\_%");
         assertEquals("Examples_", query.singleResult().getCategory());
@@ -67,6 +70,7 @@ public class ProcessDefinitionQueryEscapeClauseTest extends AbstractEscapeClause
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByKeyLike() {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("%\\_%");
         assertEquals("two_", query.singleResult().getKey());
@@ -74,6 +78,7 @@ public class ProcessDefinitionQueryEscapeClauseTest extends AbstractEscapeClause
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByResourceNameLike() {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike("%\\%%");
         assertEquals("org/flowable/engine/test/repository/one%.bpmn20.xml", query.singleResult().getResourceName());
@@ -86,6 +91,7 @@ public class ProcessDefinitionQueryEscapeClauseTest extends AbstractEscapeClause
         assertEquals(1, query.count());
     }
 
+    @Test
     public void testQueryByTenantIdLike() {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionTenantIdLike("%\\%%");
         assertEquals("One%", query.singleResult().getTenantId());

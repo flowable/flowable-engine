@@ -22,20 +22,23 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Saeid Mirzaei
  */
-
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
 
     @Autowired
     protected CamelContext camelContext;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -50,6 +53,7 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
         });
     }
 
+    @Test
     @Deployment(resources = { "process/revisited/async-revisited.bpmn20.xml" })
     public void testRunProcess() throws Exception {
         NotifyBuilder oneExchangeSendToFlowableReceive1 = new NotifyBuilder(camelContext).from("seda:continueAsync1").whenExactlyCompleted(1).create();

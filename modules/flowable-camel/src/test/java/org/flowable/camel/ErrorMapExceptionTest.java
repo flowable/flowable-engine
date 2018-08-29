@@ -18,18 +18,22 @@ import org.apache.camel.builder.RouteBuilder;
 import org.flowable.camel.util.FlagJavaDelegate;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Saeid Mirzaei
  */
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class ErrorMapExceptionTest extends SpringFlowableTestCase {
 
     @Autowired
     protected CamelContext camelContext;
 
+    @Test
     @Deployment(resources = { "process/mapExceptionSingleMap.bpmn20.xml" })
     public void testCamelSingleDirectMap() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
@@ -45,6 +49,7 @@ public class ErrorMapExceptionTest extends SpringFlowableTestCase {
         assertTrue(FlagJavaDelegate.isFlagSet());
     }
 
+    @Test
     @Deployment(resources = { "process/mapExceptionDefaultMap.bpmn20.xml" })
     public void testCamelDefaultMap() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
@@ -59,6 +64,7 @@ public class ErrorMapExceptionTest extends SpringFlowableTestCase {
         assertTrue(FlagJavaDelegate.isFlagSet());
     }
 
+    @Test
     @Deployment(resources = { "process/mapExceptionParentMap.bpmn20.xml" })
     public void testCamelParentMap() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {

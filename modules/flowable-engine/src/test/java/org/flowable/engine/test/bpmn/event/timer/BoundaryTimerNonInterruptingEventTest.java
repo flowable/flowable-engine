@@ -25,12 +25,14 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testMultipleTimersOnUserTask() {
         // Set the clock fixed
@@ -95,6 +97,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testJoin() {
         // Set the clock fixed
@@ -134,6 +137,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testTimerOnConcurrentTasks() {
         String procId = runtimeService.startProcessInstanceByKey("nonInterruptingOnConcurrentTasks").getId();
@@ -157,6 +161,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
     }
 
     // Difference with previous test: now the join will be reached first
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.testTimerOnConcurrentTasks.bpmn20.xml" })
     public void testTimerOnConcurrentTasks2() {
         String procId = runtimeService.startProcessInstanceByKey("nonInterruptingOnConcurrentTasks").getId();
@@ -181,6 +186,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment
     public void testTimerWithCycle() throws Exception {
         String processInstanceId = runtimeService.startProcessInstanceByKey("nonInterruptingCycle").getId();
@@ -214,6 +220,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
     /*
      * see https://activiti.atlassian.net/browse/ACT-1173
      */
+    @Test
     @Deployment
     public void testTimerOnEmbeddedSubprocess() {
         String id = runtimeService.startProcessInstanceByKey("nonInterruptingTimerOnEmbeddedSubprocess").getId();
@@ -242,6 +249,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
     /*
      * see https://activiti.atlassian.net/browse/ACT-1106
      */
+    @Test
     @Deployment
     public void testReceiveTaskWithBoundaryTimer() {
         // Set the clock fixed
@@ -277,6 +285,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertProcessEnded(pi.getId());
     }
 
+    @Test
     @Deployment
     public void testTimerOnConcurrentSubprocess() {
         String procId = runtimeService.startProcessInstanceByKey("testTimerOnConcurrentSubprocess").getId();
@@ -305,6 +314,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertProcessEnded(procId);
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.testTimerOnConcurrentSubprocess.bpmn20.xml")
     public void testTimerOnConcurrentSubprocess2() {
         String procId = runtimeService.startProcessInstanceByKey("testTimerOnConcurrentSubprocess").getId();

@@ -20,6 +20,7 @@ import java.util.Map;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -31,6 +32,7 @@ public class RulesDeployerTest extends ResourceFlowableTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     @Deployment(resources = { "org/flowable/standalone/rules/rulesDeploymentTestProcess.bpmn20.xml", "org/flowable/standalone/rules/simpleRule1.drl" })
     public void testRulesDeployment() {
         Map<String, Object> variableMap = new HashMap<>();

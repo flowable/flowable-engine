@@ -17,16 +17,7 @@ import org.flowable.idm.api.PasswordSalt;
 
 public class SpringEncoder implements PasswordEncoder {
 
-    private org.springframework.security.authentication.encoding.PasswordEncoder encodingPasswordEncoder;
     private org.springframework.security.crypto.password.PasswordEncoder cryptoPasswordEncoder;
-
-    /**
-     * @deprecated use {@link SpringEncoder#SpringEncoder(org.springframework.security.crypto.password.PasswordEncoder)} instead
-     */
-    @Deprecated
-    public SpringEncoder(org.springframework.security.authentication.encoding.PasswordEncoder passwordEncoder) {
-        this.encodingPasswordEncoder = passwordEncoder;
-    }
 
     public SpringEncoder(org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.cryptoPasswordEncoder = passwordEncoder;
@@ -34,20 +25,15 @@ public class SpringEncoder implements PasswordEncoder {
 
     @Override
     public String encode(CharSequence rawPassword, PasswordSalt passwordSalt) {
-        if (null == encodingPasswordEncoder)
-            return cryptoPasswordEncoder.encode(rawPassword);
-        else return encodingPasswordEncoder.encodePassword(rawPassword.toString(), passwordSalt);
+        return cryptoPasswordEncoder.encode(rawPassword);
     }
 
     @Override
     public boolean isMatches(CharSequence rawPassword, String encodedPassword, PasswordSalt passwordSalt) {
-        if (null == encodingPasswordEncoder)
-            return cryptoPasswordEncoder.matches(rawPassword, encodedPassword);
-        else
-            return encodingPasswordEncoder.isPasswordValid(encodedPassword, rawPassword.toString(), passwordSalt);
+        return cryptoPasswordEncoder.matches(rawPassword, encodedPassword);
     }
 
     public Object getSpringEncodingProvider() {
-        return (null == encodingPasswordEncoder) ? cryptoPasswordEncoder : encodingPasswordEncoder;
+        return cryptoPasswordEncoder;
     }
 }

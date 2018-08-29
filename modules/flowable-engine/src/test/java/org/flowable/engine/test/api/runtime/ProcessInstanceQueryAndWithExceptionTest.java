@@ -21,6 +21,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableTestCase {
 
@@ -30,9 +33,8 @@ public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableT
 
     private org.flowable.engine.repository.Deployment deployment;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         deployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/JobErrorCheck.bpmn20.xml")
@@ -40,12 +42,12 @@ public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableT
                 .deploy();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         repositoryService.deleteDeployment(deployment.getId(), true);
-        super.tearDown();
     }
 
+    @Test
     public void testQueryWithException() throws InterruptedException {
         ProcessInstance processNoException = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_NO_EXCEPTION);
 

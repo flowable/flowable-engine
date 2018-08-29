@@ -19,6 +19,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -30,6 +31,7 @@ public class UseFlowableServiceInServiceTaskTest extends SpringFlowableTestCase 
     /**
      * This test will use the regular mechanism (delegateExecution.getProcessEngine().getRuntimeService()) to obtain the {@link RuntimeService} to start a new process.
      */
+    @Test
     @Deployment
     public void testUseRuntimeServiceNotInjectedInServiceTask() {
         runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
@@ -57,6 +59,7 @@ public class UseFlowableServiceInServiceTaskTest extends SpringFlowableTestCase 
     /**
      * This test will use the dependency injection of Spring to inject the runtime service in the Java delegate.
      */
+    @Test
     @Deployment
     public void testUseInjectedRuntimeServiceInServiceTask() {
         runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
@@ -81,6 +84,7 @@ public class UseFlowableServiceInServiceTaskTest extends SpringFlowableTestCase 
         assertTrue(oneTaskProcessFound);
     }
 
+    @Test
     @Deployment
     public void testRollBackOnException() {
         Exception expectedException = null;

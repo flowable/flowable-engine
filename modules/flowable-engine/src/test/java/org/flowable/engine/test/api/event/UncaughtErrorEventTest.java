@@ -16,6 +16,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for {@link FlowableEvent} thrown when a BPMNError is not caught in the process.
@@ -29,6 +32,7 @@ public class UncaughtErrorEventTest extends PluggableFlowableTestCase {
     /**
      * Test events related to error-events, thrown from within process-execution (eg. service-task).
      */
+    @Test
     @Deployment
     public void testUncaughtError() throws Exception {
         try {
@@ -39,17 +43,15 @@ public class UncaughtErrorEventTest extends PluggableFlowableTestCase {
         }
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
+    @BeforeEach
+    public void setUp() {
 
         listener = new TestFlowableEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @AfterEach
+    public void tearDown() throws Exception {
 
         if (listener != null) {
             listener.clearEventsReceived();

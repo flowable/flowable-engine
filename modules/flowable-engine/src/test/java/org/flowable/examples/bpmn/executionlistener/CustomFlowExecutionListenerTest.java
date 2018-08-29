@@ -19,6 +19,7 @@ import java.util.Map;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -29,6 +30,7 @@ public class CustomFlowExecutionListenerTest extends ResourceFlowableTestCase {
         super("org/flowable/examples/bpmn/executionlistener/custom.flow.parse.handler.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/CustomFlowExecutionListenerTest.bpmn20.xml" })
     public void testScriptExecutionListener() {
         Map<String, Object> variableMap = new HashMap<>();

@@ -35,6 +35,7 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 @Configuration
@@ -78,6 +79,7 @@ public class DatabaseConfiguration {
     public Liquibase liquibase(DataSource dataSource) {
         LOGGER.debug("Configuring Liquibase");
 
+        Liquibase liquibase = null;
         try {
 
             DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
@@ -85,17 +87,32 @@ public class DatabaseConfiguration {
             database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
 
-            Liquibase liquibase = new Liquibase("META-INF/liquibase/flowable-admin-app-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            liquibase = new Liquibase("META-INF/liquibase/flowable-admin-app-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
             liquibase.update("flowable");
             return liquibase;
 
         } catch (Exception e) {
             throw new InternalServerErrorException("Error creating liquibase database");
+        } finally {
+            closeDatabase(liquibase);
         }
     }
 
     @Bean(name = "minimalDataGenerator")
     public MinimalDataGenerator minimalDataGenerator() {
         return new MinimalDataGenerator();
+    }
+
+    private void closeDatabase(Liquibase liquibase) {
+        if (liquibase != null) {
+            Database database = liquibase.getDatabase();
+            if (database != null) {
+                try {
+                    database.close();
+                } catch (DatabaseException e) {
+                    LOGGER.warn("Error closing database", e);
+                }
+            }
+        }
     }
 }

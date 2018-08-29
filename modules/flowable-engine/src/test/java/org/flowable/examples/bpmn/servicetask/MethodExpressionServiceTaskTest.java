@@ -18,12 +18,14 @@ import java.util.Map;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Christian Stettler
  */
 public class MethodExpressionServiceTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testSetServiceResultToProcessVariables() {
         Map<String, Object> variables = new HashMap<>();
@@ -34,6 +36,7 @@ public class MethodExpressionServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("ok", runtimeService.getVariable(pi.getId(), "result"));
     }
 
+    @Test
     @Deployment
     public void testSetServiceResultToProcessVariablesWithSkipExpression() {
         Map<String, Object> variables = new HashMap<>();

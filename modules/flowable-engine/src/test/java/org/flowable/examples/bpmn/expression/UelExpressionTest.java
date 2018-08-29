@@ -17,12 +17,14 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class UelExpressionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testValueAndMethodExpression() {
         // An order of price 150 is a standard order (goes through an UEL value

@@ -25,9 +25,14 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class SimpleSpringProcessTest extends SpringFlowableTestCase {
 
@@ -38,7 +43,7 @@ public class SimpleSpringProcessTest extends SpringFlowableTestCase {
 
     protected MockEndpoint service2;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -60,7 +65,7 @@ public class SimpleSpringProcessTest extends SpringFlowableTestCase {
         service2.reset();
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
@@ -69,6 +74,7 @@ public class SimpleSpringProcessTest extends SpringFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "process/example.bpmn20.xml" })
     public void testRunProcess() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);
@@ -91,6 +97,7 @@ public class SimpleSpringProcessTest extends SpringFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "process/example.bpmn20.xml" })
     public void testRunProcessByKey() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);

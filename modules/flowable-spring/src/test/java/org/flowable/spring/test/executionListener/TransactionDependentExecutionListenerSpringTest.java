@@ -16,6 +16,7 @@ package org.flowable.spring.test.executionListener;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -28,6 +29,7 @@ public class TransactionDependentExecutionListenerSpringTest extends SpringFlowa
     @Autowired
     MyTransactionDependentExecutionListener listener;
 
+    @Test
     @Deployment
     public void testCustomPropertiesMapDelegateExpression() {
         runtimeService.startProcessInstanceByKey("transactionDependentExecutionListenerProcess");

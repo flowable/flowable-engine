@@ -25,9 +25,11 @@ import org.flowable.job.api.Job;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.jupiter.api.Test;
 
 public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
+    @Test
     @Deployment
     public void testRepeatWithEnd() throws Throwable {
 

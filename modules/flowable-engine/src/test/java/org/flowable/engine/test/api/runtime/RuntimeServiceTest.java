@@ -45,6 +45,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -52,6 +53,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
  */
 public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceWithVariables() {
         Map<String, Object> vars = new HashMap<>();
@@ -61,6 +63,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertNotNull(task.getProcessVariables());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceWithLongStringVariable() {
         Map<String, Object> vars = new HashMap<>();
@@ -75,6 +78,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals(longString.toString(), task.getProcessVariables().get("longString"));
     }
 
+    @Test
     public void testStartProcessInstanceByKeyNullKey() {
         try {
             runtimeService.startProcessInstanceByKey(null);
@@ -84,6 +88,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testStartProcessInstanceByKeyUnexistingKey() {
         try {
             runtimeService.startProcessInstanceByKey("unexistingkey");
@@ -94,6 +99,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testStartProcessInstanceByIdNullId() {
         try {
             runtimeService.startProcessInstanceById(null);
@@ -103,6 +109,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testStartProcessInstanceByIdUnexistingId() {
         try {
             runtimeService.startProcessInstanceById("unexistingId");
@@ -113,12 +120,14 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceByIdNullVariables() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess", (Map<String, Object>) null);
         assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceWithBusinessKey() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -147,6 +156,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals("value2", runtimeService.getVariable(processInstance.getId(), "var"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceByProcessInstanceBuilder() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -195,6 +205,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals("101124", processInstance.getBusinessKey());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceDefinitionInformation() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -210,6 +221,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals(processDefinition.getName(), processInstance.getProcessDefinitionName());
     }
 
+    @Test
     public void testStartProcessInstanceByProcessInstanceBuilderWithTenantId() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml").
@@ -231,6 +243,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testNonUniqueBusinessKey() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess", "123");
@@ -240,6 +253,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("123").count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceFormWithoutFormKey() {
         Map<String, Object> vars = new HashMap<>();
@@ -255,6 +269,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     // some databases might react strange on having multiple times null for the
     // business key
     // when the unique constraint is {processDefinitionId, businessKey}
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testMultipleNullBusinessKeys() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -266,6 +281,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals(3, runtimeService.createProcessInstanceQuery().count());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testDeleteProcessInstance() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -293,6 +309,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testDeleteProcessInstanceNullReason() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -311,6 +328,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeleteProcessInstanceUnexistingId() {
         try {
             runtimeService.deleteProcessInstance("enexistingInstanceId", null);
@@ -321,6 +339,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeleteProcessInstanceNullId() {
         try {
             runtimeService.deleteProcessInstance(null, "test null id delete");
@@ -330,6 +349,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testFindActiveActivityIds() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -339,6 +359,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals(1, activities.size());
     }
 
+    @Test
     public void testFindActiveActivityIdsUnexistingExecututionId() {
         try {
             runtimeService.getActiveActivityIds("unexistingExecutionId");
@@ -349,6 +370,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testFindActiveActivityIdsNullExecututionId() {
         try {
             runtimeService.getActiveActivityIds(null);
@@ -361,6 +383,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     /**
      * Testcase to reproduce ACT-950 (https://jira.codehaus.org/browse/ACT-950)
      */
+    @Test
     @Deployment
     public void testFindActiveActivityIdProcessWithErrorEventAndSubProcess() {
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("errorEventSubprocess");
@@ -438,6 +461,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     public void testSignalUnexistingExecututionId() {
         try {
             runtimeService.trigger("unexistingExecutionId");
@@ -448,6 +472,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testSignalNullExecutionId() {
         try {
             runtimeService.trigger(null);
@@ -457,6 +482,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testSignalWithProcessVariables() {
 
@@ -473,6 +499,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testGetVariablesUnexistingExecutionId() {
         try {
             runtimeService.getVariables("unexistingExecutionId");
@@ -483,6 +510,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testGetVariablesNullExecutionId() {
         try {
             runtimeService.getVariables(null);
@@ -492,6 +520,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testGetVariableUnexistingExecutionId() {
         try {
             runtimeService.getVariables("unexistingExecutionId");
@@ -502,6 +531,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testGetVariableNullExecutionId() {
         try {
             runtimeService.getVariables(null);
@@ -511,6 +541,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableUnexistingVariableName() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -518,6 +549,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertNull(variableValue);
     }
 
+    @Test
     public void testSetVariableUnexistingExecutionId() {
         try {
             runtimeService.setVariable("unexistingExecutionId", "variableName", "value");
@@ -528,6 +560,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testSetVariableNullExecutionId() {
         try {
             runtimeService.setVariable(null, "variableName", "variableValue");
@@ -537,6 +570,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetVariableNullVariableName() {
         try {
@@ -548,6 +582,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetVariables() {
         Map<String, Object> vars = new HashMap<>();
@@ -562,6 +597,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testSetVariablesUnexistingExecutionId() {
         try {
             runtimeService.setVariables("unexistingexecution", Collections.EMPTY_MAP);
@@ -573,6 +609,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testSetVariablesNullExecutionId() {
         try {
             runtimeService.setVariables(null, Collections.EMPTY_MAP);
@@ -606,6 +643,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testRemoveVariable() {
         Map<String, Object> vars = new HashMap<>();
@@ -624,6 +662,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneSubProcess.bpmn20.xml" })
     public void testRemoveVariableInParentScope() {
         Map<String, Object> vars = new HashMap<>();
@@ -641,6 +680,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
     }
 
+    @Test
     public void testRemoveVariableNullExecutionId() {
         try {
             runtimeService.removeVariable(null, "variable");
@@ -650,6 +690,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testRemoveVariableLocal() {
         Map<String, Object> vars = new HashMap<>();
@@ -666,6 +707,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneSubProcess.bpmn20.xml" })
     public void testRemoveVariableLocalWithParentScope() {
         Map<String, Object> vars = new HashMap<>();
@@ -692,6 +734,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         checkHistoricVariableUpdateEntity("localVariable", processInstance.getId());
     }
 
+    @Test
     public void testRemoveLocalVariableNullExecutionId() {
         try {
             runtimeService.removeVariableLocal(null, "variable");
@@ -701,6 +744,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testRemoveVariables() {
         Map<String, Object> vars = new HashMap<>();
@@ -724,6 +768,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         checkHistoricVariableUpdateEntity("variable2", processInstance.getId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneSubProcess.bpmn20.xml" })
     public void testRemoveVariablesWithParentScope() {
         Map<String, Object> vars = new HashMap<>();
@@ -755,6 +800,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testRemoveVariablesNullExecutionId() {
         try {
             runtimeService.removeVariables(null, Collections.EMPTY_LIST);
@@ -764,6 +810,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneSubProcess.bpmn20.xml" })
     public void testRemoveVariablesLocalWithParentScope() {
         Map<String, Object> vars = new HashMap<>();
@@ -810,6 +857,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testRemoveVariablesLocalNullExecutionId() {
         try {
             runtimeService.removeVariablesLocal(null, Collections.EMPTY_LIST);
@@ -819,6 +867,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/RuntimeServiceTest.catchAlertSignal.bpmn20.xml",
         "org/flowable/engine/test/api/runtime/RuntimeServiceTest.catchPanicSignal.bpmn20.xml" })
     public void testSignalEventReceived() {
@@ -851,6 +900,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/RuntimeServiceTest.catchAlertMessage.bpmn20.xml",
         "org/flowable/engine/test/api/runtime/RuntimeServiceTest.catchPanicMessage.bpmn20.xml" })
     public void testMessageEventReceived() {
@@ -876,6 +926,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     public void testSignalEventReceivedNonExistingExecution() {
         try {
             runtimeService.signalEventReceived("alert", "nonexistingExecution");
@@ -886,6 +937,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testMessageEventReceivedNonExistingExecution() {
         try {
             runtimeService.messageEventReceived("alert", "nonexistingExecution");
@@ -895,6 +947,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/RuntimeServiceTest.catchAlertSignal.bpmn20.xml" })
     public void testExecutionWaitingForDifferentSignal() {
         runtimeService.startProcessInstanceByKey("catchAlertSignal");
@@ -907,6 +960,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetProcessInstanceName() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -965,6 +1019,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableUnexistingVariableNameWithCast() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -972,6 +1027,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertNull(variableValue);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableExistingVariableNameWithCast() {
         Map<String, Object> params = new HashMap<>();
@@ -981,6 +1037,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertTrue(variableValue);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableExistingVariableNameWithInvalidCast() {
         Map<String, Object> params = new HashMap<>();
@@ -990,6 +1047,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             .isExactlyInstanceOf(ClassCastException.class);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableLocalUnexistingVariableNameWithCast() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -997,6 +1055,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertNull(variableValue);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableLocalExistingVariableNameWithCast() {
         Map<String, Object> params = new HashMap<>();
@@ -1006,6 +1065,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertTrue(variableValue);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableLocalExistingVariableNameWithInvalidCast() {
         Map<String, Object> params = new HashMap<>();
@@ -1016,6 +1076,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     }
 
     // Test for https://activiti.atlassian.net/browse/ACT-2186
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoricVariableRemovedWhenRuntimeVariableIsRemoved() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -1052,6 +1113,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartTimeProcessInstance() {
         Calendar calendar = new GregorianCalendar();
@@ -1070,6 +1132,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals(noon, processInstance.getStartTime());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testAuthenticatedStartUserProcessInstance() {
         final String authenticatedUser = "user1";
@@ -1079,6 +1142,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals(authenticatedUser, processInstance.getStartUserId());
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testNoAuthenticatedStartUserProcessInstance() {
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -1086,6 +1150,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertNull(processInstance.getStartUserId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     public void testAdhocCallbacks() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").

@@ -104,6 +104,26 @@
             <artifactId>junit</artifactId>
             <scope>provided</scope>
         </dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
 
     </dependencies>
 
@@ -175,6 +195,38 @@
 	</build>
 
 	<profiles>
+        <profile>
+            <id>errorLogging</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>error-logging</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating log4j configuration to error logging" />
+                                        <copy
+                                            file="${basedir}/../../qa/logging/log4j.properties"
+                                            todir="target/test-classes"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 		<profile>
 			<id>distro</id>
 			<build>
