@@ -19,7 +19,6 @@ matrix:
       - master
     if: TRAVIS_PULL_REQUEST != false
   allow_failures:
-  - jdk: openjdk11
   - jdk: openjdk-ea
   - name: "Flowable 5 tests"
 
