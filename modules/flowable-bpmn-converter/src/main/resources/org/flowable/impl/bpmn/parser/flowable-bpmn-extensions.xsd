@@ -200,8 +200,8 @@
       <documentation>
         Service Task attribute for specifying a fully qualified Java class
         name. The Java class must implement either
-        org.activiti.engine.delegate.JavaDelegate or
-        org.activiti.engine.impl.pvm.delegate.ActivityBehavior
+        org.flowable.engine.delegate.JavaDelegate or
+        org.flowable.engine.impl.delegate.ActivityBehavior
       </documentation>
     </annotation>
     <simpleType>
@@ -424,7 +424,7 @@
       <attribute name="class" type="string">
         <annotation>
           <documentation>
-            An implementation of the org.activiti.engine.impl.pvm.delegate.TaskListener interface
+            An implementation of the org.flowable.engine.delegate.TaskListener interface
             that will be called when the task event occurs.
           </documentation>
         </annotation>
@@ -477,7 +477,7 @@
       <attribute name="customPropertiesResolverClass" type="string">
         <annotation>
           <documentation>
-            An implementation of the org.activiti.engine.delegate.CustomPropertiesResolver interface
+            An implementation of the org.flowable.engine.delegate.CustomPropertiesResolver interface
             that will be called when the event occurs.
           </documentation>
         </annotation>
@@ -516,7 +516,7 @@
       <attribute name="class" type="string">
         <annotation>
           <documentation>
-            An implementation of the org.activiti.engine.impl.pvm.delegate.ExecutionListener interface
+            An implementation of the org.flowable.engine.delegate.ExecutionListener interface
             that will be called when the event occurs.
           </documentation>
         </annotation>
@@ -570,7 +570,7 @@
       <attribute name="customPropertiesResolverClass" type="string">
         <annotation>
           <documentation>
-            An implementation of the org.activiti.engine.delegate.CustomPropertiesResolver interface
+            An implementation of the org.flowable.engine.delegate.CustomPropertiesResolver interface
             that will be called when the event occurs.
           </documentation>
         </annotation>
