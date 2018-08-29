@@ -57,6 +57,8 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.el.VariableEqualsExpressionEnhancer;
 import org.flowable.cmmn.engine.impl.el.VariableEqualsFunctionDelegate;
+import org.flowable.cmmn.engine.impl.el.VariableNotEqualsExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableNotEqualsFunctionDelegate;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
@@ -777,6 +779,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             flowableFunctionDelegates = new ArrayList<>();
             
             flowableFunctionDelegates.add(new VariableEqualsFunctionDelegate());
+            flowableFunctionDelegates.add(new VariableNotEqualsFunctionDelegate());
         }
         
         if (customFlowableFunctionDelegates != null) {
@@ -789,6 +792,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             expressionEnhancers = new ArrayList<>();
             
             expressionEnhancers.add(new VariableEqualsExpressionEnhancer());
+            expressionEnhancers.add(new VariableNotEqualsExpressionEnhancer());
         }
         
         if (customExpressionEnhancers != null) {

@@ -16,20 +16,32 @@ import java.util.Objects;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
+import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
+ * A class containing the static functions that can be used in an {@link Expression}.
+ * 
+ * To register a custom function:
+ * 
+ * - Create the appropriate {@link FlowableFunctionDelegate} and register it with the {@link ExpressionManager}. 
+ *   The function delegate will link to this class thtrough reflection.
+ * - Create the appropriate {@link FlowableExpressionEnhancer} that enhances function shorthand to their real function call (if needed).  
+ * 
  * @author Joram Barrez
  */
-public class ElVariablesUtil {
+public class VariableExpressionFunctionsUtil {
     
-    public static boolean equals(PlanItemInstance planItemInstance, Object variable, Object variableValue) {
+    public static boolean equals(PlanItemInstance planItemInstance, String variableName, Object variableValue) {
         
-        if (variable == null) {
-            throw new FlowableIllegalArgumentException("Variable passed to equals function is null");
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("Variable name passed is null");
         }
         
-        Object actualValue = ((VariableScope) planItemInstance).getVariable((String) variable);
+        Object actualValue = ((VariableScope) planItemInstance).getVariable((String) variableName);
         
         if (variableValue != null && actualValue != null) {
             
@@ -68,6 +80,10 @@ public class ElVariablesUtil {
     
     protected static boolean defaultEquals(Object variableValue, Object actualValue) {
         return Objects.equals(actualValue, variableValue);
+    }
+    
+    public static boolean notEquals(PlanItemInstance planItemInstance, String variableName, Object variableValue) {
+        return !equals(planItemInstance, variableName, variableValue);
     }
 
 }

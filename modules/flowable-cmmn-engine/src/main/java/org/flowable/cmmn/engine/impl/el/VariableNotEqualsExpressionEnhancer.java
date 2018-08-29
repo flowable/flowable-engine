@@ -17,10 +17,10 @@ import java.util.Arrays;
 /**
  * @author Joram Barrez
  */
-public class VariableEqualsExpressionEnhancer extends AbstractVariableExpressionEnhancer {
+public class VariableNotEqualsExpressionEnhancer extends AbstractVariableExpressionEnhancer {
     
-    public VariableEqualsExpressionEnhancer() {
-        super(Arrays.asList("equals", "eq"), VariableEqualsFunctionDelegate.FUNCTION_NAME);
+    public VariableNotEqualsExpressionEnhancer() {
+        super(Arrays.asList("notEquals", "ne"), VariableNotEqualsFunctionDelegate.FUNCTION_NAME);
     }
     
 }

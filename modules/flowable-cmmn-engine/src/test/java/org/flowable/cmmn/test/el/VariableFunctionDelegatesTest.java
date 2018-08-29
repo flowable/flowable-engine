@@ -25,7 +25,7 @@ import org.junit.Test;
 /**
  * @author Joram Barrez
  */
-public class FunctionDelegatesTest extends FlowableCmmnTestCase {
+public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
@@ -57,6 +57,18 @@ public class FunctionDelegatesTest extends FlowableCmmnTestCase {
         
         // Setting the variable should satisfy the sentry of the second task
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", 123);
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("Guarded Task", tasks.get(0).getName());
+        assertEquals("The Task", tasks.get(1).getName());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableNotEquals() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testElFunction").start();
+        
+        // There should be two tasks active after start, 0as the variable is null and is not equal to the needed value
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
         assertEquals("Guarded Task", tasks.get(0).getName());

@@ -13,14 +13,19 @@
 package org.flowable.cmmn.engine.impl.el;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Joram Barrez
  */
-public class VariableEqualsExpressionEnhancer extends AbstractVariableExpressionEnhancer {
+public class AbstractVariableExpressionEnhancer extends AbstractFlowableFunctionExpressionEnhancer {
     
-    public VariableEqualsExpressionEnhancer() {
-        super(Arrays.asList("equals", "eq"), VariableEqualsFunctionDelegate.FUNCTION_NAME);
+    private static final List<String> FUNCTION_PREFIXES = Arrays.asList("variables", "vars", "var");
+    
+    private static final String FINAL_FUNCTION_PREFIX = "variables";
+    
+    public AbstractVariableExpressionEnhancer(List<String> functionNameOptions, String functionName) {
+        super(FUNCTION_PREFIXES, functionNameOptions, FINAL_FUNCTION_PREFIX, functionName);
     }
     
 }

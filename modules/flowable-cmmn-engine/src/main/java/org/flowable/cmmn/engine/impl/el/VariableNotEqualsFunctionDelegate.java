@@ -22,19 +22,19 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Joram Barrez
  */
-public class VariableEqualsFunctionDelegate implements FlowableFunctionDelegate {
+public class VariableNotEqualsFunctionDelegate implements FlowableFunctionDelegate {
+
+    public static String FUNCTION_NAME = "notEquals";
     
-    public static final String FUNCTION_NAME = "equals";
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(VariableEqualsFunctionDelegate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VariableNotEqualsFunctionDelegate.class);
     
     private static Method METHOD;
     
     static {
         try {
-            METHOD = VariableExpressionFunctionsUtil.class.getDeclaredMethod("equals", PlanItemInstance.class, String.class, Object.class);
+            METHOD = VariableExpressionFunctionsUtil.class.getDeclaredMethod("notEquals", PlanItemInstance.class, String.class, Object.class);
         } catch (Exception e) {
-            LOGGER.error("Cannot find correct equals method on " + VariableExpressionFunctionsUtil.class, e);
+            LOGGER.error("Cannot find correct notEquals method on " + VariableExpressionFunctionsUtil.class, e);
         }
     }
 
