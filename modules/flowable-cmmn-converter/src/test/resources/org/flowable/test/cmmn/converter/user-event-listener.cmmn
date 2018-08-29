@@ -9,16 +9,17 @@
             <planItem id="planItemB" name="B" definitionRef="taskB">
                 <entryCriterion id="entryTaskB" sentryRef="sentryOnUserEventListener"/>
             </planItem>
-
-            <humanTask id="taskA" name="A"/>
-            <userEventListener id="userActionListener" name="myUserEventListener" authorizedRoleRefs="aRole">
-                <documentation>UserEventListener documentation</documentation>
-            </userEventListener>
+            
             <sentry id="sentryOnUserEventListener">
                 <planItemOnPart id="sentryOnUserEvent" sourceRef="userEventListener">
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>
             </sentry>
+
+            <humanTask id="taskA" name="A"/>
+            <userEventListener id="userActionListener" name="myUserEventListener">
+                <documentation>UserEventListener documentation</documentation>
+            </userEventListener>
             <humanTask id="taskB" name="B"/>
         </casePlanModel>
     </case>

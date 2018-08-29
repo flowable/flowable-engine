@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.PlanItem;
@@ -107,6 +108,13 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         fieldExtension = taskB.getFieldExtensions().get(3);
         assertEquals("fieldD", fieldExtension.getFieldName());
         assertEquals("test", fieldExtension.getExpression());
+        
+        assertEquals(1, taskB.getExtensionElements().size());
+        List<ExtensionElement> extensionElements = taskB.getExtensionElements().get("taskTest");
+        assertEquals(1, extensionElements.size());
+        ExtensionElement extensionElement = extensionElements.get(0);
+        assertEquals("taskTest", extensionElement.getName());
+        assertEquals("hello", extensionElement.getElementText());
     }
 
 }
