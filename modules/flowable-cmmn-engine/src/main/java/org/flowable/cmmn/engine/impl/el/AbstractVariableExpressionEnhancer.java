@@ -24,8 +24,8 @@ public class AbstractVariableExpressionEnhancer extends AbstractFlowableFunction
     
     private static final String FINAL_FUNCTION_PREFIX = "variables";
     
-    public AbstractVariableExpressionEnhancer(List<String> functionNameOptions, String functionName) {
-        super(FUNCTION_PREFIXES, functionNameOptions, FINAL_FUNCTION_PREFIX, functionName);
+    public AbstractVariableExpressionEnhancer(List<String> functionNameOptions, String functionName, boolean multiParameterFunction) {
+        super(FUNCTION_PREFIXES, functionNameOptions, FINAL_FUNCTION_PREFIX, functionName, multiParameterFunction);
     }
     
 }

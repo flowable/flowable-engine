@@ -82,5 +82,25 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         assertEquals("Guarded Task", tasks.get(0).getName());
         assertEquals("The Task", tasks.get(1).getName());
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableExists() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testElFunction").start();
+        
+        // Variable is not set, only one  task should be created
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Variable is set, two tasks should be created
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "someValue");
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Passing the variable on caseInstance start should immediately create two tasks
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testElFunction")
+                .variable("myVar", "Hello World")
+                .start();
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
 
 }

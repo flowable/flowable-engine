@@ -28,10 +28,19 @@ public abstract class AbstractFlowableFunctionExpressionEnhancer implements Flow
     
     protected String replacePattern;
     
+    /**
+     * @param functionPrefixOptions The list of function prefixes, e.g. variables, vars, var
+     * @param functionNameOptions The list of function names, e.g. equals, eq
+     * @param finalFunctionPrefix The prefix to which all the others will be enhanced to
+     * @param finalFunctionName The function name to  which all the others will be enhanced to
+     * @param multiParameterFunction Indicates if the function has multiple (more than one) parameter
+     */
     public AbstractFlowableFunctionExpressionEnhancer(List<String> functionPrefixOptions, List<String> functionNameOptions, 
-                                                      String finalFunctionPrefix, String finalFunctionName) {
+                                                      String finalFunctionPrefix, String finalFunctionName,
+                                                      boolean multiParameterFunction) {
         
-        // Regex:
+        // Regex for expressions like ${variables:equals(myVar, 123)}  
+        //
         // - starts with function name (e.g. variables or vars or var), followed by :
         // - followed by the function name (e.g. equals or eq)
         // - followed by 0 or more whitespaces
@@ -41,9 +50,16 @@ public abstract class AbstractFlowableFunctionExpressionEnhancer implements Flow
         // - word group
         // - Optionally followed by a single our double quote
         // - followed by 0 or more whitespaces
-        this.pattern = Pattern.compile(buildOrWordGroup(functionPrefixOptions) + ":" + buildOrWordGroup(functionNameOptions) + "\\s*\\(\\s*'?\"?(.*?)'?\"?\\s*,");
+        // - followed by a comma or a closing parenthese
+        this.pattern = Pattern.compile(buildOrWordGroup(functionPrefixOptions) + ":" 
+                + buildOrWordGroup(functionNameOptions) 
+                + "\\s*\\(\\s*'?\"?(.*?)'?\"?\\s*"
+                + (multiParameterFunction ? "," : "\\)"));
         
-        this.replacePattern = finalFunctionPrefix + ":" + finalFunctionName + "(planItemInstance,'$3',"; // 3th word group: prefix and function name are two first groups
+        this.replacePattern = finalFunctionPrefix + ":" 
+                + finalFunctionName 
+                + "(planItemInstance,'$3'" // 3th word group: prefix and function name are two first groups
+                + (multiParameterFunction ? "," : ")");
         
     }
     

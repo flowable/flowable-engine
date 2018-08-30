@@ -20,7 +20,7 @@ import java.util.Arrays;
 public class VariableNotEqualsExpressionEnhancer extends AbstractVariableExpressionEnhancer {
     
     public VariableNotEqualsExpressionEnhancer() {
-        super(Arrays.asList("notEquals", "ne"), VariableNotEqualsFunctionDelegate.FUNCTION_NAME);
+        super(Arrays.asList("notEquals", "ne"), VariableNotEqualsFunctionDelegate.FUNCTION_NAME, true);
     }
     
 }

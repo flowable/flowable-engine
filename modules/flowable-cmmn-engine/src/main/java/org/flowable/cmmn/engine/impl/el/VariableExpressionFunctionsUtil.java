@@ -35,6 +35,10 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableExpressionFunctionsUtil {
     
+    /**
+     * Compares the value of a variable (fetched using the variableName through the {@link PlanItemInstance})
+     * with a value on equality. If the variable value is null, false is returned (unless compared to null). 
+     */
     public static boolean equals(PlanItemInstance planItemInstance, String variableName, Object variableValue) {
         
         Object actualValue = getVariableValue(planItemInstance, variableName);
@@ -69,21 +73,14 @@ public class VariableExpressionFunctionsUtil {
         return defaultEquals(variableValue, actualValue);
     }
 
-    protected static Object getVariableValue(PlanItemInstance planItemInstance, String variableName) {
-        if (variableName == null) {
-            throw new FlowableIllegalArgumentException("Variable name passed is null");
-        }
-        return ((VariableScope) planItemInstance).getVariable((String) variableName);
-    }
-
-    protected static boolean valuesAreNumbers(Object variableValue, Object actualValue) {
-        return actualValue instanceof Number && variableValue instanceof Number;
-    }
-    
     protected static boolean defaultEquals(Object variableValue, Object actualValue) {
         return Objects.equals(actualValue, variableValue);
     }
     
+    /**
+     * Compares the value of a variable (fetched using the variableName through the {@link PlanItemInstance})
+     * with a value on inequality. If the variable value is null, false is returned (unless compared to null). 
+     */
     public static boolean notEquals(PlanItemInstance planItemInstance, String variableName, Object variableValue) {
         
         // Special handling for null: when the variable is null, false is returned.
@@ -96,6 +93,24 @@ public class VariableExpressionFunctionsUtil {
         }
         
         return false;
+    }
+    
+    /**
+     * Returns whether or not a variable with the given name exists when fetched through the provided {@link PlanItemInstance}.
+     */
+    public static boolean exists(PlanItemInstance planItemInstance, String variableName) {
+        return getVariableValue(planItemInstance, variableName) != null;
+    }
+    
+    protected static Object getVariableValue(PlanItemInstance planItemInstance, String variableName) {
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("Variable name passed is null");
+        }
+        return ((VariableScope) planItemInstance).getVariable((String) variableName);
+    }
+
+    protected static boolean valuesAreNumbers(Object variableValue, Object actualValue) {
+        return actualValue instanceof Number && variableValue instanceof Number;
     }
 
 }
