@@ -10,10 +10,10 @@ services:
             - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-rest-db:5432/flowable
             - SPRING_DATASOURCE_USERNAME=flowable
             - SPRING_DATASOURCE_PASSWORD=flowable
-            - FLOWABLE.REST.APP.ADMIN.USER-ID=rest-admin
-            - FLOWABLE.REST.APP.ADMIN.PASSWORD=test
-            - FLOWABLE.REST.APP.ADMIN.FIRST-NAME=Rest
-            - FLOWABLE.REST.APP.ADMIN.LAST-NAME=Admin
+            - FLOWABLE_REST_APP_ADMIN_USER-ID=rest-admin
+            - FLOWABLE_REST_APP_ADMIN_PASSWORD=test
+            - FLOWABLE_REST_APP_ADMIN_FIRST-NAME=Rest
+            - FLOWABLE_REST_APP_ADMIN_LAST-NAME=Admin
         ports:
             - 8080:8080
         entrypoint: ["./wait-for-something.sh", "flowable-rest-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
