@@ -37,12 +37,7 @@ public class VariableExpressionFunctionsUtil {
     
     public static boolean equals(PlanItemInstance planItemInstance, String variableName, Object variableValue) {
         
-        if (variableName == null) {
-            throw new FlowableIllegalArgumentException("Variable name passed is null");
-        }
-        
-        Object actualValue = ((VariableScope) planItemInstance).getVariable((String) variableName);
-        
+        Object actualValue = getVariableValue(planItemInstance, variableName);
         if (variableValue != null && actualValue != null) {
             
             // Numbers are not necessarily of the expected type due to coming from JUEL, 
@@ -74,6 +69,13 @@ public class VariableExpressionFunctionsUtil {
         return defaultEquals(variableValue, actualValue);
     }
 
+    protected static Object getVariableValue(PlanItemInstance planItemInstance, String variableName) {
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("Variable name passed is null");
+        }
+        return ((VariableScope) planItemInstance).getVariable((String) variableName);
+    }
+
     protected static boolean valuesAreNumbers(Object variableValue, Object actualValue) {
         return actualValue instanceof Number && variableValue instanceof Number;
     }
@@ -83,7 +85,17 @@ public class VariableExpressionFunctionsUtil {
     }
     
     public static boolean notEquals(PlanItemInstance planItemInstance, String variableName, Object variableValue) {
-        return !equals(planItemInstance, variableName, variableValue);
+        
+        // Special handling for null: when the variable is null, false is returned.
+        // This is similar to equals, where a null variable value will always return false 
+        // (it's effectively ignored) - unless it's compared to null itself)
+        
+        Object actualValue = getVariableValue(planItemInstance, variableName);
+        if (actualValue != null) {
+            return !equals(planItemInstance, variableName, variableValue);
+        }
+        
+        return false;
     }
 
 }

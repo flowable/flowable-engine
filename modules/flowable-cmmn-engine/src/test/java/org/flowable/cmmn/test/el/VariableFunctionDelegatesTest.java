@@ -68,7 +68,15 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
     public void testVariableNotEquals() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testElFunction").start();
         
-        // There should be two tasks active after start, 0as the variable is null and is not equal to the needed value
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("The Task", task.getName());
+        
+        // Setting the variable to 123 should NOT satisfy the sentry of the second task, as the notEquals is with 123
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", 123);
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Setting the variable to another value should satisfy the sentry
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", 1);
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
         assertEquals("Guarded Task", tasks.get(0).getName());
