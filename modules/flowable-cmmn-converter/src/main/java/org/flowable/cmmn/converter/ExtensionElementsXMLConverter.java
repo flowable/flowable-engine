@@ -34,7 +34,9 @@ import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.FlowableHttpRequestHandler;
 import org.flowable.cmmn.model.FlowableHttpResponseHandler;
 import org.flowable.cmmn.model.HttpServiceTask;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.TaskWithFieldExtensions;
 import org.slf4j.Logger;
@@ -77,6 +79,12 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                         
                     } else if (CmmnXmlConstants.ELEMENT_HTTP_RESPONSE_HANDLER.equals(xtr.getLocalName())) {
                         readHttpResponseHandler(xtr, conversionHelper);
+                        
+                    } else if (CmmnXmlConstants.ELEMENT_PROCESS_TASK_IN_PARAMETERS.equals(xtr.getLocalName())) {
+                        readIOParameter(xtr, true, conversionHelper);
+                        
+                    } else if (CmmnXmlConstants.ELEMENT_PROCESS_TASK_OUT_PARAMETERS.equals(xtr.getLocalName())) {
+                        readIOParameter(xtr, false, conversionHelper);
                         
                     } else {
                         ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
@@ -200,6 +208,33 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         setImplementation(xtr, responseHandler);
 
         ((HttpServiceTask) cmmnElement).setHttpResponseHandler(responseHandler);
+    }
+    
+    protected void readIOParameter(XMLStreamReader xtr, boolean isInParameter, ConversionHelper conversionHelper) {
+        if (!(conversionHelper.getCurrentCmmnElement() instanceof ProcessTask)) {
+            return;
+        }
+        
+        ProcessTask processTask = (ProcessTask) conversionHelper.getCurrentCmmnElement();
+        String source = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
+        String sourceExpression = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
+        String target = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
+        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && StringUtils.isNotEmpty(target)) {
+            IOParameter parameter = new IOParameter();
+            if (StringUtils.isNotEmpty(sourceExpression)) {
+                parameter.setSourceExpression(sourceExpression);
+            } else {
+                parameter.setSource(source);
+            }
+
+            parameter.setTarget(target);
+            
+            if (isInParameter) {
+                processTask.getInParameters().add(parameter);
+            } else {
+                processTask.getOutParameters().add(parameter);
+            }
+        }
     }
     
     protected void setImplementation(XMLStreamReader xtr, AbstractFlowableHttpHandler handler) {
