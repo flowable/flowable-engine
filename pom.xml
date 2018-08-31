@@ -864,7 +864,7 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>3.6.1</version>
+				<version>3.6.2</version>
 				<exclusions>
 					<exclusion>
 						<groupId>ch.qos.logback</groupId>
