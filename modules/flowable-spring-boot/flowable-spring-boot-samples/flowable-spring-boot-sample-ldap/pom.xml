@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot-samples</artifactId>
-        <version>6.3.2-6</version>
+        <version>6.3.2-7</version>
     </parent>
 
     <artifactId>flowable-spring-boot-sample-ldap</artifactId>
