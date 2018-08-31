@@ -14,6 +14,9 @@ package org.flowable.cmmn.test.el;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -101,6 +104,69 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
                 .variable("myVar", "Hello World")
                 .start();
         assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableComperatorFunctionsForInteger() {
+        
+        // 3 -> 2 tasks (LT 10 / LTE  10)
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testElFunctions").start();
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", 3);
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("LT 10", tasks.get(0).getName());
+        assertEquals("LTE 10", tasks.get(1).getName());
+        
+        // 10 -> 2 tasks (LTE 10 / GTE  10)
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testElFunctions").start();
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", 10);
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("GTE 10", tasks.get(0).getName());
+        assertEquals("LTE 10", tasks.get(1).getName());
+        
+        // 13 -> 2 tasks (GT 10 / GTE 10)
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testElFunctions").start();
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", 13);
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("GT 10", tasks.get(0).getName());
+        assertEquals("GTE 10", tasks.get(1).getName());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableComperatorFunctionsForDate() {
+        Instant now = Instant.now();
+        Date yesterday = new Date(now.minus(Duration.ofDays(1)).toEpochMilli());
+        Date tomorrow = new Date(now.plus(Duration.ofDays(1)).toEpochMilli());
+        
+        // Test 1 : date LT
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testElFunctions")
+                .variable("yesterday", yesterday)
+                .variable("tomorrow", tomorrow)
+                .start();
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        Date myVar = new Date(yesterday.getTime() - (60  * 60  * 1000)); // day before yesterday
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", myVar);
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("Yesterday", task.getName());
+        
+        // Test 2 : date GT
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testElFunctions")
+                .variable("yesterday", yesterday)
+                .variable("tomorrow", tomorrow)
+                .start();
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        myVar = new Date(tomorrow.getTime() + (60  * 60  * 1000)); // day after tomorrow
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", myVar);
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("Tomorrow", task.getName());
     }
 
 }

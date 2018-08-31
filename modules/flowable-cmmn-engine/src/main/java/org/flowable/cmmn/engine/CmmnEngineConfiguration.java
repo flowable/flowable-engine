@@ -59,6 +59,14 @@ import org.flowable.cmmn.engine.impl.el.VariableEqualsExpressionEnhancer;
 import org.flowable.cmmn.engine.impl.el.VariableEqualsFunctionDelegate;
 import org.flowable.cmmn.engine.impl.el.VariableExistsExpressionEnhancer;
 import org.flowable.cmmn.engine.impl.el.VariableExistsFunctionDelegate;
+import org.flowable.cmmn.engine.impl.el.VariableGreaterThanExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableGreaterThanFunctionDelegate;
+import org.flowable.cmmn.engine.impl.el.VariableGreaterThanOrEqualsExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableGreaterThanOrEqualsFunctionDelegate;
+import org.flowable.cmmn.engine.impl.el.VariableLowerThanExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableLowerThanFunctionDelegate;
+import org.flowable.cmmn.engine.impl.el.VariableLowerThanOrEqualsExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableLowerThanOrEqualsFunctionDelegate;
 import org.flowable.cmmn.engine.impl.el.VariableNotEqualsExpressionEnhancer;
 import org.flowable.cmmn.engine.impl.el.VariableNotEqualsFunctionDelegate;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
@@ -783,6 +791,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             flowableFunctionDelegates.add(new VariableEqualsFunctionDelegate());
             flowableFunctionDelegates.add(new VariableNotEqualsFunctionDelegate());
             flowableFunctionDelegates.add(new VariableExistsFunctionDelegate());
+            flowableFunctionDelegates.add(new VariableLowerThanFunctionDelegate());
+            flowableFunctionDelegates.add(new VariableLowerThanOrEqualsFunctionDelegate());
+            flowableFunctionDelegates.add(new VariableGreaterThanFunctionDelegate());
+            flowableFunctionDelegates.add(new VariableGreaterThanOrEqualsFunctionDelegate());
         }
         
         if (customFlowableFunctionDelegates != null) {
@@ -797,6 +809,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             expressionEnhancers.add(new VariableEqualsExpressionEnhancer());
             expressionEnhancers.add(new VariableNotEqualsExpressionEnhancer());
             expressionEnhancers.add(new VariableExistsExpressionEnhancer());
+            expressionEnhancers.add(new VariableLowerThanExpressionEnhancer());
+            expressionEnhancers.add(new VariableLowerThanOrEqualsExpressionEnhancer());
+            expressionEnhancers.add(new VariableGreaterThanExpressionEnhancer());
+            expressionEnhancers.add(new VariableGreaterThanOrEqualsExpressionEnhancer());
         }
         
         if (customExpressionEnhancers != null) {

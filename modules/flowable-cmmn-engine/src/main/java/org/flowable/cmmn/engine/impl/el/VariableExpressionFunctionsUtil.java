@@ -35,34 +35,36 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class VariableExpressionFunctionsUtil {
     
+    private static enum OPERATOR { LT, LTE, GT, GTE, EQ };
+    
     /**
      * Compares the value of a variable (fetched using the variableName through the {@link PlanItemInstance})
      * with a value on equality. If the variable value is null, false is returned (unless compared to null). 
      */
-    public static boolean equals(PlanItemInstance planItemInstance, String variableName, Object variableValue) {
+    public static boolean equals(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
         
-        Object actualValue = getVariableValue(planItemInstance, variableName);
-        if (variableValue != null && actualValue != null) {
+        Object variableValue = getVariableValue(planItemInstance, variableName);
+        if (comparedValue != null && variableValue != null) {
             
             // Numbers are not necessarily of the expected type due to coming from JUEL, 
             // (eg. variable can be an Integer but JUEL passes a Long). 
             // As such, a specific check for the supported Number variable types of Flowable is done.
             
-            if (valuesAreNumbers(variableValue, actualValue)) {
-                if (actualValue instanceof Long) {
-                    return ((Number) actualValue).longValue() == ((Number) variableValue).longValue();
+            if (valuesAreNumbers(comparedValue, variableValue)) {
+                if (variableValue instanceof Long) {
+                    return ((Number) variableValue).longValue() == ((Number) comparedValue).longValue();
 
-                } else if(actualValue instanceof Integer) {
-                    return ((Number) actualValue).intValue() == ((Number) variableValue).intValue();
+                } else if(variableValue instanceof Integer) {
+                    return ((Number) variableValue).intValue() == ((Number) comparedValue).intValue();
                     
-                } else if(actualValue instanceof Double) {
-                    return ((Number) actualValue).doubleValue() == ((Number) variableValue).doubleValue();
+                } else if(variableValue instanceof Double) {
+                    return ((Number) variableValue).doubleValue() == ((Number) comparedValue).doubleValue();
                     
-                } else if(actualValue instanceof Float) {
-                    return ((Number) actualValue).floatValue() == ((Number) variableValue).floatValue();
+                } else if(variableValue instanceof Float) {
+                    return ((Number) variableValue).floatValue() == ((Number) comparedValue).floatValue();
                     
-                } else if(actualValue instanceof Short) {
-                    return ((Number) actualValue).shortValue() == ((Number) variableValue).shortValue();
+                } else if(variableValue instanceof Short) {
+                    return ((Number) variableValue).shortValue() == ((Number) comparedValue).shortValue();
                     
                 } // Other subtypes possible (e.g. BigDecimal, AtomicInteger, etc.), will fall back to default comparison
                 
@@ -70,7 +72,7 @@ public class VariableExpressionFunctionsUtil {
             
         }
         
-        return defaultEquals(variableValue, actualValue);
+        return defaultEquals(comparedValue, variableValue);
     }
 
     protected static boolean defaultEquals(Object variableValue, Object actualValue) {
@@ -100,6 +102,122 @@ public class VariableExpressionFunctionsUtil {
      */
     public static boolean exists(PlanItemInstance planItemInstance, String variableName) {
         return getVariableValue(planItemInstance, variableName) != null;
+    }
+    
+    public static boolean lowerThan(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
+        return compareVariableValue(planItemInstance, variableName, comparedValue, OPERATOR.LT);
+    }
+    
+    public static boolean lowerThanOrEquals(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
+        return compareVariableValue(planItemInstance, variableName, comparedValue, OPERATOR.LTE);
+    }
+    
+    public static boolean greaterThan(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
+        return compareVariableValue(planItemInstance, variableName, comparedValue, OPERATOR.GT);
+    }
+    
+    public static boolean greaterThanOrEquals(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
+        return compareVariableValue(planItemInstance, variableName, comparedValue, OPERATOR.GTE);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected static boolean compareVariableValue(PlanItemInstance planItemInstance, String variableName, Object comparedValue, OPERATOR operator) {
+        
+        Object variableValue = getVariableValue(planItemInstance, variableName);
+        if (comparedValue != null && variableValue != null) {
+
+            // See equals method for an explanation why Number instances are handled specifically
+            if (valuesAreNumbers(comparedValue, variableValue)) {
+                if (variableValue instanceof Long) {
+                    
+                    long longVariableValue = ((Number) variableValue).longValue();
+                    long longComparedValue =((Number) comparedValue).longValue();
+                    if (operator == OPERATOR.LT) {
+                        return longVariableValue < longComparedValue;                        
+                    } else if (operator == OPERATOR.LTE) {
+                        return longVariableValue <= longComparedValue;
+                    } else if (operator == OPERATOR.GT) {
+                        return longVariableValue > longComparedValue;
+                    } else if (operator == OPERATOR.GTE) {
+                        return longVariableValue >= longComparedValue;
+                    }
+
+                } else if(variableValue instanceof Integer) {
+                    
+                    int intVariableValue = ((Number) variableValue).intValue();
+                    int intComparedValue =((Number) comparedValue).intValue();
+                    if (operator == OPERATOR.LT) {
+                        return intVariableValue < intComparedValue;                        
+                    } else if (operator == OPERATOR.LTE) {
+                        return intVariableValue <= intComparedValue;
+                    } else if (operator == OPERATOR.GT) {
+                        return intVariableValue > intComparedValue;
+                    } else if (operator == OPERATOR.GTE) {
+                        return intVariableValue >= intComparedValue;
+                    }
+                    
+                } else if(variableValue instanceof Double) {
+                    
+                    double doubleVariableValue = ((Number) variableValue).doubleValue();
+                    double doubleComparedValue =((Number) comparedValue).doubleValue();
+                    if (operator == OPERATOR.LT) {
+                        return doubleVariableValue < doubleComparedValue;                        
+                    } else if (operator == OPERATOR.LTE) {
+                        return doubleVariableValue <= doubleComparedValue;
+                    } else if (operator == OPERATOR.GT) {
+                        return doubleVariableValue > doubleComparedValue;
+                    } else if (operator == OPERATOR.GTE) {
+                        return doubleVariableValue >= doubleComparedValue;
+                    }
+                    
+                } else if(variableValue instanceof Float) {
+                    
+                    float floatVariableValue = ((Number) variableValue).floatValue();
+                    float floatComparedValue =((Number) comparedValue).floatValue();
+                    if (operator == OPERATOR.LT) {
+                        return floatVariableValue < floatComparedValue;                        
+                    } else if (operator == OPERATOR.LTE) {
+                        return floatVariableValue <= floatComparedValue;
+                    } else if (operator == OPERATOR.GT) {
+                        return floatVariableValue > floatComparedValue;
+                    } else if (operator == OPERATOR.GTE) {
+                        return floatVariableValue >= floatComparedValue;
+                    }
+                    
+                } else if(variableValue instanceof Short) {
+                    
+                    short shortVariableValue = ((Number) variableValue).shortValue();
+                    short shortComparedValue =((Number) comparedValue).shortValue();
+                    if (operator == OPERATOR.LT) {
+                        return shortVariableValue < shortComparedValue;                        
+                    } else if (operator == OPERATOR.LTE) {
+                        return shortVariableValue <= shortComparedValue;
+                    } else if (operator == OPERATOR.GT) {
+                        return shortVariableValue > shortComparedValue;
+                    } else if (operator == OPERATOR.GTE) {
+                        return shortVariableValue >= shortComparedValue;
+                    }
+                    
+                } // Other subtypes possible (e.g. BigDecimal, AtomicInteger, etc.), will fall back to default comparison
+                
+            }
+            
+            if (variableValue instanceof Comparable && comparedValue instanceof Comparable) {
+                if (operator == OPERATOR.LT) {
+                    return ((Comparable) variableValue).compareTo((Comparable) comparedValue) < 0;                      
+                } else if (operator == OPERATOR.LTE) {
+                    return ((Comparable) variableValue).compareTo((Comparable) comparedValue) <= 0;
+                } else if (operator == OPERATOR.GT) {
+                    return ((Comparable) variableValue).compareTo((Comparable) comparedValue) > 0;
+                } else if (operator == OPERATOR.GTE) {
+                    return ((Comparable) variableValue).compareTo((Comparable) comparedValue) >= 0;
+                }
+            }
+            
+        }
+        
+        // if any of the values is null, return false;
+        return false;
     }
     
     protected static Object getVariableValue(PlanItemInstance planItemInstance, String variableName) {
