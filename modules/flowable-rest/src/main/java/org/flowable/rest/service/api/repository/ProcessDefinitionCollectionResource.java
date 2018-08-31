@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -157,6 +159,6 @@ public class ProcessDefinitionCollectionResource {
             restApiInterceptor.accessProcessDefinitionsWithQuery(processDefinitionQuery);
         }
 
-        return new ProcessDefinitionsPaginateList(restResponseFactory).paginateList(allRequestParams, processDefinitionQuery, "name", properties);
+        return paginateList(allRequestParams, processDefinitionQuery, "name", properties, restResponseFactory::createProcessDefinitionResponseList);
     }
 }

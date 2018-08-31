@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.planitem;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +123,7 @@ public class PlanItemInstanceBaseResource {
             restApiInterceptor.accessPlanItemInstanceInfoWithQuery(query);
         }
 
-        return new PlanItemInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "startTime", allowedSortProperties);
+        return paginateList(requestParams, queryRequest, query, "startTime", allowedSortProperties, restResponseFactory::createPlanItemInstanceResponseList);
     }
 
     protected void addVariables(PlanItemInstanceQuery planItemInstanceQuery, List<QueryVariable> variables, boolean isCase) {

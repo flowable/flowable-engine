@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -130,7 +132,7 @@ public class DmnDeploymentCollectionResource {
             restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
         }
 
-        return new DmnDeploymentsPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
+        return paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties, dmnRestResponseFactory::createDmnDeploymentResponseList);
     }
 
     @ApiOperation(value = "Create a new decision table deployment", nickname = "uploadDecistionTableDeployment", tags = {
