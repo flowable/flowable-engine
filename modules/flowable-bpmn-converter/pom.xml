@@ -139,6 +139,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.flowable</groupId>
+      <artifactId>flowable-engine-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>

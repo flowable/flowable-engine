@@ -59,7 +59,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_ENTRY_CRITERION = "entryCriterion";
     String ELEMENT_EXIT_CRITERION = "exitCriterion";
     String ELEMENT_IF_PART = "ifPart";
-    String ELEMENT_EXTENSIONS = "extensionElements";
+    String ELEMENT_EXTENSION_ELEMENTS = "extensionElements";
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
 
@@ -96,7 +96,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_DECISION_REF_EXPRESSION = "decisionRefExpression";
     String ELEMENT_CONDITION = "condition";
 
-    String ELEMENT_PARAMETER_MAPPING = "extensionElements";
+    String ELEMENT_PARAMETER_MAPPING = "parameterMapping";
 
     String ELEMENT_PROCESS_TASK_IN_PARAMETERS = "in";
     String ELEMENT_PROCESS_TASK_OUT_PARAMETERS = "out";

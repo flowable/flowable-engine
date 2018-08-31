@@ -720,9 +720,9 @@ This are the Modeler UI App specific properties.
 
 |flowable.modeler.app.deployment-api-url
 |deployment.api.url
-|http://localhost:8080/flowable-task/process-api
+|http://localhost:8080/flowable-task/app-api
 |The root URI to the REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine.
- Default url for the Flowable Task application is http://localhost:8080/flowable-task/process-api
+ Default url for the Flowable Task application is http://localhost:8080/flowable-task/app-api
 
 |flowable.modeler.app.rest-enabled
 |rest.modeler-app.enabled

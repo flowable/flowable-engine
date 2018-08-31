@@ -53,10 +53,14 @@
             <timerEventListener id="eventListenerOne" name="A completion neutral event listener"/>
             <stage id="stageOne" name="A completion neutral stage">
                 <planItem id="withoutCondition" name="Completion Neutral without condition" definitionRef="taskTwo">
+                    <extensionElements>
+                        <flowable:planItemTest>hello</flowable:planItemTest>
+                    </extensionElements>
                     <itemControl>
                         <extensionElements>
                             <flowable:completionNeutralRule/>
                         </extensionElements>
+                        <requiredRule/>
                     </itemControl>
                 </planItem>
                 <task id="taskTwo"/>
