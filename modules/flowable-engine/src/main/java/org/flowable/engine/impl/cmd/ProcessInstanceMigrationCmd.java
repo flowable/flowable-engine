@@ -54,8 +54,7 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
         return cmd;
     }
 
-    public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId,
-        ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
         Objects.requireNonNull(processDefinitionKey);
         Objects.requireNonNull(processDefinitionVersion);

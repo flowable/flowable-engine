@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 
 /**
@@ -26,16 +25,8 @@ import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
  */
 public interface DynamicStateManager {
 
-    ExecutionEntity resolveActiveExecution(String executionId, CommandContext commandContext);
-
-    ExecutionEntity resolveActiveExecution(String processInstanceId, String activityId, CommandContext commandContext);
-
-    List<ExecutionEntity> resolveActiveExecutions(String processInstanceId, String activityId, CommandContext commandContext);
-
     List<MoveExecutionEntityContainer> resolveMoveExecutionEntityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext);
 
     void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, CommandContext commandContext);
-
-    void migrateToProcessDefinition(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, String migrateToProcessDefinitionId, CommandContext commandContext);
 
 }

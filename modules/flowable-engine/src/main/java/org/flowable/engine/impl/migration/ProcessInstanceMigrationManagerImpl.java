@@ -14,12 +14,13 @@ package org.flowable.engine.impl.migration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
+import org.flowable.engine.impl.dynamic.AbstractDynamicStateManager;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -33,15 +34,11 @@ import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Dennis Federico
  */
-public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigrationManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessInstanceMigrationManagerImpl.class);
+public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateManager implements ProcessInstanceMigrationManager {
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String procDefKey, String procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
@@ -150,43 +147,7 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
 
     }
 
-    protected static ProcessDefinition resolveProcessDefinition(ProcessInstanceMigrationDocument document, CommandContext commandContext) {
-        if (document.getMigrateToProcessDefinitionId() != null) {
-            ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
-            return processDefinitionEntityManager.findById(document.getMigrateToProcessDefinitionId());
-        } else {
-            String nullableTenantId = document.getMigrateToProcessDefinitionTenantId();
-            return resolveProcessDefinition(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
-        }
-    }
-
-    protected static ProcessDefinition resolveProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId, CommandContext commandContext) {
-        ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
-        return processDefinitionEntityManager.findProcessDefinitionByKeyAndVersionAndTenantId(processDefinitionKey, Integer.valueOf(processDefinitionVersion), processDefinitionTenantId);
-    }
-
-    protected static ProcessInstanceMigrationValidationResult doValidateProcessInstanceMigration(String processInstanceId, String tenantId, BpmnModel bpmnModel, Map<String, String> activityMappings, CommandContext commandContext) {
-
-        ProcessInstanceMigrationValidationResult result = new ProcessInstanceMigrationValidationResult();
-
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-
-        //Check that the processInstance exists
-        ExecutionEntity processInstanceExecution = executionEntityManager.findById(processInstanceId);
-        if (processInstanceExecution == null) {
-            return result.addValidationMessage("Cannot find process instance with id:'" + processInstanceId + "'");
-        }
-
-        //Check processExecution and processDefinition tenant
-        if (!isSameTenant(processInstanceExecution.getTenantId(), tenantId)) {
-            return result.addValidationMessage("Tenant mismatch between Process Instance ('" + processInstanceExecution.getTenantId() + "') and Process Definition ('" + tenantId + "') to migrate to");
-        }
-
-        ProcessInstanceMigrationValidationResult mappingValidationResult = doValidateActivityMappings(processInstanceId, activityMappings, bpmnModel, commandContext);
-        return result.addValidationResult(mappingValidationResult);
-    }
-
-    protected static void doMigrateProcessInstance(String processInstanceId, ProcessDefinition procDefToMigrateTo, BpmnModel bpmnModel, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+    protected void doMigrateProcessInstance(String processInstanceId, ProcessDefinition procDefToMigrateTo, BpmnModel bpmnModel, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         LOGGER.debug("Start migration of process instance with Id:'" + processInstanceId + "' to " + printProcessDefinitionIdentifierMessage(document));
 
         //Check processExecution and processDefinition tenant
@@ -223,9 +184,8 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
         processExecution.setProcessDefinitionId(procDefToMigrateTo.getId());
 
         LOGGER.debug("Migrating activity executions");
-        DynamicStateManager dynamicStateManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicStateManager();
-        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = dynamicStateManager.resolveMoveExecutionEntityContainers(changeActivityStateBuilder, commandContext);
-        dynamicStateManager.migrateToProcessDefinition(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), procDefToMigrateTo.getId(), commandContext);
+        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, commandContext);
+        doMoveExecutionState(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), Optional.ofNullable(procDefToMigrateTo.getId()), commandContext);
 
         LOGGER.debug("Updating Process definition reference in history");
         changeProcessDefinitionReferenceOfHistory(commandContext, processExecution, procDefToMigrateTo);
@@ -241,6 +201,32 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
             return true;
         }
         return false;
+    }
+
+    protected static void changeProcessDefinitionReferenceOfHistory(CommandContext commandContext, ProcessInstance processInstance, ProcessDefinition processDefinition) {
+        HistoryManager historyManager = CommandContextUtil.getHistoryManager(commandContext);
+        historyManager.updateProcessDefinitionIdInHistory((ProcessDefinitionEntity) processDefinition, (ExecutionEntity) processInstance);
+    }
+
+    protected static ProcessInstanceMigrationValidationResult doValidateProcessInstanceMigration(String processInstanceId, String tenantId, BpmnModel bpmnModel, Map<String, String> activityMappings, CommandContext commandContext) {
+
+        ProcessInstanceMigrationValidationResult result = new ProcessInstanceMigrationValidationResult();
+
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+
+        //Check that the processInstance exists
+        ExecutionEntity processInstanceExecution = executionEntityManager.findById(processInstanceId);
+        if (processInstanceExecution == null) {
+            return result.addValidationMessage("Cannot find process instance with id:'" + processInstanceId + "'");
+        }
+
+        //Check processExecution and processDefinition tenant
+        if (!isSameTenant(processInstanceExecution.getTenantId(), tenantId)) {
+            return result.addValidationMessage("Tenant mismatch between Process Instance ('" + processInstanceExecution.getTenantId() + "') and Process Definition ('" + tenantId + "') to migrate to");
+        }
+
+        ProcessInstanceMigrationValidationResult mappingValidationResult = doValidateActivityMappings(processInstanceId, activityMappings, bpmnModel, commandContext);
+        return result.addValidationResult(mappingValidationResult);
     }
 
     protected static ProcessInstanceMigrationValidationResult doValidateActivityMappings(String processInstanceId, Map<String, String> activityMappings, BpmnModel bpmnModel, CommandContext commandContext) {
@@ -261,13 +247,23 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
         return result;
     }
 
-    protected static boolean isActivityIdInProcessDefinitionModel(String activityId, BpmnModel bpmnModel) {
-        return bpmnModel.getFlowElement(activityId) != null;
+    protected static ProcessDefinition resolveProcessDefinition(ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+        if (document.getMigrateToProcessDefinitionId() != null) {
+            ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
+            return processDefinitionEntityManager.findById(document.getMigrateToProcessDefinitionId());
+        } else {
+            String nullableTenantId = document.getMigrateToProcessDefinitionTenantId();
+            return resolveProcessDefinition(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId(), commandContext);
+        }
     }
 
-    protected static void changeProcessDefinitionReferenceOfHistory(CommandContext commandContext, ProcessInstance processInstance, ProcessDefinition processDefinition) {
-        HistoryManager historyManager = CommandContextUtil.getHistoryManager(commandContext);
-        historyManager.updateProcessDefinitionIdInHistory((ProcessDefinitionEntity) processDefinition, (ExecutionEntity) processInstance);
+    protected static ProcessDefinition resolveProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId, CommandContext commandContext) {
+        ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
+        return processDefinitionEntityManager.findProcessDefinitionByKeyAndVersionAndTenantId(processDefinitionKey, Integer.valueOf(processDefinitionVersion), processDefinitionTenantId);
+    }
+
+    protected static boolean isActivityIdInProcessDefinitionModel(String activityId, BpmnModel bpmnModel) {
+        return bpmnModel.getFlowElement(activityId) != null;
     }
 
     protected static String printProcessDefinitionIdentifierMessage(ProcessInstanceMigrationDocument document) {
