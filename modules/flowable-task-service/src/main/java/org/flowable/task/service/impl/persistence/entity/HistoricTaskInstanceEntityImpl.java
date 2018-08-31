@@ -498,5 +498,5 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
     public String toString() {
         return "HistoricTaskInstanceEntity[id=" + id + "]";
     }
-    
+
 }

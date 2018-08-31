@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +31,7 @@ public class MoveExecutionEntityContainer {
     protected List<String> moveToActivityIds;
     protected boolean moveToParentProcess;
     protected boolean moveToSubProcessInstance;
+    protected boolean directExecutionMigration;
     protected String callActivityId;
     protected CallActivity callActivity;
     protected ProcessDefinition subProcessDefinition;
@@ -47,9 +48,9 @@ public class MoveExecutionEntityContainer {
     }
 
     public List<ExecutionEntity> getExecutions() {
-        return executions;    
+        return executions;
     }
-    
+
     public List<String> getMoveToActivityIds() {
         return moveToActivityIds;
     }
@@ -61,13 +62,21 @@ public class MoveExecutionEntityContainer {
     public void setMoveToParentProcess(boolean moveToParentProcess) {
         this.moveToParentProcess = moveToParentProcess;
     }
-    
+
     public boolean isMoveToSubProcessInstance() {
         return moveToSubProcessInstance;
     }
 
     public void setMoveToSubProcessInstance(boolean moveToSubProcessInstance) {
         this.moveToSubProcessInstance = moveToSubProcessInstance;
+    }
+
+    public boolean isDirectExecutionMigration() {
+        return directExecutionMigration;
+    }
+
+    public void setDirectExecutionMigration(boolean directMigrateUserTask) {
+        this.directExecutionMigration = directMigrateUserTask;
     }
 
     public String getCallActivityId() {
@@ -113,23 +122,23 @@ public class MoveExecutionEntityContainer {
     public void addContinueParentExecution(String executionId, ExecutionEntity continueParentExecution) {
         continueParentExecutionMap.put(executionId, continueParentExecution);
     }
-    
+
     public ExecutionEntity getContinueParentExecution(String executionId) {
         return continueParentExecutionMap.get(executionId);
     }
-    
+
     public void addMoveToFlowElement(String activityId, FlowElement flowElement) {
         moveToFlowElementMap.put(activityId, flowElement);
     }
-    
+
     public FlowElement getMoveToFlowElement(String activityId) {
         return moveToFlowElementMap.get(activityId);
     }
-    
+
     public Collection<FlowElement> getMoveToFlowElements() {
         return moveToFlowElementMap.values();
     }
-    
+
     public void addSubProcessToCreate(String activityId, SubProcess subProcess) {
         List<SubProcess> subProcesses = null;
         if (subProcessesToCreateMap.containsKey(activityId)) {
@@ -137,19 +146,19 @@ public class MoveExecutionEntityContainer {
         } else {
             subProcesses = new ArrayList<>();
         }
-        
+
         subProcesses.add(0, subProcess);
         subProcessesToCreateMap.put(activityId, subProcesses);
     }
-    
+
     public Map<String, List<SubProcess>> getSubProcessesToCreateMap() {
         return subProcessesToCreateMap;
     }
-    
+
     public void addNewSubProcessChildExecution(String subProcessId, ExecutionEntity childExecution) {
         newSubProcessChildExecutionMap.put(subProcessId, childExecution);
     }
-    
+
     public ExecutionEntity getNewSubProcessChildExecution(String subProcessId) {
         return newSubProcessChildExecutionMap.get(subProcessId);
     }

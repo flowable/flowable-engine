@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,8 +38,10 @@ import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -52,8 +55,12 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -61,6 +68,9 @@ import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.TaskService;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +78,9 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  */
 public class DefaultDynamicStateManager implements DynamicStateManager {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDynamicStateManager.class);
-    
+
     @Override
     public ExecutionEntity resolveActiveExecution(String executionId, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
@@ -83,10 +93,10 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
             throw new FlowableException("Flowable 5 process definitions are not supported");
         }
-        
+
         return execution;
     }
-    
+
     @Override
     public ExecutionEntity resolveActiveExecution(String processInstanceId, String activityId, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
@@ -103,7 +113,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processExecution.getProcessDefinitionId())) {
             throw new FlowableException("Flowable 5 process definitions are not supported");
         }
-        
+
         return getActiveExecution(activityId, processExecution, commandContext);
     }
 
@@ -151,21 +161,8 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                     List<ExecutionEntity> activityExecutions = resolveActiveExecutions(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext);
                     if (!activityExecutions.isEmpty()) {
                         ExecutionEntity execution = activityExecutions.get(0);
-
-                        //Check if the activity is inside a multiInstance subProcess
-                        boolean insideMultiInstance = false;
-                        FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
-                        while (!(parentContainer instanceof Process)) {
-                            MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentContainer).getLoopCharacteristics();
-                            if (loopCharacteristics != null) {
-                                insideMultiInstance = true;
-                                break;
-                            }
-                            parentContainer = ((Activity) parentContainer).getParentContainer();
-                        }
-
                         //If inside a multiInstance, we create one container for each execution
-                        if (insideMultiInstance) {
+                        if (isExecutionInsideMultiInstance(execution)) {
                             //We group by the parentId (executions belonging to the same parent execution instance
                             // i.e. gateways nested in MultiInstance subprocesses, need to be in the same move container)
                             Stream<ExecutionEntity> executionEntitiesStream = activityExecutions.stream();
@@ -188,7 +185,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 //Create a move container for each execution group (executionList)
                 Stream.concat(activitiesExecutionsByMultiInstanceParentId.values().stream(), Stream.of(activitiesExecutionsNotInMultiInstanceParent))
                     .filter(executions -> executions != null && !executions.isEmpty())
-                    .forEach(executions -> moveExecutionEntityContainerList.add(createMoveExecutionContainer(activityContainer, executions)));
+                    .forEach(executions -> moveExecutionEntityContainerList.add(createMoveExecutionEntityContainer(activityContainer, executions)));
             }
         }
         return moveExecutionEntityContainerList;
@@ -201,119 +198,35 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
     }
 
     @Override
-    public void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, String overrideProcessDefinitionId, CommandContext commandContext) {
-        doMoveExecutionState(moveExecutionEntityContainerList, processVariables, localVariables, Optional.ofNullable(overrideProcessDefinitionId), commandContext);
+    public void migrateToProcessDefinition(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, String migrateToProcessDefinitionId, CommandContext commandContext) {
+        doMoveExecutionState(moveExecutionEntityContainerList, processVariables, localVariables, Optional.ofNullable(migrateToProcessDefinitionId), commandContext);
     }
 
-    protected void doMoveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables,
-        Map<String, Map<String, Object>> localVariables, Optional<String> overrideProcessDefinitionId, CommandContext commandContext) {
+    protected void doMoveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        
-        for (MoveExecutionEntityContainer moveExecutionContainer : moveExecutionEntityContainerList) {
-            
-            // Get FlowElement objects for every move to activity id
-            for (String activityId : moveExecutionContainer.getMoveToActivityIds()) {
-                BpmnModel bpmnModel = null;
-                if (moveExecutionContainer.isMoveToParentProcess()) {
-                    String parentProcessDefinitionId = moveExecutionContainer.getSuperExecution().getProcessDefinitionId();
-                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentProcessDefinitionId);
-                    
-                } else if (moveExecutionContainer.isMoveToSubProcessInstance()) {
-                    // Get first execution to get process definition id
-                    ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
-                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(firstExecution.getProcessDefinitionId());
-                    
-                    FlowElement callActivityElement = bpmnModel.getFlowElement(moveExecutionContainer.getCallActivityId());
-                    
-                    if (callActivityElement == null) {
-                        throw new FlowableException("Call activity could not be found in process definition for id " + activityId);
-                    }
-                    
-                    CallActivity callActivity = (CallActivity) callActivityElement;
-                    moveExecutionContainer.setCallActivity(callActivity);
-                    
-                    ProcessDefinition subProcessDefinition = null;
-                    if (callActivity.isSameDeployment()) {
-                        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(firstExecution.getProcessDefinitionId());
-                        ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
-                        if (firstExecution.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(firstExecution.getTenantId())) {
-                            subProcessDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(processDefinition.getDeploymentId(), callActivity.getCalledElement());
-                        } else {
-                            subProcessDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(processDefinition.getDeploymentId(), 
-                                            callActivity.getCalledElement(), firstExecution.getTenantId());
-                        }
-                    }
-                    
-                    if (subProcessDefinition == null) {
-                        if (firstExecution.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(firstExecution.getTenantId())) {
-                            subProcessDefinition = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager()
-                                            .findDeployedLatestProcessDefinitionByKey(callActivity.getCalledElement());
-                        } else {
-                            subProcessDefinition = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager()
-                                            .findDeployedLatestProcessDefinitionByKeyAndTenantId(callActivity.getCalledElement(), firstExecution.getTenantId());
-                        }
-                    }
-                    
-                    BpmnModel subProcessModel = ProcessDefinitionUtil.getBpmnModel(subProcessDefinition.getId());
-                    moveExecutionContainer.setSubProcessDefinition(subProcessDefinition);
-                    moveExecutionContainer.setSubProcessModel(subProcessModel);
-                    
-                    FlowElement newFlowElement = subProcessModel.getFlowElement(activityId);
-                    
-                    if (newFlowElement == null) {
-                        throw new FlowableException("Activity could not be found in sub process definition for id " + activityId);
-                    }
-                    
-                    moveExecutionContainer.addMoveToFlowElement(activityId, newFlowElement);
 
-                } else if (overrideProcessDefinitionId.isPresent()) {
-                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(overrideProcessDefinitionId.get());
-                } else {
-                    // Get first execution to get process definition id
-                    ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
-                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(firstExecution.getProcessDefinitionId());
-                }
-                
-                if (!moveExecutionContainer.isMoveToSubProcessInstance()) {
-                    FlowElement newFlowElement = bpmnModel.getFlowElement(activityId);
-                    
-                    if (newFlowElement == null) {
-                        throw new FlowableException("Activity could not be found in process definition for id " + activityId);
-                    }
-                    
-                    moveExecutionContainer.addMoveToFlowElement(activityId, newFlowElement);
-                }
+        for (MoveExecutionEntityContainer moveExecutionContainer : moveExecutionEntityContainerList) {
+            // Prepare/complete each moveExecutionEntityContainer to make the move for each target activity (get next flowElement, and other flags)
+            for (String activityId : moveExecutionContainer.getMoveToActivityIds()) {
+                prepareMoveExecutionEntityContainer(moveExecutionContainer, activityId, migrateToProcessDefinitionId, commandContext);
             }
-            
+
+            // Action the moves (changeState)
             if (moveExecutionContainer.isMoveToParentProcess()) {
-                ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
-                List<ExecutionEntity> subProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(firstExecution.getProcessInstanceId());
-                List<String> executionIds = new ArrayList<>();
-                for (ExecutionEntity execution : moveExecutionContainer.getExecutions()) {
-                    executionIds.add(execution.getId());
-                }
-                
-                for (ExecutionEntity subProcessExecution : subProcessExecutions) {
-                    if (!executionIds.contains(subProcessExecution.getId())) {
-                        throw new FlowableException("Execution of sub process instance is not moved " + subProcessExecution.getId());
-                    }
-                }
-                
-                // delete the sub process instance
-                executionEntityManager.deleteProcessInstance(firstExecution.getProcessInstanceId(), "Change activity to parent process activity ids: " + 
-                                printFlowElementIds(moveExecutionContainer.getMoveToFlowElements()), true);
+                String processInstanceId = moveExecutionContainer.getExecutions().get(0).getProcessInstanceId();
+                String deleteReason = "Change activity to parent process activity ids: " + printFlowElementIds(moveExecutionContainer.getMoveToFlowElements());
+                safeDeleteSubProcessInstance(processInstanceId, moveExecutionContainer.getExecutions(), deleteReason, commandContext);
             }
-                
-            List<ExecutionEntity> currentExecutions = null;
+
+            List<ExecutionEntity> currentExecutions;
             if (moveExecutionContainer.isMoveToParentProcess()) {
                 currentExecutions = Collections.singletonList(moveExecutionContainer.getSuperExecution());
-                
             } else {
                 currentExecutions = moveExecutionContainer.getExecutions();
             }
-            
-            Collection<FlowElement> moveToFlowElements = null;
+
+            Collection<FlowElement> moveToFlowElements;
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 moveToFlowElements = Collections.singletonList(moveExecutionContainer.getCallActivity());
             } else {
@@ -324,55 +237,54 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             Collection<String> executionIdsNotToDelete = new HashSet<>();
             for (ExecutionEntity execution : currentExecutions) {
                 executionIdsNotToDelete.add(execution.getId());
-                executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
-                executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, true, execution.getCurrentFlowElement());
-            }
 
-            // Delete the parent executions for each current execution when the move to activity id has the same sub process scope
-            for (ExecutionEntity execution : currentExecutions) {
+                if (!moveExecutionContainer.isDirectExecutionMigration()) {
+                    executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
+                    executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, true, execution.getCurrentFlowElement());
+                }
+
+                // Make sure we are not moving the root execution
                 if (execution.getParentId() == null) {
                     throw new FlowableException("Execution has no parent execution " + execution.getParentId());
                 }
 
-                ExecutionEntity continueParentExecution = deleteParentExecutions(execution.getParentId(), moveToFlowElements, executionIdsNotToDelete,
-                        commandContext);
+                // Delete the parent executions for each current execution when the move to activity id has the same sub process scope
+                ExecutionEntity continueParentExecution = deleteParentExecutions(execution.getParentId(), moveToFlowElements, executionIdsNotToDelete, commandContext);
                 moveExecutionContainer.addContinueParentExecution(execution.getId(), continueParentExecution);
             }
 
             List<ExecutionEntity> newChildExecutions = createEmbeddedSubProcessExecutions(moveToFlowElements, currentExecutions, moveExecutionContainer, commandContext);
-            
-            ExecutionEntity defaultContinueParentExecution = null;
+
+            ExecutionEntity defaultContinueParentExecution;
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 CallActivity callActivity = moveExecutionContainer.getCallActivity();
                 Process subProcess = moveExecutionContainer.getSubProcessModel().getProcessById(callActivity.getCalledElement());
-                ExecutionEntity subProcessChildExecution = createSubProcessInstance(callActivity, moveExecutionContainer.getSubProcessDefinition(), 
-                                newChildExecutions.get(0), subProcess.getInitialFlowElement(), commandContext);
+                ExecutionEntity subProcessChildExecution = createSubProcessInstance(callActivity, moveExecutionContainer.getSubProcessDefinition(), newChildExecutions.get(0), subProcess.getInitialFlowElement(), commandContext);
                 List<ExecutionEntity> currentSubProcessExecutions = Collections.singletonList(subProcessChildExecution);
-                
+
                 MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(currentSubProcessExecutions, moveExecutionContainer.getMoveToActivityIds());
                 subProcessMoveExecutionEntityContainer.addMoveToFlowElement(callActivity.getId(), callActivity);
-                
+
                 ExecutionEntity continueParentExecution = deleteParentExecutions(subProcessChildExecution.getParentId(), moveExecutionContainer.getMoveToFlowElements(), commandContext);
                 subProcessMoveExecutionEntityContainer.addContinueParentExecution(subProcessChildExecution.getId(), continueParentExecution);
-                
+
                 executionEntityManager.deleteExecutionAndRelatedData(subProcessChildExecution, "Change activity to " + printFlowElementIds(moveToFlowElements));
-                
-                newChildExecutions = createEmbeddedSubProcessExecutions(moveExecutionContainer.getMoveToFlowElements(), 
-                                currentSubProcessExecutions, subProcessMoveExecutionEntityContainer, commandContext);
-                
+
+                newChildExecutions = createEmbeddedSubProcessExecutions(moveExecutionContainer.getMoveToFlowElements(), currentSubProcessExecutions, subProcessMoveExecutionEntityContainer, commandContext);
+
                 defaultContinueParentExecution = newChildExecutions.get(0);
-            
+
             } else {
-            
+
                 // The default parent execution is retrieved from the match with the first source execution 
                 defaultContinueParentExecution = moveExecutionContainer.getContinueParentExecution(currentExecutions.get(0).getId());
             }
-            
+
             if (processVariables != null && processVariables.size() > 0) {
                 ExecutionEntity processInstanceExecution = defaultContinueParentExecution.getProcessInstance();
                 processInstanceExecution.setVariables(processVariables);
             }
-            
+
             if (localVariables != null && localVariables.size() > 0) {
                 Iterator<ExecutionEntity> newChildExecutionsIter = newChildExecutions.iterator();
                 while (newChildExecutionsIter.hasNext()) {
@@ -388,38 +300,153 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                     }
                 }
             }
-            
-            for (ExecutionEntity newChildExecution : newChildExecutions) {
-                CommandContextUtil.getAgenda().planContinueProcessOperation(newChildExecution);
+
+            //TODO WIP ... Its always the same type of activity
+            if (!moveExecutionContainer.isDirectExecutionMigration()) {
+                for (ExecutionEntity newChildExecution : newChildExecutions) {
+                    CommandContextUtil.getAgenda().planContinueProcessOperation(newChildExecution);
+                }
             }
         }
     }
 
-    protected List<ExecutionEntity> createEmbeddedSubProcessExecutions(Collection<FlowElement> moveToFlowElements, List<ExecutionEntity> currentExecutions, 
-                    MoveExecutionEntityContainer moveExecutionContainer, CommandContext commandContext) {
-        
+    protected static void prepareMoveExecutionEntityContainer(MoveExecutionEntityContainer moveExecutionContainer, String activityId, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
+
+        FlowElement currentFlowElement = null;
+        FlowElement newFlowElement;
+        String currentActivityId = null;
+        if (moveExecutionContainer.isMoveToParentProcess()) {
+            String parentProcessDefinitionId = moveExecutionContainer.getSuperExecution().getProcessDefinitionId();
+            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentProcessDefinitionId);
+            if (migrateToProcessDefinitionId.isPresent()) {
+                currentActivityId = moveExecutionContainer.getExecutions().get(0).getCurrentActivityId();
+                currentFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, currentActivityId);
+                bpmnModel = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinitionId.get());
+            }
+            newFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, activityId);
+        } else if (moveExecutionContainer.isMoveToSubProcessInstance()) {
+            //The subProcess model is defined in the callActivity of the current processDefinition or the migrateProcessDefinition if defined
+            ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
+            String processDefinitionIdOfCallActivity = firstExecution.getProcessDefinitionId();
+            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(firstExecution.getProcessDefinitionId());
+            if (migrateToProcessDefinitionId.isPresent()) {
+                currentActivityId = firstExecution.getCurrentActivityId();
+                currentFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, currentActivityId);
+                bpmnModel = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinitionId.get());
+            }
+
+            FlowElement callActivityElement = bpmnModel.getFlowElement(moveExecutionContainer.getCallActivityId());
+            if (callActivityElement == null) {
+                throw new FlowableException("Call activity could not be found in process definition for id " + activityId);
+            }
+
+            CallActivity callActivity = (CallActivity) callActivityElement;
+            moveExecutionContainer.setCallActivity(callActivity);
+
+            String calledProcessDefinitionKey = callActivity.getCalledElement();
+            ProcessDefinition callActivityProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionIdOfCallActivity);
+            String deploymentId = callActivityProcessDefinition.getDeploymentId();
+            String tenantId = callActivityProcessDefinition.getTenantId();
+
+            ProcessDefinition subProcessDefinition = null;
+            if (callActivity.isSameDeployment()) {
+                ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
+                if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                    subProcessDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, calledProcessDefinitionKey);
+                } else {
+                    subProcessDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, calledProcessDefinitionKey, tenantId);
+                }
+            }
+
+            if (subProcessDefinition == null) {
+                if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                    subProcessDefinition = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey(calledProcessDefinitionKey);
+                } else {
+                    subProcessDefinition = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKeyAndTenantId(calledProcessDefinitionKey, tenantId);
+                }
+            }
+
+            BpmnModel subProcessModel = ProcessDefinitionUtil.getBpmnModel(subProcessDefinition.getId());
+            moveExecutionContainer.setSubProcessDefinition(subProcessDefinition);
+            moveExecutionContainer.setSubProcessModel(subProcessModel);
+
+            newFlowElement = resolveFlowElementFromBpmnModel(subProcessModel, activityId);
+        } else {
+            // Get first execution to get process definition id
+            ExecutionEntity firstExecution = moveExecutionContainer.getExecutions().get(0);
+            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(firstExecution.getProcessDefinitionId());
+            if (migrateToProcessDefinitionId.isPresent()) {
+                currentActivityId = moveExecutionContainer.getExecutions().get(0).getCurrentActivityId();
+                currentFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, currentActivityId);
+                bpmnModel = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinitionId.get());
+            }
+            newFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, activityId);
+        }
+
+        moveExecutionContainer.addMoveToFlowElement(activityId, newFlowElement);
+
+//        if (currentActivityId != null && currentFlowElement != null) {
+//            moveExecutionContainer.addMoveFromFlowElement(currentActivityId, currentFlowElement);
+//        }
+
+        if (migrateToProcessDefinitionId.isPresent() && isDirectMigration(currentFlowElement, newFlowElement)) {
+            moveExecutionContainer.setDirectExecutionMigration(true);
+        }
+    }
+
+    protected static boolean isDirectMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
+        return currentFlowElement instanceof UserTask && newFlowElement instanceof UserTask ||
+            currentFlowElement instanceof ReceiveTask && newFlowElement instanceof ReceiveTask;
+    }
+
+    protected static void safeDeleteSubProcessInstance(String processInstanceId, List<ExecutionEntity> executionsPool, String deleteReason, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        
+
+        //Confirm that all the subProcessExecutions are in the executionsPool
+        List<ExecutionEntity> subProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
+        HashSet<String> executionIdsToMove = executionsPool.stream().map(ExecutionEntity::getId).collect(Collectors.toCollection(HashSet::new));
+        Optional<ExecutionEntity> notIncludedExecution = subProcessExecutions.stream().filter(e -> !executionIdsToMove.contains(e.getId())).findAny();
+        if (notIncludedExecution.isPresent()) {
+            throw new FlowableException("Execution of sub process instance is not moved " + notIncludedExecution.get().getId());
+        }
+
+        // delete the sub process instance
+        executionEntityManager.deleteProcessInstance(processInstanceId, deleteReason, true);
+    }
+
+    protected static FlowElement resolveFlowElementFromBpmnModel(BpmnModel bpmnModel, String activityId) {
+        FlowElement flowElement = bpmnModel.getFlowElement(activityId);
+        if (flowElement == null) {
+            throw new FlowableException("Activity could not be found in process definition for id " + activityId);
+        }
+        return flowElement;
+    }
+
+    protected List<ExecutionEntity> createEmbeddedSubProcessExecutions(Collection<FlowElement> moveToFlowElements, List<ExecutionEntity> currentExecutions, MoveExecutionEntityContainer moveExecutionContainer, CommandContext commandContext) {
+
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+
+        //TODO WIP ... break the recursion and/or avoid using the moveExecutionContainer to hold the state (subProcessMapToCreate) is used only in this method scope
         // Resolve the sub process elements that need to be created for each move to flow element
         for (FlowElement flowElement : moveToFlowElements) {
-            resolveSubProcesExecutionsToCreate(flowElement.getId(), flowElement.getSubProcess(), currentExecutions, moveExecutionContainer);
+            resolveSubProcessExecutionsToCreate(flowElement.getId(), flowElement.getSubProcess(), currentExecutions, moveExecutionContainer);
         }
-        
+
         // The default parent execution is retrieved from the match with the first source execution 
         ExecutionEntity defaultContinueParentExecution = moveExecutionContainer.getContinueParentExecution(currentExecutions.get(0).getId());
-        
+
         for (String activityId : moveExecutionContainer.getSubProcessesToCreateMap().keySet()) {
             List<SubProcess> subProcessesToCreate = moveExecutionContainer.getSubProcessesToCreateMap().get(activityId);
             for (SubProcess subProcess : subProcessesToCreate) {
-                
+
                 // Check if sub process execution was not already created
                 if (moveExecutionContainer.getNewSubProcessChildExecution(subProcess.getId()) == null) {
                     FlowElement startElement = getStartElement(subProcess);
-        
+
                     if (startElement == null) {
                         throw new FlowableException("No initial activity found for subprocess " + subProcess.getId());
                     }
-                    
+
                     ExecutionEntity subProcessExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
                     subProcessExecution.setCurrentFlowElement(subProcess);
                     subProcessExecution.setScope(true);
@@ -427,52 +454,60 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                     FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
                     if (eventDispatcher.isEnabled()) {
                         eventDispatcher.dispatchEvent(
-                                FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, subProcess.getId(), subProcess.getName(), subProcessExecution.getId(),
-                                        subProcessExecution.getProcessInstanceId(), subProcessExecution.getProcessDefinitionId(), subProcess));
+                            FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, subProcess.getId(), subProcess.getName(), subProcessExecution.getId(),
+                                subProcessExecution.getProcessInstanceId(), subProcessExecution.getProcessDefinitionId(), subProcess));
                     }
 
                     subProcessExecution.setVariablesLocal(processDataObjects(subProcess.getDataObjects()));
 
                     CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessExecution);
-                    
+
                     List<BoundaryEvent> boundaryEvents = subProcess.getBoundaryEvents();
                     if (CollectionUtil.isNotEmpty(boundaryEvents)) {
                         executeBoundaryEvents(boundaryEvents, subProcessExecution);
                     }
-                    
+
                     ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
                     processInstanceHelper.processAvailableEventSubProcesses(subProcessExecution, subProcess, commandContext);
-        
+
                     ExecutionEntity startSubProcessExecution = CommandContextUtil.getExecutionEntityManager(commandContext)
-                            .createChildExecution(subProcessExecution);
+                        .createChildExecution(subProcessExecution);
                     startSubProcessExecution.setCurrentFlowElement(startElement);
-                    
+
                     moveExecutionContainer.addNewSubProcessChildExecution(subProcess.getId(), startSubProcessExecution);
                 }
             }
         }
-        
+
+        //TODO ... WIP Separate parentProcessCreation from actual execution
         List<ExecutionEntity> newChildExecutions = new ArrayList<>();
         for (FlowElement newFlowElement : moveToFlowElements) {
             ExecutionEntity newChildExecution = null;
-            
+
             // Check if a sub process child execution was created for this move to flow element, otherwise use the default continue parent execution
             if (moveExecutionContainer.getSubProcessesToCreateMap().containsKey(newFlowElement.getId())) {
                 newChildExecution = moveExecutionContainer.getNewSubProcessChildExecution(moveExecutionContainer.getSubProcessesToCreateMap().get(newFlowElement.getId()).get(0).getId());
             } else {
-                newChildExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
+                if (moveExecutionContainer.isDirectExecutionMigration()) {
+                    //                    TODO WIP ... need to match/keep the newFlowElement with the currentExecution
+                    ExecutionEntity currentExecution = currentExecutions.get(0);
+                    newChildExecution = migrateExecutionEntity(defaultContinueParentExecution, currentExecution, newFlowElement, commandContext);
+
+                } else {
+                    newChildExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
+                }
             }
-            
+
             newChildExecution.setCurrentFlowElement(newFlowElement);
-            
+
             if (newFlowElement instanceof CallActivity) {
                 CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(newChildExecution);
 
                 FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
                 if (eventDispatcher.isEnabled()) {
                     eventDispatcher.dispatchEvent(
-                            FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
-                                    newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement));
+                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
+                            newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement));
                 }
             }
 
@@ -490,10 +525,10 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             }
 
         }
-        
+
         return newChildExecutions;
     }
-    
+
     protected ExecutionEntity getActiveExecution(String activityId, ExecutionEntity processExecution, CommandContext commandContext) {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
@@ -530,14 +565,13 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         return deleteParentExecutions(parentExecutionId, moveToFlowElements, null, commandContext);
     }
 
-    protected ExecutionEntity deleteParentExecutions(String parentExecutionId, Collection<FlowElement> moveToFlowElements, Collection<String>
-            executionIdsNotToDelete, CommandContext commandContext) {
+    protected ExecutionEntity deleteParentExecutions(String parentExecutionId, Collection<FlowElement> moveToFlowElements, Collection<String> executionIdsNotToDelete, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        
+
         ExecutionEntity continueParentExecution = executionEntityManager.findById(parentExecutionId);
         if (continueParentExecution.getCurrentFlowElement() instanceof SubProcess) {
             SubProcess parentSubProcess = (SubProcess) continueParentExecution.getCurrentFlowElement();
-            
+
             if (!isSubProcessUsedInNewFlowElements(parentSubProcess.getId(), moveToFlowElements)) {
                 ExecutionEntity toDeleteParentExecution = resolveParentExecutionToDelete(continueParentExecution, moveToFlowElements);
                 ExecutionEntity finalDeleteExecution = null;
@@ -546,27 +580,25 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 } else {
                     finalDeleteExecution = continueParentExecution;
                 }
-                
+
                 continueParentExecution = finalDeleteExecution.getParent();
 
                 String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
-                executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine,
-                        true, null);
-                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, true,
-                        finalDeleteExecution.getCurrentFlowElement());
+                executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine, true, null);
+                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, true, finalDeleteExecution.getCurrentFlowElement());
             }
         }
-        
+
         return continueParentExecution;
     }
-    
+
     protected void executeBoundaryEvents(Collection<BoundaryEvent> boundaryEvents, ExecutionEntity execution) {
 
         // The parent execution becomes a scope, and a child execution is created for each of the boundary events
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
 
             if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
-                    || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+                || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
                 continue;
             }
 
@@ -581,20 +613,19 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             boundaryEventBehavior.execute(childExecutionEntity);
         }
     }
-    
-    protected ExecutionEntity createSubProcessInstance(CallActivity callActivity, ProcessDefinition subProcessDefinition, ExecutionEntity parentExecution, 
-                    FlowElement initialFlowElement, CommandContext commandContext) {
-        
+
+    protected ExecutionEntity createSubProcessInstance(CallActivity callActivity, ProcessDefinition subProcessDefinition, ExecutionEntity parentExecution, FlowElement initialFlowElement, CommandContext commandContext) {
+
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        
+
         Process subProcess = ProcessDefinitionUtil.getProcess(subProcessDefinition.getId());
         if (subProcess == null) {
-            throw new FlowableException("Cannot start a sub process instance. Process model " + 
-                            subProcessDefinition.getName() + " (id = " + subProcessDefinition.getId() + ") could not be found");
+            throw new FlowableException("Cannot start a sub process instance. Process model " +
+                subProcessDefinition.getName() + " (id = " + subProcessDefinition.getId() + ") could not be found");
         }
-        
+
         String businessKey = null;
 
         if (!StringUtils.isEmpty(callActivity.getBusinessKey())) {
@@ -607,13 +638,13 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         }
 
         ExecutionEntity subProcessInstance = executionEntityManager.createSubprocessInstance(
-                        subProcessDefinition, parentExecution, businessKey, initialFlowElement.getId());
+            subProcessDefinition, parentExecution, businessKey, initialFlowElement.getId());
         CommandContextUtil.getHistoryManager(commandContext).recordSubProcessInstanceStart(parentExecution, subProcessInstance);
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
+                FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
         }
 
         // process template-defined data objects
@@ -652,33 +683,32 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         // Create the first execution that will visit all the process definition elements
         ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
         subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
-        
+
         CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessInitialExecution);
-        
+
         return subProcessInitialExecution;
     }
-    
-    protected void resolveSubProcesExecutionsToCreate(String searchActivitiyId, SubProcess searchSubProcess, 
-                    List<ExecutionEntity> currentExecutions, MoveExecutionEntityContainer moveExecutionContainer) {
-        
+
+    protected void resolveSubProcessExecutionsToCreate(String searchActivityId, SubProcess searchSubProcess, List<ExecutionEntity> currentExecutions, MoveExecutionEntityContainer moveExecutionContainer) {
+
         if (searchSubProcess != null) {
-            
+
             if (!hasSubProcessId(searchSubProcess.getId(), currentExecutions)) {
-                moveExecutionContainer.addSubProcessToCreate(searchActivitiyId, searchSubProcess);
+                moveExecutionContainer.addSubProcessToCreate(searchActivityId, searchSubProcess);
             }
-            
-            resolveSubProcesExecutionsToCreate(searchActivitiyId, searchSubProcess.getSubProcess(), currentExecutions, moveExecutionContainer);
+
+            resolveSubProcessExecutionsToCreate(searchActivityId, searchSubProcess.getSubProcess(), currentExecutions, moveExecutionContainer);
         }
     }
-    
+
     protected ExecutionEntity resolveParentExecutionToDelete(ExecutionEntity execution, Collection<FlowElement> moveToFlowElements) {
         ExecutionEntity parentExecution = execution.getParent();
-        
+
         if (parentExecution.isProcessInstanceType()) {
             return null;
         }
-        
-        if (!isSubProcessUsedInNewFlowElements(parentExecution.getActivityId(),  moveToFlowElements)) {
+
+        if (!isSubProcessUsedInNewFlowElements(parentExecution.getActivityId(), moveToFlowElements)) {
             ExecutionEntity subProcessParentExecution = resolveParentExecutionToDelete(parentExecution, moveToFlowElements);
             if (subProcessParentExecution != null) {
                 return subProcessParentExecution;
@@ -686,23 +716,21 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 return parentExecution;
             }
         }
-        
+
         return null;
     }
-    
+
     protected boolean isSubProcessUsedInNewFlowElements(String subProcessId, Collection<FlowElement> moveToFlowElements) {
-        boolean isUsed = false;
-        for (FlowElement flowElement : moveToFlowElements) {
-            SubProcess elementSubProcess = flowElement.getSubProcess();
-            if (elementSubProcess != null && elementSubProcess.getId().equals(subProcessId)) {
-                isUsed = true;
-                break;
-            }
-        }
-        
-        return isUsed;
+
+        Optional<SubProcess> isUsed = moveToFlowElements.stream()
+            .map(FlowElement::getSubProcess)
+            .filter(Objects::nonNull)
+            .filter(elementSubProcess -> elementSubProcess.getId().equals(subProcessId))
+            .findAny();
+
+        return isUsed.isPresent();
     }
-    
+
     protected boolean hasSubProcessId(String subProcessId, List<ExecutionEntity> currentExecutions) {
         for (ExecutionEntity execution : currentExecutions) {
             FlowElement executionElement = execution.getCurrentFlowElement();
@@ -717,7 +745,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         }
         return false;
     }
-    
+
     protected FlowElement getStartElement(SubProcess subProcess) {
         if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
             for (FlowElement subElement : subProcess.getFlowElements()) {
@@ -728,7 +756,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         }
         return null;
     }
-    
+
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
         Map<String, Object> variablesMap = new HashMap<>();
         // convert data objects to process variables
@@ -741,7 +769,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         return variablesMap;
     }
 
-    protected String printFlowElementIds(Collection<FlowElement> flowElements) {
+    protected static String printFlowElementIds(Collection<FlowElement> flowElements) {
         return flowElements.stream()
             .map(FlowElement::getId)
             .collect(Collectors.joining(","));
@@ -756,7 +784,7 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         executionEntities.add(executionEntity);
     }
 
-    protected static MoveExecutionEntityContainer createMoveExecutionContainer(ChangeActivityStateBuilderImpl.MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions) {
+    protected static MoveExecutionEntityContainer createMoveExecutionEntityContainer(ChangeActivityStateBuilderImpl.MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions) {
         MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds());
 
         if (activityContainer.isMoveToParentProcess()) {
@@ -775,4 +803,70 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         }
         return moveExecutionEntityContainer;
     }
+
+    protected static boolean isExecutionInsideMultiInstance(ExecutionEntity execution) {
+        FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
+        while (!(parentContainer instanceof Process)) {
+            MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentContainer).getLoopCharacteristics();
+            if (loopCharacteristics != null) {
+                return true;
+            }
+            parentContainer = ((Activity) parentContainer).getParentContainer();
+        }
+        return false;
+    }
+
+    protected static ExecutionEntity migrateExecutionEntity(ExecutionEntity parentExecutionEntity, ExecutionEntity childExecution, FlowElement newFlowElement, CommandContext commandContext) {
+
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
+
+        childExecution.setParent(parentExecutionEntity);
+        // manage the bidirectional parent-child relation
+        parentExecutionEntity.addChildExecution(childExecution);
+        childExecution.setProcessDefinitionId(parentExecutionEntity.getProcessDefinitionId());
+        childExecution.setProcessInstanceId(parentExecutionEntity.getProcessInstanceId() != null ? parentExecutionEntity.getProcessInstanceId() : parentExecutionEntity.getId());
+        childExecution.setRootProcessInstanceId(parentExecutionEntity.getRootProcessInstanceId());
+
+        // Inherits the 'count' feature from the parent
+        if (parentExecutionEntity instanceof CountingExecutionEntity) {
+            CountingExecutionEntity countingParentExecutionEntity = (CountingExecutionEntity) parentExecutionEntity;
+            ((CountingExecutionEntity) childExecution).setCountEnabled(countingParentExecutionEntity.isCountEnabled());
+        }
+
+        //Additional changes if the new activity Id doesn't match
+        String oldActivityId = childExecution.getCurrentActivityId();
+        if (childExecution.getCurrentActivityId() != newFlowElement.getId()) {
+            ((ExecutionEntityImpl) childExecution).setActivityId(newFlowElement.getId());
+        }
+
+        // If we are moving a UserTask we need to update its processDefinition references
+        if (newFlowElement instanceof UserTask) {
+            TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery().executionId(childExecution.getId()).singleResult();
+            task.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+            task.setTaskDefinitionKey(newFlowElement.getId());
+            task.setName(newFlowElement.getName());
+
+            //Sync historic
+            List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
+            for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
+                historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+                historicActivityInstance.setActivityId(childExecution.getActivityId());
+                historicActivityInstance.setActivityName(newFlowElement.getName());
+            }
+
+            historicTaskService.recordTaskInfoChange(task);
+        }
+
+        //TODO ... check persistance state May not be needed
+        //executionEntityManager.update(childExecution, false);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Child execution {} updated with parent {}", childExecution, parentExecutionEntity.getId());
+        }
+        return childExecution;
+    }
+
 }

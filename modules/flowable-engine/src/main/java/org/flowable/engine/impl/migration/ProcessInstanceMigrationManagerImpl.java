@@ -225,7 +225,7 @@ public class ProcessInstanceMigrationManagerImpl implements ProcessInstanceMigra
         LOGGER.debug("Migrating activity executions");
         DynamicStateManager dynamicStateManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicStateManager();
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = dynamicStateManager.resolveMoveExecutionEntityContainers(changeActivityStateBuilder, commandContext);
-        dynamicStateManager.moveExecutionState(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), procDefToMigrateTo.getId(), commandContext);
+        dynamicStateManager.migrateToProcessDefinition(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), procDefToMigrateTo.getId(), commandContext);
 
         LOGGER.debug("Updating Process definition reference in history");
         changeProcessDefinitionReferenceOfHistory(commandContext, processExecution, procDefToMigrateTo);
