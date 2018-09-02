@@ -12,15 +12,22 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.HistoricProcessInstanceDataManager;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 
 /**
  * @author Tijs Rademakers
@@ -46,8 +53,25 @@ public class MongoDbHistoricProcessInstanceDataManager extends AbstractMongoDbDa
 
     @Override
     public HistoricProcessInstanceEntity update(HistoricProcessInstanceEntity entity) {
-        // TODO Auto-generated method stub
-        return null;
+        getMongoDbSession().update(entity);
+        return entity;
+    }
+    
+    @Override
+    public void updateEntity(Entity entity) {
+        HistoricProcessInstanceEntity instanceEntity = (HistoricProcessInstanceEntity) entity;
+        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
+        BasicDBObject updateObject = null;
+        updateObject = setUpdateProperty("deleteReason", instanceEntity.getDeleteReason(), persistentState, updateObject);
+        updateObject = setUpdateProperty("endActivityId", instanceEntity.getEndActivityId(), persistentState, updateObject);
+        updateObject = setUpdateProperty("endTime", instanceEntity.getEndTime(), persistentState, updateObject);
+        updateObject = setUpdateProperty("startActivityId", instanceEntity.getStartActivityId(), persistentState, updateObject);
+        updateObject = setUpdateProperty("startTime", instanceEntity.getStartTime(), persistentState, updateObject);
+        updateObject = setUpdateProperty("startUserId", instanceEntity.getStartUserId(), persistentState, updateObject);
+        
+        if (updateObject != null) {
+            getMongoDbSession().performUpdate(COLLECTION_HISTORIC_PROCESS_INSTANCES, entity, new Document().append("$set", updateObject));
+        }
     }
 
     @Override
@@ -87,10 +111,8 @@ public class MongoDbHistoricProcessInstanceDataManager extends AbstractMongoDbDa
     }
 
     @Override
-    public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(
-            HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        return getMongoDbSession().find(COLLECTION_HISTORIC_PROCESS_INSTANCES, createFilter(historicProcessInstanceQuery));
     }
 
     @Override
@@ -112,5 +134,30 @@ public class MongoDbHistoricProcessInstanceDataManager extends AbstractMongoDbDa
         return 0;
     }
     
+    protected Bson createFilter(HistoricProcessInstanceQueryImpl processInstanceQuery) {
+        List<Bson> andFilters = new ArrayList<>();
+        if (processInstanceQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", processInstanceQuery.getProcessInstanceId()));
+        }
+        
+        if (processInstanceQuery.getDeploymentId() != null) {
+            andFilters.add(Filters.eq("deploymentId", processInstanceQuery.getDeploymentId()));
+        }
+        
+        if (processInstanceQuery.getProcessDefinitionId() != null) {
+            andFilters.add(Filters.eq("processDefinitionId", processInstanceQuery.getProcessDefinitionId()));
+        }
+        
+        if (processInstanceQuery.getSuperProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("superProcessInstanceId", processInstanceQuery.getSuperProcessInstanceId()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return filter;
+    }
     
 }

@@ -21,19 +21,18 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.mongodb.cfg.MongoDbProcessEngineConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.opentest4j.AssertionFailedError;
+import org.junit.jupiter.api.Test;
 
 import com.mongodb.ServerAddress;
 
 /**
  * @author Tijs Rademakers
  */
-public class AbstractMongoDbTest {
+public class CleanMongoDbTest {
     
     protected MongoDbProcessEngineConfiguration mongoDbProcessEngineConfiguration;
     protected ProcessEngine processEngine;
@@ -68,12 +67,10 @@ public class AbstractMongoDbTest {
     public void cleanup() {
         mongoDbProcessEngineConfiguration.getMongoDatabase().drop();
     }
-
-    protected void assertProcessEnded(final String processInstanceId) {
-        ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-
-        if (processInstance != null) {
-            throw new AssertionFailedError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
-        }
+    
+    @Test
+    public void fakeTest() {
+        
     }
+
 }

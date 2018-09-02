@@ -12,6 +12,7 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -90,17 +91,14 @@ public class MongoDbHistoricActivityInstanceDataManager extends AbstractMongoDbD
     }
 
     @Override
-    public long findHistoricActivityInstanceCountByQueryCriteria(
-            HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+    public long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(
-            HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        return getMongoDbSession().find(COLLECTION_HISTORIC_ACTIVITY_INSTANCES, createFilter(historicActivityInstanceQuery));
     }
 
     @Override
@@ -115,4 +113,29 @@ public class MongoDbHistoricActivityInstanceDataManager extends AbstractMongoDbD
         return 0;
     }
     
+    protected Bson createFilter(HistoricActivityInstanceQueryImpl activityInstanceQuery) {
+        List<Bson> andFilters = new ArrayList<>();
+        if (activityInstanceQuery.getExecutionId() != null) {
+            andFilters.add(Filters.eq("executionId", activityInstanceQuery.getExecutionId()));
+        }
+        
+        if (activityInstanceQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", activityInstanceQuery.getProcessInstanceId()));
+        }
+        
+        if (activityInstanceQuery.getActivityId() != null) {
+            andFilters.add(Filters.eq("activityId", activityInstanceQuery.getActivityId()));
+        }
+        
+        if (activityInstanceQuery.getActivityName() != null) {
+            andFilters.add(Filters.eq("activityName", activityInstanceQuery.getActivityName()));
+        }
+        
+        Bson filter = null;
+        if (andFilters.size() > 0) {
+            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        }
+        
+        return filter;
+    }
 }

@@ -21,12 +21,14 @@ import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.TaskQueryImpl;
+import org.flowable.task.service.impl.TaskQueryProperty;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 
 /**
  * @author Joram Barrez
@@ -55,7 +57,6 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
         getMongoDbSession().update(entity);
         return entity;
     }
-    
 
     @Override
     public void updateEntity(Entity entity) {
@@ -89,7 +90,8 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
 
     @Override
     public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
-        throw new UnsupportedOperationException();
+        Bson filter = Filters.eq("processInstanceId", processInstanceId);
+        return getMongoDbSession().find(COLLECTION_TASKS, filter);
     }
 
     @Override
@@ -104,8 +106,7 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
 
     @Override
     public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
-        Bson filter = createFilter(taskQuery);
-        return getMongoDbSession().find(COLLECTION_TASKS, filter);
+        return getMongoDbSession().find(COLLECTION_TASKS, createFilter(taskQuery), createSort(taskQuery));
     }
 
     @Override
@@ -171,11 +172,41 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
             andFilters.add(Filters.eq("assignee", null));
         }
         
+        if (taskQuery.getName() != null) {
+            andFilters.add(Filters.eq("name", taskQuery.getName()));
+        }
+        
         Bson filter = null;
         if (andFilters.size() > 0) {
             filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
         }
         
         return filter;
+    }
+    
+    protected Bson createSort(TaskQueryImpl taskQuery) {
+        List<Bson> bsonSorts = new ArrayList<>();
+        for (String column : taskQuery.getOrderByColumnMap().keySet()) {
+            boolean isAscending = taskQuery.getOrderByColumnMap().get(column);
+            String columnName = null;
+            if (TaskQueryProperty.NAME.getName().equals(column)) {
+                columnName = "name";
+            }
+            
+            if (columnName != null) {
+                if (isAscending) {
+                    bsonSorts.add(Sorts.ascending(columnName));
+                } else {
+                    bsonSorts.add(Sorts.descending(columnName));
+                }
+            }
+        }
+        
+        Bson bsonSortResult = null;
+        if (bsonSorts.size() > 0) {
+            bsonSortResult = Sorts.orderBy(bsonSorts);
+        }
+        
+        return bsonSortResult;
     }
 }

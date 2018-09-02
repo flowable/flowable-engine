@@ -30,12 +30,12 @@ public class MongoDbJobServiceConfiguration extends JobServiceConfiguration {
     public void initDataManagers() {
         // TODO: other data managers
         if (jobDataManager == null) {
-            MongoDbJobDataManager mongoDbJobDataManager = new MongoDbJobDataManager();
+            MongoDbJobDataManager mongoDbJobDataManager = new MongoDbJobDataManager(this);
             mongoDbSessionFactory.registerDataManager(MongoDbJobDataManager.COLLECTION_JOBS, mongoDbJobDataManager);
             jobDataManager = mongoDbJobDataManager;
         }
         if (timerJobDataManager == null) {
-            MongoDbTimerJobDataManager mongoDbTimerJobDataManager = new MongoDbTimerJobDataManager();
+            MongoDbTimerJobDataManager mongoDbTimerJobDataManager = new MongoDbTimerJobDataManager(this);
             mongoDbSessionFactory.registerDataManager(MongoDbTimerJobDataManager.COLLECTION_TIMER_JOBS, mongoDbTimerJobDataManager);
             timerJobDataManager = mongoDbTimerJobDataManager;
         }

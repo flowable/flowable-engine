@@ -104,6 +104,10 @@ public class MongoDbSession implements Session {
         determineUpdatedObjects(); // Needs to be done before the removeUnnecessaryOperations, as removeUnnecessaryOperations will remove stuff from the cache
         removeUnnecessaryOperations();
         
+        if (LOGGER.isDebugEnabled()) {
+            debugFlush();
+        }
+        
         flushInserts();
         flushUpdates();
         flushDeletes();
@@ -170,6 +174,16 @@ public class MongoDbSession implements Session {
         return mapToEntities(collection, documents);
     }
     
+    public <T> List<T> find(String collection, Bson bsonFilter, Bson bsonSort) {
+        FindIterable<Document> documents = findDocuments(collection, bsonFilter, bsonSort);
+        return mapToEntities(collection, documents);
+    }
+    
+    public <T> List<T> find(String collection, Bson bsonFilter, Bson bsonSort, int limit) {
+        FindIterable<Document> documents = findDocuments(collection, bsonFilter, bsonSort, limit);
+        return mapToEntities(collection, documents);
+    }
+    
     public <T> List<T> find(String collection, Bson bsonFilter, Object parameter, Class<? extends Entity> entityClass, CachedEntityMatcher<Entity> cachedEntityMatcher, boolean checkDatabase) {
         return find(collection, bsonFilter, parameter, entityClass, cachedEntityMatcher, checkDatabase, true);
     }
@@ -203,9 +217,7 @@ public class MongoDbSession implements Session {
                 }
 
                 dbEntities = entityMap.values();
-
             }
-
         }
 
         // Remove entries which are already deleted
@@ -240,7 +252,18 @@ public class MongoDbSession implements Session {
     public <T> T findOne(String collection, Bson bsonFilter) {
         FindIterable<Document> documents = findDocuments(collection, bsonFilter);
         if (documents != null) {
-            return mapToEntity(collection, documents);
+            T entity = mapToEntity(collection, documents);
+            if (entity instanceof Entity) {
+                String id = ((Entity) entity).getId();
+                T cachedEntity = (T) entityCache.findInCache(mongoDbSessionFactory.getClassForCollection(collection), id);
+                if (cachedEntity != null) {
+                    return cachedEntity;
+                }
+                
+                entityCache.put((Entity) entity, true); // true -> store state so we can see later if it is updated later on
+            }
+            
+            return entity;
         }
         return null;
     }
@@ -279,12 +302,31 @@ public class MongoDbSession implements Session {
     }
     
     public FindIterable<Document> findDocuments(String collection, Bson bsonFilter) {
+        return findDocuments(collection, bsonFilter, null);
+    }
+    
+    public FindIterable<Document> findDocuments(String collection, Bson bsonFilter, Bson bsonSort) {
+        return findDocuments(collection, bsonFilter, bsonSort, 0);
+    }
+    
+    public FindIterable<Document> findDocuments(String collection, Bson bsonFilter, Bson bsonSort, int limit) {
         MongoCollection<Document> mongoDbCollection = getCollection(collection);
+        FindIterable<Document> documentResult = null;
         if (bsonFilter != null) {
-            return mongoDbCollection.find(clientSession, bsonFilter);
+            documentResult = mongoDbCollection.find(clientSession, bsonFilter);
         } else {
-            return mongoDbCollection.find(clientSession);
+            documentResult = mongoDbCollection.find(clientSession);
         }
+        
+        if (bsonSort != null) {
+            documentResult.sort(bsonSort);
+        }
+        
+        if (limit > 0) {
+            documentResult.limit(limit);
+        }
+        
+        return documentResult;
     }
     
     @SuppressWarnings("unchecked")
@@ -359,9 +401,8 @@ public class MongoDbSession implements Session {
                 // even when the execution are deleted, as they can change the parent-child relationships.
                 // For the other entities, this is not applicable and an update can be discarded when an update follows.
 
-                if (!isEntityInserted(cachedEntity) &&
-                        (cachedEntity instanceof AlwaysUpdatedPersistentObject || !isEntityToBeDeleted(cachedEntity)) &&
-                        cachedObject.hasChanged()) {
+                if (!isEntityInserted(cachedEntity) && !isEntityToBeDeleted(cachedEntity) && 
+                        (cachedEntity instanceof AlwaysUpdatedPersistentObject || cachedObject.hasChanged())) {
 
                     updatedObjects.add(cachedEntity);
                 }
@@ -394,6 +435,31 @@ public class MongoDbSession implements Session {
             }
 
         }
+    }
+    
+    protected void debugFlush() {
+        LOGGER.debug("Flushing dbSqlSession");
+        int nrOfInserts = 0;
+        int nrOfUpdates = 0;
+        int nrOfDeletes = 0;
+        for (Map<String, Entity> insertedObjectMap : insertedObjects.values()) {
+            for (Entity insertedObject : insertedObjectMap.values()) {
+                LOGGER.debug("  insert {}", insertedObject);
+                nrOfInserts++;
+            }
+        }
+        for (Entity updatedObject : updatedObjects) {
+            LOGGER.debug("  update {}", updatedObject);
+            nrOfUpdates++;
+        }
+        for (Map<String, Entity> deletedObjectMap : deletedObjects.values()) {
+            for (Entity deletedObject : deletedObjectMap.values()) {
+                LOGGER.debug("  delete {} with id {}", deletedObject, deletedObject.getId());
+                nrOfDeletes++;
+            }
+        }
+        LOGGER.debug("flush summary: {} insert, {} update, {} delete.", nrOfInserts, nrOfUpdates, nrOfDeletes);
+        LOGGER.debug("now executing flush...");
     }
     
     public boolean isEntityInserted(Entity entity) {
@@ -444,7 +510,7 @@ public class MongoDbSession implements Session {
         return entity;
     }
     
-    protected MongoCollection<Document> getCollection(String collection) {
+    public MongoCollection<Document> getCollection(String collection) {
         return getMongoDatabase().getCollection(collection);
     }
 

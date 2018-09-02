@@ -14,14 +14,19 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByExecutionIdMatcher;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 
 /**
@@ -30,6 +35,9 @@ import com.mongodb.client.model.Filters;
 public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManager implements VariableInstanceDataManager {
     
     public static final String COLLECTION_VARIABLES = "variables";
+    
+    protected CachedEntityMatcher<Entity> variableInstanceByExecutionIdMatcher = 
+            (CachedEntityMatcher) new VariableInstanceByExecutionIdMatcher();
 
     @Override
     public VariableInstanceEntity create() {
@@ -48,7 +56,24 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
 
     @Override
     public VariableInstanceEntity update(VariableInstanceEntity entity) {
-        throw new UnsupportedOperationException();
+        getMongoDbSession().update(entity);
+        return entity;
+    }
+    
+    @Override
+    public void updateEntity(Entity entity) {
+        VariableInstanceEntity variableEntity = (VariableInstanceEntity) entity;
+        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
+        BasicDBObject updateObject = null;
+        updateObject = setUpdateProperty("textValue", variableEntity.getTextValue(), persistentState, updateObject);
+        updateObject = setUpdateProperty("textValue2", variableEntity.getTextValue2(), persistentState, updateObject);
+        updateObject = setUpdateProperty("doubleValue", variableEntity.getDoubleValue(), persistentState, updateObject);
+        updateObject = setUpdateProperty("longValue", variableEntity.getLongValue(), persistentState, updateObject);
+        updateObject = setUpdateProperty("typeName", variableEntity.getTypeName(), persistentState, updateObject);
+        
+        if (updateObject != null) {
+            getMongoDbSession().performUpdate(COLLECTION_VARIABLES, entity, new Document().append("$set", updateObject));
+        }
     }
 
     @Override
@@ -73,7 +98,8 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
 
     @Override
     public List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
-        return getMongoDbSession().find(COLLECTION_VARIABLES, Filters.eq("executionId", executionId));
+        return getMongoDbSession().find(COLLECTION_VARIABLES, Filters.eq("executionId", executionId), executionId, 
+                VariableInstanceEntityImpl.class, variableInstanceByExecutionIdMatcher, true);
     }
 
     @Override
@@ -88,14 +114,14 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
     }
 
     @Override
-    public List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId,
-            Collection<String> names) {
+    public List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName) {
-        throw new UnsupportedOperationException();
+        Bson filter = Filters.and(Filters.eq("taskId", taskId), Filters.eq("name", variableName));
+        return getMongoDbSession().findOne(COLLECTION_VARIABLES, filter);
     }
 
     @Override
@@ -105,13 +131,15 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
 
     @Override
     public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType) {
-        throw new UnsupportedOperationException();
+        Bson filter = Filters.and(Filters.eq("scopeId", scopeId), Filters.eq("scopeType", scopeType));
+        return getMongoDbSession().findOne(COLLECTION_VARIABLES, filter);
     }
 
     @Override
-    public VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType,
-            String variableName) {
-        throw new UnsupportedOperationException();
+    public VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName) {
+        Bson filter = Filters.and(Filters.eq("scopeId", scopeId), Filters.eq("scopeType", scopeType), 
+                Filters.eq("name", variableName));
+        return getMongoDbSession().findOne(COLLECTION_VARIABLES, filter);
     }
 
     @Override

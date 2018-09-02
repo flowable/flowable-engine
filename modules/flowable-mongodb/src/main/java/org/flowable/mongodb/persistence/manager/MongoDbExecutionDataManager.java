@@ -22,6 +22,7 @@ import java.util.Map;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.ExecutionQueryImpl;
@@ -38,7 +39,9 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.UpdateResult;
 
 /**
  * @author Joram Barrez
@@ -60,7 +63,7 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public ExecutionEntity findById(String executionId) {
-       return getMongoDbSession().findOne(COLLECTION_EXECUTIONS, executionId);
+        return getMongoDbSession().findOne(COLLECTION_EXECUTIONS, executionId);
     }
 
     public void insert(ExecutionEntity executionEntity) {
@@ -78,8 +81,11 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
         BasicDBObject updateObject = null;
         updateObject = setUpdateProperty("isActive", executionEntity.isActive(), persistentState, updateObject);
         updateObject = setUpdateProperty("isScope", executionEntity.isScope(), persistentState, updateObject);
+        updateObject = setUpdateProperty("isConcurrent", executionEntity.isConcurrent(), persistentState, updateObject);
+        updateObject = setUpdateProperty("isEventScope", executionEntity.isEventScope(), persistentState, updateObject);
         updateObject = setUpdateProperty("activityId", executionEntity.getActivityId(), persistentState, updateObject);
         updateObject = setUpdateProperty("parentId", executionEntity.getParentId(), persistentState, updateObject);
+        updateObject = setUpdateProperty("superExecutionId", executionEntity.getSuperExecutionId(), persistentState, updateObject);
         
         if (updateObject != null) {
             getMongoDbSession().performUpdate(COLLECTION_EXECUTIONS, entity, new Document().append("$set", updateObject));
@@ -87,7 +93,8 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public void delete(String id) {
-        throw new UnsupportedOperationException();
+        ExecutionEntity executionEntity = findById(id);
+        delete(executionEntity);
     }
 
     public void delete(ExecutionEntity executionEntity) {
@@ -95,12 +102,12 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public ExecutionEntity findSubProcessInstanceBySuperExecutionId(String superExecutionId) {
-       List<ExecutionEntity> executionEntities = getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("superExecution", superExecutionId));
+       List<ExecutionEntity> executionEntities = getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("superExecutionId", superExecutionId));
        if (executionEntities.size() > 1) {
            throw new FlowableException("Programmatics error: multiple super executions found");
        } 
        if (!executionEntities.isEmpty()) {
-           executionEntities.get(0);
+           return executionEntities.get(0);
        }
        return null;
     }
@@ -152,8 +159,8 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
         return getMongoDbSession().count(COLLECTION_EXECUTIONS, Filters.eq("parentId", null));
     }
 
-    public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
-       throw new UnsupportedOperationException();
+    public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+        return getMongoDbSession().find(COLLECTION_EXECUTIONS, createFilter(processInstanceQuery));
     }
 
     public List<ExecutionEntity> findExecutionsByRootProcessInstanceId(String rootProcessInstanceId) {
@@ -210,7 +217,15 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, Date expirationTime) {
-        throw new UnsupportedOperationException();        
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.append("lockTime", lockDate);
+        
+        MongoCollection<Document> mongoDbCollection = getMongoDbSession().getCollection(COLLECTION_EXECUTIONS);
+        Bson filter = Filters.and(Filters.eq("_id", processInstanceId), Filters.or(Filters.eq("lockTime", null), Filters.lt("lockTime", expirationTime)));
+        UpdateResult updateResult = mongoDbCollection.updateOne(filter, new Document().append("$set", updateObject));
+        if (updateResult.getModifiedCount() != 1) {
+            throw new FlowableOptimisticLockingException("Could not lock process instance");
+        }
     }
 
     public void updateAllExecutionRelatedEntityCountFlags(boolean newValue) {
@@ -218,7 +233,11 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     }
 
     public void clearProcessInstanceLockTime(String processInstanceId) {
-        throw new UnsupportedOperationException();        
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.append("lockTime", null);
+        
+        MongoCollection<Document> mongoDbCollection = getMongoDbSession().getCollection(COLLECTION_EXECUTIONS);
+        mongoDbCollection.updateOne(Filters.eq("_id", processInstanceId), new Document().append("$set", updateObject));
     }
     
     protected boolean isExecutionTreeFetched(final String executionId) {
@@ -243,5 +262,51 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
                 executionId, ExecutionEntity.class, executionsWithSameRootProcessInstanceIdMatcher, true);
         
         return true;
+    }
+    
+    protected Bson createFilter(ProcessInstanceQueryImpl processInstanceQuery) {
+        List<Bson> andFilters = new ArrayList<>();
+        
+        andFilters.add(Filters.eq("parentId", null));
+        
+        if (processInstanceQuery.getExecutionId() != null) {
+            andFilters.add(Filters.eq("executionId", processInstanceQuery.getExecutionId()));
+        }
+        
+        if (processInstanceQuery.getProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("processInstanceId", processInstanceQuery.getProcessInstanceId()));
+        }
+        
+        if (processInstanceQuery.getDeploymentId() != null) {
+            andFilters.add(Filters.eq("deploymentId", processInstanceQuery.getDeploymentId()));
+        }
+        
+        if (processInstanceQuery.getProcessDefinitionId() != null) {
+            andFilters.add(Filters.eq("processDefinitionId", processInstanceQuery.getProcessDefinitionId()));
+        }
+        
+        if (processInstanceQuery.getRootProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("rootProcessInstanceId", processInstanceQuery.getRootProcessInstanceId()));
+        }
+        
+        if (processInstanceQuery.getSuperProcessInstanceId() != null) {
+            List<ExecutionEntity> superExecutions = getMongoDbSession().find(COLLECTION_EXECUTIONS, 
+                    Filters.eq("processInstanceId", processInstanceQuery.getSuperProcessInstanceId()));
+            
+            List<String> superExecutionIds = new ArrayList<>();
+            for (ExecutionEntity execution : superExecutions) {
+                superExecutionIds.add(execution.getId());
+            }
+            
+            andFilters.add(Filters.in("superExecutionId", superExecutionIds));
+        }
+        
+        if (processInstanceQuery.getSubProcessInstanceId() != null) {
+            andFilters.add(Filters.eq("subProcessInstanceId", processInstanceQuery.getSubProcessInstanceId()));
+        }
+        
+        Bson filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        
+        return filter;
     }
 }

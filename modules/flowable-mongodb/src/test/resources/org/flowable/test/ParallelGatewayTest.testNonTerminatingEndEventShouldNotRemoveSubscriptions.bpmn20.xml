@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+    <message id="testmessage" name="testmessage"/>
+    <process id="ec7ca606-a4f2-11e7-abc4-cec278b6b50a" name="bug-end-event-terminates-subscriptions" isExecutable="true">
+        <startEvent id="sid-68AB1FA5-A6A3-4FC3-BAF9-287F523D28FD"/>
+        <userTask id="sid-AEC348F2-DC13-4EF0-AD2F-0D2A4263986C" name="task 1"/>
+        <sequenceFlow id="sid-5AF1E880-8880-4EC2-BD54-299BA0081D4A" sourceRef="sid-68AB1FA5-A6A3-4FC3-BAF9-287F523D28FD" targetRef="sid-AEC348F2-DC13-4EF0-AD2F-0D2A4263986C"/>
+        <sequenceFlow id="sid-947D5427-0C07-4CDB-BE72-7B50CE67C738" sourceRef="sid-AEC348F2-DC13-4EF0-AD2F-0D2A4263986C" targetRef="sid-87211CCC-626E-4202-AF21-7130C2EC46A0"/>
+        <parallelGateway id="sid-87211CCC-626E-4202-AF21-7130C2EC46A0"/>
+        <userTask id="sid-83B9B6F6-ADA5-416B-805D-70BA473A09CD" name="task 3"/>
+        <sequenceFlow id="sid-6EF184F9-4C7D-466D-8CB1-4CEAACA9E89D" sourceRef="sid-87211CCC-626E-4202-AF21-7130C2EC46A0" targetRef="sid-83B9B6F6-ADA5-416B-805D-70BA473A09CD"/>
+        <endEvent id="sid-2CD0FEBA-D553-4D75-A8A8-84E66653017B"/>
+        <sequenceFlow id="sid-A0733B46-86EF-4BB1-8570-F1C2F4AB0836" sourceRef="sid-83B9B6F6-ADA5-416B-805D-70BA473A09CD" targetRef="sid-2CD0FEBA-D553-4D75-A8A8-84E66653017B"/>
+        <userTask id="sid-23B4AE4A-0FA7-4352-920F-E0ADFAF5CD45" name="task 2"/>
+        <sequenceFlow id="sid-BEF95839-A52E-4197-B216-247E7E286787" sourceRef="sid-87211CCC-626E-4202-AF21-7130C2EC46A0" targetRef="sid-23B4AE4A-0FA7-4352-920F-E0ADFAF5CD45"/>
+        <endEvent id="sid-F11C7072-ED46-471F-8AC6-3D58CCB219C4"/>
+        <sequenceFlow id="sid-8F5069BB-361C-4D0B-9DEF-A2C3B129E5E8" sourceRef="sid-23B4AE4A-0FA7-4352-920F-E0ADFAF5CD45" targetRef="sid-F11C7072-ED46-471F-8AC6-3D58CCB219C4"/>
+        <subProcess id="sid-7A1F2BCA-0901-4C42-B07B-058F274E1AB7" name="subProcess" triggeredByEvent="true">
+            <startEvent id="sid-3424CB22-151B-45F6-980D-74544EEFAEF7" isInterrupting="false">
+                <messageEventDefinition  messageRef="testmessage"/>
+            </startEvent>
+            <userTask id="sid-18E43470-81FF-4DA8-9F0C-348B02A0CA3C" name="message task"/>
+            <endEvent id="sid-44386EE8-23A4-4171-80A6-763C4C1EE2DB"/>
+            <sequenceFlow id="sid-89F6ECA4-CD1E-40A2-B24F-4B8DD8612863" sourceRef="sid-3424CB22-151B-45F6-980D-74544EEFAEF7" targetRef="sid-18E43470-81FF-4DA8-9F0C-348B02A0CA3C"/>
+            <sequenceFlow id="sid-977747BD-F95E-4F50-9A0C-3BCD72C3D759" sourceRef="sid-18E43470-81FF-4DA8-9F0C-348B02A0CA3C" targetRef="sid-44386EE8-23A4-4171-80A6-763C4C1EE2DB"/>
+        </subProcess>
+    </process>
+</definitions>

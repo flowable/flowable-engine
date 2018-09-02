@@ -13,16 +13,22 @@
 package org.flowable.mongodb.persistence.manager;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 
 /**
@@ -31,6 +37,16 @@ import com.mongodb.client.model.Filters;
 public class MongoDbJobDataManager extends AbstractMongoDbDataManager implements JobDataManager {
 
     public static final String COLLECTION_JOBS = "jobs";
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
+    public MongoDbJobDataManager() {
+        
+    }
+    
+    public MongoDbJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
+    }
     
     @Override
     public JobEntity create() {
@@ -46,10 +62,26 @@ public class MongoDbJobDataManager extends AbstractMongoDbDataManager implements
     public void insert(JobEntity entity) {
         getMongoDbSession().insertOne(entity);
     }
-
+    
     @Override
     public JobEntity update(JobEntity entity) {
-        throw new UnsupportedOperationException();
+        getMongoDbSession().update(entity);
+        return entity;
+    }
+
+    @Override
+    public void updateEntity(Entity entity) {
+        JobEntity jobEntity = (JobEntity) entity;
+        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
+        BasicDBObject updateObject = null;
+        updateObject = setUpdateProperty("retries", jobEntity.getRetries(), persistentState, updateObject);
+        updateObject = setUpdateProperty("exceptionMessage", jobEntity.getExceptionMessage(), persistentState, updateObject);
+        updateObject = setUpdateProperty("lockOwner", jobEntity.getLockOwner(), persistentState, updateObject);
+        updateObject = setUpdateProperty("lockExpirationTime", jobEntity.getLockExpirationTime(), persistentState, updateObject);
+        
+        if (updateObject != null) {
+            getMongoDbSession().performUpdate(COLLECTION_JOBS, jobEntity, new Document().append("$set", updateObject));
+        }
     }
 
     @Override
@@ -65,7 +97,18 @@ public class MongoDbJobDataManager extends AbstractMongoDbDataManager implements
 
     @Override
     public List<JobEntity> findJobsToExecute(Page page) {
-        throw new UnsupportedOperationException();
+        Bson filter = null;
+        if (jobServiceConfiguration.getJobExecutionScope() == null) {
+            filter = Filters.and(Filters.eq("scopeType", null), Filters.eq("lockExpirationTime", null));
+            
+        } else if (!jobServiceConfiguration.getJobExecutionScope().equals("all")){
+            filter = Filters.and(Filters.eq("scopeType", jobServiceConfiguration.getJobExecutionScope()), 
+                    Filters.eq("lockExpirationTime", null));
+            
+        } else {
+            filter = Filters.eq("lockExpirationTime", null);
+        }
+        return getMongoDbSession().find(COLLECTION_JOBS, filter, null, 1);
     }
 
     @Override
@@ -82,7 +125,22 @@ public class MongoDbJobDataManager extends AbstractMongoDbDataManager implements
 
     @Override
     public List<JobEntity> findExpiredJobs(Page page) {
-        throw new UnsupportedOperationException();
+        Bson filter = null;
+        if (jobServiceConfiguration.getJobExecutionScope() == null) {
+            filter = Filters.eq("scopeType", null);
+            
+        } else if (!jobServiceConfiguration.getJobExecutionScope().equals("all")){
+            filter = Filters.eq("scopeType", jobServiceConfiguration.getJobExecutionScope());
+            
+        }
+        
+        Date now = jobServiceConfiguration.getClock().getCurrentTime();
+        Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
+        
+        filter = Filters.and(filter, Filters.or(Filters.lt("lockExpirationTime", now), 
+                Filters.and(Filters.eq("lockExpirationTime", null), Filters.lt("createTime", maxTimeout))));
+        
+        return getMongoDbSession().find(COLLECTION_JOBS, filter, null, 1);
     }
 
     @Override
