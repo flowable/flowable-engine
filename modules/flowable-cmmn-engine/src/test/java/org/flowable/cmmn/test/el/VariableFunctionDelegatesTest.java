@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +26,9 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
@@ -167,6 +172,108 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", myVar);
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Tomorrow", task.getName());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableIsEmpty() {
+        
+        //  String
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsEmptyFunction")
+                .variable("myVar", "hello world")
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "");
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsEmptyFunction")
+                .variable("myVar", "")
+                .start();
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsEmptyFunction")
+                .variable("myVar", "hello world")
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "other value");
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Collection
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsEmptyFunction")
+                .variable("myVar", Arrays.asList("one", "two"))
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", new ArrayList<>());
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // ArrayNode
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        arrayNode.add(1);
+        arrayNode.add(2);
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsEmptyFunction")
+                .variable("myVar", arrayNode)
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", objectMapper.createArrayNode());
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableIsNotEmpty() {
+        
+        //  String
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsNotEmptyFunction")
+                .variable("myVar", "")
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "hello world");
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsNotEmptyFunction")
+                .variable("myVar", "hello world")
+                .start();
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsNotEmptyFunction")
+                .variable("myVar", "")
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "");
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Collection
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsNotEmptyFunction")
+                .variable("myVar", new ArrayList<>())
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar",  Arrays.asList("one", "two"));
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // ArrayNode
+        ObjectMapper objectMapper = new ObjectMapper();        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsNotEmptyFunction")
+                .variable("myVar", objectMapper.createArrayNode())
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        arrayNode.add(1);
+        arrayNode.add(2);
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", arrayNode);
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
     }
 
 }

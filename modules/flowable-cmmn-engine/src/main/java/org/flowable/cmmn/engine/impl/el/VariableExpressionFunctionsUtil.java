@@ -12,15 +12,20 @@
  */
 package org.flowable.cmmn.engine.impl.el;
 
+import java.util.Collection;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.variable.api.delegate.VariableScope;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * A class containing the static functions that can be used in an {@link Expression}.
@@ -218,6 +223,46 @@ public class VariableExpressionFunctionsUtil {
         
         // if any of the values is null, return false;
         return false;
+    }
+    
+    /**
+     * Checks if the value of a variable (fetched using the variableName through the {@link PlanItemInstance}) is empty.
+     * 
+     * Depending on the variable type, this means the following:
+     * 
+     * - {@link String}: following {@link StringUtils#isEmpty(CharSequence)} semantics 
+     * - {@link Collection}: if the collection has no elements
+     * - {@link ArrayNode}: if the json array has no elements.
+     * 
+     * When the variable value is null, true is returned in all cases.
+     * When the variale value is not null, and the instance type is not one of the cases above, false will be returned.
+     */
+    @SuppressWarnings("rawtypes")
+    public static boolean isEmpty(PlanItemInstance planItemInstance, String variableName) {
+        Object variableValue = getVariableValue(planItemInstance, variableName);
+        if (variableValue == null)  {
+            return true;
+            
+        } else if (variableValue instanceof String) {
+            return StringUtils.isEmpty((String) variableValue);
+            
+        } else if  (variableValue instanceof Collection) {
+            return CollectionUtil.isEmpty((Collection) variableValue);
+            
+        } else if (variableValue instanceof ArrayNode) {
+            return ((ArrayNode) variableValue).size() == 0;
+            
+        } else {
+            return false;
+            
+        }
+    }
+    
+    /**
+     * Opposite operation of {@link #isEmpty(PlanItemInstance, String, Object, OPERATOR)}. 
+     */
+    public static boolean isNotEmpty(PlanItemInstance planItemInstance, String variableName) {
+        return !isEmpty(planItemInstance, variableName);
     }
     
     protected static Object getVariableValue(PlanItemInstance planItemInstance, String variableName) {
