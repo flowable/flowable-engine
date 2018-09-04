@@ -312,7 +312,9 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    public void testUserTaskDirectMigration() {
+    public void testSimpleUserTaskDirectMigration() {
+
+        //Almost all tests use UserTask, thus are direct migrations, but this one checks explicitly for changes in History
         //Deploy first version of the process
         ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/MyProcess-v1.bpmn20.xml");
 
@@ -382,4 +384,259 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         taskService.complete(tasksAfter.get(0).getId());
         assertProcessEnded(processInstanceToMigrate.getId());
     }
+
+    @Test
+    public void testSimpleMigrationWithinSimpleSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
+
+        //Start an instance of a process with one task inside a subProcess
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        //Should be only one task
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
+        completeTask(task);
+
+        List<Execution> executionsBeforeMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executionsBeforeMigration.size()); //Includes subProcess
+        assertThat(executionsBeforeMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess1");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefTwoTasks.getId())
+            .addActivityMigrationMapping("InsideSimpleSubProcess1", "InsideSimpleSubProcess2")
+            .migrate(processInstance.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executionsAfterMigration.size()); //includes subProcess
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefTwoTasks.getId());
+
+        completeProcessTasks(processInstance.getId());
+
+        //Check History - should contain two SubProcesses and 3 userTask Activities (before and after subprocess and the migrated user taks within the subprocess)
+        List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .list();
+        assertEquals(2, subProcesses.size());
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsOnly("SimpleSubProcess");
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefTwoTasks.getId());
+
+        List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("BeforeSubProcess", "AfterSubProcess", "InsideSimpleSubProcess2");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefTwoTasks.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testSimpleMigrationWithinSimpleSubProcess2() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefTwoTasks.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefTwoTasks.getId());
+
+        //Move to the second task inside the SubProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
+        completeTask(task);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
+        completeTask(task);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess2");
+
+        List<Execution> executionsBeforeMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executionsBeforeMigration.size()); //Includes subProcess
+        assertThat(executionsBeforeMigration).extracting("activityId").containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2");
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefOneTask.getId())
+            .addActivityMigrationMapping("InsideSimpleSubProcess2", "InsideSimpleSubProcess1")
+            .migrate(processInstance.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executionsAfterMigration.size()); //includes subProcess
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess1");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        completeProcessTasks(processInstance.getId());
+
+        //Check History - should contain two SubProcesses and 4 userTask Activities:
+        //Two user tasks defined before and after the SubProcess
+        //One task inside the subProcess that was completed before the migration (but the process definition reference should update anyway)
+        //One tasks inside the subProcess that was completed after the migration
+        List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .list();
+        assertEquals(2, subProcesses.size());
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsOnly("SimpleSubProcess");
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertEquals(4, userTasks.size());
+        //InsideSimpleSubProcess2 was migrated from the first definition but completed as InsideSimpleSubProcess1
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsOnly("BeforeSubProcess", "AfterSubProcess", "InsideSimpleSubProcess1");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testSimpleMigrationIntoEmbeddedSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        //Confirm migration point before the subProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefTwoTasks.getId())
+            .addActivityMigrationMapping("BeforeSubProcess", "InsideSimpleSubProcess2")
+            .migrate(processInstance.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(2, executionsAfterMigration.size()); //includes subProcess
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "InsideSimpleSubProcess2");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefTwoTasks.getId());
+
+        completeProcessTasks(processInstance.getId());
+
+        //Check History - should contain one SubProcess and 2 userTask Activities since the migratedUser task moved forward inside the last task of the subProcess
+        HistoricActivityInstance subProcess = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .singleResult();
+        assertThat(subProcess).extracting(HistoricActivityInstance::getActivityId).isEqualTo("SimpleSubProcess");
+        assertThat(subProcess).extracting(HistoricActivityInstance::getProcessDefinitionId).isEqualTo(procDefTwoTasks.getId());
+
+        List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertEquals(2, userTasks.size());
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsOnly("AfterSubProcess", "InsideSimpleSubProcess2");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefTwoTasks.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testSimpleMigrationOutOfEmbeddedSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefTwoTasks = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-inside-subprocess.bpmn20.xml");
+
+        //Start an instance of the definition with two task inside the subProcess
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefTwoTasks.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefTwoTasks.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
+        completeTask(task);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
+        completeTask(task);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess2");
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefOneTask.getId())
+            .addActivityMigrationMapping("InsideSimpleSubProcess2", "BeforeSubProcess")
+            .migrate(processInstance.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(1, executionsAfterMigration.size()); //No subProcess
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("BeforeSubProcess");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        //Check History - should contain one SubProcess ended during the migration and 3 userTask Activities, two completed before the migration and the migrated
+        HistoricActivityInstance subProcess = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .singleResult();
+        assertThat(subProcess).extracting(HistoricActivityInstance::getActivityId).isEqualTo("SimpleSubProcess");
+        assertThat(subProcess).extracting(HistoricActivityInstance::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+
+        List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertEquals(3, userTasks.size());
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsOnly("BeforeSubProcess", "InsideSimpleSubProcess1");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        completeProcessTasks(processInstance.getId());
+
+        //Check History Again - should contain two SubProcess and 3 userTask Activities, two completed before the migration
+        List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .list();
+        assertEquals(2, subProcesses.size());
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsOnly("SimpleSubProcess");
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertEquals(5, userTasks.size());
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsOnly("BeforeSubProcess", "InsideSimpleSubProcess1", "AfterSubProcess");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    //TODO ... Nested embedded subprocesses
+
+    protected void completeProcessTasks(String processInstanceId) {
+        List<Task> tasks;
+        do {
+            tasks = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+            tasks.forEach(this::completeTask);
+        } while (!tasks.isEmpty());
+    }
+
 }
