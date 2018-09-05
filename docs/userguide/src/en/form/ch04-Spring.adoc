@@ -6,7 +6,7 @@ While you can definitely use Flowable Form without Spring, we've provided some v
 
 === FormEngineFactoryBean
 
-The +~FormEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.form.spring.FormEngineFactoryBean+. This bean takes a Form engine configuration and creates the Form engine. This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration, the configuration and engine beans will look like this:
+The +FormEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.form.spring.FormEngineFactoryBean+. This bean takes a Form engine configuration and creates the Form engine. This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration, the configuration and engine beans will look like this:
 
 [source,xml,linenums]
 ----

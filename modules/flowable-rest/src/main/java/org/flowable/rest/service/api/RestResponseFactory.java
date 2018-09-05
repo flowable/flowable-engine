@@ -1045,6 +1045,10 @@ public class RestResponseFactory {
         return response;
     }
 
+    public List<UserResponse> createUserResponseList(List<User> users) {
+        return createUserResponseList(users, false);
+    }
+
     public List<UserResponse> createUserResponseList(List<User> users, boolean incudePassword) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<UserResponse> responseList = new ArrayList<>();

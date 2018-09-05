@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -134,7 +136,7 @@ public class UserCollectionResource {
             restApiInterceptor.accessUserInfoWithQuery(query);
         }
 
-        return new UserPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
+        return paginateList(allRequestParams, query, "id", properties, restResponseFactory::createUserResponseList);
     }
 
     @ApiOperation(value = "Create a user", tags = { "Users" })

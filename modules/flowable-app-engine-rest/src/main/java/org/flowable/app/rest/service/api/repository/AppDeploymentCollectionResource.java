@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
@@ -125,7 +127,7 @@ public class AppDeploymentCollectionResource {
             restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
         }
 
-        return new AppDeploymentsPaginateList(appRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
+        return paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties, appRestResponseFactory::createAppDeploymentResponseList);
     }
 
     @ApiOperation(value = "Create a new app deployment", tags = {

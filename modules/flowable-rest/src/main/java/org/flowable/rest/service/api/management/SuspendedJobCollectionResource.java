@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.management;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -152,6 +154,6 @@ public class SuspendedJobCollectionResource {
             restApiInterceptor.accessSuspendedJobInfoWithQuery(query);
         }
 
-        return new JobPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES);
+        return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createJobResponseList);
     }
 }
