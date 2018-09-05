@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -133,7 +135,8 @@ public class HistoricProcessInstanceBaseResource {
             restApiInterceptor.accessHistoryProcessInfoWithQuery(query);
         }
 
-        return new HistoricProcessInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties);
+        return paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties,
+            restResponseFactory::createHistoricProcessInstanceResponseList);
     }
     
     protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {

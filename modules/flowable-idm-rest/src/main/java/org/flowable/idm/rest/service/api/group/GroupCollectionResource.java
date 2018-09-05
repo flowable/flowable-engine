@@ -13,6 +13,8 @@
 
 package org.flowable.idm.rest.service.api.group;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,7 +108,7 @@ public class GroupCollectionResource {
             restApiInterceptor.accessGroupInfoWithQuery(query);
         }
 
-        return new GroupPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
+        return paginateList(allRequestParams, query, "id", properties, restResponseFactory::createGroupResponseList);
     }
 
     @ApiOperation(value = "Create a group", tags = { "Groups" })

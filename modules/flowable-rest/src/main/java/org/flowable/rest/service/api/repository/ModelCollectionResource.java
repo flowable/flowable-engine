@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -144,7 +146,7 @@ public class ModelCollectionResource extends BaseModelResource {
             restApiInterceptor.accessModelInfoWithQuery(modelQuery);
         }
         
-        return new ModelsPaginateList(restResponseFactory).paginateList(allRequestParams, modelQuery, "id", allowedSortProperties);
+        return paginateList(allRequestParams, modelQuery, "id", allowedSortProperties, restResponseFactory::createModelResponseList);
     }
 
     @ApiOperation(value = "Create a model", tags = {

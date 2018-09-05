@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +104,7 @@ public class BaseCaseInstanceResource {
             restApiInterceptor.accessCaseInstanceInfoWithQuery(query);
         }
 
-        return new CaseInstancePaginateList(restResponseFactory).paginateList(requestParams, queryRequest, query, "id", allowedSortProperties);
+        return paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
     }
     
     protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {

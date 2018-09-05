@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,6 +145,6 @@ public class DecisionTableCollectionResource {
             restApiInterceptor.accessDecisionTableInfoWithQuery(decisionTableQuery);
         }
 
-        return new DecisionTablesDmnPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, decisionTableQuery, "name", properties);
+        return paginateList(allRequestParams, decisionTableQuery, "name", properties, dmnRestResponseFactory::createDecisionTableResponseList);
     }
 }
