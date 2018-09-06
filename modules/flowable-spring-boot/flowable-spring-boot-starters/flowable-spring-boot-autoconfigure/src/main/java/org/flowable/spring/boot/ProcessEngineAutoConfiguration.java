@@ -135,8 +135,9 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @Bean
     @ConditionalOnMissingBean
     public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-            ObjectProvider<IdGenerator> processIdGenerator,
-            @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider, 
+            @Process ObjectProvider<IdGenerator> processIdGenerator,
+            ObjectProvider<IdGenerator> globalIdGenerator,
+            @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
             @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
@@ -188,8 +189,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
 
-        // We can't use the getIfAvailable(Supplier<T>) method because we need 4.3 and 5.0 support
-        IdGenerator idGenerator = processIdGenerator.getIfAvailable();
+        IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
         if (idGenerator == null) {
             idGenerator = new StrongUuidGenerator();
         }
