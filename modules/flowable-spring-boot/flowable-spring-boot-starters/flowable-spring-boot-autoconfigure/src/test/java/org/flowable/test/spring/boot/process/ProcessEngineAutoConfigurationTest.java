@@ -19,6 +19,7 @@ import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDep
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,6 +49,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
+import org.flowable.spring.boot.process.Process;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -184,6 +186,76 @@ public class ProcessEngineAutoConfigurationTest {
             });
     }
 
+    @Test
+    public void processEngineWithMultipleCustomIdGeneratorsAsBean() {
+        contextRunner.withUserConfiguration(
+            CustomBeanIdGeneratorConfiguration.class,
+            SecondCustomBeanIdGeneratorConfiguration.class
+        ).run(context -> {
+            assertThat(context)
+                .as("Process engine").hasSingleBean(ProcessEngine.class)
+                .as("Custom Id generator").hasBean("customIdGenerator")
+                .as("Second Custom Id generator").hasBean("secondCustomIdGenerator");
+
+            Map<String, IdGenerator> idGenerators = context.getBeansOfType(IdGenerator.class);
+            assertThat(idGenerators).containsOnlyKeys("customIdGenerator", "secondCustomIdGenerator");
+
+            IdGenerator customIdGenerator = idGenerators.get("customIdGenerator");
+            assertThat(customIdGenerator).isInstanceOf(DbIdGenerator.class);
+
+            IdGenerator secondCustomIdGenerator = idGenerators.get("secondCustomIdGenerator");
+            assertThat(secondCustomIdGenerator).isInstanceOf(StrongUuidGenerator.class);
+
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+            ProcessEngineConfiguration engineConfiguration = processEngine.getProcessEngineConfiguration();
+            assertThat(engineConfiguration.getIdGenerator())
+                .isInstanceOf(StrongUuidGenerator.class)
+                .isNotEqualTo(customIdGenerator)
+                .isNotEqualTo(secondCustomIdGenerator);
+        });
+    }
+
+    @Test
+    public void processEngineWithMultipleCustomIdGeneratorsAndAQualifiedProcessOneAsBean() {
+        contextRunner.withUserConfiguration(
+            CustomBeanIdGeneratorConfiguration.class,
+            SecondCustomBeanIdGeneratorConfiguration.class,
+            ProcessQualifiedCustomBeanIdGeneratorConfiguration.class
+        ).run(context -> {
+            assertThat(context)
+                .as("Process engine").hasSingleBean(ProcessEngine.class)
+                .as("Custom Id generator").hasBean("customIdGenerator")
+                .as("Second Custom Id generator").hasBean("secondCustomIdGenerator")
+                .as("Process Custom Id generator").hasBean("processQualifiedCustomIdGenerator");
+
+            Map<String, IdGenerator> idGenerators = context.getBeansOfType(IdGenerator.class);
+            assertThat(idGenerators).containsOnlyKeys(
+                "customIdGenerator",
+                "secondCustomIdGenerator",
+                "processQualifiedCustomIdGenerator"
+            );
+
+            IdGenerator customIdGenerator = idGenerators.get("customIdGenerator");
+            assertThat(customIdGenerator).isInstanceOf(DbIdGenerator.class);
+
+            IdGenerator secondCustomIdGenerator = idGenerators.get("secondCustomIdGenerator");
+            assertThat(secondCustomIdGenerator).isInstanceOf(StrongUuidGenerator.class);
+
+            IdGenerator processCustomIdGenerator = idGenerators.get("processQualifiedCustomIdGenerator");
+            assertThat(processCustomIdGenerator).isInstanceOf(StrongUuidGenerator.class);
+
+            ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+            ProcessEngineConfiguration engineConfiguration = processEngine.getProcessEngineConfiguration();
+            assertThat(engineConfiguration.getIdGenerator())
+                .isInstanceOf(StrongUuidGenerator.class)
+                .isNotEqualTo(customIdGenerator)
+                .isNotEqualTo(secondCustomIdGenerator)
+                .isEqualTo(processCustomIdGenerator);
+        });
+    }
+
     private void assertAllServicesPresent(ApplicationContext context, ProcessEngine processEngine) {
         List<Method> methods = Stream.of(ProcessEngine.class.getDeclaredMethods())
             .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
@@ -271,6 +343,25 @@ public class ProcessEngineAutoConfigurationTest {
         @Bean
         public IdGenerator customIdGenerator() {
             return new DbIdGenerator();
+        }
+    }
+
+    @Configuration
+    static class SecondCustomBeanIdGeneratorConfiguration {
+
+        @Bean
+        public IdGenerator secondCustomIdGenerator() {
+            return new StrongUuidGenerator();
+        }
+    }
+
+    @Configuration
+    static class ProcessQualifiedCustomBeanIdGeneratorConfiguration {
+
+        @Bean
+        @Process
+        public IdGenerator processQualifiedCustomIdGenerator() {
+            return new StrongUuidGenerator();
         }
     }
 }

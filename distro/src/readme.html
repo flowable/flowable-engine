@@ -48,6 +48,8 @@
 <p>
     It is now possible to define the custom IdGenerator for the Flowable Process engine, by creating a bean of type IdGenerator.
     If no bean is provided the StrongUuidGenerator will be used.
+    If there is a bean qualified with @Process then this one would be used, otherwise a unique global one would be used.
+    If there are more global beans then the default StrongUuidGenerator will be used.
 </p>
 
 <h3>Release Notes - Flowable - 6.3.1</h3>
