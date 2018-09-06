@@ -23,6 +23,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
@@ -629,7 +630,234 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
-    //TODO ... Nested embedded subprocesses
+    @Test
+    public void testMigrationTaskFromProcessRootIntoNestedEmbeddedSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefNested = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess.bpmn20.xml");
+
+        //Start an instance of the definition with two task inside the subProcess
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefNested.getId())
+            .addActivityMigrationMapping("BeforeSubProcess", "InsideNestedSubProcess")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(3, executionsAfterMigration.size());
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefNested.getId());
+
+        //Complete the process
+        completeProcessTasks(processInstance.getId());
+
+        //Check History - should contain one SubProcess ended during the migration and 3 userTask Activities, two completed before the migration and the migrated
+        List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .list();
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess");
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefNested.getId());
+
+        List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertEquals(2, userTasks.size());
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("InsideNestedSubProcess", "AfterSubProcess");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefNested.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrationTaskFromProcessRootIntoNestedEmbeddedSubProcessWithDataObject() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess-with-data-object.bpmn20.xml");
+        ProcessDefinition procDefNested = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess-with-data-object.bpmn20.xml");
+
+        //Start an instance of the definition with two task inside the subProcess
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefNested.getId())
+            .addActivityMigrationMapping("BeforeSubProcess", "InsideNestedSubProcess")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(3, executionsAfterMigration.size());
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefNested.getId());
+
+        //Should contain the dataObject of the new embedded process definition
+        Execution nestedSubProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("SimpleSubProcess").singleResult();
+        assertNotNull(runtimeService.getVariableLocal(nestedSubProcess.getId(), "dataScopeNested", String.class));
+        DataObject nameDataObject = runtimeService.getDataObjectLocal(nestedSubProcess.getId(), "dataScopeNested");
+        assertNotNull(nameDataObject);
+        assertEquals("nestedSubProcess", nameDataObject.getValue());
+
+        //Complete the process
+        completeProcessTasks(processInstance.getId());
+
+        //Check History - should contain one SubProcess ended during the migration and 3 userTask Activities, two completed before the migration and the migrated
+        List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .list();
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess");
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefNested.getId());
+
+        List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertEquals(2, userTasks.size());
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("InsideNestedSubProcess", "AfterSubProcess");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefNested.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrationTaskFromEmbeddedSubProcessIntoNestedEmbeddedSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess.bpmn20.xml");
+        ProcessDefinition procDefNested = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess.bpmn20.xml");
+
+        //Start an instance of the definition with two task inside the subProcess
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefNested.getId())
+            .addActivityMigrationMapping("InsideSimpleSubProcess1", "InsideNestedSubProcess")
+            .migrate(processInstance.getId());
+
+        //Confirm - we move from a subProcess to a nestedSubProcess with the same name (SimpleSubProcess), the original is not created, but cancelled and created from the new model
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(3, executionsAfterMigration.size()); //2 subProcesses and 1 userTask
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefNested.getId());
+
+        //Complete the process
+        completeProcessTasks(processInstance.getId());
+
+        //Check History - should contain one SubProcess ended during the migration and 3 userTask Activities, two completed before the migration and the migrated
+        List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .list();
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "OuterSubProcess", "SimpleSubProcess");
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefNested.getId());
+
+        List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertEquals(3, userTasks.size());
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("BeforeSubProcess", "InsideNestedSubProcess", "AfterSubProcess");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefNested.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrationTaskFromEmbeddedSubProcessIntoNestedEmbeddedSubProcessWithDataObject() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-inside-subprocess-with-data-object.bpmn20.xml");
+        ProcessDefinition procDefNested = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-tasks-nested-subprocess-with-data-object.bpmn20.xml");
+
+        //Start an instance of the definition with two task inside the subProcess
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm and move inside the subProcess
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size()); //includes root execution
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("BeforeSubProcess");
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("InsideSimpleSubProcess1");
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("SimpleSubProcess").singleResult();
+        assertNotNull(runtimeService.getVariableLocal(subProcessExecution.getId(), "dataScope", String.class));
+        DataObject nameDataObject = runtimeService.getDataObjectLocal(subProcessExecution.getId(), "dataScope");
+        assertNotNull(nameDataObject);
+        assertEquals("subProcess", nameDataObject.getValue());
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefNested.getId())
+            .addActivityMigrationMapping("InsideSimpleSubProcess1", "InsideNestedSubProcess")
+            .migrate(processInstance.getId());
+
+        //Confirm - we move from a subProcess to a nestedSubProcess with the same name (SimpleSubProcess), the original is not created, but cancelled and created from the new model
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(3, executionsAfterMigration.size()); //2 subProcesses and 1 userTask
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactlyInAnyOrder("OuterSubProcess", "SimpleSubProcess", "InsideNestedSubProcess");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefNested.getId());
+
+        //Confirm we have the dataObject of the subProcess in the new definition (its a new SubProcess execution nonetheless)
+        subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("SimpleSubProcess").singleResult();
+        assertThat(runtimeService.getVariablesLocal(subProcessExecution.getId())).containsOnlyKeys("dataScopeNested");
+        assertThat(runtimeService.getDataObjectsLocal(subProcessExecution.getId())).containsOnlyKeys("dataScopeNested");
+        nameDataObject = runtimeService.getDataObjectLocal(subProcessExecution.getId(), "dataScopeNested");
+        assertNotNull(nameDataObject);
+        assertEquals("nestedSubProcess", nameDataObject.getValue());
+
+        //Complete the process
+        completeProcessTasks(processInstance.getId());
+
+        //Check History - should contain one SubProcess ended during the migration and 3 userTask Activities, two completed before the migration and the migrated
+        List<HistoricActivityInstance> subProcesses = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("subProcess")
+            .list();
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("SimpleSubProcess", "OuterSubProcess", "SimpleSubProcess");
+        assertThat(subProcesses).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefNested.getId());
+
+        List<HistoricActivityInstance> userTasks = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertEquals(3, userTasks.size());
+        assertThat(userTasks).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("BeforeSubProcess", "InsideNestedSubProcess", "AfterSubProcess");
+        assertThat(userTasks).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefNested.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
 
     protected void completeProcessTasks(String processInstanceId) {
         List<Task> tasks;

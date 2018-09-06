@@ -13,8 +13,7 @@
 
 package org.flowable.engine.test.api.runtime;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,21 +21,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
@@ -56,6 +50,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
@@ -63,6 +60,7 @@ import org.junit.jupiter.api.Test;
 public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
     private ChangeStateEventListener changeStateEventListener = new ChangeStateEventListener();
+
     @BeforeEach
     protected void setUp() {
         processEngine.getRuntimeService().addEventListener(changeStateEventListener);
@@ -99,12 +97,12 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -142,12 +140,12 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -180,12 +178,12 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -215,12 +213,12 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -264,19 +262,19 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -314,19 +312,19 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -371,17 +369,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
@@ -425,17 +423,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
@@ -486,24 +484,24 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("firstTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("firstTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("firstTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("secondTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("secondTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        entityEvent = (FlowableEngineEntityEvent)event;
+        entityEvent = (FlowableEngineEntityEvent) event;
         timer = (Job) entityEvent.getEntity();
         assertEquals("secondTimerEvent", getActivityId(timer));
 
@@ -549,17 +547,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -604,17 +602,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -658,23 +656,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("name", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals("John", ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("name", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("John", ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -713,23 +711,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("name", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals("John", ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("name", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("John", ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -776,23 +774,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("name", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals("John", ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("name", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("John", ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -839,23 +837,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("name", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals("John", ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("name", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("John", ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -903,23 +901,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -974,23 +972,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1040,23 +1038,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1097,23 +1095,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1152,23 +1150,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1213,19 +1211,19 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask2", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask2", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1272,19 +1270,19 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask2", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask2", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1297,7 +1295,6 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
-    // TODO
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithTimerInSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityToTaskWithTimerInSubProcess() {
@@ -1318,22 +1315,22 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
@@ -1384,23 +1381,23 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
 
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
@@ -1446,22 +1443,22 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
-        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent)event;
+        FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
         assertEquals("boundaryTimerEvent", getActivityId(timer));
 
@@ -1469,6 +1466,510 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         Job executableTimerJob = managementService.moveTimerToExecutableJob(timerJob.getId());
         managementService.executeJob(executableTimerJob.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityIntoNestedSubProcessExecutionFromRoot() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        changeStateEventListener.clear();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("taskBefore", "nestedSubTask")
+            .changeState();
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubTask", task.getTaskDefinitionKey());
+
+        // Verify events
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertTrue(iterator.hasNext());
+
+        FlowableEvent event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
+
+        assertTrue(!iterator.hasNext());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTaskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.oneTaskNestedSubProcessWithObject.bpmn20.xml" })
+    public void testSetCurrentActivityIntoNestedSubProcessExecutionFromRootWithDataObject() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        changeStateEventListener.clear();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("taskBefore", "nestedSubTask")
+            .changeState();
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubTask", task.getTaskDefinitionKey());
+
+        Execution nestedSubProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("nestedSubProcess").singleResult();
+        assertNotNull(runtimeService.getVariableLocal(nestedSubProcess.getId(), "name", String.class));
+        DataObject nameDataObject = runtimeService.getDataObjectLocal(nestedSubProcess.getId(), "name");
+        assertNotNull(nameDataObject);
+        assertEquals("John", nameDataObject.getValue());
+
+        // Verify events
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertTrue(iterator.hasNext());
+
+        FlowableEvent event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
+        assertEquals("name", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("John", ((FlowableVariableEvent) event).getVariableValue());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
+
+        assertTrue(!iterator.hasNext());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTaskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
+    public void testSetCurrentExecutionIntoNestedSubProcessExecutionFromRoot() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        changeStateEventListener.clear();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(task.getExecutionId(), "nestedSubTask")
+            .changeState();
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubTask", task.getTaskDefinitionKey());
+
+        // Verify events
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertTrue(iterator.hasNext());
+
+        FlowableEvent event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
+
+        assertTrue(!iterator.hasNext());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTaskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.oneTaskNestedSubProcessWithObject.bpmn20.xml" })
+    public void testSetCurrentExecutionIntoNestedSubProcessExecutionFromRootWithDataObject() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        changeStateEventListener.clear();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(task.getExecutionId(), "nestedSubTask")
+            .changeState();
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubTask", task.getTaskDefinitionKey());
+
+        Execution nestedSubProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("nestedSubProcess").singleResult();
+        assertNotNull(runtimeService.getVariableLocal(nestedSubProcess.getId(), "name", String.class));
+        DataObject nameDataObject = runtimeService.getDataObjectLocal(nestedSubProcess.getId(), "name");
+        assertNotNull(nameDataObject);
+        assertEquals("John", nameDataObject.getValue());
+
+        // Verify events
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertTrue(iterator.hasNext());
+
+        FlowableEvent event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
+        assertEquals("name", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("John", ((FlowableVariableEvent) event).getVariableValue());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
+
+        assertTrue(!iterator.hasNext());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTaskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityIntoNestedSubProcessExecutionFromOuter() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTask", task.getTaskDefinitionKey());
+
+        changeStateEventListener.clear();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("subTask", "nestedSubTask")
+            .changeState();
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubTask", task.getTaskDefinitionKey());
+
+        // Verify events
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertTrue(iterator.hasNext());
+
+        FlowableEvent event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
+
+        assertTrue(!iterator.hasNext());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTaskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.oneTaskNestedSubProcessWithObject.bpmn20.xml" })
+    public void testSetCurrentActivityIntoNestedSubProcessExecutionFromOuterWithDataObject() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTask", task.getTaskDefinitionKey());
+
+        changeStateEventListener.clear();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("subTask", "nestedSubTask")
+            .changeState();
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubTask", task.getTaskDefinitionKey());
+
+        Execution nestedSubProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("nestedSubProcess").singleResult();
+        assertNotNull(runtimeService.getVariableLocal(nestedSubProcess.getId(), "name", String.class));
+        DataObject nameDataObject = runtimeService.getDataObjectLocal(nestedSubProcess.getId(), "name");
+        assertNotNull(nameDataObject);
+        assertEquals("John", nameDataObject.getValue());
+
+        // Verify events
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertTrue(iterator.hasNext());
+
+        FlowableEvent event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
+        assertEquals("name", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("John", ((FlowableVariableEvent) event).getVariableValue());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
+
+        assertTrue(!iterator.hasNext());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTaskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
+    public void testSetCurrentExecutionIntoNestedSubProcessExecutionFromOuter() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTask", task.getTaskDefinitionKey());
+
+        changeStateEventListener.clear();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(task.getExecutionId(), "nestedSubTask")
+            .changeState();
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubTask", task.getTaskDefinitionKey());
+
+        // Verify events
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertTrue(iterator.hasNext());
+
+        FlowableEvent event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
+
+        assertTrue(!iterator.hasNext());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTaskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.oneTaskNestedSubProcessWithObject.bpmn20.xml" })
+    public void testSetCurrentExecutionIntoNestedSubProcessExecutionFromOuterWithDataObject() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTask", task.getTaskDefinitionKey());
+
+        changeStateEventListener.clear();
+
+        runtimeService.createChangeActivityStateBuilder()
+            .moveExecutionToActivityId(task.getExecutionId(), "nestedSubTask")
+            .changeState();
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubTask", task.getTaskDefinitionKey());
+
+        Execution nestedSubProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("nestedSubProcess").singleResult();
+        assertNotNull(runtimeService.getVariableLocal(nestedSubProcess.getId(), "name", String.class));
+        DataObject nameDataObject = runtimeService.getDataObjectLocal(nestedSubProcess.getId(), "name");
+        assertNotNull(nameDataObject);
+        assertEquals("John", nameDataObject.getValue());
+
+        // Verify events
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        assertTrue(iterator.hasNext());
+
+        FlowableEvent event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
+        assertEquals("name", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("John", ((FlowableVariableEvent) event).getVariableValue());
+
+        event = iterator.next();
+        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
+
+        assertTrue(!iterator.hasNext());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subTaskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("taskAfter", task.getTaskDefinitionKey());
@@ -1510,17 +2011,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("nestedSubTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("nestedSubProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTaskAfter", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTaskAfter", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1565,17 +2066,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("nestedSubTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("nestedSubProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTaskAfter", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTaskAfter", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1620,17 +2121,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("nestedSubTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("nestedSubProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1682,17 +2183,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("nestedSubTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("nestedSubTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("nestedSubProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1742,22 +2243,22 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subtask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subtask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess2", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess2", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subtask2", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subtask2", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1798,22 +2299,22 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subtask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subtask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess2", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess2", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subtask2", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subtask2", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1870,41 +2371,41 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("processVar2", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals(10, ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("processVar2", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals(10, ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("processVar1", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals("test", ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("processVar1", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("test", ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("localVar2", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals(20, ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("localVar2", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals(20, ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("localVar1", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals("test2", ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("localVar1", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("test2", ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -1964,41 +2465,41 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subTask", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("processVar2", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals(10, ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("processVar2", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals(10, ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("processVar1", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals("test", ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("processVar1", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("test", ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("localVar2", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals(20, ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("localVar2", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals(20, ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, event.getType());
-        assertEquals("localVar1", ((FlowableVariableEvent)event).getVariableName());
-        assertEquals("test2", ((FlowableVariableEvent)event).getVariableValue());
+        assertEquals("localVar1", ((FlowableVariableEvent) event).getVariableName());
+        assertEquals("test2", ((FlowableVariableEvent) event).getVariableValue());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -2014,16 +2515,16 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
     }
-    
+
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityInUnstartedSubProcessWithModeledDataObject() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
 
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("taskBefore","subTask")
-                .changeState();
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("taskBefore", "subTask")
+            .changeState();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("subTask", task.getTaskDefinitionKey());
@@ -2053,10 +2554,10 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
 
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdTo("taskBefore","subTask")
-                .localVariable("subProcess", "name", "Joe")
-                .changeState();
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("taskBefore", "subTask")
+            .localVariable("subProcess", "name", "Joe")
+            .changeState();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("subTask", task.getTaskDefinitionKey());
@@ -2120,17 +2621,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("task1", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("task1", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("task2", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("task2", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -2187,17 +2688,17 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
 
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("task1", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("task1", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("task2", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("task2", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskAfter", ((FlowableActivityEvent)event).getActivityId());
+        assertEquals("taskAfter", ((FlowableActivityEvent) event).getActivityId());
 
         assertTrue(!iterator.hasNext());
 
@@ -2731,7 +3232,6 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(2, executions.size());
 
-
         List<String> currentActivityIds = new ArrayList<>();
         currentActivityIds.add("task1");
         currentActivityIds.add("task2");
@@ -2756,7 +3256,6 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/inclusiveGatewayForkJoin.bpmn20.xml" })
     public void testSetMultipleActivitiesIntoSynchronizingInclusiveGateway() {
-
 
         //Move all parallelGateway activities to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
@@ -2922,7 +3421,6 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
             .processInstanceId(processInstance.getId())
             .moveActivityIdTo("task2", "gwJoin")
             .changeState();
-
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertEquals(1, executions.size());
@@ -5724,7 +6222,77 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    //TODO
+    //@Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.adhocSubProcess.bpmn20.xml" })
+    public void testAdhocSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ADHOC");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+
+        //Confirm process started and move inside the Adhoc process
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("beforeSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        completeTask(task);
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(3, executions.size());
+        assertThat(executions).extracting(Execution::getActivityId).containsOnly("adhocSubProcess", "userTask1", "userTask2");
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsOnly("userTask1", "userTask2");
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("userTask1", "afterSubProcess")
+            .changeState();
+
+        //Confirm the move
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertEquals(3, executions.size());
+        assertThat(executions).extracting(Execution::getActivityId).containsOnly("adhocSubProcess", "userTask2", "afterSubProcess");
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsOnly("userTask2", "afterSubProcess");
+
+        //Change state of one task, outside the subProcess
+
+        //
+
+        //        Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
+        //        assertEquals(2, executionsByActivity.size());
+        //        assertEquals(1, executionsByActivity.get("processTask").size());
+        //        assertEquals(1, executionsByActivity.get("eventSubProcessStart").size());
+        //
+        //        List<Task> tasks = taskService.createTaskQuery().list();
+        //        Map<String, List<Task>> tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        //        assertEquals(1, tasksByKey.size());
+        //        assertEquals(1, tasksByKey.get("processTask").size());
+        //
+        //        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        //        assertEquals("eventSubProcessStart", eventSubscription.getActivityId());
+        //        assertEquals("signal", eventSubscription.getEventType());
+        //        assertEquals("eventSignal", eventSubscription.getEventName());
+        //
+        //        runtimeService.createChangeActivityStateBuilder()
+        //            .moveExecutionToActivityId(executionsByActivity.get("eventSubProcessStart").get(0).getId(), "eventSubProcessTask")
+        //            .changeState();
+        //
+        //        tasks = taskService.createTaskQuery().list();
+        //        tasksByKey = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
+        //        assertEquals(2, tasksByKey.size());
+        //        assertEquals(1, tasksByKey.get("processTask").size());
+        //        assertEquals(1, tasksByKey.get("eventSubProcessTask").size());
+        //
+        //        eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        //        assertNull(eventSubscription);
+        //
+        //        taskService.complete(tasksByKey.get("eventSubProcessTask").get(0).getId());
+        //        taskService.complete(tasksByKey.get("processTask").get(0).getId());
+
+        //        assertProcessEnded(processInstance.getId());
+    }
+
     class ChangeStateEventListener extends AbstractFlowableEngineEventListener {
+
         private List<FlowableEvent> events = new ArrayList<>();
 
         public ChangeStateEventListener() {
@@ -5735,7 +6303,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         protected void activityStarted(FlowableActivityEvent event) {
             List<String> types = Arrays.asList("userTask", "subProcess", "callActivity");
 
-            if(types.contains(event.getActivityType())) {
+            if (types.contains(event.getActivityType())) {
                 events.add(event);
             }
         }
@@ -5744,7 +6312,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         protected void activityCancelled(FlowableActivityCancelledEvent event) {
             List<String> types = Arrays.asList("userTask", "subProcess", "callActivity");
 
-            if(types.contains(event.getActivityType())) {
+            if (types.contains(event.getActivityType())) {
                 events.add(event);
             }
         }
@@ -5800,6 +6368,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             Map<String, Object> jobConfigurationMap = objectMapper.readValue(job.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
+
             });
             return (String) jobConfigurationMap.get("activityId");
         } catch (IOException e) {
