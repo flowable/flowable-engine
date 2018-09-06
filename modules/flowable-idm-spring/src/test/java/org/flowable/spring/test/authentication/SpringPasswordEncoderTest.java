@@ -77,7 +77,7 @@ public class SpringPasswordEncoderTest {
         autoWiredIdmIdentityService.saveUser(user);
 
         User johndoe = autoWiredIdmIdentityService.createUserQuery().userId("johndoe").list().get(0);
-        LOGGER.info("Hash Password = {} ", johndoe.getPassword());
+        LOGGER.info("Hash Password = {}", johndoe.getPassword());
 
         assertFalse("xxx".equals(johndoe.getPassword()));
         assertTrue(autoWiredIdmIdentityService.checkPassword("johndoe", "xxx"));

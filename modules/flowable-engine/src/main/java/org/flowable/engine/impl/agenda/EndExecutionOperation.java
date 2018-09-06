@@ -95,7 +95,7 @@ public class EndExecutionOperation extends AbstractOperation {
 
         int activeExecutions = getNumberOfActiveChildExecutionsForProcessInstance(executionEntityManager, processInstanceId);
         if (activeExecutions == 0) {
-            LOGGER.debug("No active executions found. Ending process instance {} ", processInstanceId);
+            LOGGER.debug("No active executions found. Ending process instance {}", processInstanceId);
 
             // note the use of execution here vs processinstance execution for getting the flow element
             executionEntityManager.deleteProcessInstanceExecutionEntity(processInstanceId,
