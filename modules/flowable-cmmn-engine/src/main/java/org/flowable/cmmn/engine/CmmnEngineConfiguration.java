@@ -55,6 +55,8 @@ import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
+import org.flowable.cmmn.engine.impl.el.VariableContainsExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableContainsFunctionDelegate;
 import org.flowable.cmmn.engine.impl.el.VariableEqualsExpressionEnhancer;
 import org.flowable.cmmn.engine.impl.el.VariableEqualsFunctionDelegate;
 import org.flowable.cmmn.engine.impl.el.VariableExistsExpressionEnhancer;
@@ -804,6 +806,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             flowableFunctionDelegates.add(new VariableGreaterThanFunctionDelegate());
             flowableFunctionDelegates.add(new VariableGreaterThanOrEqualsFunctionDelegate());
             
+            flowableFunctionDelegates.add(new VariableContainsFunctionDelegate());
+            
         }
         
         if (customFlowableFunctionDelegates != null) {
@@ -826,6 +830,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             expressionEnhancers.add(new VariableLowerThanOrEqualsExpressionEnhancer());
             expressionEnhancers.add(new VariableGreaterThanExpressionEnhancer());
             expressionEnhancers.add(new VariableGreaterThanOrEqualsExpressionEnhancer());
+            
+            expressionEnhancers.add(new VariableContainsExpressionEnhancer());
             
         }
         
