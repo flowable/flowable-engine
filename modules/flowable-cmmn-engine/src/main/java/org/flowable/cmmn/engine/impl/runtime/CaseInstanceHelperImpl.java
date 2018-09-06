@@ -93,6 +93,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             caseInstanceEntity.setTenantId(caseInstanceBuilder.getTenantId());
         }
 
+        if (caseInstanceBuilder.getParentId() != null) {
+            caseInstanceEntity.setParentId(caseInstanceBuilder.getParentId());
+        }
+
         if (caseInstanceBuilder.getCallbackId() != null) {
             caseInstanceEntity.setCallbackId(caseInstanceBuilder.getCallbackId());
         }

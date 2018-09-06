@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.rest.service.api.history;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -124,6 +126,7 @@ public class HistoryDecisionExecutionCollectionResource {
             restApiInterceptor.accessDecisionHistoryInfoWithQuery(historicDecisionExecutionQuery);
         }
 
-        return new HistoricDecisionExecutionsDmnPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, historicDecisionExecutionQuery, "startTime", properties);
+        return paginateList(allRequestParams, historicDecisionExecutionQuery, "startTime", properties,
+            dmnRestResponseFactory::createHistoricDecisionExecutionResponseList);
     }
 }

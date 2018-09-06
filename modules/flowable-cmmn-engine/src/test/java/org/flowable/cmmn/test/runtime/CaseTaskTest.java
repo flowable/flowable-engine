@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -264,6 +265,9 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         // Terminate child
         CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
         assertNotNull(childCaseInstance);
+        HistoricCaseInstance historicChildCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
+        assertNotNull(historicChildCaseInstance);
+
         cmmnRuntimeService.terminateCaseInstance(childCaseInstance.getId());
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());

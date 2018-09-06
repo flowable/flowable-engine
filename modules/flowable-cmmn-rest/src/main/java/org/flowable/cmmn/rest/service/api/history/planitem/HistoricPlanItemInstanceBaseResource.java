@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -98,7 +100,8 @@ public abstract class HistoricPlanItemInstanceBaseResource {
             restApiInterceptor.accessHistoryPlanItemInfoWithQuery(query);
         }
 
-        return new HistoricPlanItemInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "createdTime", allowedSortProperties);
+        return paginateList(allRequestParams, queryRequest, query, "createdTime", allowedSortProperties,
+            restResponseFactory::createHistoricPlanItemInstanceResponseList);
     }
 
 }
