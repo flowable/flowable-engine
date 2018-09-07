@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -27,7 +26,7 @@ import org.flowable.job.service.JobServiceConfiguration;
  *
  * @author Tijs Rademakers
  */
-public abstract class AbstractJobEntityImpl extends AbstractEntity implements AbstractRuntimeJobEntity, Serializable {
+public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity implements AbstractRuntimeJobEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

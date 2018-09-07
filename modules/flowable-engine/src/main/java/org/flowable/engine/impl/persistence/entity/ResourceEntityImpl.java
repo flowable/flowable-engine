@@ -15,13 +15,11 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class ResourceEntityImpl extends AbstractEntityNoRevision implements ResourceEntity, Serializable {
+public class ResourceEntityImpl extends AbstractBpmnEngineNoRevisionEntity implements ResourceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

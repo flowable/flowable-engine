@@ -17,12 +17,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
-
 /**
  * @author Joram Barrez
  */
-public class HistoricMilestoneInstanceEntityImpl extends AbstractEntity implements HistoricMilestoneInstanceEntity {
+public class HistoricMilestoneInstanceEntityImpl extends AbstractCmmnEngineEntity implements HistoricMilestoneInstanceEntity {
     
     protected String name;
     protected Date timeStamp;

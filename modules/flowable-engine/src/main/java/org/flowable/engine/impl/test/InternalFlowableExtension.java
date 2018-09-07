@@ -124,7 +124,8 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
                 processEngineConfiguration.setAsyncHistoryEnabled(false);
                 asyncHistoryManager = processEngineConfiguration.getHistoryManager();
                 processEngineConfiguration
-                    .setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, processEngineConfiguration.getHistoryLevel()));
+                    .setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, 
+                            processEngineConfiguration.getHistoryLevel(), processEngineConfiguration.isUsePrefixId()));
             }
 
             String annotationDeploymentKey = context.getUniqueId() + ANNOTATION_DEPLOYMENT_ID_KEY;

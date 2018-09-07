@@ -18,12 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.db.HasRevision;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tijs Rademakers
  */
-public class TokenEntityImpl extends AbstractEntity implements TokenEntity, Serializable, HasRevision {
+public class TokenEntityImpl extends AbstractIdmEngineEntity implements TokenEntity, Serializable, HasRevision {
 
     private static final long serialVersionUID = 1L;
 

@@ -40,8 +40,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 
 public class AsyncHistoryManager extends AbstractHistoryManager {
 
-    public AsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel) {
-        super(processEngineConfiguration, historyLevel);
+    public AsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel, boolean usePrefixId) {
+        super(processEngineConfiguration, historyLevel, usePrefixId);
     }
 
     public AsyncHistorySession getAsyncHistorySession() {

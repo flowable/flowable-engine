@@ -1191,9 +1191,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initHistoryManager() {
         if (historyManager == null) {
             if (isAsyncHistoryEnabled) {
-                historyManager = new AsyncHistoryManager(this, historyLevel);
+                historyManager = new AsyncHistoryManager(this, historyLevel, usePrefixId);
             } else {
-                historyManager = new DefaultHistoryManager(this, historyLevel);
+                historyManager = new DefaultHistoryManager(this, historyLevel, usePrefixId);
             }
         }
     }
@@ -1328,7 +1328,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        this.taskServiceConfiguration.setIdGenerator(this.taskIdGenerator);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
@@ -1623,6 +1622,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnDeployer.setBpmnDeploymentHelper(bpmnDeploymentHelper);
         bpmnDeployer.setCachingAndArtifactsManager(cachingAndArtifactsManager);
         bpmnDeployer.setProcessDefinitionDiagramHelper(processDefinitionDiagramHelper);
+        bpmnDeployer.setUsePrefixId(usePrefixId);
 
         defaultDeployers.add(bpmnDeployer);
 
@@ -2018,9 +2018,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (dbIdGenerator.getCommandConfig() == null) {
                 dbIdGenerator.setCommandConfig(getDefaultCommandConfig().transactionRequiresNew());
             }
-        }
-        if (taskIdGenerator == null) {
-            taskIdGenerator = idGenerator;
         }
     }
 

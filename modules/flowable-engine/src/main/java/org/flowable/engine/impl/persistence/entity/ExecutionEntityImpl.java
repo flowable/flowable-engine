@@ -47,7 +47,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
  * @author Joram Barrez
  */
 
-public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionEntity, CountingExecutionEntity {
+public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity implements ExecutionEntity, CountingExecutionEntity {
 
     private static final long serialVersionUID = 1L;
 

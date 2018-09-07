@@ -64,7 +64,11 @@ public class AppDeployer implements EngineDeployer {
                     AppDefinitionEntityManager appDefinitionEntityManager = appEngineConfiguration.getAppDefinitionEntityManager();
                     AppDefinitionEntity newAppDefinition = appEngineConfiguration.getAppDefinitionEntityManager().create();
                     newAppDefinition.setVersion(version);
-                    newAppDefinition.setId(appEngineConfiguration.getIdGenerator().getNextId());
+                    if (appEngineConfiguration.isUsePrefixId()) {
+                        newAppDefinition.setId(newAppDefinition.getIdPrefix() + appEngineConfiguration.getIdGenerator().getNextId());
+                    } else {
+                        newAppDefinition.setId(appEngineConfiguration.getIdGenerator().getNextId());
+                    }
                     newAppDefinition.setKey(appResourceModel.getKey());
                     newAppDefinition.setName(appResourceModel.getName());
                     newAppDefinition.setDescription(appResourceModel.getDescription());
