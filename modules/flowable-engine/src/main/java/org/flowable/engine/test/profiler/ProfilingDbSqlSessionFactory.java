@@ -21,6 +21,10 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  * @author Joram Barrez
  */
 public class ProfilingDbSqlSessionFactory extends DbSqlSessionFactory {
+    
+    public ProfilingDbSqlSessionFactory(boolean usePrefixId) {
+        super(usePrefixId);
+    }
 
     @Override
     public Session openSession(CommandContext commandContext) {

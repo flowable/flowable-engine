@@ -147,7 +147,6 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
-import org.flowable.common.engine.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
@@ -156,7 +155,6 @@ import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -234,7 +232,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
-        HasTaskIdGeneratorEngineConfiguration, ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration {
+        ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -616,11 +614,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected BusinessCalendarManager businessCalendarManager;
 
     /**
-     * generator used to generate task ids
-     */
-    protected IdGenerator taskIdGenerator;
-
-    /**
      * postprocessor for a task builder
      */
     protected TaskPostProcessor taskPostProcessor;
@@ -940,6 +933,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         cmmnDeployer.setIdGenerator(idGenerator);
         cmmnDeployer.setCmmnParser(cmmnParser);
         cmmnDeployer.setCaseDefinitionDiagramHelper(caseDefinitionDiagramHelper);
+        cmmnDeployer.setUsePrefixId(usePrefixId);
 
         defaultDeployers.add(cmmnDeployer);
         return defaultDeployers;
@@ -1113,7 +1107,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        this.taskServiceConfiguration.setIdGenerator(taskIdGenerator);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
@@ -2809,28 +2802,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.formFieldHandler = formFieldHandler;
     }
 
-    @Override
-    public void initIdGenerator() {
-        super.initIdGenerator();
-        if (taskIdGenerator == null) {
-            taskIdGenerator = idGenerator;
-        }
-    }
-    
     public void resetClock() {
         if (this.clock != null) {
             clock.reset();
         }
-    }
-
-    @Override
-    public IdGenerator getTaskIdGenerator() {
-        return taskIdGenerator;
-    }
-
-    @Override
-    public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
-        this.taskIdGenerator = taskIdGenerator;
     }
 
     public TaskPostProcessor getTaskPostProcessor() {

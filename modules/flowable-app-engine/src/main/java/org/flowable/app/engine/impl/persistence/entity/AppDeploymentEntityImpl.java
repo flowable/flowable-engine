@@ -24,13 +24,12 @@ import java.util.Map;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class AppDeploymentEntityImpl extends AbstractEntityNoRevision implements AppDeploymentEntity, Serializable {
+public class AppDeploymentEntityImpl extends AbstractAppEngineNoRevisionEntity implements AppDeploymentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

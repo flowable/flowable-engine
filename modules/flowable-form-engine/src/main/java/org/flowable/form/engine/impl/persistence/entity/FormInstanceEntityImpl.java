@@ -17,14 +17,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.form.engine.FormEngineConfiguration;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements FormInstanceEntity, Serializable {
+public class FormInstanceEntityImpl extends AbstractFormEngineNoRevisionEntity implements FormInstanceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

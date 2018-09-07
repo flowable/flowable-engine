@@ -295,6 +295,7 @@ public abstract class AbstractEngineConfiguration {
     protected Map<Object, Object> beans;
 
     protected IdGenerator idGenerator;
+    protected boolean usePrefixId;
 
     protected Clock clock;
 
@@ -605,7 +606,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
     protected abstract void initDbSqlSessionFactoryEntitySettings();
@@ -1061,6 +1062,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
+        return this;
+    }
+
+    public boolean isUsePrefixId() {
+        return usePrefixId;
+    }
+
+    public AbstractEngineConfiguration setUsePrefixId(boolean usePrefixId) {
+        this.usePrefixId = usePrefixId;
         return this;
     }
 

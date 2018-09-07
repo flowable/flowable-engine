@@ -15,13 +15,12 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.io.Serializable;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class IdmPropertyEntityImpl extends AbstractEntity implements IdmPropertyEntity, Serializable {
+public class IdmPropertyEntityImpl extends AbstractIdmEngineEntity implements IdmPropertyEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

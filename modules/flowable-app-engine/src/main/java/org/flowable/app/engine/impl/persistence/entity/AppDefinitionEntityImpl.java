@@ -17,9 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.app.engine.AppEngineConfiguration;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
-public class AppDefinitionEntityImpl extends AbstractEntity implements AppDefinitionEntity {
+public class AppDefinitionEntityImpl extends AbstractAppEngineEntity implements AppDefinitionEntity {
     
     protected String category;
     protected String name;

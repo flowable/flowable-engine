@@ -64,6 +64,7 @@ public class BpmnDeployer implements EngineDeployer {
     protected BpmnDeploymentHelper bpmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
     protected ProcessDefinitionDiagramHelper processDefinitionDiagramHelper;
+    protected boolean usePrefixId;
 
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
@@ -239,7 +240,12 @@ public class BpmnDeployer implements EngineDeployer {
             
             processDefinition.setVersion(0);
             processDefinition.setDerivedVersion(derivedVersion);
-            processDefinition.setId(idGenerator.getNextId());
+            if (usePrefixId) {
+                processDefinition.setId(processDefinition.getIdPrefix() + idGenerator.getNextId());
+            } else {
+                processDefinition.setId(idGenerator.getNextId());
+            }
+            
             processDefinition.setDerivedFrom((String) deploymentSettings.get(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ID));
             processDefinition.setDerivedFromRoot((String) deploymentSettings.get(DeploymentSettings.DERIVED_PROCESS_DEFINITION_ROOT_ID));
 
@@ -299,9 +305,14 @@ public class BpmnDeployer implements EngineDeployer {
      * Process definition ids NEED to be unique across the whole engine!
      */
     protected String getIdForNewProcessDefinition(ProcessDefinitionEntity processDefinition) {
+        String prefixId = "";
+        if (usePrefixId) {
+            prefixId = processDefinition.getIdPrefix();
+        } 
+        
         String nextId = idGenerator.getNextId();
 
-        String result = processDefinition.getKey() + ":" + processDefinition.getVersion() + ":" + nextId; // ACT-505
+        String result = prefixId + processDefinition.getKey() + ":" + processDefinition.getVersion() + ":" + nextId; // ACT-505
         // ACT-115: maximum id length is 64 characters
         if (result.length() > 64) {
             result = nextId;
@@ -524,5 +535,13 @@ public class BpmnDeployer implements EngineDeployer {
 
     public void setProcessDefinitionDiagramHelper(ProcessDefinitionDiagramHelper processDefinitionDiagramHelper) {
         this.processDefinitionDiagramHelper = processDefinitionDiagramHelper;
+    }
+
+    public boolean isUsePrefixId() {
+        return usePrefixId;
+    }
+
+    public void setUsePrefixId(boolean usePrefixId) {
+        this.usePrefixId = usePrefixId;
     }
 }

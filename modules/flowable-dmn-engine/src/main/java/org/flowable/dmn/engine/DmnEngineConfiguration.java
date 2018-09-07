@@ -336,7 +336,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
     @Override
@@ -446,6 +446,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         dmnDeployer.setParsedDeploymentBuilderFactory(parsedDeploymentBuilderFactory);
         dmnDeployer.setDmnDeploymentHelper(dmnDeploymentHelper);
         dmnDeployer.setCachingAndArtifactsManager(cachingAndArtifactsManager);
+        dmnDeployer.setUsePrefixId(usePrefixId);
 
         defaultDeployers.add(dmnDeployer);
         return defaultDeployers;

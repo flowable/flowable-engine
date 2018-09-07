@@ -17,14 +17,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.content.engine.ContentEngineConfiguration;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class ContentItemEntityImpl extends AbstractEntityNoRevision implements ContentItemEntity, Serializable {
+public class ContentItemEntityImpl extends AbstractContentEngineNoRevisionEntity implements ContentItemEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

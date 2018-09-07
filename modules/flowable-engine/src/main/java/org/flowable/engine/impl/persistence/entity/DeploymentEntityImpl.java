@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -29,7 +28,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class DeploymentEntityImpl extends AbstractEntityNoRevision implements DeploymentEntity, Serializable {
+public class DeploymentEntityImpl extends AbstractBpmnEngineNoRevisionEntity implements DeploymentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

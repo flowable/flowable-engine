@@ -17,12 +17,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
-
 /**
  * @author Tijs Rademakers
  */
-public class ProcessDefinitionInfoEntityImpl extends AbstractEntity implements ProcessDefinitionInfoEntity, Serializable {
+public class ProcessDefinitionInfoEntityImpl extends AbstractBpmnEngineEntity implements ProcessDefinitionInfoEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
