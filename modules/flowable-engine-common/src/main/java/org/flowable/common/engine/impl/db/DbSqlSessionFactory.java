@@ -64,6 +64,12 @@ public class DbSqlSessionFactory implements SessionFactory {
     protected int maxNrOfStatementsInBulkInsert = 100;
     
     protected Map<String, Class<?>> logicalNameToClassMapping = new ConcurrentHashMap<>();
+    
+    protected boolean usePrefixId;
+    
+    public DbSqlSessionFactory(boolean usePrefixId) {
+        this.usePrefixId = usePrefixId;
+    }
 
     @Override
     public Class<?> getSessionType() {
@@ -332,6 +338,12 @@ public class DbSqlSessionFactory implements SessionFactory {
     public void setLogicalNameToClassMapping(Map<String, Class<?>> logicalNameToClassMapping) {
         this.logicalNameToClassMapping = logicalNameToClassMapping;
     }
-    
 
+    public boolean isUsePrefixId() {
+        return usePrefixId;
+    }
+
+    public void setUsePrefixId(boolean usePrefixId) {
+        this.usePrefixId = usePrefixId;
+    }
 }

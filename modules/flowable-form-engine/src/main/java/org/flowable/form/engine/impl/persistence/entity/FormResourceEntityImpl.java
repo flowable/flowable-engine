@@ -15,12 +15,10 @@ package org.flowable.form.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
-
 /**
  * @author Tijs Rademakers
  */
-public class FormResourceEntityImpl extends AbstractEntityNoRevision implements FormResourceEntity, Serializable {
+public class FormResourceEntityImpl extends AbstractFormEngineNoRevisionEntity implements FormResourceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

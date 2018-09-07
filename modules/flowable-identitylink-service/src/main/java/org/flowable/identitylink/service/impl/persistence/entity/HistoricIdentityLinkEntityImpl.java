@@ -18,12 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Frederik Heremans
  */
-public class HistoricIdentityLinkEntityImpl extends AbstractEntityNoRevision implements HistoricIdentityLinkEntity, Serializable {
+public class HistoricIdentityLinkEntityImpl extends AbstractIdentityLinkServiceNoRevisionEntity implements HistoricIdentityLinkEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

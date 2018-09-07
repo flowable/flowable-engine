@@ -54,8 +54,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
 
-    public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel) {
-        super(processEngineConfiguration, historyLevel);
+    public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel, boolean usePrefixId) {
+        super(processEngineConfiguration, historyLevel, usePrefixId);
     }
 
     // Process related history

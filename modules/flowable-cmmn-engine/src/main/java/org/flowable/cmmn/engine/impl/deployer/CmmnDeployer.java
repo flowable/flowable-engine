@@ -54,6 +54,7 @@ public class CmmnDeployer implements EngineDeployer {
     protected IdGenerator idGenerator;
     protected CmmnParser cmmnParser;
     protected CaseDefinitionDiagramHelper caseDefinitionDiagramHelper;
+    protected boolean usePrefixId;
 
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
@@ -144,7 +145,11 @@ public class CmmnDeployer implements EngineDeployer {
                 version = latest.getVersion() + 1;
             }
             caseDefinition.setVersion(version);
-            caseDefinition.setId(idGenerator.getNextId());
+            if (usePrefixId) {
+                caseDefinition.setId(caseDefinition.getIdPrefix() + idGenerator.getNextId());
+            } else {
+                caseDefinition.setId(idGenerator.getNextId());
+            }
 
             Case caseObject = parseResult.getCmmnCaseForCaseDefinition(caseDefinition);
             if (caseObject.getPlanModel().getFormKey() != null) {
@@ -268,5 +273,13 @@ public class CmmnDeployer implements EngineDeployer {
 
     public void setCaseDefinitionDiagramHelper(CaseDefinitionDiagramHelper caseDefinitionDiagramHelper) {
         this.caseDefinitionDiagramHelper = caseDefinitionDiagramHelper;
+    }
+
+    public boolean isUsePrefixId() {
+        return usePrefixId;
+    }
+
+    public void setUsePrefixId(boolean usePrefixId) {
+        this.usePrefixId = usePrefixId;
     }
 }

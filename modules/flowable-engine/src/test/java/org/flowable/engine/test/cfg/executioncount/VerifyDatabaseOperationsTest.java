@@ -87,7 +87,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
         // Add dbsqlSession factory that captures CRUD operations
         this.oldDbSqlSessionFactory = processEngineConfiguration.getDbSqlSessionFactory();
-        DbSqlSessionFactory newDbSqlSessionFactory = new ProfilingDbSqlSessionFactory();
+        DbSqlSessionFactory newDbSqlSessionFactory = new ProfilingDbSqlSessionFactory(processEngineConfiguration.isUsePrefixId());
         newDbSqlSessionFactory.setBulkInserteableEntityClasses(new HashSet<>(EntityDependencyOrder.INSERT_ORDER));
         newDbSqlSessionFactory.setInsertionOrder(oldDbSqlSessionFactory.getInsertionOrder());
         newDbSqlSessionFactory.setDeletionOrder(oldDbSqlSessionFactory.getDeletionOrder());

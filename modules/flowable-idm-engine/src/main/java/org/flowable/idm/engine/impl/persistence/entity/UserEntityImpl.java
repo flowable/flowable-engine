@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.db.HasRevision;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.idm.api.Picture;
 
 /**
@@ -25,7 +24,7 @@ import org.flowable.idm.api.Picture;
  * @author Arkadiy Gornovoy
  * @author Joram Barrez
  */
-public class UserEntityImpl extends AbstractEntity implements UserEntity, Serializable, HasRevision {
+public class UserEntityImpl extends AbstractIdmEngineEntity implements UserEntity, Serializable, HasRevision {
 
     private static final long serialVersionUID = 1L;
 

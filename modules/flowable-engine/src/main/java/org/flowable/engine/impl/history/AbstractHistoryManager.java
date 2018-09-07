@@ -44,11 +44,13 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
     protected HistoryLevel historyLevel;
     protected boolean enableProcessDefinitionHistoryLevel;
+    protected boolean usePrefixId;
 
-    public AbstractHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel) {
+    public AbstractHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel, boolean usePrefixId) {
         super(processEngineConfiguration);
         this.historyLevel = historyLevel;
         this.enableProcessDefinitionHistoryLevel = processEngineConfiguration.isEnableProcessDefinitionHistoryLevel();
+        this.usePrefixId = usePrefixId;
     }
     
     @Override
@@ -312,7 +314,12 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         String processInstanceId = execution.getProcessInstanceId();
 
         HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().create();
-        historicActivityInstance.setId(idGenerator.getNextId());
+        if (usePrefixId) {
+            historicActivityInstance.setId(historicActivityInstance.getIdPrefix() + idGenerator.getNextId());
+        } else {
+            historicActivityInstance.setId(idGenerator.getNextId());
+        }
+        
         historicActivityInstance.setProcessDefinitionId(processDefinitionId);
         historicActivityInstance.setProcessInstanceId(processInstanceId);
         historicActivityInstance.setExecutionId(execution.getId());

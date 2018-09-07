@@ -341,7 +341,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
     // command executors
@@ -428,6 +428,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         formDeployer.setParsedDeploymentBuilderFactory(parsedDeploymentBuilderFactory);
         formDeployer.setFormDeploymentHelper(formDeploymentHelper);
         formDeployer.setCachingAndArtifactsManager(cachingAndArtifactsManager);
+        formDeployer.setUsePrefixId(usePrefixId);
 
         defaultDeployers.add(formDeployer);
         return defaultDeployers;

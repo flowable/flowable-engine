@@ -12,17 +12,16 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+
 /**
  * @author Dennis Federico
  */
-public class HistoricPlanItemInstanceEntityImpl extends AbstractEntity implements HistoricPlanItemInstanceEntity {
+public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity implements HistoricPlanItemInstanceEntity {
 
     protected String name;
     protected String state;

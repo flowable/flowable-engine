@@ -16,7 +16,6 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
@@ -198,14 +197,6 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     @Override
     public void deleteTasksByExecutionId(String executionId) {
         taskDataManager.deleteTasksByExecutionId(executionId);
-    }
-
-    @Override
-    public void insert(TaskEntity taskEntity, boolean fireCreateEvent) {
-        if (StringUtils.isEmpty(taskEntity.getId())) {
-            taskEntity.setId(this.taskServiceConfiguration.getIdGenerator().getNextId());
-        }
-        super.insert(taskEntity, fireCreateEvent);
     }
 
     public TaskDataManager getTaskDataManager() {

@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.form.engine.FormEngineConfiguration;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class FormDefinitionEntityImpl extends AbstractEntityNoRevision implements FormDefinitionEntity, Serializable {
+public class FormDefinitionEntityImpl extends AbstractFormEngineNoRevisionEntity implements FormDefinitionEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
