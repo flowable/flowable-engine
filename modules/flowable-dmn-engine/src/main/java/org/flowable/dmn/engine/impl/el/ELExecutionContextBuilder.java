@@ -105,8 +105,12 @@ public class ELExecutionContextBuilder {
                 } else if (inputVariable.getValue() instanceof Long || inputVariable.getValue() instanceof Integer) {
                     BigInteger transformedNumber = new BigInteger(inputVariable.getValue().toString());
                     inputVariables.put(inputVariable.getKey(), transformedNumber);
-                } else if (inputVariable.getValue() instanceof Double || inputVariable.getValue() instanceof Float) {
-                    BigDecimal transformedNumber = new BigDecimal(inputVariable.getValue().toString());
+                } else if (inputVariable.getValue() instanceof Double ) {
+                    BigDecimal transformedNumber = new BigDecimal((Double) inputVariable.getValue());
+                    inputVariables.put(inputVariable.getKey(), transformedNumber);
+                } else if (inputVariable.getValue() instanceof Float) {
+                    Double doubleValue = Double.valueOf(inputVariable.getValue().toString());
+                    BigDecimal transformedNumber = new BigDecimal(doubleValue);
                     inputVariables.put(inputVariable.getKey(), transformedNumber);
                 }
             } catch (Exception ex) {
