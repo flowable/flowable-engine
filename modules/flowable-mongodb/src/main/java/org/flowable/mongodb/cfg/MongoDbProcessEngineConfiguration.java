@@ -49,6 +49,7 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.VariableServiceConfiguration;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
@@ -60,6 +61,7 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
     
     protected List<ServerAddress> serverAddresses = new ArrayList<>();
     protected String databaseName = "flowable";
+    protected MongoClientOptions mongoClientOptions;
     protected MongoClient mongoClient;
     protected MongoDatabase mongoDatabase;
     
@@ -79,8 +81,11 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
     
     @Override
     public void initNonRelationalDataSource() {
+        if (this.mongoClientOptions == null) {
+            this.mongoClientOptions = MongoClientOptions.builder().build();
+        }
         if (this.mongoClient == null) {
-            this.mongoClient = new com.mongodb.MongoClient(serverAddresses);  
+            this.mongoClient = new com.mongodb.MongoClient(serverAddresses, mongoClientOptions);  
         }
         
         //TODO Schema mgmt
@@ -263,6 +268,14 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
     public MongoDbProcessEngineConfiguration setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
         return this;
+    }
+    
+    public MongoClientOptions getMongoClientOptions() {
+        return mongoClientOptions;
+    }
+
+    public void setMongoClientOptions(MongoClientOptions mongoClientOptions) {
+        this.mongoClientOptions = mongoClientOptions;
     }
 
     public MongoClient getMongoClient() {
