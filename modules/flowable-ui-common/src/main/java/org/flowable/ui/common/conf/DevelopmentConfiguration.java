@@ -35,7 +35,7 @@ public class DevelopmentConfiguration {
     protected static final String DATASOURCE_PASSWORD = "flowable";
 
     @Bean
-    @ConditionalOnMissingBean(DataSource.class)
+    @ConditionalOnMissingBean
     public DataSource developmentDataSource() {
         return DataSourceBuilder
             .create()
