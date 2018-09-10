@@ -35,6 +35,7 @@ import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.FindIterable;
@@ -126,7 +127,7 @@ public class MongoDbSession implements Session {
             MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(clazz));
             
             Map<String, ? extends Entity> entities = insertedObjects.get(clazz);
-            EntityMapper entityMapper = mongoDbSessionFactory.getMapperForEntityClass(clazz);
+            EntityToDocumentMapper entityMapper = mongoDbSessionFactory.getMapperForEntityClass(clazz);
             for (Entity entity : entities.values()) {
                 Document document = entityMapper.toDocument(entity);
                 mongoDbCollection.insertOne(clientSession, document);
@@ -139,8 +140,13 @@ public class MongoDbSession implements Session {
             
             LOGGER.debug("updating: {}", updatedObject);
 
-            String collection = mongoDbSessionFactory.getCollections().get(updatedObject.getClass());
-            mongoDbSessionFactory.getDataManagerForCollection(collection).updateEntity(updatedObject);
+            Class<?> entityClass = updatedObject.getClass();
+            String collection = mongoDbSessionFactory.getCollections().get(entityClass);
+            BasicDBObject updateObject = mongoDbSessionFactory.getDataManagerForCollection(collection).createUpdateObject(updatedObject);
+            if (updateObject != null) {
+                performUpdate(collection, updatedObject, new Document().append("$set", updateObject));
+            }
+            
             /*if (updatedRecords == 0) {
                 throw new FlowableOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
             }*/
@@ -162,7 +168,7 @@ public class MongoDbSession implements Session {
             
             MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(clazz));
             Map<String, ? extends Entity> entities = deletedObjects.get(clazz);
-            EntityMapper entityMapper = mongoDbSessionFactory.getMapperForEntityClass(clazz);
+            EntityToDocumentMapper entityMapper = mongoDbSessionFactory.getMapperForEntityClass(clazz);
             for (Entity entity : entities.values()) {
                 mongoDbCollection.deleteOne(Filters.eq("_id", entity.getId()));
             }
@@ -273,7 +279,7 @@ public class MongoDbSession implements Session {
         if (iterator.hasNext()) {
             Document document = iterator.next();
             if (document != null) {
-                EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
+                EntityToDocumentMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
                 return (T) entityMapper.fromDocument(document);
             }
         }
@@ -282,7 +288,7 @@ public class MongoDbSession implements Session {
     
     @SuppressWarnings("unchecked")
     public <T> List<T> mapToEntities(String collection, FindIterable<Document> documents) {
-        EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
+        EntityToDocumentMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
         List<Object> entities = new ArrayList<>();
         for (Document document : documents) {
             entities.add((T) entityMapper.fromDocument(document));
@@ -292,7 +298,7 @@ public class MongoDbSession implements Session {
     }
     
     public List<Entity> mapToEntitiesType(String collection, FindIterable<Document> documents) {
-        EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
+        EntityToDocumentMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
         List<Object> entities = new ArrayList<>();
         for (Document document : documents) {
             entities.add(entityMapper.fromDocument(document));
@@ -342,7 +348,7 @@ public class MongoDbSession implements Session {
             return null;
         }
         
-        EntityMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
+        EntityToDocumentMapper<? extends Entity> entityMapper = mongoDbSessionFactory.getCollectionToMapper().get(collection);
         entity = (T) entityMapper.fromDocument(document);
         
         entityCache.put((Entity) entity, true); // true -> store state so we can see later if it is updated later on

@@ -14,48 +14,34 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 
 /**
  * @author Joram Barrez
  */
-public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager implements IdentityLinkDataManager {
+public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager<IdentityLinkEntity> implements IdentityLinkDataManager {
     
     public static String COLLECTION_IDENTITY_LINKS = "identityLinks";
 
+    @Override
+    public String getCollection() {
+        return COLLECTION_IDENTITY_LINKS;
+    }
+    
     @Override
     public IdentityLinkEntity create() {
         return new IdentityLinkEntityImpl();
     }
 
     @Override
-    public IdentityLinkEntity findById(String identityLinkId) {
-        return getMongoDbSession().findOne(COLLECTION_IDENTITY_LINKS, identityLinkId);
-    }
-
-    @Override
-    public void insert(IdentityLinkEntity identityLinkEntity) {
-        getMongoDbSession().insertOne(identityLinkEntity);
-    }
-
-    @Override
-    public IdentityLinkEntity update(IdentityLinkEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(String id) {
-        IdentityLinkEntity identityLinkEntity = findById(id);
-        delete(identityLinkEntity);
-    }
-
-    @Override
-    public void delete(IdentityLinkEntity entity) {
-        getMongoDbSession().delete(COLLECTION_IDENTITY_LINKS, entity);
+    public BasicDBObject createUpdateObject(Entity entity) {
+        return null;
     }
 
     @Override

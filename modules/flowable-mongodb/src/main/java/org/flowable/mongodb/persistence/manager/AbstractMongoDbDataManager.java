@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.mongodb.persistence.MongoDbSession;
 
 import com.mongodb.BasicDBObject;
@@ -23,19 +24,57 @@ import com.mongodb.BasicDBObject;
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractMongoDbDataManager {
+public abstract class AbstractMongoDbDataManager<EntityImpl extends Entity> implements DataManager<EntityImpl> {
+    
+    public abstract String getCollection();
     
     protected MongoDbSession getMongoDbSession() {
         return Context.getCommandContext().getSession(MongoDbSession.class);
     }
+    
+    @Override
+    public EntityImpl findById(String id) {
+        return getMongoDbSession().findOne(getCollection(), id);
+    }
 
-    public void updateEntity(Entity entity) {
-        
+    @Override
+    public void insert(EntityImpl entity) {
+        getMongoDbSession().insertOne(entity);
     }
     
-    protected BasicDBObject setUpdateProperty(String propertyName, Object value, Map<String, Object> persistentState, BasicDBObject updateObject) {
-        if ((persistentState.get(propertyName) == null && value != null) ||
-            (persistentState.get(propertyName) != null && !persistentState.get(propertyName).equals(value))) {
+    @Override
+    public EntityImpl update(EntityImpl entity) {
+        getMongoDbSession().update(entity);
+        return entity;
+    }
+    
+    @Override
+    public void delete(String id) {
+        EntityImpl entity = findById(id);
+        delete(entity);
+    }
+
+    @Override
+    public void delete(EntityImpl entity) {
+        getMongoDbSession().delete(getCollection(), entity);    
+    }
+    
+    /**
+     * Implements the update logic for the specific {@link Entity} managed and returns a {@link BasicDBObject} representing the changes.
+     * 
+     * Contrary to the relational counterpart, the update is not generic and thus each subclass needs to implement the actual update. 
+     * (The specific part for the relational case is in the Mybatis xml, so it's implicit and still needed to be written)
+     */
+    public abstract BasicDBObject createUpdateObject(Entity entity);
+    
+    /**
+     * Helper method for subclasses to create a {@link BasicDBObject} that can be used to execute an update to an {@link Entity}.
+     */
+    @SuppressWarnings("unchecked")
+    protected BasicDBObject setUpdateProperty(Entity entity, String propertyName, Object value, BasicDBObject updateObject) {
+        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
+        if ((persistentState.get(propertyName) == null && value != null) || // value didn't exist before
+            (persistentState.get(propertyName) != null && !persistentState.get(propertyName).equals(value))) { // value existed and is changed
             
             if (updateObject == null) {
                 updateObject = new BasicDBObject();

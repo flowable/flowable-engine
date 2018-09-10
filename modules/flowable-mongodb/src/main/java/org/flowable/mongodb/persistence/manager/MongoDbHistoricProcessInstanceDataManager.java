@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -32,57 +31,31 @@ import com.mongodb.client.model.Filters;
 /**
  * @author Tijs Rademakers
  */
-public class MongoDbHistoricProcessInstanceDataManager extends AbstractMongoDbDataManager implements HistoricProcessInstanceDataManager {
+public class MongoDbHistoricProcessInstanceDataManager extends AbstractMongoDbDataManager<HistoricProcessInstanceEntity> implements HistoricProcessInstanceDataManager {
     
     public static final String COLLECTION_HISTORIC_PROCESS_INSTANCES = "historicProcessInstances";
 
+    @Override
+    public String getCollection() {
+        return COLLECTION_HISTORIC_PROCESS_INSTANCES;
+    }
+    
     @Override
     public HistoricProcessInstanceEntity create() {
         return new HistoricProcessInstanceEntityImpl();
     }
 
     @Override
-    public HistoricProcessInstanceEntity findById(String instanceId) {
-        return getMongoDbSession().findOne(COLLECTION_HISTORIC_PROCESS_INSTANCES, instanceId);
-    }
-
-    @Override
-    public void insert(HistoricProcessInstanceEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public HistoricProcessInstanceEntity update(HistoricProcessInstanceEntity entity) {
-        getMongoDbSession().update(entity);
-        return entity;
-    }
-    
-    @Override
-    public void updateEntity(Entity entity) {
+    public BasicDBObject createUpdateObject(Entity entity) {
         HistoricProcessInstanceEntity instanceEntity = (HistoricProcessInstanceEntity) entity;
-        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
         BasicDBObject updateObject = null;
-        updateObject = setUpdateProperty("deleteReason", instanceEntity.getDeleteReason(), persistentState, updateObject);
-        updateObject = setUpdateProperty("endActivityId", instanceEntity.getEndActivityId(), persistentState, updateObject);
-        updateObject = setUpdateProperty("endTime", instanceEntity.getEndTime(), persistentState, updateObject);
-        updateObject = setUpdateProperty("startActivityId", instanceEntity.getStartActivityId(), persistentState, updateObject);
-        updateObject = setUpdateProperty("startTime", instanceEntity.getStartTime(), persistentState, updateObject);
-        updateObject = setUpdateProperty("startUserId", instanceEntity.getStartUserId(), persistentState, updateObject);
-        
-        if (updateObject != null) {
-            getMongoDbSession().performUpdate(COLLECTION_HISTORIC_PROCESS_INSTANCES, entity, new Document().append("$set", updateObject));
-        }
-    }
-
-    @Override
-    public void delete(String id) {
-        HistoricProcessInstanceEntity instanceEntity = findById(id);
-        delete(instanceEntity);
-    }
-
-    @Override
-    public void delete(HistoricProcessInstanceEntity instanceEntity) {
-        getMongoDbSession().delete(COLLECTION_HISTORIC_PROCESS_INSTANCES, instanceEntity);
+        updateObject = setUpdateProperty(instanceEntity, "deleteReason", instanceEntity.getDeleteReason(), updateObject);
+        updateObject = setUpdateProperty(instanceEntity, "endActivityId", instanceEntity.getEndActivityId(), updateObject);
+        updateObject = setUpdateProperty(instanceEntity, "endTime", instanceEntity.getEndTime(), updateObject);
+        updateObject = setUpdateProperty(instanceEntity, "startActivityId", instanceEntity.getStartActivityId(), updateObject);
+        updateObject = setUpdateProperty(instanceEntity, "startTime", instanceEntity.getStartTime(), updateObject);
+        updateObject = setUpdateProperty(instanceEntity, "startUserId", instanceEntity.getStartUserId(), updateObject);
+        return updateObject;
     }
 
     @Override

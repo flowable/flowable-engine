@@ -15,9 +15,7 @@ package org.flowable.mongodb.persistence.manager;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -34,7 +32,7 @@ import com.mongodb.client.model.Filters;
 /**
  * @author Joram Barrez
  */
-public class MongoDbJobDataManager extends AbstractMongoDbDataManager implements JobDataManager {
+public class MongoDbJobDataManager extends AbstractMongoDbDataManager<JobEntity> implements JobDataManager {
 
     public static final String COLLECTION_JOBS = "jobs";
     
@@ -49,50 +47,24 @@ public class MongoDbJobDataManager extends AbstractMongoDbDataManager implements
     }
     
     @Override
+    public String getCollection() {
+        return COLLECTION_JOBS;
+    }
+    
+    @Override
     public JobEntity create() {
         return new JobEntityImpl();
     }
 
     @Override
-    public JobEntity findById(String jobId) {
-        return getMongoDbSession().findOne(COLLECTION_JOBS, jobId);
-    }
-
-    @Override
-    public void insert(JobEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-    
-    @Override
-    public JobEntity update(JobEntity entity) {
-        getMongoDbSession().update(entity);
-        return entity;
-    }
-
-    @Override
-    public void updateEntity(Entity entity) {
+    public BasicDBObject createUpdateObject(Entity entity) {
         JobEntity jobEntity = (JobEntity) entity;
-        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
         BasicDBObject updateObject = null;
-        updateObject = setUpdateProperty("retries", jobEntity.getRetries(), persistentState, updateObject);
-        updateObject = setUpdateProperty("exceptionMessage", jobEntity.getExceptionMessage(), persistentState, updateObject);
-        updateObject = setUpdateProperty("lockOwner", jobEntity.getLockOwner(), persistentState, updateObject);
-        updateObject = setUpdateProperty("lockExpirationTime", jobEntity.getLockExpirationTime(), persistentState, updateObject);
-        
-        if (updateObject != null) {
-            getMongoDbSession().performUpdate(COLLECTION_JOBS, jobEntity, new Document().append("$set", updateObject));
-        }
-    }
-
-    @Override
-    public void delete(String id) {
-        JobEntity jobEntity = findById(id);
-        delete(jobEntity);
-    }
-
-    @Override
-    public void delete(JobEntity jobEntity) {
-        getMongoDbSession().delete(COLLECTION_JOBS, jobEntity);
+        updateObject = setUpdateProperty(jobEntity, "retries", jobEntity.getRetries(), updateObject);
+        updateObject = setUpdateProperty(jobEntity, "exceptionMessage", jobEntity.getExceptionMessage(), updateObject);
+        updateObject = setUpdateProperty(jobEntity, "lockOwner", jobEntity.getLockOwner(), updateObject);
+        updateObject = setUpdateProperty(jobEntity, "lockExpirationTime", jobEntity.getLockExpirationTime(), updateObject);
+        return updateObject;
     }
 
     @Override

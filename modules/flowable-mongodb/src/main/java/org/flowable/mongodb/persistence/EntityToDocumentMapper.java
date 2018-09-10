@@ -18,7 +18,7 @@ import org.flowable.common.engine.impl.persistence.entity.Entity;
 /**
  * @author Joram Barrez
  */
-public interface EntityMapper<T extends Entity> {
+public interface EntityToDocumentMapper<T extends Entity> {
     
     T fromDocument(Document document);
     

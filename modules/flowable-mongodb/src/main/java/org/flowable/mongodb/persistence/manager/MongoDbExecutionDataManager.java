@@ -46,7 +46,7 @@ import com.mongodb.client.result.UpdateResult;
 /**
  * @author Joram Barrez
  */
-public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager implements ExecutionDataManager {
+public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager<ExecutionEntity> implements ExecutionDataManager {
     
     public static final String COLLECTION_EXECUTIONS = "executions";
     
@@ -61,46 +61,26 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager impl
     public ExecutionEntity create() {
        return new ExecutionEntityImpl();
     }
-
-    public ExecutionEntity findById(String executionId) {
-        return getMongoDbSession().findOne(COLLECTION_EXECUTIONS, executionId);
-    }
-
-    public void insert(ExecutionEntity executionEntity) {
-        getMongoDbSession().insertOne(executionEntity);
-    }
-
-    public ExecutionEntity update(ExecutionEntity entity) {
-        throw new UnsupportedOperationException();
-    }
     
     @Override
-    public void updateEntity(Entity entity) {
+    public String getCollection() {
+        return COLLECTION_EXECUTIONS;
+    }
+
+    @Override
+    public BasicDBObject createUpdateObject(Entity entity) {
         ExecutionEntity executionEntity = (ExecutionEntity) entity;
-        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
         BasicDBObject updateObject = null;
-        updateObject = setUpdateProperty("isActive", executionEntity.isActive(), persistentState, updateObject);
-        updateObject = setUpdateProperty("isScope", executionEntity.isScope(), persistentState, updateObject);
-        updateObject = setUpdateProperty("isConcurrent", executionEntity.isConcurrent(), persistentState, updateObject);
-        updateObject = setUpdateProperty("isEventScope", executionEntity.isEventScope(), persistentState, updateObject);
-        updateObject = setUpdateProperty("activityId", executionEntity.getActivityId(), persistentState, updateObject);
-        updateObject = setUpdateProperty("parentId", executionEntity.getParentId(), persistentState, updateObject);
-        updateObject = setUpdateProperty("superExecutionId", executionEntity.getSuperExecutionId(), persistentState, updateObject);
-        
-        if (updateObject != null) {
-            getMongoDbSession().performUpdate(COLLECTION_EXECUTIONS, entity, new Document().append("$set", updateObject));
-        }
+        updateObject = setUpdateProperty(executionEntity, "isActive", executionEntity.isActive(), updateObject);
+        updateObject = setUpdateProperty(executionEntity, "isScope", executionEntity.isScope(), updateObject);
+        updateObject = setUpdateProperty(executionEntity, "isConcurrent", executionEntity.isConcurrent(), updateObject);
+        updateObject = setUpdateProperty(executionEntity, "isEventScope", executionEntity.isEventScope(), updateObject);
+        updateObject = setUpdateProperty(executionEntity, "activityId", executionEntity.getActivityId(), updateObject);
+        updateObject = setUpdateProperty(executionEntity, "parentId", executionEntity.getParentId(), updateObject);
+        updateObject = setUpdateProperty(executionEntity, "superExecutionId", executionEntity.getSuperExecutionId(), updateObject);
+        return updateObject;
     }
-
-    public void delete(String id) {
-        ExecutionEntity executionEntity = findById(id);
-        delete(executionEntity);
-    }
-
-    public void delete(ExecutionEntity executionEntity) {
-        getMongoDbSession().delete(COLLECTION_EXECUTIONS, executionEntity);    
-    }
-
+   
     public ExecutionEntity findSubProcessInstanceBySuperExecutionId(String superExecutionId) {
        List<ExecutionEntity> executionEntities = getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("superExecutionId", superExecutionId));
        if (executionEntities.size() > 1) {

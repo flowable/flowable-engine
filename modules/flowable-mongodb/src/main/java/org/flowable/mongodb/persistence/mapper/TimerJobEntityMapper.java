@@ -14,9 +14,9 @@ package org.flowable.mongodb.persistence.mapper;
 
 import org.bson.Document;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
-import org.flowable.mongodb.persistence.EntityMapper;
+import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
-public class TimerJobEntityMapper extends AbstractJobEntityMapper implements EntityMapper<TimerJobEntityImpl> {
+public class TimerJobEntityMapper extends AbstractJobEntityMapper implements EntityToDocumentMapper<TimerJobEntityImpl> {
 
     @Override
     public TimerJobEntityImpl fromDocument(Document document) {

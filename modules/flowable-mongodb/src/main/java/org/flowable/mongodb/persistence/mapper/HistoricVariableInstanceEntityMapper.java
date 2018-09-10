@@ -14,13 +14,13 @@ package org.flowable.mongodb.persistence.mapper;
 
 import org.bson.Document;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.mongodb.persistence.EntityMapper;
+import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 
 /**
  * @author Joram Barrez
  */
-public class HistoricVariableInstanceEntityMapper implements EntityMapper<HistoricVariableInstanceEntityImpl> {
+public class HistoricVariableInstanceEntityMapper implements EntityToDocumentMapper<HistoricVariableInstanceEntityImpl> {
 
     @Override
     public HistoricVariableInstanceEntityImpl fromDocument(Document document) {

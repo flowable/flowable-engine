@@ -15,6 +15,7 @@ package org.flowable.mongodb.persistence.manager;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -22,43 +23,47 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public class MongoDbHistoricTaskInstanceDataManager extends AbstractMongoDbDataManager implements HistoricTaskInstanceDataManager {
+public class MongoDbHistoricTaskInstanceDataManager extends AbstractMongoDbDataManager<HistoricTaskInstanceEntity> implements HistoricTaskInstanceDataManager {
     
     public static final String COLLECTION_HISTORIC_TASK_INSTANCES = "historicTaskInstances";
 
     @Override
+    public String getCollection() {
+        return COLLECTION_HISTORIC_TASK_INSTANCES;
+    }
+    
+    @Override
+    public BasicDBObject createUpdateObject(Entity entity) {
+        HistoricTaskInstanceEntity historicTaskInstanceEntity = (HistoricTaskInstanceEntity) entity;
+        BasicDBObject updateObject = null;
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "processDefinitionId", historicTaskInstanceEntity.getProcessDefinitionId(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "executionId", historicTaskInstanceEntity.getExecutionId(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "name", historicTaskInstanceEntity.getName(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "parentTaskId", historicTaskInstanceEntity.getParentTaskId(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "description", historicTaskInstanceEntity.getDescription(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "owner", historicTaskInstanceEntity.getOwner(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "assignee", historicTaskInstanceEntity.getAssignee(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "claimTime", historicTaskInstanceEntity.getClaimTime(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "endTime", historicTaskInstanceEntity.getEndTime(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "duration", historicTaskInstanceEntity.getDurationInMillis(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "deleteReason", historicTaskInstanceEntity.getDeleteReason(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "taskDefinitionKey", historicTaskInstanceEntity.getTaskDefinitionKey(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "formKey", historicTaskInstanceEntity.getFormKey(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "priority", historicTaskInstanceEntity.getPriority(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "dueDate", historicTaskInstanceEntity.getDueDate(), updateObject);
+        updateObject = setUpdateProperty(historicTaskInstanceEntity, "category", historicTaskInstanceEntity.getCategory(), updateObject);
+        return updateObject;
+    }
+    
+    @Override
     public HistoricTaskInstanceEntity create() {
         return new HistoricTaskInstanceEntityImpl();
-    }
-
-    @Override
-    public HistoricTaskInstanceEntity findById(String taskId) {
-        return getMongoDbSession().findOne(COLLECTION_HISTORIC_TASK_INSTANCES, taskId);
-    }
-
-    @Override
-    public void insert(HistoricTaskInstanceEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public HistoricTaskInstanceEntity update(HistoricTaskInstanceEntity entity) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void delete(String id) {
-        HistoricTaskInstanceEntity taskEntity = findById(id);
-        delete(taskEntity);
-    }
-
-    @Override
-    public void delete(HistoricTaskInstanceEntity taskEntity) {
-        getMongoDbSession().delete(COLLECTION_HISTORIC_TASK_INSTANCES, taskEntity);
     }
 
     @Override

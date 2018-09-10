@@ -14,45 +14,33 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Joram Barrez
  */
-public class MongoDbResourceDataManager extends AbstractMongoDbDataManager implements ResourceDataManager {
+public class MongoDbResourceDataManager extends AbstractMongoDbDataManager<ResourceEntity> implements ResourceDataManager {
     
     public static final String COLLECTION_BYTE_ARRAY = "byteArrays";
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_BYTE_ARRAY;
+    }
 
     @Override
     public ResourceEntity create() {
         return new ResourceEntityImpl();
     }
-
+    
     @Override
-    public ResourceEntity findById(String entityId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void insert(ResourceEntity resourceEntity) {
-        getMongoDbSession().insertOne(resourceEntity);
-    }
-
-    @Override
-    public ResourceEntity update(ResourceEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(String id) {
-        throw new UnsupportedOperationException();        
-    }
-
-    @Override
-    public void delete(ResourceEntity entity) {
-        throw new UnsupportedOperationException();        
+    public BasicDBObject createUpdateObject(Entity entity) {
+        return null;
     }
 
     @Override

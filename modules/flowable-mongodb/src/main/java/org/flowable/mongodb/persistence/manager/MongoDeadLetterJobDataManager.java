@@ -15,49 +15,34 @@ package org.flowable.mongodb.persistence.manager;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataManager;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Joram Barrez
  */
-public class MongoDeadLetterJobDataManager extends AbstractMongoDbDataManager implements DeadLetterJobDataManager {
+public class MongoDeadLetterJobDataManager extends AbstractMongoDbDataManager<DeadLetterJobEntity> implements DeadLetterJobDataManager {
 
     public static final String COLLECTION_DEADLETTER_JOBS = "deadLetterJobs";
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_DEADLETTER_JOBS;
+    }
     
     @Override
     public DeadLetterJobEntity create() {
         throw new UnsupportedOperationException();
     }
-
+    
     @Override
-    public DeadLetterJobEntity findById(String entityId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void insert(DeadLetterJobEntity entity) {
-        throw new UnsupportedOperationException();
-        
-    }
-
-    @Override
-    public DeadLetterJobEntity update(DeadLetterJobEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(String id) {
-        throw new UnsupportedOperationException();
-        
-    }
-
-    @Override
-    public void delete(DeadLetterJobEntity entity) {
-        throw new UnsupportedOperationException();
-        
+    public BasicDBObject createUpdateObject(Entity entity) {
+        return null;
     }
 
     @Override

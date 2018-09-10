@@ -14,12 +14,12 @@ package org.flowable.mongodb.persistence.mapper;
 
 import org.bson.Document;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
-import org.flowable.mongodb.persistence.EntityMapper;
+import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
 /**
  * @author Joram Barrez
  */
-public class IdentityLinkEntityMapper implements EntityMapper<IdentityLinkEntityImpl> {
+public class IdentityLinkEntityMapper implements EntityToDocumentMapper<IdentityLinkEntityImpl> {
 
     @Override
     public IdentityLinkEntityImpl fromDocument(Document document) {

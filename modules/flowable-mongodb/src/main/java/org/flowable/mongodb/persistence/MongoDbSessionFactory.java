@@ -84,10 +84,10 @@ public class MongoDbSessionFactory implements SessionFactory {
     protected MongoClient mongoClient;
     protected MongoDatabase mongoDatabase;
     
-    protected Map<Class<? extends Entity>, String> collections = new HashMap<>();
-    protected Map<String, EntityMapper<? extends Entity>> collectionToMapper = new HashMap<>();
-    protected Map<String, Class<? extends Entity>> collectionToClass = new HashMap<>();
-    protected Map<Class<? extends Entity>, EntityMapper<? extends Entity>> entityMappers = new HashMap<>();
+    protected Map<Class<? extends Entity>, EntityToDocumentMapper<? extends Entity>> entityMappers = new HashMap<>();
+    protected Map<Class<? extends Entity>, String> classToCollectionMap = new HashMap<>();
+    protected Map<String, EntityToDocumentMapper<? extends Entity>> collectionToMapperMap = new HashMap<>();
+    protected Map<String, Class<? extends Entity>> collectionToClassMap = new HashMap<>();
     protected Map<String, AbstractMongoDbDataManager> collectionToDataManager = new HashMap<>();
     
     public MongoDbSessionFactory(MongoClient mongoClient, MongoDatabase mongoDatabase) {
@@ -128,11 +128,11 @@ public class MongoDbSessionFactory implements SessionFactory {
         return new MongoDbSession(this, mongoClient, mongoDatabase, Context.getCommandContext().getSession(EntityCache.class));
     }
     
-    public void registerEntityMapper(Class<? extends Entity> clazz, EntityMapper<? extends Entity> mapper, String collection) {
+    public void registerEntityMapper(Class<? extends Entity> clazz, EntityToDocumentMapper<? extends Entity> mapper, String collection) {
         entityMappers.put(clazz, mapper);
-        collections.put(clazz, collection);
-        collectionToClass.put(collection, clazz);
-        collectionToMapper.put(collection, mapper);
+        classToCollectionMap.put(clazz, collection);
+        collectionToClassMap.put(collection, clazz);
+        collectionToMapperMap.put(collection, mapper);
     }
     
     public void registerDataManager(String collection, AbstractMongoDbDataManager dataManager) {
@@ -156,31 +156,31 @@ public class MongoDbSessionFactory implements SessionFactory {
     }
     
     public String getCollectionForEntityClass(Class<? extends Entity> clazz) {
-        return collections.get(clazz);
+        return classToCollectionMap.get(clazz);
     }
 
     public Map<Class<? extends Entity>, String> getCollections() {
-        return collections;
+        return classToCollectionMap;
     }
 
     public void setCollections(Map<Class<? extends Entity>, String> collections) {
-        this.collections = collections;
+        this.classToCollectionMap = collections;
     }
     
-    public EntityMapper<? extends Entity> getMapperForCollection(String collection) {
-        return collectionToMapper.get(collection);
+    public EntityToDocumentMapper<? extends Entity> getMapperForCollection(String collection) {
+        return collectionToMapperMap.get(collection);
     }
 
-    public Map<String, EntityMapper<? extends Entity>> getCollectionToMapper() {
-        return collectionToMapper;
+    public Map<String, EntityToDocumentMapper<? extends Entity>> getCollectionToMapper() {
+        return collectionToMapperMap;
     }
 
-    public void setCollectionToMapper(Map<String, EntityMapper<? extends Entity>> collectionToMapper) {
-        this.collectionToMapper = collectionToMapper;
+    public void setCollectionToMapper(Map<String, EntityToDocumentMapper<? extends Entity>> collectionToMapper) {
+        this.collectionToMapperMap = collectionToMapper;
     }
     
     public Class<? extends Entity> getClassForCollection(String collection) {
-        return collectionToClass.get(collection);
+        return collectionToClassMap.get(collection);
     }
     
     public AbstractMongoDbDataManager getDataManagerForCollection(String collection) {
@@ -188,22 +188,22 @@ public class MongoDbSessionFactory implements SessionFactory {
     }
     
     public Map<String, Class<? extends Entity>> getCollectionToClass() {
-        return collectionToClass;
+        return collectionToClassMap;
     }
 
     public void setCollectionToClass(Map<String, Class<? extends Entity>> collectionToClass) {
-        this.collectionToClass = collectionToClass;
+        this.collectionToClassMap = collectionToClass;
     }
 
-    public EntityMapper<? extends Entity> getMapperForEntityClass(Class<? extends Entity> clazz) {
+    public EntityToDocumentMapper<? extends Entity> getMapperForEntityClass(Class<? extends Entity> clazz) {
         return entityMappers.get(clazz);
     }
 
-    public Map<Class<? extends Entity>, EntityMapper<? extends Entity>> getEntityMappers() {
+    public Map<Class<? extends Entity>, EntityToDocumentMapper<? extends Entity>> getEntityMappers() {
         return entityMappers;
     }
 
-    public void setEntityMappers(Map<Class<? extends Entity>, EntityMapper<? extends Entity>> entityMappers) {
+    public void setEntityMappers(Map<Class<? extends Entity>, EntityToDocumentMapper<? extends Entity>> entityMappers) {
         this.entityMappers = entityMappers;
     }
     

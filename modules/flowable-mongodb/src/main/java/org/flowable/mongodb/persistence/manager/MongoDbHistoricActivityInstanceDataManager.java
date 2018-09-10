@@ -17,51 +17,36 @@ import java.util.List;
 import java.util.Map;
 
 import org.bson.conversions.Bson;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.HistoricActivityInstanceDataManager;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 
 /**
  * @author Tijs Rademakers
  */
-public class MongoDbHistoricActivityInstanceDataManager extends AbstractMongoDbDataManager implements HistoricActivityInstanceDataManager {
+public class MongoDbHistoricActivityInstanceDataManager extends AbstractMongoDbDataManager<HistoricActivityInstanceEntity> implements HistoricActivityInstanceDataManager {
     
     public static final String COLLECTION_HISTORIC_ACTIVITY_INSTANCES = "historicActivityInstances";
 
     @Override
+    public String getCollection() {
+        return COLLECTION_HISTORIC_ACTIVITY_INSTANCES;
+    }
+    
+    @Override
     public HistoricActivityInstanceEntity create() {
         return new HistoricActivityInstanceEntityImpl();
     }
-
+    
     @Override
-    public HistoricActivityInstanceEntity findById(String instanceId) {
-        return getMongoDbSession().findOne(COLLECTION_HISTORIC_ACTIVITY_INSTANCES, instanceId);
-    }
-
-    @Override
-    public void insert(HistoricActivityInstanceEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public HistoricActivityInstanceEntity update(HistoricActivityInstanceEntity entity) {
-        // TODO Auto-generated method stub
+    public BasicDBObject createUpdateObject(Entity entity) {
         return null;
-    }
-
-    @Override
-    public void delete(String id) {
-        HistoricActivityInstanceEntity instanceEntity = findById(id);
-        delete(instanceEntity);
-    }
-
-    @Override
-    public void delete(HistoricActivityInstanceEntity instanceEntity) {
-        getMongoDbSession().delete(COLLECTION_HISTORIC_ACTIVITY_INSTANCES, instanceEntity);
     }
 
     @Override

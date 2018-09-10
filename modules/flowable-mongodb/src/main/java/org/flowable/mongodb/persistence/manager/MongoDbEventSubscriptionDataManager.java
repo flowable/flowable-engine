@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bson.conversions.Bson;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
@@ -28,46 +29,26 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
 import org.flowable.engine.impl.persistence.entity.data.EventSubscriptionDataManager;
 import org.flowable.engine.runtime.EventSubscription;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 
 /**
  * @author Joram Barrez
  */
-public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataManager implements EventSubscriptionDataManager {
+public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataManager<EventSubscriptionEntity> implements EventSubscriptionDataManager {
     
     public static final String COLLECTION_EVENT_SUBSCRIPTION = "eventSubscriptions";
-
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_EVENT_SUBSCRIPTION;
+    }
+    
     @Override
     public EventSubscriptionEntity create() {
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public EventSubscriptionEntity findById(String eventId) {
-        return getMongoDbSession().findOne(COLLECTION_EVENT_SUBSCRIPTION, eventId);
-    }
-
-    @Override
-    public void insert(EventSubscriptionEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public EventSubscriptionEntity update(EventSubscriptionEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(String id) {
-        EventSubscriptionEntity eventEntity = findById(id);
-        delete(eventEntity);
-    }
-
-    @Override
-    public void delete(EventSubscriptionEntity entity) {
-        getMongoDbSession().delete(COLLECTION_EVENT_SUBSCRIPTION, entity);
-    }
-
+    
     @Override
     public MessageEventSubscriptionEntity createMessageEventSubscription() {
         return new MessageEventSubscriptionEntityImpl();
@@ -81,6 +62,11 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
     @Override
     public CompensateEventSubscriptionEntity createCompensateEventSubscription() {
         return new CompensateEventSubscriptionEntityImpl();
+    }
+    
+    @Override
+    public BasicDBObject createUpdateObject(Entity entity) {
+        return null;
     }
 
     @Override

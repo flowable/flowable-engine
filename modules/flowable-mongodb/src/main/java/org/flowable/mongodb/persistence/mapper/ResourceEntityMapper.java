@@ -14,12 +14,12 @@ package org.flowable.mongodb.persistence.mapper;
 
 import org.bson.Document;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
-import org.flowable.mongodb.persistence.EntityMapper;
+import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
 /**
  * @author Joram Barrez
  */
-public class ResourceEntityMapper implements EntityMapper<ResourceEntityImpl> {
+public class ResourceEntityMapper implements EntityToDocumentMapper<ResourceEntityImpl> {
 
     @Override
     public ResourceEntityImpl fromDocument(Document document) {

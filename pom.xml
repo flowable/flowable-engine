@@ -1451,6 +1451,7 @@
 				<module>modules/flowable-crystalball</module>
 				<module>modules/flowable-ui-common</module>
 				<module>modules/flowable-ui-edge</module>
+                <module>modules/flowable-mongodb</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 		</profile>

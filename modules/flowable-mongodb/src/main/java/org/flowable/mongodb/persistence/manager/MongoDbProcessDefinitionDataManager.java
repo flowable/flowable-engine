@@ -16,12 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.bson.Document;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
 import org.flowable.engine.repository.ProcessDefinition;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
@@ -29,38 +31,23 @@ import com.mongodb.client.model.Sorts;
 /**
  * @author Joram Barrez
  */
-public class MongoDbProcessDefinitionDataManager extends AbstractMongoDbDataManager implements ProcessDefinitionDataManager {
+public class MongoDbProcessDefinitionDataManager extends AbstractMongoDbDataManager<ProcessDefinitionEntity> implements ProcessDefinitionDataManager {
     
     public static final String COLLECTION_PROCESS_DEFINITIONS = "processDefinitions";
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_PROCESS_DEFINITIONS;
+    }
 
     @Override
     public ProcessDefinitionEntity create() {
         return new ProcessDefinitionEntityImpl();
     }
-
+    
     @Override
-    public ProcessDefinitionEntity findById(String id) {
-        return getMongoDbSession().findOne(COLLECTION_PROCESS_DEFINITIONS, id);
-    }
-
-    @Override
-    public void insert(ProcessDefinitionEntity processDefinitionEntity) {
-        getMongoDbSession().insertOne(processDefinitionEntity);
-    }
-
-    @Override
-    public ProcessDefinitionEntity update(ProcessDefinitionEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(String id) {
-        throw new UnsupportedOperationException();        
-    }
-
-    @Override
-    public void delete(ProcessDefinitionEntity entity) {
-        throw new UnsupportedOperationException();        
+    public BasicDBObject createUpdateObject(Entity entity) {
+        return null;
     }
 
     @Override

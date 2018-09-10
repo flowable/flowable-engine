@@ -14,12 +14,12 @@ package org.flowable.mongodb.persistence.mapper;
 
 import org.bson.Document;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
-import org.flowable.mongodb.persistence.EntityMapper;
+import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
 /**
  * @author Tijs Rademakers
  */
-public class CommentEntityMapper implements EntityMapper<CommentEntityImpl> {
+public class CommentEntityMapper implements EntityToDocumentMapper<CommentEntityImpl> {
 
     @Override
     public CommentEntityImpl fromDocument(Document document) {

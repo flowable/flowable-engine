@@ -236,6 +236,25 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
         this.serverAddresses = serverAddresses;
         return this;
     }
+    
+    /**
+     * server addresses in the form of "host:port, host:port, ..." 
+     */
+    public MongoDbProcessEngineConfiguration setServerAddresses(String serverAddresses) {
+        List<ServerAddress> result = new ArrayList<>();
+        
+        String[] addresses = serverAddresses.split(",");
+        for (String address : addresses) {
+            String[] splittedAddress = address.split(":");
+            String host = splittedAddress[0].trim();
+            int port = Integer.valueOf(splittedAddress[1].trim());
+            
+            result.add(new ServerAddress(host, port));
+        }
+        
+        setServerAddresses(serverAddresses);
+        return this;
+    }
 
     public String getDatabaseName() {
         return databaseName;

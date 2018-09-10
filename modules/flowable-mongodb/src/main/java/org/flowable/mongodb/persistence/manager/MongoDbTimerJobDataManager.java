@@ -15,9 +15,7 @@ package org.flowable.mongodb.persistence.manager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -34,7 +32,7 @@ import com.mongodb.client.model.Filters;
 /**
  * @author Joram Barrez
  */
-public class MongoDbTimerJobDataManager extends AbstractMongoDbDataManager implements TimerJobDataManager {
+public class MongoDbTimerJobDataManager extends AbstractMongoDbDataManager<TimerJobEntity> implements TimerJobDataManager {
     
     public static final String COLLECTION_TIMER_JOBS = "timerJobs";
     
@@ -43,6 +41,11 @@ public class MongoDbTimerJobDataManager extends AbstractMongoDbDataManager imple
     public MongoDbTimerJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_TIMER_JOBS;
+    }
 
     @Override
     public TimerJobEntity create() {
@@ -50,46 +53,15 @@ public class MongoDbTimerJobDataManager extends AbstractMongoDbDataManager imple
     }
 
     @Override
-    public TimerJobEntity findById(String jobId) {
-        return getMongoDbSession().findOne(COLLECTION_TIMER_JOBS, jobId);
-    }
-
-    @Override
-    public void insert(TimerJobEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public TimerJobEntity update(TimerJobEntity entity) {
-        getMongoDbSession().update(entity);
-        return entity;
-    }
-    
-    @Override
-    public void updateEntity(Entity entity) {
+    public BasicDBObject createUpdateObject(Entity entity) {
         TimerJobEntity jobEntity = (TimerJobEntity) entity;
-        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
         BasicDBObject updateObject = null;
-        updateObject = setUpdateProperty("retries", jobEntity.getRetries(), persistentState, updateObject);
-        updateObject = setUpdateProperty("exceptionMessage", jobEntity.getExceptionMessage(), persistentState, updateObject);
-        updateObject = setUpdateProperty("lockOwner", jobEntity.getLockOwner(), persistentState, updateObject);
-        updateObject = setUpdateProperty("lockExpirationTime", jobEntity.getLockExpirationTime(), persistentState, updateObject);
-        updateObject = setUpdateProperty("dueDate", jobEntity.getDuedate(), persistentState, updateObject);
-        
-        if (updateObject != null) {
-            getMongoDbSession().performUpdate(COLLECTION_TIMER_JOBS, jobEntity, new Document().append("$set", updateObject));
-        }
-    }
-
-    @Override
-    public void delete(String id) {
-        TimerJobEntity jobEntity = findById(id);
-        delete(jobEntity);
-    }
-
-    @Override
-    public void delete(TimerJobEntity jobEntity) {
-        getMongoDbSession().delete(COLLECTION_TIMER_JOBS, jobEntity);
+        updateObject = setUpdateProperty(jobEntity, "retries", jobEntity.getRetries(), updateObject);
+        updateObject = setUpdateProperty(jobEntity, "exceptionMessage", jobEntity.getExceptionMessage(), updateObject);
+        updateObject = setUpdateProperty(jobEntity, "lockOwner", jobEntity.getLockOwner(), updateObject);
+        updateObject = setUpdateProperty(jobEntity, "lockExpirationTime", jobEntity.getLockExpirationTime(), updateObject);
+        updateObject = setUpdateProperty(jobEntity, "dueDate", jobEntity.getDuedate(), updateObject);
+        return updateObject;
     }
 
     @Override

@@ -18,9 +18,9 @@ import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEn
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
-import org.flowable.mongodb.persistence.EntityMapper;
+import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
-public class EventSubscriptionEntityMapper implements EntityMapper<EventSubscriptionEntityImpl> {
+public class EventSubscriptionEntityMapper implements EntityToDocumentMapper<EventSubscriptionEntityImpl> {
 
     @Override
     public EventSubscriptionEntityImpl fromDocument(Document document) {

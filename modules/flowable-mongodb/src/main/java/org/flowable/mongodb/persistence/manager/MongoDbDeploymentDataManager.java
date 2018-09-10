@@ -15,47 +15,35 @@ package org.flowable.mongodb.persistence.manager;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
 import org.flowable.engine.repository.Deployment;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Joram Barrez
  */
-public class MongoDbDeploymentDataManager extends AbstractMongoDbDataManager implements DeploymentDataManager {
+public class MongoDbDeploymentDataManager extends AbstractMongoDbDataManager<DeploymentEntity> implements DeploymentDataManager {
     
     public static final String COLLECTION_DEPLOYMENT = "deployments";
 
     @Override
-    public DeploymentEntity create() {
-        return new DeploymentEntityImpl();
-    }
-
-    @Override
-    public DeploymentEntity findById(String entityId) {
-        throw new UnsupportedOperationException();
+    public String getCollection() {
+        return COLLECTION_DEPLOYMENT;
     }
     
     @Override
-    public void insert(DeploymentEntity deploymentEntity) {
-        getMongoDbSession().insertOne(deploymentEntity);
+    public DeploymentEntity create() {
+        return new DeploymentEntityImpl();
     }
-
+    
     @Override
-    public DeploymentEntity update(DeploymentEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(String id) {
-        throw new UnsupportedOperationException();        
-    }
-
-    @Override
-    public void delete(DeploymentEntity entity) {
-        throw new UnsupportedOperationException();        
+    public BasicDBObject createUpdateObject(Entity entity) {
+        return null;
     }
 
     @Override

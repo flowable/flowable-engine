@@ -15,49 +15,34 @@ package org.flowable.mongodb.persistence.manager;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Joram Barrez
  */
-public class MongoSuspendedJobDataManager extends AbstractMongoDbDataManager implements SuspendedJobDataManager {
+public class MongoSuspendedJobDataManager extends AbstractMongoDbDataManager<SuspendedJobEntity> implements SuspendedJobDataManager {
 
     public static final String COLLECTION_SUSPENDED_JOBS = "suspendedJobs";
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_SUSPENDED_JOBS;
+    }
     
     @Override
     public SuspendedJobEntity create() {
         throw new UnsupportedOperationException();
     }
-
+    
     @Override
-    public SuspendedJobEntity findById(String entityId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void insert(SuspendedJobEntity entity) {
-        throw new UnsupportedOperationException();
-        
-    }
-
-    @Override
-    public SuspendedJobEntity update(SuspendedJobEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(String id) {
-        throw new UnsupportedOperationException();
-        
-    }
-
-    @Override
-    public void delete(SuspendedJobEntity entity) {
-        throw new UnsupportedOperationException();
-        
+    public BasicDBObject createUpdateObject(Entity entity) {
+        return null;
     }
 
     @Override

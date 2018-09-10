@@ -14,49 +14,35 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Tijs Rademakers
  */
-public class MongoDbCommentDataManager extends AbstractMongoDbDataManager implements CommentDataManager {
+public class MongoDbCommentDataManager extends AbstractMongoDbDataManager<CommentEntity> implements CommentDataManager {
 
     public static final String COLLECTION_COMMENTS = "comments";
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_COMMENTS;
+    }
 
     @Override
     public CommentEntity create() {
         return new CommentEntityImpl();
     }
-
+    
     @Override
-    public CommentEntity findById(String commentId) {
-        return getMongoDbSession().findOne(COLLECTION_COMMENTS, commentId);
-    }
-
-    @Override
-    public void insert(CommentEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public CommentEntity update(CommentEntity entity) {
-        // TODO Auto-generated method stub
+    public BasicDBObject createUpdateObject(Entity entity) {
         return null;
-    }
-
-    @Override
-    public void delete(String id) {
-        CommentEntity commentEntity = findById(id);
-        delete(commentEntity);
-    }
-
-    @Override
-    public void delete(CommentEntity commentEntity) {
-        getMongoDbSession().delete(COLLECTION_COMMENTS, commentEntity);
     }
 
     @Override

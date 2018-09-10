@@ -14,9 +14,9 @@ package org.flowable.mongodb.persistence.mapper;
 
 import org.bson.Document;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
-import org.flowable.mongodb.persistence.EntityMapper;
+import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
-public class DeploymentEntityMapper implements EntityMapper<DeploymentEntityImpl> {
+public class DeploymentEntityMapper implements EntityToDocumentMapper<DeploymentEntityImpl> {
 
     @Override
     public DeploymentEntityImpl fromDocument(Document document) {

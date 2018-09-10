@@ -12,44 +12,32 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
+
+import com.mongodb.BasicDBObject;
 
 /**
  * @author Joram Barrez
  */
-public class MongoDbProcessDefinitionInfoDataManager extends AbstractMongoDbDataManager implements ProcessDefinitionInfoDataManager {
+public class MongoDbProcessDefinitionInfoDataManager extends AbstractMongoDbDataManager<ProcessDefinitionInfoEntity> implements ProcessDefinitionInfoDataManager {
     
     public static final String COLLECTION_PROCESS_DEFINITION_INFO = "processDefinitionInfo";
 
     @Override
+    public String getCollection() {
+        return COLLECTION_PROCESS_DEFINITION_INFO;
+    }
+    
+    @Override
     public ProcessDefinitionInfoEntity create() {
         throw new UnsupportedOperationException();
     }
-
+    
     @Override
-    public ProcessDefinitionInfoEntity findById(String entityId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void insert(ProcessDefinitionInfoEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ProcessDefinitionInfoEntity update(ProcessDefinitionInfoEntity entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(String id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(ProcessDefinitionInfoEntity entity) {
-        throw new UnsupportedOperationException();
+    public BasicDBObject createUpdateObject(Entity entity) {
+        return null;
     }
 
     @Override

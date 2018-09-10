@@ -15,18 +15,26 @@ package org.flowable.mongodb.persistence.manager;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Tijs Rademakers
  */
-public class MongoDbHistoricVariableInstanceDataManager extends AbstractMongoDbDataManager implements HistoricVariableInstanceDataManager {
+public class MongoDbHistoricVariableInstanceDataManager extends AbstractMongoDbDataManager<HistoricVariableInstanceEntity> implements HistoricVariableInstanceDataManager {
     
     public static final String COLLECTION_HISTORIC_VARIABLE_INSTANCES = "historicVariableInstances";
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_HISTORIC_VARIABLE_INSTANCES;
+    }
 
     @Override
     public HistoricVariableInstanceEntity create() {
@@ -34,30 +42,8 @@ public class MongoDbHistoricVariableInstanceDataManager extends AbstractMongoDbD
     }
 
     @Override
-    public HistoricVariableInstanceEntity findById(String entityId) {
-        return getMongoDbSession().findOne(COLLECTION_HISTORIC_VARIABLE_INSTANCES, entityId);
-    }
-
-    @Override
-    public void insert(HistoricVariableInstanceEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public HistoricVariableInstanceEntity update(HistoricVariableInstanceEntity entity) {
-        // TODO Auto-generated method stub
+    public BasicDBObject createUpdateObject(Entity entity) {
         return null;
-    }
-
-    @Override
-    public void delete(String id) {
-        HistoricVariableInstanceEntity variableEntity = findById(id);
-        delete(variableEntity);
-    }
-
-    @Override
-    public void delete(HistoricVariableInstanceEntity variableEntity) {
-        getMongoDbSession().delete(COLLECTION_HISTORIC_VARIABLE_INSTANCES, variableEntity);
     }
 
     @Override

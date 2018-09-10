@@ -14,16 +14,24 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 
+import com.mongodb.BasicDBObject;
+
 /**
  * @author Tijs Rademakers
  */
-public class MongoDbHistoricIdentityLinkDataManager extends AbstractMongoDbDataManager implements HistoricIdentityLinkDataManager {
+public class MongoDbHistoricIdentityLinkDataManager extends AbstractMongoDbDataManager<HistoricIdentityLinkEntity> implements HistoricIdentityLinkDataManager {
     
     public static final String COLLECTION_HISTORIC_IDENTITY_LINKS = "historicIdentityLinks";
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_HISTORIC_IDENTITY_LINKS;
+    }
 
     @Override
     public HistoricIdentityLinkEntity create() {
@@ -31,30 +39,8 @@ public class MongoDbHistoricIdentityLinkDataManager extends AbstractMongoDbDataM
     }
 
     @Override
-    public HistoricIdentityLinkEntity findById(String entityId) {
-        return getMongoDbSession().findOne(COLLECTION_HISTORIC_IDENTITY_LINKS, entityId);
-    }
-
-    @Override
-    public void insert(HistoricIdentityLinkEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public HistoricIdentityLinkEntity update(HistoricIdentityLinkEntity entity) {
-        // TODO Auto-generated method stub
+    public BasicDBObject createUpdateObject(Entity entity) {
         return null;
-    }
-
-    @Override
-    public void delete(String id) {
-        HistoricIdentityLinkEntity linkEntity = findById(id);
-        delete(linkEntity);
-    }
-
-    @Override
-    public void delete(HistoricIdentityLinkEntity linkEntity) {
-        getMongoDbSession().delete(COLLECTION_HISTORIC_IDENTITY_LINKS, linkEntity);
     }
 
     @Override

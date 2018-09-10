@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.task.api.Task;
@@ -33,9 +32,14 @@ import com.mongodb.client.model.Sorts;
 /**
  * @author Joram Barrez
  */
-public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implements TaskDataManager {
+public class MongoDbTaskDataManager extends AbstractMongoDbDataManager<TaskEntity> implements TaskDataManager {
     
     public static final String COLLECTION_TASKS = "tasks";
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_TASKS;
+    }
 
     @Override
     public TaskEntity create() {
@@ -43,43 +47,12 @@ public class MongoDbTaskDataManager extends AbstractMongoDbDataManager implement
     }
 
     @Override
-    public TaskEntity findById(String taskId) {
-        return getMongoDbSession().findOne(COLLECTION_TASKS, taskId);
-    }
-
-    @Override
-    public void insert(TaskEntity taskEntity) {
-        getMongoDbSession().insertOne(taskEntity);
-    }
-
-    @Override
-    public TaskEntity update(TaskEntity entity) {
-        getMongoDbSession().update(entity);
-        return entity;
-    }
-
-    @Override
-    public void updateEntity(Entity entity) {
+    public BasicDBObject createUpdateObject(Entity entity) {
         TaskEntity taskEntity = (TaskEntity) entity;
-        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
         BasicDBObject updateObject = null;
-        updateObject = setUpdateProperty("assignee", taskEntity.getAssignee(), persistentState, updateObject);
-        updateObject = setUpdateProperty("owner", taskEntity.getOwner(), persistentState, updateObject);
-        
-        if (updateObject != null) {
-            getMongoDbSession().performUpdate(COLLECTION_TASKS, entity, new Document().append("$set", updateObject));
-        }
-    }
-
-    @Override
-    public void delete(String id) {
-        TaskEntityImpl taskEntity = (TaskEntityImpl) findById(id);
-        delete(taskEntity);
-    }
-
-    @Override
-    public void delete(TaskEntity taskEntity) {
-        getMongoDbSession().delete(COLLECTION_TASKS, taskEntity);
+        updateObject = setUpdateProperty(taskEntity, "assignee", taskEntity.getAssignee(), updateObject);
+        updateObject = setUpdateProperty(taskEntity, "owner", taskEntity.getOwner(), updateObject);
+        return updateObject;
     }
 
     @Override

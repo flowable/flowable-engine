@@ -14,7 +14,6 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.bson.Document;
@@ -32,12 +31,17 @@ import com.mongodb.client.model.Filters;
 /**
  * @author Joram Barrez
  */
-public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManager implements VariableInstanceDataManager {
+public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
     
     public static final String COLLECTION_VARIABLES = "variables";
     
     protected CachedEntityMatcher<Entity> variableInstanceByExecutionIdMatcher = 
             (CachedEntityMatcher) new VariableInstanceByExecutionIdMatcher();
+    
+    @Override
+    public String getCollection() {
+        return COLLECTION_VARIABLES;
+    }
 
     @Override
     public VariableInstanceEntity create() {
@@ -45,45 +49,15 @@ public class MongoDbVariableInstanceDataManager extends AbstractMongoDbDataManag
     }
 
     @Override
-    public VariableInstanceEntity findById(String entityId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void insert(VariableInstanceEntity entity) {
-        getMongoDbSession().insertOne(entity);
-    }
-
-    @Override
-    public VariableInstanceEntity update(VariableInstanceEntity entity) {
-        getMongoDbSession().update(entity);
-        return entity;
-    }
-    
-    @Override
-    public void updateEntity(Entity entity) {
+    public BasicDBObject createUpdateObject(Entity entity) {
         VariableInstanceEntity variableEntity = (VariableInstanceEntity) entity;
-        Map<String, Object> persistentState = (Map<String, Object>) entity.getOriginalPersistentState();
         BasicDBObject updateObject = null;
-        updateObject = setUpdateProperty("textValue", variableEntity.getTextValue(), persistentState, updateObject);
-        updateObject = setUpdateProperty("textValue2", variableEntity.getTextValue2(), persistentState, updateObject);
-        updateObject = setUpdateProperty("doubleValue", variableEntity.getDoubleValue(), persistentState, updateObject);
-        updateObject = setUpdateProperty("longValue", variableEntity.getLongValue(), persistentState, updateObject);
-        updateObject = setUpdateProperty("typeName", variableEntity.getTypeName(), persistentState, updateObject);
-        
-        if (updateObject != null) {
-            getMongoDbSession().performUpdate(COLLECTION_VARIABLES, entity, new Document().append("$set", updateObject));
-        }
-    }
-
-    @Override
-    public void delete(String id) {
-        throw new UnsupportedOperationException();        
-    }
-
-    @Override
-    public void delete(VariableInstanceEntity entity) {
-        throw new UnsupportedOperationException();        
+        updateObject = setUpdateProperty(variableEntity, "textValue", variableEntity.getTextValue(), updateObject);
+        updateObject = setUpdateProperty(variableEntity, "textValue2", variableEntity.getTextValue2(), updateObject);
+        updateObject = setUpdateProperty(variableEntity, "doubleValue", variableEntity.getDoubleValue(), updateObject);
+        updateObject = setUpdateProperty(variableEntity, "longValue", variableEntity.getLongValue(), updateObject);
+        updateObject = setUpdateProperty(variableEntity, "typeName", variableEntity.getTypeName(), updateObject);
+        return updateObject;
     }
 
     @Override

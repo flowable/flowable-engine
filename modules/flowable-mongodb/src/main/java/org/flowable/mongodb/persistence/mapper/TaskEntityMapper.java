@@ -13,13 +13,13 @@
 package org.flowable.mongodb.persistence.mapper;
 
 import org.bson.Document;
-import org.flowable.mongodb.persistence.EntityMapper;
+import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 
 /**
  * @author Joram Barrez
  */
-public class TaskEntityMapper implements EntityMapper<TaskEntityImpl> {
+public class TaskEntityMapper implements EntityToDocumentMapper<TaskEntityImpl> {
 
     @Override
     public TaskEntityImpl fromDocument(Document document) {
