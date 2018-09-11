@@ -24,12 +24,15 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.delegate.event.FlowableMessageEvent;
+import org.flowable.engine.delegate.event.FlowableSignalEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.DataObject;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.api.runtime.ChangeStateEventListener;
@@ -1538,6 +1541,550 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             .list();
         assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("subTask", "taskAfter");
         assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procDefTimerTaskInSubProcess.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    //-- Intermediate Signal Catch Events
+    @Test
+    public void testMigrateSimpleActivityToIntermediateSignalCatchingEventInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
+
+        //Start the processInstance without timer
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        changeStateEventListener.clear();
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "intermediateCatchEvent")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).isEmpty();
+
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+
+        // Verify events
+        List<FlowableEvent> events = changeStateEventListener.getEvents();
+        assertTrue(changeStateEventListener.hasEvents());
+        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
+
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
+        assertThat(activityEvent).extracting(FlowableActivityEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(activityEvent).extracting(FlowableActivityEvent::getActivityId).isEqualTo("userTask1Id");
+
+        FlowableSignalEvent signalEvent = (FlowableSignalEvent) iterator.next();
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getActivityId).isEqualTo("intermediateCatchEvent");
+        //TODO WIP -- Possible bug? the Signal name should be "someSignal"
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("mySignal");
+
+        //Trigger the event
+        runtimeService.signalEventReceived("someSignal");
+
+        executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("afterCatchEvent");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("afterCatchEvent");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        //Check History
+        List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "afterCatchEvent");
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+        List<HistoricActivityInstance> eventExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("intermediateCatchEvent")
+            .list();
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+        List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .list();
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("userTask1Id", "afterCatchEvent");
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateIntermediateSignalCatchingEventToSimpleActivityInNewDefinition() {
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+
+        //Start the processInstance without timer
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeCatchEvent");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        completeTask(task);
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).isEmpty();
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+
+        changeStateEventListener.clear();
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefOneTask.getId())
+            .addActivityMigrationMapping("intermediateCatchEvent", "userTask1Id")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        // Verify events
+        List<FlowableEvent> events = changeStateEventListener.getEvents();
+        assertTrue(changeStateEventListener.hasEvents());
+        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED);
+
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
+        assertThat(activityEvent).extracting(FlowableActivityEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent).extracting(FlowableActivityEvent::getActivityId).isEqualTo("userTask1Id");
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        //Check History
+        List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeCatchEvent", "userTask1Id");
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        List<HistoricActivityInstance> eventExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("intermediateCatchEvent")
+            .list();
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .list();
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("beforeCatchEvent", "userTask1Id");
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateIntermediateSignalCatchingEventToIntermediateSignalCatchingEventInNewDefinition() {
+        ProcessDefinition procWithSignalVer1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateSignalCatchEvent.bpmn20.xml");
+        ProcessDefinition procWithSignalVer2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/simple-intermediate-signal-catch-event.bpmn20.xml");
+
+        //Start the processInstance without timer
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignalVer1.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeCatchEvent");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignalVer1.getId());
+        completeTask(task);
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignalVer1.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).isEmpty();
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+
+        changeStateEventListener.clear();
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignalVer2.getId())
+            .addActivityMigrationMapping("intermediateCatchEvent", "newIntermediateCatchEvent")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("newIntermediateCatchEvent");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignalVer2.getId());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).isEmpty();
+
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("newIntermediateCatchEvent");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+
+        // Verify events
+        List<FlowableEvent> events = changeStateEventListener.getEvents();
+        assertTrue(changeStateEventListener.hasEvents());
+        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
+
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        FlowableSignalEvent signalEvent = (FlowableSignalEvent) iterator.next();
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getActivityId).isEqualTo("newIntermediateCatchEvent");
+        //TODO WIP -- Possible bug? the Signal name should be "someNewSignal"
+        assertThat(signalEvent).extracting(FlowableSignalEvent::getSignalName).isEqualTo("myNewSignal");
+
+        //Trigger the event
+        runtimeService.signalEventReceived("someNewSignal");
+
+        executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("afterNewCatchEvent");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignalVer2.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("afterNewCatchEvent");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignalVer2.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        //Check History
+        List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeCatchEvent", "afterNewCatchEvent");
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignalVer2.getId());
+
+        List<HistoricActivityInstance> eventExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("intermediateCatchEvent")
+            .list();
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactly("intermediateCatchEvent", "newIntermediateCatchEvent");
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignalVer2.getId());
+
+        List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .list();
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("beforeCatchEvent", "afterNewCatchEvent");
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignalVer2.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    //-- Intermediate Message Catch Events
+    @Test
+    public void testMigrateSimpleActivityToIntermediateMessageCatchingEventInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
+
+        //Start the processInstance without timer
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        changeStateEventListener.clear();
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "intermediateCatchEvent")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).isEmpty();
+
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+
+        // Verify events
+        List<FlowableEvent> events = changeStateEventListener.getEvents();
+        assertTrue(changeStateEventListener.hasEvents());
+        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
+
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
+        assertThat(activityEvent).extracting(FlowableActivityEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(activityEvent).extracting(FlowableActivityEvent::getActivityId).isEqualTo("userTask1Id");
+
+        FlowableMessageEvent signalEvent = (FlowableMessageEvent) iterator.next();
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getActivityId).isEqualTo("intermediateCatchEvent");
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getMessageName).isEqualTo("someMessage");
+
+        //Trigger the event
+        Execution messageCatchExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("intermediateCatchEvent").singleResult();
+        runtimeService.messageEventReceived("someMessage", messageCatchExecution.getId());
+
+        executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("afterCatchEvent");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("afterCatchEvent");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        //Check History
+        List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("userTask1Id", "afterCatchEvent");
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+        List<HistoricActivityInstance> eventExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("intermediateCatchEvent")
+            .list();
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+        List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .list();
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("userTask1Id", "afterCatchEvent");
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateIntermediateMessageCatchingEventToSimpleActivityInNewDefinition() {
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+
+        //Start the processInstance without timer
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignal.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeCatchEvent");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        completeTask(task);
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).isEmpty();
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+
+        changeStateEventListener.clear();
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procDefOneTask.getId())
+            .addActivityMigrationMapping("intermediateCatchEvent", "userTask1Id")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        // Verify events
+        List<FlowableEvent> events = changeStateEventListener.getEvents();
+        assertTrue(changeStateEventListener.hasEvents());
+        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED, FlowableEngineEventType.ACTIVITY_STARTED);
+
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        FlowableActivityEvent signalEvent = (FlowableMessageEvent) iterator.next();
+        assertThat(signalEvent).extracting(FlowableActivityEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED);
+        assertThat(signalEvent).extracting(FlowableActivityEvent::getActivityId).isEqualTo("intermediateCatchEvent");
+        assertThat((FlowableMessageEvent) signalEvent).extracting(FlowableMessageEvent::getMessageName).isEqualTo("someMessage");
+
+        FlowableActivityEvent activityEvent = (FlowableActivityEvent) iterator.next();
+        assertThat(activityEvent).extracting(FlowableActivityEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(activityEvent).extracting(FlowableActivityEvent::getActivityId).isEqualTo("userTask1Id");
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        //Check History
+        List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeCatchEvent", "userTask1Id");
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        List<HistoricActivityInstance> eventExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("intermediateCatchEvent")
+            .list();
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .list();
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("beforeCatchEvent", "userTask1Id");
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateIntermediateMessageCatchingEventToIntermediateMessageCatchingEventInNewDefinition() {
+        ProcessDefinition procWithSignalVer1 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.simpleIntermediateMessageCatchEvent.bpmn20.xml");
+        ProcessDefinition procWithSignalVer2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/simple-intermediate-message-catch-event.bpmn20.xml");
+
+        //Start the processInstance without timer
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procWithSignalVer1.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeCatchEvent");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignalVer1.getId());
+        completeTask(task);
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignalVer1.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).isEmpty();
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateCatchEvent");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+
+        changeStateEventListener.clear();
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignalVer2.getId())
+            .addActivityMigrationMapping("intermediateCatchEvent", "intermediateNewCatchEvent")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("intermediateNewCatchEvent");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignalVer2.getId());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).isEmpty();
+
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("intermediateNewCatchEvent");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+
+        // Verify events
+        List<FlowableEvent> events = changeStateEventListener.getEvents();
+        assertTrue(changeStateEventListener.hasEvents());
+        assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED, FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
+
+        Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
+        FlowableMessageEvent signalEvent = (FlowableMessageEvent) iterator.next();
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED);
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getActivityId).isEqualTo("intermediateCatchEvent");
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getMessageName).isEqualTo("someMessage");
+
+        signalEvent = (FlowableMessageEvent) iterator.next();
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getType).isEqualTo(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getActivityId).isEqualTo("intermediateNewCatchEvent");
+        assertThat(signalEvent).extracting(FlowableMessageEvent::getMessageName).isEqualTo("someNewMessage");
+
+        //Trigger the event
+        Execution messageCatchExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("intermediateNewCatchEvent").singleResult();
+        runtimeService.messageEventReceived("someNewMessage", messageCatchExecution.getId());
+
+        executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executionsAfterMigration).extracting(Execution::getActivityId).containsExactly("afterNewCatchEvent");
+        assertThat(executionsAfterMigration).extracting("processDefinitionId").containsOnly(procWithSignalVer2.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("afterNewCatchEvent");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignalVer2.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertTrue(eventSubscriptions.isEmpty());
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        //Check History
+        List<HistoricActivityInstance> taskExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("userTask")
+            .list();
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactlyInAnyOrder("beforeCatchEvent", "afterNewCatchEvent");
+        assertThat(taskExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignalVer2.getId());
+
+        List<HistoricActivityInstance> eventExecutions = historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .activityType("intermediateCatchEvent")
+            .list();
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getActivityId).containsExactly("intermediateCatchEvent", "intermediateNewCatchEvent");
+        assertThat(eventExecutions).extracting(HistoricActivityInstance::getProcessDefinitionId).containsOnly(procWithSignalVer2.getId());
+
+        List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .list();
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getTaskDefinitionKey).containsExactly("beforeCatchEvent", "afterNewCatchEvent");
+        assertThat(historicTasks).extracting(HistoricTaskInstance::getProcessDefinitionId).containsOnly(procWithSignalVer2.getId());
 
         assertProcessEnded(processInstance.getId());
     }

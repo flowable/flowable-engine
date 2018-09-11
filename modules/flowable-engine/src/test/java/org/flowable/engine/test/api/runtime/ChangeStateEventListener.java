@@ -23,6 +23,8 @@ import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableMessageEvent;
+import org.flowable.engine.delegate.event.FlowableSignalEvent;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 
 public class ChangeStateEventListener extends AbstractFlowableEngineEventListener {
@@ -78,6 +80,31 @@ public class ChangeStateEventListener extends AbstractFlowableEngineEventListene
 
     @Override
     protected void variableCreated(FlowableVariableEvent event) {
+        events.add(event);
+    }
+
+    @Override
+    protected void activitySignalWaiting(FlowableSignalEvent event) {
+        events.add(event);
+    }
+
+    @Override
+    protected void activitySignaled(FlowableSignalEvent event) {
+        events.add(event);
+    }
+
+    @Override
+    protected void activityMessageWaiting(FlowableMessageEvent event) {
+        events.add(event);
+    }
+
+    @Override
+    protected void activityMessageReceived(FlowableMessageEvent event) {
+        events.add(event);
+    }
+
+    @Override
+    protected void activityMessageCancelled(FlowableMessageEvent event) {
         events.add(event);
     }
 
