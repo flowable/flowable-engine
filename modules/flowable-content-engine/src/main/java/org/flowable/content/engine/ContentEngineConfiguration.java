@@ -132,7 +132,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
             initDataSource();
         }
         
-        if (usingRelationalDatabase || usingSchema) {
+        if (usingRelationalDatabase || usingSchemaMgmt) {
             initSchemaManager();
             initSchemaManagementCommand();
         }
@@ -201,8 +201,8 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     @Override
     public void initSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new ContentDbSchemaManager();
+        if (this.schemaManager == null) {
+            this.schemaManager = new ContentDbSchemaManager();
         }
     }
     

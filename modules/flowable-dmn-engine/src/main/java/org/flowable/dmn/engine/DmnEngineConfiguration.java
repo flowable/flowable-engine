@@ -237,7 +237,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
             initDataSource();
         }
         
-        if (usingRelationalDatabase || usingSchema) {
+        if (usingRelationalDatabase || usingSchemaMgmt) {
             initSchemaManager();
             initSchemaManagementCommand();
         }
@@ -312,8 +312,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     @Override
     public void initSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new DmnDbSchemaManager();
+        if (this.schemaManager == null) {
+            this.schemaManager = new DmnDbSchemaManager();
         }
     }
 

@@ -896,7 +896,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             initNonRelationalDataSource();
         }
         
-        if (usingRelationalDatabase || usingSchema) {
+        if (usingRelationalDatabase || usingSchemaMgmt) {
             initSchemaManager();
             initSchemaManagementCommand();
         }
@@ -1027,8 +1027,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     protected void initProcessDbSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new ProcessDbSchemaManager();
+        if (this.schemaManager == null) {
+            this.schemaManager = new ProcessDbSchemaManager();
         }
     }
 

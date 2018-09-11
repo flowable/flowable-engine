@@ -189,7 +189,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
             initDataSource();
         }
         
-        if (usingRelationalDatabase || usingSchema) {
+        if (usingRelationalDatabase || usingSchemaMgmt) {
             initSchemaManager();
             initSchemaManagementCommand();
         }
@@ -265,8 +265,8 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     @Override
     public void initSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new FormDbSchemaManager();
+        if (this.schemaManager == null) {
+            this.schemaManager = new FormDbSchemaManager();
         }
     }
     

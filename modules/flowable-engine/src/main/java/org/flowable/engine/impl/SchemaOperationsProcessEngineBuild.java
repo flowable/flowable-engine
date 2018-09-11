@@ -32,26 +32,26 @@ public class SchemaOperationsProcessEngineBuild implements Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {
         
-        SchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
-        
+        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
         String databaseSchemaUpdate = CommandContextUtil.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
-        LOGGER.debug("Executing performSchemaOperationsProcessEngineBuild with setting {}", databaseSchemaUpdate);
-        if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
+        
+        LOGGER.debug("Executing schema management with setting {}", databaseSchemaUpdate);
+        if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
             try {
-                dbSchemaManager.schemaDrop();
+                schemaManager.schemaDrop();
             } catch (RuntimeException e) {
                 // ignore
             }
         }
-        if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)
+        if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)
                 || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate) || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)) {
-            dbSchemaManager.schemaCreate();
+            schemaManager.schemaCreate();
 
-        } else if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-            dbSchemaManager.schemaCheckVersion();
+        } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
+            schemaManager.schemaCheckVersion();
 
         } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-            dbSchemaManager.schemaUpdate();
+            schemaManager.schemaUpdate();
         }
         
         return null;

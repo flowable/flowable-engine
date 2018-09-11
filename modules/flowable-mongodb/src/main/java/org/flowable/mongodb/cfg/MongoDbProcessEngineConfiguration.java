@@ -13,16 +13,14 @@
 package org.flowable.mongodb.cfg;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -32,18 +30,11 @@ import org.flowable.mongodb.persistence.manager.MongoDbDeploymentDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbEventSubscriptionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbExecutionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricActivityInstanceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbHistoricIdentityLinkDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricProcessInstanceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbHistoricTaskInstanceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbHistoricVariableInstanceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbIdentityLinkDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbJobDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionInfoDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbResourceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbTaskDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbTimerJobDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbVariableInstanceDataManager;
+import org.flowable.mongodb.schema.MongoProcessSchemaManager;
 import org.flowable.mongodb.transaction.MongoDbTransactionContextFactory;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -52,7 +43,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.MongoIterable;
 
 /**
  * @author Joram Barrez
@@ -64,13 +54,15 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
     protected MongoClientOptions mongoClientOptions;
     protected MongoClient mongoClient;
     protected MongoDatabase mongoDatabase;
+    protected MongoProcessSchemaManager processSchemaManager;
     
     protected MongoDbSessionFactory mongoDbSessionFactory;
     
-    protected List<String> collectionNames;
     
     public MongoDbProcessEngineConfiguration() {
         this.usingRelationalDatabase = false;
+        this.usingSchemaMgmt = true;
+        this.databaseSchemaUpdate = DB_SCHEMA_UPDATE_TRUE;
         
         this.validateFlowable5EntitiesEnabled = false;
         this.performanceSettings.setValidateExecutionRelationshipCountConfigOnBoot(false);
@@ -88,50 +80,23 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
             this.mongoClient = new com.mongodb.MongoClient(serverAddresses, mongoClientOptions);  
         }
         
-        //TODO Schema mgmt
-        
         if (this.mongoDatabase == null)  {
             this.mongoDatabase = this.mongoClient.getDatabase(databaseName);
-            
-            // TODO needs to be extracted
-            
-            // Collections can't be created in a transaction (see https://docs.mongodb.com/manual/core/transactions/)
-            
-            Set<String> collections = new HashSet<>();
-            MongoIterable<String> collectionNames = this.mongoDatabase.listCollectionNames();
-            if (collectionNames != null) {
-                for (String collectionName : collectionNames) {
-                    collections.add(collectionName);
-                }
-            }
-            
-            this.collectionNames = Arrays.asList(
-                    MongoDbDeploymentDataManager.COLLECTION_DEPLOYMENT,
-                    MongoDbProcessDefinitionDataManager.COLLECTION_PROCESS_DEFINITIONS,
-                    MongoDbResourceDataManager.COLLECTION_BYTE_ARRAY,
-                    MongoDbExecutionDataManager.COLLECTION_EXECUTIONS,
-                    MongoDbProcessDefinitionInfoDataManager.COLLECTION_PROCESS_DEFINITION_INFO,
-                    MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION,
-                    MongoDbHistoricProcessInstanceDataManager.COLLECTION_HISTORIC_PROCESS_INSTANCES,
-                    MongoDbHistoricActivityInstanceDataManager.COLLECTION_HISTORIC_ACTIVITY_INSTANCES,
-                    MongoDbCommentDataManager.COLLECTION_COMMENTS,
-                    MongoDbTaskDataManager.COLLECTION_TASKS,
-                    MongoDbHistoricTaskInstanceDataManager.COLLECTION_HISTORIC_TASK_INSTANCES,
-                    MongoDbIdentityLinkDataManager.COLLECTION_IDENTITY_LINKS,
-                    MongoDbHistoricIdentityLinkDataManager.COLLECTION_HISTORIC_IDENTITY_LINKS,
-                    MongoDbVariableInstanceDataManager.COLLECTION_VARIABLES,
-                    MongoDbHistoricVariableInstanceDataManager.COLLECTION_HISTORIC_VARIABLE_INSTANCES,
-                    MongoDbJobDataManager.COLLECTION_JOBS,
-                    MongoDbTimerJobDataManager.COLLECTION_TIMER_JOBS);
-            for (String name : this.collectionNames) {
-                if (!collections.contains(name)) {
-                    this.mongoDatabase.createCollection(name);
-                }
-            };
-            
         }
     }
-
+    
+    @Override
+    public void initSchemaManager() {
+        this.schemaManager = new MongoProcessSchemaManager();
+    }
+    
+    public void initSchemaManagementCommand() {
+        // Impl note: the schemaMgmtCmd of the regular impl is reused, as it will delegate to the MongoProcessSchemaManager class
+        if (schemaManagementCmd == null) {
+            this.schemaManagementCmd = new SchemaOperationsProcessEngineBuild();
+        }
+    }
+    
     @Override
     public CommandInterceptor createTransactionInterceptor() {
         return null;
@@ -291,12 +256,13 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
         return mongoDatabase;
     }
 
-    public List<String> getCollectionNames() {
-        return collectionNames;
+    public MongoProcessSchemaManager getProcessSchemaManager() {
+        return processSchemaManager;
     }
 
-    public void setCollectionNames(List<String> collectionNames) {
-        this.collectionNames = collectionNames;
+    public MongoDbProcessEngineConfiguration setProcessSchemaManager(MongoProcessSchemaManager processSchemaManager) {
+        this.processSchemaManager = processSchemaManager;
+        return this;
     }
     
 }

@@ -197,7 +197,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             initDataSource();
         }
         
-        if (usingRelationalDatabase || usingSchema) {
+        if (usingRelationalDatabase || usingSchemaMgmt) {
             initSchemaManager();
             initSchemaManagementCommand();
         }
@@ -245,8 +245,8 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     protected void initAppDbSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new AppDbSchemaManager();
+        if (this.schemaManager == null) {
+            this.schemaManager = new AppDbSchemaManager();
         }
     }
 

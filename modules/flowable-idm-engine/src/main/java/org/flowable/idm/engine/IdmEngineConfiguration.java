@@ -184,7 +184,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
             initDataSource();
         }
         
-        if (usingRelationalDatabase || usingSchema) {
+        if (usingRelationalDatabase || usingSchemaMgmt) {
             initSchemaManager();
             initSchemaManagementCommand();
         }
@@ -207,8 +207,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
 
     @Override
     public void initSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new IdmDbSchemaManager();
+        if (this.schemaManager == null) {
+            this.schemaManager = new IdmDbSchemaManager();
         }
     }
     

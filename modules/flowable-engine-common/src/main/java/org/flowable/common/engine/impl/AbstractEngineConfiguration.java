@@ -119,7 +119,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
     protected SchemaManager commonDbSchemaManager;
-    protected SchemaManager dbSchemaManager;
+    protected SchemaManager schemaManager;
     protected Command<Void> schemaManagementCmd;
 
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
@@ -205,7 +205,7 @@ public abstract class AbstractEngineConfiguration {
      * Flag that can be set to configure whether or not a schema is used. This is usefil for custom implementations that do not use relational databases at all.
      * Setting {@link #usingRelationalDatabase} to true will automotically imply using a schema.
      */
-    protected boolean usingSchema = true;
+    protected boolean usingSchemaMgmt = true;
 
     /**
      * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named 'PRE1.', Flowable will query for executions
@@ -901,12 +901,29 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    /**
+     * Use {@link #getSchemaManager()} instead.
+     */
+    @Deprecated
     public SchemaManager getDbSchemaManager() {
-        return dbSchemaManager;
+        return schemaManager;
     }
 
+    /**
+     * Use {@link #setSchemaManager(SchemaManager)()} instead.
+     */
+    @Deprecated
     public AbstractEngineConfiguration setDbSchemaManager(SchemaManager dbSchemaManager) {
-        this.dbSchemaManager = dbSchemaManager;
+        this.schemaManager = dbSchemaManager;
+        return this;
+    }
+    
+    public SchemaManager getSchemaManager() {
+        return schemaManager;
+    }
+
+    public AbstractEngineConfiguration setSchemaManager(SchemaManager schemaManager) {
+        this.schemaManager = schemaManager;
         return this;
     }
 
@@ -1324,12 +1341,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
     
-    public boolean isUsingSchema() {
-        return usingSchema;
+    public boolean isUsingSchemaMgmt() {
+        return usingSchemaMgmt;
     }
 
-    public AbstractEngineConfiguration setUsingSchema(boolean usingSchema) {
-        this.usingSchema = usingSchema;
+    public AbstractEngineConfiguration setUsingSchemaMgmt(boolean usingSchema) {
+        this.usingSchemaMgmt = usingSchema;
         return this;
     }
 
