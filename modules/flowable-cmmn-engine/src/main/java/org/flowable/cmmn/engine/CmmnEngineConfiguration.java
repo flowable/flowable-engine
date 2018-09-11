@@ -668,7 +668,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             initDataSource();
         }
         
-        if (usingRelationalDatabase || usingSchema) {
+        if (usingRelationalDatabase || usingSchemaMgmt) {
             initSchemaManager();
             initSchemaManagementCommand();
         }
@@ -737,8 +737,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected void initCmmnDbSchemaManager() {
-        if (this.dbSchemaManager == null) {
-            this.dbSchemaManager = new CmmnDbSchemaManager();
+        if (this.schemaManager == null) {
+            this.schemaManager = new CmmnDbSchemaManager();
         }
     }
 
