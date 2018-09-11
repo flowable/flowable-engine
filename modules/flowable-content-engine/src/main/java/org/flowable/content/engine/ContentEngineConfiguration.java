@@ -39,6 +39,7 @@ import org.flowable.content.engine.impl.ContentManagementServiceImpl;
 import org.flowable.content.engine.impl.ContentServiceImpl;
 import org.flowable.content.engine.impl.cfg.StandaloneContentEngineConfiguration;
 import org.flowable.content.engine.impl.cfg.StandaloneInMemContentEngineConfiguration;
+import org.flowable.content.engine.impl.cmd.SchemaOperationsContentEngineBuild;
 import org.flowable.content.engine.impl.db.ContentDbSchemaManager;
 import org.flowable.content.engine.impl.db.EntityDependencyOrder;
 import org.flowable.content.engine.impl.fs.SimpleFileSystemContentStorage;
@@ -129,8 +130,11 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
-            initDbSchema();
+        }
+        
+        if (usingRelationalDatabase || usingSchema) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         initBeans();
@@ -196,15 +200,17 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     // data model ///////////////////////////////////////////////////////////////
 
     @Override
-    public void initDbSchemaManager() {
+    public void initSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ContentDbSchemaManager();
         }
     }
-
-    public void initDbSchema() {
-        if (dbSchemaManager != null) {
-            ((ContentDbSchemaManager) dbSchemaManager).initSchema(this, databaseSchemaUpdate);
+    
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsContentEngineBuild();
+            }
         }
     }
 

@@ -15,7 +15,7 @@ package org.flowable.content.engine.impl.db;
 import java.sql.Connection;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
@@ -30,14 +30,14 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class ContentDbSchemaManager implements DbSchemaManager {
+public class ContentDbSchemaManager implements SchemaManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentDbSchemaManager.class);
     
     public static String LIQUIBASE_CHANGELOG = "org/flowable/content/db/liquibase/flowable-content-db-changelog.xml";
     
     @Override
-    public void dbSchemaCreate() {
+    public void schemaCreate() {
         Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getContentEngineConfiguration());
         try {
             liquibase.update("content");
@@ -49,7 +49,7 @@ public class ContentDbSchemaManager implements DbSchemaManager {
     }
 
     @Override
-    public void dbSchemaDrop() {
+    public void schemaDrop() {
         Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getContentEngineConfiguration());
         try {
             liquibase.dropAll();
@@ -61,8 +61,8 @@ public class ContentDbSchemaManager implements DbSchemaManager {
     }
     
     @Override
-    public String dbSchemaUpdate() {
-        dbSchemaCreate();
+    public String schemaUpdate() {
+        schemaCreate();
         return null;
     }
 
@@ -110,6 +110,19 @@ public class ContentDbSchemaManager implements DbSchemaManager {
             }
         } catch (Exception e) {
             throw new FlowableException("Error initialising Content schema", e);
+        } finally {
+            closeDatabase(liquibase);
+        }
+    }
+    
+    @Override
+    public void schemaCheckVersion() {
+        Liquibase liquibase = null;
+        try {
+            liquibase = createLiquibaseInstance(CommandContextUtil.getContentEngineConfiguration());
+            liquibase.validate();
+        } catch (Exception e) {
+            throw new FlowableException("Error validating app engine schema", e);
         } finally {
             closeDatabase(liquibase);
         }

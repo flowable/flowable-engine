@@ -54,9 +54,9 @@ public class CmmnEngineImpl implements CmmnEngine {
         
         this.asyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
         
-        if (cmmnEngineConfiguration.isUsingRelationalDatabase() && cmmnEngineConfiguration.getDatabaseSchemaUpdate() != null) {
+        if (cmmnEngineConfiguration.getSchemaManagementCmd() != null) {
             CommandExecutor commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
-            commandExecutor.execute(cmmnEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsCmmnEngineBuild());
+            commandExecutor.execute(cmmnEngineConfiguration.getSchemaCommandConfig(), cmmnEngineConfiguration.getSchemaManagementCmd());
         }
 
         LOGGER.info("CmmnEngine {} created", name);

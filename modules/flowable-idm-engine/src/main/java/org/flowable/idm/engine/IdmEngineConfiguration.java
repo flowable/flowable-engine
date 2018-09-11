@@ -42,6 +42,7 @@ import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.engine.impl.IdmEngineImpl;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.IdmManagementServiceImpl;
+import org.flowable.idm.engine.impl.SchemaOperationsIdmEngineBuild;
 import org.flowable.idm.engine.impl.authentication.BlankSalt;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
@@ -181,7 +182,11 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
+        }
+        
+        if (usingRelationalDatabase || usingSchema) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         initBeans();
@@ -201,9 +206,17 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     @Override
-    public void initDbSchemaManager() {
+    public void initSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new IdmDbSchemaManager();
+        }
+    }
+    
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsIdmEngineBuild();
+            }
         }
     }
 

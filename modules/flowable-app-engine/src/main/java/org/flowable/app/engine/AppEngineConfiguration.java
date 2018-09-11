@@ -30,6 +30,7 @@ import org.flowable.app.engine.impl.AppEngineImpl;
 import org.flowable.app.engine.impl.AppManagementServiceImpl;
 import org.flowable.app.engine.impl.AppRepositoryServiceImpl;
 import org.flowable.app.engine.impl.cfg.StandaloneInMemAppEngineConfiguration;
+import org.flowable.app.engine.impl.cmd.SchemaOperationsAppEngineBuild;
 import org.flowable.app.engine.impl.db.AppDbSchemaManager;
 import org.flowable.app.engine.impl.db.EntityDependencyOrder;
 import org.flowable.app.engine.impl.deployer.AppDeployer;
@@ -62,7 +63,7 @@ import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -133,8 +134,8 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache;
 
     protected ExpressionManager expressionManager;
-    protected DbSchemaManager identityLinkDbSchemaManager;
-    protected DbSchemaManager variableDbSchemaManager;
+    protected SchemaManager identityLinkDbSchemaManager;
+    protected SchemaManager variableDbSchemaManager;
 
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
@@ -194,7 +195,11 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
+        }
+        
+        if (usingRelationalDatabase || usingSchema) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         initVariableTypes();
@@ -221,13 +226,21 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     @Override
-    public void initDbSchemaManager() {
-        super.initDbSchemaManager();
+    public void initSchemaManager() {
+        super.initSchemaManager();
         initAppDbSchemaManager();
 
         if (executeServiceDbSchemaManagers) {
             initIdentityLinkDbSchemaManager();
             initVariableDbSchemaManager();
+        }
+    }
+    
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsAppEngineBuild();
+            }
         }
     }
 
@@ -626,20 +639,20 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public DbSchemaManager getIdentityLinkDbSchemaManager() {
+    public SchemaManager getIdentityLinkDbSchemaManager() {
         return identityLinkDbSchemaManager;
     }
 
-    public AppEngineConfiguration setIdentityLinkDbSchemaManager(DbSchemaManager identityLinkDbSchemaManager) {
+    public AppEngineConfiguration setIdentityLinkDbSchemaManager(SchemaManager identityLinkDbSchemaManager) {
         this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
         return this;
     }
 
-    public DbSchemaManager getVariableDbSchemaManager() {
+    public SchemaManager getVariableDbSchemaManager() {
         return variableDbSchemaManager;
     }
 
-    public AppEngineConfiguration setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
+    public AppEngineConfiguration setVariableDbSchemaManager(SchemaManager variableDbSchemaManager) {
         this.variableDbSchemaManager = variableDbSchemaManager;
         return this;
     }

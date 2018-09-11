@@ -47,6 +47,7 @@ import org.flowable.cmmn.engine.impl.cfg.DefaultTaskAssignmentManager;
 import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.JobRetryCmd;
+import org.flowable.cmmn.engine.impl.cmd.SchemaOperationsCmmnEngineBuild;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
@@ -156,7 +157,7 @@ import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -308,10 +309,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
-    protected DbSchemaManager identityLinkDbSchemaManager;
-    protected DbSchemaManager variableDbSchemaManager;
-    protected DbSchemaManager taskDbSchemaManager;
-    protected DbSchemaManager jobDbSchemaManager;
+    protected SchemaManager identityLinkDbSchemaManager;
+    protected SchemaManager variableDbSchemaManager;
+    protected SchemaManager taskDbSchemaManager;
+    protected SchemaManager jobDbSchemaManager;
 
     /**
      * Case diagram generator. Default value is DefaultCaseDiagramGenerator
@@ -665,7 +666,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
+        }
+        
+        if (usingRelationalDatabase || usingSchema) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         initVariableTypes();
@@ -711,8 +716,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     @Override
-    public void initDbSchemaManager() {
-        super.initDbSchemaManager();
+    public void initSchemaManager() {
+        super.initSchemaManager();
         initCmmnDbSchemaManager();
 
         if (executeServiceDbSchemaManagers) {
@@ -720,6 +725,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             initVariableDbSchemaManager();
             initTaskDbSchemaManager();
             initJobDbSchemaManager();
+        }
+    }
+    
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsCmmnEngineBuild();
+            }
         }
     }
 
@@ -1921,38 +1934,38 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public DbSchemaManager getIdentityLinkDbSchemaManager() {
+    public SchemaManager getIdentityLinkDbSchemaManager() {
         return identityLinkDbSchemaManager;
     }
 
-    public CmmnEngineConfiguration setIdentityLinkDbSchemaManager(DbSchemaManager identityLinkDbSchemaManager) {
+    public CmmnEngineConfiguration setIdentityLinkDbSchemaManager(SchemaManager identityLinkDbSchemaManager) {
         this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
         return this;
     }
 
-    public DbSchemaManager getVariableDbSchemaManager() {
+    public SchemaManager getVariableDbSchemaManager() {
         return variableDbSchemaManager;
     }
 
-    public CmmnEngineConfiguration setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
+    public CmmnEngineConfiguration setVariableDbSchemaManager(SchemaManager variableDbSchemaManager) {
         this.variableDbSchemaManager = variableDbSchemaManager;
         return this;
     }
 
-    public DbSchemaManager getTaskDbSchemaManager() {
+    public SchemaManager getTaskDbSchemaManager() {
         return taskDbSchemaManager;
     }
 
-    public CmmnEngineConfiguration setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
+    public CmmnEngineConfiguration setTaskDbSchemaManager(SchemaManager taskDbSchemaManager) {
         this.taskDbSchemaManager = taskDbSchemaManager;
         return this;
     }
 
-    public DbSchemaManager getJobDbSchemaManager() {
+    public SchemaManager getJobDbSchemaManager() {
         return jobDbSchemaManager;
     }
 
-    public CmmnEngineConfiguration setJobDbSchemaManager(DbSchemaManager jobDbSchemaManager) {
+    public CmmnEngineConfiguration setJobDbSchemaManager(SchemaManager jobDbSchemaManager) {
         this.jobDbSchemaManager = jobDbSchemaManager;
         return this;
     }

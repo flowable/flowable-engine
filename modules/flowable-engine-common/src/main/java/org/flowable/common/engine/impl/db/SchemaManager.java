@@ -12,12 +12,18 @@
  */
 package org.flowable.common.engine.impl.db;
 
-public interface DbSchemaManager {
+/**
+ * @author Tijs Rademakers
+ * @author Joram Barrez
+ */
+public interface SchemaManager {
     
-    void dbSchemaCreate();
+    void schemaCreate();
     
-    void dbSchemaDrop();
+    void schemaDrop();
     
-    String dbSchemaUpdate();
+    String schemaUpdate();
+    
+    void schemaCheckVersion();
 
 }

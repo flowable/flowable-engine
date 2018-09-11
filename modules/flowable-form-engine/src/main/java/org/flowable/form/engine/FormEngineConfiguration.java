@@ -40,6 +40,7 @@ import org.flowable.form.engine.impl.FormRepositoryServiceImpl;
 import org.flowable.form.engine.impl.FormServiceImpl;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
 import org.flowable.form.engine.impl.cfg.StandaloneInMemFormEngineConfiguration;
+import org.flowable.form.engine.impl.cmd.SchemaOperationsFormEngineBuild;
 import org.flowable.form.engine.impl.db.EntityDependencyOrder;
 import org.flowable.form.engine.impl.db.FormDbSchemaManager;
 import org.flowable.form.engine.impl.deployer.CachingAndArtifactsManager;
@@ -186,8 +187,11 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
-            initDbSchema();
+        }
+        
+        if (usingRelationalDatabase || usingSchema) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         initBeans();
@@ -260,47 +264,17 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     // data model ///////////////////////////////////////////////////////////////
 
     @Override
-    public void initDbSchemaManager() {
+    public void initSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new FormDbSchemaManager();
         }
     }
-
-    public void initDbSchema() {
-        Liquibase liquibase = null;
-        try {
-            DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
-            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
-            database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
-            database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
-
-            if (StringUtils.isNotEmpty(databaseSchema)) {
-                database.setDefaultSchemaName(databaseSchema);
-                database.setLiquibaseSchemaName(databaseSchema);
+    
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsFormEngineBuild();
             }
-
-            if (StringUtils.isNotEmpty(databaseCatalog)) {
-                database.setDefaultCatalogName(databaseCatalog);
-                database.setLiquibaseCatalogName(databaseCatalog);
-            }
-
-            liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-
-            if (DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Dropping and creating schema FORM");
-                liquibase.dropAll();
-                liquibase.update("form");
-            } else if (DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Updating schema FORM");
-                liquibase.update("form");
-            } else if (DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Validating schema FORM");
-                liquibase.validate();
-            }
-        } catch (Exception e) {
-            throw new FlowableException("Error initialising form data schema", e);
-        } finally {
-            closeDatabase(liquibase);
         }
     }
 

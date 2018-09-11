@@ -53,7 +53,7 @@ import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
-import org.flowable.common.engine.impl.db.DbSchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -107,6 +107,7 @@ import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
+import org.flowable.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.agenda.AgendaSessionFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
@@ -828,10 +829,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
 
-    protected DbSchemaManager identityLinkDbSchemaManager;
-    protected DbSchemaManager variableDbSchemaManager;
-    protected DbSchemaManager taskDbSchemaManager;
-    protected DbSchemaManager jobDbSchemaManager;
+    protected SchemaManager identityLinkDbSchemaManager;
+    protected SchemaManager variableDbSchemaManager;
+    protected SchemaManager taskDbSchemaManager;
+    protected SchemaManager jobDbSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -891,9 +892,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManagers();
         } else {
             initNonRelationalDataSource();
+        }
+        
+        if (usingRelationalDatabase || usingSchema) {
+            initSchemaManager();
+            initSchemaManagementCommand();
         }
 
         initHelpers();
@@ -1005,9 +1010,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initService(managementService);
         initService(dynamicBpmnService);
     }
-
-    public void initDbSchemaManagers() {
-        super.initDbSchemaManager();
+    
+    @Override
+    public void initSchemaManager() {
+        super.initSchemaManager();
+        
         initProcessDbSchemaManager();
         initIdentityLinkDbSchemaManager();
         initVariableDbSchemaManager();
@@ -1046,6 +1053,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initJobDbSchemaManager() {
         if (this.jobDbSchemaManager == null) {
             this.jobDbSchemaManager = new JobDbSchemaManager();
+        }
+    }
+    
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsProcessEngineBuild();
+            }
         }
     }
 
@@ -3771,42 +3786,42 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public DbSchemaManager getVariableDbSchemaManager() {
+    public SchemaManager getVariableDbSchemaManager() {
         return variableDbSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
+    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(SchemaManager variableDbSchemaManager) {
         this.variableDbSchemaManager = variableDbSchemaManager;
         return this;
     }
 
-    public DbSchemaManager getTaskDbSchemaManager() {
+    public SchemaManager getTaskDbSchemaManager() {
         return taskDbSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
+    public ProcessEngineConfigurationImpl setTaskDbSchemaManager(SchemaManager taskDbSchemaManager) {
         this.taskDbSchemaManager = taskDbSchemaManager;
         return this;
     }
 
-    public DbSchemaManager getIdentityLinkDbSchemaManager() {
+    public SchemaManager getIdentityLinkDbSchemaManager() {
         return identityLinkDbSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setIdentityLinkDbSchemaManager(DbSchemaManager identityLinkDbSchemaManager) {
+    public ProcessEngineConfigurationImpl setIdentityLinkDbSchemaManager(SchemaManager identityLinkDbSchemaManager) {
         this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
         return this;
     }
 
-    public DbSchemaManager getJobDbSchemaManager() {
+    public SchemaManager getJobDbSchemaManager() {
         return jobDbSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setJobDbSchemaManager(DbSchemaManager jobDbSchemaManager) {
+    public ProcessEngineConfigurationImpl setJobDbSchemaManager(SchemaManager jobDbSchemaManager) {
         this.jobDbSchemaManager = jobDbSchemaManager;
         return this;
     }
-
+    
     // Flowable 5
 
     public boolean isFlowable5CompatibilityEnabled() {
