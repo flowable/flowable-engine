@@ -12,51 +12,32 @@
  */
 package org.flowable.engine.impl.migration;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.SubProcess;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.dynamic.AbstractDynamicStateManager;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.history.HistoryManager;
-import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.task.service.HistoricTaskService;
-import org.flowable.task.service.TaskService;
-import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,16 +180,20 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                     LOGGER.debug("activityId:'" + execution.getCurrentActivityId() + "' is a SubProcess - No mapping required");
                     continue;
                 }
+                if (execution.getCurrentFlowElement() instanceof BoundaryEvent) {
+                    LOGGER.debug("activityId:'" + execution.getCurrentActivityId() + "' is a Boundary Event - No mapping required");
+                    continue;
+                }
                 //If there's no specific mapping, we check if the new process definition contains it already
                 if (document.getActivityMigrationMappings().containsKey(execution.getCurrentActivityId())) {
                     String toActivityId = document.getActivityMigrationMappings().get(execution.getCurrentActivityId());
-                    LOGGER.debug("Mapping for activity '" + execution.getCurrentActivityId() + "' -> '" + toActivityId);
+                    LOGGER.debug("Mapping found for activity '" + execution.getCurrentActivityId() + "' -> '" + toActivityId);
                     changeActivityStateBuilder.moveExecutionToActivityId(execution.getId(), toActivityId);
                 } else if (isActivityIdInProcessDefinitionModel(execution.getCurrentActivityId(), bpmnModel)) {
                     LOGGER.debug("Auto mapping activity '" + execution.getCurrentActivityId());
                     changeActivityStateBuilder.moveExecutionToActivityId(execution.getId(), execution.getCurrentActivityId());
                 } else {
-                    throw new FlowableException("Migration Activity mapping missing for activity definition Id:'" + execution.getProcessDefinitionKey() + "'");
+                    throw new FlowableException("Migration Activity mapping missing for activity definition Id:'" + execution.getActivityId() + "'");
                 }
             }
         }
@@ -275,6 +260,9 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 if (execution.getCurrentFlowElement() instanceof SubProcess) {
                     continue;
                 }
+                if (execution.getCurrentFlowElement() instanceof BoundaryEvent) {
+                    continue;
+                }
                 if (!activityMappings.containsKey(execution.getCurrentActivityId()) && !isActivityIdInProcessDefinitionModel(execution.getCurrentActivityId(), bpmnModel)) {
                     result.addValidationMessage("Process instance (id:'" + processInstanceId + "') has a running Activity (id:'" + execution.getCurrentActivityId() + "') that is not mapped for migration");
                 }
@@ -323,14 +311,11 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         return false;
     }
 
-
-//    private void migrateEmbeddedSubProcessExecution(String subProcessActivityId, String processInstanceId, String processDefinitioId, CommandContext commandContext) {
-//        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-//        List<ExecutionEntity> subProcessExecutions = executionEntityManager.findExecutionsByQueryCriteria(new ExecutionQueryImpl().processInstanceId(processInstanceId).activityId(subProcessActivityId));
-//        subProcessExecutions.forEach(e -> e.setProcessDefinitionId(processDefinitioId));
-//    }
-
-
+    //    private void migrateEmbeddedSubProcessExecution(String subProcessActivityId, String processInstanceId, String processDefinitioId, CommandContext commandContext) {
+    //        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+    //        List<ExecutionEntity> subProcessExecutions = executionEntityManager.findExecutionsByQueryCriteria(new ExecutionQueryImpl().processInstanceId(processInstanceId).activityId(subProcessActivityId));
+    //        subProcessExecutions.forEach(e -> e.setProcessDefinitionId(processDefinitioId));
+    //    }
 
 }
 

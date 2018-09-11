@@ -53,7 +53,6 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -256,8 +255,8 @@ public abstract class AbstractDynamicStateManager {
             for (ExecutionEntity execution : currentExecutions) {
                 executionIdsNotToDelete.add(execution.getId());
 
+                executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
                 if (!moveExecutionContainer.isDirectExecutionMigration()) {
-                    executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
                     executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, true, execution.getCurrentFlowElement());
                 }
 
@@ -519,7 +518,6 @@ public abstract class AbstractDynamicStateManager {
         //Build the subProcess hierarchy
         HashMap<String, ExecutionEntity> createdSubProcess = new HashMap<>();
         for (SubProcess subProcess : subProcessesToCreate.values()) {
-            //TODO do we need to check if this subProcess execution already exists and/or its parent subProcess execution??
             if (!createdSubProcess.containsKey(subProcess.getId())) {
                 ExecutionEntity embeddedSubProcess = createEmbeddedSubProcess(subProcess, defaultContinueParentExecution, createdSubProcess, commandContext);
                 createdSubProcess.put(subProcess.getId(), embeddedSubProcess);
@@ -529,22 +527,19 @@ public abstract class AbstractDynamicStateManager {
         //Adds the execution (leaf) to the subProcess
         List<ExecutionEntity> newChildExecutions = new ArrayList<>();
         for (FlowElement newFlowElement : moveToFlowElements) {
-            ExecutionEntity newChildExecution = null;
+            ExecutionEntity parentExecution;
             if (newFlowElement.getSubProcess() != null && createdSubProcess.containsKey(newFlowElement.getSubProcess().getId())) {
-                ExecutionEntity parentSubProcessExecution = createdSubProcess.get(newFlowElement.getSubProcess().getId());
-                if (moveExecutionContainer.isDirectExecutionMigration()) {
-                    newChildExecution = migrateExecutionEntity(parentSubProcessExecution, currentExecutions.get(0), newFlowElement, commandContext);
-                } else {
-                    newChildExecution = executionEntityManager.createChildExecution(parentSubProcessExecution);
-                    newChildExecution.setCurrentFlowElement(newFlowElement);
-                }
+                parentExecution = createdSubProcess.get(newFlowElement.getSubProcess().getId());
             } else {
-                if (moveExecutionContainer.isDirectExecutionMigration()) {
-                    newChildExecution = migrateExecutionEntity(defaultContinueParentExecution, currentExecutions.get(0), newFlowElement, commandContext);
-                } else {
-                    newChildExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
-                    newChildExecution.setCurrentFlowElement(newFlowElement);
-                }
+                parentExecution = defaultContinueParentExecution;
+            }
+
+            ExecutionEntity newChildExecution;
+            if (moveExecutionContainer.isDirectExecutionMigration()) {
+                newChildExecution = migrateExecutionEntity(parentExecution, currentExecutions.get(0), newFlowElement, commandContext);
+            } else {
+                newChildExecution = executionEntityManager.createChildExecution(parentExecution);
+                newChildExecution.setCurrentFlowElement(newFlowElement);
             }
 
             if (newFlowElement instanceof CallActivity) {
@@ -565,6 +560,7 @@ public abstract class AbstractDynamicStateManager {
             if (newFlowElement instanceof Gateway) {
                 //Skip one that was already added
                 currentExecutions.stream().skip(1).forEach(e -> {
+                    //TODO WIP can be parentExecution insteas?
                     ExecutionEntity childExecution = executionEntityManager.createChildExecution(defaultContinueParentExecution);
                     childExecution.setCurrentFlowElement(newFlowElement);
                     newChildExecutions.add(childExecution);
@@ -756,23 +752,15 @@ public abstract class AbstractDynamicStateManager {
     //TODO WIP ... SHOULD BE ONLY IN ProcessInstanceMigration
     protected ExecutionEntity migrateExecutionEntity(ExecutionEntity parentExecutionEntity, ExecutionEntity childExecution, FlowElement newFlowElement, CommandContext commandContext) {
 
-        //        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
         HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
         HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         childExecution.setParent(parentExecutionEntity);
         // manage the bidirectional parent-child relation
         parentExecutionEntity.addChildExecution(childExecution);
         childExecution.setProcessDefinitionId(parentExecutionEntity.getProcessDefinitionId());
-        childExecution.setProcessInstanceId(parentExecutionEntity.getProcessInstanceId() != null ? parentExecutionEntity.getProcessInstanceId() : parentExecutionEntity.getId());
-        childExecution.setRootProcessInstanceId(parentExecutionEntity.getRootProcessInstanceId());
-
-        // Inherits the 'count' feature from the parent
-        if (parentExecutionEntity instanceof CountingExecutionEntity) {
-            CountingExecutionEntity countingParentExecutionEntity = (CountingExecutionEntity) parentExecutionEntity;
-            ((CountingExecutionEntity) childExecution).setCountEnabled(countingParentExecutionEntity.isCountEnabled());
-        }
 
         //Additional changes if the new activity Id doesn't match
         String oldActivityId = childExecution.getCurrentActivityId();
@@ -798,13 +786,58 @@ public abstract class AbstractDynamicStateManager {
             historicTaskService.recordTaskInfoChange(task);
         }
 
-        //TODO ... check persistance state May not be needed
-        //executionEntityManager.update(childExecution, false);
+        // Boundary Events - only applies to Activities and up to this point we have a UserTask or ReceiveTask execution, both are Activities
+        List<BoundaryEvent> boundaryEvents = ((Activity) newFlowElement).getBoundaryEvents();
+        if (boundaryEvents != null && !boundaryEvents.isEmpty()) {
+            List<ExecutionEntity> boundaryEventsExecutions = createBoundaryEvents(boundaryEvents, childExecution, commandContext);
+            executeBoundaryEvents(boundaryEvents, boundaryEventsExecutions);
+        }
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Child execution {} updated with parent {}", childExecution, parentExecutionEntity.getId());
         }
         return childExecution;
+    }
+
+    // TODO WIP - This method should be inside ExecutionEntityManager - temporarily made private and static until its moved there
+    private static List<ExecutionEntity> createBoundaryEvents(List<BoundaryEvent> boundaryEvents, ExecutionEntity execution, CommandContext commandContext) {
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+
+        List<ExecutionEntity> boundaryEventExecutions = new ArrayList<>(boundaryEvents.size());
+
+        // The parent execution becomes a scope, and a child execution is created for each of the boundary events
+        for (BoundaryEvent boundaryEvent : boundaryEvents) {
+
+            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
+                || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+                continue;
+            }
+
+            // A Child execution of the current execution is created to represent the boundary event being active
+            ExecutionEntity childExecutionEntity = executionEntityManager.createChildExecution(execution);
+            childExecutionEntity.setParentId(execution.getId());
+            childExecutionEntity.setCurrentFlowElement(boundaryEvent);
+            childExecutionEntity.setScope(false);
+            boundaryEventExecutions.add(childExecutionEntity);
+        }
+
+        return boundaryEventExecutions;
+    }
+
+    // TODO WIP - This method should be somewhere else - it works as Utility method - temporarily made private and static
+    private static void executeBoundaryEvents(List<BoundaryEvent> boundaryEvents, List<ExecutionEntity> boundaryEventExecutions) {
+        if (!CollectionUtil.isEmpty(boundaryEventExecutions)) {
+            Iterator<BoundaryEvent> boundaryEventsIterator = boundaryEvents.iterator();
+            Iterator<ExecutionEntity> boundaryEventExecutionsIterator = boundaryEventExecutions.iterator();
+
+            while (boundaryEventExecutionsIterator.hasNext() && boundaryEventExecutionsIterator.hasNext()) {
+                BoundaryEvent boundaryEvent = boundaryEventsIterator.next();
+                ExecutionEntity boundaryEventExecution = boundaryEventExecutionsIterator.next();
+                ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
+                LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), boundaryEventExecution.getId());
+                boundaryEventBehavior.execute(boundaryEventExecution);
+            }
+        }
     }
 
     private static String printFlowElementIds(Collection<FlowElement> flowElements) {

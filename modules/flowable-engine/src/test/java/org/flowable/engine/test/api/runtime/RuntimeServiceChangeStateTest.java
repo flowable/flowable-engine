@@ -15,7 +15,6 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,10 +30,7 @@ import java.util.stream.Stream;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
-import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
-import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
@@ -49,9 +45,6 @@ import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Frederik Heremans
@@ -264,7 +257,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -314,7 +307,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -381,7 +374,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(!iterator.hasNext());
 
@@ -435,7 +428,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("firstTask", task.getTaskDefinitionKey());
@@ -486,7 +479,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("firstTimerEvent", getActivityId(timer));
+        assertEquals("firstTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -503,7 +496,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         entityEvent = (FlowableEngineEntityEvent) event;
         timer = (Job) entityEvent.getEntity();
-        assertEquals("secondTimerEvent", getActivityId(timer));
+        assertEquals("secondTimerEvent", getJobActivityId(timer));
 
         assertTrue(!iterator.hasNext());
 
@@ -907,7 +900,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -978,7 +971,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -1049,7 +1042,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -1106,7 +1099,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -1161,7 +1154,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -1213,7 +1206,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -1272,7 +1265,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.JOB_CANCELED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(iterator.hasNext());
         event = iterator.next();
@@ -1332,7 +1325,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(!iterator.hasNext());
 
@@ -1399,7 +1392,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(!iterator.hasNext());
 
@@ -1460,7 +1453,7 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.TIMER_SCHEDULED, event.getType());
         FlowableEngineEntityEvent entityEvent = (FlowableEngineEntityEvent) event;
         Job timer = (Job) entityEvent.getEntity();
-        assertEquals("boundaryTimerEvent", getActivityId(timer));
+        assertEquals("boundaryTimerEvent", getJobActivityId(timer));
 
         assertTrue(!iterator.hasNext());
 
@@ -6291,88 +6284,4 @@ public class RuntimeServiceChangeStateTest extends PluggableFlowableTestCase {
         //        assertProcessEnded(processInstance.getId());
     }
 
-    class ChangeStateEventListener extends AbstractFlowableEngineEventListener {
-
-        private List<FlowableEvent> events = new ArrayList<>();
-
-        public ChangeStateEventListener() {
-
-        }
-
-        @Override
-        protected void activityStarted(FlowableActivityEvent event) {
-            List<String> types = Arrays.asList("userTask", "subProcess", "callActivity");
-
-            if (types.contains(event.getActivityType())) {
-                events.add(event);
-            }
-        }
-
-        @Override
-        protected void activityCancelled(FlowableActivityCancelledEvent event) {
-            List<String> types = Arrays.asList("userTask", "subProcess", "callActivity");
-
-            if (types.contains(event.getActivityType())) {
-                events.add(event);
-            }
-        }
-
-        @Override
-        protected void timerScheduled(FlowableEngineEntityEvent event) {
-            events.add(event);
-        }
-
-        @Override
-        protected void processCreated(FlowableEngineEntityEvent event) {
-            events.add(event);
-        }
-
-        @Override
-        protected void jobCancelled(FlowableEngineEntityEvent event) {
-            events.add(event);
-        }
-
-        @Override
-        protected void processCancelled(FlowableCancelledEvent event) {
-            events.add(event);
-        }
-
-        @Override
-        protected void variableUpdatedEvent(FlowableVariableEvent event) {
-            events.add(event);
-        }
-
-        @Override
-        protected void variableCreated(FlowableVariableEvent event) {
-            events.add(event);
-        }
-
-        public void clear() {
-            events.clear();
-        }
-
-        public Iterator<FlowableEvent> iterator() {
-            return events.iterator();
-        }
-
-        public boolean hasEvents() {
-            return events.isEmpty();
-        }
-
-        public int eventCount() {
-            return events.size();
-        }
-    }
-
-    private String getActivityId(Job job) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            Map<String, Object> jobConfigurationMap = objectMapper.readValue(job.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
-
-            });
-            return (String) jobConfigurationMap.get("activityId");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
