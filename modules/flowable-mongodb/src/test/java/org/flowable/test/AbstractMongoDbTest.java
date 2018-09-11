@@ -13,7 +13,9 @@
 package org.flowable.test;
 
 import java.util.Arrays;
+import java.util.Collection;
 
+import org.bson.Document;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -24,14 +26,19 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.mongodb.cfg.MongoDbProcessEngineConfiguration;
+import org.flowable.mongodb.persistence.MongoDbSession;
+import org.flowable.mongodb.persistence.MongoDbSessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentest4j.AssertionFailedError;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoCollection;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class AbstractMongoDbTest {
     
@@ -45,6 +52,12 @@ public class AbstractMongoDbTest {
     
     @BeforeEach
     public void setup() {
+        if (this.mongoDbProcessEngineConfiguration == null) {
+            initProcessEngine();
+        }
+    }
+
+    protected void initProcessEngine() {
         this.mongoDbProcessEngineConfiguration = (MongoDbProcessEngineConfiguration) new MongoDbProcessEngineConfiguration()
                 .setServerAddresses(Arrays.asList(new ServerAddress("localhost", 27017), new ServerAddress("localhost", 27018), new ServerAddress("localhost", 27019)))
                 .setDisableIdmEngine(true)
@@ -66,7 +79,18 @@ public class AbstractMongoDbTest {
     
     @AfterEach
     public void cleanup() {
-        mongoDbProcessEngineConfiguration.getMongoDatabase().drop();
+        deleteAllDocuments();
+    }
+
+    protected void deleteAllDocuments() {
+        MongoDbSessionFactory mongoDbSessionFactory = (MongoDbSessionFactory) mongoDbProcessEngineConfiguration.getSessionFactories().get(MongoDbSession.class);
+        Collection<String> collectionNames = mongoDbSessionFactory.getCollectionNames();
+        for (String collectionName :collectionNames) {
+            MongoCollection<Document> collection = mongoDbProcessEngineConfiguration.getMongoDatabase().getCollection(collectionName);
+            if (collection != null) {
+                collection.deleteMany(new BasicDBObject());
+            }
+        }
     }
 
     protected void assertProcessEnded(final String processInstanceId) {

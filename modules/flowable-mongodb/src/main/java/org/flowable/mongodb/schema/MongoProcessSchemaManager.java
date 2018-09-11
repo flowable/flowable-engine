@@ -12,34 +12,21 @@
  */
 package org.flowable.mongodb.schema;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import org.bson.Document;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.mongodb.cfg.MongoDbProcessEngineConfiguration;
-import org.flowable.mongodb.persistence.manager.MongoDbCommentDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbDeploymentDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbEventSubscriptionDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbExecutionDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbHistoricActivityInstanceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbHistoricIdentityLinkDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbHistoricProcessInstanceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbHistoricTaskInstanceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbHistoricVariableInstanceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbIdentityLinkDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbJobDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionInfoDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbResourceDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbTaskDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbTimerJobDataManager;
-import org.flowable.mongodb.persistence.manager.MongoDbVariableInstanceDataManager;
+import org.flowable.mongodb.persistence.MongoDbSession;
+import org.flowable.mongodb.persistence.MongoDbSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 
 /**
@@ -48,10 +35,9 @@ import com.mongodb.client.MongoIterable;
 public class MongoProcessSchemaManager implements SchemaManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoProcessSchemaManager.class);
-
+    
     @Override
     public void schemaCreate() {
-        
         MongoDbProcessEngineConfiguration engineConfiguration = getEngineConfiguration();
         
         // Collections can't be created in a transaction (see https://docs.mongodb.com/manual/core/transactions/)
@@ -63,26 +49,7 @@ public class MongoProcessSchemaManager implements SchemaManager {
             }
         }
         
-        List<String> collectionNames = Arrays.asList(
-                MongoDbDeploymentDataManager.COLLECTION_DEPLOYMENT,
-                MongoDbProcessDefinitionDataManager.COLLECTION_PROCESS_DEFINITIONS,
-                MongoDbResourceDataManager.COLLECTION_BYTE_ARRAY,
-                MongoDbExecutionDataManager.COLLECTION_EXECUTIONS,
-                MongoDbProcessDefinitionInfoDataManager.COLLECTION_PROCESS_DEFINITION_INFO,
-                MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION,
-                MongoDbHistoricProcessInstanceDataManager.COLLECTION_HISTORIC_PROCESS_INSTANCES,
-                MongoDbHistoricActivityInstanceDataManager.COLLECTION_HISTORIC_ACTIVITY_INSTANCES,
-                MongoDbCommentDataManager.COLLECTION_COMMENTS,
-                MongoDbTaskDataManager.COLLECTION_TASKS,
-                MongoDbHistoricTaskInstanceDataManager.COLLECTION_HISTORIC_TASK_INSTANCES,
-                MongoDbIdentityLinkDataManager.COLLECTION_IDENTITY_LINKS,
-                MongoDbHistoricIdentityLinkDataManager.COLLECTION_HISTORIC_IDENTITY_LINKS,
-                MongoDbVariableInstanceDataManager.COLLECTION_VARIABLES,
-                MongoDbHistoricVariableInstanceDataManager.COLLECTION_HISTORIC_VARIABLE_INSTANCES,
-                MongoDbJobDataManager.COLLECTION_JOBS,
-                MongoDbTimerJobDataManager.COLLECTION_TIMER_JOBS);
-        
-        for (String name : collectionNames) {
+        for (String name : getAllCollectionNames()) {
             if (!collections.contains(name)) {
                 engineConfiguration.getMongoDatabase().createCollection(name);
             }
@@ -92,7 +59,13 @@ public class MongoProcessSchemaManager implements SchemaManager {
     @Override
     public void schemaDrop() {
         LOGGER.info("Dropping all MongoDB collections in the database");
-        getEngineConfiguration().getMongoDatabase().drop();
+        MongoDatabase mongoDatabase = getEngineConfiguration().getMongoDatabase();
+        for (String collectionName : getAllCollectionNames()) {
+            MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+            if (collection != null) {
+                collection.drop();
+            }
+        }
     }
 
     @Override
@@ -104,6 +77,11 @@ public class MongoProcessSchemaManager implements SchemaManager {
     @Override
     public void schemaCheckVersion() {
         
+    }
+    
+    protected Collection<String> getAllCollectionNames() {
+        MongoDbSessionFactory mongoDbSessionFactory = (MongoDbSessionFactory) getEngineConfiguration().getSessionFactories().get(MongoDbSession.class);
+        return mongoDbSessionFactory.getCollectionNames();
     }
     
     protected MongoDbProcessEngineConfiguration getEngineConfiguration() {

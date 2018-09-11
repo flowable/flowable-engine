@@ -12,6 +12,7 @@
  */
 package org.flowable.mongodb.persistence;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -153,6 +154,10 @@ public class MongoDbSessionFactory implements SessionFactory {
 
     public void setMongoDatabase(MongoDatabase mongoDatabase) {
         this.mongoDatabase = mongoDatabase;
+    }
+    
+    public Collection<String> getCollectionNames() {
+        return classToCollectionMap.values();
     }
     
     public String getCollectionForEntityClass(Class<? extends Entity> clazz) {
