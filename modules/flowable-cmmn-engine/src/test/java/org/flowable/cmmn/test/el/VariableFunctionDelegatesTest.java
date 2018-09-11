@@ -392,5 +392,113 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", arrayNode);
         assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableContainsAny() {
+        
+        //  String
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "test");
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "hello there");
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .variable("myVar", "what a world!")
+                .start();
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Collection
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .variable("myVar", new ArrayList<>())
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar",  Arrays.asList("a", "world", "b"));
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // ArrayNode
+        ObjectMapper objectMapper = new ObjectMapper();        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .variable("myVar", objectMapper.createArrayNode())
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        arrayNode.add("one");
+        arrayNode.add("two");
+        arrayNode.add(123);
+        arrayNode.add("hello");
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", arrayNode);
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableContainsAnyString() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "test");
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "developers typically write a hello world when learning a new programming language");
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .variable("myVar", "The world is a big place")
+                .start();
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableContainsAnyCollection() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .variable("myVar", new ArrayList<>())
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar",  Arrays.asList("c"));
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar",  Arrays.asList("a", "b", "c", "d", "e", "f", "g"));
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableContainsAnyArrayNode() {
+        ObjectMapper objectMapper = new ObjectMapper();        
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .variable("myVar", objectMapper.createArrayNode())
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        arrayNode.add(3);
+        arrayNode.add(4);
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", arrayNode);
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        arrayNode.add(1);
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", arrayNode);
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        arrayNode.add(2);
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .variable("myVar", arrayNode)
+                .start();
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
 
 }

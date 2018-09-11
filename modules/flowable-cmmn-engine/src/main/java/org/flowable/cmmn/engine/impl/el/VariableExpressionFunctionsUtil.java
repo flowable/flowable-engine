@@ -350,17 +350,67 @@ public class VariableExpressionFunctionsUtil {
             } else if (value != null) {
                 if (value instanceof String && jsonNode.isTextual() && StringUtils.equals(jsonNode.asText(), (String) value)) {
                     return true;
-                } else if (value instanceof Long && jsonNode.isLong() && jsonNode.longValue() == ((Long) value).longValue()) {
+                } else if (value instanceof Number && jsonNode.isLong() && jsonNode.longValue() == ((Number) value).longValue()) {
                     return true;
-                } else if (value instanceof Double && jsonNode.isDouble() && jsonNode.doubleValue() == ((Double) value).doubleValue()) {
+                } else if (value instanceof Number && jsonNode.isDouble() && jsonNode.doubleValue() == ((Number) value).doubleValue()) {
                     return true;
-                } else if (value instanceof Integer && jsonNode.isInt() && jsonNode.intValue() == ((Integer) value).intValue()) {
+                } else if (value instanceof Number && jsonNode.isInt() && jsonNode.intValue() == ((Number) value).intValue()) {
                     return true;
                 } else if (value instanceof Boolean && jsonNode.isBoolean() && jsonNode.booleanValue() == ((Boolean) value).booleanValue()) {
                     return true;
                 }
             }
         }   
+        return false;
+    }
+    
+    /**
+     * Checks if the value of a variable (fetched using the variableName through the {@link PlanItemInstance}) contains any of the provided values.
+     * 
+     * Depending on the variable type, this means the following:
+     * 
+     * - {@link String}: following {@link StringUtils#contains(CharSequence, CharSequence)} semantics for one of the passed values
+     * - {@link Collection}: following the {@link Collection#contains(Object)} for one of the passed values
+     * - {@link ArrayNode}: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type
+     * 
+     * When the variable value is null, false is returned in all cases.
+     * When the variale value is not null, and the instance type is not one of the cases above, false will be returned.
+     */
+    @SuppressWarnings({ "rawtypes"})
+    public static boolean containsAny(PlanItemInstance planItemInstance, String variableName, Object... values) {
+        Object variableValue = getVariableValue(planItemInstance, variableName);
+        if (variableValue != null) {
+            if (variableValue instanceof String) {
+                String variableStringValue = (String) variableValue;
+                for (Object value : values) {
+                    String stringValue = (String) value;
+                    if (StringUtils.contains(variableStringValue, stringValue)) {
+                        return true;
+                    }
+                }
+                return false;
+
+            } else if (variableValue instanceof Collection) {
+                Collection collectionVariableValue = (Collection) variableValue;
+                for (Object value : values) {
+                   if (collectionContains(collectionVariableValue, value)) {
+                       return true;
+                   }
+                }
+                return false;
+
+            } else if (variableValue instanceof ArrayNode) {
+                ArrayNode arrayNodeVariableValue = (ArrayNode) variableValue;
+                for (Object value : values) {
+                   if (arrayNodeContains(arrayNodeVariableValue, value)) {
+                       return true;
+                   }
+                }
+                return false;
+
+            }
+        }
+        
         return false;
     }
     
