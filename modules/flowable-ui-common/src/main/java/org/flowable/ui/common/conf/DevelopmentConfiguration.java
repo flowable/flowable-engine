@@ -12,10 +12,10 @@
  */
 package org.flowable.ui.common.conf;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
@@ -35,7 +35,7 @@ public class DevelopmentConfiguration {
     protected static final String DATASOURCE_PASSWORD = "flowable";
 
     @Bean
-    @Primary
+    @ConditionalOnMissingBean
     public DataSource developmentDataSource() {
         return DataSourceBuilder
             .create()
