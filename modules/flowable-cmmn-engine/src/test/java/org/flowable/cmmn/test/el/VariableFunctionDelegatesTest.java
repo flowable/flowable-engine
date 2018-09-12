@@ -500,5 +500,27 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
                 .start();
         assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableGet() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testVariableGet")
+                .variable("myVar", "")
+                .start();
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "hello");
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testVariableGetWithDefaultValue() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testVariableGet")
+                .start();
+        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+    }
 
 }

@@ -63,6 +63,10 @@ import org.flowable.cmmn.engine.impl.el.VariableEqualsExpressionEnhancer;
 import org.flowable.cmmn.engine.impl.el.VariableEqualsFunctionDelegate;
 import org.flowable.cmmn.engine.impl.el.VariableExistsExpressionEnhancer;
 import org.flowable.cmmn.engine.impl.el.VariableExistsFunctionDelegate;
+import org.flowable.cmmn.engine.impl.el.VariableGetExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableGetFunctionDelegate;
+import org.flowable.cmmn.engine.impl.el.VariableGetOrDefaultExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.VariableGetOrDefaultFunctionDelegate;
 import org.flowable.cmmn.engine.impl.el.VariableGreaterThanExpressionEnhancer;
 import org.flowable.cmmn.engine.impl.el.VariableGreaterThanFunctionDelegate;
 import org.flowable.cmmn.engine.impl.el.VariableGreaterThanOrEqualsExpressionEnhancer;
@@ -796,6 +800,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (flowableFunctionDelegates == null) {
             flowableFunctionDelegates = new ArrayList<>();
             
+            flowableFunctionDelegates.add(new VariableGetFunctionDelegate());
+            flowableFunctionDelegates.add(new VariableGetOrDefaultFunctionDelegate());
+            
             flowableFunctionDelegates.add(new VariableEqualsFunctionDelegate());
             flowableFunctionDelegates.add(new VariableNotEqualsFunctionDelegate());
             
@@ -821,6 +828,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initExpressionEnhancers() {
         if (expressionEnhancers == null) {
             expressionEnhancers = new ArrayList<>();
+            
+            expressionEnhancers.add(new VariableGetExpressionEnhancer());
+            expressionEnhancers.add(new VariableGetOrDefaultExpressionEnhancer());
             
             expressionEnhancers.add(new VariableEqualsExpressionEnhancer());
             expressionEnhancers.add(new VariableNotEqualsExpressionEnhancer());

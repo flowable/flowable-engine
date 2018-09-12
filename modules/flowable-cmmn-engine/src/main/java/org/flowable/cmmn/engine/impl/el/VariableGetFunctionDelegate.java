@@ -22,19 +22,19 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Joram Barrez
  */
-public class VariableContainsAnyFunctionDelegate implements FlowableFunctionDelegate {
+public class VariableGetFunctionDelegate implements FlowableFunctionDelegate {
     
-    public static final String FUNCTION_NAME = "containsAny";
+    public static final String FUNCTION_NAME = "get";
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(VariableContainsAnyFunctionDelegate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VariableGetFunctionDelegate.class);
     
     private static Method METHOD;
     
     static {
         try {
-            METHOD = VariableExpressionFunctionsUtil.class.getDeclaredMethod("containsAny", PlanItemInstance.class, String.class, Object[].class);
+            METHOD = VariableExpressionFunctionsUtil.class.getDeclaredMethod("getVariable", PlanItemInstance.class, String.class);
         } catch (Exception e) {
-            LOGGER.error("Cannot find correct containsAny method on " + VariableExpressionFunctionsUtil.class, e);
+            LOGGER.error("Cannot find correct getVariable method on " + VariableExpressionFunctionsUtil.class, e);
         }
     }
 

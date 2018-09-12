@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -412,6 +413,27 @@ public class VariableExpressionFunctionsUtil {
         }
         
         return false;
+    }
+    
+    /**
+     * Returns the value of a variable. This avoids the {@link PropertyNotFoundException} that otherwise gets thrown when referencing a variable in JUEL.
+     */
+    public static Object getVariable(PlanItemInstance planItemInstance, String variableName) {
+        Object variableValue = getVariableValue(planItemInstance, variableName);
+        return variableValue;
+    }
+    
+    /**
+     * Returns the value of a variable, or a default if the value is null.
+     * This avoids the {@link PropertyNotFoundException} that otherwise gets thrown when referencing a variable in JUEL.
+     */
+    public static Object getVariableOrDefault(PlanItemInstance planItemInstance, String variableName, Object value) {
+        Object variableValue = getVariableValue(planItemInstance, variableName);
+        if (variableValue != null) {
+            return variableValue;
+        } else {
+            return value;
+        }
     }
     
     protected static Object getVariableValue(PlanItemInstance planItemInstance, String variableName) {
