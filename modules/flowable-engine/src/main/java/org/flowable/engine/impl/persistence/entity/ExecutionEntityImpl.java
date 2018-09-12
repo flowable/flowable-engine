@@ -509,7 +509,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     protected void ensureRootProcessInstanceInitialized() {
-        if (rootProcessInstanceId == null) {
+        if (rootProcessInstanceId != null) {
             rootProcessInstance = (ExecutionEntityImpl) CommandContextUtil.getExecutionEntityManager().findById(rootProcessInstanceId);
         }
     }
