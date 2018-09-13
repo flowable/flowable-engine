@@ -43,7 +43,12 @@ public class ProcessExpressionManager extends VariableScopeExpressionManager {
     
     public ProcessExpressionManager(DelegateInterceptor delegateInterceptor, Map<Object, Object> beans) {
         super(beans);
-        this.delegateInterceptor = delegateInterceptor;
+        if (delegateInterceptor==null) {
+            this.delegateInterceptor=new DefaultDelegateInterceptor();
+        }else {
+            this.delegateInterceptor = delegateInterceptor;
+        }
+       
     }
     
     @Override

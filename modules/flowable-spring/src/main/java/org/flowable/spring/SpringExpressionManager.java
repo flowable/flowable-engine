@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
+import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -44,9 +45,11 @@ public class SpringExpressionManager extends ProcessExpressionManager {
      *            the applicationContext to use. Ignored when 'beans' parameter is not null.
      * @param beans
      *            a map of custom beans to expose. If null, all beans in the application-context will be exposed.
+     * @param delegateInterceptor
+     *            If delegateInterceptor is not defined, DefaultDelegateInterceptor is used by default.
      */
-    public SpringExpressionManager(ApplicationContext applicationContext, Map<Object, Object> beans) {
-        super(beans);
+    public SpringExpressionManager(ApplicationContext applicationContext, Map<Object, Object> beans,DelegateInterceptor delegateInterceptor) {
+        super(delegateInterceptor,beans);
         this.applicationContext = applicationContext;
     }
     
