@@ -10,22 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.el.function;
+package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
- * Returns whether or not a variable with the given name exists when fetched through the provided {@link PlanItemInstance}.
- * 
+ * Opposite operation of the ${@link VariableIsEmptyExpressionFunction} .
+ *  
  * @author Joram Barrez
  */
-public class VariableExistsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
+public class VariableIsNotEmptyExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableExistsExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("exists", "exist"), "exists");
+    public VariableIsNotEmptyExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("isNotEmpty", "notEmpty"), "isNotEmpty");
     }
     
     @Override
@@ -33,8 +32,8 @@ public class VariableExistsExpressionFunction extends AbstractFlowableVariableEx
         return false;
     }
     
-    public static boolean exists(VariableScope variableScope, String variableName) {
-        return getVariableValue(variableScope, variableName) != null;
+    public static boolean isNotEmpty(VariableScope variableScope, String variableName) {
+        return !VariableIsEmptyExpressionFunction.isEmpty(variableScope, variableName);
     }
 
 }

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.el.function;
+package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
 
@@ -19,14 +19,14 @@ import org.flowable.variable.api.delegate.VariableScope;
 /**
  * @author Joram Barrez
  */
-public class VariableGreaterThanOrEqualsExpressionFunction extends AbstractVariableComparatorExpressionFunction {
+public class VariableLowerThanOrEqualsExpressionFunction extends AbstractVariableComparatorExpressionFunction {
 
-    public VariableGreaterThanOrEqualsExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("greaterThanOrEquals", "gte"), "greaterThanOrEquals");
+    public VariableLowerThanOrEqualsExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("lowerThanOrEquals", "lte"), "lowerThanOrEquals");
     }
     
-    public static boolean greaterThanOrEquals(VariableScope variableScope, String variableName, Object comparedValue) {
-        return compareVariableValue(variableScope, variableName, comparedValue, OPERATOR.GTE);
+    public static boolean lowerThanOrEquals(VariableScope variableScope, String variableName, Object comparedValue) {
+        return compareVariableValue(variableScope, variableName, comparedValue, OPERATOR.LTE);
     }
 
 }

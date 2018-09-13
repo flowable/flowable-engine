@@ -14,7 +14,7 @@ package org.flowable.cmmn.test.el;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.flowable.cmmn.engine.impl.el.function.VariableNotEqualsExpressionFunction;
+import org.flowable.common.engine.impl.el.function.VariableNotEqualsExpressionFunction;
 import org.junit.Test;
 
 /**

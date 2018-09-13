@@ -14,11 +14,11 @@ package org.flowable.cmmn.test.el;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.flowable.cmmn.engine.impl.el.function.VariableGreaterThanExpressionFunction;
-import org.flowable.cmmn.engine.impl.el.function.VariableGreaterThanOrEqualsExpressionFunction;
-import org.flowable.cmmn.engine.impl.el.function.VariableLowerThanExpressionFunction;
-import org.flowable.cmmn.engine.impl.el.function.VariableLowerThanOrEqualsExpressionFunction;
 import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
+import org.flowable.common.engine.impl.el.function.VariableGreaterThanExpressionFunction;
+import org.flowable.common.engine.impl.el.function.VariableGreaterThanOrEqualsExpressionFunction;
+import org.flowable.common.engine.impl.el.function.VariableLowerThanExpressionFunction;
+import org.flowable.common.engine.impl.el.function.VariableLowerThanOrEqualsExpressionFunction;
 import org.junit.Test;
 
 /**

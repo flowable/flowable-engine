@@ -10,30 +10,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.el.function;
+package org.flowable.common.engine.impl.el.function;
 
 import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
- * Returns the value of a variable, or a default if the value is null.
- * This avoids the {@link PropertyNotFoundException} that otherwise gets thrown when referencing a variable in JUEL.
+ * Returns the value of a variable. This avoids the {@link PropertyNotFoundException} that otherwise gets thrown when referencing a variable in JUEL.
  * 
  * @author Joram Barrez
  */
-public class VariableGetOrDefaultExpressionFunction extends AbstractFlowableVariableExpressionFunction {
+public class VariableGetExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableGetOrDefaultExpressionFunction(String variableScopeName) {
-        super(variableScopeName, "getOrDefault");
+    public VariableGetExpressionFunction(String variableScopeName) {
+        super(variableScopeName, "get");
     }
-
-    public static Object getOrDefault(VariableScope variableScope, String variableName, Object value) {
+    
+    public static Object get(VariableScope variableScope, String variableName) {
         Object variableValue = getVariableValue(variableScope, variableName);
-        if (variableValue != null) {
-            return variableValue;
-        } else {
-            return value;
-        }
+        return variableValue;
+    }
+    
+    @Override
+    protected boolean isMultiParameterFunction() {
+        return false;
     }
 
 }

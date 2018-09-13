@@ -10,30 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.el.function;
+package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
 
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
- * Opposite operation of the ${@link VariableIsEmptyExpressionFunction} .
- *  
  * @author Joram Barrez
  */
-public class VariableIsNotEmptyExpressionFunction extends AbstractFlowableVariableExpressionFunction {
-    
-    public VariableIsNotEmptyExpressionFunction(String variableScopeName) {
-        super(variableScopeName, Arrays.asList("isNotEmpty", "notEmpty"), "isNotEmpty");
+public class VariableLowerThanExpressionFunction extends AbstractVariableComparatorExpressionFunction {
+
+    public VariableLowerThanExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("lowerThan", "lt"), "lowerThan");
     }
     
-    @Override
-    protected boolean isMultiParameterFunction() {
-        return false;
-    }
-    
-    public static boolean isNotEmpty(VariableScope variableScope, String variableName) {
-        return !VariableIsEmptyExpressionFunction.isEmpty(variableScope, variableName);
+    public static boolean lowerThan(VariableScope variableScope, String variableName, Object comparedValue) {
+        return compareVariableValue(variableScope, variableName, comparedValue, OPERATOR.LT);
     }
 
 }

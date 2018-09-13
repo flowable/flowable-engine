@@ -10,30 +10,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.el.function;
+package org.flowable.common.engine.impl.el.function;
 
-import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
+import java.util.Arrays;
+
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
- * Returns the value of a variable. This avoids the {@link PropertyNotFoundException} that otherwise gets thrown when referencing a variable in JUEL.
+ * Returns whether or not a variable with the given name exists when fetched through the provided {@link PlanItemInstance}.
  * 
  * @author Joram Barrez
  */
-public class VariableGetExpressionFunction extends AbstractFlowableVariableExpressionFunction {
+public class VariableExistsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableGetExpressionFunction(String variableScopeName) {
-        super(variableScopeName, "get");
-    }
-    
-    public static Object get(VariableScope variableScope, String variableName) {
-        Object variableValue = getVariableValue(variableScope, variableName);
-        return variableValue;
+    public VariableExistsExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("exists", "exist"), "exists");
     }
     
     @Override
     protected boolean isMultiParameterFunction() {
         return false;
+    }
+    
+    public static boolean exists(VariableScope variableScope, String variableName) {
+        return getVariableValue(variableScope, variableName) != null;
     }
 
 }
