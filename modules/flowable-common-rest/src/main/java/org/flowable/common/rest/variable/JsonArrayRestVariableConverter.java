@@ -14,7 +14,12 @@
 package org.flowable.common.rest.variable;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 
 public class JsonArrayRestVariableConverter implements RestVariableConverter {
@@ -26,14 +31,21 @@ public class JsonArrayRestVariableConverter implements RestVariableConverter {
 
     @Override
     public Class<?> getVariableType() {
-
-        return ArrayList.class;
+        return ArrayNode.class;
     }
 
     @Override
     public Object getVariableValue(EngineRestVariable result) {
         if (result.getValue() != null) {
-            return result.getValue();
+            if (result.getValue() instanceof LinkedHashMap || result.getValue() instanceof ArrayList) {
+                // When the variable is coming from the REST API it automatically gets converted to an ArrayList or
+                // LinkedHashMap. In all other cases JSON is saved as ArrayNode or ObjectNode. For consistency the
+                // variable is converted to such an object here.
+                ObjectMapper objectMapper = new ObjectMapper();
+                return objectMapper.valueToTree(result.getValue());
+            } else {
+                return result.getValue();
+            }
         }
         return null;
     }
@@ -41,8 +53,8 @@ public class JsonArrayRestVariableConverter implements RestVariableConverter {
     @Override
     public void convertVariableValue(Object variableValue, EngineRestVariable result) {
         if (variableValue != null) {
-            if (!(variableValue instanceof java.util.ArrayList)) {
-                throw new FlowableIllegalArgumentException("Converter can only convert java.util.ArrayList");
+            if (!(variableValue instanceof ArrayNode)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert com.fasterxml.jackson.databind.node.ArrayNode.");
             }
             result.setValue(variableValue);
         } else {
