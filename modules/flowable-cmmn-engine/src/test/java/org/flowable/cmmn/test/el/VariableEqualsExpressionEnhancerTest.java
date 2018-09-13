@@ -22,7 +22,7 @@ import org.junit.Test;
  */
 public class VariableEqualsExpressionEnhancerTest {
     
-    private VariableEqualsExpressionFunction expressionFunction = new VariableEqualsExpressionFunction();
+    private VariableEqualsExpressionFunction expressionFunction = new VariableEqualsExpressionFunction("planItemInstance");
     
     @Test
     public void testRegexDefault() {

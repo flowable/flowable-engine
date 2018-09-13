@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Compares the value of a variable (fetched using the variableName through the {@link PlanItemInstance})
@@ -25,13 +26,13 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
  */
 public class VariableEqualsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableEqualsExpressionFunction() {
-        super(Arrays.asList("equals", "eq"), "equals");
+    public VariableEqualsExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("equals", "eq"), "equals");
     }
     
-    public static boolean equals(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
+    public static boolean equals(VariableScope variableScope, String variableName, Object comparedValue) {
         
-        Object variableValue = getVariableValue(planItemInstance, variableName);
+        Object variableValue = getVariableValue(variableScope, variableName);
         if (comparedValue != null && variableValue != null) {
             
             // Numbers are not necessarily of the expected type due to coming from JUEL, 

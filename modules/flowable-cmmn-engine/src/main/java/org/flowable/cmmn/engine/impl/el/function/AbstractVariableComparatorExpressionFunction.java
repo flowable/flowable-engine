@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.el.function;
 
 import java.util.List;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
@@ -23,14 +23,14 @@ public abstract class AbstractVariableComparatorExpressionFunction extends Abstr
     
     protected static enum OPERATOR { LT, LTE, GT, GTE, EQ };
 
-    public AbstractVariableComparatorExpressionFunction(List<String> functionNameOptions, String functionName) {
-        super(functionNameOptions, functionName);
+    public AbstractVariableComparatorExpressionFunction(String variableScopeName, List<String> functionNameOptions, String functionName) {
+        super(variableScopeName, functionNameOptions, functionName);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected static boolean compareVariableValue(PlanItemInstance planItemInstance, String variableName, Object comparedValue, OPERATOR operator) {
+    protected static boolean compareVariableValue(VariableScope variableScope, String variableName, Object comparedValue, OPERATOR operator) {
         
-        Object variableValue = getVariableValue(planItemInstance, variableName);
+        Object variableValue = getVariableValue(variableScope, variableName);
         if (comparedValue != null && variableValue != null) {
 
             // See equals method for an explanation why Number instances are handled specifically

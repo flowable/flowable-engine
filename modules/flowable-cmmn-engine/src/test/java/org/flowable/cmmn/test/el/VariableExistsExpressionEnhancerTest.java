@@ -22,7 +22,7 @@ import org.junit.Test;
  */
 public class VariableExistsExpressionEnhancerTest {
     
-    private VariableExistsExpressionFunction expressionFunction = new VariableExistsExpressionFunction();
+    private VariableExistsExpressionFunction expressionFunction = new VariableExistsExpressionFunction("planItemInstance");
     
     @Test
     public void testRegexNameReplacement() {

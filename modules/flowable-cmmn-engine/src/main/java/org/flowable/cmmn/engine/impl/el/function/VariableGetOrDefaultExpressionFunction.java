@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.el.function;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Returns the value of a variable, or a default if the value is null.
@@ -23,12 +23,12 @@ import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
  */
 public class VariableGetOrDefaultExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableGetOrDefaultExpressionFunction() {
-        super("getOrDefault");
+    public VariableGetOrDefaultExpressionFunction(String variableScopeName) {
+        super(variableScopeName, "getOrDefault");
     }
 
-    public static Object getOrDefault(PlanItemInstance planItemInstance, String variableName, Object value) {
-        Object variableValue = getVariableValue(planItemInstance, variableName);
+    public static Object getOrDefault(VariableScope variableScope, String variableName, Object value) {
+        Object variableValue = getVariableValue(variableScope, variableName);
         if (variableValue != null) {
             return variableValue;
         } else {

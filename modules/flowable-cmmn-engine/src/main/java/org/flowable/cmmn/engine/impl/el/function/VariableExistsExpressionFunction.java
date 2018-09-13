@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.el.function;
 import java.util.Arrays;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Returns whether or not a variable with the given name exists when fetched through the provided {@link PlanItemInstance}.
@@ -23,8 +24,8 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
  */
 public class VariableExistsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableExistsExpressionFunction() {
-        super(Arrays.asList("exists", "exist"), "exists");
+    public VariableExistsExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("exists", "exist"), "exists");
     }
     
     @Override
@@ -32,8 +33,8 @@ public class VariableExistsExpressionFunction extends AbstractFlowableVariableEx
         return false;
     }
     
-    public static boolean exists(PlanItemInstance planItemInstance, String variableName) {
-        return getVariableValue(planItemInstance, variableName) != null;
+    public static boolean exists(VariableScope variableScope, String variableName) {
+        return getVariableValue(variableScope, variableName) != null;
     }
 
 }

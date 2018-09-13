@@ -18,6 +18,7 @@ import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.variable.api.delegate.VariableScope;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -37,8 +38,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public class VariableIsEmptyExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableIsEmptyExpressionFunction() {
-        super(Arrays.asList("isEmpty", "empty"), "isEmpty");
+    public VariableIsEmptyExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("isEmpty", "empty"), "isEmpty");
     }
     
     @Override
@@ -47,8 +48,8 @@ public class VariableIsEmptyExpressionFunction extends AbstractFlowableVariableE
     }
     
     @SuppressWarnings("rawtypes")
-    public static boolean isEmpty(PlanItemInstance planItemInstance, String variableName) {
-        Object variableValue = getVariableValue(planItemInstance, variableName);
+    public static boolean isEmpty(VariableScope variableScope, String variableName) {
+        Object variableValue = getVariableValue(variableScope, variableName);
         if (variableValue == null)  {
             return true;
             

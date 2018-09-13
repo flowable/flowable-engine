@@ -38,13 +38,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public class VariableContainsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableContainsExpressionFunction() {
-        super("contains");
+    public VariableContainsExpressionFunction(String variableScopeName) {
+        super(variableScopeName, "contains");
     }
     
     @SuppressWarnings({ "rawtypes"})
-    public static boolean contains(VariableScope planItemInstance, String variableName, Object... values) {
-        Object variableValue = getVariableValue((PlanItemInstance) planItemInstance, variableName);
+    public static boolean contains(VariableScope variableScope, String variableName, Object... values) {
+        Object variableValue = getVariableValue(variableScope, variableName);
         if (variableValue != null) {
             if (variableValue instanceof String) {
                 String variableStringValue = (String) variableValue;

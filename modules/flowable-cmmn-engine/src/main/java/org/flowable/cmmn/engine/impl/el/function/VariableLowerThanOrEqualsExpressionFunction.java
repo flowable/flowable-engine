@@ -14,19 +14,19 @@ package org.flowable.cmmn.engine.impl.el.function;
 
 import java.util.Arrays;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
  */
 public class VariableLowerThanOrEqualsExpressionFunction extends AbstractVariableComparatorExpressionFunction {
 
-    public VariableLowerThanOrEqualsExpressionFunction() {
-        super(Arrays.asList("lowerThanOrEquals", "lte"), "lowerThanOrEquals");
+    public VariableLowerThanOrEqualsExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("lowerThanOrEquals", "lte"), "lowerThanOrEquals");
     }
     
-    public static boolean lowerThanOrEquals(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
-        return compareVariableValue(planItemInstance, variableName, comparedValue, OPERATOR.LTE);
+    public static boolean lowerThanOrEquals(VariableScope variableScope, String variableName, Object comparedValue) {
+        return compareVariableValue(variableScope, variableName, comparedValue, OPERATOR.LTE);
     }
 
 }

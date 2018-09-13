@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.el.function;
 import java.util.Arrays;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Compares the value of a variable (fetched using the variableName through the {@link PlanItemInstance})
@@ -24,19 +25,19 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
  */
 public class VariableNotEqualsExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableNotEqualsExpressionFunction() {
-        super(Arrays.asList("notEquals", "ne"), "notEquals");
+    public VariableNotEqualsExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("notEquals", "ne"), "notEquals");
     }
 
-    public static boolean notEquals(PlanItemInstance planItemInstance, String variableName, Object variableValue) {
+    public static boolean notEquals(VariableScope variableScope, String variableName, Object variableValue) {
         
         // Special handling for null: when the variable is null, false is returned.
         // This is similar to equals, where a null variable value will always return false 
         // (it's effectively ignored) - unless it's compared to null itself)
         
-        Object actualValue = getVariableValue(planItemInstance, variableName);
+        Object actualValue = getVariableValue(variableScope, variableName);
         if (actualValue != null) {
-            return !VariableEqualsExpressionFunction.equals(planItemInstance, variableName, variableValue);
+            return !VariableEqualsExpressionFunction.equals(variableScope, variableName, variableValue);
         }
         
         return false;

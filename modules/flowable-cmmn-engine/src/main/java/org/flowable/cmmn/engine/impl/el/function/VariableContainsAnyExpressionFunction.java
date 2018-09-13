@@ -16,6 +16,7 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -35,13 +36,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public class VariableContainsAnyExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableContainsAnyExpressionFunction() {
-        super("containsAny");
+    public VariableContainsAnyExpressionFunction(String variableScopeName) {
+        super(variableScopeName, "containsAny");
     }
     
     @SuppressWarnings({ "rawtypes"})
-    public static boolean containsAny(PlanItemInstance planItemInstance, String variableName, Object... values) {
-        Object variableValue = getVariableValue(planItemInstance, variableName);
+    public static boolean containsAny(VariableScope variableScope, String variableName, Object... values) {
+        Object variableValue = getVariableValue(variableScope, variableName);
         if (variableValue != null) {
             if (variableValue instanceof String) {
                 String variableStringValue = (String) variableValue;

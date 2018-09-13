@@ -25,14 +25,15 @@ import org.flowable.common.engine.api.FlowableException;
  */
 public abstract class AbstractFlowableShortHandExpressionFunction implements FlowableShortHandExpressionFunction {
 
-    protected Pattern pattern;
-    protected String replacePattern;
-    
+    protected String variableScopeName;
     protected List<String> functionNameOptions;
     protected String functionName;
     protected String prefix;
     protected String localName;
     protected Method method;
+    
+    protected Pattern pattern;
+    protected String replacePattern;
     
     /**
      * @param functionPrefixOptions The list of function prefixes, e.g. variables, vars, var
@@ -41,7 +42,7 @@ public abstract class AbstractFlowableShortHandExpressionFunction implements Flo
      * @param finalFunctionName The function name to  which all the others will be enhanced to
      * @param multiParameterFunction Indicates if the function has multiple (more than one) parameter
      */
-    public AbstractFlowableShortHandExpressionFunction(List<String> functionNameOptions, String functionName) {
+    public AbstractFlowableShortHandExpressionFunction(String variableScopeName, List<String> functionNameOptions, String functionName) {
         
         // Regex for expressions like ${variables:equals(myVar, 123)}  
         //
@@ -62,7 +63,7 @@ public abstract class AbstractFlowableShortHandExpressionFunction implements Flo
         
         this.replacePattern = getFinalFunctionPrefix() + ":" 
                 + functionName 
-                + "(planItemInstance,'$3'" // 3th word group: prefix and function name are two first groups
+                + "(" + variableScopeName + ",'$3'" // 3th word group: prefix and function name are two first groups
                 + (isMultiParameterFunction() ? "," : ")");
         
         this.prefix = getFinalFunctionPrefix();

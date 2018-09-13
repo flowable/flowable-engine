@@ -790,23 +790,25 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (shortHandExpressionFunctions == null) {
             shortHandExpressionFunctions = new ArrayList<>();
             
-            shortHandExpressionFunctions.add(new VariableGetExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGetOrDefaultExpressionFunction());
+            String variableScopeName = "planItemInstance";
             
-            shortHandExpressionFunctions.add(new VariableContainsAnyExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableContainsExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableGetExpressionFunction(variableScopeName));
+            shortHandExpressionFunctions.add(new VariableGetOrDefaultExpressionFunction(variableScopeName));
             
-            shortHandExpressionFunctions.add(new VariableEqualsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableNotEqualsExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableContainsAnyExpressionFunction(variableScopeName));
+            shortHandExpressionFunctions.add(new VariableContainsExpressionFunction(variableScopeName));
             
-            shortHandExpressionFunctions.add(new VariableExistsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableIsEmptyExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableIsNotEmptyExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableEqualsExpressionFunction(variableScopeName));
+            shortHandExpressionFunctions.add(new VariableNotEqualsExpressionFunction(variableScopeName));
             
-            shortHandExpressionFunctions.add(new VariableLowerThanExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableLowerThanOrEqualsExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGreaterThanExpressionFunction());
-            shortHandExpressionFunctions.add(new VariableGreaterThanOrEqualsExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableExistsExpressionFunction(variableScopeName));
+            shortHandExpressionFunctions.add(new VariableIsEmptyExpressionFunction(variableScopeName));
+            shortHandExpressionFunctions.add(new VariableIsNotEmptyExpressionFunction(variableScopeName));
+            
+            shortHandExpressionFunctions.add(new VariableLowerThanExpressionFunction(variableScopeName));
+            shortHandExpressionFunctions.add(new VariableLowerThanOrEqualsExpressionFunction(variableScopeName));
+            shortHandExpressionFunctions.add(new VariableGreaterThanExpressionFunction(variableScopeName));
+            shortHandExpressionFunctions.add(new VariableGreaterThanOrEqualsExpressionFunction(variableScopeName));
         }
     }
     

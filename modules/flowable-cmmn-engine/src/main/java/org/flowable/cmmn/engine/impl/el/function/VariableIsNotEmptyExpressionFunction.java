@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.el.function;
 
 import java.util.Arrays;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Opposite operation of the ${@link VariableIsEmptyExpressionFunction} .
@@ -23,8 +23,8 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
  */
 public class VariableIsNotEmptyExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableIsNotEmptyExpressionFunction() {
-        super(Arrays.asList("isNotEmpty", "notEmpty"), "isNotEmpty");
+    public VariableIsNotEmptyExpressionFunction(String variableScopeName) {
+        super(variableScopeName, Arrays.asList("isNotEmpty", "notEmpty"), "isNotEmpty");
     }
     
     @Override
@@ -32,8 +32,8 @@ public class VariableIsNotEmptyExpressionFunction extends AbstractFlowableVariab
         return false;
     }
     
-    public static boolean isNotEmpty(PlanItemInstance planItemInstance, String variableName) {
-        return !VariableIsEmptyExpressionFunction.isEmpty(planItemInstance, variableName);
+    public static boolean isNotEmpty(VariableScope variableScope, String variableName) {
+        return !VariableIsEmptyExpressionFunction.isEmpty(variableScope, variableName);
     }
 
 }

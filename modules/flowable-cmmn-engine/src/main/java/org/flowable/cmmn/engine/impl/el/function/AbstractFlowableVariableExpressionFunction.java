@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.impl.el.function;
 import java.util.Arrays;
 import java.util.List;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -28,12 +27,12 @@ public abstract class AbstractFlowableVariableExpressionFunction extends Abstrac
     
     private static final String FINAL_FUNCTION_PREFIX = "variables";
     
-    public AbstractFlowableVariableExpressionFunction(String functionName) {
-        this(Arrays.asList(functionName), functionName);
+    public AbstractFlowableVariableExpressionFunction(String variableScopeName, String functionName) {
+        this(variableScopeName, Arrays.asList(functionName), functionName);
     }
     
-    public AbstractFlowableVariableExpressionFunction(List<String> functionNameOptions, String functionName) {
-        super(functionNameOptions, functionName);
+    public AbstractFlowableVariableExpressionFunction(String variableScopeName, List<String> functionNameOptions, String functionName) {
+        super(variableScopeName, functionNameOptions, functionName);
     }
     
     @Override
@@ -58,11 +57,11 @@ public abstract class AbstractFlowableVariableExpressionFunction extends Abstrac
     
     // Helper methods
     
-    protected static Object getVariableValue(PlanItemInstance planItemInstance, String variableName) {
+    protected static Object getVariableValue(VariableScope variableScope, String variableName) {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("Variable name passed is null");
         }
-        return ((VariableScope) planItemInstance).getVariable((String) variableName);
+        return variableScope.getVariable((String) variableName);
     }
     
     protected static boolean valuesAreNumbers(Object variableValue, Object actualValue) {

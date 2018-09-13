@@ -26,10 +26,10 @@ import org.junit.Test;
  */
 public class VariableComparatorExpressionEnhancerTest {
     
-    private VariableLowerThanExpressionFunction variableLowerThanExpressionFunction = new VariableLowerThanExpressionFunction();
-    private VariableLowerThanOrEqualsExpressionFunction variableLowerThanOrEqualsExpressionFunction = new VariableLowerThanOrEqualsExpressionFunction();
-    private VariableGreaterThanExpressionFunction variableGreaterThanExpressionFunction = new VariableGreaterThanExpressionFunction(); 
-    private VariableGreaterThanOrEqualsExpressionFunction variableGreaterThanOrEqualsExpressionFunction = new  VariableGreaterThanOrEqualsExpressionFunction();  
+    private VariableLowerThanExpressionFunction variableLowerThanExpressionFunction = new VariableLowerThanExpressionFunction("planItemInstance");
+    private VariableLowerThanOrEqualsExpressionFunction variableLowerThanOrEqualsExpressionFunction = new VariableLowerThanOrEqualsExpressionFunction("planItemInstance");
+    private VariableGreaterThanExpressionFunction variableGreaterThanExpressionFunction = new VariableGreaterThanExpressionFunction("planItemInstance"); 
+    private VariableGreaterThanOrEqualsExpressionFunction variableGreaterThanOrEqualsExpressionFunction = new  VariableGreaterThanOrEqualsExpressionFunction("planItemInstance");  
     
     @Test
     public void testRegexNameReplacement() {

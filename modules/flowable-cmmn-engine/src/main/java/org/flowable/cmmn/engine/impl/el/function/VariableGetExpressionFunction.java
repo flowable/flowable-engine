@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.el.function;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Returns the value of a variable. This avoids the {@link PropertyNotFoundException} that otherwise gets thrown when referencing a variable in JUEL.
@@ -22,12 +22,12 @@ import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
  */
 public class VariableGetExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    public VariableGetExpressionFunction() {
-        super("get");
+    public VariableGetExpressionFunction(String variableScopeName) {
+        super(variableScopeName, "get");
     }
     
-    public static Object get(PlanItemInstance planItemInstance, String variableName) {
-        Object variableValue = getVariableValue(planItemInstance, variableName);
+    public static Object get(VariableScope variableScope, String variableName) {
+        Object variableValue = getVariableValue(variableScope, variableName);
         return variableValue;
     }
     
