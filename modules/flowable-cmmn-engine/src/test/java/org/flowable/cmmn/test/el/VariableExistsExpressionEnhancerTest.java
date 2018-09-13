@@ -14,7 +14,7 @@ package org.flowable.cmmn.test.el;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.flowable.cmmn.engine.impl.el.VariableExistsExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.function.VariableExistsExpressionFunction;
 import org.junit.Test;
 
 /**
@@ -22,7 +22,7 @@ import org.junit.Test;
  */
 public class VariableExistsExpressionEnhancerTest {
     
-    private VariableExistsExpressionEnhancer expressionEnhancer = new VariableExistsExpressionEnhancer();
+    private VariableExistsExpressionFunction expressionFunction = new VariableExistsExpressionFunction();
     
     @Test
     public void testRegexNameReplacement() {
@@ -33,7 +33,7 @@ public class VariableExistsExpressionEnhancerTest {
     }
         
     public void assertRegexCorrect(String in, String out) {
-        assertEquals(out, expressionEnhancer.enhance(in));
+        assertEquals(out, expressionFunction.enhance(in));
     }
 
 }

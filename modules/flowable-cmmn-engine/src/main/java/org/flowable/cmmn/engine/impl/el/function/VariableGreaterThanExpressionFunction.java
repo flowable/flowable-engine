@@ -10,17 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.el;
+package org.flowable.cmmn.engine.impl.el.function;
 
 import java.util.Arrays;
+
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 
 /**
  * @author Joram Barrez
  */
-public class VariableGetExpressionEnhancer extends AbstractVariableExpressionEnhancer {
-    
-    public VariableGetExpressionEnhancer() {
-        super(Arrays.asList("get"), VariableGetFunctionDelegate.FUNCTION_NAME, false);
+public class VariableGreaterThanExpressionFunction extends AbstractVariableComparatorExpressionFunction {
+
+    public VariableGreaterThanExpressionFunction() {
+        super(Arrays.asList("greaterThan", "gt"), "greaterThan");
     }
     
+    public static boolean greaterThan(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
+        return compareVariableValue(planItemInstance, variableName, comparedValue, OPERATOR.GT);
+    }
+
 }

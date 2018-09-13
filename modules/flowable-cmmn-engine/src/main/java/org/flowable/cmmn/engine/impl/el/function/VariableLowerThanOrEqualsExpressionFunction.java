@@ -10,17 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.el;
+package org.flowable.cmmn.engine.impl.el.function;
 
 import java.util.Arrays;
+
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 
 /**
  * @author Joram Barrez
  */
-public class VariableGreaterThanOrEqualsExpressionEnhancer extends AbstractVariableExpressionEnhancer {
-    
-    public VariableGreaterThanOrEqualsExpressionEnhancer() {
-        super(Arrays.asList("greaterThanOrEquals", "gte"), VariableGreaterThanOrEqualsFunctionDelegate.FUNCTION_NAME, true);
+public class VariableLowerThanOrEqualsExpressionFunction extends AbstractVariableComparatorExpressionFunction {
+
+    public VariableLowerThanOrEqualsExpressionFunction() {
+        super(Arrays.asList("lowerThanOrEquals", "lte"), "lowerThanOrEquals");
     }
     
+    public static boolean lowerThanOrEquals(PlanItemInstance planItemInstance, String variableName, Object comparedValue) {
+        return compareVariableValue(planItemInstance, variableName, comparedValue, OPERATOR.LTE);
+    }
+
 }

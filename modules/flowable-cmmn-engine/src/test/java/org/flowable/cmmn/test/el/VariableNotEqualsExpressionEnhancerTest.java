@@ -14,7 +14,7 @@ package org.flowable.cmmn.test.el;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.flowable.cmmn.engine.impl.el.VariableNotEqualsExpressionEnhancer;
+import org.flowable.cmmn.engine.impl.el.function.VariableNotEqualsExpressionFunction;
 import org.junit.Test;
 
 /**
@@ -22,7 +22,7 @@ import org.junit.Test;
  */
 public class VariableNotEqualsExpressionEnhancerTest {
     
-    private VariableNotEqualsExpressionEnhancer expressionEnhancer = new VariableNotEqualsExpressionEnhancer();
+    private VariableNotEqualsExpressionFunction expressionFunction = new VariableNotEqualsExpressionFunction();
     
     @Test
     public void testRegexNameReplacement() {
@@ -36,7 +36,7 @@ public class VariableNotEqualsExpressionEnhancerTest {
     }
         
     public void assertRegexCorrect(String in, String out) {
-        assertEquals(out, expressionEnhancer.enhance(in));
+        assertEquals(out, expressionFunction.enhance(in));
     }
 
 }

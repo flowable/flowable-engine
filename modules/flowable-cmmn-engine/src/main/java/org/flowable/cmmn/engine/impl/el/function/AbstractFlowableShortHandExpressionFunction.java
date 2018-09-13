@@ -10,23 +10,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.el;
+package org.flowable.cmmn.engine.impl.el.function;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractFlowableFunctionExpressionEnhancer implements FlowableExpressionEnhancer {
+public abstract class AbstractFlowableShortHandExpressionFunction implements FlowableShortHandExpressionFunction {
 
     protected Pattern pattern;
-    
     protected String replacePattern;
+    
+    protected List<String> functionNameOptions;
+    protected String functionName;
+    protected String prefix;
+    protected String localName;
+    protected Method method;
     
     /**
      * @param functionPrefixOptions The list of function prefixes, e.g. variables, vars, var
@@ -35,9 +41,7 @@ public abstract class AbstractFlowableFunctionExpressionEnhancer implements Flow
      * @param finalFunctionName The function name to  which all the others will be enhanced to
      * @param multiParameterFunction Indicates if the function has multiple (more than one) parameter
      */
-    public AbstractFlowableFunctionExpressionEnhancer(List<String> functionPrefixOptions, List<String> functionNameOptions, 
-                                                      String finalFunctionPrefix, String finalFunctionName,
-                                                      boolean multiParameterFunction) {
+    public AbstractFlowableShortHandExpressionFunction(List<String> functionNameOptions, String functionName) {
         
         // Regex for expressions like ${variables:equals(myVar, 123)}  
         //
@@ -51,17 +55,38 @@ public abstract class AbstractFlowableFunctionExpressionEnhancer implements Flow
         // - Optionally followed by a single our double quote
         // - followed by 0 or more whitespaces
         // - followed by a comma or a closing parenthese
-        this.pattern = Pattern.compile(buildOrWordGroup(functionPrefixOptions) + ":" 
+        this.pattern = Pattern.compile(buildOrWordGroup(getFunctionPrefixOptions()) + ":" 
                 + buildOrWordGroup(functionNameOptions) 
                 + "\\s*\\(\\s*'?\"?(.*?)'?\"?\\s*"
-                + (multiParameterFunction ? "," : "\\)"));
+                + (isMultiParameterFunction() ? "," : "\\)"));
         
-        this.replacePattern = finalFunctionPrefix + ":" 
-                + finalFunctionName 
+        this.replacePattern = getFinalFunctionPrefix() + ":" 
+                + functionName 
                 + "(planItemInstance,'$3'" // 3th word group: prefix and function name are two first groups
-                + (multiParameterFunction ? "," : ")");
+                + (isMultiParameterFunction() ? "," : ")");
         
+        this.prefix = getFinalFunctionPrefix();
+        this.localName = functionName;
+        
+        // By convention, the implementing class should have one method with the same name
+        this.method = findMethod();
     }
+    
+    protected Method findMethod() {
+        Method[] methods = this.getClass().getMethods();
+        for (Method method : methods) {
+            if (method.getName().equals(localName)) {
+                return method;
+            }
+        }
+        throw new FlowableException("Programmatic error: could not find method " + localName + " on class " + this.getClass());
+    }
+    
+    protected abstract List<String> getFunctionPrefixOptions();
+    
+    protected abstract String getFinalFunctionPrefix();
+    
+    protected abstract boolean isMultiParameterFunction();
     
     protected String buildOrWordGroup(List<String> options) {
         StringBuilder strb = new StringBuilder();
@@ -78,6 +103,21 @@ public abstract class AbstractFlowableFunctionExpressionEnhancer implements Flow
             return matcher.replaceAll(replacePattern);
         }
         return expressionText;
+    }
+    
+    @Override
+    public String localName() {
+        return localName;
+    }
+    
+    @Override
+    public String prefix() {
+        return prefix;
+    }
+    
+    @Override
+    public Method functionMethod() {
+        return method;
     }
     
 }

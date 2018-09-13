@@ -55,32 +55,20 @@ import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
-import org.flowable.cmmn.engine.impl.el.VariableContainsAnyExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableContainsAnyFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableContainsExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableContainsFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableEqualsExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableEqualsFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableExistsExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableExistsFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableGetExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableGetFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableGetOrDefaultExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableGetOrDefaultFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableGreaterThanExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableGreaterThanFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableGreaterThanOrEqualsExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableGreaterThanOrEqualsFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableIsEmptyExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableIsEmptyFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableIsNotEmptyExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableIsNotEmptyFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableLowerThanExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableLowerThanFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableLowerThanOrEqualsExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableLowerThanOrEqualsFunctionDelegate;
-import org.flowable.cmmn.engine.impl.el.VariableNotEqualsExpressionEnhancer;
-import org.flowable.cmmn.engine.impl.el.VariableNotEqualsFunctionDelegate;
+import org.flowable.cmmn.engine.impl.el.function.FlowableShortHandExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableContainsAnyExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableContainsExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableEqualsExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableExistsExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableGetExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableGetOrDefaultExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableGreaterThanExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableGreaterThanOrEqualsExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableIsEmptyExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableIsNotEmptyExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableLowerThanExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableLowerThanOrEqualsExpressionFunction;
+import org.flowable.cmmn.engine.impl.el.function.VariableNotEqualsExpressionFunction;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
@@ -327,6 +315,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
     protected List<FlowableExpressionEnhancer> expressionEnhancers;
     protected List<FlowableExpressionEnhancer> customExpressionEnhancers;
+    protected List<FlowableShortHandExpressionFunction> shortHandExpressionFunctions;
 
     protected ScriptingEngines scriptingEngines;
     protected List<ResolverFactory> resolverFactories;
@@ -696,6 +685,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initShortHandExpressionFunctions();
         initFunctionDelegates();
         initExpressionEnhancers();
         initExpressionManager();
@@ -796,28 +786,37 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
     
+    public void initShortHandExpressionFunctions() {
+        if (shortHandExpressionFunctions == null) {
+            shortHandExpressionFunctions = new ArrayList<>();
+            
+            shortHandExpressionFunctions.add(new VariableGetExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableGetOrDefaultExpressionFunction());
+            
+            shortHandExpressionFunctions.add(new VariableContainsAnyExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableContainsExpressionFunction());
+            
+            shortHandExpressionFunctions.add(new VariableEqualsExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableNotEqualsExpressionFunction());
+            
+            shortHandExpressionFunctions.add(new VariableExistsExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableIsEmptyExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableIsNotEmptyExpressionFunction());
+            
+            shortHandExpressionFunctions.add(new VariableLowerThanExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableLowerThanOrEqualsExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableGreaterThanExpressionFunction());
+            shortHandExpressionFunctions.add(new VariableGreaterThanOrEqualsExpressionFunction());
+        }
+    }
+    
     public void initFunctionDelegates() {
         if (flowableFunctionDelegates == null) {
             flowableFunctionDelegates = new ArrayList<>();
             
-            flowableFunctionDelegates.add(new VariableGetFunctionDelegate());
-            flowableFunctionDelegates.add(new VariableGetOrDefaultFunctionDelegate());
-            
-            flowableFunctionDelegates.add(new VariableEqualsFunctionDelegate());
-            flowableFunctionDelegates.add(new VariableNotEqualsFunctionDelegate());
-            
-            flowableFunctionDelegates.add(new VariableExistsFunctionDelegate());
-            flowableFunctionDelegates.add(new VariableIsEmptyFunctionDelegate());
-            flowableFunctionDelegates.add(new VariableIsNotEmptyFunctionDelegate());
-            
-            flowableFunctionDelegates.add(new VariableLowerThanFunctionDelegate());
-            flowableFunctionDelegates.add(new VariableLowerThanOrEqualsFunctionDelegate());
-            flowableFunctionDelegates.add(new VariableGreaterThanFunctionDelegate());
-            flowableFunctionDelegates.add(new VariableGreaterThanOrEqualsFunctionDelegate());
-            
-            flowableFunctionDelegates.add(new VariableContainsFunctionDelegate());
-            flowableFunctionDelegates.add(new VariableContainsAnyFunctionDelegate());
-            
+            for (FlowableShortHandExpressionFunction expressionFunction : shortHandExpressionFunctions) {
+                flowableFunctionDelegates.add(expressionFunction);
+            }
         }
         
         if (customFlowableFunctionDelegates != null) {
@@ -829,23 +828,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (expressionEnhancers == null) {
             expressionEnhancers = new ArrayList<>();
             
-            expressionEnhancers.add(new VariableGetExpressionEnhancer());
-            expressionEnhancers.add(new VariableGetOrDefaultExpressionEnhancer());
-            
-            expressionEnhancers.add(new VariableEqualsExpressionEnhancer());
-            expressionEnhancers.add(new VariableNotEqualsExpressionEnhancer());
-            
-            expressionEnhancers.add(new VariableExistsExpressionEnhancer());
-            expressionEnhancers.add(new VariableIsEmptyExpressionEnhancer());
-            expressionEnhancers.add(new VariableIsNotEmptyExpressionEnhancer());
-            
-            expressionEnhancers.add(new VariableLowerThanExpressionEnhancer());
-            expressionEnhancers.add(new VariableLowerThanOrEqualsExpressionEnhancer());
-            expressionEnhancers.add(new VariableGreaterThanExpressionEnhancer());
-            expressionEnhancers.add(new VariableGreaterThanOrEqualsExpressionEnhancer());
-            
-            expressionEnhancers.add(new VariableContainsExpressionEnhancer());
-            expressionEnhancers.add(new VariableContainsAnyExpressionEnhancer());
+            for (FlowableShortHandExpressionFunction expressionFunction : shortHandExpressionFunctions) {
+                expressionEnhancers.add(expressionFunction);
+            }
             
         }
         
@@ -2028,6 +2013,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCustomExpressionEnhancers(List<FlowableExpressionEnhancer> customExpressionEnhancers) {
         this.customExpressionEnhancers = customExpressionEnhancers;
+        return this;
+    }
+    
+    public List<FlowableShortHandExpressionFunction> getShortHandExpressionFunctions() {
+        return shortHandExpressionFunctions;
+    }
+
+    public CmmnEngineConfiguration setShortHandExpressionFunctions(List<FlowableShortHandExpressionFunction> shortHandExpressionFunctions) {
+        this.shortHandExpressionFunctions = shortHandExpressionFunctions;
         return this;
     }
 
