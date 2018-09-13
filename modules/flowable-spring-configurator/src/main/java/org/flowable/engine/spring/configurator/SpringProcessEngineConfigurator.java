@@ -42,7 +42,7 @@ public class SpringProcessEngineConfigurator extends ProcessEngineConfigurator {
         SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngineConfiguration;
         springProcessEngineConfiguration.setTransactionManager(springEngineConfiguration.getTransactionManager());
         springProcessEngineConfiguration.setExpressionManager(new SpringExpressionManager(
-                        springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+                        springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans(),springProcessEngineConfiguration.getDelegateInterceptor()));
 
         initProcessEngine();
 
