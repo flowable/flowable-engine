@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
- * Checks if the value of a variable (fetched using the variableName through the {@link PlanItemInstance}) contains all of the provided values.
+ * Checks if the value of a variable (fetched using the variableName through the variable scope) contains all of the provided values.
  * 
  * Depending on the variable type, this means the following:
  * 

@@ -22,7 +22,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
- * Checks if the value of a variable (fetched using the variableName through the {@link PlanItemInstance}) is empty.
+ * Checks if the value of a variable (fetched using the variableName through the variable scope) is empty.
  * 
  * Depending on the variable type, this means the following:
  * 

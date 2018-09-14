@@ -17,7 +17,7 @@ import java.util.Arrays;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
- * Returns whether or not a variable with the given name exists when fetched through the provided {@link PlanItemInstance}.
+ * Returns whether or not a variable with the given name exists when fetched through the provided variable scope.
  * 
  * @author Joram Barrez
  */
