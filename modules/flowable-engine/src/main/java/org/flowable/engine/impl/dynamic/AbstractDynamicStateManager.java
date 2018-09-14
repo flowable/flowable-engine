@@ -31,15 +31,21 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CompensateEventDefinition;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.IOParameter;
+import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ReceiveTask;
+import org.flowable.bpmn.model.Signal;
+import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableException;
@@ -51,20 +57,30 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
+import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
+import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
+import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
+import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
@@ -519,7 +535,7 @@ public abstract class AbstractDynamicStateManager {
         HashMap<String, ExecutionEntity> createdSubProcess = new HashMap<>();
         for (SubProcess subProcess : subProcessesToCreate.values()) {
             if (!createdSubProcess.containsKey(subProcess.getId())) {
-                ExecutionEntity embeddedSubProcess = createEmbeddedSubProcess(subProcess, defaultContinueParentExecution, createdSubProcess, commandContext);
+                ExecutionEntity embeddedSubProcess = createEmbeddedSubProcessHierarchy(subProcess, defaultContinueParentExecution, createdSubProcess, subProcessesToCreate, commandContext);
                 createdSubProcess.put(subProcess.getId(), embeddedSubProcess);
             }
         }
@@ -594,15 +610,15 @@ public abstract class AbstractDynamicStateManager {
 
     }
 
-    protected static ExecutionEntity createEmbeddedSubProcess(SubProcess subProcess, ExecutionEntity defaultParentExecution, HashMap<String, ExecutionEntity> createdSubProcesses, CommandContext commandContext) {
-        if (createdSubProcesses.containsKey(subProcess.getId())) {
-            return createdSubProcesses.get(subProcess.getId());
+    protected static ExecutionEntity createEmbeddedSubProcessHierarchy(SubProcess subProcess, ExecutionEntity defaultParentExecution, HashMap<String, ExecutionEntity> createdSubProcessesCache, HashMap<String, SubProcess> subProcessesToCreate, CommandContext commandContext) {
+        if (createdSubProcessesCache.containsKey(subProcess.getId())) {
+            return createdSubProcessesCache.get(subProcess.getId());
         }
         //Create the parent, if needed
         ExecutionEntity parentSubProcess = defaultParentExecution;
         if (subProcess.getSubProcess() != null) {
-            parentSubProcess = createEmbeddedSubProcess(subProcess.getSubProcess(), defaultParentExecution, createdSubProcesses, commandContext);
-            createdSubProcesses.put(subProcess.getSubProcess().getId(), parentSubProcess);
+            parentSubProcess = createEmbeddedSubProcessHierarchy(subProcess.getSubProcess(), defaultParentExecution, createdSubProcessesCache, subProcessesToCreate, commandContext);
+            createdSubProcessesCache.put(subProcess.getSubProcess().getId(), parentSubProcess);
         }
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
@@ -626,21 +642,18 @@ public abstract class AbstractDynamicStateManager {
             executeBoundaryEvents(boundaryEvents, subProcessExecution);
         }
 
+        if (subProcess instanceof EventSubProcess) {
+            processEventSubProcessForChangeState((EventSubProcess) subProcess, subProcessExecution, commandContext);
+        }
+
         ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
-        processInstanceHelper.processAvailableEventSubProcesses(subProcessExecution, subProcess, commandContext);
+        //Process containing child Event SubProcesses not contained in this creation hierarchy
+        List<EventSubProcess> childEventSubProcesses = subProcess.findAllSubFlowElementInFlowMapOfType(EventSubProcess.class);
+        childEventSubProcesses.stream()
+            .filter(childEventSubProcess -> !subProcessesToCreate.containsKey(childEventSubProcess.getId()))
+            .forEach(childEventSubProcess -> processInstanceHelper.processEventSubProcess(subProcessExecution, childEventSubProcess, commandContext));
 
         return subProcessExecution;
-    }
-
-    protected static FlowElement getStartFlowElement(SubProcess subProcess) {
-        if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
-            for (FlowElement subElement : subProcess.getFlowElements()) {
-                if (subElement instanceof StartEvent) {
-                    return subElement;
-                }
-            }
-        }
-        return null;
     }
 
     protected static Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
@@ -836,6 +849,103 @@ public abstract class AbstractDynamicStateManager {
                 ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
                 LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), boundaryEventExecution.getId());
                 boundaryEventBehavior.execute(boundaryEventExecution);
+            }
+        }
+    }
+
+    // TODO WIP - Partly fetched from ProcessInstanceHelper - temporarily made private and static until cleanup
+    private static void processEventSubProcessForChangeState(EventSubProcess eventSubProcess, ExecutionEntity subProcessExecution, CommandContext commandContext) {
+
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+        List<StartEvent> allStartEvents = eventSubProcess.findAllSubFlowElementInFlowMapOfType(StartEvent.class);
+
+        for (StartEvent startEvent : allStartEvents) {
+            if (!startEvent.getEventDefinitions().isEmpty()) {
+
+                EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
+                List<EventSubscriptionEntity> eventSubscriptions = null;
+                if (eventDefinition instanceof SignalEventDefinition) {
+                    eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(subProcessExecution.getProcessInstanceId(), startEvent.getId(), SignalEventSubscriptionEntity.EVENT_TYPE);
+                } else if (eventDefinition instanceof MessageEventDefinition) {
+                    eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(subProcessExecution.getProcessInstanceId(), startEvent.getId(), MessageEventSubscriptionEntity.EVENT_TYPE);
+                } else if (eventDefinition instanceof TimerEventDefinition) {
+                    //TODO CHECK ALSO FOR TIMER JOBS
+                }
+
+                // If its an interrupting eventSubProcess we don't register a subscription or startEvent executions nd we make sure that they are removed if existed
+                if (startEvent.isInterrupting()) {
+                    ExecutionEntity startEventExecution = null;
+                    if (eventSubscriptions != null && !eventSubscriptions.isEmpty()) {
+                        for (EventSubscriptionEntity subscriptionEntity : eventSubscriptions) {
+                            if (startEventExecution == null) {
+                                startEventExecution = subscriptionEntity.getExecution();
+                            }
+                            eventSubscriptionEntityManager.delete(subscriptionEntity);
+                        }
+                        if (startEventExecution != null) {
+                            executionEntityManager.deleteExecutionAndRelatedData(startEventExecution, DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
+                        }
+                    }
+                    //TODO - CHECK TO KILL TIMER JOBS AS WELL
+
+                } else { // For non-interrupting, we register a subscription and startEvent execution if they don't exist already
+                    if (eventSubscriptions == null || eventSubscriptions.isEmpty()) {
+
+                        if (eventDefinition instanceof MessageEventDefinition) {
+                            MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+                            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(subProcessExecution.getProcessDefinitionId());
+                            if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
+                                messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
+                            }
+
+                            ExecutionEntity messageExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
+                            messageExecution.setCurrentFlowElement(startEvent);
+                            messageExecution.setEventScope(true);
+                            messageExecution.setActive(false);
+                            MessageEventSubscriptionEntity messageSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution);
+                            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                                .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageSubscription.getActivityId(),
+                                    messageSubscription.getEventName(), null, messageSubscription.getExecution().getId(),
+                                    messageSubscription.getProcessInstanceId(), messageSubscription.getProcessDefinitionId()));
+
+                        } else if (eventDefinition instanceof SignalEventDefinition) {
+                            SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
+                            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(subProcessExecution.getProcessDefinitionId());
+                            Signal signal = null;
+                            if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
+                                signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+                                signalEventDefinition.setSignalRef(signal.getName());
+                            }
+
+                            ExecutionEntity signalExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
+                            signalExecution.setCurrentFlowElement(startEvent);
+                            signalExecution.setEventScope(true);
+                            signalExecution.setActive(false);
+                            SignalEventSubscriptionEntity signalSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertSignalEvent(signalEventDefinition.getSignalRef(), signal, signalExecution);
+                            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                                .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalSubscription.getActivityId(),
+                                    signalSubscription.getEventName(), null, signalSubscription.getExecution().getId(),
+                                    signalSubscription.getProcessInstanceId(), signalSubscription.getProcessDefinitionId()));
+
+                        } else if (eventDefinition instanceof TimerEventDefinition) {
+                            TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+
+                            ExecutionEntity timerExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
+                            timerExecution.setCurrentFlowElement(startEvent);
+                            timerExecution.setEventScope(true);
+                            timerExecution.setActive(false);
+
+                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
+                                TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+
+                            if (timerJob != null) {
+                                CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

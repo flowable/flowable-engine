@@ -41,6 +41,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -2088,4 +2089,615 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
     }
+
+    //-- Event SubProcesses
+    @Test
+    public void testMigrateSimpleActivityToActivityInsideSignalEventSubProcessInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-signal-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("eventSubProcess", "eventSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("eventSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        //-- TODO CHECK HISTORY AND EVENTS
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateSimpleActivityToActivityInsideMessageEventSubProcessInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("eventSubProcess", "eventSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("eventSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        //-- TODO CHECK HISTORY AND EVENTS
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Disabled("Moving the only remaining task in the parent process inside a non interrupting event subProcess will leave the process in a state where it will never complete as the event subscripton wont be removed")
+    public void testMigrateSimpleActivityToActivityInsideNonInterruptingSignalEventSubProcessInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-signal-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("eventSubProcess", "eventSubProcessTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("eventSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        completeProcessInstanceTasks(processInstance.getId());
+        //THIS ASSERTION WOULD ALWAYS FAIL THE SUBSCRIPTION WILL NEVER BE REMOVED
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Disabled("Moving the only remaining task in the parent process inside a non interrupting event subProcess will leave the process in a state where it will never complete as the event subscripton wont be removed")
+    public void testMigrateSimpleActivityToActivityInsideNonInterruptingMessageEventSubProcessInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "eventSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("eventSubProcess", "eventSubProcessTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("eventSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        completeProcessInstanceTasks(processInstance.getId());
+        //THIS ASSERTION WOULD ALWAYS FAIL THE SUBSCRIPTION WILL NEVER BE REMOVED
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateParallelActivityToActivityInsideSignalEventSubProcessInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/timer-parallel-task.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-signal-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Spawn the parallel task
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("timerBound", "processTask", "parallelTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "parallelTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        //-- TODO CHECK HISTORY AND EVENTS
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateParallelActivityToActivityInsideMessageEventSubProcessInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/timer-parallel-task.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Spawn the parallel task
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("timerBound", "processTask", "parallelTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "parallelTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        //-- TODO CHECK HISTORY AND EVENTS
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateParallelActivityToActivityInsideNonInterruptingSignalEventSubProcessInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/timer-parallel-task.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-signal-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Spawn the parallel task
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("timerBound", "processTask", "parallelTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "parallelTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcessTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
+
+        //Fire the signal
+        runtimeService.signalEventReceived("eventSignal");
+
+        executions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcess", "eventSubProcessStart", "eventSubProcessTask", "eventSubProcessTask");
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask", "eventSubProcessTask", "processTask");
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("eventSignal");
+
+        //-- TODO CHECK HISTORY AND EVENTS
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateParallelActivityToActivityInsideNonInterruptingMessageEventSubProcessInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/timer-parallel-task.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Spawn the parallel task
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("timerBound", "processTask", "parallelTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "parallelTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("parallelTask", "eventSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcessTask", "eventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask", "eventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //Trigger the event
+        Execution messageSubscriptionExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).messageEventSubscriptionName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", messageSubscriptionExecution.getId());
+
+        executions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask", "eventSubProcess", "eventSubProcess", "eventSubProcessStart", "eventSubProcessTask", "eventSubProcessTask");
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask", "eventSubProcessTask", "processTask");
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("eventSubProcessStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //-- TODO CHECK HISTORY AND EVENTS
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateSimpleActivityToActivityInsideSubProcessInNewDefinitionWithNestedSignalEventSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-signal-event-subprocess-nested-in-embedded-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "insideSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("outerSubProcess", "insideSubProcessTask", "nestedEventSubProcStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("insideSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("nestedEventSubProcStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someSignal");
+
+        //Fire the signal
+        runtimeService.signalEventReceived("someSignal");
+
+        executions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("outerSubProcess", "nestedEventSubProcStart", "nestedEventSubProcess", "insideEventSubProcessTask");
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("insideEventSubProcessTask");
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+        eventSubscriptions.isEmpty();
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateSimpleActivityToActivityInsideSubProcessInNewDefinitionWithNestedMessageEventSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/interrupting-message-event-subprocess-nested-in-embedded-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "insideSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("outerSubProcess", "insideSubProcessTask", "nestedEventSubProcStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("insideSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("nestedEventSubProcStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventName).containsExactly("someMessage");
+
+        //Trigger the event
+        //Trigger the event
+        Execution messageSubscriptionExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).messageEventSubscriptionName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", messageSubscriptionExecution.getId());
+
+        executions = runtimeService.createExecutionQuery().onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("outerSubProcess", "nestedEventSubProcStart", "nestedEventSubProcess", "insideEventSubProcessTask");
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("insideEventSubProcessTask");
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+        eventSubscriptions.isEmpty();
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateSimpleActivityToActivityInsideSubProcessInNewDefinitionWithNestedNonInterruptingSignalEventSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-signal-event-subprocess-nested-in-embedded-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "insideSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("outerSubProcess", "nestedEventSubProcStart", "insideSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("insideSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("nestedEventSubProcStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+
+        //-- TODO CHECK HISTORY AND EVENTS
+
+        //Check that the trigger works
+        runtimeService.signalEventReceived("someSignal");
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("outerSubProcess", "nestedEventSubProcStart", "nestedEventSubProcess", "insideEventSubProcessTask", "insideSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("insideSubProcessTask", "insideEventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("nestedEventSubProcStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateSimpleActivityToActivityInsideSubProcessInNewDefinitionWithNestedNonInterruptingMessageEventSubProcess() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-message-event-subprocess-nested-in-embedded-subprocess.bpmn20.xml");
+
+        //Start the processInstance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactly("userTask1Id");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procDefOneTask.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procDefOneTask.getId());
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).isEmpty();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(procWithSignal.getId())
+            .addActivityMigrationMapping("userTask1Id", "insideSubProcessTask")
+            .migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("outerSubProcess", "nestedEventSubProcStart", "insideSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("insideSubProcessTask");
+        assertThat(task).extracting(Task::getProcessDefinitionId).isEqualTo(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("nestedEventSubProcStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+
+        //-- TODO CHECK HISTORY AND EVENTS
+
+        //Trigger the event
+        Execution messageCatchExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).messageEventSubscriptionName("someMessage").singleResult();
+        runtimeService.messageEventReceived("someMessage", messageCatchExecution.getId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("outerSubProcess", "insideSubProcessTask", "nestedEventSubProcess", "nestedEventSubProcStart", "insideEventSubProcessTask");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("insideSubProcessTask", "insideEventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions).extracting(EventSubscription::getActivityId).containsExactly("nestedEventSubProcStart");
+        assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    //TODO ACTIVITY INTO NESTED EVENT SUBPROCESS (DISABLED for Non Interrupting)
+
+    //TODO PARALLEL ACTIVITY TO NESTED
+
 }

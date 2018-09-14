@@ -14,7 +14,7 @@
         <endEvent id="theEnd"/>
 
         <subProcess id="eventSubProcess" triggeredByEvent="true">
-            <startEvent id="eventSubProcessStart" isInterrupting="true">
+            <startEvent id="eventSubProcessStart" isInterrupting="false">
                 <signalEventDefinition signalRef="mySignal" />
             </startEvent>
             <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
