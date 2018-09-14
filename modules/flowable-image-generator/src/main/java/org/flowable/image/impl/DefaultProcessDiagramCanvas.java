@@ -782,6 +782,10 @@ public class DefaultProcessDiagramCanvas {
                         lastLine = lastLine.substring(0, lastLine.length() - 4) + "...";
                     }
                     layouts.add(new TextLayout(lastLine, g.getFont(), g.getFontRenderContext()));
+                }else {
+                    // in order to avoid empty box
+                    layouts.add(layout);
+                    currentHeight += height;
                 }
                 break;
             } else {
