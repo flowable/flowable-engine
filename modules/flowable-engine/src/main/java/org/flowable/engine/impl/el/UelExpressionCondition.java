@@ -37,10 +37,10 @@ public class UelExpressionCondition implements Condition {
         Object result = expression.getValue(execution);
 
         if (result == null) {
-            throw new FlowableException("condition expression returns null");
+            throw new FlowableException("condition expression returns null (sequenceFlowId: " + sequenceFlowId + ")" );
         }
         if (!(result instanceof Boolean)) {
-            throw new FlowableException("condition expression returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+            throw new FlowableException("condition expression returns non-Boolean (sequenceFlowId: " + sequenceFlowId + "): " + result + " (" + result.getClass().getName() + ")");
         }
         return (Boolean) result;
     }
