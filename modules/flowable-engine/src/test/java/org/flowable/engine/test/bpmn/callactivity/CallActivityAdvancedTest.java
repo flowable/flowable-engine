@@ -24,18 +24,22 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskQuery; 
+import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -51,17 +55,29 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     public void testCallSimpleSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
-        // one task in the subprocess should be active after starting the
-        // process instance
+        // one task in the subprocess should be active after starting the process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
         Task taskBeforeSubProcess = taskQuery.singleResult();
         assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
-        // Completing the task continues the process which leads to calling the
-        // subprocess
+        // Completing the task continues the process which leads to calling the subprocess
         taskService.complete(taskBeforeSubProcess.getId());
         Task taskInSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskInSubProcess.getName());
+        Execution execution = runtimeService.createExecutionQuery().executionId(taskInSubProcess.getExecutionId()).singleResult();
+        assertEquals(processInstance.getId(), execution.getRootProcessInstanceId());
+        assertNotEquals(execution.getProcessInstanceId(), execution.getRootProcessInstanceId());
+        managementService.executeCommand(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                ExecutionEntity rootProcessInstance = ((ExecutionEntity) execution).getRootProcessInstance();
+                assertNotNull(rootProcessInstance);
+                assertEquals(processInstance.getId(), rootProcessInstance.getId());
+                return null;
+            }
+            
+        });
 
         // Completing the task in the subprocess, finishes the subprocess
         taskService.complete(taskInSubProcess.getId());
