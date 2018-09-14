@@ -87,6 +87,8 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
 
         // Variables
         getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        
+        // Identity links
         getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
         
         // Tasks
@@ -104,6 +106,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
 
         // Plan item instances
         PlanItemInstanceEntityManager planItemInstanceEntityManager = getPlanItemInstanceEntityManager();
+        
         // Plan item instances are removed per stage, in reversed order
         ArrayList<PlanItemInstanceEntity> stagePlanItemInstances = new ArrayList<>();
         collectStagePlanItemInstances(caseInstanceEntity, stagePlanItemInstances);

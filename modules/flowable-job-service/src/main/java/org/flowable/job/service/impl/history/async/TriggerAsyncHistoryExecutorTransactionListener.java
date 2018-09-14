@@ -12,9 +12,6 @@
  */
 package org.flowable.job.service.impl.history.async;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.common.engine.impl.cfg.TransactionListener;
 import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -30,54 +27,33 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
  * 
  * @author Joram Barrez
  */
-public class TriggerAsyncExecutorTransactionListener implements TransactionListener {
+public class TriggerAsyncHistoryExecutorTransactionListener implements TransactionListener {
     
-    protected List<HistoryJobEntity> historyJobEntities;
+    protected HistoryJobEntity historyJobEntity;
     
     protected  JobServiceConfiguration jobServiceConfiguration;
     
-    public TriggerAsyncExecutorTransactionListener(CommandContext commandContext) {
+    public TriggerAsyncHistoryExecutorTransactionListener(CommandContext commandContext) {
         this(commandContext,null);
     }
     
-    public TriggerAsyncExecutorTransactionListener(CommandContext commandContext, HistoryJobEntity historyJobEntity) {
+    public TriggerAsyncHistoryExecutorTransactionListener(CommandContext commandContext, HistoryJobEntity historyJobEntity) {
         // The execution of this listener will reference components that might 
         // not be available when the command context is closing (when typically 
         // the history jobs are created and scheduled), so they are already referenced here.
         this.jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-        
-        if (historyJobEntity != null) {
-            this.historyJobEntities = new ArrayList<>(1);
-            this.historyJobEntities.add(historyJobEntity);
-        }
-    }
-    
-    public void addHistoryJobEntity(HistoryJobEntity historyJobEntity) {
-        if (this.historyJobEntities == null) {
-            this.historyJobEntities = new ArrayList<>(1);
-        }
-        this.historyJobEntities.add(historyJobEntity);
-    }
-    
-    public void addHistoryJobEntities(List<HistoryJobEntity> historyJobEntities) {
-        if (this.historyJobEntities == null) {
-            this.historyJobEntities = new ArrayList<>(historyJobEntities.size());
-        }
-        this.historyJobEntities.addAll(historyJobEntities);
+        this.historyJobEntity = historyJobEntity;
     }
     
     @Override
     public void execute(CommandContext commandContext) {
-        // Each needs to run in a separate transaction, as the trigger could fail independently.
-        for (HistoryJobEntity historyJobEntity : historyJobEntities) {
-            jobServiceConfiguration.getCommandExecutor().execute(new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), new Command<Void>() {
-                @Override
-                public Void execute(CommandContext commandContext) {
-                    jobServiceConfiguration.getAsyncHistoryExecutor().executeAsyncJob(historyJobEntity);
-                    return null;
-                }
-            });
-        }
+        jobServiceConfiguration.getCommandExecutor().execute(new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), new Command<Void>() {
+            @Override
+            public Void execute(CommandContext commandContext) {
+                jobServiceConfiguration.getAsyncHistoryExecutor().executeAsyncJob(historyJobEntity);
+                return null;
+            }
+        });
     }
 
 }
