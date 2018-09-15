@@ -30,7 +30,6 @@ import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
 import org.flowable.common.engine.impl.javax.el.ValueExpression;
-import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 /**
@@ -52,8 +51,7 @@ public class DefaultExpressionManager implements ExpressionManager {
     protected Map<Object, Object> beans;
     
     protected DeploymentCache<Expression> expressionCache;
-    protected int expressionCacheSize = 4096;
-    protected int expressionTextLengthCacheLimit = 1024;
+    protected int expressionTextLengthCacheLimit = -1;
     
     public DefaultExpressionManager() {
         this(null);
@@ -62,16 +60,12 @@ public class DefaultExpressionManager implements ExpressionManager {
     public DefaultExpressionManager(Map<Object, Object> beans) {
         this.expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
         this.beans = beans;
-        
-        if (expressionCache == null) {
-            expressionCache = new DefaultDeploymentCache<>(expressionCacheSize);
-        }
     }
 
     @Override
     public Expression createExpression(String text) {
         
-        if (text.length() <= expressionTextLengthCacheLimit) {
+        if (isCacheEnabled(text)) {
             Expression cachedExpression = expressionCache.get(text);
             if (cachedExpression != null) {
                 return cachedExpression;
@@ -93,8 +87,16 @@ public class DefaultExpressionManager implements ExpressionManager {
         
         ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expressionText, Object.class);
         Expression expression = createJuelExpression(text, valueExpression);
-        expressionCache.add(text, expression);
+        
+        if (isCacheEnabled(text)) {
+            expressionCache.add(text, expression);
+        }
+        
         return expression;
+    }
+
+    protected boolean isCacheEnabled(String text) {
+        return expressionCache != null && (expressionTextLengthCacheLimit < 0 || text.length() <= expressionTextLengthCacheLimit);
     }
 
     protected Expression createJuelExpression(String expression, ValueExpression valueExpression) {
@@ -184,14 +186,6 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     public void setExpressionCache(DeploymentCache<Expression> expressionCache) {
         this.expressionCache = expressionCache;
-    }
-
-    public int getExpressionCacheSize() {
-        return expressionCacheSize;
-    }
-
-    public void setExpressionCacheSize(int expressionCacheSize) {
-        this.expressionCacheSize = expressionCacheSize;
     }
 
     public int getExpressionTextLengthCacheLimit() {

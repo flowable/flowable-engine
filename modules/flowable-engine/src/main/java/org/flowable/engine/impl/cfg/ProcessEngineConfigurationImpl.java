@@ -774,6 +774,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<String> customScriptingEngineClasses;
     protected ScriptingEngines scriptingEngines;
     protected List<ResolverFactory> resolverFactories;
+    
+    protected boolean isExpressionCacheEnabled = true;
+    protected int expressionCacheSize = 4096;
+    protected int expressionTextLengthCacheLimit = -1; // negative value to have no max length
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -2148,7 +2152,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new ProcessExpressionManager(delegateInterceptor, beans);
+            ProcessExpressionManager processExpressionManager = new ProcessExpressionManager(delegateInterceptor, beans);
+            
+            if (isExpressionCacheEnabled) {
+                processExpressionManager.setExpressionCache(new DefaultDeploymentCache<>(expressionCacheSize));
+                processExpressionManager.setExpressionTextLengthCacheLimit(expressionTextLengthCacheLimit);
+            }
+            
+            expressionManager = processExpressionManager;
         }
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
         expressionManager.setExpressionEnhancers(expressionEnhancers);
@@ -2826,6 +2837,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public ProcessEngineConfigurationImpl setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+        return this;
+    }
+    
+    public boolean isExpressionCacheEnabled() {
+        return isExpressionCacheEnabled;
+    }
+
+    public ProcessEngineConfigurationImpl setExpressionCacheEnabled(boolean isExpressionCacheEnabled) {
+        this.isExpressionCacheEnabled = isExpressionCacheEnabled;
+        return this;
+    }
+
+    public int getExpressionCacheSize() {
+        return expressionCacheSize;
+    }
+
+    public ProcessEngineConfigurationImpl setExpressionCacheSize(int expressionCacheSize) {
+        this.expressionCacheSize = expressionCacheSize;
+        return this;
+    }
+
+    public int getExpressionTextLengthCacheLimit() {
+        return expressionTextLengthCacheLimit;
+    }
+
+    public ProcessEngineConfigurationImpl setExpressionTextLengthCacheLimit(int expressionTextLengthCacheLimit) {
+        this.expressionTextLengthCacheLimit = expressionTextLengthCacheLimit;
         return this;
     }
 

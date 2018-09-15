@@ -316,6 +316,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<FlowableExpressionEnhancer> expressionEnhancers;
     protected List<FlowableExpressionEnhancer> customExpressionEnhancers;
     protected List<FlowableShortHandExpressionFunction> shortHandExpressionFunctions;
+    
+    protected boolean isExpressionCacheEnabled = true;
+    protected int expressionCacheSize = 4096;
+    protected int expressionTextLengthCacheLimit = -1; // negative value to have no max length
 
     protected ScriptingEngines scriptingEngines;
     protected List<ResolverFactory> resolverFactories;
@@ -843,7 +847,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new CmmnExpressionManager(beans);
+            CmmnExpressionManager cmmnExpressionManager = new CmmnExpressionManager(beans);
+            
+            if (isExpressionCacheEnabled) {
+                cmmnExpressionManager.setExpressionCache(new DefaultDeploymentCache<>(expressionCacheSize));
+                cmmnExpressionManager.setExpressionTextLengthCacheLimit(expressionTextLengthCacheLimit);
+            }
+            
+            expressionManager = cmmnExpressionManager;
         }
         
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
@@ -1970,6 +1981,33 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     public CmmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+        return this;
+    }
+    
+    public boolean isExpressionCacheEnabled() {
+        return isExpressionCacheEnabled;
+    }
+
+    public CmmnEngineConfiguration setExpressionCacheEnabled(boolean isExpressionCacheEnabled) {
+        this.isExpressionCacheEnabled = isExpressionCacheEnabled;
+        return this;
+    }
+
+    public int getExpressionCacheSize() {
+        return expressionCacheSize;
+    }
+
+    public CmmnEngineConfiguration setExpressionCacheSize(int expressionCacheSize) {
+        this.expressionCacheSize = expressionCacheSize;
+        return this;
+    }
+
+    public int getExpressionTextLengthCacheLimit() {
+        return expressionTextLengthCacheLimit;
+    }
+
+    public CmmnEngineConfiguration setExpressionTextLengthCacheLimit(int expressionTextLengthCacheLimit) {
+        this.expressionTextLengthCacheLimit = expressionTextLengthCacheLimit;
         return this;
     }
 
