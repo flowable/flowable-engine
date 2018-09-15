@@ -84,7 +84,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").tenantId("flowable").start();
             this.expectedException.expect(FlowableObjectNotFoundException.class);
-            this.expectedException.expectMessage("no cases deployed with key 'oneTaskCase' for tenant identifier 'flowable'");
+            this.expectedException.expectMessage("no case definition deployed with key 'oneTaskCase' for tenant identifier 'flowable'");
             assertBlockingCaseTaskFlow(caseInstance);
         } finally {
             cmmnRepositoryService.deleteDeployment(parentCaseDeploymentId, true);
