@@ -311,6 +311,46 @@ On top of all process variables, there are a few default objects available that 
 For more concrete usage and examples, check out <<springExpressions,Expressions in Spring>>, <<bpmnJavaServiceTaskXML,Java Service tasks>>, <<executionListeners,Execution Listeners>>,  <<taskListeners,Task Listeners>> or <<conditionalSequenceFlowXml,Conditional sequence flows>>.
 
 
+[[expressionsFunctions]]
+
+=== Expression functions
+
+[Experimental] Expression functions have been added in version 6.4.0.
+
+To make working with process variables easier, a set of out-of-the-box functions is available, under the _variables_ namespace.
+
+* *variables:get(varName)*: Retrieves the value of a variable. The main difference with writing the variable name directly in the expression is that using this function won't throw an exception when the variable doesn't exist. For example _${myVariable == "hello"}_ would throw an exception if _myVariable_ doesn't exist, but _${var:get(myVariable) == 'hello'}_ will just work.
+* *variables:getOrDefault(varName, defaultValue)*: similar to _get_, but with the option of providing a default value which is returned when the variable isn't set or the value is _null_.
+* *variables:exists(varName)*: Returns _true_ if the variable has a non-null value.
+* *variables:isEmpty(varName)* (alias _:empty_) : Checks if the variable value is not empty. Depending on the variable type, the behavior is the following:
+** For String variables, the variable is deemed empty if it's the empty string. 
+** For +java.util.Collection+ variables, _true_ is returned if the collection has no elements.
+** For +ArrayNode+ variables, _true_ is returned if there are no elements
+** In case the variable is _null_, _true_ is always returned  
+* *variables:isNotEmpty(varName)* (alias _:notEmpty_) : the reverse operation of _isEmpty_.
+* *variables:equals(varName, value)* (alias _:eq_) : checks if a variable is equal to a given value. This is a shorthand function for an expression that would otherwise be written as _${execution.getVariable("varName") != null && execution.getVariable("varName") == value}_.
+** If the variable value is null, false is returned (unless compared to null).
+* *variables:notEquals(varName, value)* (alias _:ne_) : the reverse comparison of _equals_.
+* *variables:contains(varName, value1, value2, ...)*: checks if *all* values provided are contained within a variable. Depending on the variable type, the behavior is the following:
+** For String variables, the passed values are used as substrings that need to be part of the variable
+** For +java.util.Collection+ variables, all the passed values need to be an element of the collection (regular _contains_ semantics).
+** For +ArrayNode+ variables: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type
+** When the variable value is null, false is returned in all cases. When the variale value is not null, and the instance type is not one of the types above, false will be returned.
+* *variables:containsAny(varName, value1, value2, ...)* : similar to the _contains_ function, but _true_ will be returned if *any* (and not all) the passed values is contained in the variable.
+* Comparator functions:
+** *variables:lowerThan(varName, value)* (alias _:lt_) : shorthand for _${execution.getVariable("varName") != null && execution.getVariable("varName") < value}_
+** *variables:lowerThanOrEquals(varName, value)* (alias _:lte_) : similar, but now for _< =_
+** *variables:greaterThan(varName, value)* (alias _:gt_) : similar, but now for _>_
+** *variables:greaterThanOrEquals(varName, value)* (alias _:gte_) : similar, but now for _> =_
+
+The _variables_ namespace is aliased to _vars_ or _var_. So _variables:get(varName)_ is equivalent to writing _vars:get(varName)_ or _var:get(varName)_. Note that it's not needed to put quotes around the variable name: _var:get(varName)_ is equivalent to _var:get(\'varName')_ or _var:get("varName")_.
+ 
+Also note that in none of the functions above the _execution_ needs to be passed into the function (as would be needed when not using a function). The engine will inject the appropiate variable scope when invoking the function. This also means that these functions can be used in exactly the same way when writing expression in CMMN case definitions.
+
+Additionally, it's possible to register custom functions that can be used in expressions. See the +org.flowable.common.engine.api.delegate.FlowableFunctionDelegate+ interface for more information.
+
+
+
 [[apiUnitTesting]]
 
 

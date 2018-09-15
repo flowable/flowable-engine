@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -28,16 +29,47 @@ import org.flowable.common.engine.impl.javax.el.ELContext;
  */
 public interface ExpressionManager {
 
+    /**
+     * Creates an {@link Expression} instance from the given String.
+     * Expression are resolved against a {@link VariableContainer} (e.g. a process Execution, a case instance plan item, etc.)
+     */
     Expression createExpression(String expression);
     
+    /**
+     * Creates an {@link ELContext} against which {@link Expression} instance can be resolved.
+     */
     ELContext getElContext(VariableContainer variableContainer);
     
+    /**
+     * Returns the beans registered with this expression manager instance.
+     */
     Map<Object, Object> getBeans();
     
+    /**
+     * Sets the beans which can be used in expressions.
+     */
     void setBeans(Map<Object, Object> beans);
     
+    /**
+     * Returns the custom functions registered and usable in expressions.
+     */
     List<FlowableFunctionDelegate> getFunctionDelegates();
     
+    /**
+     * Set the custom functions usable in expressions. 
+     */
     void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates);
+    
+    /**
+     * Returns the {@link FlowableExpressionEnhancer} which potentially can alter the expression text 
+     * before being transformed into an {@link Expression} instance.
+     */
+    List<FlowableExpressionEnhancer> getExpressionEnhancers();
+    
+    /**
+     * Sets the {@link FlowableExpressionEnhancer} instances which can enhance expression texts 
+     * before being tranformed into an {@link Expression} instance.
+     */
+    void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers);
 
 }
