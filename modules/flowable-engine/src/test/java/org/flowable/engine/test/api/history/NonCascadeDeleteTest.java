@@ -51,7 +51,7 @@ public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
             // clean
             historyService.deleteHistoricProcessInstance(processInstanceId);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         }
     }
 }

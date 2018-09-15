@@ -69,7 +69,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
 
         runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "");
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     /**
@@ -119,7 +119,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         // Manually cleanup the process instance.
         runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "");
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
     
     @Test
@@ -147,7 +147,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
 
         runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "");
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     @Test
@@ -192,7 +192,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         String eventsReceived = (String) runtimeService.getVariable(task.getProcessInstanceId(), "events");
         assertEquals("create - assignment - complete - delete", eventsReceived);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     @Test

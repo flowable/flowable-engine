@@ -613,7 +613,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         timeToFire.add(Calendar.HOUR, 2);
         timeToFire.add(Calendar.MINUTE, 5);
         processEngineConfiguration.getClock().setCurrentTime(timeToFire.getTime());
-        waitForJobExecutorToProcessAllJobs(5000, 500);
+        waitForJobExecutorToProcessAllJobs(7000, 500);
 
         // Check timeout-events have been dispatched
         assertEquals(4, listener.getEventsReceived().size());

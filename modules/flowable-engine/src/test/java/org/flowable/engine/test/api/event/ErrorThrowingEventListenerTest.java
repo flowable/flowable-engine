@@ -50,7 +50,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
             assertNotNull(task);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
@@ -74,7 +74,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
         assertNotNull(task);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask2").singleResult();
             assertNotNull(task);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
@@ -138,6 +138,6 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("escalatedTask").singleResult();
         assertNotNull(task);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 }
