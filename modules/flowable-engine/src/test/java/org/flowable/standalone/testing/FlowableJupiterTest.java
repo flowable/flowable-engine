@@ -70,7 +70,7 @@ class FlowableJupiterTest {
         // now there should be one job in the database:
         assertThat(managementService.createJobQuery().count()).isEqualTo(1);
 
-        testHelper.waitForJobExecutorToProcessAllJobs(5000L, 500L);
+        testHelper.waitForJobExecutorToProcessAllJobs(7000L, 500L);
 
         // the job is done
         assertThat(managementService.createJobQuery().count()).isEqualTo(0);

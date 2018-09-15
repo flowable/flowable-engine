@@ -129,7 +129,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(2, history.size());
         
@@ -174,7 +174,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(2, history.size());
         
@@ -219,7 +219,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.OWNER);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(2, history.size());
         Collections.sort(history, new Comparator<HistoricIdentityLink>() {
@@ -259,7 +259,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(1, history.size());
         HistoricIdentityLink assigned = history.get(0);
@@ -285,7 +285,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 0, null, null, null);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(0, history.size());
     }

@@ -240,7 +240,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         // When the timer on the subprocess is fired, the complete subprocess is destroyed
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (6 * 60 * 1000))); // + 6 minutes, timer fires on 5 minutes
-        waitForJobExecutorToProcessAllJobs(10000, 5000L);
+        waitForJobExecutorToProcessAllJobs(10000, 200L);
 
         org.flowable.task.api.Task escalatedTask = taskQuery.singleResult();
         assertEquals("Escalated Task", escalatedTask.getName());

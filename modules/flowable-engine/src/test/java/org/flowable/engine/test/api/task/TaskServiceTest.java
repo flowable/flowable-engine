@@ -448,7 +448,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
             assertEquals(0, taskService.getTaskComments(taskId).size());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).list().size());
 
             taskService.deleteTask(taskId, true);
@@ -479,7 +479,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
             assertEquals(0, taskService.getTaskComments(taskId).size());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
             assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).list().size());
 
@@ -1788,7 +1788,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
             Thread.sleep(50L); // to make sure the times for ordering below are different.
             taskService.setVariable(task.getId(), "variable1", "value2");
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             HistoricActivityInstance historicActivitiInstance = historyService.createHistoricActivityInstanceQuery()
                     .processInstanceId(processInstance.getId())
@@ -1855,7 +1855,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
             taskService.deleteTask(task.getId(), "deleted for testing purposes");
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
 

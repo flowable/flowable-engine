@@ -39,7 +39,7 @@ public class InstantTimeTimerEventTest extends ResourceFlowableTestCase {
         TimerJobQuery jobQuery = managementService.createTimerJobQuery();
         assertEquals(1, jobQuery.count());
 
-        waitForJobExecutorToProcessAllJobs(5000L, 200L);
+        waitForJobExecutorToProcessAllJobs(7000L, 200L);
 
         jobQuery = managementService.createTimerJobQuery();
         assertEquals(0, jobQuery.count());

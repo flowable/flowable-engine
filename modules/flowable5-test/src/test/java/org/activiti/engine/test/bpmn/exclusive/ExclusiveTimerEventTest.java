@@ -38,7 +38,7 @@ public class ExclusiveTimerEventTest extends PluggableFlowableTestCase {
         // After setting the clock to time '50minutes and 5 seconds', the timers should fire
         clock.setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
         processEngineConfiguration.setClock(clock);
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 200L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 200L);
 
         assertEquals(0, jobQuery.count());
         assertProcessEnded(pi.getProcessInstanceId());
