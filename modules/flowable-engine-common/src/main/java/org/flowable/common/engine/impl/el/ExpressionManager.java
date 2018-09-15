@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -39,5 +40,9 @@ public interface ExpressionManager {
     List<FlowableFunctionDelegate> getFunctionDelegates();
     
     void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates);
+    
+    List<FlowableExpressionEnhancer> getExpressionEnhancers();
+    
+    void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers);
 
 }

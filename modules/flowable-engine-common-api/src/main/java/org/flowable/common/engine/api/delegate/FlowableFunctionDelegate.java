@@ -19,14 +19,25 @@ import java.lang.reflect.Method;
  * Interface for pluggable functions that can be used in the EL expressions
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface FlowableFunctionDelegate {
 
+    /**
+     * The prefix of the method when used in an expression, like the first part of ${prefix:method()}.
+     * Will be used to match the text of the expression to the actual {@link FlowableFunctionDelegate} instance.
+     */
     String prefix();
 
+    /**
+     * The name of the method when used in an expression, like the second part of ${prefix:method()}.
+     * Will be used to match the text of the expression to the actual {@link FlowableFunctionDelegate} instance.
+     */
     String localName();
 
+    /**
+     * Returns the method that is invoked by JUEL.
+     */
     Method functionMethod();
-
-    Class<?> functionClass();
+    
 }

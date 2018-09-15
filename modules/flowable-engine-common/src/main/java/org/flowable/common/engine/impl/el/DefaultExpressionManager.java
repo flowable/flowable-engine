@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
@@ -29,6 +30,8 @@ import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
 import org.flowable.common.engine.impl.javax.el.ValueExpression;
+import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 /**
  * Default {@link ExpressionManager} implementation that contains the logic for creating 
@@ -43,10 +46,15 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
+    protected List<FlowableExpressionEnhancer> expressionEnhancers;
 
     protected ELContext parsingElContext;
     protected Map<Object, Object> beans;
-
+    
+    protected DeploymentCache<Expression> expressionCache;
+    protected int expressionCacheSize = 4096;
+    protected int expressionTextLengthCacheLimit = 1024;
+    
     public DefaultExpressionManager() {
         this(null);
     }
@@ -54,18 +62,39 @@ public class DefaultExpressionManager implements ExpressionManager {
     public DefaultExpressionManager(Map<Object, Object> beans) {
         this.expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
         this.beans = beans;
+        
+        if (expressionCache == null) {
+            expressionCache = new DefaultDeploymentCache<>(expressionCacheSize);
+        }
     }
 
     @Override
-    public Expression createExpression(String expression) {
+    public Expression createExpression(String text) {
+        
+        if (text.length() <= expressionTextLengthCacheLimit) {
+            Expression cachedExpression = expressionCache.get(text);
+            if (cachedExpression != null) {
+                return cachedExpression;
+            }
+        }
+        
         if (parsingElContext == null) {
             this.parsingElContext = new ParsingElContext(functionDelegates);
         } else if (parsingElContext.getFunctionMapper() != null && parsingElContext.getFunctionMapper() instanceof FlowableFunctionMapper) {
             ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionDelegates(functionDelegates);
         }
 
-        ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
-        return createJuelExpression(expression, valueExpression);
+        String expressionText = text.trim();
+        if (expressionEnhancers != null) {
+            for (FlowableExpressionEnhancer expressionEnhancer : expressionEnhancers) {
+                expressionText = expressionEnhancer.enhance(expressionText);
+            }
+        }
+        
+        ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expressionText, Object.class);
+        Expression expression = createJuelExpression(text, valueExpression);
+        expressionCache.add(text, expression);
+        return expression;
     }
 
     protected Expression createJuelExpression(String expression, ValueExpression valueExpression) {
@@ -138,4 +167,39 @@ public class DefaultExpressionManager implements ExpressionManager {
     public void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates) {
         this.functionDelegates = functionDelegates;
     }
+    
+    @Override
+    public List<FlowableExpressionEnhancer> getExpressionEnhancers() {
+        return expressionEnhancers;
+    }
+    
+    @Override
+    public void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
+        this.expressionEnhancers = expressionEnhancers;
+    }
+
+    public DeploymentCache<Expression> getExpressionCache() {
+        return expressionCache;
+    }
+
+    public void setExpressionCache(DeploymentCache<Expression> expressionCache) {
+        this.expressionCache = expressionCache;
+    }
+
+    public int getExpressionCacheSize() {
+        return expressionCacheSize;
+    }
+
+    public void setExpressionCacheSize(int expressionCacheSize) {
+        this.expressionCacheSize = expressionCacheSize;
+    }
+
+    public int getExpressionTextLengthCacheLimit() {
+        return expressionTextLengthCacheLimit;
+    }
+
+    public void setExpressionTextLengthCacheLimit(int expressionTextLengthCacheLimit) {
+        this.expressionTextLengthCacheLimit = expressionTextLengthCacheLimit;
+    }
+    
 }

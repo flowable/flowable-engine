@@ -106,7 +106,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
         String className = method.getMethod().getDeclaringClass().getName().replace('.', '/');
         String methodName = method.getName();
         for (String suffix : CmmnDeployer.CMMN_RESOURCE_SUFFIXES) {
-            String resource = className + "." + methodName + "." + suffix;
+            String resource = className + "." + methodName + suffix;
             if (CmmnTestRunner.class.getClassLoader().getResource(resource) != null) {
                 return resource;
             }
