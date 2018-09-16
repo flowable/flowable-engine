@@ -58,8 +58,7 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
         List<Job> jobs = jobQuery.list();
         assertEquals(1, jobs.size());
 
-        // After setting the clock to time '1 hour and 5 seconds', the second timer should fire
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
         assertEquals(0L, jobQuery.count());
 
         assertProcessEnded(processInstance.getId());

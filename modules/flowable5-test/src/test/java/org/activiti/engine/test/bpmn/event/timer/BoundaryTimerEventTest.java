@@ -74,7 +74,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         clock.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
         processEngineConfiguration.setClock(clock);
 
-        waitForJobExecutorToProcessAllJobs(5000L, 25L);
+        waitForJobExecutorToProcessAllJobs(7000L, 25L);
         assertEquals(0L, jobQuery.count());
 
         // which means that the third task is reached
@@ -96,7 +96,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals("Inner subprocess task 2", tasks.get(1).getName());
 
         // Timer will fire in 2 hours
-        processEngineConfiguration.getClock().setCurrentTime(new Date(testStartTime.getTime() + ((2 * 60 * 60 * 1000) + 5000)));
+        processEngineConfiguration.getClock().setCurrentTime(new Date(testStartTime.getTime() + ((2 * 60 * 60 * 1000) + 7000)));
         Job timer = managementService.createTimerJobQuery().singleResult();
         managementService.moveTimerToExecutableJob(timer.getId());
         managementService.executeJob(timer.getId());
@@ -127,7 +127,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         clock.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
         processEngineConfiguration.setClock(clock);
 
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 200L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 200L);
         assertEquals(0L, jobQuery.count());
 
         // start execution listener is not executed

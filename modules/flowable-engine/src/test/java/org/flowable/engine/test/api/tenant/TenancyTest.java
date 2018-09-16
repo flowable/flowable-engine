@@ -455,7 +455,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
                 taskService.complete(task.getId());
             }
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // Verify process instances
             assertEquals(TEST_TENANT_ID, historyService.createHistoricProcessInstanceQuery().processDefinitionId(processDefinitionIdWithTenant).list().get(0).getTenantId());
@@ -880,7 +880,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("process1", null, CollectionUtil.singletonMap("sendFor", "test"), tenantId);
             Assert.assertNotNull(processInstance);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("process2").processInstanceTenantId(tenantId).count());
             Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("process2").count());

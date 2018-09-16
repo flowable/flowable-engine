@@ -36,7 +36,7 @@ public class AsyncEmailTaskTest extends EmailTestCase {
         List<WiserMessage> messages = wiser.getMessages();
         assertEquals(0, messages.size());
 
-        waitForJobExecutorToProcessAllJobs(5000L, 25L);
+        waitForJobExecutorToProcessAllJobs(7000L, 25L);
 
         messages = wiser.getMessages();
         assertEquals(1, messages.size());
@@ -54,7 +54,7 @@ public class AsyncEmailTaskTest extends EmailTestCase {
         List<WiserMessage> messages = wiser.getMessages();
         assertEquals(0, messages.size());
 
-        waitForJobExecutorToProcessAllJobs(5000L, 25L);
+        waitForJobExecutorToProcessAllJobs(7000L, 25L);
 
         messages = wiser.getMessages();
         assertEquals(1, messages.size());
