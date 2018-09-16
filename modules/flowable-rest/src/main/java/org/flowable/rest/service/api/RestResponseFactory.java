@@ -27,12 +27,11 @@ import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
+import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
 import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
-import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
-import org.flowable.common.rest.variable.JsonArrayRestVariableConverter;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.FormProperty;
@@ -95,6 +94,8 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Default implementation of a {@link RestResponseFactory}.
  * 
@@ -118,9 +119,11 @@ public class RestResponseFactory {
     public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
     public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
 
+    protected ObjectMapper objectMapper;
     protected List<RestVariableConverter> variableConverters = new ArrayList<>();
 
-    public RestResponseFactory() {
+    public RestResponseFactory(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         initializeVariableConverters();
     }
 
@@ -1240,8 +1243,7 @@ public class RestResponseFactory {
         variableConverters.add(new DoubleRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
-        variableConverters.add(new JsonObjectRestVariableConverter());
-        variableConverters.add(new JsonArrayRestVariableConverter());
+        variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 
     protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {

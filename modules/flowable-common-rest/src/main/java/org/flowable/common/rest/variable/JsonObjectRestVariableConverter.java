@@ -13,14 +13,21 @@
 
 package org.flowable.common.rest.variable;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonObjectRestVariableConverter implements RestVariableConverter {
+    
+    protected ObjectMapper objectMapper;
+    
+    public JsonObjectRestVariableConverter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public String getRestTypeName() {
@@ -29,17 +36,16 @@ public class JsonObjectRestVariableConverter implements RestVariableConverter {
 
     @Override
     public Class<?> getVariableType() {
-        return ObjectNode.class;
+        return JsonNode.class;
     }
 
     @Override
     public Object getVariableValue(EngineRestVariable result) {
         if (result.getValue() != null) {
-            if (result.getValue() instanceof LinkedHashMap || result.getValue() instanceof ArrayList) {
+            if (result.getValue() instanceof Map || result.getValue() instanceof List) {
                 // When the variable is coming from the REST API it automatically gets converted to an ArrayList or
                 // LinkedHashMap. In all other cases JSON is saved as ArrayNode or ObjectNode. For consistency the
                 // variable is converted to such an object here.
-                ObjectMapper objectMapper = new ObjectMapper();
                 return objectMapper.valueToTree(result.getValue());
             } else {
                 return result.getValue();
@@ -51,8 +57,8 @@ public class JsonObjectRestVariableConverter implements RestVariableConverter {
     @Override
     public void convertVariableValue(Object variableValue, EngineRestVariable result) {
         if (variableValue != null) {
-            if (!(variableValue instanceof ObjectNode)) {
-                throw new FlowableIllegalArgumentException("Converter can only convert com.fasterxml.jackson.databind.node.ObjectNode.");
+            if (!(variableValue instanceof JsonNode)) {
+                throw new FlowableIllegalArgumentException("Converter can only convert com.fasterxml.jackson.databind.JsonNode.");
             }
             result.setValue(variableValue);
         } else {
