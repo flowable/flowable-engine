@@ -31,6 +31,8 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
+import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
+import org.flowable.common.rest.variable.JsonArrayRestVariableConverter;
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.FormProperty;
@@ -1238,6 +1240,8 @@ public class RestResponseFactory {
         variableConverters.add(new DoubleRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
+        variableConverters.add(new JsonObjectRestVariableConverter());
+        variableConverters.add(new JsonArrayRestVariableConverter());
     }
 
     protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {
