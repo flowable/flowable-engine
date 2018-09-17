@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.dynamic;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.Map;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -39,8 +37,6 @@ public class MoveExecutionEntityContainer {
     protected ExecutionEntity superExecution;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
     protected Map<String, FlowElement> moveToFlowElementMap = new HashMap<>();
-//    protected Map<String, List<SubProcess>> subProcessesToCreateMap = new HashMap<>();
-//    protected Map<String, ExecutionEntity> newSubProcessChildExecutionMap = new HashMap<>();
 
     public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
         this.executions = executions;
@@ -139,27 +135,27 @@ public class MoveExecutionEntityContainer {
         return moveToFlowElementMap.values();
     }
 
-//    public void addSubProcessToCreate(String activityId, SubProcess subProcess) {
-//        List<SubProcess> subProcesses = null;
-//        if (subProcessesToCreateMap.containsKey(activityId)) {
-//            subProcesses = subProcessesToCreateMap.get(activityId);
-//        } else {
-//            subProcesses = new ArrayList<>();
-//        }
-//
-//        subProcesses.add(0, subProcess);
-//        subProcessesToCreateMap.put(activityId, subProcesses);
-//    }
-//
-//    public Map<String, List<SubProcess>> getSubProcessesToCreateMap() {
-//        return subProcessesToCreateMap;
-//    }
-//
-//    public void addNewSubProcessChildExecution(String subProcessId, ExecutionEntity childExecution) {
-//        newSubProcessChildExecutionMap.put(subProcessId, childExecution);
-//    }
-//
-//    public ExecutionEntity getNewSubProcessChildExecution(String subProcessId) {
-//        return newSubProcessChildExecutionMap.get(subProcessId);
-//    }
+    //    public void addSubProcessToCreate(String activityId, SubProcess subProcess) {
+    //        List<SubProcess> subProcesses = null;
+    //        if (subProcessesToCreateMap.containsKey(activityId)) {
+    //            subProcesses = subProcessesToCreateMap.get(activityId);
+    //        } else {
+    //            subProcesses = new ArrayList<>();
+    //        }
+    //
+    //        subProcesses.add(0, subProcess);
+    //        subProcessesToCreateMap.put(activityId, subProcesses);
+    //    }
+    //
+    //    public Map<String, List<SubProcess>> getSubProcessesToCreateMap() {
+    //        return subProcessesToCreateMap;
+    //    }
+    //
+    //    public void addNewSubProcessChildExecution(String subProcessId, ExecutionEntity childExecution) {
+    //        newSubProcessChildExecutionMap.put(subProcessId, childExecution);
+    //    }
+    //
+    //    public ExecutionEntity getNewSubProcessChildExecution(String subProcessId) {
+    //        return newSubProcessChildExecutionMap.get(subProcessId);
+    //    }
 }

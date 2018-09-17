@@ -35,7 +35,7 @@ import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.test.api.runtime.ChangeStateEventListener;
+import org.flowable.engine.test.api.runtime.changestate.ChangeStateEventListener;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;

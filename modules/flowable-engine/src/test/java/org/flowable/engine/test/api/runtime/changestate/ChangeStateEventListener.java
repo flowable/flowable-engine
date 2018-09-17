@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.test.api.runtime;
+package org.flowable.engine.test.api.runtime.changestate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
