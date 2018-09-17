@@ -389,7 +389,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
             taskService.setVariable(newTask.getId(), "testVariable", 123);
             taskService.setVariable(newTask.getId(), "testVariable", 456);
             
-            waitForJobExecutorToProcessAllHistoryJobs(5000, 200);
+            waitForJobExecutorToProcessAllHistoryJobs(7000, 200);
             
             taskService.removeVariable(newTask.getId(), "testVariable");
 

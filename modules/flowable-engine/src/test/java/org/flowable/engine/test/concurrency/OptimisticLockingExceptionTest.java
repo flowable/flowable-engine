@@ -65,7 +65,7 @@ public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
                 Thread.sleep(250L);
                 totalWaitTime += 250L;
 
-                if (totalWaitTime >= 5000L) {
+                if (totalWaitTime >= 7000L) {
                     break;
                 }
             }

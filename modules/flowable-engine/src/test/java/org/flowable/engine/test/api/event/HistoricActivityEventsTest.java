@@ -70,7 +70,7 @@ public class HistoricActivityEventsTest extends PluggableFlowableTestCase {
 
             List<FlowableEvent> events = listener.getEventsReceived();
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
             int processInstanceCreated = 0;
             int mainStartActivityStarted = 0;

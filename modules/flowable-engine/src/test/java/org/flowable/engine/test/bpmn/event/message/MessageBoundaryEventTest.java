@@ -523,7 +523,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
         // After setting the clock to time '1 hour and 5 seconds', the timer should fire.
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-        waitForJobExecutorOnCondition(5000L, 100L, new Callable<Boolean>() {
+        waitForJobExecutorOnCondition(7000L, 100L, new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return taskService.createTaskQuery().count() == 2;

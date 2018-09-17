@@ -57,7 +57,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
 
@@ -66,7 +66,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
     }
@@ -82,7 +82,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
 
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         
         historyService.createHistoricTaskInstanceQuery().orderByDeleteReason().asc().list();
         historyService.createHistoricTaskInstanceQuery().orderByExecutionId().asc().list();
@@ -107,7 +107,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         identityService.setAuthenticatedUserId("johndoe");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
         assertEquals("johndoe", historicProcessInstance.getStartUserId());
@@ -117,7 +117,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
         assertEquals("theEnd", historicProcessInstance.getEndActivityId());
@@ -136,7 +136,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task prepareAndShipTask = taskQuery.singleResult();
         assertEquals("Prepare and Ship", prepareAndShipTask.getName());
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         // verify
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
@@ -149,7 +149,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     public void testExcludeSubprocesses() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().excludeSubprocesses(true).singleResult();
         assertNotNull(historicProcessInstance);
@@ -168,7 +168,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey(processDefinitionKey);
         runtimeService.startProcessInstanceByKey("orderProcess");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processDefinitionKey).singleResult();
         assertNotNull(historicProcessInstance);
@@ -181,7 +181,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         map.put("creditApproved", true);
         taskService.complete(task.getId(), map);
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         // and make sure the super process instance is set correctly on the HistoricProcessInstance
         HistoricProcessInstance historicProcessInstanceSub = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("checkCreditProcess").singleResult();
@@ -201,7 +201,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         // start an instance that will not be part of the query
         runtimeService.startProcessInstanceByKey("oneTaskProcess2", "2");
 
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         
         HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceIds(processInstanceIds);
         assertEquals(5, processInstanceQuery.count());
@@ -241,7 +241,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
         runtimeService.deleteProcessInstance(processInstanceId, null);
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId);
         assertEquals(1, processInstanceQuery.count());
@@ -260,7 +260,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         historyService.deleteHistoricProcessInstance(processInstanceId);
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         
         processInstanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId);
         assertEquals(0, processInstanceQuery.count());
@@ -268,7 +268,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
         runtimeService.deleteProcessInstance(processInstanceId, "custom message");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         processInstanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId);
         assertEquals(1, processInstanceQuery.count());
@@ -295,7 +295,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         }
         runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery().deploymentId(deployment.getId());
         assertEquals(5, processInstanceQuery.count());
@@ -318,7 +318,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         }
         runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployment.getId());
@@ -345,7 +345,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         }
         runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().deploymentId(deployment.getId());
         assertEquals(5, taskInstanceQuery.count());
@@ -367,7 +367,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         }
         runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployment.getId());
@@ -397,7 +397,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         }
         runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().deploymentId(deployment.getId()).endOr();
         assertEquals(5, taskInstanceQuery.count());
@@ -483,7 +483,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         }
         runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployment.getId());
@@ -515,7 +515,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     public void testLocalizeTasks() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list();
         assertEquals(1, tasks.size());
         assertEquals("my task", tasks.get(0).getName());
@@ -525,7 +525,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         dynamicBpmnService.changeLocalizationDescription("en-GB", "theTask", "My localized description", infoNode);
         dynamicBpmnService.saveProcessDefinitionInfo(processInstance.getProcessDefinitionId(), infoNode);
 
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         tasks = historyService.createHistoricTaskInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).list();
         assertEquals(1, tasks.size());
         assertEquals("my task", tasks.get(0).getName());
@@ -577,7 +577,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         }
         taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("rootValue", "test").count());
 
@@ -608,7 +608,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         // Test EQUAL on single string variable, should result in 2 matches
         HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().variableValueEquals("stringVar", "abcdef");
@@ -696,7 +696,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         historyService.deleteHistoricProcessInstance(processInstance2.getId());
         historyService.deleteHistoricProcessInstance(processInstance3.getId());
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     }
 
     @Test
@@ -708,7 +708,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         vars.put("upper", "abcdefg");
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().variableValueEqualsIgnoreCase("mixed", "abcdefg").singleResult();
         assertNotNull(instance);
@@ -781,7 +781,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         Calendar oneYearAgo = Calendar.getInstance();
         oneYearAgo.add(Calendar.YEAR, -1);
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         // Query on single short variable, should result in 2 matches
         HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().variableValueEquals("dateVar", date1);
@@ -861,7 +861,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         historyService.deleteHistoricProcessInstance(processInstance2.getId());
         historyService.deleteHistoricProcessInstance(processInstance3.getId());
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
     }
 
     @Test
@@ -869,7 +869,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     public void testNativeHistoricProcessInstanceTest() {
         // just test that the query will be constructed and executed, details are tested in the TaskQueryTest
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
         assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
         // assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT * FROM " +
@@ -880,7 +880,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testNativeHistoricTaskInstanceTest() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
         assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
         assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
@@ -890,7 +890,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testNativeHistoricActivityInstanceTest() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
         assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
         assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
         assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
@@ -904,7 +904,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         String processDefinitionName = "The One Task Process";
         runtimeService.startProcessInstanceByKey(processDefinitionKey);
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         assertEquals(processDefinitionName, historyService.createHistoricProcessInstanceQuery().processDefinitionName(processDefinitionName).list().get(0).getProcessDefinitionName());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionName(processDefinitionName).list().size());
@@ -923,7 +923,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         String processDefinitionCategory = "ExamplesCategory";
         runtimeService.startProcessInstanceByKey(processDefinitionKey);
         
-        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionCategory(processDefinitionCategory).list().size());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionCategory(processDefinitionCategory).count());

@@ -108,7 +108,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         assertNoInvolvement("user3");
         assertNoInvolvement("user4");
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     @Test

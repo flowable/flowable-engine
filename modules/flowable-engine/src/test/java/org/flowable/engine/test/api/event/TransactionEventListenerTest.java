@@ -67,7 +67,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
             expectedCreatedEvents = 7;
         }
         if (processEngineConfiguration.isAsyncHistoryEnabled()) {
-            waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
+            waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
         }
 
         assertEquals(expectedCreatedEvents, TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name()).size());

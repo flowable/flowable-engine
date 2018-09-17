@@ -117,7 +117,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         assertExecutionDetails(event, processInstance);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     @Test
