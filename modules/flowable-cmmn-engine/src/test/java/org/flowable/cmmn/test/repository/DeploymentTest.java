@@ -144,7 +144,7 @@ public class DeploymentTest extends FlowableCmmnTestCase {
             .containsExactlyInAnyOrder("org/flowable/cmmn/test/one-human-task-model.cmmn");
 
         assertThat(cmmnRepositoryService.getDeploymentResourceNames(deploymentIds.get(1)))
-            .containsExactlyInAnyOrder("org/flowable/cmmn/test/example-human-task-model.cmmn");
+            .containsExactlyInAnyOrder("org/flowable/cmmn/test/example-task-model.cmmn");
 
         assertThat(cmmnRepositoryService.createDeploymentQuery().list())
             .as("Deployment time not null")
