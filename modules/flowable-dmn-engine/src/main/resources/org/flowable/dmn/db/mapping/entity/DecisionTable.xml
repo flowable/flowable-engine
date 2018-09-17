@@ -248,22 +248,6 @@
           VERSION_ = (select max(VERSION_) from ${prefix}ACT_DMN_DECISION_TABLE where KEY_ = #{decisionTableKey} and TENANT_ID_ = #{tenantId})
   </select>
   
- 
-  <!-- mysql specific sql -->
-  <select id="selectDecisionTablesByQueryCriteria" databaseId="mysql" parameterType="org.flowable.dmn.engine.impl.DecisionTableQueryImpl" resultMap="decisionTableResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectDecisionTablesByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectDecisionTableCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.dmn.engine.impl.DecisionTableQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectDecisionTablesByQueryCriteriaSql"/>
-  </select>
-
   <select id="selectDecisionTableByNativeQuery" parameterType="java.util.Map" resultMap="decisionTableResultMap">
     <include refid="org.flowable.dmn.engine.db.common.selectByNativeQuery"/>
   </select>

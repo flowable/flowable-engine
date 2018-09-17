@@ -136,7 +136,7 @@
   
   <!-- mysql specific -->
   <select id="selectDeploymentCountByQueryCriteria_mysql" parameterType="org.activiti.engine.impl.DeploymentQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
   </select>
 
