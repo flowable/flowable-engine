@@ -13,6 +13,7 @@
 
 package org.flowable.idm.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -93,6 +94,85 @@ public class IdentityServiceTest extends PluggableFlowableIdmTestCase {
         assertEquals("Jane", user.getFirstName());
         assertEquals("Donnel", user.getLastName());
         assertEquals("updated@alfresco.com", user.getEmail());
+
+        idmIdentityService.deleteUser(user.getId());
+    }
+
+    @Test
+    public void testUpdateUserDeltaOnly() {
+        // First, create a new user
+        User user = idmIdentityService.newUser("testuser");
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setDisplayName("John Doe");
+        user.setEmail("testuser@flowable.com");
+        user.setPassword("test");
+        idmIdentityService.saveUser(user);
+        String initialPassword = user.getPassword();
+
+        // Fetch and update the user
+        user = idmIdentityService.createUserQuery().userId("testuser").singleResult();
+        assertThat(user)
+            .returns("John", User::getFirstName)
+            .returns("Doe", User::getLastName)
+            .returns("John Doe", User::getDisplayName)
+            .returns("testuser@flowable.com", User::getEmail)
+            .returns(initialPassword, User::getPassword);
+
+        user.setFirstName("Jane");
+        idmIdentityService.saveUser(user);
+
+        user = idmIdentityService.createUserQuery().userId("testuser").singleResult();
+        assertThat(user)
+            .returns("Jane", User::getFirstName)
+            .returns("Doe", User::getLastName)
+            .returns("John Doe", User::getDisplayName)
+            .returns("testuser@flowable.com", User::getEmail)
+            .returns(initialPassword, User::getPassword);
+
+        user.setLastName("Doelle");
+        idmIdentityService.saveUser(user);
+
+        user = idmIdentityService.createUserQuery().userId("testuser").singleResult();
+        assertThat(user)
+            .returns("Jane", User::getFirstName)
+            .returns("Doelle", User::getLastName)
+            .returns("John Doe", User::getDisplayName)
+            .returns("testuser@flowable.com", User::getEmail)
+            .returns(initialPassword, User::getPassword);
+
+        user.setDisplayName("Jane Doelle");
+        idmIdentityService.saveUser(user);
+
+        user = idmIdentityService.createUserQuery().userId("testuser").singleResult();
+        assertThat(user)
+            .returns("Jane", User::getFirstName)
+            .returns("Doelle", User::getLastName)
+            .returns("Jane Doelle", User::getDisplayName)
+            .returns("testuser@flowable.com", User::getEmail)
+            .returns(initialPassword, User::getPassword);
+
+        user.setEmail("janedoelle@flowable.com");
+        idmIdentityService.saveUser(user);
+
+        user = idmIdentityService.createUserQuery().userId("testuser").singleResult();
+        assertThat(user)
+            .returns("Jane", User::getFirstName)
+            .returns("Doelle", User::getLastName)
+            .returns("Jane Doelle", User::getDisplayName)
+            .returns("janedoelle@flowable.com", User::getEmail)
+            .returns(initialPassword, User::getPassword);
+
+        user.setPassword("test-pass");
+        idmIdentityService.saveUser(user);
+
+        user = idmIdentityService.createUserQuery().userId("testuser").singleResult();
+        assertThat(user)
+            .returns("Jane", User::getFirstName)
+            .returns("Doelle", User::getLastName)
+            .returns("Jane Doelle", User::getDisplayName)
+            .returns("janedoelle@flowable.com", User::getEmail)
+            .returns(initialPassword, User::getPassword);
 
         idmIdentityService.deleteUser(user.getId());
     }

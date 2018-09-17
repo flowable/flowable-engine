@@ -55,12 +55,24 @@
   <update id="updateUser" parameterType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
     update ${prefix}ACT_ID_USER set
       REV_ = #{revisionNext ,jdbcType=INTEGER},
-      FIRST_ = #{firstName ,jdbcType=VARCHAR},
-      LAST_ = #{lastName ,jdbcType=VARCHAR},
-      DISPLAY_NAME_ = #{displayName ,jdbcType=VARCHAR},
-      EMAIL_ = #{email ,jdbcType=VARCHAR},
-      TENANT_ID_ = #{tenantId ,jdbcType=VARCHAR},
-      PWD_ = #{password ,jdbcType=VARCHAR},
+      <if test="originalPersistentState.firstName != firstName">
+        FIRST_ = #{firstName, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.lastName != lastName">
+        LAST_ = #{lastName ,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.displayName != displayName">
+        DISPLAY_NAME_ = #{displayName ,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.email != email">
+        EMAIL_ = #{email ,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.tenantId != tenantId">
+        TENANT_ID_ = #{tenantId ,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.password != password">
+        PWD_ = #{password ,jdbcType=VARCHAR},
+      </if>
       PICTURE_ID_ = #{pictureByteArrayRef ,typeHandler=IdmByteArrayRefTypeHandler}
     where ID_ = #{id}
       and REV_ = #{revision}
