@@ -2,7 +2,6 @@
 <definitions id="definitions"
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              targetNamespace="Examples">
-    <signal id="signal" name="eventSignal"/>
 
     <process id="TAES" name="Timer and Event SubProcess" isExecutable="true">
         <startEvent id="processStart"/>
@@ -17,7 +16,9 @@
         <endEvent id="processEnd"/>
         <subProcess id="eventSubProcess" name="subProcess" triggeredByEvent="true">
             <startEvent id="eventSubProcessStart" isInterrupting="false">
-                <signalEventDefinition signalRef="signal"/>
+                <timerEventDefinition>
+                    <timeCycle>R/PT15M</timeCycle>
+                </timerEventDefinition>
             </startEvent>
             <userTask id="eventSubProcessTask" name="eventSubProcessTask"/>
             <endEvent id="eventSubProcessEnd"/>

@@ -9,8 +9,16 @@
 
         <startEvent id="theStart"/>
         <sequenceFlow sourceRef="theStart" targetRef="processTask"/>
-        <userTask id="processTask"/>
+        <userTask id="processTask" name="processTask"/>
         <sequenceFlow sourceRef="processTask" targetRef="subProcess"/>
+        <boundaryEvent id="spawnParallelTask" attachedToRef="processTask" cancelActivity="false">
+            <timerEventDefinition>
+                <timeDuration>PT15M</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow sourceRef="spawnParallelTask" targetRef="parallelTask"/>
+        <userTask id="parallelTask" name="parallelTask"/>
+        <sequenceFlow sourceRef="parallelTask" targetRef="theEnd"/>
         <endEvent id="theEnd"/>
 
         <subProcess id="subProcess">
@@ -19,13 +27,13 @@
             <userTask id="subProcessTask"/>
             <sequenceFlow sourceRef="subProcessTask" targetRef="subProcessEnd"/>
             <endEvent id="subProcessEnd"/>
-            <subProcess id="eventSubProcess" triggeredByEvent="true">
-                <startEvent id="eventSubProcessStart" isInterrupting="false">
+            <subProcess id="messageEventSubProcess" triggeredByEvent="true">
+                <startEvent id="messageEventSubProcessStart" isInterrupting="false">
                     <messageEventDefinition messageRef="myMessage"/>
                 </startEvent>
-                <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask"/>
-                <userTask id="eventSubProcessTask"/>
-                <sequenceFlow sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd"/>
+                <sequenceFlow sourceRef="messageEventSubProcessStart" targetRef="messageEventSubProcessTask"/>
+                <userTask id="messageEventSubProcessTask"/>
+                <sequenceFlow sourceRef="messageEventSubProcessTask" targetRef="eventSubProcessEnd"/>
                 <endEvent id="eventSubProcessEnd"/>
             </subProcess>
         </subProcess>

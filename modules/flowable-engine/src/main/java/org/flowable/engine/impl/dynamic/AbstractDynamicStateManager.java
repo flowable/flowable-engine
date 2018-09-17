@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.dynamic;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,6 +88,9 @@ import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Dennis
@@ -866,16 +871,25 @@ public abstract class AbstractDynamicStateManager {
 
                 EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                 List<EventSubscriptionEntity> eventSubscriptions = null;
+                List<TimerJobEntity> timerJobs = null;
                 if (eventDefinition instanceof SignalEventDefinition) {
                     eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(subProcessExecution.getProcessInstanceId(), startEvent.getId(), SignalEventSubscriptionEntity.EVENT_TYPE);
                 } else if (eventDefinition instanceof MessageEventDefinition) {
                     eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(subProcessExecution.getProcessInstanceId(), startEvent.getId(), MessageEventSubscriptionEntity.EVENT_TYPE);
                 } else if (eventDefinition instanceof TimerEventDefinition) {
-                    //TODO CHECK ALSO FOR TIMER JOBS
+                    timerJobs = timerJobService.findTimerJobsByProcessInstanceId(subProcessExecution.getProcessInstanceId())
+                        .stream().filter(getTimerJobPredicateForActivityId(startEvent.getId()))
+                        .collect(Collectors.toList());
                 }
 
-                // If its an interrupting eventSubProcess we don't register a subscription or startEvent executions nd we make sure that they are removed if existed
-                if (startEvent.isInterrupting()) {
+                boolean nonInterruptingAsInterrupting = false;
+                if (!startEvent.isInterrupting()) {
+                    //TODO WIP - For non interrupting, should we get the execution it the next parent scope or from the process? also do we care about the type (subProcess, task, etc)?
+                    nonInterruptingAsInterrupting = isLastExecutionFromParentScope(subProcessExecution.getParentId(), commandContext);
+                }
+
+                // If its an interrupting eventSubProcess we don't register a subscription or startEvent executions and we make sure that they are removed if existed
+                if (startEvent.isInterrupting() || nonInterruptingAsInterrupting) { //Current eventSubProcess plus its startEvent
                     ExecutionEntity startEventExecution = null;
                     if (eventSubscriptions != null && !eventSubscriptions.isEmpty()) {
                         for (EventSubscriptionEntity subscriptionEntity : eventSubscriptions) {
@@ -884,70 +898,110 @@ public abstract class AbstractDynamicStateManager {
                             }
                             eventSubscriptionEntityManager.delete(subscriptionEntity);
                         }
-                        if (startEventExecution != null) {
-                            executionEntityManager.deleteExecutionAndRelatedData(startEventExecution, DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
+                    }
+                    if (timerJobs != null && !timerJobs.isEmpty()) {
+                        for (TimerJobEntity timerJobEntity : timerJobs) {
+                            if (startEventExecution == null) {
+                                Collection<ExecutionEntity> inactiveExecutionsByProcessInstanceId = executionEntityManager.findInactiveExecutionsByProcessInstanceId(subProcessExecution.getProcessInstanceId());
+                                startEventExecution = inactiveExecutionsByProcessInstanceId.stream().filter(execution -> execution.getId().equals(timerJobEntity.getExecutionId())).findFirst().orElse(null);
+                            }
+                            timerJobService.deleteTimerJob(timerJobEntity);
                         }
                     }
-                    //TODO - CHECK TO KILL TIMER JOBS AS WELL
+                    if (startEventExecution != null) {
+                        executionEntityManager.deleteExecutionAndRelatedData(startEventExecution, DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
+                    }
+                } else {
+                    // For non-interrupting, we register a subscription and startEvent execution if they don't exist already
+                    if (eventDefinition instanceof MessageEventDefinition && (eventSubscriptions == null || eventSubscriptions.isEmpty())) {
+                        MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+                        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(subProcessExecution.getProcessDefinitionId());
+                        if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
+                            messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
+                        }
 
-                } else { // For non-interrupting, we register a subscription and startEvent execution if they don't exist already
-                    if (eventSubscriptions == null || eventSubscriptions.isEmpty()) {
+                        ExecutionEntity messageExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
+                        messageExecution.setCurrentFlowElement(startEvent);
+                        messageExecution.setEventScope(true);
+                        messageExecution.setActive(false);
+                        MessageEventSubscriptionEntity messageSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution);
+                        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                            .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageSubscription.getActivityId(),
+                                messageSubscription.getEventName(), null, messageSubscription.getExecution().getId(),
+                                messageSubscription.getProcessInstanceId(), messageSubscription.getProcessDefinitionId()));
 
-                        if (eventDefinition instanceof MessageEventDefinition) {
-                            MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
-                            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(subProcessExecution.getProcessDefinitionId());
-                            if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
-                                messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
-                            }
+                    }
+                    if (eventDefinition instanceof SignalEventDefinition && (eventSubscriptions == null || eventSubscriptions.isEmpty())) {
+                        SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
+                        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(subProcessExecution.getProcessDefinitionId());
+                        Signal signal = null;
+                        if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
+                            signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+                            signalEventDefinition.setSignalRef(signal.getName());
+                        }
 
-                            ExecutionEntity messageExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
-                            messageExecution.setCurrentFlowElement(startEvent);
-                            messageExecution.setEventScope(true);
-                            messageExecution.setActive(false);
-                            MessageEventSubscriptionEntity messageSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(messageEventDefinition.getMessageRef(), messageExecution);
-                            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
-                                .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageSubscription.getActivityId(),
-                                    messageSubscription.getEventName(), null, messageSubscription.getExecution().getId(),
-                                    messageSubscription.getProcessInstanceId(), messageSubscription.getProcessDefinitionId()));
+                        ExecutionEntity signalExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
+                        signalExecution.setCurrentFlowElement(startEvent);
+                        signalExecution.setEventScope(true);
+                        signalExecution.setActive(false);
+                        SignalEventSubscriptionEntity signalSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertSignalEvent(signalEventDefinition.getSignalRef(), signal, signalExecution);
+                        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                            .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalSubscription.getActivityId(),
+                                signalSubscription.getEventName(), null, signalSubscription.getExecution().getId(),
+                                signalSubscription.getProcessInstanceId(), signalSubscription.getProcessDefinitionId()));
 
-                        } else if (eventDefinition instanceof SignalEventDefinition) {
-                            SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
-                            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(subProcessExecution.getProcessDefinitionId());
-                            Signal signal = null;
-                            if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
-                                signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
-                                signalEventDefinition.setSignalRef(signal.getName());
-                            }
+                    }
 
-                            ExecutionEntity signalExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
-                            signalExecution.setCurrentFlowElement(startEvent);
-                            signalExecution.setEventScope(true);
-                            signalExecution.setActive(false);
-                            SignalEventSubscriptionEntity signalSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertSignalEvent(signalEventDefinition.getSignalRef(), signal, signalExecution);
-                            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
-                                .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalSubscription.getActivityId(),
-                                    signalSubscription.getEventName(), null, signalSubscription.getExecution().getId(),
-                                    signalSubscription.getProcessInstanceId(), signalSubscription.getProcessDefinitionId()));
+                    if (eventDefinition instanceof TimerEventDefinition && (timerJobs == null || timerJobs.isEmpty())) {
+                        TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
 
-                        } else if (eventDefinition instanceof TimerEventDefinition) {
-                            TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+                        ExecutionEntity timerExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
+                        timerExecution.setCurrentFlowElement(startEvent);
+                        timerExecution.setEventScope(true);
+                        timerExecution.setActive(false);
 
-                            ExecutionEntity timerExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(subProcessExecution.getParent());
-                            timerExecution.setCurrentFlowElement(startEvent);
-                            timerExecution.setEventScope(true);
-                            timerExecution.setActive(false);
+                        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
+                            TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
-                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
-                                TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-
-                            if (timerJob != null) {
-                                CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
-                            }
+                        if (timerJob != null) {
+                            CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
                         }
                     }
                 }
             }
         }
+    }
+
+    // TODO WIP - This method should be in a TimerJob related class (domain, manager, etc)
+    public static Predicate<TimerJobEntity> getTimerJobPredicateForActivityId(String activityId) {
+        return new Predicate<TimerJobEntity>() {
+
+            @Override
+            public boolean test(TimerJobEntity timerJobEntity) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    Map<String, Object> jobConfigurationMap = objectMapper.readValue(timerJobEntity.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
+
+                    });
+                    String timerActivityId = (String) jobConfigurationMap.get("activityId");
+                    return activityId.equals(timerActivityId);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+    }
+
+    protected static boolean isLastExecutionFromParentScope(String parentId, CommandContext commandContext) {
+        //Go backward from the parent scope looking for active executions
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+//
+//        ExecutionEntity byId = executionEntityManager.findById(parentId);
+//        byId.getParentId()
+
+        List<ExecutionEntity> childExecutionsByParentExecutionId = executionEntityManager.findChildExecutionsByParentExecutionId(parentId);
+        int childExecutionsAtParentScope = childExecutionsByParentExecutionId.size();
+        return childExecutionsAtParentScope <= 2;
     }
 
     private static String printFlowElementIds(Collection<FlowElement> flowElements) {

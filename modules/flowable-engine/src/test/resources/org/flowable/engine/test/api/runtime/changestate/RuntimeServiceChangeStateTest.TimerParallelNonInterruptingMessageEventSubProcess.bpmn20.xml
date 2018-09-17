@@ -7,12 +7,12 @@
     <process id="TAES" name="Timer and Event SubProcess" isExecutable="true">
         <startEvent id="processStart"/>
         <userTask id="processTask" name="processTask"/>
-        <boundaryEvent id="timerBound" attachedToRef="processTask" cancelActivity="false">
+        <boundaryEvent id="spawnParallelTask" attachedToRef="processTask" cancelActivity="false">
             <timerEventDefinition>
-                <timeCycle>R/PT15M</timeCycle>
+                <timeDuration>PT15M</timeDuration>
             </timerEventDefinition>
         </boundaryEvent>
-        <sequenceFlow id="sid-010924B1-4782-404F-AB7B-8961589B113B" sourceRef="timerBound" targetRef="parallelTask"></sequenceFlow>
+        <sequenceFlow id="sid-010924B1-4782-404F-AB7B-8961589B113B" sourceRef="spawnParallelTask" targetRef="parallelTask"></sequenceFlow>
         <sequenceFlow id="sid-F8AF2DCF-E4A9-4165-8979-B5080DF20A7D" sourceRef="processStart" targetRef="processTask"/>
         <endEvent id="processEnd"/>
         <subProcess id="eventSubProcess" name="subProcess" triggeredByEvent="true">

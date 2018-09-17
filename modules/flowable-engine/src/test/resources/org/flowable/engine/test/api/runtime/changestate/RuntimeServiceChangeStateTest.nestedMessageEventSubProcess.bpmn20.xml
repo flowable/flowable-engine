@@ -20,7 +20,7 @@
             <sequenceFlow sourceRef="subProcessTask" targetRef="subProcessEnd"/>
             <endEvent id="subProcessEnd"/>
             <subProcess id="eventSubProcess" triggeredByEvent="true">
-                <startEvent id="eventSubProcessStart" isInterrupting="false">
+                <startEvent id="eventSubProcessStart" isInterrupting="true">
                     <messageEventDefinition messageRef="myMessage"/>
                 </startEvent>
                 <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask"/>

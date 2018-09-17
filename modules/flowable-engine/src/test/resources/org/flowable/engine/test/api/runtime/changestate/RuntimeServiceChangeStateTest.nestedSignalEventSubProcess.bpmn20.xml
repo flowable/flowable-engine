@@ -3,7 +3,7 @@
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              targetNamespace="Examples">
 
-    <message id="myMessage" name="eventMessage"/>
+    <signal id="mySignal" name="eventSignal"/>
 
     <process id="changeStateForEventSubProcess">
 
@@ -19,9 +19,10 @@
             <userTask id="subProcessTask"/>
             <sequenceFlow sourceRef="subProcessTask" targetRef="subProcessEnd"/>
             <endEvent id="subProcessEnd"/>
+
             <subProcess id="eventSubProcess" triggeredByEvent="true">
-                <startEvent id="eventSubProcessStart" isInterrupting="false">
-                    <messageEventDefinition messageRef="myMessage"/>
+                <startEvent id="eventSubProcessStart" isInterrupting="true">
+                    <signalEventDefinition signalRef="mySignal"/>
                 </startEvent>
                 <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask"/>
                 <userTask id="eventSubProcessTask"/>
@@ -29,6 +30,7 @@
                 <endEvent id="eventSubProcessEnd"/>
             </subProcess>
         </subProcess>
+        
     </process>
 
 </definitions>
