@@ -18,6 +18,39 @@
         #{parentDeploymentId, jdbcType=VARCHAR}
     )
   </insert>
+  
+  <insert id="bulkInsertCmmnDeployment" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+        values
+        <foreach collection="list" item="deployment" index="index" separator=",">
+            (
+                #{deployment.id, jdbcType=VARCHAR},
+                #{deployment.name, jdbcType=VARCHAR},
+                #{deployment.category, jdbcType=VARCHAR},
+                #{deployment.key, jdbcType=VARCHAR},
+                #{deployment.tenantId, jdbcType=VARCHAR},
+                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+            )
+        </foreach>
+  </insert>
+  
+  <insert id="bulkInsertCmmnDeployment" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="deployment" index="index">
+            insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) values
+            (
+                #{deployment.id, jdbcType=VARCHAR},
+                #{deployment.name, jdbcType=VARCHAR},
+                #{deployment.category, jdbcType=VARCHAR},
+                #{deployment.key, jdbcType=VARCHAR},
+                #{deployment.tenantId, jdbcType=VARCHAR},
+                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
 
   <!-- DEPLOYMENT UPDATE -->
   
