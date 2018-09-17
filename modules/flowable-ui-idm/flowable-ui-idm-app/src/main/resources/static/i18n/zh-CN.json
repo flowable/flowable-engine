@@ -33,21 +33,21 @@
         }
     },
     "LOGIN": {
-        "TITLE": "登陆",
+        "TITLE": "登录",
         "USERNAME": "用户名",
         "USERNAME-PLACEHOLDER": "输入您的用户名",
         "PASSWORD": "密码",
         "PASSWORD-PLACEHOLDER": "输入您的密码",
         "INVALID-CREDENTIALS": "无效凭据",
         "ACTION": {
-            "CONFIRM": "登陆"
+            "CONFIRM": "登录"
         }
     },
     "ACCOUNT": {
         "ACTIVATE": {
           "TITLE":"激活帐户",
           "ACTIVATING-MESSAGE":"{{userFullName}}, 请稍候, 我们正在激活您的帐户...",
-          "SUCCESS-MESSAGE":"您的帐户已被激活。请在下面登录, 开始设计和运行进程 ",
+          "SUCCESS-MESSAGE":"您的帐户已被激活。请在下面登录, 开始设计和运行流程 ",
           "FAILURE-MESSAGE":"您的帐户无法激活。它已被激活或激活链接已过期。"
         },
 
@@ -189,8 +189,8 @@
         "ADD-SUBGROUP": "+ 添加子组",
         "NO-SUBGROUPS": "没有发现子组",
         "USER-ADDED": "用户已被添加到组中",
-        "INACTIVE": "解散",
-        "INACTIVE-DESCRIPTION": "This group has been deactivated. Users will still be able complete currently assigned tasks to this group, but new process definitions cannot use this group anymore.",
+        "INACTIVE": "已停止",
+        "INACTIVE-DESCRIPTION": "此组已被停用.用户仍然可以完成当前分配给该组的任务, 但发起新进程不能再使用这个组了",
         "ADD-POPOVER-TITLE": "选择用户",
             "POPUP": {
                 "CREATE-TITLE": "创建组",
@@ -200,20 +200,20 @@
                 "DELETE-DESCRIPTION": "确实要删除这个组吗?",
                 "DELETE-CONFIRM": "确认",
                 "DEACTIVATE-TITLE": "停用组",
-                "DEACTIVATE-DESCRIPTION": "确实要删除这个组吗? This will delete all sub groups too. Note that a group will first be deactivated, such that tasks of processes can be properly finished. Clicking the removal button a second time will delete the group completely.",
+                "DEACTIVATE-DESCRIPTION": "是否确实要删除此组？这将删除所有子组.请注意, 组将首先被停用, 这样可以正确完成进程任务.再次单击 \"删除\" 按钮将完全将该组.",
                 "DELETE-MEMBER-TITLE": "删除组中的成员",
                 "DELETE-MEMBER-DESCRIPTION": "确实要从组中删除此用户吗?",
                 "ADD-MEMBER-TITLE": "添加用户",
                 "ADD-MEMBER-NO-USERS": "没有找到用户",
                 "ADD-MEMBER-CONFIRM": "添加 ({{selectedUsers.length}})",
                 "ACTIVATE-TITLE": "激活组",
-                "ACTIVATE-DESCRIPTION": "Activate this group again? This means that this group would again be eligble for task assignment. Note that subgroups of a group are not activated by default.",
+                "ACTIVATE-DESCRIPTION": "是否再次激活此组？这意味着该组将再次获得任务分配的资格.请注意, 默认情况下不激活组的子分组.",
                 "ACTIVATE-CONFIRM": "激活",
                 "EDIT-TITLE": "编辑组"
             }
         },
       "PRIVILEGE-MGMT": {
-          "access-idm": "访问身份管理应用",
+          "access-idm": "访问idm应用",
           "access-admin": "访问admin应用",
           "access-modeler": "访问modeler应用",
 		  "access-task": "访问workflow应用",
@@ -246,7 +246,7 @@
             "UPLOAD-PICTURE-DESCRIPTION": "请从您的计算机中选择一个图像，或将其放在下面的区域中",
             "UPLOAD-PICTURE-CANCEL-UPLOAD": "取消上传",
             "UPLOAD-PICTURE-DROPZONE": "在这里删除图像文件",
-            "UPLOAD-PICTURE-NO-DROP": "浏览器不支持DROP",
+            "UPLOAD-PICTURE-NO-DROP": "您的浏览器不支持删除",
             "UPLOAD-PICTURE-ERROR": "错误",
             "CHANGE-PASSWORD-TITLE": "修改密码",
             "CHANGE-PASSWORD-ORIGINAL": "原有密码",
