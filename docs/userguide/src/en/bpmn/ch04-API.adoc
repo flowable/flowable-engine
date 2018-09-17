@@ -338,8 +338,8 @@ To make working with process variables easier, a set of out-of-the-box functions
 ** When the variable value is null, false is returned in all cases. When the variale value is not null, and the instance type is not one of the types above, false will be returned.
 * *variables:containsAny(varName, value1, value2, ...)* : similar to the _contains_ function, but _true_ will be returned if *any* (and not all) the passed values is contained in the variable.
 * Comparator functions:
-** *variables:lowerThan(varName, value)* (alias _:lt_) : shorthand for _${execution.getVariable("varName") != null && execution.getVariable("varName") < value}_
-** *variables:lowerThanOrEquals(varName, value)* (alias _:lte_) : similar, but now for _< =_
+** *variables:lowerThan(varName, value)* (alias _:lessThan_ or  _:lt_) : shorthand for _${execution.getVariable("varName") != null && execution.getVariable("varName") < value}_
+** *variables:lowerThanOrEquals(varName, value)* (alias _:lessThanOrEquals_ or _:lte_) : similar, but now for _< =_
 ** *variables:greaterThan(varName, value)* (alias _:gt_) : similar, but now for _>_
 ** *variables:greaterThanOrEquals(varName, value)* (alias _:gte_) : similar, but now for _> =_
 
