@@ -202,6 +202,7 @@ public interface StencilConstants {
 
     final String PROPERTY_SCRIPT_FORMAT = "scriptformat";
     final String PROPERTY_SCRIPT_TEXT = "scripttext";
+    final String PROPERTY_SCRIPT_AUTO_STORE_VARIABLES = "scriptautostorevariables";
 
     final String PROPERTY_RULETASK_CLASS = "ruletask_class";
     final String PROPERTY_RULETASK_VARIABLES_INPUT = "ruletask_variables_input";
