@@ -62,7 +62,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         // The tests are doing deployments, which trigger async history. Therefore, we need to invoke them manually and then wait for the jobs to finish
         // so there can be clean data in the DB
         cleanDeployments();
-        waitForHistoryJobExecutorToProcessAllJobs(5500, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 100);
         for (Job job : managementService.createJobQuery().list()) {
             if (job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
                     || job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {

@@ -158,9 +158,6 @@
   
   <sql id="selectProcessDefinitionsByQueryCriteriaSql">  
     from ${prefix}ACT_RE_PROCDEF RES
-    <if test="eventSubscriptionType != null">
-    	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT on RES.ID_ = EVT.CONFIGURATION_
-    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -254,7 +251,7 @@
       	and RES.ENGINE_VERSION_ = #{engineVersion}
       </if> 
       <if test="eventSubscriptionType != null">
-      	and (EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName}) 
+        and exists(select 1 from ${prefix}ACT_RU_EVENT_SUBSCR EVT where RES.ID_ = EVT.CONFIGURATION_ and EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName}) 
       </if>
       <if test="authorizationUserId != null">
         AND (exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
@@ -332,21 +329,6 @@
     where KEY_ = #{processDefinitionKey} and
     TENANT_ID_ = #{tenantId} and
     DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
-  </select>
-  
-  <!-- mysql specific sql -->
-  <select id="selectProcessDefinitionsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-  </select>
-
-  <!-- mysql specific sql -->
-  <select id="selectProcessDefinitionCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
   </select>
 
   <select id="selectProcessDefinitionByNativeQuery" parameterType="java.util.Map" resultMap="processDefinitionResultMap">

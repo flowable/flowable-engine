@@ -12,11 +12,14 @@
  */
 package org.flowable.app.engine.test.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 
@@ -134,5 +137,43 @@ public class DeploymentTest extends FlowableAppTestCase {
         assertEquals("Vacation request app", appModel.getName());
         
         appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+    }
+
+    @Test
+    public void testBulkInsertAppDeployments() {
+        List<String> deploymentIds = appEngineConfiguration.getCommandExecutor()
+            .execute(commandContext -> {
+                org.flowable.app.api.repository.AppDeployment deployment1 = appRepositoryService.createDeployment()
+                    .name("First")
+                    .key("full-info")
+                    .category("test")
+                    .addClasspathResource("org/flowable/app/engine/test/fullinfo.app")
+                    .deploy();
+
+                org.flowable.app.api.repository.AppDeployment deployment2 = appRepositoryService.createDeployment()
+                    .name("Second")
+                    .key("test")
+                    .addClasspathResource("org/flowable/app/engine/test/test.app")
+                    .deploy();
+                return Arrays.asList(deployment1.getId(), deployment2.getId());
+            });
+
+        assertThat(appRepositoryService.getDeploymentResourceNames(deploymentIds.get(0)))
+            .containsExactlyInAnyOrder("org/flowable/app/engine/test/fullinfo.app");
+        assertThat(appRepositoryService.getDeploymentResourceNames(deploymentIds.get(1)))
+            .containsExactlyInAnyOrder("org/flowable/app/engine/test/test.app");
+
+        assertThat(appRepositoryService.createDeploymentQuery().list())
+            .as("deployment time not null")
+            .allSatisfy(deployment -> assertThat(deployment.getDeploymentTime()).as(deployment.getName()).isNotNull())
+            .extracting(org.flowable.app.api.repository.AppDeployment::getId, org.flowable.app.api.repository.AppDeployment::getName,
+                org.flowable.app.api.repository.AppDeployment::getKey, org.flowable.app.api.repository.AppDeployment::getCategory)
+            .as("id, name, key, category")
+            .containsExactlyInAnyOrder(
+                tuple(deploymentIds.get(0), "First", "full-info", "test"),
+                tuple(deploymentIds.get(1), "Second", "test", null)
+            );
+
+        deploymentIds.forEach(deploymentId -> appRepositoryService.deleteDeployment(deploymentId, true));
     }
 }
