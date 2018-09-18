@@ -15,8 +15,8 @@ package org.flowable.engine.impl.migration;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 
@@ -66,8 +66,12 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(String fromActivityId, String toActivityId) {
-        Objects.requireNonNull(fromActivityId, "From process activity cannot be null");
-        Objects.requireNonNull(toActivityId, "To process activity cannot be null");
+        if (fromActivityId == null) {
+            throw new FlowableException("From process activity id mapping cannot be null");
+        }
+        if (toActivityId == null) {
+            throw new FlowableException("To process activity id mapping cannot be null");
+        }
         this.activityMigrationMappings.put(fromActivityId, toActivityId);
         return this;
     }
@@ -76,8 +80,12 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     public ProcessInstanceMigrationDocument build() {
 
         if (migrateToProcessDefinitionId == null) {
-            Objects.requireNonNull(migrateToProcessDefinitionKey, "Process definition key cannot be null");
-            Objects.requireNonNull(migrateToProcessDefinitionVersion, "Process definition version cannot be null");
+            if (migrateToProcessDefinitionKey == null) {
+                throw new FlowableException("Process definition key cannot be null");
+            }
+            if (migrateToProcessDefinitionVersion == null) {
+                throw new FlowableException("Process definition version cannot be null");
+            }
         }
 
         ProcessInstanceMigrationDocumentImpl document = new ProcessInstanceMigrationDocumentImpl();

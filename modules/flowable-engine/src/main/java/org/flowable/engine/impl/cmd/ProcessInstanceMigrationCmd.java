@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.util.Objects;
-
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -35,9 +33,12 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
     protected String processDefinitionTenantId;
 
     public static ProcessInstanceMigrationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-
-        Objects.requireNonNull(processInstanceId);
-        Objects.requireNonNull(processInstanceMigrationDocument);
+        if (processInstanceId == null) {
+            throw new FlowableException("Must specify a process instance id to migrate");
+        }
+        if (processInstanceMigrationDocument == null) {
+            throw new FlowableException("Must specify a process instance migration document");
+        }
         ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
         cmd.processInstanceId = processInstanceId;
         cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
@@ -45,9 +46,12 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
     }
 
     public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-
-        Objects.requireNonNull(processDefinitionId);
-        Objects.requireNonNull(processInstanceMigrationDocument);
+        if (processDefinitionId == null) {
+            throw new FlowableException("Must specify a process definition id to migrate");
+        }
+        if (processInstanceMigrationDocument == null) {
+            throw new FlowableException("Must specify a process instance migration document");
+        }
         ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
         cmd.processDefinitionId = processDefinitionId;
         cmd.processInstanceMigrationDocument = processInstanceMigrationDocument;
@@ -55,10 +59,15 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
     }
 
     public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-
-        Objects.requireNonNull(processDefinitionKey);
-        Objects.requireNonNull(processDefinitionVersion);
-        Objects.requireNonNull(processInstanceMigrationDocument);
+        if (processDefinitionKey == null) {
+            throw new FlowableException("Must specify the process definition key to migrate");
+        }
+        if (processDefinitionVersion == null) {
+            throw new FlowableException("Must specify the process definition version to migrate");
+        }
+        if (processInstanceMigrationDocument == null) {
+            throw new FlowableException("Must specify a process instance migration document");
+        }
         ProcessInstanceMigrationCmd cmd = new ProcessInstanceMigrationCmd();
         cmd.processDefinitionKey = processDefinitionKey;
         cmd.processDefinitionVersion = processDefinitionVersion;

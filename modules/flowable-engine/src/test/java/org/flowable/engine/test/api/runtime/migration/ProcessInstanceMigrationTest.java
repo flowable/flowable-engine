@@ -41,6 +41,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -3566,7 +3567,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    //    @Disabled("Timer EventSubProcess migration not working good")
     public void testMigrateParallelActivityToActivityInsideNestedNonInterruptingTimerEventSubProcessInNewDefinitionAndActivityToParentScope() {
         ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/timer-parallel-task.bpmn20.xml");
         ProcessDefinition procWithSignal = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/non-interrupting-timer-event-subprocess-nested-in-embedded-subprocess.bpmn20.xml");

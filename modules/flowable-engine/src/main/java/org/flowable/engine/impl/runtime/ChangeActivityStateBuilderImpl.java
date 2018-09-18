@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 
@@ -151,7 +152,9 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
 
     @Override
     public void changeState() {
-        Objects.requireNonNull(runtimeService, "RuntimeService cannot be null, Obtain your builder instance from the RuntimService to access this feature");
+        if (runtimeService == null) {
+            throw new FlowableException("RuntimeService cannot be null, Obtain your builder instance from the RuntimService to access this feature");
+        }
         runtimeService.changeActivityState(this);
     }
 

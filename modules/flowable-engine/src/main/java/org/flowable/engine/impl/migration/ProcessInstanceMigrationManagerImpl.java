@@ -171,6 +171,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         ChangeActivityStateBuilderImpl changeActivityStateBuilder = new ChangeActivityStateBuilderImpl();
         changeActivityStateBuilder.processInstanceId(processInstanceId);
 
+        //TODO Automatic mappings first
         List<ExecutionEntity> executions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
         LOGGER.debug("Preparing ActivityChangeState builder for '" + executions.size() + "' activity executions");
         for (ExecutionEntity execution : executions) {
@@ -311,12 +312,6 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         //TODO WIP ... recreates all subProcesses
         return false;
     }
-
-    //    private void migrateEmbeddedSubProcessExecution(String subProcessActivityId, String processInstanceId, String processDefinitioId, CommandContext commandContext) {
-    //        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-    //        List<ExecutionEntity> subProcessExecutions = executionEntityManager.findExecutionsByQueryCriteria(new ExecutionQueryImpl().processInstanceId(processInstanceId).activityId(subProcessActivityId));
-    //        subProcessExecutions.forEach(e -> e.setProcessDefinitionId(processDefinitioId));
-    //    }
 
 }
 
