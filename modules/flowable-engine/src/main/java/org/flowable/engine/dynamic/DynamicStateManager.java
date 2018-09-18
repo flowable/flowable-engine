@@ -27,6 +27,6 @@ public interface DynamicStateManager {
 
     List<MoveExecutionEntityContainer> resolveMoveExecutionEntityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext);
 
-    void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, CommandContext commandContext);
+    void moveExecutionState(String processInstanceId, List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, CommandContext commandContext);
 
 }

@@ -3,8 +3,6 @@
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              targetNamespace="Examples">
 
-    <message id="myMessage" name="someMessage"/>
-
     <process id="NES" name="Nested Event SubProcess" isExecutable="true">
 
         <startEvent id="procStart"/>
@@ -14,13 +12,15 @@
 
         <subProcess id="subProcess" name="subProcess">
 
-            <subProcess id="nestedMessageEventSubProcess" name="Simple Event Nested SubProcess" triggeredByEvent="true">
-                <startEvent id="nestedMessageEventSubProcessStart" isInterrupting="false">
-                    <messageEventDefinition messageRef="myMessage"/>
+            <subProcess id="nestedTimerEventSubProcess" name="Simple Event Nested SubProcess" triggeredByEvent="true">
+                <startEvent id="nestedTimerEventSubProcessStart" isInterrupting="false">
+                    <timerEventDefinition>
+                        <timeCycle>R/PT15M</timeCycle>
+                    </timerEventDefinition>
                 </startEvent>
-                <sequenceFlow id="subSeqFlow1" sourceRef="nestedMessageEventSubProcessStart" targetRef="nestedMessageEventSubProcessTask"/>
-                <userTask id="nestedMessageEventSubProcessTask" name="insideEventSubProcess"/>
-                <sequenceFlow id="subSeqFlow2" sourceRef="nestedMessageEventSubProcessTask" targetRef="nestedEventSubProcEnd"/>
+                <sequenceFlow id="subSeqFlow1" sourceRef="nestedTimerEventSubProcessStart" targetRef="nestedTimerEventSubProcessTask"/>
+                <userTask id="nestedTimerEventSubProcessTask" name="insideEventSubProcess"/>
+                <sequenceFlow id="subSeqFlow2" sourceRef="nestedTimerEventSubProcessTask" targetRef="nestedEventSubProcEnd"/>
                 <endEvent id="nestedEventSubProcEnd" name="nestedEventSubProcEnd"/>
             </subProcess>
 

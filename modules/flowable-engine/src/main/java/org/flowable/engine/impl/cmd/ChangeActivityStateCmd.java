@@ -44,10 +44,9 @@ public class ChangeActivityStateCmd implements Command<Void> {
         }
 
         DynamicStateManager dynamicStateManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicStateManager();
-
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = dynamicStateManager.resolveMoveExecutionEntityContainers(changeActivityStateBuilder, commandContext);
-
-        dynamicStateManager.moveExecutionState(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), commandContext);
+        String processInstanceId = moveExecutionEntityContainerList.get(0).getExecutions().get(0).getProcessInstanceId();
+        dynamicStateManager.moveExecutionState(processInstanceId, moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), commandContext);
 
         return null;
     }

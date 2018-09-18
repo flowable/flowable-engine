@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
@@ -202,7 +203,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         LOGGER.debug("Migrating activity executions");
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, commandContext);
-        doMoveExecutionState(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), Optional.ofNullable(procDefToMigrateTo.getId()), commandContext);
+        doMoveExecutionState(processInstanceId, moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), Optional.ofNullable(procDefToMigrateTo.getId()), commandContext);
 
         LOGGER.debug("Updating Process definition reference in history");
         changeProcessDefinitionReferenceOfHistory(commandContext, processExecution, procDefToMigrateTo);
@@ -252,9 +253,9 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
-        //For each "running" activity of the processInstance, check that there's a mapping defined or if it can be found in the new definition (auto-mapped by activity id)
-        List<ExecutionEntity> executions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
-        for (ExecutionEntity execution : executions) {
+        //For each "running" active activity of the processInstance, check that there's a mapping defined or if it can be found in the new definition (auto-mapped by activity id)
+        List<ExecutionEntity> activeExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
+        for (ExecutionEntity execution : activeExecutions) {
             if (execution.getCurrentActivityId() != null) {
                 //SubProcesses don't need to be mapped
                 if (execution.getCurrentFlowElement() instanceof SubProcess) {
@@ -300,7 +301,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     @Override
-    protected boolean isParentSubProcessOfAnyExecution(String subProcessId, List<ExecutionEntity> currentExecutions) {
+    protected boolean isSubProcessAncestorOfAnyExecution(String subProcessId, List<ExecutionEntity> currentExecutions) {
         //TODO WIP ... recreates all subProcesses
         return false;
     }

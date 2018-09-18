@@ -26,8 +26,8 @@ import org.flowable.engine.dynamic.DynamicStateManager;
 public class DefaultDynamicStateManager extends AbstractDynamicStateManager implements DynamicStateManager {
 
     @Override
-    public void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, CommandContext commandContext) {
-        doMoveExecutionState(moveExecutionEntityContainerList, processVariables, localVariables, Optional.empty(), commandContext);
+    public void moveExecutionState(String processInstancesId, List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, CommandContext commandContext) {
+        doMoveExecutionState(processInstancesId, moveExecutionEntityContainerList, processVariables, localVariables, Optional.empty(), commandContext);
     }
 
 }

@@ -1739,14 +1739,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
-
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
-
-        event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
         assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
 
@@ -1806,14 +1798,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
-
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
-
-        event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
         assertEquals("nestedSubProcess", ((FlowableActivityEvent) event).getActivityId());
 
@@ -1869,14 +1853,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
         assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
-
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
-
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
@@ -1935,14 +1911,6 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         FlowableEvent event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
         assertEquals("subTask", ((FlowableActivityEvent) event).getActivityId());
-
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
-
-        event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("subProcess", ((FlowableActivityEvent) event).getActivityId());
 
         event = iterator.next();
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());

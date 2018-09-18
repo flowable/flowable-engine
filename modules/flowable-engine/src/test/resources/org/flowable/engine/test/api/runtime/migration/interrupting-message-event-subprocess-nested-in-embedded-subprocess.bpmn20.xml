@@ -10,29 +10,29 @@
         <startEvent id="procStart"/>
         <sequenceFlow id="seqFlow1" sourceRef="procStart" targetRef="beforeSubProcessTask"/>
         <userTask id="beforeSubProcessTask" name="outsideTask"/>
-        <sequenceFlow id="seqFlow2" sourceRef="beforeSubProcessTask" targetRef="outerSubProcess"/>
+        <sequenceFlow id="seqFlow2" sourceRef="beforeSubProcessTask" targetRef="subProcess"/>
 
-        <subProcess id="outerSubProcess" name="subProcess">
+        <subProcess id="subProcess" name="subProcess">
 
-            <subProcess id="nestedEventSubProcess" name="Simple Event Nested SubProcess" triggeredByEvent="true">
-                <startEvent id="nestedEventSubProcStart">
+            <subProcess id="nestedMessageEventSubProcess" name="Simple Event Nested SubProcess" triggeredByEvent="true">
+                <startEvent id="nestedMessageEventSubProcessStart">
                     <messageEventDefinition messageRef="myMessage"/>
                 </startEvent>
-                <sequenceFlow id="subSeqFlow1" sourceRef="nestedEventSubProcStart" targetRef="insideEventSubProcessTask"/>
-                <userTask id="insideEventSubProcessTask" name="insideEventSubProcess"/>
-                <sequenceFlow id="subSeqFlow2" sourceRef="insideEventSubProcessTask" targetRef="nestedEventSubProcEnd"/>
+                <sequenceFlow id="subSeqFlow1" sourceRef="nestedMessageEventSubProcessStart" targetRef="nestedMessageEventSubProcessTask"/>
+                <userTask id="nestedMessageEventSubProcessTask" name="insideEventSubProcess"/>
+                <sequenceFlow id="subSeqFlow2" sourceRef="nestedMessageEventSubProcessTask" targetRef="nestedEventSubProcEnd"/>
                 <endEvent id="nestedEventSubProcEnd" name="nestedEventSubProcEnd"/>
             </subProcess>
 
             <startEvent id="subProcStart" name="subProcStart"/>
-            <sequenceFlow id="outerSubSeqFlow1" sourceRef="subProcStart" targetRef="insideSubProcessTask"/>
-            <userTask id="insideSubProcessTask" name="insideSubProcess"/>
-            <sequenceFlow id="outerSubSeqFlow2" sourceRef="insideSubProcessTask" targetRef="subProcEnd"/>
+            <sequenceFlow id="outerSubSeqFlow1" sourceRef="subProcStart" targetRef="subProcessTask"/>
+            <userTask id="subProcessTask" name="insideSubProcess"/>
+            <sequenceFlow id="outerSubSeqFlow2" sourceRef="subProcessTask" targetRef="subProcEnd"/>
             <endEvent id="subProcEnd" name="subProcEnd"/>
 
         </subProcess>
 
-        <sequenceFlow id="seqFlow3" sourceRef="outerSubProcess" targetRef="afterSubProcessTask"/>
+        <sequenceFlow id="seqFlow3" sourceRef="subProcess" targetRef="afterSubProcessTask"/>
         <userTask id="afterSubProcessTask" name="afterSubProcess"/>
         <sequenceFlow id="seqFlow4" sourceRef="afterSubProcessTask" targetRef="procEnd"/>
         <endEvent id="procEnd" name="procEnd"/>

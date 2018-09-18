@@ -34,6 +34,7 @@ public class MoveExecutionEntityContainer {
     protected CallActivity callActivity;
     protected ProcessDefinition subProcessDefinition;
     protected BpmnModel subProcessModel;
+    protected BpmnModel processModel;
     protected ExecutionEntity superExecution;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
     protected Map<String, FlowElement> moveToFlowElementMap = new HashMap<>();
@@ -99,6 +100,14 @@ public class MoveExecutionEntityContainer {
         this.subProcessDefinition = subProcessDefinition;
     }
 
+    public BpmnModel getProcessModel() {
+        return processModel;
+    }
+
+    public void setProcessModel(BpmnModel processModel) {
+        this.processModel = processModel;
+    }
+
     public BpmnModel getSubProcessModel() {
         return subProcessModel;
     }
@@ -134,28 +143,4 @@ public class MoveExecutionEntityContainer {
     public Collection<FlowElement> getMoveToFlowElements() {
         return moveToFlowElementMap.values();
     }
-
-    //    public void addSubProcessToCreate(String activityId, SubProcess subProcess) {
-    //        List<SubProcess> subProcesses = null;
-    //        if (subProcessesToCreateMap.containsKey(activityId)) {
-    //            subProcesses = subProcessesToCreateMap.get(activityId);
-    //        } else {
-    //            subProcesses = new ArrayList<>();
-    //        }
-    //
-    //        subProcesses.add(0, subProcess);
-    //        subProcessesToCreateMap.put(activityId, subProcesses);
-    //    }
-    //
-    //    public Map<String, List<SubProcess>> getSubProcessesToCreateMap() {
-    //        return subProcessesToCreateMap;
-    //    }
-    //
-    //    public void addNewSubProcessChildExecution(String subProcessId, ExecutionEntity childExecution) {
-    //        newSubProcessChildExecutionMap.put(subProcessId, childExecution);
-    //    }
-    //
-    //    public ExecutionEntity getNewSubProcessChildExecution(String subProcessId) {
-    //        return newSubProcessChildExecutionMap.get(subProcessId);
-    //    }
 }
