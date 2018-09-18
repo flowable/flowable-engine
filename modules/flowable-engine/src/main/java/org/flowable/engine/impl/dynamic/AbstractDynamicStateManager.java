@@ -81,6 +81,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.HistoricTaskService;
@@ -982,6 +983,7 @@ public abstract class AbstractDynamicStateManager {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
         List<StartEvent> allStartEvents = eventSubProcess.findAllSubFlowElementInFlowMapOfType(StartEvent.class);
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
 
         for (StartEvent startEvent : allStartEvents) {
             if (!startEvent.getEventDefinitions().isEmpty()) {
@@ -1076,18 +1078,23 @@ public abstract class AbstractDynamicStateManager {
                     }
 
                     if (eventDefinition instanceof TimerEventDefinition && (timerJobs == null || timerJobs.isEmpty())) {
-                        TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+                        Collection<ExecutionEntity> inactiveExecutionsByProcessInstanceId = executionEntityManager.findInactiveExecutionsByProcessInstanceId(eventSubProcessExecution.getProcessInstanceId());
+                        Optional<ExecutionEntity> startEventExecution = inactiveExecutionsByProcessInstanceId.stream().filter(execution -> execution.getActivityId().equals(startEvent.getId())).findFirst();
+                        if (!startEventExecution.isPresent()) {
 
-                        ExecutionEntity timerExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(eventSubProcessExecution.getParent());
-                        timerExecution.setCurrentFlowElement(startEvent);
-                        timerExecution.setEventScope(true);
-                        timerExecution.setActive(false);
+                            TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
 
-                        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
-                            TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+                            ExecutionEntity timerExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(eventSubProcessExecution.getParent());
+                            timerExecution.setCurrentFlowElement(startEvent);
+                            timerExecution.setEventScope(true);
+                            timerExecution.setActive(false);
 
-                        if (timerJob != null) {
-                            timerJobService.scheduleTimerJob(timerJob);
+                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
+                                TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+
+                            if (timerJob != null) {
+                                timerJobService.scheduleTimerJob(timerJob);
+                            }
                         }
                     }
                 }

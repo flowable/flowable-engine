@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.migration;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -29,7 +29,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     protected String migrateToProcessDefinitionKey;
     protected String migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
-    protected Map<String, String> activityMigrationMappings = new HashMap<>();
+    protected Map<String, String> activityMigrationMappings = new LinkedHashMap<>();
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId) {

@@ -41,7 +41,6 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -3225,8 +3224,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedTimerEventSubProcessTask");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
 
-        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).isEmpty();
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(job);
 
         //-- TODO CHECK HISTORY AND EVENTS
 
@@ -3274,8 +3273,8 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("nestedTimerEventSubProcessTask");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
 
-        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(eventSubscriptions).isEmpty();
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(job);
 
         //-- TODO CHECK HISTORY AND EVENTS
 
@@ -3557,6 +3556,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("beforeSubProcessTask", "nestedTimerEventSubProcessTask");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
 
+        //Behaves like interrupting since theres no execution in the parentScop
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(job);
 
@@ -3607,7 +3607,23 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask");
         assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
 
-        //Job
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).extracting(this::getJobActivityId).isEqualTo("nestedTimerEventSubProcessStart");
+
+        //Fire the timer
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId)
+            .containsExactlyInAnyOrder("subProcess", "subProcessTask", "nestedTimerEventSubProcess", "nestedTimerEventSubProcessTask", "nestedTimerEventSubProcess", "nestedTimerEventSubProcessTask", "nestedTimerEventSubProcessStart");
+        assertThat(executions).extracting("processDefinitionId").containsOnly(procWithSignal.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask", "nestedTimerEventSubProcessTask", "nestedTimerEventSubProcessTask");
+        assertThat(tasks).extracting(Task::getProcessDefinitionId).containsOnly(procWithSignal.getId());
+
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).extracting(this::getJobActivityId).isEqualTo("nestedTimerEventSubProcessStart");
 
         //-- TODO CHECK HISTORY AND EVENTS
 
