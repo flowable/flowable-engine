@@ -86,6 +86,11 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     public void planEndExecutionOperation(ExecutionEntity execution) {
         planOperation(new EndExecutionOperation(commandContext, execution), execution);
     }
+    
+    @Override
+    public void planEndExecutionOperationSynchronous(ExecutionEntity execution) {
+        planOperation(new EndExecutionOperation(commandContext, execution, true), execution);
+    }
 
     @Override
     public void planTriggerExecutionOperation(ExecutionEntity execution) {
