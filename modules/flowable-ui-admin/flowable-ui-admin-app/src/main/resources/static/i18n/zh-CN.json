@@ -1227,8 +1227,8 @@
         },
         "POPUP": {
             "TITLE": "决策表: ",
-            "KEY": "Key: ",
-            "HIT-POLICY": "命中策略: ",
+            "KEY": "Key:",
+            "HIT-POLICY": "命中策略:",
             "HIT-POLICIES": {
                 "FIRST": "First (Single pass)",
                 "ANY": "Any (Single pass)"
