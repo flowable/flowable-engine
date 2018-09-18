@@ -534,7 +534,7 @@
   </select>
 
   <select id="selectExecutionCountByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectExecutionsByQueryCriteriaSql"/>
   </select>
 

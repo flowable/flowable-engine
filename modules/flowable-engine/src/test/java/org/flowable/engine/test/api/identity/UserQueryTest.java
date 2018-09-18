@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.api.identity;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -23,9 +27,6 @@ import org.flowable.idm.api.UserQuery;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Joram Barrez
@@ -286,6 +287,31 @@ public class UserQueryTest extends PluggableFlowableTestCase {
 
         try {
             identityService.createUserQuery().memberOfGroup(null).list();
+            fail();
+        } catch (FlowableIllegalArgumentException e) {
+        }
+    }
+    
+    @Test
+    public void testQueryByMemberOfGroups() {
+        List<User> users = identityService.createUserQuery().memberOfGroups(Arrays.asList("muppets", "frogs")).orderByUserId().asc().list();
+        assertEquals(3, users.size());
+        assertEquals("fozzie", users.get(0).getId());
+        assertEquals("gonzo", users.get(1).getId());
+        assertEquals("kermit", users.get(2).getId());
+        
+        users = identityService.createUserQuery().memberOfGroups(Arrays.asList("frogs")).list();
+        assertEquals(1, users.size());
+        assertEquals("kermit", users.get(0).getId());
+    }
+    
+    @Test
+    public void testQueryByInvalidMemberOfGroups() {
+        UserQuery query = identityService.createUserQuery().memberOfGroups(Arrays.asList("invalid"));
+        verifyQueryResults(query, 0);
+
+        try {
+            identityService.createUserQuery().memberOfGroups(null).list();
             fail();
         } catch (FlowableIllegalArgumentException e) {
         }

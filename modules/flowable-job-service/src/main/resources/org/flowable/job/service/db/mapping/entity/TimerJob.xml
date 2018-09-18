@@ -47,15 +47,12 @@
     </select>
 
     <select id="selectTimerJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.TimerJobQueryImpl" resultType="long">
-        select count(distinct RES.ID_)
+        select count(RES.ID_)
         <include refid="selectTimerJobByQueryCriteriaSql" />
     </select>
 
     <sql id="selectTimerJobByQueryCriteriaSql">
         from ${prefix}ACT_RU_TIMER_JOB RES
-        <if test="executable">
-            LEFT OUTER JOIN ${prefix}ACT_RU_EXECUTION PI ON PI.ID_ = RES.PROCESS_INSTANCE_ID_
-        </if>
         <where>
             <if test="id != null">
                 RES.ID_ = #{id}
