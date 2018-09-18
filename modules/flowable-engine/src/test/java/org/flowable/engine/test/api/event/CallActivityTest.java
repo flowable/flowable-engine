@@ -17,10 +17,13 @@ import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
+import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -614,6 +617,75 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertEquals("Process instance B", childProcessInstances.get(1).getName());
         assertEquals("Process instance C", childProcessInstances.get(2).getName());
         assertEquals("Process instance D", childProcessInstances.get(3).getName());
+    }
+    
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
+    })
+    public void testCallActivityAsyncComplete() {
+        runtimeService.startProcessInstanceByKey("testAsyncComplete");
+        
+        // 1 async service task
+        List<Job> jobs = managementService.createJobQuery().list();
+        assertEquals(1, jobs.size());
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // 5 async multi instance call activities after start
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        for (Job job : jobs) {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
+            assertEquals("testAsyncComplete", processDefinition.getKey());
+        }
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // 1 job for each step1 in subprocess, so 5 in total
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        for (Job job : jobs) {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
+            assertEquals("subProcess", processDefinition.getKey());
+        }
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+
+        // Step 2
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // Step 3 will trigger the async complete
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // Async complete
+        jobs = managementService.createJobQuery().list();
+        assertEquals(5, jobs.size());
+        for (Job job : jobs) {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId()).singleResult();
+            assertEquals("subProcess", processDefinition.getKey()); // context is the subprocess, as the EndExecution will be scheduled for that process definition
+            
+            assertEquals(AsyncCompleteCallActivityJobHandler.TYPE, job.getJobHandlerType());
+        }
+        
+        // Completing ends the process instance
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    }
+    
+    // Same as testCallActivityAsyncComplete, but now using the real job executor instead of fetching and executing jobs manually
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
+    })
+    public void testCallActivityAsyncCompleteRealExecutor() {
+        runtimeService.startProcessInstanceByKey("testAsyncComplete");
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 100L);
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     }
 
     class CallActivityEventListener extends AbstractFlowableEngineEventListener {
