@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateManager implements ProcessInstanceMigrationManager {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(ProcessInstanceMigrationManager.class);
+    protected final Logger LOGGER = LoggerFactory.getLogger(ProcessInstanceMigrationManager.class);
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String procDefKey, String procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {

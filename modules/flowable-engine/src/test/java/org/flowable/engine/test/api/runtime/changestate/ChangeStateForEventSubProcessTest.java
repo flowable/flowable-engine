@@ -717,6 +717,143 @@ public class ChangeStateForEventSubProcessTest extends PluggableFlowableTestCase
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.nestedSignalEventSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityToActivityAtParentSubProcessOfNestedSignalEventSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask");
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask");
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(eventSubscription);
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("processTask", "subProcessTask")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subProcessTask", "eventSubProcessStart");
+
+        tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask");
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(eventSubscription).extracting(EventSubscription::getActivityId).isEqualTo("eventSubProcessStart");
+        assertThat(eventSubscription).extracting(EventSubscription::getEventType).isEqualTo("signal");
+        assertThat(eventSubscription).extracting(EventSubscription::getEventName).isEqualTo("eventSignal");
+
+        //Trigger the event
+        runtimeService.signalEventReceived("eventSignal");
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "eventSubProcess", "eventSubProcessStart", "eventSubProcessTask");
+
+        tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(eventSubscription);
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.nestedMessageEventSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityToActivityAtParentSubProcessOfNestedMessageEventSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask");
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask");
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(eventSubscription);
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("processTask", "subProcessTask")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subProcessTask", "eventSubProcessStart");
+
+        tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask");
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(eventSubscription).extracting(EventSubscription::getActivityId).isEqualTo("eventSubProcessStart");
+        assertThat(eventSubscription).extracting(EventSubscription::getEventType).isEqualTo("message");
+        assertThat(eventSubscription).extracting(EventSubscription::getEventName).isEqualTo("eventMessage");
+
+        //Trigger the event
+        runtimeService.messageEventReceived("eventMessage", eventSubscription.getExecutionId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "eventSubProcess", "eventSubProcessStart", "eventSubProcessTask");
+
+        tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(eventSubscription);
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.nestedTimerEventSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityToActivityAtParentSubProcessOfNestedTimerEventSubProcess() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("processTask");
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("processTask");
+
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(job);
+
+        runtimeService.createChangeActivityStateBuilder()
+            .processInstanceId(processInstance.getId())
+            .moveActivityIdTo("processTask", "subProcessTask")
+            .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "subProcessTask", "eventSubProcessStart");
+
+        tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("subProcessTask");
+
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).extracting(this::getJobActivityId).isEqualTo("eventSubProcessStart");
+
+        //Fire the timer
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "eventSubProcess", "eventSubProcessStart", "eventSubProcessTask");
+
+        tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).extracting(Task::getTaskDefinitionKey).containsExactlyInAnyOrder("eventSubProcessTask");
+
+        job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNull(job);
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.nestedSignalEventSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityToActivityInsideNestedSignalEventSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
 
@@ -1178,7 +1315,7 @@ public class ChangeStateForEventSubProcessTest extends PluggableFlowableTestCase
         completeProcessInstanceTasks(processInstance.getId());
         assertProcessEnded(processInstance.getId());
     }
-//--
+
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.TimerParallelNestedNonInterruptingSignalEventSubProcess.bpmn20.xml" })
     public void testSetParallelActivityToActivityInsideNestedNonInterruptingSignalEventSubProcessWithActivityAtRootScope() {

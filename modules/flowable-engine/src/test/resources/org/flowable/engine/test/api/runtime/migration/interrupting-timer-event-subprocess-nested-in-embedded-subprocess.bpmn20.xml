@@ -15,7 +15,7 @@
             <subProcess id="nestedTimerEventSubProcess" name="Simple Event Nested SubProcess" triggeredByEvent="true">
                 <startEvent id="nestedTimerEventSubProcessStart">
                     <timerEventDefinition>
-                        <timeCycle>R/PT15M</timeCycle>
+                        <timeCycle>R1/PT15M</timeCycle>
                     </timerEventDefinition>
                 </startEvent>
                 <sequenceFlow id="subSeqFlow1" sourceRef="nestedTimerEventSubProcessStart" targetRef="nestedTimerEventSubProcessTask"/>

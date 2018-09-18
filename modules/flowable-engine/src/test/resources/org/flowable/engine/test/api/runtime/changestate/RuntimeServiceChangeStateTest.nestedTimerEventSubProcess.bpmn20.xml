@@ -20,7 +20,7 @@
             <subProcess id="eventSubProcess" triggeredByEvent="true">
                 <startEvent id="eventSubProcessStart" isInterrupting="true">
                     <timerEventDefinition>
-                        <timeCycle>R/PT15M</timeCycle>
+                        <timeCycle>R1/PT15M</timeCycle>
                     </timerEventDefinition>
                 </startEvent>
                 <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask"/>

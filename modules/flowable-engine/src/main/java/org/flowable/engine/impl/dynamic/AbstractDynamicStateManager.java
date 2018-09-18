@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -246,6 +245,8 @@ public abstract class AbstractDynamicStateManager {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
+        HashMap<String, ExecutionEntity> createdEmbeddedSubProcessesAcrossMoveContainers = new HashMap<>();
+
         Map<String, ExecutionEntity> existingEmbeddedSubProcesses;
         if (migrateToProcessDefinitionId.isPresent()) {
             existingEmbeddedSubProcesses = Collections.emptyMap();
@@ -305,7 +306,8 @@ public abstract class AbstractDynamicStateManager {
                 moveExecutionContainer.addContinueParentExecution(execution.getId(), continueParentExecution);
             }
 
-            List<ExecutionEntity> newChildExecutions = createEmbeddedSubProcessExecutions(moveToFlowElements, executionsToMove, existingEmbeddedSubProcesses, moveExecutionContainer, migrateToProcessDefinitionId, commandContext);
+            List<ExecutionEntity> newChildExecutions = createEmbeddedSubProcessExecutions(moveToFlowElements, executionsToMove, existingEmbeddedSubProcesses, moveExecutionContainer, createdEmbeddedSubProcessesAcrossMoveContainers,
+                commandContext);
 
             ExecutionEntity defaultContinueParentExecution;
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
@@ -322,8 +324,8 @@ public abstract class AbstractDynamicStateManager {
 
                 executionEntityManager.deleteExecutionAndRelatedData(subProcessChildExecution, "Change activity to " + printFlowElementIds(moveToFlowElements));
 
-                newChildExecutions = createEmbeddedSubProcessExecutions(moveExecutionContainer.getMoveToFlowElements(), currentSubProcessExecutions, Collections.emptyMap(), subProcessMoveExecutionEntityContainer,
-                    migrateToProcessDefinitionId, commandContext);
+                newChildExecutions = createEmbeddedSubProcessExecutions(moveExecutionContainer.getMoveToFlowElements(), currentSubProcessExecutions, Collections.emptyMap(), subProcessMoveExecutionEntityContainer, new HashMap<>(),
+                    commandContext);
 
                 defaultContinueParentExecution = newChildExecutions.get(0);
 
@@ -569,12 +571,13 @@ public abstract class AbstractDynamicStateManager {
         return null;
     }
 
-    protected List<ExecutionEntity> createEmbeddedSubProcessExecutions(Collection<FlowElement> moveToFlowElements, List<ExecutionEntity> movingExecutions, Map<String, ExecutionEntity> existingEmbeddedSubProcesses, MoveExecutionEntityContainer moveExecutionContainer, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
+    protected List<ExecutionEntity> createEmbeddedSubProcessExecutions(Collection<FlowElement> moveToFlowElements, List<ExecutionEntity> movingExecutions, Map<String, ExecutionEntity> existingEmbeddedSubProcesses,
+        MoveExecutionEntityContainer moveExecutionContainer, Map<String, ExecutionEntity> createdSubProcess, CommandContext commandContext) {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         // Resolve the sub process elements that need to be created for each move to flow element
-        HashMap<String, ExecutionEntity> createdSubProcess = new HashMap<>();
+//      HashMap<String, ExecutionEntity> createdSubProcess = new HashMap<>();
         HashMap<String, SubProcess> subProcessesToCreate = new HashMap<>();
         for (FlowElement flowElement : moveToFlowElements) {
             SubProcess subProcess = flowElement.getSubProcess();
@@ -685,12 +688,12 @@ public abstract class AbstractDynamicStateManager {
     }
 
     protected static ExecutionEntity createEmbeddedSubProcessHierarchy(SubProcess subProcess, ExecutionEntity defaultParentExecution, Map<String, ExecutionEntity> createdSubProcessesCache, Map<String, SubProcess> subProcessesToCreate, Map<String, ExecutionEntity> existingSubProcesses, Set<String> movingExecutionIds, CommandContext commandContext) {
-        if (createdSubProcessesCache.containsKey(subProcess.getId())) {
-            return createdSubProcessesCache.get(subProcess.getId());
-        }
-
         if (existingSubProcesses.containsKey(subProcess.getId())) {
             return existingSubProcesses.get(subProcess.getId());
+        }
+
+        if (createdSubProcessesCache.containsKey(subProcess.getId())) {
+            return createdSubProcessesCache.get(subProcess.getId());
         }
 
         //Create the parent, if needed
@@ -952,7 +955,8 @@ public abstract class AbstractDynamicStateManager {
                     eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(eventSubProcessExecution.getProcessInstanceId(), startEvent.getId(), MessageEventSubscriptionEntity.EVENT_TYPE);
                 } else if (eventDefinition instanceof TimerEventDefinition) {
                     timerJobs = timerJobService.findTimerJobsByProcessInstanceId(eventSubProcessExecution.getProcessInstanceId())
-                        .stream().filter(getTimerJobPredicateForActivityId(startEvent.getId()))
+                        .stream()
+                        .filter(timerJobEntity -> startEvent.getId().equals(getTimerJobActivityId(timerJobEntity)))
                         .collect(Collectors.toList());
                 }
 
@@ -1043,7 +1047,7 @@ public abstract class AbstractDynamicStateManager {
                             TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
                         if (timerJob != null) {
-                            CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
+                            timerJobService.scheduleTimerJob(timerJob);
                         }
                     }
                 }
@@ -1052,23 +1056,16 @@ public abstract class AbstractDynamicStateManager {
     }
 
     // TODO WIP - This method should be in a TimerJob related class (domain, manager, etc)
-    public static Predicate<TimerJobEntity> getTimerJobPredicateForActivityId(String activityId) {
-        return new Predicate<TimerJobEntity>() {
+    public static String getTimerJobActivityId(TimerJobEntity timerJobEntity) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, Object> jobConfigurationMap = objectMapper.readValue(timerJobEntity.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
 
-            @Override
-            public boolean test(TimerJobEntity timerJobEntity) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                try {
-                    Map<String, Object> jobConfigurationMap = objectMapper.readValue(timerJobEntity.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
-
-                    });
-                    String timerActivityId = (String) jobConfigurationMap.get("activityId");
-                    return activityId.equals(timerActivityId);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
+            });
+            return (String) jobConfigurationMap.get("activityId");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static boolean isOnlyRemainingExecutionAtParentScope(ExecutionEntity executionEntity, Set<String> ignoreExecutionIds, CommandContext commandContext) {
