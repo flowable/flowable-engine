@@ -36,7 +36,7 @@
   <insert id="bulkInsertAppDeployment" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
     <foreach collection="list" item="appDeployment" index="index">
-      insert into ${prefix}ACT_APP_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_) values
+      into ${prefix}ACT_APP_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_) values
         (
             #{appDeployment.id, jdbcType=VARCHAR},
             #{appDeployment.name, jdbcType=VARCHAR},
