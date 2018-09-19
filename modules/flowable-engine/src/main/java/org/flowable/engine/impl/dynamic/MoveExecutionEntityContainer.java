@@ -37,7 +37,7 @@ public class MoveExecutionEntityContainer {
     protected BpmnModel processModel;
     protected ExecutionEntity superExecution;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
-    protected Map<String, FlowElement> moveToFlowElementMap = new HashMap<>();
+    protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new HashMap<>();
 
     public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
         this.executions = executions;
@@ -132,15 +132,42 @@ public class MoveExecutionEntityContainer {
         return continueParentExecutionMap.get(executionId);
     }
 
-    public void addMoveToFlowElement(String activityId, FlowElement flowElement) {
-        moveToFlowElementMap.put(activityId, flowElement);
+    public void addMoveToFlowElement(String activityId, FlowElementMoveEntry flowElementMoveEntry) {
+        moveToFlowElementMap.put(activityId, flowElementMoveEntry);
     }
 
-    public FlowElement getMoveToFlowElement(String activityId) {
+    public void addMoveToFlowElement(String activityId, FlowElement originalFlowElement, FlowElement newFlowElement) {
+        moveToFlowElementMap.put(activityId, new FlowElementMoveEntry(originalFlowElement, newFlowElement));
+    }
+
+    public void addMoveToFlowElement(String activityId, FlowElement originalFlowElement) {
+        moveToFlowElementMap.put(activityId, new FlowElementMoveEntry(originalFlowElement, originalFlowElement));
+    }
+
+    public FlowElementMoveEntry getMoveToFlowElement(String activityId) {
         return moveToFlowElementMap.get(activityId);
     }
 
-    public Collection<FlowElement> getMoveToFlowElements() {
+    public Collection<FlowElementMoveEntry> getMoveToFlowElements() {
         return moveToFlowElementMap.values();
+    }
+
+    public static class FlowElementMoveEntry {
+
+        protected FlowElement originalFlowElement;
+        protected FlowElement newFlowElement;
+
+        public FlowElementMoveEntry(FlowElement originalFlowElement, FlowElement newFlowElement) {
+            this.originalFlowElement = originalFlowElement;
+            this.newFlowElement = newFlowElement;
+        }
+
+        public FlowElement getOriginalFlowElement() {
+            return originalFlowElement;
+        }
+
+        public FlowElement getNewFlowElement() {
+            return newFlowElement;
+        }
     }
 }

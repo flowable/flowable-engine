@@ -13,13 +13,10 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.util.List;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.dynamic.DynamicStateManager;
-import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -44,9 +41,7 @@ public class ChangeActivityStateCmd implements Command<Void> {
         }
 
         DynamicStateManager dynamicStateManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicStateManager();
-        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = dynamicStateManager.resolveMoveExecutionEntityContainers(changeActivityStateBuilder, commandContext);
-        String processInstanceId = moveExecutionEntityContainerList.get(0).getExecutions().get(0).getProcessInstanceId();
-        dynamicStateManager.moveExecutionState(processInstanceId, moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), commandContext);
+        dynamicStateManager.moveExecutionState(changeActivityStateBuilder, commandContext);
 
         return null;
     }

@@ -170,7 +170,7 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
         return moveActivityIdList;
     }
 
-    public Map<String, Object> getProcessVariables() {
+    public Map<String, Object> getProcessInstanceVariables() {
         return processVariables;
     }
 

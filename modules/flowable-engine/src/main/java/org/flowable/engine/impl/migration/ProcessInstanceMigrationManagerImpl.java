@@ -22,12 +22,15 @@ import java.util.stream.Collectors;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.dynamic.AbstractDynamicStateManager;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
+import org.flowable.engine.impl.dynamic.ProcessInstanceChangeState;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -166,14 +169,32 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         processExecution.setProcessDefinitionId(procDefToMigrateTo.getId());
 
         LOGGER.debug("Migrating activity executions");
-        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, commandContext);
-        doMoveExecutionState(processInstanceId, moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), changeActivityStateBuilder.getLocalVariables(), Optional.ofNullable(procDefToMigrateTo.getId()),
-            commandContext);
+        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, Optional.of(procDefToMigrateTo.getId()), commandContext);
+
+        ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
+            .setProcessInstanceId(processInstanceId)
+            .setProcessDefinitionToMigrateTo(procDefToMigrateTo)
+            .setMoveExecutionEntityContainers(moveExecutionEntityContainerList)
+            .setProcessInstanceVariables(changeActivityStateBuilder.getProcessInstanceVariables())
+            .setLocalVariables(changeActivityStateBuilder.getLocalVariables());
+
+        doMoveExecutionState(processInstanceChangeState, commandContext);
 
         LOGGER.debug("Updating Process definition reference in history");
         changeProcessDefinitionReferenceOfHistory(commandContext, processExecution, procDefToMigrateTo);
 
         LOGGER.debug("Process migration ended for process instance with Id:'" + processInstanceId + "'");
+    }
+
+    @Override
+    protected Map<String, List<ExecutionEntity>> resolveProcessInstanceActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    protected boolean isDirectFlowElementExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
+        return currentFlowElement instanceof UserTask && newFlowElement instanceof UserTask ||
+            currentFlowElement instanceof ReceiveTask && newFlowElement instanceof ReceiveTask;
     }
 
     protected ChangeActivityStateBuilderImpl prepareChangeStateBuilder(String processInstanceId, ProcessDefinition procDefToMigrateTo, BpmnModel bpmnModel, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
@@ -338,13 +359,13 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
     @Override
     protected boolean isSubProcessAncestorOfAnyExecution(String subProcessId, List<ExecutionEntity> currentExecutions) {
-        //TODO WIP ... recreates all subProcesses
+        //recreates all subProcesses
         return false;
     }
 
     @Override
-    protected boolean isSubProcessUsedInNewFlowElements(String subProcessId, Collection<FlowElement> moveToFlowElements) {
-        //TODO WIP ... recreates all subProcesses
+    protected boolean isSubProcessUsedInNewFlowElements(String subProcessId, Collection<MoveExecutionEntityContainer.FlowElementMoveEntry> moveToFlowElements) {
+        //recreates all subProcesses
         return false;
     }
 

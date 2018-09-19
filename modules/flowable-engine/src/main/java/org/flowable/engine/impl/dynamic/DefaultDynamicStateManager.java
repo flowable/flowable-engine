@@ -16,9 +16,16 @@ package org.flowable.engine.impl.dynamic;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.dynamic.DynamicStateManager;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -26,8 +33,34 @@ import org.flowable.engine.dynamic.DynamicStateManager;
 public class DefaultDynamicStateManager extends AbstractDynamicStateManager implements DynamicStateManager {
 
     @Override
-    public void moveExecutionState(String processInstancesId, List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, Map<String, Map<String, Object>> localVariables, CommandContext commandContext) {
-        doMoveExecutionState(processInstancesId, moveExecutionEntityContainerList, processVariables, localVariables, Optional.empty(), commandContext);
+    public void moveExecutionState(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext) {
+        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, Optional.empty(), commandContext);
+        String processInstanceId = moveExecutionEntityContainerList.get(0).getExecutions().get(0).getProcessInstanceId();
+
+        ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
+            .setProcessInstanceId(processInstanceId)
+            .setMoveExecutionEntityContainers(moveExecutionEntityContainerList)
+            .setLocalVariables(changeActivityStateBuilder.getLocalVariables())
+            .setProcessInstanceVariables(changeActivityStateBuilder.getProcessInstanceVariables());
+        doMoveExecutionState(processInstanceChangeState, commandContext);
+
+    }
+
+    @Override
+    protected Map<String, List<ExecutionEntity>> resolveProcessInstanceActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext) {
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+
+        Map<String, List<ExecutionEntity>> activeSubProcessesByActivityId = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId)
+            .stream()
+            .filter(ExecutionEntity::isActive)
+            .filter(executionEntity -> executionEntity.getCurrentFlowElement() instanceof SubProcess)
+            .collect(Collectors.groupingBy(ExecutionEntity::getActivityId));
+        return activeSubProcessesByActivityId;
+    }
+
+    @Override
+    protected boolean isDirectFlowElementExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
+        return false;
     }
 
 }
