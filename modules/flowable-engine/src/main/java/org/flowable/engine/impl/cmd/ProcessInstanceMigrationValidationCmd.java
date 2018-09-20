@@ -30,7 +30,7 @@ public class ProcessInstanceMigrationValidationCmd implements Command<ProcessIns
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String processDefinitionKey;
-    protected String processDefinitionVersion;
+    protected int processDefinitionVersion;
     protected String processDefinitionTenantId;
 
     public static ProcessInstanceMigrationValidationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
@@ -61,14 +61,14 @@ public class ProcessInstanceMigrationValidationCmd implements Command<ProcessIns
         return cmd;
     }
 
-    public static ProcessInstanceMigrationValidationCmd forProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId,
+    public static ProcessInstanceMigrationValidationCmd forProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId,
         ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
         if (processDefinitionKey == null) {
             throw new FlowableException("Must specify the process definition key to migrate");
         }
-        if (processDefinitionVersion == null) {
-            throw new FlowableException("Must specify the process definition version to migrate");
+        if (processDefinitionVersion < 0) {
+            throw new FlowableException("Must specify a valid version number to migrate");
         }
         if (processInstanceMigrationDocument == null) {
             throw new FlowableException("Must specify a process instance migration document");
@@ -94,7 +94,7 @@ public class ProcessInstanceMigrationValidationCmd implements Command<ProcessIns
             return migrationManager.validateMigrateProcessInstancesOfProcessDefinition(processDefinitionId, processInstanceMigrationDocument, commandContext);
         }
 
-        if (processDefinitionKey != null && processDefinitionVersion != null) {
+        if (processDefinitionKey != null && processDefinitionVersion >= 0) {
             return migrationManager.validateMigrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument, commandContext);
         }
 

@@ -27,7 +27,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
 
     protected String migrateToProcessDefinitionId;
     protected String migrateToProcessDefinitionKey;
-    protected String migrateToProcessDefinitionVersion;
+    protected int migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
     protected Map<String, String> activityMigrationMappings = new LinkedHashMap<>();
 
@@ -38,22 +38,14 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, String processDefinitionVersion) {
+    public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, int processDefinitionVersion) {
         this.migrateToProcessDefinitionKey = processDefinitionKey;
         this.migrateToProcessDefinitionVersion = processDefinitionVersion;
         return this;
     }
 
     @Override
-    public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId) {
-        this.migrateToProcessDefinitionKey = processDefinitionKey;
-        this.migrateToProcessDefinitionVersion = processDefinitionVersion;
-        this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
-        return this;
-    }
-
-    @Override
-    public ProcessInstanceMigrationDocumentBuilder setTenantOfProcessDefinitionToMigrateTo(String processDefinitionTenantId) {
+    public ProcessInstanceMigrationDocumentBuilder setTenantId(String processDefinitionTenantId) {
         this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
         return this;
     }
@@ -83,8 +75,8 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
             if (migrateToProcessDefinitionKey == null) {
                 throw new FlowableException("Process definition key cannot be null");
             }
-            if (migrateToProcessDefinitionVersion == null) {
-                throw new FlowableException("Process definition version cannot be null");
+            if (migrateToProcessDefinitionVersion < 0) {
+                throw new FlowableException("Process definition version must be a positive number");
             }
         }
 

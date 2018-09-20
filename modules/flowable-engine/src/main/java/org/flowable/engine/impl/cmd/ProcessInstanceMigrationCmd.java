@@ -29,7 +29,7 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String processDefinitionKey;
-    protected String processDefinitionVersion;
+    protected int processDefinitionVersion;
     protected String processDefinitionTenantId;
 
     public static ProcessInstanceMigrationCmd forProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
@@ -58,12 +58,12 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
         return cmd;
     }
 
-    public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
+    public static ProcessInstanceMigrationCmd forProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
         if (processDefinitionKey == null) {
             throw new FlowableException("Must specify the process definition key to migrate");
         }
-        if (processDefinitionVersion == null) {
-            throw new FlowableException("Must specify the process definition version to migrate");
+        if (processDefinitionVersion < 0) {
+            throw new FlowableException("Must specify a positive definition version number to migrate");
         }
         if (processInstanceMigrationDocument == null) {
             throw new FlowableException("Must specify a process instance migration document");
@@ -84,7 +84,7 @@ public class ProcessInstanceMigrationCmd implements Command<Void> {
             migrationManager.migrateProcessInstance(processInstanceId, processInstanceMigrationDocument, commandContext);
         } else if (processDefinitionId != null) {
             migrationManager.migrateProcessInstancesOfProcessDefinition(processDefinitionId, processInstanceMigrationDocument, commandContext);
-        } else if (processDefinitionKey != null && processDefinitionVersion != null) {
+        } else if (processDefinitionKey != null && processDefinitionVersion >= 0) {
             migrationManager.migrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, processInstanceMigrationDocument, commandContext);
         } else {
             throw new FlowableException("Cannot migrate process(es), not enough information");

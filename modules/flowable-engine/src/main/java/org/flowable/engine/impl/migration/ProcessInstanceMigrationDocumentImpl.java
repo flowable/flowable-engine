@@ -30,7 +30,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
 
     protected String migrateToProcessDefinitionId;
     protected String migrateToProcessDefinitionKey;
-    protected String migrateToProcessDefinitionVersion;
+    protected int migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
     protected Map<String, String> activityMigrationMappings;
 
@@ -53,12 +53,12 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
         return migrateToProcessDefinitionId;
     }
 
-    public void setMigrateToProcessDefinition(String processDefinitionKey, String processDefinitionVersion) {
+    public void setMigrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion) {
         this.migrateToProcessDefinitionKey = processDefinitionKey;
         this.migrateToProcessDefinitionVersion = processDefinitionVersion;
     }
 
-    public void setMigrateToProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId) {
+    public void setMigrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         this.migrateToProcessDefinitionKey = processDefinitionKey;
         this.migrateToProcessDefinitionVersion = processDefinitionVersion;
         this.migrateToProcessDefinitionTenantId = processDefinitionTenantId;
@@ -70,7 +70,7 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     }
 
     @Override
-    public String getMigrateToProcessDefinitionVersion() {
+    public int getMigrateToProcessDefinitionVersion() {
         return migrateToProcessDefinitionVersion;
     }
 

@@ -28,8 +28,8 @@ public class ProcessInstanceChangeState {
 
     protected String processInstanceId;
     protected ProcessDefinition processDefinitionToMigrateTo;
-    protected Map<String, Object> processVariables;
-    protected Map<String, Map<String, Object>> localVariables;
+    protected Map<String, Object> processVariables = new HashMap<>();
+    protected Map<String, Map<String, Object>> localVariables = new HashMap<>();
     protected Map<String, List<ExecutionEntity>> processInstanceActiveEmbeddedExecutions;
     protected List<MoveExecutionEntityContainer> moveExecutionEntityContainers;
     protected HashMap<String, ExecutionEntity> createdEmbeddedSubProcess = new HashMap<>();
@@ -59,8 +59,8 @@ public class ProcessInstanceChangeState {
         return getProcessDefinitionToMigrateTo().isPresent();
     }
 
-    public Optional<Map<String, Object>> getProcessInstanceVariables() {
-        return Optional.ofNullable(processVariables);
+    public Map<String, Object> getProcessInstanceVariables() {
+        return processVariables;
     }
 
     public ProcessInstanceChangeState setProcessInstanceVariables(Map<String, Object> processVariables) {
@@ -68,8 +68,8 @@ public class ProcessInstanceChangeState {
         return this;
     }
 
-    public Optional<Map<String, Map<String, Object>>> getLocalVariables() {
-        return Optional.ofNullable(localVariables);
+    public Map<String, Map<String, Object>> getLocalVariables() {
+        return localVariables;
     }
 
     public ProcessInstanceChangeState setLocalVariables(Map<String, Map<String, Object>> localVariables) {
@@ -108,4 +108,3 @@ public class ProcessInstanceChangeState {
     }
 
 }
-

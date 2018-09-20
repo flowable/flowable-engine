@@ -34,8 +34,8 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
     protected String processInstanceId;
     protected List<MoveExecutionIdContainer> moveExecutionIdList = new ArrayList<>();
     protected List<MoveActivityIdContainer> moveActivityIdList = new ArrayList<>();
-    protected Map<String, Object> processVariables;
-    protected Map<String, Map<String, Object>> localVariables;
+    protected Map<String, Object> processVariables = new HashMap<>();
+    protected Map<String, Map<String, Object>> localVariables = new HashMap<>();
 
     public ChangeActivityStateBuilderImpl() {
     }

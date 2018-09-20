@@ -24,9 +24,9 @@ public interface ProcessInstanceMigrationBuilder {
 
     ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionId);
 
-    ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, String processDefinitionVersion);
+    ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion);
 
-    ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId);
+    ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 
     ProcessInstanceMigrationBuilder withMigrateToProcessDefinitionTenantId(String processDefinitionTenantId);
 
@@ -40,5 +40,5 @@ public interface ProcessInstanceMigrationBuilder {
 
     void migrateProcessInstancesOf(String processDefinitionId);
 
-    void migrateProcessInstancesOf(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId);
+    void migrateProcessInstancesOf(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 }

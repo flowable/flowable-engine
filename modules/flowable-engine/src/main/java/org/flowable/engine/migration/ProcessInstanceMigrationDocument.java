@@ -24,7 +24,7 @@ public interface ProcessInstanceMigrationDocument {
 
     String getMigrateToProcessDefinitionKey();
 
-    String getMigrateToProcessDefinitionVersion();
+    int getMigrateToProcessDefinitionVersion();
 
     String getMigrateToProcessDefinitionTenantId();
 

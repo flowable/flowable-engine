@@ -21,7 +21,7 @@ import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResu
  */
 public interface ProcessInstanceMigrationManager {
 
-    ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenant, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
+    ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenant, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
 
     ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument processInstanceMigrationDocument, CommandContext commandContext);
 
@@ -29,7 +29,7 @@ public interface ProcessInstanceMigrationManager {
 
     void migrateProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
 
-    void migrateProcessInstancesOfProcessDefinition(String procDefKey, String procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
+    void migrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
 
     void migrateProcessInstancesOfProcessDefinition(String processDefinitionId, ProcessInstanceMigrationDocument document, CommandContext commandContext);
 }

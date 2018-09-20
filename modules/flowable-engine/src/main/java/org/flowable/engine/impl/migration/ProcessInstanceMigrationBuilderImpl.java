@@ -34,7 +34,8 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     @Override
     public ProcessInstanceMigrationBuilder fromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
         migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionId());
-        migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion(), document.getMigrateToProcessDefinitionTenantId());
+        migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion());
+        migrationDocumentBuilder.setTenantId(document.getMigrateToProcessDefinitionTenantId());
         migrationDocumentBuilder.addActivityMigrationMappings(document.getActivityMigrationMappings());
         return this;
     }
@@ -46,20 +47,21 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, String processDefinitionVersion) {
+    public ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion) {
         this.migrationDocumentBuilder.setProcessDefinitionToMigrateTo(processDefinitionKey, processDefinitionVersion);
         return this;
     }
 
     @Override
-    public ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId) {
-        this.migrationDocumentBuilder.setProcessDefinitionToMigrateTo(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId);
+    public ProcessInstanceMigrationBuilder migrateToProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+        this.migrationDocumentBuilder.setProcessDefinitionToMigrateTo(processDefinitionKey, processDefinitionVersion);
+        this.migrationDocumentBuilder.setTenantId(processDefinitionTenantId);
         return this;
     }
 
     @Override
     public ProcessInstanceMigrationBuilder withMigrateToProcessDefinitionTenantId(String processDefinitionTenantId) {
-        this.migrationDocumentBuilder.setTenantOfProcessDefinitionToMigrateTo(processDefinitionTenantId);
+        this.migrationDocumentBuilder.setTenantId(processDefinitionTenantId);
         return this;
     }
 
@@ -93,7 +95,7 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
-    public void migrateProcessInstancesOf(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId) {
+    public void migrateProcessInstancesOf(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         runtimeService.migrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }

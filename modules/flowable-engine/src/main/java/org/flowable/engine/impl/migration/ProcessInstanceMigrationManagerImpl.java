@@ -50,7 +50,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateManager implements ProcessInstanceMigrationManager {
 
     @Override
-    public ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String procDefKey, String procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+    public ProcessInstanceMigrationValidationResult validateMigrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
 
         ProcessInstanceMigrationValidationResult result = new ProcessInstanceMigrationValidationResult();
         //Must first resolve the Id of the processDefinition
@@ -127,7 +127,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     @Override
-    public void migrateProcessInstancesOfProcessDefinition(String procDefKey, String procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+    public void migrateProcessInstancesOfProcessDefinition(String procDefKey, int procDefVer, String procDefTenantId, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         ProcessDefinition processDefinition = resolveProcessDefinition(procDefKey, procDefVer, procDefTenantId, commandContext);
         if (processDefinition != null) {
             migrateProcessInstancesOfProcessDefinition(processDefinition.getId(), document, commandContext);
@@ -339,7 +339,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         }
     }
 
-    protected ProcessDefinition resolveProcessDefinition(String processDefinitionKey, String processDefinitionVersion, String processDefinitionTenantId, CommandContext commandContext) {
+    protected ProcessDefinition resolveProcessDefinition(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId, CommandContext commandContext) {
         ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
         return processDefinitionEntityManager.findProcessDefinitionByKeyAndVersionAndTenantId(processDefinitionKey, Integer.valueOf(processDefinitionVersion), processDefinitionTenantId);
     }
@@ -351,7 +351,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     protected String printProcessDefinitionIdentifierMessage(ProcessInstanceMigrationDocument document) {
         String id = document.getMigrateToProcessDefinitionId();
         String key = document.getMigrateToProcessDefinitionKey();
-        String version = document.getMigrateToProcessDefinitionVersion();
+        int version = document.getMigrateToProcessDefinitionVersion();
         String tenantId = document.getMigrateToProcessDefinitionTenantId();
 
         return "process definition identified by [id:'" + id + "'] or [key:'" + key + "', version:'" + version + "', tenantId:'" + tenantId + "']";

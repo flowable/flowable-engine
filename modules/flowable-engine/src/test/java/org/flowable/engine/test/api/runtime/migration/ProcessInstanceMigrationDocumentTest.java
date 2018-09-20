@@ -36,7 +36,7 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
 
         String definitionId = "someProcessId";
         String definitionKey = "MyProcessKey";
-        String definitionVer = "version 1";
+        int definitionVer = 9;
         String definitionTenantId = "admin";
         HashMap activityMappings = new HashMap<String, String>() {
 
@@ -85,7 +85,7 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
 
         assertEquals(definitionId, migrationDocument.getMigrateToProcessDefinitionId());
         assertNull(migrationDocument.getMigrateToProcessDefinitionKey());
-        assertNull(migrationDocument.getMigrateToProcessDefinitionVersion());
+        assertEquals(0, migrationDocument.getMigrateToProcessDefinitionVersion());
         assertNull(migrationDocument.getMigrateToProcessDefinitionTenantId());
         assertThat(migrationDocument.getActivityMigrationMappings(), is(activityMappings));
     }
@@ -94,7 +94,7 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
     public void testSerializeDeSerializeProcessInstanceMigrationDocumentForDefinitionKeyVersion() {
 
         String definitionKey = "MyProcessKey";
-        String definitionVer = "version 1";
+        int definitionVer = 5;
         String definitionTenantId = "admin";
         HashMap activityMappings = new HashMap<String, String>() {
 

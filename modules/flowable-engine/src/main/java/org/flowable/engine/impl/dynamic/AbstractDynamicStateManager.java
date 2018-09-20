@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.dynamic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -89,9 +88,6 @@ import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -416,18 +412,15 @@ public abstract class AbstractDynamicStateManager {
                 defaultContinueParentExecution = newChildExecutions.get(0);
 
             } else {
-
                 // The default parent execution is retrieved from the match with the first source execution
                 defaultContinueParentExecution = moveExecutionContainer.getContinueParentExecution(executionsToMove.get(0).getId());
             }
 
-            if (processInstanceChangeState.getProcessInstanceVariables().isPresent()) {
-                ExecutionEntity processInstanceExecution = defaultContinueParentExecution.getProcessInstance();
-                processInstanceExecution.setVariables(processInstanceChangeState.getProcessInstanceVariables().get());
-            }
+            ExecutionEntity processInstanceExecution = defaultContinueParentExecution.getProcessInstance();
+            processInstanceExecution.setVariables(processInstanceChangeState.getProcessInstanceVariables());
 
-            if (processInstanceChangeState.getLocalVariables().isPresent()) {
-                Map<String, Map<String, Object>> localVariables = processInstanceChangeState.getLocalVariables().get();
+            if (!processInstanceChangeState.getLocalVariables().isEmpty()) {
+                Map<String, Map<String, Object>> localVariables = processInstanceChangeState.getLocalVariables();
                 Iterator<ExecutionEntity> newChildExecutionsIterator = newChildExecutions.iterator();
                 while (newChildExecutionsIterator.hasNext()) {
                     ExecutionEntity execution = newChildExecutionsIterator.next();
@@ -924,9 +917,11 @@ public abstract class AbstractDynamicStateManager {
         for (StartEvent startEvent : allStartEvents) {
             if (!startEvent.getEventDefinitions().isEmpty()) {
 
+                Collection<ExecutionEntity> inactiveExecutionsByProcessInstanceId = executionEntityManager.findInactiveExecutionsByProcessInstanceId(eventSubProcessExecution.getProcessInstanceId());
+                Optional<ExecutionEntity> startEventExecution = inactiveExecutionsByProcessInstanceId.stream().filter(execution -> execution.getActivityId().equals(startEvent.getId())).findFirst();
+
                 EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                 List<EventSubscriptionEntity> eventSubscriptions = null;
-                List<TimerJobEntity> timerJobs = null;
                 if (eventDefinition instanceof SignalEventDefinition) {
                     eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(eventSubProcessExecution.getProcessInstanceId(), startEvent.getId(), SignalEventSubscriptionEntity.EVENT_TYPE);
                 } else if (eventDefinition instanceof MessageEventDefinition) {
@@ -937,27 +932,17 @@ public abstract class AbstractDynamicStateManager {
 
                 // If its an interrupting eventSubProcess we don't register a subscription or startEvent executions and we make sure that they are removed if existed
                 if (startEvent.isInterrupting() || isOnlyRemainingExecutionAtParentScope) { //Current eventSubProcess plus its startEvent
-                    ExecutionEntity startEventExecution = null;
                     if (eventSubscriptions != null && !eventSubscriptions.isEmpty()) {
-                        for (EventSubscriptionEntity subscriptionEntity : eventSubscriptions) {
-                            if (startEventExecution == null) {
-                                startEventExecution = subscriptionEntity.getExecution();
-                            }
-                            eventSubscriptionEntityManager.delete(subscriptionEntity);
-                        }
+                        eventSubscriptions.forEach(eventSubscriptionEntityManager::delete);
                     }
-                    if (timerJobs != null && !timerJobs.isEmpty()) {
-                        for (TimerJobEntity timerJobEntity : timerJobs) {
-                            if (startEventExecution == null) {
-                                Collection<ExecutionEntity> inactiveExecutionsByProcessInstanceId = executionEntityManager.findInactiveExecutionsByProcessInstanceId(eventSubProcessExecution.getProcessInstanceId());
-                                startEventExecution = inactiveExecutionsByProcessInstanceId.stream().filter(execution -> execution.getId().equals(timerJobEntity.getExecutionId())).findFirst().orElse(null);
-                            }
-                            timerJobService.deleteTimerJob(timerJobEntity);
-                        }
+                    if (eventDefinition instanceof TimerEventDefinition && startEventExecution.isPresent()) {
+                        List<TimerJobEntity> timerJobsByExecutionId = timerJobService.findTimerJobsByExecutionId(startEventExecution.get().getId());
+                        timerJobsByExecutionId.forEach(timerJobService::deleteTimerJob);
                     }
-                    if (startEventExecution != null) {
-                        executionEntityManager.deleteExecutionAndRelatedData(startEventExecution, DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
+                    if (startEventExecution.isPresent()) {
+                        executionEntityManager.deleteExecutionAndRelatedData(startEventExecution.get(), DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
                     }
+
                     //Remove any other child of the parentScope
                     List<ExecutionEntity> childExecutions = executionEntityManager.collectChildren(eventSubProcessExecution.getParent());
                     for (int i = childExecutions.size() - 1; i >= 0; i--) {
@@ -1009,20 +994,15 @@ public abstract class AbstractDynamicStateManager {
                     }
 
                     if (eventDefinition instanceof TimerEventDefinition) {
-                        Collection<ExecutionEntity> inactiveExecutionsByProcessInstanceId = executionEntityManager.findInactiveExecutionsByProcessInstanceId(eventSubProcessExecution.getProcessInstanceId());
-                        Optional<ExecutionEntity> startEventExecution = inactiveExecutionsByProcessInstanceId.stream().filter(execution -> execution.getActivityId().equals(startEvent.getId())).findFirst();
                         if (!startEventExecution.isPresent()) {
 
                             TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
-
                             ExecutionEntity timerExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(eventSubProcessExecution.getParent());
                             timerExecution.setCurrentFlowElement(startEvent);
                             timerExecution.setEventScope(true);
                             timerExecution.setActive(false);
-
                             TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
                                 TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-
                             if (timerJob != null) {
                                 timerJobService.scheduleTimerJob(timerJob);
                             }
@@ -1032,18 +1012,6 @@ public abstract class AbstractDynamicStateManager {
             }
         }
     }
-
-//    protected String getTimerJobActivityId(TimerJobEntity timerJobEntity) {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        try {
-//            Map<String, Object> jobConfigurationMap = objectMapper.readValue(timerJobEntity.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
-//
-//            });
-//            return (String) jobConfigurationMap.get("activityId");
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
     protected boolean isOnlyRemainingExecutionAtParentScope(ExecutionEntity executionEntity, Set<String> ignoreExecutionIds, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
