@@ -931,11 +931,6 @@ public abstract class AbstractDynamicStateManager {
                     eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(eventSubProcessExecution.getProcessInstanceId(), startEvent.getId(), SignalEventSubscriptionEntity.EVENT_TYPE);
                 } else if (eventDefinition instanceof MessageEventDefinition) {
                     eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByProcessInstanceAndActivityId(eventSubProcessExecution.getProcessInstanceId(), startEvent.getId(), MessageEventSubscriptionEntity.EVENT_TYPE);
-                } else if (eventDefinition instanceof TimerEventDefinition) {
-                    timerJobs = timerJobService.findTimerJobsByProcessInstanceId(eventSubProcessExecution.getProcessInstanceId())
-                        .stream()
-                        .filter(timerJobEntity -> startEvent.getId().equals(getTimerJobActivityId(timerJobEntity)))
-                        .collect(Collectors.toList());
                 }
 
                 boolean isOnlyRemainingExecutionAtParentScope = isOnlyRemainingExecutionAtParentScope(eventSubProcessExecution, movingExecutionIds, commandContext);
@@ -1013,7 +1008,7 @@ public abstract class AbstractDynamicStateManager {
 
                     }
 
-                    if (eventDefinition instanceof TimerEventDefinition && (timerJobs == null || timerJobs.isEmpty())) {
+                    if (eventDefinition instanceof TimerEventDefinition) {
                         Collection<ExecutionEntity> inactiveExecutionsByProcessInstanceId = executionEntityManager.findInactiveExecutionsByProcessInstanceId(eventSubProcessExecution.getProcessInstanceId());
                         Optional<ExecutionEntity> startEventExecution = inactiveExecutionsByProcessInstanceId.stream().filter(execution -> execution.getActivityId().equals(startEvent.getId())).findFirst();
                         if (!startEventExecution.isPresent()) {
@@ -1038,17 +1033,17 @@ public abstract class AbstractDynamicStateManager {
         }
     }
 
-    protected String getTimerJobActivityId(TimerJobEntity timerJobEntity) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            Map<String, Object> jobConfigurationMap = objectMapper.readValue(timerJobEntity.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
-
-            });
-            return (String) jobConfigurationMap.get("activityId");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    protected String getTimerJobActivityId(TimerJobEntity timerJobEntity) {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        try {
+//            Map<String, Object> jobConfigurationMap = objectMapper.readValue(timerJobEntity.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
+//
+//            });
+//            return (String) jobConfigurationMap.get("activityId");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     protected boolean isOnlyRemainingExecutionAtParentScope(ExecutionEntity executionEntity, Set<String> ignoreExecutionIds, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);

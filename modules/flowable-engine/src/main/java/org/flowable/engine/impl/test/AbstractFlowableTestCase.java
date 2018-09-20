@@ -429,6 +429,18 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         }
     }
 
+    protected ProcessDefinition deployProcessDefinition(String name, String path) {
+        Deployment deployment = repositoryService.createDeployment()
+            .name(name)
+            .addClasspathResource(path)
+            .deploy();
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            .deploymentId(deployment.getId()).singleResult();
+
+        return processDefinition;
+    }
+
     protected void completeProcessInstanceTasks(String processInstanceId) {
         List<Task> tasks;
         do {

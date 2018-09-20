@@ -17,10 +17,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
@@ -40,10 +38,13 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
         String definitionKey = "MyProcessKey";
         String definitionVer = "version 1";
         String definitionTenantId = "admin";
-        Map<String, String> activityMappings = Stream.of(new String[][] {
-            { "originalActivity1", "newActivity1" },
-            { "originalActivity2", "newActivity2" }
-        }).collect(Collectors.toMap(a -> a[0], a -> a[1]));
+        HashMap activityMappings = new HashMap<String, String>() {
+
+            {
+                put("originalActivity1", "newActivity1");
+                put("originalActivity2", "newActivity2");
+            }
+        };
 
         String jsonAsStr = IoUtil.readFileAsString("org/flowable/engine/test/api/runtime/migration/simpleProcessInstanceMigrationDocument.json");
 
@@ -62,10 +63,13 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
 
         String definitionId = "someProcessId";
         List<String> instancesIds = Arrays.asList("123", "234", "567");
-        Map<String, String> activityMappings = Stream.of(new String[][] {
-            { "originalActivity1", "newActivity1" },
-            { "originalActivity2", "newActivity2" }
-        }).collect(Collectors.toMap(a -> a[0], a -> a[1]));
+        HashMap activityMappings = new HashMap<String, String>() {
+
+            {
+                put("originalActivity1", "newActivity1");
+                put("originalActivity2", "newActivity2");
+            }
+        };
 
         ProcessInstanceMigrationDocument document = runtimeService.createProcessInstanceMigrationBuilder()
             .migrateToProcessDefinition(definitionId)
@@ -92,10 +96,13 @@ public class ProcessInstanceMigrationDocumentTest extends PluggableFlowableTestC
         String definitionKey = "MyProcessKey";
         String definitionVer = "version 1";
         String definitionTenantId = "admin";
-        Map<String, String> activityMappings = Stream.of(new String[][] {
-            { "originalActivity1", "newActivity1" },
-            { "originalActivity2", "newActivity2" }
-        }).collect(Collectors.toMap(a -> a[0], a -> a[1]));
+        HashMap activityMappings = new HashMap<String, String>() {
+
+            {
+                put("originalActivity1", "newActivity1");
+                put("originalActivity2", "newActivity2");
+            }
+        };
 
         //Build a process migration document
         ProcessInstanceMigrationDocument document = runtimeService.createProcessInstanceMigrationBuilder()
