@@ -35,23 +35,24 @@ public class DefaultDynamicStateManager extends AbstractDynamicStateManager impl
     @Override
     public void moveExecutionState(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext) {
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, Optional.empty(), commandContext);
-        String processInstanceId = moveExecutionEntityContainerList.get(0).getExecutions().get(0).getProcessInstanceId();
-
+        List<ExecutionEntity> executions = moveExecutionEntityContainerList.iterator().next().getExecutions();
+        String processInstanceId = executions.iterator().next().getProcessInstanceId();
+        
         ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
             .setProcessInstanceId(processInstanceId)
             .setMoveExecutionEntityContainers(moveExecutionEntityContainerList)
             .setLocalVariables(changeActivityStateBuilder.getLocalVariables())
             .setProcessInstanceVariables(changeActivityStateBuilder.getProcessInstanceVariables());
+        
         doMoveExecutionState(processInstanceChangeState, commandContext);
-
     }
 
     @Override
-    protected Map<String, List<ExecutionEntity>> resolveProcessInstanceActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext) {
+    protected Map<String, List<ExecutionEntity>> resolveActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
 
-        Map<String, List<ExecutionEntity>> activeSubProcessesByActivityId = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId)
-            .stream()
+        Map<String, List<ExecutionEntity>> activeSubProcessesByActivityId = childExecutions.stream()
             .filter(ExecutionEntity::isActive)
             .filter(executionEntity -> executionEntity.getCurrentFlowElement() instanceof SubProcess)
             .collect(Collectors.groupingBy(ExecutionEntity::getActivityId));

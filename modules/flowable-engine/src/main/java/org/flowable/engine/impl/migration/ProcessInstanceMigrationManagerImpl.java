@@ -187,7 +187,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     }
 
     @Override
-    protected Map<String, List<ExecutionEntity>> resolveProcessInstanceActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext) {
+    protected Map<String, List<ExecutionEntity>> resolveActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext) {
         return Collections.emptyMap();
     }
 

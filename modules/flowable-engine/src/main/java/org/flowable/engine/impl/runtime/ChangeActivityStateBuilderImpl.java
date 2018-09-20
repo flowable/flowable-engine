@@ -13,12 +13,9 @@
 package org.flowable.engine.impl.runtime;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.RuntimeServiceImpl;
@@ -176,90 +173,5 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
 
     public Map<String, Map<String, Object>> getLocalVariables() {
         return localVariables;
-    }
-
-    public class MoveExecutionIdContainer {
-
-        protected List<String> executionIds;
-        protected List<String> moveToActivityIds;
-
-        public MoveExecutionIdContainer(String singleExecutionId, String moveToActivityId) {
-            this.executionIds = Collections.singletonList(singleExecutionId);
-            this.moveToActivityIds = Collections.singletonList(moveToActivityId);
-        }
-
-        public MoveExecutionIdContainer(List<String> executionIds, String moveToActivityId) {
-            this.executionIds = executionIds;
-            this.moveToActivityIds = Collections.singletonList(moveToActivityId);
-        }
-
-        public MoveExecutionIdContainer(String singleExecutionId, List<String> moveToActivityIds) {
-            this.executionIds = Collections.singletonList(singleExecutionId);
-            this.moveToActivityIds = moveToActivityIds;
-        }
-
-        public List<String> getExecutionIds() {
-            return Optional.ofNullable(executionIds).orElse(Collections.EMPTY_LIST);
-        }
-
-        public List<String> getMoveToActivityIds() {
-            return Optional.ofNullable(moveToActivityIds).orElse(Collections.EMPTY_LIST);
-        }
-    }
-
-    public class MoveActivityIdContainer {
-
-        protected List<String> activityIds;
-        protected List<String> moveToActivityIds;
-        protected boolean moveToParentProcess;
-        protected boolean moveToSubProcessInstance;
-        protected String callActivityId;
-
-        public MoveActivityIdContainer(String singleActivityId, String moveToActivityId) {
-            this.activityIds = Collections.singletonList(singleActivityId);
-            this.moveToActivityIds = Collections.singletonList(moveToActivityId);
-        }
-
-        public MoveActivityIdContainer(List<String> activityIds, String moveToActivityId) {
-            this.activityIds = activityIds;
-            this.moveToActivityIds = Collections.singletonList(moveToActivityId);
-        }
-
-        public MoveActivityIdContainer(String singleActivityId, List<String> moveToActivityIds) {
-            this.activityIds = Collections.singletonList(singleActivityId);
-            this.moveToActivityIds = moveToActivityIds;
-        }
-
-        public List<String> getActivityIds() {
-            return Optional.ofNullable(activityIds).orElse(Collections.EMPTY_LIST);
-        }
-
-        public List<String> getMoveToActivityIds() {
-            return Optional.ofNullable(moveToActivityIds).orElse(Collections.EMPTY_LIST);
-        }
-
-        public boolean isMoveToParentProcess() {
-            return moveToParentProcess;
-        }
-
-        public void setMoveToParentProcess(boolean moveToParentProcess) {
-            this.moveToParentProcess = moveToParentProcess;
-        }
-
-        public boolean isMoveToSubProcessInstance() {
-            return moveToSubProcessInstance;
-        }
-
-        public void setMoveToSubProcessInstance(boolean moveToSubProcessInstance) {
-            this.moveToSubProcessInstance = moveToSubProcessInstance;
-        }
-
-        public String getCallActivityId() {
-            return callActivityId;
-        }
-
-        public void setCallActivityId(String callActivityId) {
-            this.callActivityId = callActivityId;
-        }
     }
 }

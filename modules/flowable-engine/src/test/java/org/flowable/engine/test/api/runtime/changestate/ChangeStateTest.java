@@ -1885,6 +1885,9 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("subTask", task.getTaskDefinitionKey());
+        
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(2);
 
         changeStateEventListener.clear();
 
@@ -1892,7 +1895,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
             .moveExecutionToActivityId(task.getExecutionId(), "nestedSubTask")
             .changeState();
 
-        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(3);
         assertThat(executions).extracting(Execution::getActivityId).containsExactlyInAnyOrder("subProcess", "nestedSubProcess", "nestedSubTask");
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

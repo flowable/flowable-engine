@@ -74,13 +74,14 @@ import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntit
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
+import org.flowable.engine.impl.runtime.MoveActivityIdContainer;
+import org.flowable.engine.impl.runtime.MoveExecutionIdContainer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.HistoricTaskService;
@@ -101,42 +102,59 @@ public abstract class AbstractDynamicStateManager {
     public List<MoveExecutionEntityContainer> resolveMoveExecutionEntityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
         if (changeActivityStateBuilder.getMoveExecutionIdList().size() > 0) {
-            for (ChangeActivityStateBuilderImpl.MoveExecutionIdContainer executionContainer : changeActivityStateBuilder.getMoveExecutionIdList()) {
+            for (MoveExecutionIdContainer executionContainer : changeActivityStateBuilder.getMoveExecutionIdList()) {
                 //Executions belonging to the same parent should move together - i.e multipleExecution to single activity
                 Map<String, List<ExecutionEntity>> executionsByParent = new HashMap<>();
                 for (String executionId : executionContainer.getExecutionIds()) {
                     ExecutionEntity execution = resolveActiveExecution(executionId, commandContext);
                     addExecutionToExecutionListsByParentIdMap(executionsByParent, execution.getParentId(), execution);
                 }
-                executionsByParent.values().forEach(l -> moveExecutionEntityContainerList.add(new MoveExecutionEntityContainer(l, executionContainer.getMoveToActivityIds())));
+                executionsByParent.values().forEach(executions -> moveExecutionEntityContainerList.add(
+                                new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds())));
             }
         }
 
         if (changeActivityStateBuilder.getMoveActivityIdList().size() > 0) {
-            for (ChangeActivityStateBuilderImpl.MoveActivityIdContainer activityContainer : changeActivityStateBuilder.getMoveActivityIdList()) {
+            for (MoveActivityIdContainer activityContainer : changeActivityStateBuilder.getMoveActivityIdList()) {
                 Map<String, List<ExecutionEntity>> activitiesExecutionsByMultiInstanceParentId = new HashMap<>();
                 List<ExecutionEntity> activitiesExecutionsNotInMultiInstanceParent = new ArrayList<>();
 
                 for (String activityId : activityContainer.getActivityIds()) {
                     List<ExecutionEntity> activityExecutions = resolveActiveExecutions(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext);
                     if (!activityExecutions.isEmpty()) {
-                        ExecutionEntity execution = activityExecutions.get(0);
+                        
+                        // check for a multi instance root execution
+                        ExecutionEntity miExecution = null;
+                        boolean isInsideMultiInstance = false;
+                        for (ExecutionEntity possibleMIExecution : activityExecutions) {
+                            if (possibleMIExecution.isMultiInstanceRoot()) {
+                                miExecution = possibleMIExecution;
+                                isInsideMultiInstance = true;
+                                break;
+                            }
+                            
+                            if (isExecutionInsideMultiInstance(possibleMIExecution)) {
+                                isInsideMultiInstance = true;
+                            }
+                        }
+                        
                         //If inside a multiInstance, we create one container for each execution
-                        if (isExecutionInsideMultiInstance(execution)) {
+                        if (isInsideMultiInstance) {
+                            
                             //We group by the parentId (executions belonging to the same parent execution instance
                             // i.e. gateways nested in MultiInstance subprocesses, need to be in the same move container)
                             Stream<ExecutionEntity> executionEntitiesStream = activityExecutions.stream();
-
-                            //If the source activity is already a multiInstance, we need to move only the parents (filter)
-                            if (execution.isMultiInstanceRoot()) {
+                            if (miExecution != null) {
                                 executionEntitiesStream = executionEntitiesStream.filter(ExecutionEntity::isMultiInstanceRoot);
                             }
 
-                            executionEntitiesStream.forEach(e -> {
-                                String parentId = e.isMultiInstanceRoot() ? e.getId() : e.getParentId();
-                                addExecutionToExecutionListsByParentIdMap(activitiesExecutionsByMultiInstanceParentId, parentId, e);
+                            executionEntitiesStream.forEach(childExecution -> {
+                                String parentId = childExecution.isMultiInstanceRoot() ? childExecution.getId() : childExecution.getParentId();
+                                addExecutionToExecutionListsByParentIdMap(activitiesExecutionsByMultiInstanceParentId, parentId, childExecution);
                             });
+                            
                         } else {
+                            ExecutionEntity execution = activityExecutions.iterator().next();
                             activitiesExecutionsNotInMultiInstanceParent.add(execution);
                         }
                     }
@@ -192,16 +210,15 @@ public abstract class AbstractDynamicStateManager {
 
         List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processExecution.getId());
 
-        //For multi instance executions, the parent should have the lower start time, we make sure to order the collection since it may not be guaranteed in the query result
         List<ExecutionEntity> executions = childExecutions.stream()
             .filter(e -> e.getCurrentActivityId() != null)
             .filter(e -> e.getCurrentActivityId().equals(activityId))
-            .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
             .collect(Collectors.toList());
 
         if (executions.isEmpty()) {
             throw new FlowableException("Active execution could not be found with activity id " + activityId);
         }
+        
         return executions;
     }
 
@@ -214,19 +231,7 @@ public abstract class AbstractDynamicStateManager {
         executionEntities.add(executionEntity);
     }
 
-    protected boolean isExecutionInsideMultiInstance(ExecutionEntity execution) {
-        FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
-        while (!(parentContainer instanceof Process)) {
-            MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentContainer).getLoopCharacteristics();
-            if (loopCharacteristics != null) {
-                return true;
-            }
-            parentContainer = ((Activity) parentContainer).getParentContainer();
-        }
-        return false;
-    }
-
-    protected MoveExecutionEntityContainer createMoveExecutionEntityContainer(ChangeActivityStateBuilderImpl.MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
+    protected MoveExecutionEntityContainer createMoveExecutionEntityContainer(MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
         MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds());
 
         if (activityContainer.isMoveToParentProcess()) {
@@ -339,8 +344,8 @@ public abstract class AbstractDynamicStateManager {
     protected void doMoveExecutionState(ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        Map<String, List<ExecutionEntity>> processInstanceActiveEmbeddedSubProcesses = resolveProcessInstanceActiveEmbeddedSubProcesses(processInstanceChangeState.getProcessInstanceId(), commandContext);
-        processInstanceChangeState.setProcessInstanceActiveEmbeddedExecutions(processInstanceActiveEmbeddedSubProcesses);
+        Map<String, List<ExecutionEntity>> activeEmbeddedSubProcesses = resolveActiveEmbeddedSubProcesses(processInstanceChangeState.getProcessInstanceId(), commandContext);
+        processInstanceChangeState.setProcessInstanceActiveEmbeddedExecutions(activeEmbeddedSubProcesses);
 
         for (MoveExecutionEntityContainer moveExecutionContainer : processInstanceChangeState.getMoveExecutionEntityContainers()) {
 
@@ -443,7 +448,7 @@ public abstract class AbstractDynamicStateManager {
         }
     }
 
-    protected abstract Map<String, List<ExecutionEntity>> resolveProcessInstanceActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext);
+    protected abstract Map<String, List<ExecutionEntity>> resolveActiveEmbeddedSubProcesses(String processInstanceId, CommandContext commandContext);
 
     protected abstract boolean isDirectFlowElementExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement);
 
@@ -905,6 +910,18 @@ public abstract class AbstractDynamicStateManager {
             }
         }
     }
+    
+    protected boolean isExecutionInsideMultiInstance(ExecutionEntity execution) {
+        FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
+        while (!(parentContainer instanceof Process)) {
+            MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentContainer).getLoopCharacteristics();
+            if (loopCharacteristics != null) {
+                return true;
+            }
+            parentContainer = ((Activity) parentContainer).getParentContainer();
+        }
+        return false;
+    }
 
     protected void processEventSubProcess(EventSubProcess eventSubProcess, ExecutionEntity eventSubProcessExecution, Set<String> movingExecutionIds, CommandContext commandContext) {
 
@@ -912,7 +929,6 @@ public abstract class AbstractDynamicStateManager {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
         List<StartEvent> allStartEvents = eventSubProcess.findAllSubFlowElementInFlowMapOfType(StartEvent.class);
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
 
         for (StartEvent startEvent : allStartEvents) {
             if (!startEvent.getEventDefinitions().isEmpty()) {
