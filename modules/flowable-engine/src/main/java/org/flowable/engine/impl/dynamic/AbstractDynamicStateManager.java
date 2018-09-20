@@ -15,6 +15,7 @@ package org.flowable.engine.impl.dynamic;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -196,7 +197,7 @@ public abstract class AbstractDynamicStateManager {
         List<ExecutionEntity> executions = childExecutions.stream()
             .filter(e -> e.getCurrentActivityId() != null)
             .filter(e -> e.getCurrentActivityId().equals(activityId))
-            .sorted(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR)
+            .sorted(Comparator.comparing(ExecutionEntity::isMultiInstanceRoot).reversed())
             .collect(Collectors.toList());
 
         if (executions.isEmpty()) {
