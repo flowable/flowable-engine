@@ -1,0 +1,11 @@
+{
+  "migrateToProcessDefinitionId": "someProcessId",
+  "migrateToProcessDefinitionKey": "MyProcessKey",
+  "migrateToProcessDefinitionVersion": 9,
+  "migrateToProcessDefinitionTenantId": "admin",
+  "nonMappedDocumentProperty": "someValue",
+  "activityMigrationMappings": {
+    "originalActivity1": "newActivity1",
+    "originalActivity2": "newActivity2"
+  }
+}

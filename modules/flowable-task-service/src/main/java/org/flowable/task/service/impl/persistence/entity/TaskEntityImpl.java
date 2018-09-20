@@ -134,6 +134,9 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         if (taskDefinitionId != null) {
             persistentState.put("taskDefinitionId", this.taskDefinitionId);
         }
+        if (taskDefinitionKey != null) {
+            persistentState.put("taskDefinitionKey", this.taskDefinitionKey);
+        }
         if (scopeId != null) {
             persistentState.put("scopeId", this.scopeId);
         }

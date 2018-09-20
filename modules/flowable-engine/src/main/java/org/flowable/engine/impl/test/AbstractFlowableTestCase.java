@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +49,14 @@ import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -412,5 +417,37 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
     protected static<T> Map<String, List<T>> groupListContentBy(List<T> source, Function<T, String> classifier) {
         return source.stream().collect(Collectors.groupingBy(classifier));
+    }
+
+    protected String getJobActivityId(Job job) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, Object> jobConfigurationMap = objectMapper.readValue(job.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
+
+            });
+            return (String) jobConfigurationMap.get("activityId");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected ProcessDefinition deployProcessDefinition(String name, String path) {
+        Deployment deployment = repositoryService.createDeployment()
+            .name(name)
+            .addClasspathResource(path)
+            .deploy();
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            .deploymentId(deployment.getId()).singleResult();
+
+        return processDefinition;
+    }
+
+    protected void completeProcessInstanceTasks(String processInstanceId) {
+        List<Task> tasks;
+        do {
+            tasks = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+            tasks.forEach(this::completeTask);
+        } while (!tasks.isEmpty());
     }
 }
