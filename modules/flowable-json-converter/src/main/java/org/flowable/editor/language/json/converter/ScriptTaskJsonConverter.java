@@ -50,6 +50,7 @@ public class ScriptTaskJsonConverter extends BaseBpmnJsonConverter {
         ScriptTask scriptTask = (ScriptTask) baseElement;
         propertiesNode.put(PROPERTY_SCRIPT_FORMAT, scriptTask.getScriptFormat());
         propertiesNode.put(PROPERTY_SCRIPT_TEXT, scriptTask.getScript());
+        propertiesNode.put(PROPERTY_SCRIPT_AUTO_STORE_VARIABLES, scriptTask.isAutoStoreVariables());
     }
 
     @Override
@@ -57,6 +58,7 @@ public class ScriptTaskJsonConverter extends BaseBpmnJsonConverter {
         ScriptTask task = new ScriptTask();
         task.setScriptFormat(getPropertyValueAsString(PROPERTY_SCRIPT_FORMAT, elementNode));
         task.setScript(getPropertyValueAsString(PROPERTY_SCRIPT_TEXT, elementNode));
+        task.setAutoStoreVariables(getPropertyValueAsBoolean(PROPERTY_SCRIPT_AUTO_STORE_VARIABLES, elementNode));
         return task;
     }
 }
