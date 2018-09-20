@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -91,6 +93,20 @@ public class SubProcess extends Activity implements FlowElementsContainer {
 
     public boolean containsFlowElementId(String id) {
         return flowElementMap.containsKey(id);
+    }
+
+    public <T extends FlowElement> T findFirstSubFlowElementInFlowMapOfType(Class<T> clazz) {
+        Optional<FlowElement> first = flowElementMap.values().stream()
+            .filter(subFlowElement -> clazz.isInstance(subFlowElement))
+            .findFirst();
+        return (T) first.orElse(null);
+    }
+
+    public <T extends FlowElement> List<T> findAllSubFlowElementInFlowMapOfType(Class<T> clazz) {
+        return flowElementMap.values().stream()
+            .filter(clazz::isInstance)
+            .map(subFlowElement -> (T) subFlowElement)
+            .collect(Collectors.toList());
     }
 
     @Override

@@ -189,6 +189,7 @@
             <artifactId>java-uuid-generator</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <!-- required for DiagramQueryTest -->
             <groupId>commons-io</groupId>

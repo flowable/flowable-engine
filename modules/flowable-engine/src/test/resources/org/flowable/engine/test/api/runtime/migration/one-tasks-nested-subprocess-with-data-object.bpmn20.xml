@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="Examples">
+
+    <process id="OneTaskSubProcess" name="One Task Inside SubProcess" isExecutable="true">
+        <startEvent id="start" name="start"/>
+        <sequenceFlow id="seqFlow1" sourceRef="start" targetRef="BeforeSubProcess"/>
+        <userTask id="BeforeSubProcess" name="BeforeSubProcess"/>
+        <sequenceFlow id="seqFlow2" sourceRef="BeforeSubProcess" targetRef="OuterSubProcess"/>
+
+        <subProcess id="OuterSubProcess" name="Simple Outer SubProcess">
+            <dataObject itemSubjectRef="xsd:string" name="dataScope" id="dataObject1">
+                <extensionElements>
+                    <flowable:value>outerSubProcess</flowable:value>
+                </extensionElements>
+            </dataObject>
+
+            <startEvent id="outerSubProcessStart" name="outerSubProcessStart"/>
+            <sequenceFlow id="outerSubSeqFlow1" sourceRef="outerSubProcessStart" targetRef="InsideOuterSubProcess"/>
+            <userTask id="InsideOuterSubProcess" name="InsideOuterSubProcess"/>
+            <sequenceFlow id="outerSubSeqFlow2" sourceRef="InsideOuterSubProcess" targetRef="SimpleSubProcess"/>
+
+            <subProcess id="SimpleSubProcess" name="Simple Nested SubProcess">
+                <dataObject itemSubjectRef="xsd:string" name="dataScopeNested" id="dataObject2">
+                    <extensionElements>
+                        <flowable:value>nestedSubProcess</flowable:value>
+                    </extensionElements>
+                </dataObject>
+                <startEvent id="subProcessStart" name="subProcessStart"/>
+                <sequenceFlow id="subSeqFlow1" sourceRef="subProcessStart" targetRef="InsideNestedSubProcess"/>
+                <userTask id="InsideNestedSubProcess" name="InsideNestedSubProcess"/>
+                <sequenceFlow id="subSeqFlow2" sourceRef="InsideNestedSubProcess" targetRef="subProcessEnd"/>
+                <endEvent id="subProcessEnd" name="subProcessEnd"></endEvent>
+            </subProcess>
+
+            <sequenceFlow id="outerSubSeqFlow3" sourceRef="SimpleSubProcess" targetRef="outerSubProcessEnd"/>
+            <endEvent id="outerSubProcessEnd" name="outerSubProcessEnd"></endEvent>
+
+        </subProcess>
+
+        <sequenceFlow id="seqFlow3" sourceRef="OuterSubProcess" targetRef="AfterSubProcess"></sequenceFlow>
+        <userTask id="AfterSubProcess" name="AfterSubProcess"/>
+        <sequenceFlow id="seqFlow4" sourceRef="AfterSubProcess" targetRef="end"></sequenceFlow>
+        <endEvent id="end" name="end"></endEvent>
+    </process>
+</definitions>

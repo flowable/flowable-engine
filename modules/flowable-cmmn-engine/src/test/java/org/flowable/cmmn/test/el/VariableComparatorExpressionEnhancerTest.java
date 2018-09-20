@@ -34,9 +34,11 @@ public class VariableComparatorExpressionEnhancerTest {
     @Test
     public void testRegexNameReplacement() {
         assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lowerThan(myVar,123)}", "${variables:lowerThan(planItemInstance,'myVar',123)}");
+        assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lessThan(myVar,123)}", "${variables:lowerThan(planItemInstance,'myVar',123)}");
         assertRegexCorrect(variableLowerThanExpressionFunction, "${variables:lt(myVar,123)}", "${variables:lowerThan(planItemInstance,'myVar',123)}");
         
         assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction, "${variables:lowerThanOrEquals(myVar,123)}", "${variables:lowerThanOrEquals(planItemInstance,'myVar',123)}");
+        assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction, "${variables:lessThanOrEquals(myVar,123)}", "${variables:lowerThanOrEquals(planItemInstance,'myVar',123)}");
         assertRegexCorrect(variableLowerThanOrEqualsExpressionFunction,  "${variables:lte(myVar,123)}", "${variables:lowerThanOrEquals(planItemInstance,'myVar',123)}");
         
         assertRegexCorrect(variableGreaterThanExpressionFunction, "${variables:greaterThan(myVar,123)}", "${variables:greaterThan(planItemInstance,'myVar',123)}");

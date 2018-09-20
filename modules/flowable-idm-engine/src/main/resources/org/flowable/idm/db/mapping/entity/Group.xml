@@ -103,10 +103,6 @@
   
   <sql id="selectGroupByQueryCriteriaSql">
     from ${prefix}ACT_ID_GROUP RES
-    <if test="userId != null">
-      inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.GROUP_ID_
-      inner join ${prefix}ACT_ID_USER U on M.USER_ID_ = U.ID_
-    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -131,17 +127,24 @@
         and RES.TYPE_ = #{type}
       </if>
       <if test="userId != null">
-        and U.ID_ = #{userId}
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.GROUP_ID_ = RES.ID_ and M.USER_ID_ = #{userId})
       </if>
       <if test="userIds != null &amp;&amp; userIds.size() &gt; 0">
-        and RES.ID_ IN
-        <foreach item="userId" index="index" collection="userIds" 
-                 open="(" separator="," close=")">
-          #{userId}
-        </foreach>
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.GROUP_ID_ = RES.ID_ and M.USER_ID_ in  
+            <foreach item="userId" index="index" collection="userIds" open="(" separator="," close=")">#{userId}</foreach>)
       </if>
     </where>
   </sql>
+  
+  <!-- 
+  <if test="groupId != null">
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ = #{groupId})
+      </if>
+      <if test="groupIds != null &amp;&amp; groupIds.size() &gt; 0">
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ in  
+            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId}</foreach>)
+      </if>
+       -->
 
   <select id="selectGroupByNativeQuery" parameterType="java.util.Map" resultMap="groupResultMap">
     <include refid="org.flowable.idm.engine.db.common.selectByNativeQuery"/>

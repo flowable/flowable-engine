@@ -119,10 +119,6 @@
 
   <sql id="selectUserByQueryCriteriaSql">
     from ${prefix}ACT_ID_USER RES
-    <if test="groupId != null || (groupIds != null &amp;&amp; groupIds.size() &gt; 0) ">
-      inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.USER_ID_
-      inner join ${prefix}ACT_ID_GROUP G on M.GROUP_ID_ = G.ID_
-    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -180,14 +176,11 @@
         and RES.TENANT_ID_ = #{tenantId}
       </if>
       <if test="groupId != null">
-        and G.ID_ = #{groupId}
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ = #{groupId})
       </if>
       <if test="groupIds != null &amp;&amp; groupIds.size() &gt; 0">
-        and G.ID_ IN
-        <foreach item="groupId" index="index" collection="groupIds"
-                 open="(" separator="," close=")">
-          #{groupId}
-        </foreach>
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ in  
+            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId}</foreach>)
       </if>
     </where>
   </sql>

@@ -313,21 +313,6 @@
 	    </where>
 	</sql>
 
-	<!-- mysql specific sql -->
-	<select id="selectContentItemsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl" resultMap="contentItemResultMap">
-	  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-	    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-	    <include refid="selectContentItemsByQueryCriteriaSql"/>
-	    ${orderBy}
-	    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
-	</select>
-
-	<!-- mysql specific sql -->
-	<select id="selectContentItemCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl" resultType="long">
-	   	select distinct count(RES.ID_)
-	    <include refid="selectContentItemsByQueryCriteriaSql"/>
-	</select>
-
 	<delete id="deleteContentItem" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl">
 	   delete from ${prefix}ACT_CO_CONTENT_ITEM where ID_ = #{id, jdbcType=VARCHAR}
 	</delete>
