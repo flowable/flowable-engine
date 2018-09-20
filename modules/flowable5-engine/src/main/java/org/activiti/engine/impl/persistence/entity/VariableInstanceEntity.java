@@ -21,16 +21,16 @@ import org.activiti.engine.impl.db.BulkDeleteable;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.persistence.entity.AbstractVariableServiceEntity;
 
 /**
  * @author Tom Baeyens
  * @author Marcus Klimstra (CGI)
  */
-public class VariableInstanceEntity extends AbstractEntity implements VariableInstance, ValueFields, PersistentObject, HasRevision, BulkDeleteable, Serializable {
+public class VariableInstanceEntity extends AbstractVariableServiceEntity implements VariableInstance, ValueFields, PersistentObject, HasRevision, BulkDeleteable, Serializable {
 
     private static final long serialVersionUID = 1L;
 

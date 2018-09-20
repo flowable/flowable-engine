@@ -17,9 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
-public class CaseDefinitionEntityImpl extends AbstractEntity implements CaseDefinitionEntity {
+public class CaseDefinitionEntityImpl extends AbstractCmmnEngineEntity implements CaseDefinitionEntity {
     
     protected String category;
     protected String name;

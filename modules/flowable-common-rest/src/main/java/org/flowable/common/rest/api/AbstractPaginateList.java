@@ -16,13 +16,14 @@ package org.flowable.common.rest.api;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
 import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Tijs Rademakers
+ * @deprecated use {@link PaginateListUtil} and {@link ListProcessor} instead
  */
+@Deprecated
 public abstract class AbstractPaginateList<RES, REQ> {
 
     /**
@@ -36,85 +37,12 @@ public abstract class AbstractPaginateList<RES, REQ> {
      * @param defaultSort
      *            The default sort column (the rest attribute) that later will be mapped to an internal engine name
      * @param properties
+     * @deprecated use {@link PaginateListUtil#paginateList(Map, PaginateRequest, Query, String, Map, ListProcessor)} instead
      */
+    @Deprecated
     public DataResponse<RES> paginateList(Map<String, String> requestParams, PaginateRequest paginateRequest, Query<?, REQ> query, String defaultSort, Map<String, QueryProperty> properties) {
 
-        if (paginateRequest == null) {
-            paginateRequest = new PaginateRequest();
-        }
-
-        // In case pagination request is incomplete, fill with values found in URL if possible
-        if (paginateRequest.getStart() == null) {
-            paginateRequest.setStart(RequestUtil.getInteger(requestParams, "start", 0));
-        }
-
-        if (paginateRequest.getSize() == null) {
-            paginateRequest.setSize(RequestUtil.getInteger(requestParams, "size", 10));
-        }
-
-        if (paginateRequest.getOrder() == null) {
-            paginateRequest.setOrder(requestParams.get("order"));
-        }
-
-        if (paginateRequest.getSort() == null) {
-            paginateRequest.setSort(requestParams.get("sort"));
-        }
-
-        // Use defaults for paging, if not set in the PaginationRequest, nor in the URL
-        Integer start = paginateRequest.getStart();
-        if (start == null || start < 0) {
-            start = 0;
-        }
-
-        Integer size = paginateRequest.getSize();
-        if (size == null || size < 0) {
-            size = 10;
-        }
-
-        String sort = paginateRequest.getSort();
-        if (sort == null) {
-            sort = defaultSort;
-        }
-        String order = paginateRequest.getOrder();
-        if (order == null) {
-            order = "asc";
-        }
-
-        // Sort order
-        if (sort != null && properties != null && !properties.isEmpty()) {
-            QueryProperty queryProperty = properties.get(sort);
-            if (queryProperty == null) {
-                throw new FlowableIllegalArgumentException("Value for param 'sort' is not valid, '" + sort + "' is not a valid property");
-            }
-
-            query.orderBy(queryProperty);
-            if (order.equals("asc")) {
-                query.asc();
-            } else if (order.equals("desc")) {
-                query.desc();
-            } else {
-                throw new FlowableIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
-            }
-        }
-
-        DataResponse<RES> response = new DataResponse<>();
-        response.setStart(start);
-        response.setSort(sort);
-        response.setOrder(order);
-
-
-        // Get result and set pagination parameters
-        List<RES> list = processList(query.listPage(start, size));
-        if (start == 0 && list.size() < size) {
-            response.setTotal(list.size());
-        } else {
-            response.setTotal(query.count());
-        }
-
-        response.setSize(list.size());
-        response.setData(list);
-
-        return response;
+        return PaginateListUtil.paginateList(requestParams, paginateRequest, query, defaultSort, properties, this::processList);
     }
 
     /**
@@ -128,7 +56,9 @@ public abstract class AbstractPaginateList<RES, REQ> {
      *            The default sort column (the rest attribute) that later will be mapped to an internal engine name
      * @param properties
      *
+     * @deprecated user {@link PaginateListUtil#paginateList(Map, Query, String, Map, ListProcessor)} instead
      */
+    @Deprecated
     public DataResponse<RES> paginateList(Map<String, String> requestParams, Query<?, REQ> query, String defaultSort, Map<String, QueryProperty> properties) {
         return paginateList(requestParams, null, query, defaultSort, properties);
     }

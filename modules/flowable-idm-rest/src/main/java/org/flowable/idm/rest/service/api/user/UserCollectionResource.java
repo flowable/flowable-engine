@@ -13,6 +13,8 @@
 
 package org.flowable.idm.rest.service.api.user;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -130,7 +132,7 @@ public class UserCollectionResource {
             restApiInterceptor.accessUserInfoWithQuery(query);
         }
 
-        return new UserPaginateList(idmRestResponseFactory).paginateList(allRequestParams, query, "id", properties);
+        return paginateList(allRequestParams, query, "id", properties, idmRestResponseFactory::createUserResponseList);
     }
 
     @ApiOperation(value = "Create a user", tags = { "Users" })

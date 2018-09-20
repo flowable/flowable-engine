@@ -74,10 +74,10 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(1, timerJobs.size());
         
         try {
-            JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(processEngine.getProcessEngineConfiguration(), processEngineManagementService, 5000, 200, true);
+            JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(processEngine.getProcessEngineConfiguration(), processEngineManagementService, 7000, 200, true);
             fail("should throw time limit exceeded");
         } catch (FlowableException e) {
-            assertEquals("time limit of 5000 was exceeded", e.getMessage());
+            assertEquals("time limit of 7000 was exceeded", e.getMessage());
         }
         
         // Timer fires after 3 hours, so setting it to 3 hours + 1 second
@@ -87,7 +87,7 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(1, timerJobs.size());
         assertEquals(timerJobId, timerJobs.get(0).getId());
         
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 5000L, 200L, true);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
         
         // User task should be active after the timer has triggered
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();

@@ -12,6 +12,8 @@
  */
 package org.flowable.idm.rest.service.api.privilege;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.List;
 import java.util.Map;
 
@@ -92,7 +94,7 @@ public class PrivilegeCollectionResource {
             restApiInterceptor.accessPrivilegeInfoWithQuery(query);
         }
         
-        return new PrivilegePaginateList(idmRestResponseFactory).paginateList(allRequestParams, query, "id", null);
+        return paginateList(allRequestParams, query, "id", null, idmRestResponseFactory::createPrivilegeResponseList);
     }
 
     @ApiOperation(value = "List all users for a given privilege", nickname = "listPrivilegeUsers", tags = { "Privileges" }, produces = "application/json")

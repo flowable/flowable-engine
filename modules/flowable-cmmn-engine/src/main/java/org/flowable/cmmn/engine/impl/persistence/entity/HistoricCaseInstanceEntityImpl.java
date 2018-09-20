@@ -19,14 +19,13 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Joram Barrez
  */
-public class HistoricCaseInstanceEntityImpl extends AbstractEntity implements HistoricCaseInstanceEntity {
+public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity implements HistoricCaseInstanceEntity {
     
     protected String businessKey;
     protected String name;

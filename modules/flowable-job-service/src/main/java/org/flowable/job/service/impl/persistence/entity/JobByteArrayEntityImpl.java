@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tom Baeyens
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public class JobByteArrayEntityImpl extends AbstractEntity implements JobByteArrayEntity, Serializable {
+public class JobByteArrayEntityImpl extends AbstractJobServiceEntity implements JobByteArrayEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

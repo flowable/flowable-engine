@@ -806,6 +806,16 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         runtimeService.signalEventReceived("signal3");
         validateTaskCounts(3, 1, 2);
     }
+    
+    @Test
+    @Deployment
+    public void testSingleSignalCatchAfterEventGateway() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("testSignalAfterEventGateway").getId();
+        assertEquals(1, runtimeService.createEventSubscriptionQuery().processInstanceId(processInstanceId).count());
+        runtimeService.signalEventReceived("mySignal");
+        
+        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstanceId).count());
+    }
 
     private void validateTaskCounts(long taskACount, long taskBCount, long taskCCount) {
         assertEquals(taskACount, taskService.createTaskQuery().taskName("Task A").count());

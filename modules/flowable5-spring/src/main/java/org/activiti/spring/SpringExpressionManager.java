@@ -18,12 +18,12 @@ import java.util.Map;
 import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.el.ReadOnlyMapELResolver;
 import org.activiti.engine.impl.el.VariableScopeElResolver;
-import org.activiti.engine.impl.javax.el.ArrayELResolver;
-import org.activiti.engine.impl.javax.el.BeanELResolver;
-import org.activiti.engine.impl.javax.el.CompositeELResolver;
-import org.activiti.engine.impl.javax.el.ELResolver;
-import org.activiti.engine.impl.javax.el.ListELResolver;
-import org.activiti.engine.impl.javax.el.MapELResolver;
+import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
+import org.flowable.common.engine.impl.javax.el.BeanELResolver;
+import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ListELResolver;
+import org.flowable.common.engine.impl.javax.el.MapELResolver;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.springframework.context.ApplicationContext;
 

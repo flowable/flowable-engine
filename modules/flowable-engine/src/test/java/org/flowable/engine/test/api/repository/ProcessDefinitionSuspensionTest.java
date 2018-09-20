@@ -300,7 +300,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         // Move clock 8 days further and let job executor run
         long eightDaysSinceStartTime = oneWeekFromStartTime + (24 * 60 * 60 * 1000);
         processEngineConfiguration.getClock().setCurrentTime(new Date(eightDaysSinceStartTime));
-        waitForJobExecutorToProcessAllJobs(5000L, 200L);
+        waitForJobExecutorToProcessAllJobs(7000L, 200L);
 
         // verify job is now removed
         assertEquals(0, managementService.createJobQuery().processDefinitionId(processDefinition.getId()).count());
@@ -359,7 +359,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         // Move clock 9 days further and let job executor run
         long eightDaysSinceStartTime = oneWeekFromStartTime + (2 * 24 * 60 * 60 * 1000);
         processEngineConfiguration.getClock().setCurrentTime(new Date(eightDaysSinceStartTime));
-        waitForJobExecutorToProcessAllJobs(5000L, 50L);
+        waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         // Try to start process instance. It should fail now.
         try {
@@ -415,7 +415,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         // Move clock two days and let job executor run
         long twoDaysFromStart = startTime.getTime() + (2 * 24 * 60 * 60 * 1000);
         processEngineConfiguration.getClock().setCurrentTime(new Date(twoDaysFromStart));
-        waitForJobExecutorToProcessAllJobs(5000L, 50L);
+        waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         // Starting a process instance should now succeed
         runtimeService.startProcessInstanceById(processDefinition.getId());

@@ -42,7 +42,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.saveUser(user);
 
         User johndoe = idmIdentityService.createUserQuery().userId("johndoe").list().get(0);
-        LOGGER.info("Hash Password = {} ", johndoe.getPassword());
+        LOGGER.info("Hash Password = {}", johndoe.getPassword());
 
         assertFalse("xxx".equals(johndoe.getPassword()));
         assertTrue(idmIdentityService.checkPassword("johndoe", "xxx"));

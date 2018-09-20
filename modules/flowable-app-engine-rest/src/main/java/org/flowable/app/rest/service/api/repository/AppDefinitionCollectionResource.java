@@ -12,6 +12,8 @@
  */
 package org.flowable.app.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -166,6 +168,6 @@ public class AppDefinitionCollectionResource {
             restApiInterceptor.accessAppDefinitionInfoWithQuery(appDefinitionQuery);
         }
 
-        return new AppDefinitionPaginateList(appRestResponseFactory).paginateList(allRequestParams, appDefinitionQuery, "name", properties);
+        return paginateList(allRequestParams, appDefinitionQuery, "name", properties, appRestResponseFactory::createAppDefinitionResponseList);
     }
 }

@@ -175,7 +175,7 @@ ${myBean.myProperty}
 ----
 ${printer.print()}
 ${myBean.addNewOrder('orderName')}
-${myBean.doSomething(myVar, execution)}
+${myBean.doSomething(myVar, planItemInstance)}
 ----
 
 Note that these expressions support resolving primitives (including comparing them), beans, lists, arrays and maps.
@@ -184,6 +184,68 @@ On top of all process variables, there are a few default objects available that 
 
 * ++caseInstance++: The +DelegateCaseInstance+ holds additional information about the ongoing case instance.
 * ++planItemInstance++: The +DelegatePlanItemInstance+ holds additional information about the current plan item.
+
+[[cmmnExpressionsFunctions]]
+
+=== Expression functions
+
+[Experimental] Expression functions have been added in version 6.4.0.
+
+To make working with case variables easier, a set of out-of-the-box functions is available, under the _variables_ namespace.
+
+* *variables:get(varName)*: Retrieves the value of a variable. The main difference with writing the variable name directly in the expression is that using this function won't throw an exception when the variable doesn't exist. For example _${myVariable == "hello"}_ would throw an exception if _myVariable_ doesn't exist, but _${var:get(myVariable) == 'hello'}_ will just work.
+* *variables:getOrDefault(varName, defaultValue)*: similar to _get_, but with the option of providing a default value which is returned when the variable isn't set or the value is _null_.
+* *variables:exists(varName)*: Returns _true_ if the variable has a non-null value.
+* *variables:isEmpty(varName)* (alias _:empty_) : Checks if the variable value is not empty. Depending on the variable type, the behavior is the following:
+** For String variables, the variable is deemed empty if it's the empty string. 
+** For +java.util.Collection+ variables, _true_ is returned if the collection has no elements.
+** For +ArrayNode+ variables, _true_ is returned if there are no elements
+** In case the variable is _null_, _true_ is always returned  
+* *variables:isNotEmpty(varName)* (alias _:notEmpty_) : the reverse operation of _isEmpty_.
+* *variables:equals(varName, value)* (alias _:eq_) : checks if a variable is equal to a given value. This is a shorthand function for an expression that would otherwise be written as _${execution.getVariable("varName") != null && execution.getVariable("varName") == value}_.
+** If the variable value is null, false is returned (unless compared to null).
+* *variables:notEquals(varName, value)* (alias _:ne_) : the reverse comparison of _equals_.
+* *variables:contains(varName, value1, value2, ...)*: checks if *all* values provided are contained within a variable. Depending on the variable type, the behavior is the following:
+** For String variables, the passed values are used as substrings that need to be part of the variable
+** For +java.util.Collection+ variables, all the passed values need to be an element of the collection (regular _contains_ semantics).
+** For +ArrayNode+ variables: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type
+** When the variable value is null, false is returned in all cases. When the variale value is not null, and the instance type is not one of the types above, false will be returned.
+* *variables:containsAny(varName, value1, value2, ...)* : similar to the _contains_ function, but _true_ will be returned if *any* (and not all) the passed values is contained in the variable.
+* Comparator functions:
+** *variables:lowerThan(varName, value)* (alias _:lessThan_ or _:lt_) : shorthand for _${execution.getVariable("varName") != null && execution.getVariable("varName") < value}_
+** *variables:lowerThanOrEquals(varName, value)* (alias _:lessThanOrEquals_ or _:lte_) : similar, but now for _< =_
+** *variables:greaterThan(varName, value)* (alias _:gt_) : similar, but now for _>_
+** *variables:greaterThanOrEquals(varName, value)* (alias _:gte_) : similar, but now for _> =_
+
+The _variables_ namespace is aliased to _vars_ or _var_. So _variables:get(varName)_ is equivalent to writing _vars:get(varName)_ or _var:get(varName)_. Note that it's not needed to put quotes around the variable name: _var:get(varName)_ is equivalent to _var:get(\'varName')_ or _var:get("varName")_.
+ 
+Also note that in none of the functions above the _planItemInstance_ or _caseInstance_ needs to be passed into the function (as would be needed when not using a function). The engine will inject the appropiate variable scope when invoking the function. This also means that these functions can be used in exactly the same way when writing expression in BPMN process definitions.
+
+The use of these variable functions is especially useful in CMMN, for example when it comes to writing the condition of an if-part of sentry. Take the following CMMN case definition:
+
+image::images/cmmn.expression-functions.png[align="center"]
+
+Assume the sentry has an if-part besides the completion event. Right after a case instance is started, this if-part condition will be evaluated (as the stage becomes available). If the condition is of the form _${someVariable == someValue}_, this means the variable needs to be available when starting the case instance. In many cases, this is not possible or the variable comes later (e.g. from a form), which leads to a low-level _PropertyNotFoundException_. Taking the potential nullability in account, the correct expression would have to be:
+
+----
+${planItemInstance.getVariable('someVariable') != null && planItemInstance.getVariable('someVariable') == someValue}
+----
+
+Which is quite long. Using the functions above however, this can be simplified to
+
+----
+${var:eq(someVariable, someValue)}
+----
+
+or
+
+----
+${var:get(someVariable) == someValue}
+----
+
+The function implementations take in account the nullability of the variable (and not throw and exception in case the variable is null) and will handle the equality correctly.
+
+Additionally, it's possible to register custom functions that can be used in expressions. See the +org.flowable.common.engine.api.delegate.FlowableFunctionDelegate+ interface for more information.
 
 
 [[apiUnitTesting]]

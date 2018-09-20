@@ -16,12 +16,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
-
 /**
  * @author Joram Barrez
  */
-public class SentryPartInstanceEntityImpl extends AbstractEntity implements SentryPartInstanceEntity {
+public class SentryPartInstanceEntityImpl extends AbstractCmmnEngineEntity implements SentryPartInstanceEntity {
 
     protected String caseDefinitionId;
     protected String caseInstanceId;

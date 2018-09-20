@@ -26,7 +26,7 @@ import javax.persistence.Id;
 public class BigIntegerIdJPAEntity {
 
     @Id
-    @Column(name = "ID_")
+    @Column(name = "ID_", precision = 35)
     private BigInteger bigIntegerId;
 
     public BigInteger getBigIntegerId() {

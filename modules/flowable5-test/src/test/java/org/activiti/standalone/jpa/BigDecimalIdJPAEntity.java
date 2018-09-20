@@ -26,7 +26,7 @@ import javax.persistence.Id;
 public class BigDecimalIdJPAEntity {
 
     @Id
-    @Column(name = "ID_")
+    @Column(name = "ID_", precision = 50, scale = 20)
     private BigDecimal bigDecimalId;
 
     public BigDecimal getBigDecimalId() {

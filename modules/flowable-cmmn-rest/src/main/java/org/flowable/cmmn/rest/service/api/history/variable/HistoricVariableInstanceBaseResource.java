@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.history.variable;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +96,7 @@ public class HistoricVariableInstanceBaseResource {
             restApiInterceptor.accessHistoryVariableInfoWithQuery(query);
         }
 
-        return new HistoricVariableInstancePaginateList(restResponseFactory).paginateList(allRequestParams, query, "variableName", allowedSortProperties);
+        return paginateList(allRequestParams, query, "variableName", allowedSortProperties, restResponseFactory::createHistoricVariableInstanceResponseList);
     }
     
     public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId, HttpServletRequest request) {

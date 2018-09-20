@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.context.Context;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.util.CommandContextUtil;
@@ -32,7 +31,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements HistoricTaskInstanceEntity {
+public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity implements HistoricTaskInstanceEntity {
 
     private static final long serialVersionUID = 1L;
 

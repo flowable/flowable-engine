@@ -23,13 +23,12 @@ import java.util.Map;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implements CmmnDeploymentEntity, Serializable {
+public class CmmnDeploymentEntityImpl extends AbstractCmmnEngineNoRevisionEntity implements CmmnDeploymentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -100,20 +100,22 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
             }
         }
 
-        CommandContext commandContext = Context.getCommandContext();
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-
-        // Find the executions
-        List<ExecutionEntity> executionEntities = executionEntityManager
-                .findExecutionsByParentExecutionAndActivityIds(execution.getParentId(), eventActivityIds);
-
-        // Execute the cancel behaviour of the IntermediateCatchEvent
-        for (ExecutionEntity executionEntity : executionEntities) {
-            if (eventActivityIds.contains(executionEntity.getActivityId()) && execution.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
-                IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) execution.getCurrentFlowElement();
-                if (intermediateCatchEvent.getBehavior() instanceof IntermediateCatchEventActivityBehavior) {
-                    ((IntermediateCatchEventActivityBehavior) intermediateCatchEvent.getBehavior()).eventCancelledByEventGateway(executionEntity);
-                    eventActivityIds.remove(executionEntity.getActivityId()); // We only need to delete ONE execution at the event.
+        if (!eventActivityIds.isEmpty()) {
+            CommandContext commandContext = Context.getCommandContext();
+            ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+    
+            // Find the executions
+            List<ExecutionEntity> executionEntities = executionEntityManager
+                    .findExecutionsByParentExecutionAndActivityIds(execution.getParentId(), eventActivityIds);
+    
+            // Execute the cancel behaviour of the IntermediateCatchEvent
+            for (ExecutionEntity executionEntity : executionEntities) {
+                if (eventActivityIds.contains(executionEntity.getActivityId()) && execution.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
+                    IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) execution.getCurrentFlowElement();
+                    if (intermediateCatchEvent.getBehavior() instanceof IntermediateCatchEventActivityBehavior) {
+                        ((IntermediateCatchEventActivityBehavior) intermediateCatchEvent.getBehavior()).eventCancelledByEventGateway(executionEntity);
+                        eventActivityIds.remove(executionEntity.getActivityId()); // We only need to delete ONE execution at the event.
+                    }
                 }
             }
         }

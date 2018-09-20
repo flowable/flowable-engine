@@ -46,7 +46,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         startMap.put("anothertest", 456);
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     @AfterEach

@@ -21,14 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements DmnDeploymentEntity, Serializable {
+public class DmnDeploymentEntityImpl extends AbstractDmnEngineNoRevisionEntity implements DmnDeploymentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

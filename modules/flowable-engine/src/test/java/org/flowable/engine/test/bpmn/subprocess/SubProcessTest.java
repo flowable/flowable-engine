@@ -76,7 +76,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // Setting the clock forward 2 hours 1 second (timer fires in 2 hours) and fire up the job executor
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (2 * 60 * 60 * 1000) + 1000));
         assertEquals(1, managementService.createTimerJobQuery().count());
-        waitForJobExecutorToProcessAllJobs(5000L, 500L);
+        waitForJobExecutorToProcessAllJobs(7000L, 500L);
 
         // The subprocess should be left, and the escalated task should be active
         org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -162,7 +162,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and
         // fire up the job executor
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (60 * 60 * 1000) + 1000));
-        waitForJobExecutorToProcessAllJobs(5000L, 50L);
+        waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         // The inner subprocess should be destroyed, and the escalated task should be active
         org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
@@ -322,7 +322,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // Firing the timer should destroy all three subprocesses and activate the task after the timer
         // processEngineConfiguration.getClock().setCurrentTime(new
         // Date(startTime.getTime() + (2 * 60 * 60 * 1000 ) + 1000));
-        // waitForJobExecutorToProcessAllJobs(5000L, 50L);
+        // waitForJobExecutorToProcessAllJobs(7000L, 50L);
         Job job = managementService.createTimerJobQuery().singleResult();
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());

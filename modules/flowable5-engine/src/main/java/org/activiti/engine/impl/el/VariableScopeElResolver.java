@@ -16,10 +16,10 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
 import org.activiti.engine.impl.identity.Authentication;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**

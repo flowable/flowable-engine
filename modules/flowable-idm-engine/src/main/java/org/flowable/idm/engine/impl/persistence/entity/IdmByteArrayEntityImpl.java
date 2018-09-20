@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Tijs Rademakers
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public class IdmByteArrayEntityImpl extends AbstractEntity implements IdmByteArrayEntity, Serializable {
+public class IdmByteArrayEntityImpl extends AbstractIdmEngineEntity implements IdmByteArrayEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

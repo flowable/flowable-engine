@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -250,7 +252,8 @@ public class HistoricTaskInstanceBaseResource {
             restApiInterceptor.accessHistoryTaskInfoWithQuery(query);
         }
 
-        return new HistoricTaskInstancePaginateList(restResponseFactory, serverRootUrl).paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties);
+        return paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties,
+            restResponseFactory::createHistoricTaskInstanceResponseList);
     }
     
     protected HistoricTaskInstance getHistoricTaskInstanceFromRequest(String taskId) {

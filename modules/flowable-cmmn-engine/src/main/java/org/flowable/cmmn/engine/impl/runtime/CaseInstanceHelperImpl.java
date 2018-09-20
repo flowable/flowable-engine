@@ -24,8 +24,8 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -34,6 +34,7 @@ import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.identitylink.api.IdentityLinkType;
 
 /**
  * @author Joram Barrez
@@ -93,6 +94,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             caseInstanceEntity.setTenantId(caseInstanceBuilder.getTenantId());
         }
 
+        if (caseInstanceBuilder.getParentId() != null) {
+            caseInstanceEntity.setParentId(caseInstanceBuilder.getParentId());
+        }
+
         if (caseInstanceBuilder.getCallbackId() != null) {
             caseInstanceEntity.setCallbackId(caseInstanceBuilder.getCallbackId());
         }
@@ -141,10 +146,13 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         caseInstanceEntity.setTenantId(caseDefinition.getTenantId());
 
         String authenticatedUserId = Authentication.getAuthenticatedUserId();
-
         caseInstanceEntity.setStartUserId(authenticatedUserId);
-
+        
         caseInstanceEntityManager.insert(caseInstanceEntity);
+        
+        if (authenticatedUserId != null) {
+            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstanceEntity, authenticatedUserId, null, IdentityLinkType.STARTER);
+        }
 
         caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<>(1));
 

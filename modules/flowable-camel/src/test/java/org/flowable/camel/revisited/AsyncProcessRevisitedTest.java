@@ -63,7 +63,7 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
 
         List<Execution> executionList = runtimeService.createExecutionQuery().list();
         assertEquals(3, executionList.size());
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000, 200);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000, 200);
 
         assertTrue(oneExchangeSendToFlowableReceive1.matchesMockWaitTime());
         assertTrue(oneExchangeSendToFlowableReceive2.matchesMockWaitTime());

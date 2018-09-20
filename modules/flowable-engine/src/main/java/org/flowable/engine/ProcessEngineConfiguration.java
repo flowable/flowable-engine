@@ -13,10 +13,14 @@
 
 package org.flowable.engine;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.HasTaskIdGeneratorEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.cfg.HttpClientConfig;
@@ -26,11 +30,6 @@ import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.task.service.TaskPostProcessor;
-
-import javax.sql.DataSource;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Configuration information from which a process engine can be build.
@@ -79,7 +78,7 @@ import java.util.Map;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration implements HasTaskIdGeneratorEngineConfiguration {
+public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration {
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
     protected int idBlockSize = 2500;
@@ -138,11 +137,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessEngineLifecycleListener processEngineLifecycleListener;
 
     protected boolean enableProcessDefinitionInfoCache;
-
-    /**
-     * generator used to generate task ids
-     */
-    protected IdGenerator taskIdGenerator;
 
     /** postprocessor for a task builder */
     protected TaskPostProcessor taskPostProcessor = null;
@@ -692,24 +686,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     public ProcessEngineConfiguration setEnableProcessDefinitionInfoCache(boolean enableProcessDefinitionInfoCache) {
         this.enableProcessDefinitionInfoCache = enableProcessDefinitionInfoCache;
         return this;
-    }
-
-    @Override
-    public void initIdGenerator() {
-        super.initIdGenerator();
-        if (taskIdGenerator == null) {
-            taskIdGenerator = idGenerator;
-        }
-    }
-
-    @Override
-    public IdGenerator getTaskIdGenerator() {
-        return taskIdGenerator;
-    }
-
-    @Override
-    public void setTaskIdGenerator(IdGenerator taskIdGenerator) {
-        this.taskIdGenerator = taskIdGenerator;
     }
 
     public TaskPostProcessor getTaskPostProcessor() {

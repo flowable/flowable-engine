@@ -12,6 +12,8 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -165,6 +167,6 @@ public class FormDefinitionCollectionResource {
             restApiInterceptor.accessFormDefinitionInfoWithQuery(formDefinitionQuery);
         }
 
-        return new FormPaginateList(formRestResponseFactory).paginateList(allRequestParams, formDefinitionQuery, "name", properties);
+        return paginateList(allRequestParams, formDefinitionQuery, "name", properties, formRestResponseFactory::createFormResponseList);
     }
 }

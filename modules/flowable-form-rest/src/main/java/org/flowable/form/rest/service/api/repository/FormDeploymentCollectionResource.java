@@ -12,6 +12,8 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,7 +131,7 @@ public class FormDeploymentCollectionResource {
             restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
         }
 
-        return new FormDeploymentsPaginateList(formRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
+        return paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties, formRestResponseFactory::createFormDeploymentResponseList);
     }
 
     @ApiOperation(value = "Create a new form deployment", tags = {

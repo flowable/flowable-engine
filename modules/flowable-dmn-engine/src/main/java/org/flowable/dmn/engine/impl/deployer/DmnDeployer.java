@@ -36,6 +36,7 @@ public class DmnDeployer implements Deployer {
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
     protected DmnDeploymentHelper dmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
+    protected boolean usePrefixId;
 
     @Override
     public void deploy(DmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
@@ -94,7 +95,11 @@ public class DmnDeployer implements Deployer {
             }
 
             decisionTable.setVersion(version);
-            decisionTable.setId(idGenerator.getNextId());
+            if (usePrefixId) {
+                decisionTable.setId(decisionTable.getIdPrefix() + idGenerator.getNextId());
+            } else {
+                decisionTable.setId(idGenerator.getNextId());
+            }
         }
     }
 
@@ -153,5 +158,13 @@ public class DmnDeployer implements Deployer {
 
     public void setCachingAndArtifactsManager(CachingAndArtifactsManager manager) {
         this.cachingAndArtifactsManager = manager;
+    }
+
+    public boolean isUsePrefixId() {
+        return usePrefixId;
+    }
+
+    public void setUsePrefixId(boolean usePrefixId) {
+        this.usePrefixId = usePrefixId;
     }
 }
