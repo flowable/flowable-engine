@@ -61,6 +61,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         assertEquals("testTask", tasks.get(0).getName());
 
+        task = tasks.get(0);
         task.setName("Update name");
         taskService.saveTask(task);
         tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();

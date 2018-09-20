@@ -26,6 +26,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.form.StartFormData;
+import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
@@ -138,6 +139,8 @@ public interface Flowable5CompatibilityHandler {
     Object getRenderedStartForm(String processDefinitionId, String formEngineName);
 
     ProcessInstance submitStartFormData(String processDefinitionId, String businessKey, Map<String, String> properties);
+    
+    TaskFormData getTaskFormData(String taskId);
 
     void submitTaskFormData(String taskId, Map<String, String> properties, boolean completeTask);
 

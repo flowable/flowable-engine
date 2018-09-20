@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.variable.CacheableVariable;
 import org.activiti.engine.impl.variable.JPAEntityListVariableType;
 import org.activiti.engine.impl.variable.JPAEntityVariableType;
+import org.flowable.variable.service.impl.types.CacheableVariable;
 
 /**
  * List that initialises binary variable values if command-context is active.

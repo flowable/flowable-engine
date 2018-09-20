@@ -13,6 +13,8 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.context.Context;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.types.CacheableVariable;
+import org.flowable.variable.service.impl.types.JPAEntityMappings;
 
 /**
  * Variable type capable of storing a list of reference to JPA-entities. Only JPA-Entities which are configured by annotations are supported. Use of compound primary keys is not supported. <br>

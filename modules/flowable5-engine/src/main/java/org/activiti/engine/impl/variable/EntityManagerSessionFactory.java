@@ -18,6 +18,7 @@ import javax.persistence.EntityManagerFactory;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.flowable.variable.service.impl.types.EntityManagerSession;
 
 /**
  * @author Frederik Heremans
