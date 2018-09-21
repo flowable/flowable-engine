@@ -76,22 +76,22 @@ public class MongoDbHistoricDetailDataManager extends AbstractMongoDbDataManager
 
     @Override
     public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap) {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -161,15 +161,6 @@ public class MongoDbSession implements Session {
 
         }
         updatedObjects.clear();
-
-//        // MongoDb specific updates
-//        if (!mongoDbSpecificUpdates.isEmpty()) {
-//            for (String collection : mongoDbSpecificUpdates.keySet()) {
-//                List<SingleEntityUpdate> basicDBObjects = mongoDbSpecificUpdates.get(collection);
-//                basicDBObjects.forEach(singleEntityUpdate -> getMongoDatabase().getCollection(collection)
-//                    .updateMany(clientSession, Filters.eq("_id", singleEntityUpdate.getId()), new Document().append("$set", singleEntityUpdate.getBasicDBObject())));
-//            }
-//        }
     }
     
     protected void flushDeletes() {
