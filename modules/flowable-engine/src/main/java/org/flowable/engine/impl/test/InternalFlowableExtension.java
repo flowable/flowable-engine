@@ -93,6 +93,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
         ProcessEngine processEngine = getProcessEngine(context);
+
         // Always reset authenticated user to avoid any mistakes
         processEngine.getIdentityService().setAuthenticatedUserId(null);
 
@@ -138,6 +139,9 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
 
             AnnotationSupport.findAnnotation(context.getTestMethod(), CleanTest.class)
                 .ifPresent(cleanTest -> removeDeployments(processEngine.getRepositoryService()));
+            
+            AbstractFlowableTestCase.cleanDeployments(processEngine);
+            
             if (context.getTestInstanceLifecycle().orElse(TestInstance.Lifecycle.PER_METHOD) == lifecycleForClean) {
                 cleanTestAndAssertAndEnsureCleanDb(context, processEngine);
             }

@@ -58,10 +58,13 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
     @AfterEach
     protected void tearDown() throws Exception {
-
         // The tests are doing deployments, which trigger async history. Therefore, we need to invoke them manually and then wait for the jobs to finish
         // so there can be clean data in the DB
-        cleanDeployments();
+        for (String autoDeletedDeploymentId : deploymentIdsForAutoCleanup) {
+            repositoryService.deleteDeployment(autoDeletedDeploymentId, true);
+        }
+        deploymentIdsForAutoCleanup.clear();
+        
         waitForHistoryJobExecutorToProcessAllJobs(10000, 100);
         for (Job job : managementService.createJobQuery().list()) {
             if (job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
@@ -69,7 +72,6 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                 managementService.deleteJob(job.getId());
             }
         }
-
     }
 
     @Test

@@ -52,7 +52,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -71,7 +70,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
     protected ProcessEngine processEngine;
 
-    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<>();
+    protected static List<String> deploymentIdsForAutoCleanup = new ArrayList<>();
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected RepositoryService repositoryService;
@@ -97,10 +96,10 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         dynamicBpmnService = processEngine.getDynamicBpmnService();
     }
 
-    @AfterEach
-    public final void cleanDeployments() {
+    protected static void cleanDeployments(ProcessEngine processEngine) {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
         for (String autoDeletedDeploymentId : deploymentIdsForAutoCleanup) {
-            repositoryService.deleteDeployment(autoDeletedDeploymentId, true);
+            processEngineConfiguration.getRepositoryService().deleteDeployment(autoDeletedDeploymentId, true);
         }
         deploymentIdsForAutoCleanup.clear();
     }
@@ -113,7 +112,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().finished().list();
 
             for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
-
+                
                 assertNotNull("Historic process instance has no process definition id", historicProcessInstance.getProcessDefinitionId());
                 assertNotNull("Historic process instance has no process definition key", historicProcessInstance.getProcessDefinitionKey());
                 assertNotNull("Historic process instance has no process definition version", historicProcessInstance.getProcessDefinitionVersion());
