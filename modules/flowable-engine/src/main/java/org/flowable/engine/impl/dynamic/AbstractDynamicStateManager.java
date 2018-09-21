@@ -53,6 +53,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -110,7 +111,7 @@ public abstract class AbstractDynamicStateManager {
                     addExecutionToExecutionListsByParentIdMap(executionsByParent, execution.getParentId(), execution);
                 }
                 executionsByParent.values().forEach(executions -> moveExecutionEntityContainerList.add(
-                                new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds())));
+                    new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds())));
             }
         }
 
@@ -122,7 +123,7 @@ public abstract class AbstractDynamicStateManager {
                 for (String activityId : activityContainer.getActivityIds()) {
                     List<ExecutionEntity> activityExecutions = resolveActiveExecutions(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext);
                     if (!activityExecutions.isEmpty()) {
-                        
+
                         // check for a multi instance root execution
                         ExecutionEntity miExecution = null;
                         boolean isInsideMultiInstance = false;
@@ -132,15 +133,15 @@ public abstract class AbstractDynamicStateManager {
                                 isInsideMultiInstance = true;
                                 break;
                             }
-                            
+
                             if (isExecutionInsideMultiInstance(possibleMIExecution)) {
                                 isInsideMultiInstance = true;
                             }
                         }
-                        
+
                         //If inside a multiInstance, we create one container for each execution
                         if (isInsideMultiInstance) {
-                            
+
                             //We group by the parentId (executions belonging to the same parent execution instance
                             // i.e. gateways nested in MultiInstance subprocesses, need to be in the same move container)
                             Stream<ExecutionEntity> executionEntitiesStream = activityExecutions.stream();
@@ -152,7 +153,7 @@ public abstract class AbstractDynamicStateManager {
                                 String parentId = childExecution.isMultiInstanceRoot() ? childExecution.getId() : childExecution.getParentId();
                                 addExecutionToExecutionListsByParentIdMap(activitiesExecutionsByMultiInstanceParentId, parentId, childExecution);
                             });
-                            
+
                         } else {
                             ExecutionEntity execution = activityExecutions.iterator().next();
                             activitiesExecutionsNotInMultiInstanceParent.add(execution);
@@ -218,7 +219,7 @@ public abstract class AbstractDynamicStateManager {
         if (executions.isEmpty()) {
             throw new FlowableException("Active execution could not be found with activity id " + activityId);
         }
-        
+
         return executions;
     }
 
@@ -826,8 +827,6 @@ public abstract class AbstractDynamicStateManager {
     protected ExecutionEntity migrateExecutionEntity(ExecutionEntity parentExecutionEntity, ExecutionEntity childExecution, FlowElement newFlowElement, CommandContext commandContext) {
 
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
-        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         childExecution.setParent(parentExecutionEntity);
@@ -848,15 +847,8 @@ public abstract class AbstractDynamicStateManager {
             task.setTaskDefinitionKey(newFlowElement.getId());
             task.setName(newFlowElement.getName());
 
-            //Sync historic
-            List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
-            for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
-                historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
-                historicActivityInstance.setActivityId(childExecution.getActivityId());
-                historicActivityInstance.setActivityName(newFlowElement.getName());
-            }
-
-            historicTaskService.recordTaskInfoChange(task);
+            //Sync history
+            syncTaskExecutionHistory(childExecution, newFlowElement, oldActivityId, task, commandContext);
         }
 
         // Boundary Events - only applies to Activities and up to this point we have a UserTask or ReceiveTask execution, both are Activities
@@ -870,6 +862,25 @@ public abstract class AbstractDynamicStateManager {
             LOGGER.debug("Child execution {} updated with parent {}", childExecution, parentExecutionEntity.getId());
         }
         return childExecution;
+    }
+
+    protected void syncTaskExecutionHistory(ExecutionEntity childExecution, FlowElement newFlowElement, String oldActivityId, TaskEntityImpl task, CommandContext commandContext) {
+
+        HistoryLevel currentHistoryLevel = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoryLevel();
+        if (currentHistoryLevel.isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext);
+            List<HistoricActivityInstanceEntity> historicActivityInstances = historicActivityInstanceEntityManager.findHistoricActivityInstancesByExecutionAndActivityId(childExecution.getId(), oldActivityId);
+            for (HistoricActivityInstanceEntity historicActivityInstance : historicActivityInstances) {
+                historicActivityInstance.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+                historicActivityInstance.setActivityId(childExecution.getActivityId());
+                historicActivityInstance.setActivityName(newFlowElement.getName());
+            }
+        }
+
+        if (currentHistoryLevel.isAtLeast(HistoryLevel.AUDIT)) {
+            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+            historicTaskService.recordTaskInfoChange(task);
+        }
     }
 
     protected List<ExecutionEntity> createBoundaryEvents(List<BoundaryEvent> boundaryEvents, ExecutionEntity execution, CommandContext commandContext) {
@@ -910,7 +921,7 @@ public abstract class AbstractDynamicStateManager {
             }
         }
     }
-    
+
     protected boolean isExecutionInsideMultiInstance(ExecutionEntity execution) {
         FlowElementsContainer parentContainer = execution.getCurrentFlowElement().getParentContainer();
         while (!(parentContainer instanceof Process)) {

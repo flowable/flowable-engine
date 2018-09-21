@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.dynamic.AbstractDynamicStateManager;
@@ -181,7 +182,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         doMoveExecutionState(processInstanceChangeState, commandContext);
 
         LOGGER.debug("Updating Process definition reference in history");
-        changeProcessDefinitionReferenceOfHistory(commandContext, processExecution, procDefToMigrateTo);
+        changeProcessDefinitionReferenceOfHistory(processExecution, procDefToMigrateTo, commandContext);
 
         LOGGER.debug("Process migration ended for process instance with Id:'" + processInstanceId + "'");
     }
@@ -278,9 +279,12 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         return false;
     }
 
-    protected void changeProcessDefinitionReferenceOfHistory(CommandContext commandContext, ProcessInstance processInstance, ProcessDefinition processDefinition) {
-        HistoryManager historyManager = CommandContextUtil.getHistoryManager(commandContext);
-        historyManager.updateProcessDefinitionIdInHistory((ProcessDefinitionEntity) processDefinition, (ExecutionEntity) processInstance);
+    protected void changeProcessDefinitionReferenceOfHistory(ProcessInstance processInstance, ProcessDefinition processDefinition, CommandContext commandContext) {
+        HistoryLevel currentHistoryLevel = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoryLevel();
+        if (currentHistoryLevel.isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoryManager historyManager = CommandContextUtil.getHistoryManager(commandContext);
+            historyManager.updateProcessDefinitionIdInHistory((ProcessDefinitionEntity) processDefinition, (ExecutionEntity) processInstance);
+        }
     }
 
     protected ProcessInstanceMigrationValidationResult doValidateProcessInstanceMigration(String processInstanceId, String tenantId, BpmnModel bpmnModel, Map<String, String> activityMappings, CommandContext commandContext) {
