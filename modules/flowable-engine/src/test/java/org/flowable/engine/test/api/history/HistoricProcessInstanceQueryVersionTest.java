@@ -19,15 +19,17 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTestCase {
 
     private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
     private static final String DEPLOYMENT_FILE_PATH = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml";
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         repositoryService.createDeployment()
                 .addClasspathResource(DEPLOYMENT_FILE_PATH)
                 .deploy();
@@ -44,14 +46,15 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         startMap.put("anothertest", 456);
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, startMap);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         deleteDeployments();
     }
 
+    @Test
     public void testHistoricProcessInstanceQueryByProcessDefinitionVersion() {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(1).list().get(0).getProcessDefinitionVersion().intValue());
         assertEquals(2, historyService.createHistoricProcessInstanceQuery().processDefinitionVersion(2).list().get(0).getProcessDefinitionVersion().intValue());
@@ -82,6 +85,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         }
     }
 
+    @Test
     public void testHistoricProcessInstanceQueryByProcessDefinitionVersionAndKey() {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(1).count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionVersion(2).count());
@@ -93,6 +97,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("undefined").processDefinitionVersion(2).list().size());
     }
 
+    @Test
     public void testHistoricProcessInstanceOrQueryByProcessDefinitionVersion() {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionVersion(1).processDefinitionId("undefined").endOr().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionVersion(2).processDefinitionId("undefined").endOr().count());

@@ -18,6 +18,9 @@ import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for cub-tasks querying
@@ -29,7 +32,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
 
     private List<String> taskIds;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
 
         identityService.saveUser(identityService.newUser("kermit"));
@@ -44,7 +47,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
         taskIds = generateTestSubTasks();
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");
@@ -56,6 +59,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion (no other filters, no sort)
      */
+    @Test
     public void testQueryExcludeSubtasks() throws Exception {
         // query all tasks, including subtasks
         TaskQuery query = taskService.createTaskQuery();
@@ -70,6 +74,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion (no other filters, no sort)
      */
+    @Test
     public void testQueryWithPagination() throws Exception {
         // query all tasks, including subtasks
         TaskQuery query = taskService.createTaskQuery();
@@ -84,6 +89,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion (no other filters, order by task assignee )
      */
+    @Test
     public void testQueryExcludeSubtasksSorted() throws Exception {
         // query all tasks, including subtasks
         TaskQuery query = taskService.createTaskQuery().orderByTaskAssignee().asc();
@@ -98,6 +104,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion when additional filter is specified (like assignee), no order.
      */
+    @Test
     public void testQueryByAssigneeExcludeSubtasks() throws Exception {
         // gonzo has 2 root tasks and 3+2 subtasks assigned
         // include subtasks
@@ -125,6 +132,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion when additional filter is specified (like assignee), no order.
      */
+    @Test
     public void testQueryByAssigneeExcludeSubtasksPaginated() throws Exception {
         // gonzo has 2 root tasks and 3+2 subtasks assigned
         // include subtasks
@@ -152,6 +160,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered.
      */
+    @Test
     public void testQueryByAssigneeExcludeSubtasksOrdered() throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 
@@ -185,6 +194,7 @@ public class SubTaskQueryTest extends PluggableFlowableTestCase {
     /**
      * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered.
      */
+    @Test
     public void testQueryByAssigneeExcludeSubtasksOrderedAndPaginated() throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 

@@ -6,7 +6,7 @@
     <parent>
         <artifactId>flowable-spring-boot</artifactId>
         <groupId>org.flowable</groupId>
-        <version>6.3.2-SNAPSHOT</version>
+        <version>6.4.0-SNAPSHOT</version>
         <relativePath>../flowable-spring-boot/pom.xml</relativePath>
     </parent>
 

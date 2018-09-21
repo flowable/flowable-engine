@@ -31,7 +31,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements PlanItemInstanceEntity, CountingPlanItemInstanceEntity {
+public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements PlanItemInstanceEntity, CountingPlanItemInstanceEntity {
     
     protected String caseDefinitionId;
     protected String caseInstanceId;

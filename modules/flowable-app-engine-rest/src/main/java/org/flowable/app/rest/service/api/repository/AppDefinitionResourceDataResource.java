@@ -21,6 +21,7 @@ import org.apache.commons.io.IOUtils;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class AppDefinitionResourceDataResource {
 
     @Autowired
     protected AppRepositoryService appRepositoryService;
+    
+    @Autowired(required=false)
+    protected AppRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get an app definition resource content", nickname = "getAppDefinitionContent", tags = { "App Definitions" })
     @ApiResponses(value = {
@@ -64,6 +68,10 @@ public class AppDefinitionResourceDataResource {
         }
         if (appDefinition.getResourceName() == null) {
             throw new FlowableException("No resource name available");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessAppDefinitionInfoById(appDefinition);
         }
 
         // Check if deployment exists

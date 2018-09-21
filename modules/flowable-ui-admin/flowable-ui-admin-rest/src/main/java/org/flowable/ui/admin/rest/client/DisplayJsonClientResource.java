@@ -336,6 +336,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                 elementNode.put("type", "sequenceFlow");
                 elementNode.put("sourceRef", flow.getSourceRef());
                 elementNode.put("targetRef", flow.getTargetRef());
+                elementNode.put("name", flow.getName());
 
                 List<GraphicInfo> flowInfo = model.getFlowLocationGraphicInfo(flow.getId());
                 ArrayNode waypointArray = objectMapper.createArrayNode();

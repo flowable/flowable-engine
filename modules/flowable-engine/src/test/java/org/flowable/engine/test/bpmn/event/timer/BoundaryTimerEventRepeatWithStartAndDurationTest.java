@@ -28,9 +28,11 @@ import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.jupiter.api.Test;
 
 public class BoundaryTimerEventRepeatWithStartAndDurationTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testRepeatWithStartAndDuration() throws Throwable {
 

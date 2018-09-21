@@ -26,6 +26,8 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.util.ReflectUtil;
+import org.flowable.variable.service.impl.types.EntityMetaData;
+import org.flowable.variable.service.impl.types.JPAEntityScanner;
 
 /**
  * @author Frederik Heremans

@@ -3,7 +3,7 @@ package org.activiti.engine;
 import org.flowable.job.api.Job;
 
 /**
- * This exception is thrown when you try to execute a job that is not found (may be due to cancelActiviti="true" for instance)..
+ * This exception is thrown when you try to execute a job that was not found (may be due to cancelActiviti="true" for instance)..
  * 
  * @author Prabhat Tripathi
  */

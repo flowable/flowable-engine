@@ -12,6 +12,7 @@
  */
 package org.flowable.standalone.deploy;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -20,17 +21,12 @@ import java.util.Scanner;
  */
 public class DeploymentCacheTestUtil {
 
-    public static String readTemplateFile(String templateFile) {
-        InputStream inputStream = DeploymentCacheTestUtil.class.getResourceAsStream(templateFile);
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(inputStream, "UTF-8").useDelimiter("\\A");
+    public static String readTemplateFile(String templateFile) throws IOException {
+        try (InputStream inputStream = DeploymentCacheTestUtil.class.getResourceAsStream(templateFile);
+             Scanner scanner = new Scanner(inputStream, "UTF-8")) {
+            scanner.useDelimiter("\\A");
             if (scanner.hasNext()) {
                 return scanner.next();
-            }
-        } finally {
-            if (scanner != null) {
-                scanner.close();
             }
         }
         return null;

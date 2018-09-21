@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="processEngineConfiguration"
+		class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+		
+		<property name="jdbcUrl" value="jdbc:h2:mem:flowable-prefixid-test;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+
+		<property name="databaseSchemaUpdate" value="true" />
+		
+		<property name="idGenerator" ref="idGenerator"/>
+		
+		<property name="usePrefixId" value="true" />
+	</bean>
+
+	<bean id="idGenerator" class="org.flowable.common.engine.impl.persistence.StrongUuidGenerator"/>
+
+</beans>

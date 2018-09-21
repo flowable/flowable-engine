@@ -14,6 +14,7 @@ package org.flowable.standalone.parsing;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -25,6 +26,7 @@ public class BPMNParseHandlerTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/parsing/bpmn.parse.listener.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testAlterProcessDefinitionKeyWhenDeploying() throws Exception {
         // Check if process-definition has different key

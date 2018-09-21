@@ -55,6 +55,14 @@ public interface CaseInstanceBuilder {
      */
     CaseInstanceBuilder callbackId(String callbackId);
 
+    /**
+     * Set parent case instanceId of the newly create case instance
+     *
+     * @param parentCaseInstanceId parent case instance identifier
+     * @return modified case instance builder which creates case instance with the reference to parent
+     */
+    CaseInstanceBuilder parentId(String parentCaseInstanceId);
+
     CaseInstance start();
     
     CaseInstance startWithForm();
@@ -78,4 +86,7 @@ public interface CaseInstanceBuilder {
     String getCallbackType();
 
     String getCallbackId();
+
+    String getParentId();
+
 }

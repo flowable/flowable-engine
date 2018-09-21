@@ -53,7 +53,7 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncCamelProcessRevisited");
         List<Execution> executionList = runtimeService.createExecutionQuery().list();
         assertEquals(3, executionList.size());
-        waitForJobExecutorToProcessAllJobs(5000, 200);
+        waitForJobExecutorToProcessAllJobs(7000, 200);
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 }

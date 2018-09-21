@@ -139,6 +139,10 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
     public void storeFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
         FormInfo formModel;
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.storeFormInstance(formRequest);
+        }
 
         if (formRequest.getFormDefinitionKey() != null) {
             formModel = formService.getFormModelWithVariablesByKey(

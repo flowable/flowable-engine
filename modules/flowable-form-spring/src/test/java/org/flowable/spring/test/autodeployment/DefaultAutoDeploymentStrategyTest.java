@@ -13,10 +13,10 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
@@ -29,21 +29,21 @@ import java.io.InputStream;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Tiese Barrell
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStrategyTest {
 
     private DefaultAutoDeploymentStrategy classUnderTest;
 
-    @Before
+    @BeforeEach
     @Override
     public void before() throws Exception {
         super.before();
@@ -84,14 +84,17 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
         verify(deploymentBuilderMock, times(1)).deploy();
     }
 
-    @Test(expected = FlowableException.class)
+    @Test
     public void testDeployResourcesIOExceptionYieldsFlowableException() throws Exception {
-        when(resourceMock3.getInputStream()).thenThrow(new IOException());
+        IOException ioException = new IOException("Test message");
+        when(resourceMock3.getInputStream()).thenThrow(ioException);
 
         final Resource[] resources = new Resource[] { resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
-
-        fail("Expected exception for IOException");
+        assertThatThrownBy(() ->
+            classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock))
+            .isInstanceOf(FlowableException.class)
+            .hasMessage("couldn't auto deploy resource 'resourceMock3': Test message")
+            .hasCause(ioException);
     }
 
     @Test

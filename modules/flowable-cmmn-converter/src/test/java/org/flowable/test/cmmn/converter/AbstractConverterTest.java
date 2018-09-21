@@ -14,31 +14,21 @@ package org.flowable.test.cmmn.converter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
 
 public abstract class AbstractConverterTest implements CmmnXmlConstants {
 
     protected CmmnModel readXMLFile(String resource) throws Exception {
         InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        return new CmmnXmlConverter().convertToCmmnModel(xtr);
+        return new CmmnXmlConverter().convertToCmmnModel(new InputStreamSource(xmlStream), true, false, "UTF-8");
     }
 
     protected CmmnModel exportAndReadXMLFile(CmmnModel cmmnModel) throws Exception {
         byte[] xml = new CmmnXmlConverter().convertToXML(cmmnModel);
-        //System.out.println(new String(xml, "utf-8"));
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        return new CmmnXmlConverter().convertToCmmnModel(xtr);
+        return new CmmnXmlConverter().convertToCmmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
     }
 }

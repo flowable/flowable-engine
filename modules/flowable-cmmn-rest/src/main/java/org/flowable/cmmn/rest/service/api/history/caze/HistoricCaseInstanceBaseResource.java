@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.history.caze;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -112,7 +114,8 @@ public class HistoricCaseInstanceBaseResource {
             restApiInterceptor.accessHistoryCaseInfoWithQuery(query);
         }
 
-        return new HistoricCaseInstancePaginateList(restResponseFactory).paginateList(allRequestParams, queryRequest, query, "caseInstanceId", allowedSortProperties);
+        return paginateList(allRequestParams, queryRequest, query, "caseInstanceId", allowedSortProperties,
+            restResponseFactory::createHistoricCaseInstanceResponseList);
     }
     
     protected HistoricCaseInstance getHistoricCaseInstanceFromRequest(String caseInstanceId) {

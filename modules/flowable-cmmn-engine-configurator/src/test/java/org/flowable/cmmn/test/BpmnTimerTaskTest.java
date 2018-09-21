@@ -64,10 +64,10 @@ public class BpmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         String timerJobId = timerJobs.get(0).getId();
         
         try {
-            CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 5000, 200, true);
+            CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000, 200, true);
             fail("should throw time limit exceeded");
         } catch (FlowableException e) {
-            assertEquals("Time limit of 5000 was exceeded", e.getMessage());
+            assertEquals("Time limit of 7000 was exceeded", e.getMessage());
         }
         
         processEngine.getProcessEngineConfiguration().setClock(clock);
@@ -76,7 +76,7 @@ public class BpmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals(1, timerJobs.size());
         assertEquals(timerJobId, timerJobs.get(0).getId());
         
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngine.getProcessEngineConfiguration(), processEngineManagementService, 5000, 200, true);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngine.getProcessEngineConfiguration(), processEngineManagementService, 7000, 200, true);
         
         timerJobs = processEngineManagementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(0, timerJobs.size());

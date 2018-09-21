@@ -78,6 +78,9 @@ public class DbSqlSession implements Session {
     public void insert(Entity entity) {
         if (entity.getId() == null) {
             String id = Context.getCommandContext().getCurrentEngineConfiguration().getIdGenerator().getNextId();
+            if (dbSqlSessionFactory.isUsePrefixId()) {
+                id = entity.getIdPrefix() + id;
+            }
             entity.setId(id);
         }
         

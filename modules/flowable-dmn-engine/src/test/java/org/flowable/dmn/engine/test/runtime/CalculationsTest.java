@@ -33,6 +33,51 @@ public class CalculationsTest {
     public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/calculations2.dmn")
+    public void doubleToBigDecimalScaleConversion() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        Double inputDouble1 = 0.40D;
+
+        processVariablesInput.put("sample_input", inputDouble1);
+
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("dmnWithExpressionAndDecimals")
+            .variables(processVariablesInput)
+            .executeWithAuditTrail();
+
+        Assert.assertFalse(result.isFailed());
+        Assert.assertEquals(2, result.getRuleExecutions().size());
+        Assert.assertTrue(result.getRuleExecutions().get(2).isValid());
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/calculations2.dmn")
+    public void floatToBigDecimalScaleConversion() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+
+        Float inputFloat1 = 0.40F;
+
+        processVariablesInput.put("sample_input", inputFloat1);
+
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+
+        DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
+            .decisionKey("dmnWithExpressionAndDecimals")
+            .variables(processVariablesInput)
+            .executeWithAuditTrail();
+
+        Assert.assertFalse(result.isFailed());
+        Assert.assertEquals(2, result.getRuleExecutions().size());
+        Assert.assertTrue(result.getRuleExecutions().get(2).isValid());
+    }
+
+
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/calculations.dmn")
     public void floatAndDoubleOutputEntry() {
         Map<String, Object> processVariablesInput = new HashMap<>();

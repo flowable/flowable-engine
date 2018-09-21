@@ -13,6 +13,10 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +32,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -58,10 +60,13 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
 
             Group group3 = identityService.createGroupQuery().groupId("admin").singleResult();
             assertNotNull(group3);
+            
+            Group group4 = identityService.createGroupQuery().groupId("sales").singleResult();
+            assertNotNull(group4);
 
             // Test filter-less
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION);
-            assertResultsPresentInDataResponse(url, group1.getId(), group2.getId(), group3.getId());
+            assertResultsPresentInDataResponse(url, group1.getId(), group2.getId(), group3.getId(), group4.getId());
 
             // Test based on name
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION) + "?name=" + encode("Test group");

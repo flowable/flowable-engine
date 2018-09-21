@@ -264,8 +264,8 @@ paths:
               format: "byte"
         404:
           description: "Indicates the requested historic detail instance was not found\
-            \ or the historic detail instance doesn?t have a variable with the given\
-            \ name or the variable doesn?t have a binary stream available. Status\
+            \ or the historic detail instance does not have a variable with the given\
+            \ name or the variable does not have a binary stream available. Status\
             \ message provides additional information."
       security:
       - basicAuth: []
@@ -316,7 +316,7 @@ paths:
         type: "string"
       - name: "excludeSubprocesses"
         in: "query"
-        description: "Return only historic process instances which aren?t sub processes."
+        description: "Return only historic process instances which are not sub processes."
         required: false
         type: "boolean"
       - name: "finishedAfter"
@@ -514,7 +514,7 @@ paths:
             $ref: "#/definitions/CommentResponse"
         404:
           description: "Indicates the requested historic process instance was not\
-            \ found or the historic process instance doesn?t have a comment with the\
+            \ found or the historic process instance does not have a comment with the\
             \ given ID."
       security:
       - basicAuth: []
@@ -539,7 +539,7 @@ paths:
             \ and the comment is deleted. Response body is left empty intentionally."
         404:
           description: "Indicates the requested historic process instance was not\
-            \ found or the historic process instance doesn?t have a comment with the\
+            \ found or the historic process instance does not have a comment with the\
             \ given ID."
       security:
       - basicAuth: []
@@ -600,8 +600,8 @@ paths:
               format: "byte"
         404:
           description: "Indicates the requested process instance was not found or\
-            \ the process instance doesn?t have a variable with the given name or\
-            \ the variable doesn?t have a binary stream available. Status message\
+            \ the process instance does not have a variable with the given name or\
+            \ the variable does not have a binary stream available. Status message\
             \ provides additional information."
       security:
       - basicAuth: []
@@ -968,8 +968,8 @@ paths:
               format: "byte"
         404:
           description: "Indicates the requested task instance was not found or the\
-            \ process instance doesn?t have a variable with the given name or the\
-            \ variable doesn?t have a binary stream available. Status message provides\
+            \ process instance does not have a variable with the given name or the\
+            \ variable does not have a binary stream available. Status message provides\
             \ additional information."
       security:
       - basicAuth: []
@@ -1046,8 +1046,8 @@ paths:
               format: "byte"
         404:
           description: "Indicates the requested variable instance was not found or\
-            \ the variable instance doesn?t have a variable with the given name or\
-            \ the variable doesn?t have a binary stream available. Status message\
+            \ the variable instance does not have a variable with the given name or\
+            \ the variable does not have a binary stream available. Status message\
             \ provides additional information."
       security:
       - basicAuth: []
@@ -1301,7 +1301,7 @@ paths:
         type: "string"
       - name: "firstNameLike"
         in: "query"
-        description: "Only return userswith a firstname like the given value. Use\
+        description: "Only return users with a firstname like the given value. Use\
           \ % as wildcard-character."
         required: false
         type: "string"
@@ -1532,8 +1532,8 @@ paths:
           schema:
             $ref: "#/definitions/UserInfoResponse"
         404:
-          description: "Indicates the requested user was not found or the user doesn?\
-            t have info for the given key. Status description contains additional\
+          description: "Indicates the requested user was not found or the user does not\
+            have info for the given key. Status description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -1567,8 +1567,8 @@ paths:
         400:
           description: "Indicates the value was missing from the request body."
         404:
-          description: "Indicates the requested user was not found or the user doesn?\
-            t have info for the given key. Status description contains additional\
+          description: "Indicates the requested user was not found or the user does not\
+            have info for the given key. Status description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -1592,8 +1592,8 @@ paths:
           description: "Indicates the user was found and the info for the given key\
             \ has been deleted. Response body is left empty intentionally."
         404:
-          description: "Indicates the requested user was not found or the user doesn?\
-            t have info for the given key. Status description contains additional\
+          description: "Indicates the requested user was not found or the user does not\
+            have info for the given key. Status description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -1864,8 +1864,8 @@ paths:
           schema:
             type: "string"
         404:
-          description: "Indicates the requested job was not found or the job doesn?\
-            t have an exception stacktrace. Status-description contains additional\
+          description: "Indicates the requested job was not found or the job does not\
+            have an exception stacktrace. Status-description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -2094,8 +2094,8 @@ paths:
           schema:
             type: "string"
         404:
-          description: "Indicates the requested job was not found or the job doesn?\
-            t have an exception stacktrace. Status-description contains additional\
+          description: "Indicates the requested job was not found or the job does not\
+            have an exception stacktrace. Status-description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -2298,8 +2298,8 @@ paths:
           schema:
             type: "string"
         404:
-          description: "Indicates the requested job was not found or the job doesn?\
-            t have an exception stacktrace. Status-description contains additional\
+          description: "Indicates the requested job was not found or the job does not\
+            have an exception stacktrace. Status-description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -2619,8 +2619,8 @@ paths:
           schema:
             type: "string"
         404:
-          description: "Indicates the requested job was not found or the job doesn?\
-            t have an exception stacktrace. Status-description contains additional\
+          description: "Indicates the requested job was not found or the job does not\
+            have an exception stacktrace. Status-description contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -3494,7 +3494,7 @@ paths:
             $ref: "#/definitions/RestIdentityLink"
         404:
           description: "Indicates the requested process definition was not found or\
-            \ the process definition doesn?t have an identity-link that matches the\
+            \ the process definition does not have an identity-link that matches the\
             \ url."
       security:
       - basicAuth: []
@@ -3523,7 +3523,7 @@ paths:
             \ link was removed. The response body is intentionally empty."
         404:
           description: "Indicates the requested process definition was not found or\
-            \ the process definition doesn?t have an identity-link that matches the\
+            \ the process definition does not have an identity-link that matches the\
             \ url."
       security:
       - basicAuth: []
@@ -4068,7 +4068,7 @@ paths:
         404:
           description: "Indicates the requested execution was not found or the execution\
             \ does not have a variable with the given name in the requested scope\
-            \ (in case scope-query parameter was omitted, variable doesn?t exist in\
+            \ (in case scope-query parameter was omitted, variable does not exist in\
             \ local and global scope). Status description contains additional information\
             \ about the error."
       security:
@@ -4170,7 +4170,7 @@ paths:
               format: "byte"
         404:
           description: "Indicates the requested execution was not found or the task\
-            \ doesn?t have a variable with the given name (in the given scope). Status\
+            \ does not have a variable with the given name (in the given scope). Status\
             \ message provides additional information."
       security:
       - basicAuth: []
@@ -4231,7 +4231,7 @@ paths:
         type: "string"
       - name: "excludeSubprocesses"
         in: "query"
-        description: "Return only process instances which aren?t sub processes."
+        description: "Return only process instances which are not sub processes."
         required: false
         type: "boolean"
       - name: "includeProcessVariables"
@@ -4443,7 +4443,7 @@ paths:
               format: "byte"
         400:
           description: "Indicates the requested process instance was not found but\
-            \ the process doesn?t contain any graphical information (BPMN:DI) and\
+            \ the process does not contain any graphical information (BPMN:DI) and\
             \ no diagram can be created."
         404:
           description: "Indicates the requested process instance was not found."
@@ -4538,7 +4538,7 @@ paths:
             $ref: "#/definitions/RestIdentityLink"
         404:
           description: "Indicates the requested process instance was not found or\
-            \ the link to delete doesn?t exist. The response status contains additional\
+            \ the link to delete does not exist. The response status contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -4567,7 +4567,7 @@ paths:
             \ been deleted. Response body is left empty intentionally."
         404:
           description: "Indicates the requested process instance was not found or\
-            \ the link to delete doesn?t exist. The response status contains additional\
+            \ the link to delete does not exist. The response status contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -4838,8 +4838,8 @@ paths:
               type: "string"
               format: "byte"
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have a variable with the given name (in the given scope). Status message\
+          description: "Indicates the requested task was not found or the task does not\
+            have a variable with the given name (in the given scope). Status message\
             \ provides additional information."
       security:
       - basicAuth: []
@@ -5417,8 +5417,8 @@ paths:
           schema:
             $ref: "#/definitions/AttachmentResponse"
         404:
-          description: "Indicates the requested task was not found or the tasks doesn?\
-            t have a attachment with the given ID."
+          description: "Indicates the requested task was not found or the tasks does not\
+            have a attachment with the given ID."
       security:
       - basicAuth: []
     delete:
@@ -5441,8 +5441,8 @@ paths:
           description: "Indicates the task and attachment were found and the attachment\
             \ is deleted. Response body is left empty intentionally."
         404:
-          description: "Indicates the requested task was not found or the tasks doesn?\
-            t have a attachment with the given ID."
+          description: "Indicates the requested task was not found or the tasks does not\
+            have a attachment with the given ID."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/attachments/{attachmentId}/content:
@@ -5473,8 +5473,8 @@ paths:
               type: "string"
               format: "byte"
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have an attachment with the given id or the attachment doesn?t have\
+          description: "Indicates the requested task was not found or the task does not\
+            have an attachment with the given id or the attachment does not have\
             \ a binary stream available. Status message provides additional information."
       security:
       - basicAuth: []
@@ -5559,8 +5559,8 @@ paths:
           schema:
             $ref: "#/definitions/CommentResponse"
         404:
-          description: "Indicates the requested task was not found or the tasks doesn?\
-            t have a comment with the given ID."
+          description: "Indicates the requested task was not found or the tasks does not\
+            have a comment with the given ID."
       security:
       - basicAuth: []
     delete:
@@ -5583,8 +5583,8 @@ paths:
           description: "Indicates the task and comment were found and the comment\
             \ is deleted. Response body is left empty intentionally."
         404:
-          description: "Indicates the requested task was not found or the tasks doesn?\
-            t have a comment with the given ID."
+          description: "Indicates the requested task was not found or the tasks does not\
+            have a comment with the given ID."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/events:
@@ -5636,8 +5636,8 @@ paths:
           schema:
             $ref: "#/definitions/EventResponse"
         404:
-          description: "Indicates the requested task was not found or the tasks doesn?\
-            t have an event with the given ID."
+          description: "Indicates the requested task was not found or the tasks does not\
+            have an event with the given ID."
       security:
       - basicAuth: []
     delete:
@@ -5659,8 +5659,8 @@ paths:
         204:
           description: "Indicates the task was found and the events are returned."
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have the requested event."
+          description: "Indicates the requested task was not found or the task does not\
+            have the requested event."
       security:
       - basicAuth: []
   /runtime/tasks/{taskId}/identitylinks:
@@ -5715,8 +5715,8 @@ paths:
         201:
           description: "Indicates the task was found and the identity link was created."
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have the requested identityLink. The status contains additional information\
+          description: "Indicates the requested task was not found or the task does not\
+            have the requested identityLink. The status contains additional information\
             \ about this error."
       security:
       - basicAuth: []
@@ -5784,8 +5784,8 @@ paths:
           schema:
             $ref: "#/definitions/RestIdentityLink"
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have the requested identityLink. The status contains additional information\
+          description: "Indicates the requested task was not found or the task does not\
+            have the requested identityLink. The status contains additional information\
             \ about this error."
       security:
       - basicAuth: []
@@ -5817,8 +5817,8 @@ paths:
           description: "Indicates the task and identity link were found and the link\
             \ has been deleted. Response-body is intentionally empty."
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have the requested identityLink. The status contains additional information\
+          description: "Indicates the requested task was not found or the task does not\
+            have the requested identityLink. The status contains additional information\
             \ about this error."
       security:
       - basicAuth: []
@@ -5981,8 +5981,8 @@ paths:
           schema:
             $ref: "#/definitions/RestVariable"
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have a variable with the given name (in the given scope). Status message\
+          description: "Indicates the requested task was not found or the task does not\
+            have a variable with the given name (in the given scope). Status message\
             \ provides additional information."
       security:
       - basicAuth: []
@@ -6025,8 +6025,8 @@ paths:
             \ a process associated) with scope global. Status message provides additional\
             \ information."
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have a variable with the given name in the given scope. Status message\
+          description: "Indicates the requested task was not found or the task does not\
+            have a variable with the given name in the given scope. Status message\
             \ contains additional information about the error."
         415:
           description: "Indicates the serializable data contains an object for which\
@@ -6063,8 +6063,8 @@ paths:
           description: "Indicates the task variable was found and has been deleted.\
             \ Response-body is intentionally empty."
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have a variable with the given name. Status message contains additional\
+          description: "Indicates the requested task was not found or the task does not\
+            have a variable with the given name. Status message contains additional\
             \ information about the error."
       security:
       - basicAuth: []
@@ -6109,8 +6109,8 @@ paths:
               type: "string"
               format: "byte"
         404:
-          description: "Indicates the requested task was not found or the task doesn?\
-            t have a variable with the given name (in the given scope). Status message\
+          description: "Indicates the requested task was not found or the task does not\
+            have a variable with the given name (in the given scope). Status message\
             \ provides additional information."
       security:
       - basicAuth: []

@@ -32,6 +32,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public class CallActivityTest extends ResourceFlowableTestCase {
 
@@ -50,16 +52,18 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/parsing/encoding.flowable.cfg.xml");
     }
 
+    @Test
     public void testInstantiateProcessByMessage() throws Exception {
         BpmnModel messageTriggeredBpmnModel = loadBPMNModel(MESSAGE_TRIGGERED_PROCESS_RESOURCE);
 
-        Deployment messageTriggeredBpmnDeployment = processEngine.getRepositoryService().createDeployment().name("messageTriggeredProcessDeployment")
+        processEngine.getRepositoryService().createDeployment().name("messageTriggeredProcessDeployment")
                 .addBpmnModel("messageTriggered.bpmn20.xml", messageTriggeredBpmnModel).deploy();
 
         ProcessInstance childProcessInstance = runtimeService.startProcessInstanceByMessage("TRIGGER_PROCESS_MESSAGE");
         assertNotNull(childProcessInstance);
     }
 
+    @Test
     public void testInstantiateSuspendedProcessByMessage() throws Exception {
         BpmnModel messageTriggeredBpmnModel = loadBPMNModel(MESSAGE_TRIGGERED_PROCESS_RESOURCE);
 
@@ -69,7 +73,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         suspendProcessDefinitions(messageTriggeredBpmnDeployment);
 
         try {
-            ProcessInstance childProcessInstance = runtimeService.startProcessInstanceByMessage("TRIGGER_PROCESS_MESSAGE");
+            runtimeService.startProcessInstanceByMessage("TRIGGER_PROCESS_MESSAGE");
             fail("Exception expected");
         } catch (FlowableException ae) {
             assertTextPresent("Cannot start process instance. Process definition Message Triggered Process", ae.getMessage());
@@ -77,15 +81,17 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
     }
 
+    @Test
     public void testInstantiateChildProcess() throws Exception {
         BpmnModel childBpmnModel = loadBPMNModel(CHILD_PROCESS_RESOURCE);
 
-        Deployment childDeployment = processEngine.getRepositoryService().createDeployment().name("childProcessDeployment").addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+        processEngine.getRepositoryService().createDeployment().name("childProcessDeployment").addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
 
         ProcessInstance childProcessInstance = runtimeService.startProcessInstanceByKey("childProcess");
         assertNotNull(childProcessInstance);
     }
 
+    @Test
     public void testInstantiateSuspendedChildProcess() throws Exception {
         BpmnModel childBpmnModel = loadBPMNModel(CHILD_PROCESS_RESOURCE);
 
@@ -94,7 +100,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         suspendProcessDefinitions(childDeployment);
 
         try {
-            ProcessInstance childProcessInstance = runtimeService.startProcessInstanceByKey("childProcess");
+            runtimeService.startProcessInstanceByKey("childProcess");
             fail("Exception expected");
         } catch (FlowableException ae) {
             assertTextPresent("Cannot start process instance. Process definition Child Process", ae.getMessage());
@@ -102,18 +108,19 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
     }
 
+    @Test
     public void testInstantiateSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(CHILD_PROCESS_RESOURCE);
 
         Deployment childDeployment = processEngine.getRepositoryService().createDeployment().name("childProcessDeployment").addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
 
-        Deployment masterDeployment = processEngine.getRepositoryService().createDeployment().name("masterProcessDeployment").addBpmnModel("masterProcess.bpmn20.xml", mainBpmnModel).deploy();
+        processEngine.getRepositoryService().createDeployment().name("masterProcessDeployment").addBpmnModel("masterProcess.bpmn20.xml", mainBpmnModel).deploy();
 
         suspendProcessDefinitions(childDeployment);
 
         try {
-            ProcessInstance masterProcessInstance = runtimeService.startProcessInstanceByKey("masterProcess");
+            runtimeService.startProcessInstanceByKey("masterProcess");
             fail("Exception expected");
         } catch (FlowableException ae) {
             assertTextPresent("Cannot start process instance. Process definition Child Process", ae.getMessage());
@@ -121,6 +128,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
 
     }
 
+    @Test
     public void testInheritVariablesSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(INHERIT_VARIABLES_CHILD_PROCESS_RESOURCE);
@@ -158,6 +166,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Test
     public void testNotInheritVariablesSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(NOT_INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(INHERIT_VARIABLES_CHILD_PROCESS_RESOURCE);
@@ -193,13 +202,14 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals(0, variableInstances.size());
     }
 
+    @Test
     public void testSameDeploymentSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
         BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
 
         // deploy the main and child process within one deployment
-        Deployment deployment = processEngine.getRepositoryService()
+        processEngine.getRepositoryService()
                 .createDeployment()
                 .name("mainProcessDeployment")
                 .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel)
@@ -220,13 +230,14 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the child process within the same deployment", "User Task", task.getName());
     }
     
+    @Test
     public void testSameDeploymentSubprocessWithTenant() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
         BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
 
         // deploy the main and child process within one deployment
-        Deployment deployment = processEngine.getRepositoryService()
+        processEngine.getRepositoryService()
                 .createDeployment()
                 .name("mainProcessDeployment")
                 .tenantId("myTenant")
@@ -249,13 +260,14 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the child process within the same deployment", "User Task", task.getName());
     }
 
+    @Test
     public void testNotSameDeploymentSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(NOT_SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
         BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
 
         // deploy the main and child process within one deployment
-        Deployment deployment = processEngine.getRepositoryService()
+        processEngine.getRepositoryService()
                 .createDeployment()
                 .name("mainProcessDeployment")
                 .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel)
@@ -276,13 +288,14 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the newest child process deployment", "User Task V2", task.getName());
     }
     
+    @Test
     public void testNotSameDeploymentSubprocessWithTenant() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(NOT_SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
         BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
 
         // deploy the main and child process within one deployment
-        Deployment deployment = processEngine.getRepositoryService()
+        processEngine.getRepositoryService()
                 .createDeployment()
                 .name("mainProcessDeployment")
                 .tenantId("myTenant")
@@ -305,13 +318,14 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the newest child process deployment", "User Task V2", task.getName());
     }
 
+    @Test
     public void testSameDeploymentSubprocessNotInSameDeployment() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
         BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
 
         // deploy the main and child process within one deployment
-        Deployment deployment = processEngine.getRepositoryService()
+        processEngine.getRepositoryService()
                 .createDeployment()
                 .name("mainProcessDeployment")
                 .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel).deploy();
@@ -337,13 +351,14 @@ public class CallActivityTest extends ResourceFlowableTestCase {
                 "is no deployed child process in the same deployment", "User Task V2", task.getName());
     }
     
+    @Test
     public void testSameDeploymentSubprocessNotInSameDeploymentWithTenant() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
         BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
         BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
 
         // deploy the main and child process within one deployment
-        Deployment deployment = processEngine.getRepositoryService()
+        processEngine.getRepositoryService()
                 .createDeployment()
                 .name("mainProcessDeployment")
                 .tenantId("myTenant")
@@ -380,12 +395,11 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         }
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
-        super.tearDown();
     }
 
     protected BpmnModel loadBPMNModel(String bpmnModelFilePath) throws Exception {

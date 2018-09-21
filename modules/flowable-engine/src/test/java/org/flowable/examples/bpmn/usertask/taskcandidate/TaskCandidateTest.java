@@ -22,6 +22,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez, Saeid Mirzaei
@@ -32,9 +35,8 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
 
     private static final String GONZO = "gonzo";
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
 
         Group accountants = identityService.newGroup("accountancy");
         identityService.saveGroup(accountants);
@@ -54,7 +56,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         identityService.createMembership(GONZO, "sales");
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteUser(KERMIT);
         identityService.deleteUser(GONZO);
@@ -62,9 +64,9 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");
 
-        super.tearDown();
     }
 
+    @Test
     @Deployment
     public void testSingleCandidateGroup() {
 
@@ -100,6 +102,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testMultipleCandidateGroups() {
 
@@ -146,6 +149,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testMultipleCandidateUsers() {
         runtimeService.startProcessInstanceByKey("multipleCandidateUsersExample", Collections.singletonMap("Variable", (Object) "var"));
@@ -171,6 +175,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         assertEquals(1, task.getTaskLocalVariables().size());
     }
 
+    @Test
     @Deployment
     public void testMixedCandidateUserAndGroup() {
         runtimeService.startProcessInstanceByKey("mixedCandidateUserAndGroupExample");
@@ -181,6 +186,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
 
     // test if candidate group works with expression, when there is a function
     // with one parameter
+    @Test
     @Deployment
     public void testCandidateExpressionOneParam() {
         Map<String, Object> params = new HashMap<>();
@@ -193,6 +199,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
 
     // test if candidate group works with expression, when there is a function
     // with two parameters
+    @Test
     @Deployment
     public void testCandidateExpressionTwoParams() {
         Map<String, Object> params = new HashMap<>();

@@ -24,6 +24,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to tasks.
@@ -37,6 +40,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
     /**
      * Check create, update and delete events for a task.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testTaskEventsInProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -113,9 +117,10 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         assertExecutionDetails(event, processInstance);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testTaskAssignmentEventInProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -185,6 +190,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
     /**
      * Check events related to process instance delete and standalone task delete.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testDeleteEventDoesNotDispathComplete() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -243,6 +249,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
      * This method checks to ensure that the task.fireEvent(TaskListener.EVENTNAME_CREATE), fires before the dispatchEvent FlowableEventType.TASK_CREATED. A ScriptTaskListener updates the priority and
      * assignee before the dispatchEvent() takes place.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/event/TaskEventsTest.testEventFiring.bpmn20.xml" })
     public void testEventFiringOrdering() {
         // We need to add a special listener that copies the org.flowable.task.service.Task values - to record its state when the event fires,
@@ -290,6 +297,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
     /**
      * Check all events for tasks not related to a process-instance
      */
+    @Test
     public void testStandaloneTaskEvents() throws Exception {
 
         org.flowable.task.api.Task task = null;
@@ -394,16 +402,14 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         listener = new TestFlowableEntityEventListener(org.flowable.task.api.Task.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

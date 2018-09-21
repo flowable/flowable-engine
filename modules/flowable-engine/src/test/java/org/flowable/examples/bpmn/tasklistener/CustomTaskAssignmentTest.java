@@ -17,6 +17,9 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -25,9 +28,8 @@ import org.flowable.engine.test.Deployment;
  */
 public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         identityService.saveUser(identityService.newUser("kermit"));
         identityService.saveUser(identityService.newUser("fozzie"));
@@ -38,15 +40,15 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         identityService.createMembership("kermit", "management");
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         identityService.deleteUser("kermit");
         identityService.deleteUser("fozzie");
         identityService.deleteUser("gonzo");
         identityService.deleteGroup("management");
-        super.tearDown();
     }
 
+    @Test
     @Deployment
     public void testCandidateGroupAssignment() {
         runtimeService.startProcessInstanceByKey("customTaskAssignment");
@@ -55,6 +57,7 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
     }
 
+    @Test
     @Deployment
     public void testCandidateUserAssignment() {
         runtimeService.startProcessInstanceByKey("customTaskAssignment");
@@ -63,6 +66,7 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().taskCandidateUser("gonzo").count());
     }
 
+    @Test
     @Deployment
     public void testAssigneeAssignment() {
         runtimeService.startProcessInstanceByKey("setAssigneeInListener");
@@ -71,6 +75,7 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().taskAssignee("gonzo").count());
     }
 
+    @Test
     @Deployment
     public void testOverwriteExistingAssignments() {
         runtimeService.startProcessInstanceByKey("overrideAssigneeInListener");
@@ -79,6 +84,7 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().taskAssignee("gonzo").count());
     }
 
+    @Test
     @Deployment
     public void testOverwriteExistingAssignmentsFromVariable() {
         // prepare variables
@@ -97,6 +103,7 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.createTaskQuery().taskAssignee("kermit").count());
     }
 
+    @Test
     @Deployment
     public void testReleaseTask() throws Exception {
         runtimeService.startProcessInstanceByKey("releaseTaskProcess");

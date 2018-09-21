@@ -38,6 +38,9 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to activities.
@@ -51,16 +54,17 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
     protected EventLogger databaseEventLogger;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
+        listener = new TestFlowableActivityEventListener(true);
+        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
 
         // Database event logger setup
         databaseEventLogger = new EventLogger(processEngineConfiguration.getClock(), processEngineConfiguration.getObjectMapper());
         runtimeService.addEventListener(databaseEventLogger);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
 
         if (listener != null) {
@@ -76,21 +80,13 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         // Database event logger teardown
         runtimeService.removeEventListener(databaseEventLogger);
 
-        super.tearDown();
-    }
-
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
-
-        listener = new TestFlowableActivityEventListener(true);
-        processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
     /**
      * Test starting and completed events for activity. Since these events are dispatched in the core of the PVM, not all individual activity-type is tested. Rather, we test the main types (tasks,
      * gateways, events, subprocesses).
      */
+    @Test
     @Deployment
     public void testActivityEvents() throws Exception {
         // We're interested in the raw events, alter the listener to keep those as well
@@ -223,6 +219,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to signalling
      */
+    @Test
     @Deployment
     public void testActivitySignalEvents() throws Exception {
         // Two paths are active in the process, one receive-task and one intermediate catching signal-event
@@ -281,6 +278,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test to verify if signals coming from an intermediate throw-event trigger the right events to be dispatched.
      */
+    @Test
     @Deployment
     public void testActivitySignalEventsWithinProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalProcess");
@@ -318,6 +316,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to message events, called from the API.
      */
+    @Test
     @Deployment
     public void testActivityMessageEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("messageProcess");
@@ -357,6 +356,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to message events, called from the API, targeting an event-subprocess.
      */
+    @Test
     @Deployment
     public void testActivityMessageEventsInEventSubprocess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("messageProcess");
@@ -400,6 +400,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to message events, called from the API, targeting an event-subprocess.
      */
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/event/ActivityEventsTest.testActivityMessageEventsInEventSubprocess.bpmn20.xml")
     public void testActivityMessageEventsInEventSubprocessForCancel() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("messageProcess");
@@ -445,6 +446,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to compensation events.
      */
+    @Test
     @Deployment
     public void testActivityCompensationEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationProcess");
@@ -480,6 +482,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to error-events
      */
+    @Test
     @Deployment
     public void testActivityErrorEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("errorProcess");
@@ -514,6 +517,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to error-events, thrown from within process-execution (eg. service-task).
      */
+    @Test
     @Deployment
     public void testActivityErrorEventsFromBPMNError() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("errorProcess");
@@ -545,6 +549,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertFalse(processInstance.getId().equals(errorEvent.getExecutionId()));
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/event/JobEventsTest.testJobEntityEvents.bpmn20.xml")
     public void testActivityTimeOutEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testJobEvents");
@@ -567,6 +572,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertTrue("Boundary timer is the cause of the cancellation", boundaryEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition);
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testTimerOnNestingOfSubprocesses.bpmn20.xml")
     public void testActivityTimeOutEventInSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnNestedSubprocesses");
@@ -595,6 +601,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertTrue(eventIdList.indexOf("innerSubprocess") >= 0);
     }
 
+    @Test
     @Deployment
     public void testActivityTimeOutEventInCallActivity() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnCallActivity");
@@ -606,7 +613,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         timeToFire.add(Calendar.HOUR, 2);
         timeToFire.add(Calendar.MINUTE, 5);
         processEngineConfiguration.getClock().setCurrentTime(timeToFire.getTime());
-        waitForJobExecutorToProcessAllJobs(5000, 500);
+        waitForJobExecutorToProcessAllJobs(7000, 500);
 
         // Check timeout-events have been dispatched
         assertEquals(4, listener.getEventsReceived().size());
@@ -627,6 +634,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to message events, called from the API.
      */
+    @Test
     @Deployment
     public void testActivityMessageBoundaryEventsOnUserTask() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("messageOnUserTaskProcess");
@@ -679,6 +687,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to message events, called from the API.
      */
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/event/ActivityEventsTest.testActivityMessageBoundaryEventsOnUserTask.bpmn20.xml")
     public void testActivityMessageBoundaryEventsOnUserTaskForCancel() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("messageOnUserTaskProcess");
@@ -721,6 +730,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /**
      * Test events related to message events, called from the API.
      */
+    @Test
     @Deployment
     public void testActivityMessageBoundaryEventsOnSubProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("messageOnSubProcess");
@@ -785,6 +795,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     /** 
      * Test events related to message events, called from the API.
      */
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/event/ActivityEventsTest.testActivityMessageBoundaryEventsOnSubProcess.bpmn20.xml")
     public void testActivityMessageBoundaryEventsOnSubProcessForCancel() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("messageOnSubProcess");
@@ -823,6 +834,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertDatabaseEventPresent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
     }
 
+    @Test
     @Deployment
     public void testActivitySignalBoundaryEventsOnSubProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalOnSubProcess");
@@ -878,6 +890,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertEquals("signalName", repositoryService.getBpmnModel(cancelEvent.getProcessDefinitionId()).getSignal(signalEventDefinition.getSignalRef()).getName());
     }
 
+    @Test
     @Deployment
     public void testActivitySignalBoundaryEventsOnUserTask() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalOnUserTask");

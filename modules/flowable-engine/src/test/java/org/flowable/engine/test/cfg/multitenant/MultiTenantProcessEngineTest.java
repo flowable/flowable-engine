@@ -27,10 +27,10 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.h2.jdbcx.JdbcDataSource;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -41,12 +41,12 @@ public class MultiTenantProcessEngineTest {
     private MultiSchemaMultiTenantProcessEngineConfiguration config;
     private ProcessEngine processEngine;
 
-    @Before
+    @BeforeEach
     public void setup() {
         setupTenantInfoHolder();
     }
 
-    @After
+    @AfterEach
     public void close() {
         processEngine.close();
     }

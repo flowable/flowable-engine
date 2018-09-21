@@ -18,6 +18,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
@@ -134,7 +135,9 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @Bean
     @ConditionalOnMissingBean
     public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
-            @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider, 
+            @Process ObjectProvider<IdGenerator> processIdGenerator,
+            ObjectProvider<IdGenerator> globalIdGenerator,
+            @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
             @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
@@ -186,7 +189,11 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
 
-        conf.setIdGenerator(new StrongUuidGenerator());
+        IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
+        if (idGenerator == null) {
+            idGenerator = new StrongUuidGenerator();
+        }
+        conf.setIdGenerator(idGenerator);
 
         return conf;
     }

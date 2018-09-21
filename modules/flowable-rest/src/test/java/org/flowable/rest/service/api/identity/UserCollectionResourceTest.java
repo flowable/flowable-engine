@@ -13,6 +13,10 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +33,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -62,10 +64,13 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
 
             User user3 = identityService.createUserQuery().userId("kermit").singleResult();
             assertNotNull(user3);
+            
+            User user4 = identityService.createUserQuery().userId("aSalesUser").singleResult();
+            assertNotNull(user4);
 
             // Test filter-less
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION);
-            assertResultsPresentInDataResponse(url, user1.getId(), user2.getId(), user3.getId());
+            assertResultsPresentInDataResponse(url, user1.getId(), user2.getId(), user3.getId(), user4.getId());
 
             // Test based on userId
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_COLLECTION) + "?id=testuser";

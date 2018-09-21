@@ -17,7 +17,6 @@ import java.util.List;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.Signal;
@@ -84,10 +83,6 @@ public class EventSubscriptionManager {
 
     protected void insertMessageEvent(MessageEventDefinition messageEventDefinition, StartEvent startEvent, ProcessDefinitionEntity processDefinition, BpmnModel bpmnModel) {
         CommandContext commandContext = Context.getCommandContext();
-        if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
-            Message message = bpmnModel.getMessage(messageEventDefinition.getMessageRef());
-            messageEventDefinition.setMessageRef(message.getName());
-        }
 
         // look for subscriptions for the same name in db:
         List<EventSubscriptionEntity> subscriptionsForSameMessageName = CommandContextUtil.getEventSubscriptionEntityManager(commandContext)

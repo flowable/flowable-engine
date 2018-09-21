@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.task;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,8 +34,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -58,7 +58,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/variables/{variableName}", produces = "application/json")
     public RestVariable getVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
@@ -87,7 +87,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the variables was updated and the result is returned."),
             @ApiResponse(code = 400, message = "Indicates the name of a variable to update was missing or that an attempt is done to update a variable on a standalone task (without a process associated) with scope global. Status message provides additional information."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name in the given scope. Status message contains additional information about the error."),
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name in the given scope. Status message contains additional information about the error."),
             @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized."),
     })
     @PutMapping(value = "/cmmn-runtime/tasks/{taskId}/variables/{variableName}", produces = "application/json", consumes = {"text/plain", "application/json", "multipart/form-data"})
@@ -132,7 +132,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task variable was found and has been deleted. Response-body is intentionally empty."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name. Status message contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name. Status message contains additional information about the error.")
     })
     @DeleteMapping(value = "/cmmn-runtime/tasks/{taskId}/variables/{variableName}")
     public void deleteVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,

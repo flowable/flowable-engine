@@ -18,12 +18,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
-
 /**
  * @author Tom Baeyens
  */
-public class AttachmentEntityImpl extends AbstractEntity implements AttachmentEntity, Serializable {
+public class AttachmentEntityImpl extends AbstractBpmnEngineEntity implements AttachmentEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

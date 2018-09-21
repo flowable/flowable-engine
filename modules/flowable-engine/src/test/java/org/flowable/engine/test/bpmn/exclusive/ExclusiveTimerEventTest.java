@@ -18,9 +18,11 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.TimerJobQuery;
+import org.junit.jupiter.api.Test;
 
 public class ExclusiveTimerEventTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testCatchingTimerEvent() throws Exception {
 
@@ -34,7 +36,7 @@ public class ExclusiveTimerEventTest extends PluggableFlowableTestCase {
 
         // After setting the clock to time '50minutes and 5 seconds', the timers should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000L, 500L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 500L);
 
         assertEquals(0, jobQuery.count());
         assertProcessEnded(pi.getProcessInstanceId());

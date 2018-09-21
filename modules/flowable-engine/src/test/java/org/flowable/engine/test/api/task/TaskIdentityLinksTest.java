@@ -23,10 +23,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
-
-import junit.framework.AssertionFailedError;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -37,6 +36,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     private static final String IDENTITY_LINKS_PROCESS_BPMN20_XML = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml";
     private static final String IDENTITY_LINKS_PROCESS = "IdentityLinksProcess";
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCandidateUserLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
@@ -60,6 +60,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCandidateGroupLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
@@ -105,6 +106,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
     }
     
+    @Test
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
     public void testAssigneeIdentityLinkHistory() {
         if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -127,7 +129,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(2, history.size());
         
@@ -149,6 +151,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertNull(unassigned.getUserId());
     }
 
+    @Test
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
     public void testClaimingIdentityLinkHistory() {
         if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -171,7 +174,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(2, history.size());
         
@@ -193,6 +196,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertNull(unassigned.getUserId());
     }
 
+    @Test
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
     public void testOwnerIdentityLinkHistory() {
         if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -215,7 +219,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.OWNER);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(2, history.size());
         Collections.sort(history, new Comparator<HistoricIdentityLink>() {
@@ -236,6 +240,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertNull(unassigned.getUserId());
     }
     
+    @Test
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
     public void testUnchangedIdentityIdCreatesNoLinks() {
         if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -254,7 +259,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(1, history.size());
         HistoricIdentityLink assigned = history.get(0);
@@ -262,6 +267,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals("kermit", assigned.getUserId());
     }
 
+    @Test
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
     public void testNullIdentityIdCreatesNoLinks() {
         if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -279,11 +285,12 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 0, null, null, null);
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
         assertEquals(0, history.size());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCustomTypeUserLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
@@ -307,6 +314,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCustomLinkGroupLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
@@ -330,6 +338,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
     }
 
+    @Test
     public void testDeleteAssignee() {
         org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("nonExistingUser");
@@ -345,6 +354,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.deleteTask(task.getId(), true);
     }
 
+    @Test
     public void testDeleteOwner() {
         org.flowable.task.api.Task task = taskService.newTask();
         task.setOwner("nonExistingUser");
@@ -360,6 +370,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.deleteTask(task.getId(), true);
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testDeleteCandidateUser.bpmn20.xml")
     public void testDeleteCandidateUser() {
         runtimeService.startProcessInstanceByKey("TaskIdentityLinks");
@@ -374,6 +385,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         assertEquals("user", identityLink.getUserId());
     }
 
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testEmptyCandidateUserLink() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
@@ -399,6 +411,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     // Test custom identity links
+    @Test
     @Deployment
     public void testCustomIdentityLink() {
         runtimeService.startProcessInstanceByKey("customIdentityLink");
@@ -444,6 +457,6 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                 return event;
             }
         }
-        throw new AssertionFailedError("no task event found with action " + action);
+        throw new AssertionError("no task event found with action " + action);
     }
 }

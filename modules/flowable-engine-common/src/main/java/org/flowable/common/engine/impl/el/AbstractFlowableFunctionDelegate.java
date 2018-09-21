@@ -24,6 +24,12 @@ import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
  * @author Tijs Rademakers
  */
 public abstract class AbstractFlowableFunctionDelegate implements FlowableFunctionDelegate {
+    
+    /**
+     * The class, typically containing static methods. 
+     * If {@link #functionMethod()} is provided, this method does not need to return a value.
+     */
+    public abstract Class<?> functionClass();
 
     protected Method getNoParameterMethod() {
         try {

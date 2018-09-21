@@ -12,10 +12,11 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.model.DecisionTask;
-
 import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.DecisionTask;
 
 public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<DecisionTask> {
 
@@ -34,10 +35,15 @@ public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<Decisio
         super.writePlanItemDefinitionSpecificAttributes(decisionTask, xtw);
         TaskExport.writeCommonTaskAttributes(decisionTask, xtw);
     }
+    
+    @Override
+    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, DecisionTask decisionTask, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
+        return TaskExport.writeTaskFieldExtensions(decisionTask, didWriteExtensionElement, xtw);
+    }
 
     @Override
-    protected void writePlanItemDefinitionBody(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
-        super.writePlanItemDefinitionBody(decisionTask, xtw);
+    protected void writePlanItemDefinitionBody(CmmnModel model, DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionBody(model, decisionTask, xtw);
         if (StringUtils.isNotEmpty(decisionTask.getDecisionRef()) || StringUtils.isNotEmpty(decisionTask.getDecisionRefExpression())) {
             xtw.writeStartElement(ELEMENT_DECISION_REF_EXPRESSION);
             xtw.writeCData(
@@ -47,6 +53,5 @@ public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<Decisio
             );
             xtw.writeEndElement();
         }
-        TaskExport.writeTaskFieldExtensions(decisionTask, xtw);
     }
 }

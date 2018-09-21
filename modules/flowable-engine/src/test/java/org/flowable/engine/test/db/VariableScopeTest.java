@@ -28,6 +28,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -36,6 +37,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class VariableScopeTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testVariableScope() {
 
@@ -89,6 +91,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
     /**
      * A testcase to produce and fix issue ACT-862.
      */
+    @Test
     @Deployment
     public void testVariableNamesScope() {
 
@@ -150,6 +153,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         taskService.complete(subProcessTask.getId());
     }
 
+    @Test
     @Deployment
     public void testModeledVariableScope() {
 
@@ -241,6 +245,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testGetVariableLocal() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("getVariableLocal");

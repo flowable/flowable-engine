@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.bpmn.gateway.ExclusiveGatewayTest;
+import org.junit.jupiter.api.Test;
 
 /**
  * See {@link ExclusiveGatewayTest} for a default sequence flow test on an exclusive gateway.
@@ -25,6 +26,7 @@ import org.flowable.engine.test.bpmn.gateway.ExclusiveGatewayTest;
  */
 public class DefaultSequenceFlowTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testDefaultSequenceFlowOnTask() {
         String procId = runtimeService.startProcessInstanceByKey("defaultSeqFlow", CollectionUtil.singletonMap("input", 2)).getId();

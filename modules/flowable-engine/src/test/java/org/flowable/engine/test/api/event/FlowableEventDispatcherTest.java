@@ -26,18 +26,19 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
  * @author Frederik Heremans
  */
-public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
+public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
 
     protected FlowableEventDispatcher dispatcher;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         dispatcher = new FlowableEventDispatcherImpl();
     }
@@ -45,7 +46,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
     /**
      * Test adding a listener and check if events are sent to it. Also checks that after removal, no events are received.
      */
-    public void addAndRemoveEventListenerAllEvents() throws Exception {
+    @Test
+    public void testAddAndRemoveEventListenerAllEvents() throws Exception {
         // Create a listener that just adds the events to a list
         TestFlowableEventListener newListener = new TestFlowableEventListener();
 
@@ -77,7 +79,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
     /**
      * Test adding a listener and check if events are sent to it, for the types it was registered for. Also checks that after removal, no events are received.
      */
-    public void addAndRemoveEventListenerTyped() throws Exception {
+    @Test
+    public void testAddAndRemoveEventListenerTyped() throws Exception {
         // Create a listener that just adds the events to a list
         TestFlowableEventListener newListener = new TestFlowableEventListener();
 
@@ -111,7 +114,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
     /**
      * Test that adding a listener with a null-type is never called.
      */
-    public void addAndRemoveEventListenerTypedNullType() throws Exception {
+    @Test
+    public void testAddAndRemoveEventListenerTypedNullType() throws Exception {
 
         // Create a listener that just adds the events to a list
         TestFlowableEventListener newListener = new TestFlowableEventListener();
@@ -133,7 +137,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
     /**
      * Test the {@link BaseEntityEventListener} shipped with Flowable.
      */
-    public void baseEntityEventListener() throws Exception {
+    @Test
+    public void testBaseEntityEventListener() throws Exception {
         TestBaseEntityEventListener listener = new TestBaseEntityEventListener();
 
         dispatcher.addEventListener(listener);
@@ -197,7 +202,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
     /**
      * Test dispatching behavior when an exception occurs in the listener
      */
-    public void exceptionInListener() throws Exception {
+    @Test
+    public void testExceptionInListener() throws Exception {
         // Create listener that doesn't force the dispatching to fail
         TestExceptionFlowableEventListener listener = new TestExceptionFlowableEventListener(false);
         TestFlowableEventListener secondListener = new TestFlowableEventListener();
@@ -240,7 +246,8 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
      * Test conversion of string-value (and list) in list of {@link FlowableEngineEventType}s, used in configuration of process-engine
      * {@link ProcessEngineConfigurationImpl#setTypedEventListeners(java.util.Map)} .
      */
-    public void activitiEventTypeParsing() throws Exception {
+    @Test
+    public void testActivitiEventTypeParsing() throws Exception {
         // Check with empty null
         FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(null);
         assertNotNull(types);

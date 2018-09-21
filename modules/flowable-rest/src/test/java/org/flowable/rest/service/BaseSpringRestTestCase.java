@@ -91,8 +91,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import junit.framework.AssertionFailedError;
-
 public class BaseSpringRestTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
@@ -226,7 +224,7 @@ public class BaseSpringRestTestCase {
         try {
             TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), testName.getMethodName());
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(System.lineSeparator());
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
@@ -258,8 +256,20 @@ public class BaseSpringRestTestCase {
         Group group = identityService.newGroup("admin");
         group.setName("Administrators");
         identityService.saveGroup(group);
-
+        
         identityService.createMembership(user.getId(), group.getId());
+        
+        user = identityService.newUser("aSalesUser");
+        user.setFirstName("Sales");
+        user.setLastName("User");
+        user.setPassword("sales");
+        identityService.saveUser(user);
+        
+        Group salesGroup = identityService.newGroup("sales");
+        salesGroup.setName("Administrators");
+        identityService.saveGroup(salesGroup);
+        
+        identityService.createMembership(user.getId(), salesGroup.getId());
     }
 
     /**
@@ -322,6 +332,10 @@ public class BaseSpringRestTestCase {
         identityService.deleteUser("kermit");
         identityService.deleteGroup("admin");
         identityService.deleteMembership("kermit", "admin");
+        
+        identityService.deleteUser("aSalesUser");
+        identityService.deleteGroup("sales");
+        identityService.deleteMembership("aSalesUser", "sales");
     }
 
     /**
@@ -397,7 +411,7 @@ public class BaseSpringRestTestCase {
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (processInstance != null) {
-            throw new AssertionFailedError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
+            throw new AssertionError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
         }
     }
 

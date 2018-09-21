@@ -14,9 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
-
-public class CmmnResourceEntityImpl extends AbstractEntityNoRevision implements CmmnResourceEntity, Serializable {
+public class CmmnResourceEntityImpl extends AbstractCmmnEngineNoRevisionEntity implements CmmnResourceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
     

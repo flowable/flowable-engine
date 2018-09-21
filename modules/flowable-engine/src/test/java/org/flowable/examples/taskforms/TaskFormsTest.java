@@ -19,6 +19,9 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -26,19 +29,20 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskFormsTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("fozzie"));
         identityService.saveGroup(identityService.newGroup("management"));
         identityService.createMembership("fozzie", "management");
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteGroup("management");
         identityService.deleteUser("fozzie");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/taskforms/VacationRequest_deprecated_forms.bpmn20.xml", "org/flowable/examples/taskforms/approve.form",
             "org/flowable/examples/taskforms/request.form", "org/flowable/examples/taskforms/adjustRequest.form" })
     public void testTaskFormsWithVacationRequestProcess() {
@@ -71,6 +75,7 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         assertEquals("Adjust vacation request", task.getName());
     }
 
+    @Test
     @Deployment
     public void testTaskFormUnavailable() {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();

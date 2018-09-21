@@ -22,6 +22,7 @@ import java.util.Set;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -33,6 +34,7 @@ public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
 
     private static final String TARGET_NAMESPACE = "targetNamespace='http://activiti.org/BPMN20'";
 
+    @Test
     public void testGetProcessDefinitions() {
         List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 1' />" + "</definitions>")));
@@ -114,6 +116,7 @@ public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
         deleteDeployments(deploymentIds);
     }
 
+    @Test
     public void testDeployIdenticalProcessDefinitions() {
         List<String> deploymentIds = new ArrayList<>();
         deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report' />" + "</definitions>")));
@@ -139,6 +142,7 @@ public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
         deleteDeployments(deploymentIds);
     }
 
+    @Test
     public void testProcessDefinitionDescription() {
         String deploymentId = deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='test' name='test'><documentation>This is a test</documentation></process></definitions>"));
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();

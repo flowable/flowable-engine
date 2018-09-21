@@ -24,6 +24,7 @@ import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -1424,11 +1425,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     protected List<String> getGroupsForCandidateUser(String candidateUser) {
         List<String> groupIds = new ArrayList<>();
-        IdmIdentityService idmIdentityService = CommandContextUtil.getTaskServiceConfiguration().getIdmIdentityService();
-        if (idmIdentityService != null) {
-            List<Group> groups = idmIdentityService.createGroupQuery().groupMember(candidateUser).list();
-            for (Group group : groups) {
-                groupIds.add(group.getId());
+        IdmEngineConfigurationApi idmEngineConfiguration = CommandContextUtil.getIdmEngineConfiguration();
+        if (idmEngineConfiguration != null) {
+            IdmIdentityService idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+            if (idmIdentityService != null) {
+                List<Group> groups = idmIdentityService.createGroupQuery().groupMember(candidateUser).list();
+                for (Group group : groups) {
+                    groupIds.add(group.getId());
+                }
             }
         }
         return groupIds;

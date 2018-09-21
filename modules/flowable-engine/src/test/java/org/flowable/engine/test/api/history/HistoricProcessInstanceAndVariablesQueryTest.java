@@ -22,6 +22,9 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -39,9 +42,8 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml")
@@ -68,13 +70,13 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap).getId());
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         deleteDeployments();
         
-        super.tearDown();
     }
 
+    @Test
     public void testQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().variableValueEquals("anothertest", 123).singleResult();
@@ -184,6 +186,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         }
     }
 
+    @Test
     public void testQueryByprocessDefinition() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // DeploymentId
@@ -224,6 +227,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         }
     }
     
+    @Test
     public void testQueryByVariableExist() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // DeploymentId
@@ -254,6 +258,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         }
     }
 
+    @Test
     public void testOrQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().variableValueEquals("anothertest", 123)
@@ -374,6 +379,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         }
     }
 
+    @Test
     public void testOrQueryMultipleVariableValues() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstanceQuery query0 = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or();
@@ -425,6 +431,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         }
     }
 
+    @Test
     public void testOrQueryByprocessDefinition() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // DeploymentId

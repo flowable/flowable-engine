@@ -3,9 +3,31 @@ language: java
 dist: trusty
 sudo: required
 
-jdk:
-  - oraclejdk9
-  - oraclejdk8
+matrix:
+  include:
+  - jdk: oraclejdk8
+  - name: "Flowable 5 tests"
+    jdk: oraclejdk8
+    install: true
+    script:
+      cd scripts && ./run-flowable5-tests.sh
+  - jdk: oraclejdk9
+  - jdk: openjdk10
+    # For some reason pulling from sonatype_snapshots does not work for openjdk10 and we have to manually symlink
+    # See https://github.com/travis-ci/travis-ci/issues/9368#issuecomment-405070163
+    before_install:
+    - rm "${JAVA_HOME}/lib/security/cacerts"
+    - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
+  - jdk: openjdk11
+  - jdk: openjdk-ea
+    branches:
+      only:
+      - master
+    if: TRAVIS_PULL_REQUEST != false
+  allow_failures:
+  - jdk: openjdk11
+  - jdk: openjdk-ea
+  - name: "Flowable 5 tests"
 
 cache:
   directories:

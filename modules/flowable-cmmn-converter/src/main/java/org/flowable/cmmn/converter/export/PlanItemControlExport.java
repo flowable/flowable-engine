@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.CompletionNeutralRule;
@@ -19,9 +22,6 @@ import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.RequiredRule;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 /**
  * @author Tijs Rademakers
@@ -42,10 +42,10 @@ public class PlanItemControlExport implements CmmnXmlConstants {
     }
 
     protected static void writeItemControlContent(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
+        writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
         writeRequiredRule(planItemControl.getRequiredRule(), xtw);
         writeRepetitionRule(planItemControl.getRepetitionRule(), xtw);
         writeManualActivationRule(planItemControl.getManualActivationRule(), xtw);
-        writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
     }
 
     public static void writeRequiredRule(RequiredRule requiredRule, XMLStreamWriter xtw) throws XMLStreamException {
@@ -90,7 +90,7 @@ public class PlanItemControlExport implements CmmnXmlConstants {
 
     public static void writeCompletionNeutralRule(CompletionNeutralRule completionNeutralRule, XMLStreamWriter xtw) throws XMLStreamException {
         if (completionNeutralRule != null) {
-            xtw.writeStartElement(ELEMENT_EXTENSIONS);
+            xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
             xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_COMPLETION_NEUTRAL_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
             if (StringUtils.isNotBlank(completionNeutralRule.getCondition())) {
 

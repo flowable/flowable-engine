@@ -42,6 +42,7 @@ public class CmmnEngineImpl implements CmmnEngine {
     protected CmmnHistoryService cmmnHistoryService;
     
     protected AsyncExecutor asyncExecutor;
+    protected AsyncExecutor asyncHistoryExecutor;
     
     public CmmnEngineImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
@@ -53,6 +54,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
         
         this.asyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
+        this.asyncHistoryExecutor = cmmnEngineConfiguration.getAsyncHistoryExecutor();
         
         if (cmmnEngineConfiguration.isUsingRelationalDatabase() && cmmnEngineConfiguration.getDatabaseSchemaUpdate() != null) {
             CommandExecutor commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
@@ -79,6 +81,9 @@ public class CmmnEngineImpl implements CmmnEngine {
         
         if (asyncExecutor != null && asyncExecutor.isActive()) {
             asyncExecutor.shutdown();
+        }
+        if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
+            asyncHistoryExecutor.shutdown();
         }
     }
     

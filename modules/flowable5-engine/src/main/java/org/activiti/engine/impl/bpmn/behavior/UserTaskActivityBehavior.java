@@ -12,9 +12,6 @@
  */
 package org.activiti.engine.impl.bpmn.behavior;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -42,6 +39,9 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Activity implementation for the user task.

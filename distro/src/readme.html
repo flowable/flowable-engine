@@ -26,6 +26,32 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.3.2</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Depend on Spring 5.x for the Spring Engine support.</li>
+    <li>Upgrade Java Persistence API to 2.1</li>
+    <li>Upgrade JMS API to 2.0.1</li>
+    <li>Support for using java.time.Duration variables and expressions for Timer durations</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<h5>Idm Engine SpringEncoder</h5>
+<p>
+    The deprecated constructor from SpringEncoder that accepted org.springframework.security.authentication.encoding.PasswordEncoder has been removed
+</p>
+
+<h5>Custom IdGenerator using a Bean in Spring Boot</h5>
+<p>
+    It is now possible to define the custom IdGenerator for the Flowable Process engine, by creating a bean of type IdGenerator.
+    If no bean is provided the StrongUuidGenerator will be used.
+    If there is a bean qualified with @Process then this one would be used, otherwise a unique global one would be used.
+    If there are more global beans then the default StrongUuidGenerator will be used.
+</p>
+
 <h3>Release Notes - Flowable - 6.3.1</h3>
 
 <h4>Highlights</h4>

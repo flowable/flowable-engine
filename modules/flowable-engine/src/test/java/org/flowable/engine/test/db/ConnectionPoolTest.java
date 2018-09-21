@@ -19,12 +19,14 @@ import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class ConnectionPoolTest extends AbstractTestCase {
 
+    @Test
     public void testMyBatisConnectionPoolProperlyConfigured() {
         ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
                 .createProcessEngineConfigurationFromResource("org/flowable/engine/test/db/connection-pool.flowable.cfg.xml");

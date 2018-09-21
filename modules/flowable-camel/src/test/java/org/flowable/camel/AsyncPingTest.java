@@ -23,12 +23,17 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Saeid Mirzaei
  */
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class AsyncPingTest extends SpringFlowableTestCase {
 
@@ -38,7 +43,7 @@ public class AsyncPingTest extends SpringFlowableTestCase {
     @Autowired
     protected RuntimeService runtimeService;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -50,7 +55,7 @@ public class AsyncPingTest extends SpringFlowableTestCase {
         });
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
@@ -59,6 +64,7 @@ public class AsyncPingTest extends SpringFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "process/asyncPing.bpmn20.xml" })
     public void testRunProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncPingProcess");

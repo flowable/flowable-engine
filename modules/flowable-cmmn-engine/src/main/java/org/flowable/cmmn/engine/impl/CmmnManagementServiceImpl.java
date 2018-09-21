@@ -37,6 +37,7 @@ import org.flowable.job.service.impl.cmd.DeleteDeadLetterJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteSuspendedJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteTimerJobCmd;
+import org.flowable.job.service.impl.cmd.ExecuteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteJobCmd;
 import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.flowable.job.service.impl.cmd.JobType;
@@ -80,6 +81,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
                 throw new FlowableException("Job " + jobId + " failed", e);
             }
         }
+    }
+    
+    @Override
+    public void executeHistoryJob(String historyJobId) {
+        commandExecutor.execute(new ExecuteHistoryJobCmd(historyJobId));
     }
 
     @Override

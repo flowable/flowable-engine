@@ -76,7 +76,6 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
         // Also: it avoids the need for having a process definition cache for each tenant
 
         this.idGenerator = new StrongUuidGenerator();
-        this.taskIdGenerator = this.idGenerator;
 
         this.dataSource = new TenantAwareDataSource(tenantInfoHolder);
     }

@@ -12,18 +12,20 @@
  */
 package org.flowable.content.rest.service.api.management;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.content.engine.ContentEngine;
+import org.flowable.content.engine.ContentEngines;
+import org.flowable.content.rest.ContentRestApiInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.EngineInfo;
-import org.flowable.content.engine.ContentEngine;
-import org.flowable.content.engine.ContentEngines;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Tijs Rademakers
@@ -31,6 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(tags = { "Engine" }, description = "Manage Content Engine", authorizations = { @Authorization(value = "basicAuth") })
 public class ContentEngineResource {
+    
+    @Autowired(required=false)
+    protected ContentRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get Content engine info", tags = { "Engine" })
     @ApiResponses(value = {
@@ -38,6 +43,10 @@ public class ContentEngineResource {
     })
     @GetMapping(value = "/content-management/engine", produces = "application/json")
     public ContentEngineInfoResponse getEngineInfo() {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessContentManagementInfo();
+        }
+        
         ContentEngineInfoResponse response = new ContentEngineInfoResponse();
 
         try {

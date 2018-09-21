@@ -35,7 +35,7 @@ public class BaseCaseDefinitionResource {
     protected CmmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link CaseDefinition} that is requested. Throws the right exceptions when bad request was made or definition is not found.
+     * Returns the {@link CaseDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
      */
     protected CaseDefinition getCaseDefinitionFromRequest(String caseDefinitionId) {
         CaseDefinition caseDefinition = repositoryService.getCaseDefinition(caseDefinitionId);

@@ -25,6 +25,7 @@ import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConcurrentEngineUsageTest.class);
     private static final int MAX_RETRIES = 5;
 
+    @Test
     @Deployment
     public void testConcurrentUsage() throws Exception {
 

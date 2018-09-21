@@ -14,9 +14,12 @@ package org.flowable.spring.boot.process;
 
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Component scan for the Process engine REST API Configuration.
@@ -26,9 +29,12 @@ import org.springframework.context.annotation.Import;
 @Import(DispatcherServletConfiguration.class)
 @ComponentScan("org.flowable.rest.service.api")
 public class ProcessEngineRestConfiguration {
+    
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Bean
     public RestResponseFactory restResponseFactory() {
-        return new RestResponseFactory();
+        return new RestResponseFactory(objectMapper);
     }
 }

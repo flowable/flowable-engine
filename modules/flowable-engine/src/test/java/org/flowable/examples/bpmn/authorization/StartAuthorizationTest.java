@@ -25,6 +25,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Saeid Mirzaei
@@ -95,6 +96,7 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
         identityService.deleteUser("user3");
     }
 
+    @Test
     @Deployment
     public void testIdentityLinks() throws Exception {
 
@@ -133,6 +135,7 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testAddAndRemoveIdentityLinks() throws Exception {
 
@@ -187,6 +190,7 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
         return found;
     }
 
+    @Test
     @Deployment
     public void testPotentialStarter() throws Exception {
         // first check an unauthorized user. An exception is expected
@@ -234,6 +238,7 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
     /*
      * if there is no security definition, then user authorization check is not done. This ensures backward compatibility
      */
+    @Test
     @Deployment
     public void testPotentialStarterNoDefinition() throws Exception {
         identityService = processEngine.getIdentityService();
@@ -246,6 +251,7 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
     }
 
     // this test checks the list without user constraint
+    @Test
     @Deployment
     public void testProcessDefinitionList() throws Exception {
 

@@ -19,6 +19,7 @@ import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -38,6 +39,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
     @Autowired
     protected DataSource dataSource;
 
+    @Test
     @Deployment
     public void testBasicFlowableSpringIntegration() {
         userBean.hello();
@@ -46,6 +48,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
         assertEquals("Hello from Printer!", runtimeService.getVariable(processInstance.getId(), "myVar"));
     }
 
+    @Test
     @Deployment
     public void testRollbackTransactionOnFlowableException() {
 
@@ -75,6 +78,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
         jdbcTemplate.execute("drop table MY_TABLE if exists;");
     }
 
+    @Test
     public void testRollBackOnDeployment() {
         // The second process should fail. None of the processes should be
         // deployed, the first one should be rolled back

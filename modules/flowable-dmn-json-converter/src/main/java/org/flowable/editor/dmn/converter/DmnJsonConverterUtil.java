@@ -142,25 +142,27 @@ public class DmnJsonConverterUtil {
 
                     Iterator<String> ruleProperty = ruleNode.fieldNames();
                     while (ruleProperty.hasNext()) {
-                        String outputExpressionId = ruleProperty.next();
-                        if (!inputExpressionIds.containsKey(outputExpressionId)) { // is output expression
-                            String outputExpressionValue = ruleNode.get(outputExpressionId).asText();
+                        String expressionId = ruleProperty.next();
+                        if (!inputExpressionIds.containsKey(expressionId)) {
+                            if (ruleNode.hasNonNull(expressionId)) {
+                                String expressionValue = ruleNode.get(expressionId).asText();
 
-                            // remove outer escape quotes
-                            if (StringUtils.isNotEmpty(outputExpressionValue) && outputExpressionValue.startsWith("\"") && outputExpressionValue
-                                .endsWith("\"")) {
-                                outputExpressionValue = outputExpressionValue.substring(1, outputExpressionValue.length() - 1);
+                                // remove outer escape quotes
+                                if (StringUtils.isNotEmpty(expressionValue) && expressionValue.startsWith("\"") && expressionValue
+                                    .endsWith("\"")) {
+                                    expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
+                                }
+
+                                // if build in date function
+                                if (expressionValue.startsWith("fn_date(")) {
+                                    expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
+
+                                } else if (expressionValue.startsWith("date:toDate(")) {
+                                    expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
+                                }
+
+                                newRuleNode.put(expressionId, expressionValue);
                             }
-
-                            // if build in date function
-                            if (outputExpressionValue.startsWith("fn_date(")) {
-                                outputExpressionValue = outputExpressionValue.substring(9, outputExpressionValue.lastIndexOf('\''));
-
-                            } else if (outputExpressionValue.startsWith("date:toDate(")) {
-                                outputExpressionValue = outputExpressionValue.substring(13, outputExpressionValue.lastIndexOf('\''));
-                            }
-
-                            newRuleNode.put(outputExpressionId, outputExpressionValue);
                         }
                     }
 

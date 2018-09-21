@@ -61,7 +61,7 @@ public class DataStoreReferenceXMLConverter extends BaseBpmnXMLConverter {
         DataStoreReference dataStoreRef = (DataStoreReference) element;
         if (StringUtils.isNotEmpty(dataStoreRef.getDataState())) {
             xtw.writeStartElement(ELEMENT_DATA_STATE);
-            xtw.writeCharacters(dataStoreRef.getDataState());
+            xtw.writeAttribute(ATTRIBUTE_NAME, dataStoreRef.getDataState());
             xtw.writeEndElement();
         }
     }

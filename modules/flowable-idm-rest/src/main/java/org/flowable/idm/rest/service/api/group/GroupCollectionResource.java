@@ -13,6 +13,8 @@
 
 package org.flowable.idm.rest.service.api.group;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +29,7 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.GroupQueryProperty;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.rest.service.api.IdmRestApiInterceptor;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -65,6 +68,9 @@ public class GroupCollectionResource {
 
     @Autowired
     protected IdmIdentityService identityService;
+    
+    @Autowired(required=false)
+    protected IdmRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List groups", nickname="listGroups", tags = { "Groups" }, produces = "application/json")
     @ApiImplicitParams({
@@ -97,8 +103,12 @@ public class GroupCollectionResource {
         if (allRequestParams.containsKey("member")) {
             query.groupMember(allRequestParams.get("member"));
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessGroupInfoWithQuery(query);
+        }
 
-        return new GroupPaginateList(restResponseFactory).paginateList(allRequestParams, query, "id", properties);
+        return paginateList(allRequestParams, query, "id", properties, restResponseFactory::createGroupResponseList);
     }
 
     @ApiOperation(value = "Create a group", tags = { "Groups" })
@@ -121,6 +131,11 @@ public class GroupCollectionResource {
         created.setId(groupRequest.getId());
         created.setName(groupRequest.getName());
         created.setType(groupRequest.getType());
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createNewGroup(created);
+        }
+        
         identityService.saveGroup(created);
 
         response.setStatus(HttpStatus.CREATED.value());

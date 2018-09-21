@@ -20,6 +20,9 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to process definitions.
@@ -33,6 +36,7 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
     /**
      * Check identity links on process definitions.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessDefinitionIdentityLinkEvents() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
@@ -79,6 +83,7 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
     /**
      * Check identity links on process instances.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceIdentityLinkEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -111,12 +116,13 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         assertEquals("kermit", link.getUserId());
         assertEquals("test", link.getType());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     /**
      * Check identity links on process instances.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testTaskIdentityLinks() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -171,12 +177,13 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
         assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
     /**
      * Check deletion of links on process instances.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessInstanceIdentityDeleteCandidateGroupEvents() throws Exception {
 
@@ -201,17 +208,15 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         assertEquals(1, listener.getEventsReceived().size());
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
+    @BeforeEach
+    protected void setUp() {
 
         listener = new TestFlowableEntityEventListener(IdentityLink.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             listener.clearEventsReceived();

@@ -19,6 +19,7 @@ import org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEventListener}s that throw a message BPMN event when an {@link FlowableEvent} has been dispatched.
@@ -27,6 +28,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testThrowMessage() throws Exception {
         MessageThrowingEventListener listener = null;
@@ -59,6 +61,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
         }
     }
 
+    @Test
     @Deployment
     public void testThrowMessageDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testMessage");
@@ -79,6 +82,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
         assertNotNull(boundaryTask);
     }
 
+    @Test
     @Deployment
     public void testThrowMessageInterrupting() throws Exception {
         MessageThrowingEventListener listener = null;
@@ -104,7 +108,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

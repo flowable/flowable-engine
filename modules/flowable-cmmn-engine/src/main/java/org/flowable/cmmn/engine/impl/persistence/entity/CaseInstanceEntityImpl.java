@@ -27,7 +27,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 /**
  * @author Joram Barrez
  */
-public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseInstanceEntity {
+public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements CaseInstanceEntity {
 
     protected String businessKey;
     protected String name;

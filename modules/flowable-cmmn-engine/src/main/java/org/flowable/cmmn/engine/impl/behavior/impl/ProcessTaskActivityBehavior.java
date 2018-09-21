@@ -41,6 +41,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
 
     protected Process process;
     protected Expression processRefExpression;
+    protected String processRef;
     List<IOParameter> inParameters;
     List<IOParameter> outParameters;
 
@@ -48,6 +49,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         super(processTask.isBlocking(), processTask.getBlockingExpression());
         this.process = process;
         this.processRefExpression = processRefExpression;
+        this.processRef = processTask.getProcessRef();
         this.inParameters = processTask.getInParameters();
         this.outParameters = processTask.getOutParameters();
     }
@@ -64,6 +66,8 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             externalRef = process.getExternalRef();
         } else if (processRefExpression != null) {
             externalRef = processRefExpression.getValue(planItemInstanceEntity).toString();
+        } else if (processRef != null){
+            externalRef = processRef;
         }
         if (StringUtils.isEmpty(externalRef)) {
             throw new FlowableException("Could not start process instance: no externalRef defined");

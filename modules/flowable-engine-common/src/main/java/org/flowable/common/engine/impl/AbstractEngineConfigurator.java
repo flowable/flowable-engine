@@ -241,6 +241,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (targetEngineConfiguration.getIdGenerator() == null) {
             targetEngineConfiguration.setIdGenerator(engineConfiguration.getIdGenerator());
         }
+        targetEngineConfiguration.setUsePrefixId(engineConfiguration.isUsePrefixId());
     }
 
     protected void initDataSource(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {

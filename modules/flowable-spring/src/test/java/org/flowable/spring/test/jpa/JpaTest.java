@@ -7,6 +7,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -16,6 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(locations = "JPASpringTest-context.xml")
 public class JpaTest extends SpringFlowableTestCase {
 
+    @Test
     public void testJpaVariableHappyPath() {
         before();
         Map<String, Object> variables = new HashMap<>();
@@ -50,6 +52,7 @@ public class JpaTest extends SpringFlowableTestCase {
         deleteDeployments();
     }
 
+    @Test
     public void testJpaVariableDisapprovalPath() {
 
         before();

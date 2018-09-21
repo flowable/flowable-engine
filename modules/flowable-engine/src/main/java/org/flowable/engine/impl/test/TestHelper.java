@@ -42,8 +42,6 @@ import org.flowable.engine.test.mock.NoOpServiceTasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import junit.framework.AssertionFailedError;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -64,14 +62,13 @@ public abstract class TestHelper {
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (processInstance != null) {
-            throw new AssertionFailedError("expected finished process instance '" + processInstanceId + "' but it was still in the db");
+            throw new AssertionError("expected finished process instance '" + processInstanceId + "' but it was still in the db");
         }
     }
 
     // Test annotation support /////////////////////////////////////////////
 
     public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
-        String deploymentId = null;
         Method method = null;
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
@@ -79,7 +76,17 @@ public abstract class TestHelper {
             LOGGER.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
             return null;
         }
+        return annotationDeploymentSetUp(processEngine, testClass, method);
+    }
+
+    public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, Method method) {
         Deployment deploymentAnnotation = method.getAnnotation(Deployment.class);
+        return annotationDeploymentSetUp(processEngine, testClass, method, deploymentAnnotation);
+    }
+
+    public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, Method method, Deployment deploymentAnnotation) {
+        String deploymentId = null;
+        String methodName = method.getName();
         if (deploymentAnnotation != null) {
             LOGGER.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
             String[] resources = deploymentAnnotation.resources();
@@ -141,8 +148,21 @@ public abstract class TestHelper {
         }
     }
 
-    protected static void handleMockServiceTaskAnnotation(FlowableMockSupport mockSupport, MockServiceTask mockedServiceTask) {
-        mockSupport.mockServiceTaskWithClassDelegate(mockedServiceTask.originalClassName(), mockedServiceTask.mockedClassName());
+    public static void handleMockServiceTaskAnnotation(FlowableMockSupport mockSupport, MockServiceTask mockedServiceTask) {
+        String originalClassName = mockedServiceTask.originalClassName();
+        mockSupport.mockServiceTaskWithClassDelegate(originalClassName, mockedServiceTask.mockedClassName());
+        Class<?> mockedClass = mockedServiceTask.mockedClass();
+        if (!Void.class.equals(mockedClass)) {
+            mockSupport.mockServiceTaskWithClassDelegate(originalClassName, mockedClass);
+        }
+
+        String id = mockedServiceTask.id();
+        if (!id.isEmpty()) {
+            mockSupport.mockServiceTaskByIdWithClassDelegate(id, mockedServiceTask.mockedClassName());
+            if (!Void.class.equals(mockedClass)) {
+                mockSupport.mockServiceTaskByIdWithClassDelegate(id, mockedClass);
+            }
+        }
     }
 
     protected static void handleMockServiceTasksAnnotation(FlowableMockSupport mockSupport, Method method) {
@@ -157,7 +177,12 @@ public abstract class TestHelper {
     protected static void handleNoOpServiceTasksAnnotation(FlowableMockSupport mockSupport, Method method) {
         NoOpServiceTasks noOpServiceTasks = method.getAnnotation(NoOpServiceTasks.class);
         if (noOpServiceTasks != null) {
+            handleNoOpServiceTasksAnnotation(mockSupport, noOpServiceTasks);
+        }
+    }
 
+    public static void handleNoOpServiceTasksAnnotation(FlowableMockSupport mockSupport, NoOpServiceTasks noOpServiceTasks) {
+        if (noOpServiceTasks != null) {
             String[] ids = noOpServiceTasks.ids();
             Class<?>[] classes = noOpServiceTasks.classes();
             String[] classNames = noOpServiceTasks.classNames();
@@ -185,7 +210,6 @@ public abstract class TestHelper {
                 }
 
             }
-
         }
     }
 

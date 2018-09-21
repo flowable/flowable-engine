@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class DecisionTableEntityImpl extends AbstractEntityNoRevision implements DecisionTableEntity, Serializable {
+public class DecisionTableEntityImpl extends AbstractDmnEngineNoRevisionEntity implements DecisionTableEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

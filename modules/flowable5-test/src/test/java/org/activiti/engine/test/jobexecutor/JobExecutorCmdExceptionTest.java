@@ -31,6 +31,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
     public void setUp() throws Exception {
         processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
+        processEngineConfiguration.getJobServiceConfiguration().getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 

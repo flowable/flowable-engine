@@ -12,12 +12,8 @@
  */
 package org.flowable.content.rest.service.api.content;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.rest.ContentRestResponseFactory;
@@ -30,7 +26,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -116,6 +117,12 @@ public class ContentItemResource extends ContentItemBaseResource {
     })
     @DeleteMapping(value = "/content-service/content-items/{contentItemId}")
     public void deleteContentItem(@ApiParam(name = "contentItemId") @PathVariable String contentItemId, HttpServletResponse response) {
+        ContentItem contentItem = getContentItemFromRequest(contentItemId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteContentItem(contentItem);
+        }
+        
         contentService.deleteContentItem(contentItemId);
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }

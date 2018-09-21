@@ -7,7 +7,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error building v6 dependencies. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd modules/flowable5-engine/
@@ -16,7 +16,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error building v5 dependencies. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd ../..
@@ -28,7 +28,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable5-compatibility. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd ../..
@@ -40,7 +40,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable5-test. Exiting."
-  exit $?
+  exit $STATUS
 else
   echo "All Flowable 5 tests succeeded"
 fi
@@ -54,7 +54,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable5-spring. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd ../..
@@ -66,7 +66,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable5-spring-compatibility. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd ../..
@@ -78,7 +78,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable5-spring-test. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd ../..
@@ -90,7 +90,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable-cxf. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd ../..
@@ -102,7 +102,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable5-cxf-test. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd ../..
@@ -114,7 +114,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable5-camel. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 cd ../..
@@ -126,7 +126,7 @@ STATUS=$?
 if [ $STATUS -ne 0 ]
 then
   echo "Error while building flowable5-camel-test. Exiting."
-  exit $?
+  exit $STATUS
 fi
 
 

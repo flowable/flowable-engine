@@ -17,6 +17,8 @@
         </startEvent>
  
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theEnd" />
+        
+        <endEvent id="theEnd"/>
  
   </process>
 </definitions>

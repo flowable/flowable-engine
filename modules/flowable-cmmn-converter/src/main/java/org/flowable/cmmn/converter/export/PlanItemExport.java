@@ -12,12 +12,14 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
-
-import javax.xml.stream.XMLStreamWriter;
 
 /**
  * @author Tijs Rademakers
@@ -25,7 +27,7 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class PlanItemExport implements CmmnXmlConstants {
     
-    public static void writePlanItem(PlanItem planItem, XMLStreamWriter xtw) throws Exception {
+    public static void writePlanItem(CmmnModel model, PlanItem planItem, XMLStreamWriter xtw) throws Exception {
         // start plan item element
         xtw.writeStartElement(ELEMENT_PLAN_ITEM);
         xtw.writeAttribute(ATTRIBUTE_ID, planItem.getId());
@@ -43,6 +45,12 @@ public class PlanItemExport implements CmmnXmlConstants {
             xtw.writeCharacters(planItem.getDocumentation());
             xtw.writeEndElement();
         }
+        
+        boolean didWriteExtensionElement = CmmnXmlUtil.writeExtensionElements(planItem, false, model.getNamespaces(), xtw);
+        if (didWriteExtensionElement) {
+            xtw.writeEndElement();
+        }
+        
         if (planItem.getItemControl() != null) {
             PlanItemControl itemControl = planItem.getItemControl();
             PlanItemControlExport.writeItemControl(itemControl, xtw);

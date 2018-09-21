@@ -13,17 +13,23 @@
 
 package org.flowable.spring.test.autodeployment;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormDeploymentQuery;
 import org.flowable.form.api.FormRepositoryService;
-import org.flowable.form.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -32,7 +38,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class SpringAutoDeployTest extends AbstractTestCase {
+@ExtendWith(LoggingExtension.class)
+public class SpringAutoDeployTest {
 
     protected static final String CTX_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml";
     protected static final String CTX_NO_DROP_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-no-drop-context.xml";
@@ -49,14 +56,14 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         this.repositoryService = applicationContext.getBean(FormRepositoryService.class);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         removeAllDeployments();
         this.applicationContext = null;
         this.repositoryService = null;
-        super.tearDown();
     }
 
+    @Test
     public void testBasicFlowableSpringIntegration() {
         createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
         List<FormDefinition> formDefinitions = repositoryService.createFormDefinitionQuery().orderByFormDefinitionKey().asc().list();
@@ -73,6 +80,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         assertEquals(expectedFormDefinitionKeys, formDefinitionKeys);
     }
 
+    @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContext(CTX_PATH);
         FormDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
@@ -87,6 +95,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
     }
 
     // Updating the form file should lead to a new deployment when restarting the Spring container
+    @Test
     public void testResourceRedeploymentAfterFormDefinitionChange() throws Exception {
         createAppContext(CTX_PATH);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
@@ -117,24 +126,28 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         assertEquals(4, repositoryService.createFormDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithCreateDropOnCleanDb() {
         createAppContext(CTX_CREATE_DROP_CLEAN_DB);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createFormDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContext(CTX_DEPLOYMENT_MODE_DEFAULT);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createFormDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContext(CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE);
         assertEquals(2, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createFormDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContext(CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER);
         assertEquals(2, repositoryService.createDeploymentQuery().count());

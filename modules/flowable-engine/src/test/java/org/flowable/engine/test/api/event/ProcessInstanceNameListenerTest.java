@@ -28,6 +28,10 @@ import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for {@link FlowableEngineEventType#PROCESS_CREATED} event.
@@ -38,6 +42,7 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
 
     private TestInitializedEntityEventListener listener;
 
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testProcessCreateProcessNameEvent() throws Exception {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().
@@ -51,6 +56,7 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
                 listener.getProcessName(), is("oneTaskProcessInstanceName"));
     }
 
+    @Test
     public void testCallActivityProcessCreatedDefinitionName() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel("org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_mainProcess.bpmn.xml");
         BpmnModel childBpmnModel = loadBPMNModel("org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_childProcess.bpmn.xml");
@@ -69,16 +75,14 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(childDeployment.getId());
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
+    @BeforeEach
+    protected void setUp() {
         this.listener = new TestInitializedEntityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(this.listener, FlowableEngineEventType.PROCESS_CREATED);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

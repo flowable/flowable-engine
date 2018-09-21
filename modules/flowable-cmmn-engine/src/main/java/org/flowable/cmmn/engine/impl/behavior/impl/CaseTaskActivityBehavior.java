@@ -50,8 +50,8 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
         if (StringUtils.isNotEmpty(planItemInstanceEntity.getTenantId())) {
             caseInstanceBuilder.tenantId(planItemInstanceEntity.getTenantId());
         }
+        caseInstanceBuilder.parentId(planItemInstanceEntity.getCaseInstanceId());
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
-        caseInstanceEntity.setParentId(planItemInstanceEntity.getCaseInstanceId());
 
         // Bidirectional storing of reference to avoid queries later on
         caseInstanceEntity.setCallbackType(CallbackTypes.PLAN_ITEM_CHILD_CASE);

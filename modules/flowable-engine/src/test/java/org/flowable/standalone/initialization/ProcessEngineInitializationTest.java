@@ -25,12 +25,14 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class ProcessEngineInitializationTest extends AbstractTestCase {
 
+    @Test
     public void testNoTables() {
         try {
             ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml").buildProcessEngine();
@@ -41,6 +43,7 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
         }
     }
 
+    @Test
     public void testVersionMismatch() {
         // first create the schema
         ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("org/flowable/standalone/initialization/notables.flowable.cfg.xml")

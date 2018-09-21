@@ -31,6 +31,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Falko Menge
@@ -46,6 +47,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
     private static final String TEST_PROCESS_USER_TASK_V2 = "org/flowable/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithTaskV2.bpmn20.xml";
     private static final String TEST_PROCESS_NESTED_SUB_EXECUTIONS = "org/flowable/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionSubExecutionsNested.bpmn20.xml";
 
+    @Test
     public void testSetProcessDefinitionVersionEmptyArguments() {
         try {
             new SetProcessDefinitionVersionCmd(null, 23);
@@ -76,6 +78,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testSetProcessDefinitionVersionNonExistingPI() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         try {
@@ -87,6 +90,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_WITH_PARALLEL_GATEWAY })
     public void testSetProcessDefinitionVersionPIIsSubExecution() {
         // start process instance
@@ -104,6 +108,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS })
     public void testSetProcessDefinitionVersionNonExistingPD() {
         // start process instance
@@ -119,6 +124,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS })
     public void testSetProcessDefinitionVersionActivityMissing() {
         // start process instance
@@ -146,6 +152,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+    @Test
     @Deployment
     public void testSetProcessDefinitionVersion() {
         // start process instance
@@ -156,7 +163,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertNotNull(execution);
 
         // deploy new version of the process definition
-        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS).deploy();
+        repositoryService.createDeployment().addClasspathResource(TEST_PROCESS).deploy();
         assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
         // migrate process instance to new process definition version
@@ -188,6 +195,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         deleteDeployments();
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_WITH_PARALLEL_GATEWAY })
     public void testSetProcessDefinitionVersionSubExecutions() {
         // start process instance
@@ -216,6 +224,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_CALL_ACTIVITY })
     public void testSetProcessDefinitionVersionWithCallActivity() {
         // start process instance
@@ -243,6 +252,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_USER_TASK_V1 })
     public void testSetProcessDefinitionVersionWithWithTask() {
         try {
@@ -253,7 +263,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             assertEquals(1, taskService.createTaskQuery().processInstanceId(pi.getId()).count());
 
             // deploy new version of the process definition
-            org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_USER_TASK_V2).deploy();
+            repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_USER_TASK_V2).deploy();
             assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").count());
 
             ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").processDefinitionVersion(2).singleResult();
@@ -284,6 +294,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_NESTED_SUB_EXECUTIONS })
     public void testSetProcessDefinitionVersionSubExecutionsNested() {
         // start process instance

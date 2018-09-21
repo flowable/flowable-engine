@@ -18,14 +18,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.ProcessEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class ModelEntityImpl extends AbstractEntity implements ModelEntity, Serializable {
+public class ModelEntityImpl extends AbstractBpmnEngineEntity implements ModelEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

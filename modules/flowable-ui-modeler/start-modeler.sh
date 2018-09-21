@@ -8,7 +8,7 @@ then
 
 	# Run war
 	export MAVEN_OPTS="$MAVEN_OPTS -noverify -Xms512m -Xmx1024m -Xdebug -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n"
-	mvn clean install -Pmysql spring-boot:run
+	mvn clean install -Pmysql -DskipTests spring-boot:run
 else
     echo "Error while building root pom. Halting."
 fi

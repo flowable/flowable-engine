@@ -20,6 +20,7 @@ import java.util.Set;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -27,6 +28,7 @@ import org.flowable.engine.repository.DeploymentQuery;
  */
 public class DeploymentCategoryTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testDeploymentCategory() {
         String noCategoryDeploymentId = null;
         String deploymentOneId = null;
@@ -82,6 +84,7 @@ public class DeploymentCategoryTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     public void testDeploymentKey() {
         String noKeyDeploymentId = null;
         String deploymentOneId = null;

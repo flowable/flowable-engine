@@ -58,9 +58,6 @@
   
   <sql id="selectPrivilegeByQueryCriteriaSql">
     from ${prefix}ACT_ID_PRIV RES 
-    <if test="userId != null || groupId != null || groupIds != null">
-        inner join ${prefix}ACT_ID_PRIV_MAPPING MAPPING on RES.ID_ = MAPPING.PRIV_ID_
-    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -69,17 +66,14 @@
         and RES.NAME_ = #{name}
       </if>
       <if test="userId != null">
-        and MAPPING.USER_ID_ = #{userId}
+        and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.USER_ID_ = #{userId})
       </if>
       <if test="groupId != null">
-        and MAPPING.GROUP_ID_ = #{groupId}
+        and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.GROUP_ID_ = #{groupId})
       </if>
-      <if test="groupIds != null">
-        and MAPPING.GROUP_ID_ IN
-        <foreach item="id" index="index" collection="groupIds" 
-                 open="(" separator="," close=")">
-          #{id}
-        </foreach>
+      <if test="groupIds != null &amp;&amp; groupIds.size() > 0">
+        and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.GROUP_ID_ in  
+            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId}</foreach>)
       </if>
     </where>
   </sql>

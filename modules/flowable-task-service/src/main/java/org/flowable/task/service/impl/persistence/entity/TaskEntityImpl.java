@@ -48,7 +48,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
  * @author Falko Menge
  * @author Tijs Rademakers
  */
-public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, CountingTaskEntity, Serializable {
+public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity implements TaskEntity, CountingTaskEntity, Serializable {
 
     public static final String DELETE_REASON_COMPLETED = "completed";
     public static final String DELETE_REASON_DELETED = "deleted";
@@ -133,6 +133,9 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         }
         if (taskDefinitionId != null) {
             persistentState.put("taskDefinitionId", this.taskDefinitionId);
+        }
+        if (taskDefinitionKey != null) {
+            persistentState.put("taskDefinitionKey", this.taskDefinitionKey);
         }
         if (scopeId != null) {
             persistentState.put("scopeId", this.scopeId);

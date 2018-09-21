@@ -21,6 +21,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEventListener}s that throws a signal BPMN event when an {@link FlowableEvent} has been dispatched.
@@ -29,6 +30,7 @@ import org.flowable.job.api.Job;
  */
 public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testThrowSignal() throws Exception {
         SignalThrowingEventListener listener = null;
@@ -62,6 +64,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testThrowSignalDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
@@ -83,6 +86,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
         assertNotNull(boundaryTask);
     }
 
+    @Test
     @Deployment
     public void testThrowSignalInterrupting() throws Exception {
         SignalThrowingEventListener listener = null;
@@ -108,7 +112,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
@@ -118,6 +122,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
     /**
      * Test signal throwing when a job failed and the retries are decremented, effectively starting a new transaction.
      */
+    @Test
     @Deployment
     public void testThrowSignalInNewTransaction() throws Exception {
         SignalThrowingEventListener listener = null;
@@ -163,6 +168,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
     /**
      * Test signal throwing when a job failed, signaling will happen in the rolled back transaction, not doing anything in the end...
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/event/SignalThrowingEventListenerTest.testThrowSignalInNewTransaction.bpmn20.xml" })
     public void testThrowSignalInRolledbackTransaction() throws Exception {
         SignalThrowingEventListener listener = null;
@@ -209,6 +215,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
     /**
      * Test if an engine-wide signal is thrown as response to a dispatched event.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/event/SignalThrowingEventListenerTest.globalSignal.bpmn20.xml",
             "org/flowable/engine/test/api/event/SignalThrowingEventListenerTest.globalSignalExternalProcess.bpmn20.xml" })
     public void testGlobalSignal() throws Exception {
@@ -253,6 +260,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
     /**
      * Test if an engine-wide signal is thrown as response to a dispatched event.
      */
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/event/SignalThrowingEventListenerTest.globalSignalDefinedInProcessDefinition.bpmn20.xml",
             "org/flowable/engine/test/api/event/SignalThrowingEventListenerTest.globalSignalExternalProcess.bpmn20.xml" })
     public void testGlobalSignalDefinedInProcessDefinition() throws Exception {

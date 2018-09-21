@@ -622,7 +622,7 @@ Flowable also provides a Spring Boot `InfoContributor` which looks like:
 ----
 {
   "flowable": {
-    "version": "6.3.2-SNAPSHOT.0"
+    "version": "6.4.0-SNAPSHOT"
   }
 }
 ----
@@ -948,7 +948,7 @@ You can provide a custom implementation of a Flowable Service by using this. See
 
 ===== Combining starters
 
-In case you need only a combination of the engines then you can add only the required depdenencies.
+In case you need only a combination of the engines then you can add only the required dependencies.
 For example to use the Process, CMMN, Form and IDM engine and use LDAP you need to add the following dependencies:
 
 [source,xml,linenums]

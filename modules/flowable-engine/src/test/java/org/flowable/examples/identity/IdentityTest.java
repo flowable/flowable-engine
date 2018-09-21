@@ -20,12 +20,14 @@ import java.util.Set;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class IdentityTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testAuthentication() {
         User user = identityService.newUser("johndoe");
         user.setPassword("xxx");
@@ -37,6 +39,7 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.deleteUser("johndoe");
     }
 
+    @Test
     public void testFindGroupsByUserAndType() {
         Group sales = identityService.newGroup("sales");
         sales.setType("hierarchy");
@@ -94,6 +97,7 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.deleteUser("jackblack");
     }
 
+    @Test
     public void testUser() {
         User user = identityService.newUser("johndoe");
         user.setFirstName("John");
@@ -110,6 +114,7 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.deleteUser("johndoe");
     }
 
+    @Test
     public void testGroup() {
         Group group = identityService.newGroup("sales");
         group.setName("Sales division");
@@ -122,6 +127,7 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.deleteGroup("sales");
     }
 
+    @Test
     public void testMembership() {
         Group sales = identityService.newGroup("sales");
         identityService.saveGroup(sales);

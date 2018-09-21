@@ -227,7 +227,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
     @Override

@@ -300,7 +300,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
 
     @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
+        return new DbSqlSessionFactory(usePrefixId);
     }
 
     @Override

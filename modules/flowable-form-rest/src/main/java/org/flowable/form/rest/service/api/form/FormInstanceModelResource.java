@@ -18,6 +18,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.form.api.FormService;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,9 @@ public class FormInstanceModelResource {
 
     @Autowired
     protected FormRestResponseFactory formRestResponseFactory;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a form instance model", tags = { "Form Instance Models" }, nickname = "getFormInstanceModel")
     @ApiResponses(value = {
@@ -89,6 +93,10 @@ public class FormInstanceModelResource {
 
         if (formInstanceModel == null) {
             throw new FlowableObjectNotFoundException("Could not find a form instance");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormInfoById(formInstanceModel, formRequest);
         }
 
         return formRestResponseFactory.createFormInstanceModelResponse(formInstanceModel);

@@ -168,6 +168,12 @@
         <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
             CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
         </if>
+        <if test="originalPersistentState.activityId != activityId">
+            ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.activityName != activityName">
+            ACT_NAME_ = #{activityName, jdbcType=VARCHAR},
+        </if>
     </set>
     where ID_ = #{id}
     and REV_ = #{revision, jdbcType=INTEGER}

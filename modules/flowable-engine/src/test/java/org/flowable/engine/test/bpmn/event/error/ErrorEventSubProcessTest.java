@@ -18,6 +18,7 @@ import java.util.Map;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -28,6 +29,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
     private static final String LOCAL_ERROR_FLAG_VARIABLE_NAME = "localError";
     private static final String PROCESS_KEY_UNDER_TEST = "helloWorldWithBothSubProcessTypes";
 
+    @Test
     @Deployment
     // an event subprocesses takes precedence over a boundary event
     public void testEventSubprocessTakesPrecedence() {
@@ -35,6 +37,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     // an event subprocess with errorCode takes precedence over a catch-all handler
     public void testErrorCodeTakesPrecedence() {
@@ -51,36 +54,42 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testCatchErrorInEmbeddedSubProcess() {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByScriptTaskInEmbeddedSubProcess() {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInEmbeddedSubProcess").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByScriptTaskInEmbeddedSubProcessWithErrorCode() {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInEmbeddedSubProcessWithErrorCode").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByScriptTaskInTopLevelProcess() {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInTopLevelProcess").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment
     public void testCatchErrorThrownByScriptTaskInsideSubProcessInTopLevelProcess() {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInsideSubProcessInTopLevelProcess").getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-child.bpmn20.xml" })
     public void testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess() {
@@ -88,6 +97,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         assertThatErrorHasBeenCaught(procId);
     }
     
+    @Test
     @Deployment(resources = {"org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchMultipleRethrowParent.bpmn",
                     "org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchMultipleRethrowSubProcess.bpmn"})
     public void testMultipleRethrowEvents() {

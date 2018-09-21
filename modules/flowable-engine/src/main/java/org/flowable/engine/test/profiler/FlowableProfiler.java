@@ -43,7 +43,7 @@ public class FlowableProfiler implements EngineConfigurator {
         engineConfiguration.setCustomPreCommandInterceptors(interceptors);
 
         // DbsqlSession
-        engineConfiguration.setDbSqlSessionFactory(new ProfilingDbSqlSessionFactory());
+        engineConfiguration.setDbSqlSessionFactory(new ProfilingDbSqlSessionFactory(engineConfiguration.isUsePrefixId()));
     }
 
     @Override

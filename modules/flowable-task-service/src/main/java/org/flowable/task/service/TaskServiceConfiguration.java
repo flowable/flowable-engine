@@ -15,11 +15,9 @@ package org.flowable.task.service;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
-import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.TaskQueryInterceptor;
 import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
@@ -72,8 +70,6 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected HistoricTaskQueryInterceptor historicTaskQueryInterceptor;
     protected int taskQueryLimit;
     protected int historicTaskQueryLimit;
-    
-    protected IdGenerator idGenerator;
 
     protected TaskPostProcessor taskPostProcessor;
 
@@ -81,16 +77,9 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
-        checkIdGenerator();
         initDataManagers();
         initEntityManagers();
         initTaskPostProcessor();
-    }
-
-    protected void checkIdGenerator() {
-        if (this.idGenerator == null) {
-            throw new FlowableException("Id generator for task configuration must be initialized");
-        }
     }
 
     // Data managers
@@ -294,15 +283,6 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     public TaskServiceConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
         this.typedEventListeners = typedEventListeners;
         return this;
-    }
-
-    public TaskServiceConfiguration setIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-        return this;
-    }
-
-    public IdGenerator getIdGenerator() {
-        return idGenerator;
     }
 
     public TaskPostProcessor getTaskPostProcessor() {

@@ -12,15 +12,10 @@
  */
 package org.flowable.content.rest.service.api.content;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -38,9 +33,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -233,7 +235,6 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
         return getContentItemsFromQueryRequest(request, requestParams);
     }
 
-    // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Create a new content item, with content item information and an optional attached file", tags = { "Content item" },
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (ContentItemRequest) to link an external resource or by passing a multipart/form-data Object to attach a file.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
@@ -302,6 +303,11 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
         contentItem.setCreatedBy(contentItemRequest.getCreatedBy());
         contentItem.setLastModifiedBy(contentItemRequest.getLastModifiedBy());
         contentItem.setTenantId(contentItemRequest.getTenantId());
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createNewContentItem(contentItem);
+        }
+        
         contentService.saveContentItem(contentItem);
 
         return contentRestResponseFactory.createContentItemResponse(contentItem);
@@ -353,6 +359,10 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
 
         if (request.getFileMap().size() == 0) {
             throw new FlowableIllegalArgumentException("Content item content is required.");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createNewContentItem(contentItem);
         }
 
         MultipartFile file = request.getFileMap().values().iterator().next();

@@ -19,12 +19,14 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testForkJoin() {
 
@@ -48,6 +50,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         assertEquals("Archive Order", tasks.get(0).getName());
     }
 
+    @Test
     @Deployment
     public void testUnbalancedForkJoin() {
 

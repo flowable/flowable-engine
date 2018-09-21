@@ -12,11 +12,14 @@
  */
 package org.flowable.cmmn.test.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -115,5 +118,45 @@ public class DeploymentTest extends FlowableCmmnTestCase {
         InputStream caseDiagramInputStream = cmmnRepositoryService.getCaseDiagram(caseDefinition.getId());
         assertNotNull(caseDiagramInputStream);
         IOUtils.closeSilently(caseDiagramInputStream);
+    }
+
+    @Test
+    public void testBulkInsertCmmnDeployments() {
+
+        List<String> deploymentIds = cmmnEngineConfiguration.getCommandExecutor()
+            .execute(commandContext -> {
+                org.flowable.cmmn.api.repository.CmmnDeployment deployment1 = cmmnRepositoryService.createDeployment()
+                    .name("First deployment")
+                    .key("one-human")
+                    .category("test")
+                    .addClasspathResource("org/flowable/cmmn/test/one-human-task-model.cmmn")
+                    .deploy();
+                org.flowable.cmmn.api.repository.CmmnDeployment deployment2 = cmmnRepositoryService.createDeployment()
+                    .name("Second deployment")
+                    .key("example-task")
+                    .addClasspathResource("org/flowable/cmmn/test/example-task-model.cmmn")
+                    .deploy();
+
+                return Arrays.asList(deployment1.getId(), deployment2.getId());
+            });
+
+        assertThat(cmmnRepositoryService.getDeploymentResourceNames(deploymentIds.get(0)))
+            .containsExactlyInAnyOrder("org/flowable/cmmn/test/one-human-task-model.cmmn");
+
+        assertThat(cmmnRepositoryService.getDeploymentResourceNames(deploymentIds.get(1)))
+            .containsExactlyInAnyOrder("org/flowable/cmmn/test/example-task-model.cmmn");
+
+        assertThat(cmmnRepositoryService.createDeploymentQuery().list())
+            .as("Deployment time not null")
+            .allSatisfy(deployment -> assertThat(deployment.getDeploymentTime()).as(deployment.getName()).isNotNull())
+            .extracting(org.flowable.cmmn.api.repository.CmmnDeployment::getId, org.flowable.cmmn.api.repository.CmmnDeployment::getName,
+                org.flowable.cmmn.api.repository.CmmnDeployment::getKey, org.flowable.cmmn.api.repository.CmmnDeployment::getCategory)
+            .as("id, name, key, category")
+            .containsExactlyInAnyOrder(
+                tuple(deploymentIds.get(0), "First deployment", "one-human", "test"),
+                tuple(deploymentIds.get(1), "Second deployment", "example-task", null)
+            );
+
+        deploymentIds.forEach(deploymentId -> cmmnRepositoryService.deleteDeployment(deploymentId, true));
     }
 }

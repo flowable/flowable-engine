@@ -44,7 +44,7 @@
   </select>
 
   <select id="selectEventSubscriptionCountByQueryCriteria" parameterType="org.flowable.engine.impl.EventSubscriptionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
   </select>
   

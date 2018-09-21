@@ -202,6 +202,7 @@ public interface StencilConstants {
 
     final String PROPERTY_SCRIPT_FORMAT = "scriptformat";
     final String PROPERTY_SCRIPT_TEXT = "scripttext";
+    final String PROPERTY_SCRIPT_AUTO_STORE_VARIABLES = "scriptautostorevariables";
 
     final String PROPERTY_RULETASK_CLASS = "ruletask_class";
     final String PROPERTY_RULETASK_VARIABLES_INPUT = "ruletask_variables_input";
@@ -209,6 +210,7 @@ public interface StencilConstants {
     final String PROPERTY_RULETASK_RULES = "ruletask_rules";
     final String PROPERTY_RULETASK_EXCLUDE = "ruletask_exclude";
 
+    String PROPERTY_MAILTASK_HEADERS = "mailtaskheaders";
     final String PROPERTY_MAILTASK_TO = "mailtaskto";
     final String PROPERTY_MAILTASK_FROM = "mailtaskfrom";
     final String PROPERTY_MAILTASK_SUBJECT = "mailtasksubject";
@@ -268,6 +270,7 @@ public interface StencilConstants {
     final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
     final String PROPERTY_HTTPTASK_REQ_HEADERS = "httptaskrequestheaders";
     final String PROPERTY_HTTPTASK_REQ_BODY  = "httptaskrequestbody";
+    final String PROPERTY_HTTPTASK_REQ_BODY_ENCODING  = "httptaskrequestbodyencoding";
     final String PROPERTY_HTTPTASK_REQ_TIMEOUT = "httptaskrequesttimeout";
     final String PROPERTY_HTTPTASK_REQ_DISALLOW_REDIRECTS = "httptaskdisallowredirects";
     final String PROPERTY_HTTPTASK_REQ_FAIL_STATUS_CODES = "httptaskfailstatuscodes";

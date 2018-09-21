@@ -22,9 +22,11 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class ProcessInstanceUpdateBusinessKeyTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testProcessInstanceUpdateBusinessKey() {
         runtimeService.startProcessInstanceByKey("businessKeyProcess");
@@ -38,6 +40,7 @@ public class ProcessInstanceUpdateBusinessKeyTest extends PluggableFlowableTestC
         }
     }
 
+    @Test
     @Deployment
     public void testUpdateExistingBusinessKey() {
         runtimeService.startProcessInstanceByKey("businessKeyProcess", "testKey");

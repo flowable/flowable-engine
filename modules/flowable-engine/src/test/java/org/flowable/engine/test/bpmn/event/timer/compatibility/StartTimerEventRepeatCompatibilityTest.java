@@ -22,21 +22,22 @@ import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.api.event.TestFlowableEntityEventListener;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
     private TestFlowableEntityEventListener listener;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         listener = new TestFlowableEntityEventListener(Job.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
@@ -46,6 +47,7 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
     /**
      * Timer repetition
      */
+    @Test
     public void testCycleDateStartTimerEvent() throws Exception {
         Clock previousClock = processEngineConfiguration.getClock();
 

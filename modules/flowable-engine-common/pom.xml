@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.3.2-SNAPSHOT</version>
+        <version>6.4.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -29,12 +29,14 @@
             org.flowable.common.engine.impl.persistence,
             org.flowable.common.engine.impl.persistence.entity,
             org.flowable.common.engine.impl.persistence.entity.data,
+            org.flowable.common.engine.impl.test,
             org.flowable.common.engine.impl.transaction,
             org.flowable.common.engine.impl.util,
             org.flowable.common.engine.impl.util.io,
             org.flowable.common.engine.impl.runtime,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
+            org.junit.jupiter.api*;resolution:=optional,
             org.springframework*;resolution:=optional,
             javax.transaction;resolution:=optional,
             org.flowable.idm.engine.impl.persistence;resolution:=optional,
@@ -171,13 +173,19 @@
             <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
+            <!-- no official JPA 2.1 Jar was ever published, so we have to use a vendor implementation :( -->
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

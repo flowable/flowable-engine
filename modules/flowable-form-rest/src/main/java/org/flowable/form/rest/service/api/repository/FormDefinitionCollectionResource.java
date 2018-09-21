@@ -12,6 +12,8 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -26,6 +28,7 @@ import org.flowable.common.rest.api.DataResponse;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.impl.FormQueryProperty;
+import org.flowable.form.rest.FormRestApiInterceptor;
 import org.flowable.form.rest.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +63,9 @@ public class FormDefinitionCollectionResource {
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
+    
+    @Autowired(required=false)
+    protected FormRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of form definitions",  nickname = "listFormDefinitions", tags = { "Form Definitions" })
     @ApiImplicitParams({
@@ -156,7 +162,11 @@ public class FormDefinitionCollectionResource {
                 formDefinitionQuery.latestVersion();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessFormDefinitionInfoWithQuery(formDefinitionQuery);
+        }
 
-        return new FormPaginateList(formRestResponseFactory).paginateList(allRequestParams, formDefinitionQuery, "name", properties);
+        return paginateList(allRequestParams, formDefinitionQuery, "name", properties, formRestResponseFactory::createFormResponseList);
     }
 }

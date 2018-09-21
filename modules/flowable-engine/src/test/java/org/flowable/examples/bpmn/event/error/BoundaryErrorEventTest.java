@@ -19,26 +19,28 @@ import java.util.Map;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         // Normally the UI will do this automatically for us
         Authentication.setAuthenticatedUserId("kermit");
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         Authentication.setAuthenticatedUserId(null);
-        super.tearDown();
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/event/error/reviewSalesLead.bpmn20.xml" })
     public void testReviewSalesLeadProcess() {
 
