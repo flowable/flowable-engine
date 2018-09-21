@@ -281,7 +281,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
     protected void changeProcessDefinitionReferenceOfHistory(ProcessInstance processInstance, ProcessDefinition processDefinition, CommandContext commandContext) {
         HistoryLevel currentHistoryLevel = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoryLevel();
-        if (currentHistoryLevel.isAtLeast(HistoryLevel.AUDIT)) {
+        if (currentHistoryLevel.isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoryManager historyManager = CommandContextUtil.getHistoryManager(commandContext);
             historyManager.updateProcessDefinitionIdInHistory((ProcessDefinitionEntity) processDefinition, (ExecutionEntity) processInstance);
         }

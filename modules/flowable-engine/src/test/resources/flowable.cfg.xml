@@ -10,9 +10,14 @@
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
+    <!--<property name="jdbcUrl" value="jdbc:h2:tcp://localhost/~/flowable-db-test/db" />-->
+    <!--<property name="jdbcDriver" value="org.h2.Driver" />-->
+    <!--<property name="jdbcUsername" value="flowable" />-->
+    <!--<property name="jdbcPassword" value="flowable" />-->
 
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />
+    <!--<property name="databaseSchemaUpdate" value="update" />-->
 
 	<!-- Test logger -->
 	<!-- <property name="configurators">
@@ -45,8 +50,10 @@
         </entry>
       </map>
     </property>
-    
-    <property name="history" value="full" />
+
+    <!--<property name="history" value="full" />-->
+    <property name="history" value="none" />
+    <property name="dbHistoryUsed" value="false" />
     <property name="asyncHistoryEnabled" value="false" />
     <property name="enableProcessDefinitionHistoryLevel" value="true" />
     
