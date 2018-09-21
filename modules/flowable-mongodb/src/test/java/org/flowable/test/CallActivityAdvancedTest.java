@@ -232,7 +232,7 @@ public class CallActivityAdvancedTest extends AbstractMongoDbTest {
             .addClasspathResource("org/flowable/test/callactivity/CallActivity.testTimerOnCallActivity.bpmn20.xml")
             .addClasspathResource("org/flowable/test/callactivity/simpleSubProcess.bpmn20.xml")
             .deploy();
-        Date startTime = mongoDbProcessEngineConfiguration.getClock().getCurrentTime();
+        Date startTime = processEngineConfiguration.getClock().getCurrentTime();
 
         // After process start, the task in the subprocess should be active
         ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("timerOnCallActivity");
@@ -243,8 +243,8 @@ public class CallActivityAdvancedTest extends AbstractMongoDbTest {
         ProcessInstance pi2 = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi1.getId()).singleResult();
 
         // When the timer on the subprocess is fired, the complete subprocess is destroyed
-        mongoDbProcessEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (6 * 60 * 1000))); // + 6 minutes, timer fires on 5 minutes
-        JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(mongoDbProcessEngineConfiguration, 
+        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (6 * 60 * 1000))); // + 6 minutes, timer fires on 5 minutes
+        JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(processEngineConfiguration,
                 managementService, 10000, 5000L);
         
         Task escalatedTask = taskQuery.singleResult();

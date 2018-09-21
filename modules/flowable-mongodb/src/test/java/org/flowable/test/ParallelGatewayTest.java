@@ -163,7 +163,7 @@ public class ParallelGatewayTest extends AbstractMongoDbTest {
     public void testAsyncBehavior() {
         repositoryService.createDeployment().addClasspathResource("org/flowable/test/ParallelGatewayTest.testAsyncBehavior.bpmn20.xml").deploy();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("async");
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(mongoDbProcessEngineConfiguration, managementService, 5000L, 500L);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000L, 500L);
         
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }

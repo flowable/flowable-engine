@@ -19,7 +19,7 @@ import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 /**
  * @author Tijs Rademakers
  */
-public class CommentEntityMapper implements EntityToDocumentMapper<CommentEntityImpl> {
+public class CommentEntityMapper extends AbstractEntityToDocumentMapper<CommentEntityImpl> {
 
     @Override
     public CommentEntityImpl fromDocument(Document document) {
@@ -40,15 +40,15 @@ public class CommentEntityMapper implements EntityToDocumentMapper<CommentEntity
     @Override
     public Document toDocument(CommentEntityImpl commentEntity) {
         Document commentDocument = new Document();
-        commentDocument.append("_id", commentEntity.getId());
-        commentDocument.append("action", commentEntity.getAction());
-        commentDocument.append("fullMessage", commentEntity.getFullMessage());
-        commentDocument.append("message", commentEntity.getMessage());
-        commentDocument.append("processInstanceId", commentEntity.getProcessInstanceId());
-        commentDocument.append("taskId", commentEntity.getTaskId());
-        commentDocument.append("time", commentEntity.getTime());
-        commentDocument.append("type", commentEntity.getType());
-        commentDocument.append("userId", commentEntity.getUserId());
+        appendIfNotNull(commentDocument, "_id", commentEntity.getId());
+        appendIfNotNull(commentDocument, "action", commentEntity.getAction());
+        appendIfNotNull(commentDocument, "fullMessage", commentEntity.getFullMessage());
+        appendIfNotNull(commentDocument, "message", commentEntity.getMessage());
+        appendIfNotNull(commentDocument, "processInstanceId", commentEntity.getProcessInstanceId());
+        appendIfNotNull(commentDocument, "taskId", commentEntity.getTaskId());
+        appendIfNotNull(commentDocument, "time", commentEntity.getTime());
+        appendIfNotNull(commentDocument, "type", commentEntity.getType());
+        appendIfNotNull(commentDocument, "userId", commentEntity.getUserId());
         return commentDocument;
     }
 

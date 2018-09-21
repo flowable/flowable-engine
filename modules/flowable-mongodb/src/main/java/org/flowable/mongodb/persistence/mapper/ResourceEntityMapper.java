@@ -19,7 +19,7 @@ import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 /**
  * @author Joram Barrez
  */
-public class ResourceEntityMapper implements EntityToDocumentMapper<ResourceEntityImpl> {
+public class ResourceEntityMapper extends AbstractEntityToDocumentMapper<ResourceEntityImpl> {
 
     @Override
     public ResourceEntityImpl fromDocument(Document document) {
@@ -30,11 +30,11 @@ public class ResourceEntityMapper implements EntityToDocumentMapper<ResourceEnti
     @Override
     public Document toDocument(ResourceEntityImpl resourceEntity) {
         Document resourceDocument = new Document();
-        resourceDocument.append("_id", resourceEntity.getId());
-        resourceDocument.append("name", resourceEntity.getName());
-        resourceDocument.append("bytes", resourceEntity.getBytes());
-        resourceDocument.append("deploymentId", resourceEntity.getDeploymentId());
-        resourceDocument.append("generated", resourceEntity.isGenerated());
+        appendIfNotNull(resourceDocument, "_id", resourceEntity.getId());
+        appendIfNotNull(resourceDocument, "name", resourceEntity.getName());
+        appendIfNotNull(resourceDocument, "bytes", resourceEntity.getBytes());
+        appendIfNotNull(resourceDocument, "deploymentId", resourceEntity.getDeploymentId());
+        appendIfNotNull(resourceDocument, "generated", resourceEntity.isGenerated());
         return resourceDocument;
     }
 

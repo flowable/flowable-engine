@@ -16,7 +16,7 @@ import org.bson.Document;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
-public class TimerJobEntityMapper extends AbstractJobEntityMapper implements EntityToDocumentMapper<TimerJobEntityImpl> {
+public class TimerJobEntityMapper extends AbstractJobEntityMapper<TimerJobEntityImpl> {
 
     @Override
     public TimerJobEntityImpl fromDocument(Document document) {
@@ -31,8 +31,8 @@ public class TimerJobEntityMapper extends AbstractJobEntityMapper implements Ent
     @Override
     public Document toDocument(TimerJobEntityImpl jobEntity) {
         Document jobDocument = copyJobInfoToDocument(jobEntity);
-        jobDocument.append("lockExpirationTime", jobEntity.getLockExpirationTime());
-        jobDocument.append("lockOwner", jobEntity.getLockOwner());
+        appendIfNotNull(jobDocument, "lockExpirationTime", jobEntity.getLockExpirationTime());
+        appendIfNotNull(jobDocument, "lockOwner", jobEntity.getLockOwner());
         
         return jobDocument;
     }

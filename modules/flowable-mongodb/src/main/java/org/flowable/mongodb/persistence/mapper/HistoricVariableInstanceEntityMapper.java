@@ -20,7 +20,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
 /**
  * @author Joram Barrez
  */
-public class HistoricVariableInstanceEntityMapper implements EntityToDocumentMapper<HistoricVariableInstanceEntityImpl> {
+public class HistoricVariableInstanceEntityMapper extends AbstractEntityToDocumentMapper<HistoricVariableInstanceEntityImpl> {
 
     @Override
     public HistoricVariableInstanceEntityImpl fromDocument(Document document) {
@@ -49,20 +49,20 @@ public class HistoricVariableInstanceEntityMapper implements EntityToDocumentMap
     public Document toDocument(HistoricVariableInstanceEntityImpl variableEntity) {
         Document variableDocument = new Document();
         
-        variableDocument.append("_id", variableEntity.getId());
-        variableDocument.append("name", variableEntity.getName());
-        variableDocument.append("executionId", variableEntity.getExecutionId());
-        variableDocument.append("processInstanceId", variableEntity.getProcessInstanceId());
-        variableDocument.append("taskId", variableEntity.getTaskId());
-        variableDocument.append("revision", variableEntity.getRevision());
-        variableDocument.append("scopeId", variableEntity.getScopeId());
-        variableDocument.append("subScopeId", variableEntity.getSubScopeId());
-        variableDocument.append("scopeType", variableEntity.getScopeType());
-        variableDocument.append("doubleValue", variableEntity.getDoubleValue());
-        variableDocument.append("longValue", variableEntity.getLongValue());
-        variableDocument.append("textValue", variableEntity.getTextValue());
-        variableDocument.append("textValue2", variableEntity.getTextValue2());
-        variableDocument.append("typeName", variableEntity.getVariableTypeName());
+        appendIfNotNull(variableDocument, "_id", variableEntity.getId());
+        appendIfNotNull(variableDocument, "name", variableEntity.getName());
+        appendIfNotNull(variableDocument, "executionId", variableEntity.getExecutionId());
+        appendIfNotNull(variableDocument, "processInstanceId", variableEntity.getProcessInstanceId());
+        appendIfNotNull(variableDocument, "taskId", variableEntity.getTaskId());
+        appendIfNotNull(variableDocument, "revision", variableEntity.getRevision());
+        appendIfNotNull(variableDocument, "scopeId", variableEntity.getScopeId());
+        appendIfNotNull(variableDocument, "subScopeId", variableEntity.getSubScopeId());
+        appendIfNotNull(variableDocument, "scopeType", variableEntity.getScopeType());
+        appendIfNotNull(variableDocument, "doubleValue", variableEntity.getDoubleValue());
+        appendIfNotNull(variableDocument, "longValue", variableEntity.getLongValue());
+        appendIfNotNull(variableDocument, "textValue", variableEntity.getTextValue());
+        appendIfNotNull(variableDocument, "textValue2", variableEntity.getTextValue2());
+        appendIfNotNull(variableDocument, "typeName", variableEntity.getVariableTypeName());
         
         return variableDocument;
     }

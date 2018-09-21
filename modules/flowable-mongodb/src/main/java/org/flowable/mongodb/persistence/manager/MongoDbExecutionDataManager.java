@@ -14,6 +14,7 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,14 +26,18 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
+import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionByProcessInstanceMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsByParentExecutionIdEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsByProcessInstanceIdEntityMatcher;
+import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsByRootProcessInstanceMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsWithSameRootProcessInstanceIdMatcher;
+import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.InactiveExecutionsByProcInstMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.InactiveExecutionsInActivityAndProcInstMatcher;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.runtime.Execution;
@@ -57,6 +62,12 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager<Exec
     protected CachedEntityMatcher<Entity> executionsWithSameRootProcessInstanceIdMatcher = (CachedEntityMatcher) new ExecutionsWithSameRootProcessInstanceIdMatcher();
     
     protected CachedEntityMatcher<Entity> inactiveExecutionsInActivityAndProcInstMatcher = (CachedEntityMatcher) new InactiveExecutionsInActivityAndProcInstMatcher();
+
+    protected CachedEntityMatcher<Entity> executionsByRootProcessInstanceMatcher = (CachedEntityMatcher) new ExecutionsByRootProcessInstanceMatcher();
+
+    protected CachedEntityMatcher<Entity> executionByProcessInstanceMatcher = (CachedEntityMatcher) new ExecutionByProcessInstanceMatcher();
+
+    protected CachedEntityMatcher<Entity> inactiveExecutionsByProcInstMatcher = (CachedEntityMatcher) new InactiveExecutionsByProcInstMatcher();
 
     public ExecutionEntity create() {
        return new ExecutionEntityImpl();
@@ -98,8 +109,16 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager<Exec
     }
 
     public List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId) {
-       return getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("processInstanceId", processInstanceId),
-               processInstanceId, ExecutionEntityImpl.class, executionsByProcessInstanceIdMatcher, true);
+        if (isExecutionTreeFetched(processInstanceId)) {
+            return getMongoDbSession().findFromCache(executionByProcessInstanceMatcher, processInstanceId, ExecutionEntityImpl.class);
+        } else {
+            Bson filter = Filters.and(
+                Filters.eq("processInstanceId", processInstanceId),
+                Filters.exists("parentId")
+            );
+            return getMongoDbSession().find(COLLECTION_EXECUTIONS, filter,
+                processInstanceId, ExecutionEntityImpl.class, executionsByProcessInstanceIdMatcher, true);
+        }
     }
 
     public List<ExecutionEntity> findExecutionsByParentExecutionAndActivityIds(String parentExecutionId,
@@ -108,31 +127,122 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager<Exec
     }
 
     public long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery) {
-        List<Bson> andFilters = new ArrayList<>();
-        if (executionQuery.getProcessInstanceId() != null) {
-            andFilters.add(Filters.eq("processInstanceId", executionQuery.getProcessInstanceId()));
-        }
-        
-        Bson filter = null;
-        if (andFilters.size() > 0) {
-            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
-        }
-        
-        return getMongoDbSession().count(COLLECTION_EXECUTIONS, filter);
+        return getMongoDbSession().count(COLLECTION_EXECUTIONS, createFilter(executionQuery));
     }
 
     public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery) {
-        List<Bson> andFilters = new ArrayList<>();
+        return getMongoDbSession().find(COLLECTION_EXECUTIONS, createFilter(executionQuery));
+    }
+
+    protected Bson createFilter(ExecutionQueryImpl executionQuery) {
+        List<Bson> filters = new ArrayList<>();
+        if (executionQuery.getExecutionId() != null) {
+            filters.add(Filters.eq("_id", executionQuery.getExecutionId()));
+        }
+        if (executionQuery.getProcessDefinitionId() != null) {
+            filters.add(Filters.eq("processDefinitionId", executionQuery.getProcessDefinitionId()));
+        }
+        if (executionQuery.getProcessDefinitionIds() != null) {
+            filters.add(Filters.in("processDefinitionId", executionQuery.getProcessDefinitionId()));
+        }
+        if (executionQuery.getDeploymentId() != null) {
+            // TODO (done with join in relation counterpart)
+        }
+        if (executionQuery.getDeploymentIds() != null) {
+            // TODO (done with join in relation counterpart)
+        }
+        if (executionQuery.getProcessDefinitionKey() != null) {
+            // TODO (done with join in relation counterpart)
+        }
+        if (executionQuery.getProcessDefinitionKeys() != null) {
+            // TODO
+        }
+        if (executionQuery.getProcessDefinitionCategory() != null) {
+            // TODO (done with join in relation counterpart)
+        }
+        if (executionQuery.getProcessDefinitionName() != null) {
+            // TODO (done with join in relation counterpart)
+        }
+        if (executionQuery.getProcessDefinitionVersion() != null) {
+            // TODO (done with join in relation counterpart)
+        }
+        if (executionQuery.getProcessDefinitionEngineVersion() != null) {
+            // TODO (done with join in relation counterpart)
+        }
+        if (executionQuery.getActivityId() != null) {
+            filters.add(Filters.eq("activityId", executionQuery.getActivityId()));
+        }
         if (executionQuery.getProcessInstanceId() != null) {
-            andFilters.add(Filters.eq("processInstanceId", executionQuery.getProcessInstanceId()));
+            filters.add(Filters.eq("processInstanceId", executionQuery.getProcessInstanceId()));
         }
-        
-        Bson filter = null;
-        if (andFilters.size() > 0) {
-            filter = Filters.and(andFilters.toArray(new Bson[andFilters.size()]));
+        if (executionQuery.getParentId() != null) {
+            filters.add(Filters.eq("parentId", executionQuery.getParentId()));
         }
-        
-        return getMongoDbSession().find(COLLECTION_EXECUTIONS, filter);
+        if (executionQuery.isOnlyChildExecutions()) {
+            filters.add(Filters.exists("parentId"));
+        }
+        if (executionQuery.isOnlySubProcessExecutions()) {
+            // TODO
+        }
+        if (executionQuery.isOnlyProcessInstanceExecutions()) {
+            filters.add(Filters.not(Filters.exists("parentId")));
+        }
+        if (executionQuery.getRootProcessInstanceId() != null) {
+            filters.add(Filters.eq("rootProcessInstanceId", executionQuery.getRootProcessInstanceId()));
+        }
+        if (executionQuery.getStartedBefore() != null) {
+            filters.add(Filters.lt("startTime", executionQuery.getStartedBefore()));
+        }
+        if (executionQuery.getStartedAfter() != null) {
+            filters.add(Filters.gt("startTime", executionQuery.getStartedAfter()));
+        }
+        if (executionQuery.getStartedBy() != null) {
+            filters.add(Filters.eq("startedBy", executionQuery.getStartedBy()));
+        }
+        if (executionQuery.getSuperProcessInstanceId() != null) {
+            // TODO
+        }
+        if (executionQuery.getSubProcessInstanceId() != null) {
+            // TODO
+        }
+        if (executionQuery.isExcludeSubprocesses()) {
+            // TODO
+        }
+        if (executionQuery.getSuspensionState() != null) {
+            // TODO
+        }
+        if (executionQuery.getBusinessKey() != null) {
+            // TODO
+        }
+        if (executionQuery.isActive()) {
+            filters.add(Filters.eq("isActive", true));
+        }
+        if (executionQuery.getInvolvedGroups() != null) {
+            // TODO
+        }
+        if (executionQuery.getInvolvedUser() != null) {
+            // TODO
+        }
+        if (executionQuery.getName() != null) {
+            filters.add(Filters.eq("name", executionQuery.getName()));
+        }
+        if (executionQuery.getNameLike() != null) {
+            filters.add(Filters.regex("name", executionQuery.getNameLike().replace("%", ".*")));
+        }
+        if (executionQuery.getNameLikeIgnoreCase() != null) {
+            // TODO
+        }
+        if (executionQuery.getTenantId() != null) {
+            filters.add(Filters.eq("tenantId", executionQuery.getTenantId()));
+        }
+        if (executionQuery.getTenantIdLike() != null) {
+            filters.add(Filters.regex("tenantId", executionQuery.getTenantIdLike().replace("%", ".*")));
+        }
+        if (executionQuery.isWithoutTenantId()) {
+            filters.add(Filters.or(Filters.eq("tenantId", ProcessEngineConfiguration.NO_TENANT_ID), Filters.not(Filters.exists("tenantId"))));
+        }
+
+        return makeAndFilter(filters);
     }
 
     public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
@@ -144,11 +254,21 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager<Exec
     }
 
     public List<ExecutionEntity> findExecutionsByRootProcessInstanceId(String rootProcessInstanceId) {
-       throw new UnsupportedOperationException();
+        if (isExecutionTreeFetched(rootProcessInstanceId)) {
+            return getMongoDbSession().findFromCache(executionsByRootProcessInstanceMatcher, rootProcessInstanceId, ExecutionEntityImpl.class);
+        } else {
+            return getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("rootProcessInstanceId", rootProcessInstanceId),
+                rootProcessInstanceId, ExecutionEntityImpl.class, inactiveExecutionsInActivityAndProcInstMatcher, true);
+        }
     }
 
     public List<ExecutionEntity> findExecutionsByProcessInstanceId(String processInstanceId) {
-       throw new UnsupportedOperationException();
+        if (isExecutionTreeFetched(processInstanceId)) {
+            return getMongoDbSession().findFromCache(executionByProcessInstanceMatcher, processInstanceId, ExecutionEntityImpl.class);
+        } else {
+            return getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.eq("processInstanceId", processInstanceId), processInstanceId,
+                ExecutionEntityImpl.class, executionByProcessInstanceMatcher, true);
+        }
     }
 
     public List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
@@ -156,7 +276,19 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager<Exec
     }
 
     public Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(String processInstanceId) {
-       throw new UnsupportedOperationException();
+        HashMap<String, Object> params = new HashMap<>(2);
+        params.put("processInstanceId", processInstanceId);
+        params.put("isActive", false);
+
+        if (isExecutionTreeFetched(processInstanceId)) {
+            return getMongoDbSession().findFromCache(inactiveExecutionsByProcInstMatcher, processInstanceId, ExecutionEntityImpl.class);
+        } else {
+            Bson filter = Filters.and(
+                Filters.eq("processInstanceId", processInstanceId),
+                Filters.eq("isActive", false)
+            );
+            return getMongoDbSession().find(COLLECTION_EXECUTIONS, filter, params, ExecutionEntityImpl.class, inactiveExecutionsByProcInstMatcher, true);
+        }
     }
 
     public Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(String activityId, String processInstanceId) {
@@ -168,16 +300,22 @@ public class MongoDbExecutionDataManager extends AbstractMongoDbDataManager<Exec
         if (isExecutionTreeFetched(processInstanceId)) {
             return getMongoDbSession().findFromCache(inactiveExecutionsInActivityAndProcInstMatcher, params, ExecutionEntityImpl.class);
         } else {
-            List<ExecutionEntity> executions = getMongoDbSession().find(COLLECTION_EXECUTIONS, Filters.and(Filters.eq("activityId", activityId), 
-                    Filters.eq("processInstanceId", processInstanceId), Filters.eq("isActive", false)), params, ExecutionEntityImpl.class,
-                    inactiveExecutionsInActivityAndProcInstMatcher, true);
-            
-            return executions;
+            Bson filter = Filters.and(
+                Filters.eq("activityId", activityId),
+                Filters.eq("processInstanceId", processInstanceId),
+                Filters.eq("isActive", false)
+            );
+            return getMongoDbSession().find(COLLECTION_EXECUTIONS, filter, params, ExecutionEntityImpl.class, inactiveExecutionsInActivityAndProcInstMatcher, true);
         }
     }
 
     public List<String> findProcessInstanceIdsByProcessDefinitionId(String processDefinitionId) {
-       throw new UnsupportedOperationException();
+        // Note: no caching, similar to Mybatis version
+        Bson filter = Filters.and(
+            Filters.eq("processDefinitionId", processDefinitionId),
+            Filters.not(Filters.exists("parentId"))
+        );
+        return getMongoDbSession().find(COLLECTION_EXECUTIONS, filter);
     }
 
     public List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap) {

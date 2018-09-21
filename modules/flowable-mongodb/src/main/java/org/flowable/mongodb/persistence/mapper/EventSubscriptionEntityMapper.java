@@ -20,7 +20,7 @@ import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntit
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
 import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
-public class EventSubscriptionEntityMapper implements EntityToDocumentMapper<EventSubscriptionEntityImpl> {
+public class EventSubscriptionEntityMapper extends AbstractEntityToDocumentMapper<EventSubscriptionEntityImpl> {
 
     @Override
     public EventSubscriptionEntityImpl fromDocument(Document document) {
@@ -56,17 +56,17 @@ public class EventSubscriptionEntityMapper implements EntityToDocumentMapper<Eve
     @Override
     public Document toDocument(EventSubscriptionEntityImpl eventEntity) {
         Document eventDocument = new Document();
-        eventDocument.append("_id", eventEntity.getId());
-        eventDocument.append("activityId", eventEntity.getActivityId());
-        eventDocument.append("configuration", eventEntity.getConfiguration());
-        eventDocument.append("created", eventEntity.getCreated());
-        eventDocument.append("eventName", eventEntity.getEventName());
-        eventDocument.append("eventType", eventEntity.getEventType());
-        eventDocument.append("executionId", eventEntity.getExecutionId());
-        eventDocument.append("processDefinitionId", eventEntity.getProcessDefinitionId());
-        eventDocument.append("processInstanceId", eventEntity.getProcessInstanceId());
-        eventDocument.append("revision", eventEntity.getRevision());
-        eventDocument.append("tenantId", eventEntity.getTenantId());
+        appendIfNotNull(eventDocument, "_id", eventEntity.getId());
+        appendIfNotNull(eventDocument, "activityId", eventEntity.getActivityId());
+        appendIfNotNull(eventDocument, "configuration", eventEntity.getConfiguration());
+        appendIfNotNull(eventDocument, "created", eventEntity.getCreated());
+        appendIfNotNull(eventDocument, "eventName", eventEntity.getEventName());
+        appendIfNotNull(eventDocument, "eventType", eventEntity.getEventType());
+        appendIfNotNull(eventDocument, "executionId", eventEntity.getExecutionId());
+        appendIfNotNull(eventDocument, "processDefinitionId", eventEntity.getProcessDefinitionId());
+        appendIfNotNull(eventDocument, "processInstanceId", eventEntity.getProcessInstanceId());
+        appendIfNotNull(eventDocument, "revision", eventEntity.getRevision());
+        appendIfNotNull(eventDocument, "tenantId", eventEntity.getTenantId());
         
         return eventDocument;
     }

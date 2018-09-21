@@ -27,8 +27,10 @@ import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEn
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl;
+import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
+import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
@@ -42,12 +44,14 @@ import org.flowable.mongodb.persistence.manager.MongoDbDeploymentDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbEventSubscriptionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbExecutionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricActivityInstanceDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricDetailDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricIdentityLinkDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricProcessInstanceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricTaskInstanceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricVariableInstanceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbIdentityLinkDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbJobDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbModelDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbResourceDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbTaskDataManager;
@@ -58,12 +62,14 @@ import org.flowable.mongodb.persistence.mapper.DeploymentEntityMapper;
 import org.flowable.mongodb.persistence.mapper.EventSubscriptionEntityMapper;
 import org.flowable.mongodb.persistence.mapper.ExecutionEntityMapper;
 import org.flowable.mongodb.persistence.mapper.HistoricActivityInstanceEntityMapper;
+import org.flowable.mongodb.persistence.mapper.HistoricDetailEntityMapper;
 import org.flowable.mongodb.persistence.mapper.HistoricIdentityLinkEntityMapper;
 import org.flowable.mongodb.persistence.mapper.HistoricProcessInstanceEntityMapper;
 import org.flowable.mongodb.persistence.mapper.HistoricTaskInstanceEntityMapper;
 import org.flowable.mongodb.persistence.mapper.HistoricVariableInstanceEntityMapper;
 import org.flowable.mongodb.persistence.mapper.IdentityLinkEntityMapper;
 import org.flowable.mongodb.persistence.mapper.JobEntityMapper;
+import org.flowable.mongodb.persistence.mapper.ModelEntityMapper;
 import org.flowable.mongodb.persistence.mapper.ProcessDefinitionEntityMapper;
 import org.flowable.mongodb.persistence.mapper.ResourceEntityMapper;
 import org.flowable.mongodb.persistence.mapper.TaskEntityMapper;
@@ -106,17 +112,21 @@ public class MongoDbSessionFactory implements SessionFactory {
         registerEntityMapper(SignalEventSubscriptionEntityImpl.class, new EventSubscriptionEntityMapper(), MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION);
         registerEntityMapper(MessageEventSubscriptionEntityImpl.class, new EventSubscriptionEntityMapper(), MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION);
         registerEntityMapper(CompensateEventSubscriptionEntityImpl.class, new EventSubscriptionEntityMapper(), MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION);
-        registerEntityMapper(HistoricProcessInstanceEntityImpl.class, new HistoricProcessInstanceEntityMapper(), MongoDbHistoricProcessInstanceDataManager.COLLECTION_HISTORIC_PROCESS_INSTANCES);
-        registerEntityMapper(HistoricActivityInstanceEntityImpl.class, new HistoricActivityInstanceEntityMapper(), MongoDbHistoricActivityInstanceDataManager.COLLECTION_HISTORIC_ACTIVITY_INSTANCES);
         registerEntityMapper(CommentEntityImpl.class, new CommentEntityMapper(), MongoDbCommentDataManager.COLLECTION_COMMENTS);
         registerEntityMapper(IdentityLinkEntityImpl.class, new IdentityLinkEntityMapper(), MongoDbIdentityLinkDataManager.COLLECTION_IDENTITY_LINKS);
-        registerEntityMapper(HistoricIdentityLinkEntityImpl.class, new HistoricIdentityLinkEntityMapper(), MongoDbHistoricIdentityLinkDataManager.COLLECTION_HISTORIC_IDENTITY_LINKS);
+
         registerEntityMapper(TaskEntityImpl.class, new TaskEntityMapper(), MongoDbTaskDataManager.COLLECTION_TASKS);
         registerEntityMapper(HistoricTaskInstanceEntityImpl.class, new HistoricTaskInstanceEntityMapper(), MongoDbHistoricTaskInstanceDataManager.COLLECTION_HISTORIC_TASK_INSTANCES);
         registerEntityMapper(VariableInstanceEntityImpl.class, new VariableInstanceEntityMapper(), MongoDbVariableInstanceDataManager.COLLECTION_VARIABLES);
-        registerEntityMapper(HistoricVariableInstanceEntityImpl.class, new HistoricVariableInstanceEntityMapper(), MongoDbHistoricVariableInstanceDataManager.COLLECTION_HISTORIC_VARIABLE_INSTANCES);
         registerEntityMapper(JobEntityImpl.class, new JobEntityMapper(), MongoDbJobDataManager.COLLECTION_JOBS);
         registerEntityMapper(TimerJobEntityImpl.class, new TimerJobEntityMapper(), MongoDbTimerJobDataManager.COLLECTION_TIMER_JOBS);
+        registerEntityMapper(ModelEntityImpl.class, new ModelEntityMapper(), MongoDbModelDataManager.COLLECTION_MODELS);
+
+        registerEntityMapper(HistoricProcessInstanceEntityImpl.class, new HistoricProcessInstanceEntityMapper(), MongoDbHistoricProcessInstanceDataManager.COLLECTION_HISTORIC_PROCESS_INSTANCES);
+        registerEntityMapper(HistoricActivityInstanceEntityImpl.class, new HistoricActivityInstanceEntityMapper(), MongoDbHistoricActivityInstanceDataManager.COLLECTION_HISTORIC_ACTIVITY_INSTANCES);
+        registerEntityMapper(HistoricIdentityLinkEntityImpl.class, new HistoricIdentityLinkEntityMapper(), MongoDbHistoricIdentityLinkDataManager.COLLECTION_HISTORIC_IDENTITY_LINKS);
+        registerEntityMapper(HistoricVariableInstanceEntityImpl.class, new HistoricVariableInstanceEntityMapper(), MongoDbHistoricVariableInstanceDataManager.COLLECTION_HISTORIC_VARIABLE_INSTANCES);
+        registerEntityMapper(HistoricDetailEntityImpl.class, new HistoricDetailEntityMapper(), MongoDbHistoricDetailDataManager.COLLECTION_HISTORIC_DETAILS);
     }
 
     @Override
@@ -164,11 +174,11 @@ public class MongoDbSessionFactory implements SessionFactory {
         return classToCollectionMap.get(clazz);
     }
 
-    public Map<Class<? extends Entity>, String> getCollections() {
+    public Map<Class<? extends Entity>, String> getClassToCollectionsMap() {
         return classToCollectionMap;
     }
 
-    public void setCollections(Map<Class<? extends Entity>, String> collections) {
+    public void setClassToCollectionsMap(Map<Class<? extends Entity>, String> collections) {
         this.classToCollectionMap = collections;
     }
     

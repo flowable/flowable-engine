@@ -12,9 +12,11 @@
  */
 package org.flowable.mongodb.schema;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -290,10 +292,13 @@ public class MongoProcessSchemaManager implements SchemaManager {
     public void schemaDrop() {
         LOGGER.info("Dropping all MongoDB collections in the database");
         MongoDatabase mongoDatabase = getEngineConfiguration().getMongoDatabase();
+        List<String> existingCollections = getExistingCollections(mongoDatabase);
         for (String collectionName : getAllCollectionNames()) {
-            MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
-            if (collection != null) {
-                collection.drop();
+            if (existingCollections.contains(collectionName)) {
+                MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+                if (collection != null) {
+                    collection.drop();
+                }
             }
         }
     }
@@ -354,6 +359,17 @@ public class MongoProcessSchemaManager implements SchemaManager {
             }
         }
         return false;
+    }
+    
+    protected List<String> getExistingCollections(MongoDatabase mongoDatabase) {
+        List<String> result = new ArrayList<>();
+        MongoIterable<String> collectionNames = mongoDatabase.listCollectionNames();
+        if (collectionNames != null) {
+            for (String collectionName : collectionNames) {
+                result.add(collectionName);
+            }
+        }
+        return result;
     }
     
     protected String getSchemaVersionValue(MongoDatabase mongoDatabase) {

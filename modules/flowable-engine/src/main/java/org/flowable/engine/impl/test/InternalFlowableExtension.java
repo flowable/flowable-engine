@@ -138,7 +138,8 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
 
             AnnotationSupport.findAnnotation(context.getTestMethod(), CleanTest.class)
                 .ifPresent(cleanTest -> removeDeployments(processEngine.getRepositoryService()));
-            if (context.getTestInstanceLifecycle().orElse(TestInstance.Lifecycle.PER_METHOD) == lifecycleForClean) {
+            if (context.getTestInstanceLifecycle().orElse(TestInstance.Lifecycle.PER_METHOD) == lifecycleForClean
+                    && processEngineConfiguration.isUsingRelationalDatabase()) { // the logic only is applicatble to a relational database with tables
                 cleanTestAndAssertAndEnsureCleanDb(context, processEngine);
             }
 

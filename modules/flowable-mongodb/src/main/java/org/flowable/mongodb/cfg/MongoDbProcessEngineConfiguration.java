@@ -30,7 +30,9 @@ import org.flowable.mongodb.persistence.manager.MongoDbDeploymentDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbEventSubscriptionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbExecutionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricActivityInstanceDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbHistoricDetailDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbHistoricProcessInstanceDataManager;
+import org.flowable.mongodb.persistence.manager.MongoDbModelDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbProcessDefinitionInfoDataManager;
 import org.flowable.mongodb.persistence.manager.MongoDbResourceDataManager;
@@ -63,10 +65,17 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
         this.usingRelationalDatabase = false;
         this.usingSchemaMgmt = true;
         this.databaseSchemaUpdate = DB_SCHEMA_UPDATE_TRUE;
-        
+
+        // No backwards compatibility needed
         this.validateFlowable5EntitiesEnabled = false;
+
+        // Always enabled for mongo db, so no need to validate
         this.performanceSettings.setValidateExecutionRelationshipCountConfigOnBoot(false);
         this.performanceSettings.setValidateTaskRelationshipCountConfigOnBoot(false);
+
+        this.performanceSettings.setEnableEagerExecutionTreeFetching(true);
+        this.performanceSettings.setEnableExecutionRelationshipCounts(true);
+        this.performanceSettings.setEnableTaskRelationshipCounts(true);
         
         this.idGenerator = new StrongUuidGenerator(); 
     }
@@ -136,17 +145,26 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
         mongoDbSessionFactory.registerDataManager(MongoDbEventSubscriptionDataManager.COLLECTION_EVENT_SUBSCRIPTION, mongoDbEventSubscriptionDataManager);
         this.eventSubscriptionDataManager = mongoDbEventSubscriptionDataManager;
         
-        MongoDbHistoricProcessInstanceDataManager mongoDbHistoricProcessInstanceDataManager = new MongoDbHistoricProcessInstanceDataManager();
-        mongoDbSessionFactory.registerDataManager(MongoDbHistoricProcessInstanceDataManager.COLLECTION_HISTORIC_PROCESS_INSTANCES, mongoDbHistoricProcessInstanceDataManager);
-        this.historicProcessInstanceDataManager = mongoDbHistoricProcessInstanceDataManager;
-        
-        MongoDbHistoricActivityInstanceDataManager mongoDbHistoricActivityInstanceDataManager = new MongoDbHistoricActivityInstanceDataManager();
-        mongoDbSessionFactory.registerDataManager(MongoDbHistoricActivityInstanceDataManager.COLLECTION_HISTORIC_ACTIVITY_INSTANCES, mongoDbHistoricActivityInstanceDataManager);
-        this.historicActivityInstanceDataManager = mongoDbHistoricActivityInstanceDataManager;
-        
         MongoDbCommentDataManager mongoDbCommentDataManager = new MongoDbCommentDataManager();
         mongoDbSessionFactory.registerDataManager(MongoDbCommentDataManager.COLLECTION_COMMENTS, mongoDbCommentDataManager);
         this.commentDataManager = mongoDbCommentDataManager;
+
+        MongoDbModelDataManager mongoDbModelDataManager = new MongoDbModelDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbModelDataManager.COLLECTION_MODELS, mongoDbModelDataManager);
+        this.modelDataManager = mongoDbModelDataManager;
+
+        MongoDbHistoricProcessInstanceDataManager mongoDbHistoricProcessInstanceDataManager = new MongoDbHistoricProcessInstanceDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbHistoricProcessInstanceDataManager.COLLECTION_HISTORIC_PROCESS_INSTANCES, mongoDbHistoricProcessInstanceDataManager);
+        this.historicProcessInstanceDataManager = mongoDbHistoricProcessInstanceDataManager;
+
+        MongoDbHistoricActivityInstanceDataManager mongoDbHistoricActivityInstanceDataManager = new MongoDbHistoricActivityInstanceDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbHistoricActivityInstanceDataManager.COLLECTION_HISTORIC_ACTIVITY_INSTANCES, mongoDbHistoricActivityInstanceDataManager);
+        this.historicActivityInstanceDataManager = mongoDbHistoricActivityInstanceDataManager;
+
+        MongoDbHistoricDetailDataManager mongoDbHistoricDetailDataManager = new MongoDbHistoricDetailDataManager();
+        mongoDbSessionFactory.registerDataManager(MongoDbHistoricDetailDataManager.COLLECTION_HISTORIC_DETAILS, mongoDbHistoricDetailDataManager);
+        this.historicDetailDataManager = mongoDbHistoricDetailDataManager;
+
     }
     
     @Override
@@ -210,10 +228,10 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
     /**
      * server addresses in the form of "host:port, host:port, ..." 
      */
-    public MongoDbProcessEngineConfiguration setServerAddresses(String serverAddresses) {
+    public MongoDbProcessEngineConfiguration setConnectionUrl(String connectionUrl) {
         List<ServerAddress> result = new ArrayList<>();
         
-        String[] addresses = serverAddresses.split(",");
+        String[] addresses = connectionUrl.split(",");
         for (String address : addresses) {
             String[] splittedAddress = address.split(":");
             String host = splittedAddress[0].trim();
@@ -222,10 +240,10 @@ public class MongoDbProcessEngineConfiguration extends ProcessEngineConfiguratio
             result.add(new ServerAddress(host, port));
         }
         
-        setServerAddresses(serverAddresses);
+        setServerAddresses(result);
         return this;
     }
-
+    
     public String getDatabaseName() {
         return databaseName;
     }

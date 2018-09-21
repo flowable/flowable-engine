@@ -20,6 +20,7 @@ import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 
 /**
  * @author Joram Barrez
@@ -45,7 +46,7 @@ public class MongoDbResourceDataManager extends AbstractMongoDbDataManager<Resou
 
     @Override
     public void deleteResourcesByDeploymentId(String deploymentId) {
-        throw new UnsupportedOperationException();        
+        getMongoDbSession().getCollection(COLLECTION_BYTE_ARRAY).deleteMany(Filters.eq("deploymentId", deploymentId));
     }
 
     @Override

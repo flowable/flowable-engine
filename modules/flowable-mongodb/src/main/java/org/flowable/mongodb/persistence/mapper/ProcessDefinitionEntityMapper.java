@@ -19,7 +19,7 @@ import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 /**
  * @author Joram Barrez
  */
-public class ProcessDefinitionEntityMapper implements EntityToDocumentMapper<ProcessDefinitionEntityImpl> {
+public class ProcessDefinitionEntityMapper extends AbstractEntityToDocumentMapper<ProcessDefinitionEntityImpl> {
 
     @Override
     public ProcessDefinitionEntityImpl fromDocument(Document document) {
@@ -47,23 +47,23 @@ public class ProcessDefinitionEntityMapper implements EntityToDocumentMapper<Pro
     @Override
     public Document toDocument(ProcessDefinitionEntityImpl processDefinitionEntity) {
         Document processDefinitionDocument = new Document();
-        processDefinitionDocument.append("_id", processDefinitionEntity.getId());
-        processDefinitionDocument.append("name", processDefinitionEntity.getName());
-        processDefinitionDocument.append("description", processDefinitionEntity.getDescription());
-        processDefinitionDocument.append("key", processDefinitionEntity.getKey());
-        processDefinitionDocument.append("version", processDefinitionEntity.getVersion());
-        processDefinitionDocument.append("category", processDefinitionEntity.getCategory());
-        processDefinitionDocument.append("deploymentId", processDefinitionEntity.getDeploymentId());
-        processDefinitionDocument.append("resourceName", processDefinitionEntity.getResourceName());
-        processDefinitionDocument.append("tenantId", processDefinitionEntity.getTenantId());
-        processDefinitionDocument.append("historyLevel", processDefinitionEntity.getHistoryLevel());
-        processDefinitionDocument.append("diagramResourceName", processDefinitionEntity.getDiagramResourceName());
-        processDefinitionDocument.append("isGraphicalNotationDefined", processDefinitionEntity.isGraphicalNotationDefined());
-        processDefinitionDocument.append("hasStartFormKey", processDefinitionEntity.getHasStartFormKey());
-        processDefinitionDocument.append("suspensionState", processDefinitionEntity.getSuspensionState());
-        processDefinitionDocument.append("derivedFrom", processDefinitionEntity.getDerivedFrom());
-        processDefinitionDocument.append("derivedFromRoot", processDefinitionEntity.getDerivedFromRoot());
-        processDefinitionDocument.append("derivedVersion", processDefinitionEntity.getDerivedVersion());
+        appendIfNotNull(processDefinitionDocument, "_id", processDefinitionEntity.getId());
+        appendIfNotNull(processDefinitionDocument, "name", processDefinitionEntity.getName());
+        appendIfNotNull(processDefinitionDocument, "description", processDefinitionEntity.getDescription());
+        appendIfNotNull(processDefinitionDocument, "key", processDefinitionEntity.getKey());
+        appendIfNotNull(processDefinitionDocument, "version", processDefinitionEntity.getVersion());
+        appendIfNotNull(processDefinitionDocument, "category", processDefinitionEntity.getCategory());
+        appendIfNotNull(processDefinitionDocument, "deploymentId", processDefinitionEntity.getDeploymentId());
+        appendIfNotNull(processDefinitionDocument, "resourceName", processDefinitionEntity.getResourceName());
+        appendIfNotNull(processDefinitionDocument, "tenantId", processDefinitionEntity.getTenantId());
+        appendIfNotNull(processDefinitionDocument, "historyLevel", processDefinitionEntity.getHistoryLevel());
+        appendIfNotNull(processDefinitionDocument, "diagramResourceName", processDefinitionEntity.getDiagramResourceName());
+        appendIfNotNull(processDefinitionDocument, "isGraphicalNotationDefined", processDefinitionEntity.isGraphicalNotationDefined());
+        appendIfNotNull(processDefinitionDocument, "hasStartFormKey", processDefinitionEntity.getHasStartFormKey());
+        appendIfNotNull(processDefinitionDocument, "suspensionState", processDefinitionEntity.getSuspensionState());
+        appendIfNotNull(processDefinitionDocument, "derivedFrom", processDefinitionEntity.getDerivedFrom());
+        appendIfNotNull(processDefinitionDocument, "derivedFromRoot", processDefinitionEntity.getDerivedFromRoot());
+        appendIfNotNull(processDefinitionDocument, "derivedVersion", processDefinitionEntity.getDerivedVersion());
         return processDefinitionDocument;
     }
 

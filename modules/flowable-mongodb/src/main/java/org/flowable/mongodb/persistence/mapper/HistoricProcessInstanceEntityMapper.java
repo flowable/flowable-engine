@@ -19,7 +19,7 @@ import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 /**
  * @author Tijs Rademakers
  */
-public class HistoricProcessInstanceEntityMapper implements EntityToDocumentMapper<HistoricProcessInstanceEntityImpl> {
+public class HistoricProcessInstanceEntityMapper extends AbstractEntityToDocumentMapper<HistoricProcessInstanceEntityImpl> {
 
     @Override
     public HistoricProcessInstanceEntityImpl fromDocument(Document document) {
@@ -47,26 +47,26 @@ public class HistoricProcessInstanceEntityMapper implements EntityToDocumentMapp
 
     @Override
     public Document toDocument(HistoricProcessInstanceEntityImpl instanceEntity) {
-        Document instanceDocument = new Document();
-        instanceDocument.append("_id", instanceEntity.getId());
-        instanceDocument.append("processInstanceId", instanceEntity.getProcessInstanceId());
-        instanceDocument.append("businessKey", instanceEntity.getBusinessKey());
-        instanceDocument.append("processDefinitionId", instanceEntity.getProcessDefinitionId());
-        instanceDocument.append("callbackId", instanceEntity.getCallbackId());
-        instanceDocument.append("callbackType", instanceEntity.getCallbackType());
-        instanceDocument.append("deleteReason", instanceEntity.getDeleteReason());
-        instanceDocument.append("durationInMillis", instanceEntity.getDurationInMillis());
-        instanceDocument.append("endActivityId", instanceEntity.getEndActivityId());
-        instanceDocument.append("endTime", instanceEntity.getEndTime());
-        instanceDocument.append("name", instanceEntity.getName());
-        instanceDocument.append("revision", instanceEntity.getRevision());
-        instanceDocument.append("startActivityId", instanceEntity.getStartActivityId());
-        instanceDocument.append("startTime", instanceEntity.getStartTime());
-        instanceDocument.append("startUserId", instanceEntity.getStartUserId());
-        instanceDocument.append("superProccessInstanceId", instanceEntity.getSuperProcessInstanceId());
-        instanceDocument.append("tenantId", instanceEntity.getTenantId());
+        Document historicProcessInstanceDocument = new Document();
+        appendIfNotNull(historicProcessInstanceDocument, "_id", instanceEntity.getId());
+        appendIfNotNull(historicProcessInstanceDocument, "processInstanceId", instanceEntity.getProcessInstanceId());
+        appendIfNotNull(historicProcessInstanceDocument, "businessKey", instanceEntity.getBusinessKey());
+        appendIfNotNull(historicProcessInstanceDocument, "processDefinitionId", instanceEntity.getProcessDefinitionId());
+        appendIfNotNull(historicProcessInstanceDocument, "callbackId", instanceEntity.getCallbackId());
+        appendIfNotNull(historicProcessInstanceDocument, "callbackType", instanceEntity.getCallbackType());
+        appendIfNotNull(historicProcessInstanceDocument, "deleteReason", instanceEntity.getDeleteReason());
+        appendIfNotNull(historicProcessInstanceDocument, "durationInMillis", instanceEntity.getDurationInMillis());
+        appendIfNotNull(historicProcessInstanceDocument, "endActivityId", instanceEntity.getEndActivityId());
+        appendIfNotNull(historicProcessInstanceDocument, "endTime", instanceEntity.getEndTime());
+        appendIfNotNull(historicProcessInstanceDocument, "name", instanceEntity.getName());
+        appendIfNotNull(historicProcessInstanceDocument, "revision", instanceEntity.getRevision());
+        appendIfNotNull(historicProcessInstanceDocument, "startActivityId", instanceEntity.getStartActivityId());
+        appendIfNotNull(historicProcessInstanceDocument, "startTime", instanceEntity.getStartTime());
+        appendIfNotNull(historicProcessInstanceDocument, "startUserId", instanceEntity.getStartUserId());
+        appendIfNotNull(historicProcessInstanceDocument, "superProccessInstanceId", instanceEntity.getSuperProcessInstanceId());
+        appendIfNotNull(historicProcessInstanceDocument, "tenantId", instanceEntity.getTenantId());
         
-        return instanceDocument;
+        return historicProcessInstanceDocument;
     }
 
 }

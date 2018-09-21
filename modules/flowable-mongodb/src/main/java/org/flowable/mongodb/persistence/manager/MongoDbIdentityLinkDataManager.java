@@ -104,8 +104,8 @@ public class MongoDbIdentityLinkDataManager extends AbstractMongoDbDataManager<I
     }
 
     @Override
-    public void deleteIdentityLinksByProcDef(String processDefId) {
-        throw new UnsupportedOperationException();        
+    public void deleteIdentityLinksByProcDef(String processDefinitionId) {
+        getMongoDbSession().getCollection(COLLECTION_IDENTITY_LINKS).deleteMany(Filters.eq("processDefinitionId", processDefinitionId));
     }
 
     @Override

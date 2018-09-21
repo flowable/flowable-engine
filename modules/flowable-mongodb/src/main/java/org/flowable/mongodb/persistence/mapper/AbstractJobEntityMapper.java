@@ -13,9 +13,12 @@
 package org.flowable.mongodb.persistence.mapper;
 
 import org.bson.Document;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 
-public abstract class AbstractJobEntityMapper {
+import com.sun.webkit.dom.EntityImpl;
+
+public abstract class AbstractJobEntityMapper<T extends Entity> extends AbstractEntityToDocumentMapper<T> {
 
     public void copyJobInfoFromDocument(Document document, AbstractRuntimeJobEntity jobEntity) {
         jobEntity.setId(document.getString("_id"));
@@ -41,26 +44,25 @@ public abstract class AbstractJobEntityMapper {
     
     public Document copyJobInfoToDocument(AbstractRuntimeJobEntity jobEntity) {
         Document jobDocument = new Document();
-        jobDocument.append("_id", jobEntity.getId());
-        jobDocument.append("createTime", jobEntity.getCreateTime());
-        jobDocument.append("duedate", jobEntity.getDuedate());
-        jobDocument.append("exceptionMessage", jobEntity.getExceptionMessage());
-        jobDocument.append("isExclusive", jobEntity.isExclusive());
-        jobDocument.append("executionId", jobEntity.getExecutionId());
-        jobDocument.append("jobHandlerConfiguration", jobEntity.getJobHandlerConfiguration());
-        jobDocument.append("jobHandlerType", jobEntity.getJobHandlerType());
-        jobDocument.append("jobType", jobEntity.getJobType());
-        jobDocument.append("processDefinitionId", jobEntity.getProcessDefinitionId());
-        jobDocument.append("processInstanceId", jobEntity.getProcessInstanceId());
-        jobDocument.append("repeat", jobEntity.getRepeat());
-        jobDocument.append("retries", jobEntity.getRetries());
-        jobDocument.append("revision", jobEntity.getRevision());
-        jobDocument.append("scopeDefinitionId", jobEntity.getScopeDefinitionId());
-        jobDocument.append("scopeId", jobEntity.getScopeId());
-        jobDocument.append("scopeType", jobEntity.getScopeType());
-        jobDocument.append("subScopeId", jobEntity.getSubScopeId());
-        jobDocument.append("tenantId", jobEntity.getTenantId());
-        
+        appendIfNotNull(jobDocument, "_id", jobEntity.getId());
+        appendIfNotNull(jobDocument, "createTime", jobEntity.getCreateTime());
+        appendIfNotNull(jobDocument, "duedate", jobEntity.getDuedate());
+        appendIfNotNull(jobDocument, "exceptionMessage", jobEntity.getExceptionMessage());
+        appendIfNotNull(jobDocument, "isExclusive", jobEntity.isExclusive());
+        appendIfNotNull(jobDocument, "executionId", jobEntity.getExecutionId());
+        appendIfNotNull(jobDocument, "jobHandlerConfiguration", jobEntity.getJobHandlerConfiguration());
+        appendIfNotNull(jobDocument, "jobHandlerType", jobEntity.getJobHandlerType());
+        appendIfNotNull(jobDocument, "jobType", jobEntity.getJobType());
+        appendIfNotNull(jobDocument, "processDefinitionId", jobEntity.getProcessDefinitionId());
+        appendIfNotNull(jobDocument, "processInstanceId", jobEntity.getProcessInstanceId());
+        appendIfNotNull(jobDocument, "repeat", jobEntity.getRepeat());
+        appendIfNotNull(jobDocument, "retries", jobEntity.getRetries());
+        appendIfNotNull(jobDocument, "revision", jobEntity.getRevision());
+        appendIfNotNull(jobDocument, "scopeDefinitionId", jobEntity.getScopeDefinitionId());
+        appendIfNotNull(jobDocument, "scopeId", jobEntity.getScopeId());
+        appendIfNotNull(jobDocument, "scopeType", jobEntity.getScopeType());
+        appendIfNotNull(jobDocument, "subScopeId", jobEntity.getSubScopeId());
+        appendIfNotNull(jobDocument, "tenantId", jobEntity.getTenantId());
         return jobDocument;
     }
 

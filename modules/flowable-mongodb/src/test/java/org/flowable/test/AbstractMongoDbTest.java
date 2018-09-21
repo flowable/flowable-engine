@@ -23,6 +23,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.mongodb.cfg.MongoDbProcessEngineConfiguration;
@@ -30,6 +31,7 @@ import org.flowable.mongodb.persistence.MongoDbSession;
 import org.flowable.mongodb.persistence.MongoDbSessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.opentest4j.AssertionFailedError;
 
 import com.mongodb.BasicDBObject;
@@ -42,23 +44,27 @@ import com.mongodb.client.MongoCollection;
  */
 public class AbstractMongoDbTest {
     
-    protected MongoDbProcessEngineConfiguration mongoDbProcessEngineConfiguration;
+    protected MongoDbProcessEngineConfiguration processEngineConfiguration;
     protected ProcessEngine processEngine;
     protected RepositoryService repositoryService;
     protected RuntimeService runtimeService;
     protected TaskService taskService;
     protected HistoryService historyService;
     protected ManagementService managementService;
+
+    protected String deploymentId;
     
     @BeforeEach
-    public void setup() {
-        if (this.mongoDbProcessEngineConfiguration == null) {
+    public void setup(TestInfo testInfo) {
+        if (this.processEngineConfiguration == null) {
             initProcessEngine();
         }
+
+        this.deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), testInfo.getTestMethod().get().getName());
     }
 
     protected void initProcessEngine() {
-        this.mongoDbProcessEngineConfiguration = (MongoDbProcessEngineConfiguration) new MongoDbProcessEngineConfiguration()
+        this.processEngineConfiguration = (MongoDbProcessEngineConfiguration) new MongoDbProcessEngineConfiguration()
                 .setServerAddresses(Arrays.asList(new ServerAddress("localhost", 27017), new ServerAddress("localhost", 27018), new ServerAddress("localhost", 27019)))
                 .setDisableIdmEngine(true)
                 .setHistoryLevel(HistoryLevel.AUDIT);
@@ -66,10 +72,10 @@ public class AbstractMongoDbTest {
         DefaultAsyncJobExecutor asyncJobExecutor = new DefaultAsyncJobExecutor();
         asyncJobExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(1000);
         asyncJobExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(1000);
-        mongoDbProcessEngineConfiguration.setAsyncExecutor(asyncJobExecutor);
-        mongoDbProcessEngineConfiguration.setAsyncFailedJobWaitTime(1);
+        processEngineConfiguration.setAsyncExecutor(asyncJobExecutor);
+        processEngineConfiguration.setAsyncFailedJobWaitTime(1);
         
-        this.processEngine = mongoDbProcessEngineConfiguration.buildProcessEngine();
+        this.processEngine = processEngineConfiguration.buildProcessEngine();
         this.repositoryService = processEngine.getRepositoryService();
         this.runtimeService = processEngine.getRuntimeService();
         this.taskService = processEngine.getTaskService();
@@ -83,10 +89,10 @@ public class AbstractMongoDbTest {
     }
 
     protected void deleteAllDocuments() {
-        MongoDbSessionFactory mongoDbSessionFactory = (MongoDbSessionFactory) mongoDbProcessEngineConfiguration.getSessionFactories().get(MongoDbSession.class);
+        MongoDbSessionFactory mongoDbSessionFactory = (MongoDbSessionFactory) processEngineConfiguration.getSessionFactories().get(MongoDbSession.class);
         Collection<String> collectionNames = mongoDbSessionFactory.getCollectionNames();
         for (String collectionName :collectionNames) {
-            MongoCollection<Document> collection = mongoDbProcessEngineConfiguration.getMongoDatabase().getCollection(collectionName);
+            MongoCollection<Document> collection = processEngineConfiguration.getMongoDatabase().getCollection(collectionName);
             if (collection != null) {
                 collection.deleteMany(new BasicDBObject());
             }

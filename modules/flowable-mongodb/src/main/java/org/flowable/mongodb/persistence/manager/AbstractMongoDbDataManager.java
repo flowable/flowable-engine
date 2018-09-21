@@ -12,14 +12,18 @@
  */
 package org.flowable.mongodb.persistence.manager;
 
+import java.util.List;
 import java.util.Map;
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.mongodb.persistence.MongoDbSession;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 
 /**
  * @author Joram Barrez
@@ -84,4 +88,15 @@ public abstract class AbstractMongoDbDataManager<EntityImpl extends Entity> impl
         
         return updateObject;
     }
+
+    protected Bson makeAndFilter(List<Bson> filters) {
+        if (filters.size() > 1) {
+            return Filters.and(filters);
+        } else if (filters.size() == 1) {
+            return filters.get(0);
+        } else {
+            return new Document();
+        }
+    }
+
 }

@@ -13,8 +13,10 @@
 package org.flowable.mongodb.persistence.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bson.conversions.Bson;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -65,22 +67,17 @@ public class MongoDbHistoricProcessInstanceDataManager extends AbstractMongoDbDa
 
     @Override
     public List<String> findHistoricProcessInstanceIdsByProcessDefinitionId(String processDefinitionId) {
-        // TODO Auto-generated method stub
-        return null;
+        List<HistoricProcessInstance> historicProcessInstances = getMongoDbSession().find(COLLECTION_HISTORIC_PROCESS_INSTANCES, Filters.eq("processDefinitionId", processDefinitionId));
+        if (historicProcessInstances != null && !historicProcessInstances.isEmpty()) {
+            return historicProcessInstances.stream().map(HistoricProcessInstance::getId).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
-    public List<HistoricProcessInstance> findHistoricProcessInstancesBySuperProcessInstanceId(
-            String superProcessInstanceId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public long findHistoricProcessInstanceCountByQueryCriteria(
-            HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        // TODO Auto-generated method stub
-        return 0;
+    public List<HistoricProcessInstance> findHistoricProcessInstancesBySuperProcessInstanceId(String superProcessInstanceId) {
+        return getMongoDbSession().find(COLLECTION_HISTORIC_PROCESS_INSTANCES, Filters.eq("superProcessInstanceId", superProcessInstanceId));
     }
 
     @Override
@@ -89,22 +86,23 @@ public class MongoDbHistoricProcessInstanceDataManager extends AbstractMongoDbDa
     }
 
     @Override
-    public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(
-            HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        // TODO Auto-generated method stub
-        return null;
+    public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-        // TODO Auto-generated method stub
-        return 0;
+        throw new UnsupportedOperationException();
     }
     
     protected Bson createFilter(HistoricProcessInstanceQueryImpl processInstanceQuery) {

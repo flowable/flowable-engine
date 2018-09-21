@@ -54,11 +54,7 @@ public class MongoDbProcessDefinitionDataManager extends AbstractMongoDbDataMana
     public ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
         // TODO. Not all properties included yet. Check the mybatis query for all details.
         // TODO: More performant way possible?
-        FindIterable<Document> documents = getMongoDbSession().findDocuments(COLLECTION_PROCESS_DEFINITIONS, 
-                Filters.eq("key", processDefinitionKey))
-                .sort(Sorts.descending("version"))
-                .limit(1);
-        return getMongoDbSession().mapToEntity(COLLECTION_PROCESS_DEFINITIONS, documents);
+        return getMongoDbSession().findOne(COLLECTION_PROCESS_DEFINITIONS, Filters.eq("key", processDefinitionKey), Sorts.descending("version"), 1);
     }
 
     @Override
@@ -78,7 +74,7 @@ public class MongoDbProcessDefinitionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public void deleteProcessDefinitionsByDeploymentId(String deploymentId) {
-        throw new UnsupportedOperationException();        
+        getMongoDbSession().getCollection(COLLECTION_PROCESS_DEFINITIONS).deleteMany(Filters.eq("deploymentId", deploymentId));
     }
 
     @Override

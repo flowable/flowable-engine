@@ -168,7 +168,13 @@ public class MongoDbEventSubscriptionDataManager extends AbstractMongoDbDataMana
 
     @Override
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
-        throw new UnsupportedOperationException();        
+        getMongoDbSession().getCollection(COLLECTION_EVENT_SUBSCRIPTION).deleteMany(
+            Filters.and(
+                Filters.eq("processDefinitionId", processDefinitionId),
+                Filters.not(Filters.exists("executionId")),
+                Filters.not(Filters.exists("processInstanceId"))
+            )
+        );
     }
 
     @Override

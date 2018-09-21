@@ -14,19 +14,25 @@ package org.flowable.mongodb.persistence.manager;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
+import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksByProcInstMatcher;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class MongoDbHistoricIdentityLinkDataManager extends AbstractMongoDbDataManager<HistoricIdentityLinkEntity> implements HistoricIdentityLinkDataManager {
     
     public static final String COLLECTION_HISTORIC_IDENTITY_LINKS = "historicIdentityLinks";
+
+    protected CachedEntityMatcher<Entity> historicIdentityLinksByProcInstMatcher = (CachedEntityMatcher) new HistoricIdentityLinksByProcInstMatcher();
     
     @Override
     public String getCollection() {
@@ -45,33 +51,27 @@ public class MongoDbHistoricIdentityLinkDataManager extends AbstractMongoDbDataM
 
     @Override
     public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId) {
-        // TODO Auto-generated method stub
-        return null;
+        return getMongoDbSession().find(COLLECTION_HISTORIC_IDENTITY_LINKS, Filters.eq("processInstanceId", processInstanceId), processInstanceId, HistoricIdentityLinkEntityImpl.class, historicIdentityLinksByProcInstMatcher)  ;
     }
 
     @Override
-    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId,
-            String scopeType) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void deleteHistoricIdentityLinksByScopeIdAndType(String scopeId, String scopeType) {
-        // TODO Auto-generated method stub
-        
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void deleteHistoricIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
-        // TODO Auto-generated method stub
-        
+        throw new UnsupportedOperationException();
     }
 
 }

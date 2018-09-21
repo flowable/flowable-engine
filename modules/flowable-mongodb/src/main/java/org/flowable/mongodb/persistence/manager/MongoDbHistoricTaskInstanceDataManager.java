@@ -24,6 +24,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 
 /**
  * @author Tijs Rademakers
@@ -73,46 +74,38 @@ public class MongoDbHistoricTaskInstanceDataManager extends AbstractMongoDbDataM
 
     @Override
     public List<HistoricTaskInstanceEntity> findHistoricTasksByParentTaskId(String parentTaskId) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<HistoricTaskInstanceEntity> findHistoricTasksByProcessInstanceId(String processInstanceId) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: needs cache matcher (also in mybatis counterpart) ?
+        return getMongoDbSession().find(COLLECTION_HISTORIC_TASK_INSTANCES, Filters.eq("processInstanceId", processInstanceId));
     }
 
     @Override
     public long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-        // TODO Auto-generated method stub
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(
-            HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(
-            HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-        // TODO Auto-generated method stub
-        return 0;
+        throw new UnsupportedOperationException();
     }
     
 }

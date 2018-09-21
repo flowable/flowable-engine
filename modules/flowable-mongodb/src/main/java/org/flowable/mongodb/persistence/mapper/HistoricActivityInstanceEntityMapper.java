@@ -19,7 +19,7 @@ import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 /**
  * @author Joram Barrez
  */
-public class HistoricActivityInstanceEntityMapper implements EntityToDocumentMapper<HistoricActivityInstanceEntityImpl> {
+public class HistoricActivityInstanceEntityMapper extends AbstractEntityToDocumentMapper<HistoricActivityInstanceEntityImpl> {
 
     @Override
     public HistoricActivityInstanceEntityImpl fromDocument(Document document) {
@@ -46,25 +46,25 @@ public class HistoricActivityInstanceEntityMapper implements EntityToDocumentMap
 
     @Override
     public Document toDocument(HistoricActivityInstanceEntityImpl activityEntity) {
-        Document instanceDocument = new Document();
-        instanceDocument.append("_id", activityEntity.getId());
-        instanceDocument.append("activityId", activityEntity.getActivityId());
-        instanceDocument.append("activityName", activityEntity.getActivityName());
-        instanceDocument.append("activityType", activityEntity.getActivityType());
-        instanceDocument.append("processInstanceId", activityEntity.getProcessInstanceId());
-        instanceDocument.append("processDefinitionId", activityEntity.getProcessDefinitionId());
-        instanceDocument.append("assignee", activityEntity.getAssignee());
-        instanceDocument.append("calledProcessInstanceId", activityEntity.getCalledProcessInstanceId());
-        instanceDocument.append("deleteReason", activityEntity.getDeleteReason());
-        instanceDocument.append("durationInMillis", activityEntity.getDurationInMillis());
-        instanceDocument.append("endTime", activityEntity.getEndTime());
-        instanceDocument.append("executionId", activityEntity.getExecutionId());
-        instanceDocument.append("revision", activityEntity.getRevision());
-        instanceDocument.append("startTime", activityEntity.getStartTime());
-        instanceDocument.append("taskId", activityEntity.getTaskId());
-        instanceDocument.append("tenantId", activityEntity.getTenantId());
+        Document historicActivityInstanceDocument = new Document();
+        appendIfNotNull(historicActivityInstanceDocument, "_id", activityEntity.getId());
+        appendIfNotNull(historicActivityInstanceDocument, "activityId", activityEntity.getActivityId());
+        appendIfNotNull(historicActivityInstanceDocument, "activityName", activityEntity.getActivityName());
+        appendIfNotNull(historicActivityInstanceDocument, "activityType", activityEntity.getActivityType());
+        appendIfNotNull(historicActivityInstanceDocument, "processInstanceId", activityEntity.getProcessInstanceId());
+        appendIfNotNull(historicActivityInstanceDocument, "processDefinitionId", activityEntity.getProcessDefinitionId());
+        appendIfNotNull(historicActivityInstanceDocument, "assignee", activityEntity.getAssignee());
+        appendIfNotNull(historicActivityInstanceDocument, "calledProcessInstanceId", activityEntity.getCalledProcessInstanceId());
+        appendIfNotNull(historicActivityInstanceDocument, "deleteReason", activityEntity.getDeleteReason());
+        appendIfNotNull(historicActivityInstanceDocument, "durationInMillis", activityEntity.getDurationInMillis());
+        appendIfNotNull(historicActivityInstanceDocument, "endTime", activityEntity.getEndTime());
+        appendIfNotNull(historicActivityInstanceDocument, "executionId", activityEntity.getExecutionId());
+        appendIfNotNull(historicActivityInstanceDocument, "revision", activityEntity.getRevision());
+        appendIfNotNull(historicActivityInstanceDocument, "startTime", activityEntity.getStartTime());
+        appendIfNotNull(historicActivityInstanceDocument, "taskId", activityEntity.getTaskId());
+        appendIfNotNull(historicActivityInstanceDocument, "tenantId", activityEntity.getTenantId());
         
-        return instanceDocument;
+        return historicActivityInstanceDocument;
     }
 
 }

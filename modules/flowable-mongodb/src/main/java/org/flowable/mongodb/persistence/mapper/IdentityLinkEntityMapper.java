@@ -19,7 +19,7 @@ import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 /**
  * @author Joram Barrez
  */
-public class IdentityLinkEntityMapper implements EntityToDocumentMapper<IdentityLinkEntityImpl> {
+public class IdentityLinkEntityMapper extends AbstractEntityToDocumentMapper<IdentityLinkEntityImpl> {
 
     @Override
     public IdentityLinkEntityImpl fromDocument(Document document) {
@@ -40,16 +40,16 @@ public class IdentityLinkEntityMapper implements EntityToDocumentMapper<Identity
     @Override
     public Document toDocument(IdentityLinkEntityImpl identityLinkEntity) {
         Document identityLinkDocument = new Document();
-        identityLinkDocument.append("_id", identityLinkEntity.getId());
-        identityLinkDocument.append("type", identityLinkEntity.getType());
-        identityLinkDocument.append("userId", identityLinkEntity.getUserId());
-        identityLinkDocument.append("groupId", identityLinkEntity.getGroupId());
-        identityLinkDocument.append("taskId", identityLinkEntity.getTaskId());
-        identityLinkDocument.append("processInstanceId", identityLinkEntity.getProcessInstanceId());
-        identityLinkDocument.append("processDefinitionId", identityLinkEntity.getProcessDefinitionId());
-        identityLinkDocument.append("scopeId", identityLinkEntity.getScopeId());
-        identityLinkDocument.append("scopeType", identityLinkEntity.getScopeType());
-        identityLinkDocument.append("scopeDefinitionId", identityLinkEntity.getScopeDefinitionId());
+        appendIfNotNull(identityLinkDocument, "_id", identityLinkEntity.getId());
+        appendIfNotNull(identityLinkDocument, "type", identityLinkEntity.getType());
+        appendIfNotNull(identityLinkDocument, "userId", identityLinkEntity.getUserId());
+        appendIfNotNull(identityLinkDocument, "groupId", identityLinkEntity.getGroupId());
+        appendIfNotNull(identityLinkDocument, "taskId", identityLinkEntity.getTaskId());
+        appendIfNotNull(identityLinkDocument, "processInstanceId", identityLinkEntity.getProcessInstanceId());
+        appendIfNotNull(identityLinkDocument, "processDefinitionId", identityLinkEntity.getProcessDefinitionId());
+        appendIfNotNull(identityLinkDocument, "scopeId", identityLinkEntity.getScopeId());
+        appendIfNotNull(identityLinkDocument, "scopeType", identityLinkEntity.getScopeType());
+        appendIfNotNull(identityLinkDocument, "scopeDefinitionId", identityLinkEntity.getScopeDefinitionId());
         return identityLinkDocument;
     }
 

@@ -19,7 +19,7 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 /**
  * @author Tijs Rademakers
  */
-public class HistoricTaskInstanceEntityMapper implements EntityToDocumentMapper<HistoricTaskInstanceEntityImpl> {
+public class HistoricTaskInstanceEntityMapper extends AbstractEntityToDocumentMapper<HistoricTaskInstanceEntityImpl> {
 
     @Override
     public HistoricTaskInstanceEntityImpl fromDocument(Document document) {
@@ -60,34 +60,34 @@ public class HistoricTaskInstanceEntityMapper implements EntityToDocumentMapper<
     public Document toDocument(HistoricTaskInstanceEntityImpl taskEntity) {
         Document taskDocument = new Document();
         
-        taskDocument.append("_id", taskEntity.getId());
-        taskDocument.append("name", taskEntity.getName());
-        taskDocument.append("parentTaskId", taskEntity.getParentTaskId());
-        taskDocument.append("description", taskEntity.getDescription());
-        taskDocument.append("priority", taskEntity.getPriority());
-        taskDocument.append("createTime", taskEntity.getCreateTime());
-        taskDocument.append("owner", taskEntity.getOwner());
-        taskDocument.append("assignee", taskEntity.getAssignee());
-        taskDocument.append("executionId", taskEntity.getExecutionId());
-        taskDocument.append("processInstanceId", taskEntity.getProcessInstanceId());
-        taskDocument.append("processDefinitionId", taskEntity.getProcessDefinitionId());
-        taskDocument.append("taskDefinitionId", taskEntity.getTaskDefinitionId());
-        taskDocument.append("scopeId", taskEntity.getScopeId());
-        taskDocument.append("subScopeId", taskEntity.getSubScopeId());
-        taskDocument.append("scopeType", taskEntity.getScopeType());
-        taskDocument.append("scopeDefinitionId", taskEntity.getScopeDefinitionId());
-        taskDocument.append("taskDefinitionKey", taskEntity.getTaskDefinitionKey());
-        taskDocument.append("category", taskEntity.getCategory());
-        taskDocument.append("claimTime", taskEntity.getClaimTime());
-        taskDocument.append("deleteReason", taskEntity.getDeleteReason());
-        taskDocument.append("dueDate", taskEntity.getDueDate());
-        taskDocument.append("durationInMillis", taskEntity.getDurationInMillis());
-        taskDocument.append("endTime", taskEntity.getEndTime());
-        taskDocument.append("formKey", taskEntity.getFormKey());
-        taskDocument.append("lastUpdateTime", taskEntity.getLastUpdateTime());
-        taskDocument.append("revision", taskEntity.getRevision());
-        taskDocument.append("startTime", taskEntity.getStartTime());
-        taskDocument.append("tenantId", taskEntity.getTenantId());
+        appendIfNotNull(taskDocument, "_id", taskEntity.getId());
+        appendIfNotNull(taskDocument, "name", taskEntity.getName());
+        appendIfNotNull(taskDocument, "parentTaskId", taskEntity.getParentTaskId());
+        appendIfNotNull(taskDocument, "description", taskEntity.getDescription());
+        appendIfNotNull(taskDocument, "priority", taskEntity.getPriority());
+        appendIfNotNull(taskDocument, "createTime", taskEntity.getCreateTime());
+        appendIfNotNull(taskDocument, "owner", taskEntity.getOwner());
+        appendIfNotNull(taskDocument, "assignee", taskEntity.getAssignee());
+        appendIfNotNull(taskDocument, "executionId", taskEntity.getExecutionId());
+        appendIfNotNull(taskDocument, "processInstanceId", taskEntity.getProcessInstanceId());
+        appendIfNotNull(taskDocument, "processDefinitionId", taskEntity.getProcessDefinitionId());
+        appendIfNotNull(taskDocument, "taskDefinitionId", taskEntity.getTaskDefinitionId());
+        appendIfNotNull(taskDocument, "scopeId", taskEntity.getScopeId());
+        appendIfNotNull(taskDocument, "subScopeId", taskEntity.getSubScopeId());
+        appendIfNotNull(taskDocument, "scopeType", taskEntity.getScopeType());
+        appendIfNotNull(taskDocument, "scopeDefinitionId", taskEntity.getScopeDefinitionId());
+        appendIfNotNull(taskDocument, "taskDefinitionKey", taskEntity.getTaskDefinitionKey());
+        appendIfNotNull(taskDocument, "category", taskEntity.getCategory());
+        appendIfNotNull(taskDocument, "claimTime", taskEntity.getClaimTime());
+        appendIfNotNull(taskDocument, "deleteReason", taskEntity.getDeleteReason());
+        appendIfNotNull(taskDocument, "dueDate", taskEntity.getDueDate());
+        appendIfNotNull(taskDocument, "durationInMillis", taskEntity.getDurationInMillis());
+        appendIfNotNull(taskDocument, "endTime", taskEntity.getEndTime());
+        appendIfNotNull(taskDocument, "formKey", taskEntity.getFormKey());
+        appendIfNotNull(taskDocument, "lastUpdateTime", taskEntity.getLastUpdateTime());
+        appendIfNotNull(taskDocument, "revision", taskEntity.getRevision());
+        appendIfNotNull(taskDocument, "startTime", taskEntity.getStartTime());
+        appendIfNotNull(taskDocument, "tenantId", taskEntity.getTenantId());
         
         return taskDocument;
     }

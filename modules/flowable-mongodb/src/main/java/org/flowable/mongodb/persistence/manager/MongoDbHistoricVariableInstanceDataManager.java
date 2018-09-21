@@ -15,14 +15,18 @@ package org.flowable.mongodb.persistence.manager;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.conversions.Bson;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByProcInstMatcher;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 
 /**
  * @author Tijs Rademakers
@@ -30,6 +34,8 @@ import com.mongodb.BasicDBObject;
 public class MongoDbHistoricVariableInstanceDataManager extends AbstractMongoDbDataManager<HistoricVariableInstanceEntity> implements HistoricVariableInstanceDataManager {
     
     public static final String COLLECTION_HISTORIC_VARIABLE_INSTANCES = "historicVariableInstances";
+
+    protected CachedEntityMatcher<Entity> historicVariableInstanceByProcInstMatcher = (CachedEntityMatcher) new HistoricVariableInstanceByProcInstMatcher();
     
     @Override
     public String getCollection() {
@@ -48,60 +54,48 @@ public class MongoDbHistoricVariableInstanceDataManager extends AbstractMongoDbD
 
     @Override
     public List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId) {
-        // TODO Auto-generated method stub
-        return null;
+        return getMongoDbSession().find(COLLECTION_HISTORIC_VARIABLE_INSTANCES, Filters.eq("processInstanceId", processInstanceId),
+            processInstanceId, HistoricVariableInstanceEntityImpl.class, historicVariableInstanceByProcInstMatcher);
     }
 
     @Override
     public List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByTaskId(String taskId) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public long findHistoricVariableInstanceCountByQueryCriteria(
-            HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
-        // TODO Auto-generated method stub
-        return 0;
+    public long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(
-            HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId,
-            String scopeType) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(
-            String subScopeId, String scopeType) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-        // TODO Auto-generated method stub
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
 }

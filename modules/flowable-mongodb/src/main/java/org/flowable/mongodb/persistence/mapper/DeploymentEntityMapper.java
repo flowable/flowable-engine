@@ -16,7 +16,7 @@ import org.bson.Document;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.mongodb.persistence.EntityToDocumentMapper;
 
-public class DeploymentEntityMapper implements EntityToDocumentMapper<DeploymentEntityImpl> {
+public class DeploymentEntityMapper extends AbstractEntityToDocumentMapper<DeploymentEntityImpl> {
 
     @Override
     public DeploymentEntityImpl fromDocument(Document document) {
@@ -35,16 +35,16 @@ public class DeploymentEntityMapper implements EntityToDocumentMapper<Deployment
     @Override
     public Document toDocument(DeploymentEntityImpl deploymentEntity) {
         Document deploymentDocument = new Document();
-        deploymentDocument.append("_id", deploymentEntity.getId());
-        deploymentDocument.append("name", deploymentEntity.getName());
-        deploymentDocument.append("key", deploymentEntity.getName());
-        deploymentDocument.append("parentDeploymentId", deploymentEntity.getParentDeploymentId());
+        appendIfNotNull(deploymentDocument, "_id", deploymentEntity.getId());
+        appendIfNotNull(deploymentDocument, "name", deploymentEntity.getName());
+        appendIfNotNull(deploymentDocument, "key", deploymentEntity.getName());
+        appendIfNotNull(deploymentDocument, "parentDeploymentId", deploymentEntity.getParentDeploymentId());
         
-        deploymentDocument.append("deploymentTime", deploymentEntity.getDeploymentTime());
-        deploymentDocument.append("derivedFrom", deploymentEntity.getDerivedFrom());
-        deploymentDocument.append("derivedFromRoot", deploymentEntity.getDerivedFromRoot());
+        appendIfNotNull(deploymentDocument, "deploymentTime", deploymentEntity.getDeploymentTime());
+        appendIfNotNull(deploymentDocument, "derivedFrom", deploymentEntity.getDerivedFrom());
+        appendIfNotNull(deploymentDocument, "derivedFromRoot", deploymentEntity.getDerivedFromRoot());
 
-        deploymentDocument.append("tenantId", deploymentEntity.getTenantId());
+        appendIfNotNull(deploymentDocument, "tenantId", deploymentEntity.getTenantId());
         return deploymentDocument;
     }
 

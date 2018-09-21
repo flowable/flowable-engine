@@ -19,7 +19,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 /**
  * @author Joram Barrez
  */
-public class TaskEntityMapper implements EntityToDocumentMapper<TaskEntityImpl> {
+public class TaskEntityMapper extends AbstractEntityToDocumentMapper<TaskEntityImpl> {
 
     @Override
     public TaskEntityImpl fromDocument(Document document) {
@@ -48,7 +48,13 @@ public class TaskEntityMapper implements EntityToDocumentMapper<TaskEntityImpl> 
         taskEntity.setFormKey(document.getString("formKey"));
         taskEntity.setClaimTime(document.getDate("claimTime"));
         taskEntity.setTenantId(document.getString("tenantId"));
-        
+
+        // Entity counts
+        taskEntity.setCountEnabled(document.getBoolean("countEnabled"));
+        taskEntity.setVariableCount(document.getInteger("variableCount"));
+        taskEntity.setIdentityLinkCount(document.getInteger("identityLinkCount"));
+        taskEntity.setSubTaskCount(document.getInteger("subTaskCount"));
+
         return taskEntity;
     }
 
@@ -56,32 +62,37 @@ public class TaskEntityMapper implements EntityToDocumentMapper<TaskEntityImpl> 
     public Document toDocument(TaskEntityImpl taskEntity) {
         Document taskDocument = new Document();
         
-        taskDocument.append("_id", taskEntity.getId());
-        taskDocument.append("name", taskEntity.getName());
-        taskDocument.append("parentTaskId", taskEntity.getParentTaskId());
-        taskDocument.append("description", taskEntity.getDescription());
-        taskDocument.append("priority", taskEntity.getPriority());
-        taskDocument.append("createTime", taskEntity.getCreateTime());
-        taskDocument.append("owner", taskEntity.getOwner());
-        taskDocument.append("assignee", taskEntity.getAssignee());
-        taskDocument.append("delegationState", taskEntity.getDelegationState() != null ? taskEntity.getDelegationState().toString() : null);
-        taskDocument.append("executionId", taskEntity.getExecutionId());
-        taskDocument.append("processInstanceId", taskEntity.getProcessInstanceId());
-        taskDocument.append("processDefinitionId", taskEntity.getProcessDefinitionId());
-        taskDocument.append("taskDefinitionId", taskEntity.getTaskDefinitionId());
-        taskDocument.append("scopeId", taskEntity.getScopeId());
-        taskDocument.append("subScopeId", taskEntity.getSubScopeId());
-        taskDocument.append("scopeType", taskEntity.getScopeType());
-        taskDocument.append("scopeDefinitionId", taskEntity.getScopeDefinitionId());
-        taskDocument.append("taskDefinitionKey", taskEntity.getTaskDefinitionKey());
-        taskDocument.append("dueDate", taskEntity.getDueDate());
-        taskDocument.append("category", taskEntity.getCategory());
-        taskDocument.append("suspensionState", taskEntity.getSuspensionState());
-        taskDocument.append("formKey", taskEntity.getFormKey());
-        taskDocument.append("claimTime", taskEntity.getClaimTime());
-        taskDocument.append("tenantId", taskEntity.getTenantId());
-        
-        // TODO performance settings
+        appendIfNotNull(taskDocument, "_id", taskEntity.getId());
+        appendIfNotNull(taskDocument, "name", taskEntity.getName());
+        appendIfNotNull(taskDocument, "parentTaskId", taskEntity.getParentTaskId());
+        appendIfNotNull(taskDocument, "description", taskEntity.getDescription());
+        appendIfNotNull(taskDocument, "priority", taskEntity.getPriority());
+        appendIfNotNull(taskDocument, "createTime", taskEntity.getCreateTime());
+        appendIfNotNull(taskDocument, "owner", taskEntity.getOwner());
+        appendIfNotNull(taskDocument, "assignee", taskEntity.getAssignee());
+        appendIfNotNull(taskDocument, "delegationState", taskEntity.getDelegationState() != null ? taskEntity.getDelegationState().toString() : null);
+        appendIfNotNull(taskDocument, "executionId", taskEntity.getExecutionId());
+        appendIfNotNull(taskDocument, "processInstanceId", taskEntity.getProcessInstanceId());
+        appendIfNotNull(taskDocument, "processDefinitionId", taskEntity.getProcessDefinitionId());
+        appendIfNotNull(taskDocument, "taskDefinitionId", taskEntity.getTaskDefinitionId());
+        appendIfNotNull(taskDocument, "scopeId", taskEntity.getScopeId());
+        appendIfNotNull(taskDocument, "subScopeId", taskEntity.getSubScopeId());
+        appendIfNotNull(taskDocument, "scopeType", taskEntity.getScopeType());
+        appendIfNotNull(taskDocument, "scopeDefinitionId", taskEntity.getScopeDefinitionId());
+        appendIfNotNull(taskDocument, "taskDefinitionKey", taskEntity.getTaskDefinitionKey());
+        appendIfNotNull(taskDocument, "dueDate", taskEntity.getDueDate());
+        appendIfNotNull(taskDocument, "category", taskEntity.getCategory());
+        appendIfNotNull(taskDocument, "suspensionState", taskEntity.getSuspensionState());
+        appendIfNotNull(taskDocument, "formKey", taskEntity.getFormKey());
+        appendIfNotNull(taskDocument, "claimTime", taskEntity.getClaimTime());
+        appendIfNotNull(taskDocument, "tenantId", taskEntity.getTenantId());
+
+        // Entity counts
+        appendIfNotNull(taskDocument, "countEnabled", taskEntity.isCountEnabled());
+        appendIfNotNull(taskDocument, "variableCount", taskEntity.getVariableCount());
+        appendIfNotNull(taskDocument, "identityLinkCount", taskEntity.getIdentityLinkCount());
+        appendIfNotNull(taskDocument, "subTaskCount", taskEntity.getSubTaskCount());
+
         return taskDocument;
     }
 

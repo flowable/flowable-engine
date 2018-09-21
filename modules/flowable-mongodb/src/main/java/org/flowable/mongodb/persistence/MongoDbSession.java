@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.interceptor.Session;
@@ -61,7 +62,7 @@ public class MongoDbSession implements Session {
     protected Map<Class<? extends Entity>, Map<String, Entity>> insertedObjects = new HashMap<>();
     protected Map<Class<? extends Entity>, Map<String, Entity>> deletedObjects = new HashMap<>();
     protected List<Entity> updatedObjects = new ArrayList<>();
-    
+
     public MongoDbSession(MongoDbSessionFactory mongoDbSessionFactory, MongoClient mongoClient, MongoDatabase mongoDatabase, EntityCache entityCache) {
         this.mongoDbSessionFactory = mongoDbSessionFactory;
         this.mongoClient = mongoClient;
@@ -124,7 +125,7 @@ public class MongoDbSession implements Session {
             
             LOGGER.debug("inserting type: {}", clazz);
             
-            MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(clazz));
+            MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getClassToCollectionsMap().get(clazz));
             
             Map<String, ? extends Entity> entities = insertedObjects.get(clazz);
             EntityToDocumentMapper entityMapper = mongoDbSessionFactory.getMapperForEntityClass(clazz);
@@ -136,27 +137,39 @@ public class MongoDbSession implements Session {
     }
     
     protected void flushUpdates() {
+
+        // Regular updates
         for (Entity updatedObject : updatedObjects) {
             
             LOGGER.debug("updating: {}", updatedObject);
 
             Class<?> entityClass = updatedObject.getClass();
-            String collection = mongoDbSessionFactory.getCollections().get(entityClass);
-            BasicDBObject updateObject = mongoDbSessionFactory.getDataManagerForCollection(collection).createUpdateObject(updatedObject);
+            String collectionName = mongoDbSessionFactory.getClassToCollectionsMap().get(entityClass);
+            BasicDBObject updateObject = mongoDbSessionFactory.getDataManagerForCollection(collectionName).createUpdateObject(updatedObject);
             if (updateObject != null) {
-                performUpdate(collection, updatedObject, new Document().append("$set", updateObject));
+                MongoCollection<Document> collection = getMongoDatabase().getCollection(collectionName);
+                UpdateResult updateResult = collection
+                    .updateOne(clientSession, Filters.eq("_id", updatedObject.getId()), new Document().append("$set", updateObject));
+                if (updateResult.getModifiedCount() == 0) {
+                    throw new FlowableOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
+                }
             }
             
-            /*if (updatedRecords == 0) {
-                throw new FlowableOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
-            }*/
-
             if (updatedObject instanceof HasRevision) {
                 ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
             }
 
         }
         updatedObjects.clear();
+
+//        // MongoDb specific updates
+//        if (!mongoDbSpecificUpdates.isEmpty()) {
+//            for (String collection : mongoDbSpecificUpdates.keySet()) {
+//                List<SingleEntityUpdate> basicDBObjects = mongoDbSpecificUpdates.get(collection);
+//                basicDBObjects.forEach(singleEntityUpdate -> getMongoDatabase().getCollection(collection)
+//                    .updateMany(clientSession, Filters.eq("_id", singleEntityUpdate.getId()), new Document().append("$set", singleEntityUpdate.getBasicDBObject())));
+//            }
+//        }
     }
     
     protected void flushDeletes() {
@@ -166,11 +179,10 @@ public class MongoDbSession implements Session {
         
         for (Class<? extends Entity> clazz : deletedObjects.keySet()) {
             
-            MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(clazz));
+            MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getClassToCollectionsMap().get(clazz));
             Map<String, ? extends Entity> entities = deletedObjects.get(clazz);
-            EntityToDocumentMapper entityMapper = mongoDbSessionFactory.getMapperForEntityClass(clazz);
             for (Entity entity : entities.values()) {
-                mongoDbCollection.deleteOne(Filters.eq("_id", entity.getId()));
+                mongoDbCollection.deleteOne(clientSession, Filters.eq("_id", entity.getId()));
             }
         }
     }
@@ -190,12 +202,12 @@ public class MongoDbSession implements Session {
         return mapToEntities(collection, documents);
     }
     
-    public <T> List<T> find(String collection, Bson bsonFilter, Object parameter, Class<? extends Entity> entityClass, CachedEntityMatcher<Entity> cachedEntityMatcher, boolean checkDatabase) {
-        return find(collection, bsonFilter, parameter, entityClass, cachedEntityMatcher, checkDatabase, true);
+    public <T> List<T> find(String collection, Bson bsonFilter, Object parameter, Class<? extends Entity> entityClass, CachedEntityMatcher<Entity> cachedEntityMatcher) {
+        return find(collection, bsonFilter, parameter, entityClass, cachedEntityMatcher, true);
     }
     
     @SuppressWarnings("unchecked")
-    public <T> List<T> find(String collection, Bson bsonFilter, Object parameter, Class<? extends Entity> entityClass, CachedEntityMatcher<Entity> cachedEntityMatcher, boolean checkDatabase, boolean checkCache) {
+    public <T> List<T> find(String collection, Bson bsonFilter, Object parameter, Class<? extends Entity> entityClass, CachedEntityMatcher<Entity> cachedEntityMatcher, boolean checkCache) {
         FindIterable<Document> documents = findDocuments(collection, bsonFilter);
         Collection<Entity> dbEntities = mapToEntitiesType(collection, documents);
 
@@ -228,12 +240,7 @@ public class MongoDbSession implements Session {
 
         // Remove entries which are already deleted
         if (dbEntities.size() > 0) {
-            Iterator<Entity> resultIterator = dbEntities.iterator();
-            while (resultIterator.hasNext()) {
-                if (isEntityToBeDeleted(resultIterator.next())) {
-                    resultIterator.remove();
-                }
-            }
+            dbEntities.removeIf(this::isEntityToBeDeleted);
         }
 
         return (List<T>) new ArrayList<>(dbEntities);
@@ -254,9 +261,13 @@ public class MongoDbSession implements Session {
 
         return (List<T>) result;
     }
-    
+
     public <T> T findOne(String collection, Bson bsonFilter) {
-        FindIterable<Document> documents = findDocuments(collection, bsonFilter);
+        return findOne(collection, bsonFilter, null, -1);
+    }
+
+    public <T> T findOne(String collection, Bson bsonFilter, Bson sort, int limit) {
+        FindIterable<Document> documents = findDocuments(collection, bsonFilter, sort, limit);
         if (documents != null) {
             T entity = mapToEntity(collection, documents);
             if (entity instanceof Entity) {
@@ -265,10 +276,10 @@ public class MongoDbSession implements Session {
                 if (cachedEntity != null) {
                     return cachedEntity;
                 }
-                
+
                 entityCache.put((Entity) entity, true); // true -> store state so we can see later if it is updated later on
             }
-            
+
             return entity;
         }
         return null;
@@ -325,11 +336,11 @@ public class MongoDbSession implements Session {
         }
         
         if (bsonSort != null) {
-            documentResult.sort(bsonSort);
+            documentResult = documentResult.sort(bsonSort);
         }
         
         if (limit > 0) {
-            documentResult.limit(limit);
+            documentResult = documentResult.limit(limit);
         }
         
         return documentResult;
@@ -377,11 +388,6 @@ public class MongoDbSession implements Session {
     public void update(Entity entity) {
         entityCache.put(entity, false); // false -> we don't store state, meaning it will always be seen as changed
         entity.setUpdated(true);
-    }
-    
-    public UpdateResult performUpdate(String collection, Entity entity, Document updateObject) {
-        MongoCollection<Document> mongoDbCollection = getMongoDatabase().getCollection(mongoDbSessionFactory.getCollections().get(entity.getClass()));
-        return mongoDbCollection.updateOne(Filters.eq("_id", entity.getId()), updateObject);
     }
     
     public void delete(String collection, Entity entity) {
@@ -559,5 +565,5 @@ public class MongoDbSession implements Session {
     public void setEntityCache(EntityCache entityCache) {
         this.entityCache = entityCache;
     }
-    
+
 }
