@@ -26,7 +26,7 @@
         <sequenceFlow sourceRef="bookHotel" targetRef="throwCompensate" />
 
 		<intermediateThrowEvent id="throwCompensate">
-            <compensateEventDefinition activityRef="bookHotel" />
+            <compensateEventDefinition activityRef="undoBookHotel" />
 		</intermediateThrowEvent>
 		
 		<sequenceFlow sourceRef="throwCompensate" targetRef="beforeEnd" />
