@@ -88,11 +88,56 @@ long count = formRepositoryService.createNativeDeploymentQuery()
 
 As Flowable Form is an embeddable Java engine, writing unit tests for Form definitions is as simple as writing regular unit tests.
 
-Flowable supports JUnit version 4 styles of unit testing. When writing JUnit 4 unit tests, the +org.flowable.form.engine.test.FlowableFormRule+ Rule can be used. Through this rule, the Form engine and services are available through getters. Including this +Rule+ will enable the use of the +org.flowable.form.engine.test.FormDeploymentAnnotation+ annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. Form engines are statically cached over multiple unit tests when using the same configuration resource.
+Flowable supports JUnit version 4 and 5 styles of unit testing.
+
+When writing JUnit 5 unit tests, the +org.flowable.form.engine.test.FlowableFormExtension+ Extension can be used.
+Through this extension, the Form engine and services are available as parameters into test and lifecycle methods.
+Using this +Extension+ will enable the use of the +org.flowable.form.engine.test.FormDeploymentAnnotation+ annotation (see below for an explanation of its use and configuration) and it will look for the default configuration file on the classpath.
+Form engines are statically cached over multiple unit tests when using the same configuration resource.
+
+When a test method is annotated with +@FormDeploymentAnnotation+, before each test the form files defined in +FormDeploymentAnnotation#resources+ will be deployed.
+In case there are no resources defined, a resource file of the form +testClassName.testMethod.form+ in the same package as the test class, will be deployed.
+At the end of the test, the deployment will be deleted, including all related form instances, definitions, and so on.
+See the +FormDeploymentAnnotation+ class for more information.
+
+When writing JUnit 4 unit tests, the +org.flowable.form.engine.test.FlowableFormRule+ Rule can be used. Through this rule, the Form engine and services are available through getters. Including this +Rule+ will enable the use of the +org.flowable.form.engine.test.FormDeploymentAnnotation+ annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. Form engines are statically cached over multiple unit tests when using the same configuration resource.
 It's also possible to provide a custom engine configuration to the rule.
 
 The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the +FlowableFormRule+ (and passing an optional custom configuration)
 
+.JUnit 5 test
+[source,java,linenums]
+----
+@ExtendWith(FlowableFormExtension.class)
+class MyFormDefinitionTest {
+
+  //In case a custom form configuration is needed the part below should be uncommented
+  //@RegisterExtension
+  //protected final FlowableFormExtension flowableFormExtension = new FlowableFormExtension("custom1.flowable.form.cfg.xml");
+
+  private FormEngine formEngine;
+
+  @BeforeEach
+  void setUp(FormEngine formEngine) {
+    this.formEngine = formEngine;
+  }
+
+  @Test
+  @FormDeploymentAnnotation
+  void formUsageExample() {
+    FormService formService = formEngine.getFormService();
+
+    FormInstance result = formService.getFormInstanceModelById(
+        "f7689f79-f1cc-11e6-8549-acde48001122", null);
+
+    Assertions.assertNotNull(result);
+  }
+}
+----
+
+The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the +FlowableFormRule+ (and passing an optional custom configuration)
+
+.JUnit 4 test
 [source,java,linenums]
 ----
 public class MyFormDefinitionTest {
