@@ -13,9 +13,13 @@
 
 package org.flowable.common.engine.impl.db;
 
-import org.flowable.common.engine.api.query.QueryProperty;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.flowable.common.engine.api.query.Query.NullHandlingOnOrder;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.Direction;
 
 /**
  * @author Tijs Rademakers
@@ -34,6 +38,7 @@ public class ListQueryParameterObject {
     protected int maxResults = -1;
     protected Object parameter;
     protected String orderByColumns;
+    protected Map<String, Boolean> orderByColumnMap = new TreeMap<>();
     protected QueryProperty orderProperty;
     protected String nullHandlingColumn;
     protected NullHandlingOnOrder nullHandlingOnOrder;
@@ -56,6 +61,12 @@ public class ListQueryParameterObject {
             orderByColumns = "";
         } else {
             orderByColumns = orderByColumns + ", ";
+        }
+        
+        if (Direction.ASCENDING.getName().equals(sortOrder)) {
+            orderByColumnMap.put(column, true);
+        } else {
+            orderByColumnMap.put(column, false);
         }
 
         String defaultOrderByClause = column + " " + sortOrder;
@@ -173,6 +184,10 @@ public class ListQueryParameterObject {
         }
     }
     
+    public Map<String, Boolean> getOrderByColumnMap() {
+        return orderByColumnMap;
+    }
+
     public void setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
     }

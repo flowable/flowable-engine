@@ -89,7 +89,6 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected String taskDefinitionKey;
     protected String formKey;
 
-    protected boolean isDeleted;
     protected boolean isCanceled;
 
     private boolean isCountEnabled;

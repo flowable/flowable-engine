@@ -1505,6 +1505,44 @@
                 </plugins>
             </build>
         </profile>
+        
+        <profile>
+            <id>mongodb</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-mongodb</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>change config</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to mongodb.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/mongodb/mongodb.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 </project>

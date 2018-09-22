@@ -34,7 +34,7 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
     }
     
     @Override
-    public void dbSchemaCreate() {
+    public void schemaCreate() {
         if (isUpdateNeeded()) {
             String dbVersion = getSchemaVersion();
             if (!FlowableVersions.CURRENT_VERSION.equals(dbVersion)) {
@@ -53,7 +53,7 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
     }
 
     @Override
-    public void dbSchemaDrop() {
+    public void schemaDrop() {
         executeMandatorySchemaResource("drop", schemaComponent);
         if (isHistoryUsed()) {
             executeMandatorySchemaResource("drop", schemaComponentHistory);
@@ -61,7 +61,7 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
     }
 
     @Override
-    public String dbSchemaUpdate() {
+    public String schemaUpdate() {
         String feedback = null;
         if (isUpdateNeeded()) {
             String dbVersion = getSchemaVersion();
@@ -83,9 +83,16 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
             
             feedback = "upgraded from " + compareWithVersion + " to " + FlowableVersions.CURRENT_VERSION;
         } else {
-            dbSchemaCreate();
+            schemaCreate();
         }
         return feedback;
+    }
+    
+    public void schemaCheckVersion() {
+        String dbVersion = getSchemaVersion();
+        if (!FlowableVersions.CURRENT_VERSION.equals(dbVersion)) {
+            throw new FlowableWrongDbException(FlowableVersions.CURRENT_VERSION, dbVersion);
+        }
     }
 
     protected boolean isUpdateNeeded() {

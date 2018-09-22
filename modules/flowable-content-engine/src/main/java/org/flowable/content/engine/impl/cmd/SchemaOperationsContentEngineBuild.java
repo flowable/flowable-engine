@@ -10,23 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.idm.engine.impl;
+package org.flowable.content.engine.impl.cmd;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.db.IdmDbSchemaManager;
-import org.flowable.idm.engine.impl.util.CommandContextUtil;
+import org.flowable.content.engine.ContentEngineConfiguration;
+import org.flowable.content.engine.impl.db.ContentDbSchemaManager;
+import org.flowable.content.engine.impl.util.CommandContextUtil;
 
 /**
- * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public final class SchemaOperationsIdmEngineBuild implements Command<Void> {
+public class SchemaOperationsContentEngineBuild implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        IdmDbSchemaManager idmDbSchemaManager = (IdmDbSchemaManager) CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager();
-        idmDbSchemaManager.performSchemaOperationsIdmEngineBuild();
+        ContentEngineConfiguration configuration = CommandContextUtil.getContentEngineConfiguration(commandContext);
+        ((ContentDbSchemaManager)configuration.getDbSchemaManager()).initSchema(configuration, configuration.getDatabaseSchemaUpdate());
         return null;
     }
+
 }

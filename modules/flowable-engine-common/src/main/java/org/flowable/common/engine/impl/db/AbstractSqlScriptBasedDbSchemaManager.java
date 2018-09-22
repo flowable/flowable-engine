@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaManager {
+public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaManager {
     
     private static Logger LOGGER = LoggerFactory.getLogger(AbstractSqlScriptBasedDbSchemaManager.class);
     
