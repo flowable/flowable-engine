@@ -334,12 +334,21 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         assertEquals("hello", historicVariableInstances.get(0).getValue());
 
         historicVariableInstances = historyService.createHistoricVariableInstanceQuery().executionIds(processInstanceIds).list();
-        assertEquals("startVar", historicVariableInstances.get(0).getVariableName());
-        assertEquals("hello", historicVariableInstances.get(0).getValue());
-        assertEquals("startVar2", historicVariableInstances.get(1).getVariableName());
-        assertEquals("hello2", historicVariableInstances.get(1).getValue());
-        assertEquals("startVar", historicVariableInstances.get(2).getVariableName());
-        assertEquals("hello", historicVariableInstances.get(2).getValue());
+        int startVarCount = 0;
+        int startVar2Count = 0;
+        for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
+            if ("startVar".equals(historicVariableInstance.getVariableName())) {
+                startVarCount++;
+                assertEquals("hello", historicVariableInstance.getValue());
+            
+            } else if ("startVar2".equals(historicVariableInstance.getVariableName())) {
+                startVar2Count++;
+                assertEquals("hello2", historicVariableInstance.getValue());
+            }
+        }
+        
+        assertEquals(2, startVarCount);
+        assertEquals(1, startVar2Count);
     }
 
     @Test
