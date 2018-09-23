@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration">
+        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE"/>
+        <property name="jdbcDriver" value="org.h2.Driver"/>
+        <property name="jdbcUsername" value="sa"/>
+        <property name="jdbcPassword" value=""/>
+        <property name="databaseSchemaUpdate" value="true"/>
+
+        <property name="asyncExecutor" ref="asyncExecutor"/>
+        <property name="asyncExecutorActivate" value="false"/>
+
+        <property name="asyncFailedJobWaitTime" value="1"/>
+
+        <property name="cmmnEngineName" value="customName"/>
+    </bean>
+
+    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
+        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000"/>
+        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000"/>
+    </bean>
+
+</beans>
