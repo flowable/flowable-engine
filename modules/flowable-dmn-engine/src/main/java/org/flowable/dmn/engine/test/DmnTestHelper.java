@@ -78,6 +78,22 @@ public abstract class DmnTestHelper {
         return deploymentId;
     }
 
+    public static String annotationDeploymentSetUp(DmnEngine dmnEngine, Class<?> testClass, Method method, DmnDeployment dmnDeploymentAnnotation) {
+        String deploymentId = null;
+        if (dmnDeploymentAnnotation != null) {
+            deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, method.getName(), method, dmnDeploymentAnnotation.resources());
+        }
+        return deploymentId;
+    }
+
+    public static String annotationDeploymentSetUp(DmnEngine dmnEngine, Class<?> testClass, Method method, DmnDeploymentAnnotation dmnDeploymentAnnotation) {
+        String deploymentId = null;
+        if (dmnDeploymentAnnotation != null) {
+            deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, method.getName(), method, dmnDeploymentAnnotation.resources());
+        }
+        return deploymentId;
+    }
+
     protected static String deployResourceFromAnnotation(DmnEngine dmnEngine, Class<?> testClass, String methodName,
             Method method, String[] resources) {
         String deploymentId;
