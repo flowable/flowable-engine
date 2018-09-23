@@ -13,11 +13,16 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Modified to add a "completed" flag, which lets the caller know if the process instance has run to completion without encountering a wait state or experiencing an error/ exception.
@@ -26,15 +31,22 @@ import java.util.List;
  * @author Ryan Johnston (@rjfsu)
  */
 public class ProcessInstanceResponse {
+    
     protected String id;
     protected String url;
+    protected String name;
     protected String businessKey;
     protected boolean suspended;
     protected boolean ended;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
     protected String activityId;
+    protected String startedBy;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date started;
     protected List<RestVariable> variables = new ArrayList<>();
+    protected String callbackId;
+    protected String callbackType;
     protected String tenantId;
 
     // Added by Ryan Johnston
@@ -56,6 +68,15 @@ public class ProcessInstanceResponse {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+    
+    @ApiModelProperty(example = "myProcessInstanceName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @ApiModelProperty(example = "myBusinessKey")
@@ -109,6 +130,24 @@ public class ProcessInstanceResponse {
     public void setActivityId(String activityId) {
         this.activityId = activityId;
     }
+    
+    @ApiModelProperty(example = "johnDoe")
+    public String getStartedBy() {
+        return startedBy;
+    }
+
+    public void setStartedBy(String startedBy) {
+        this.startedBy = startedBy;
+    }
+
+    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000")
+    public Date getStarted() {
+        return started;
+    }
+
+    public void setStarted(Date started) {
+        this.started = started;
+    }
 
     public List<RestVariable> getVariables() {
         return variables;
@@ -121,12 +160,30 @@ public class ProcessInstanceResponse {
     public void addVariable(RestVariable variable) {
         variables.add(variable);
     }
+    
+    @ApiModelProperty(example = "3")
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+
+    @ApiModelProperty(example = "cmmn")
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+    }
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
-    @ApiModelProperty(example = "null")
+    @ApiModelProperty(example = "someTenantId")
     public String getTenantId() {
         return tenantId;
     }

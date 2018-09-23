@@ -13,17 +13,18 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans
@@ -44,6 +45,9 @@ public class TaskResponse {
     protected int priority;
     protected boolean suspended;
     protected String taskDefinitionKey;
+    protected String scopeDefinitionId;
+    protected String scopeId;
+    protected String scopeType;
     protected String tenantId;
     protected String category;
     protected String formKey;
@@ -77,6 +81,9 @@ public class TaskResponse {
         setCategory(task.getCategory());
         setProcessInstanceId(task.getProcessInstanceId());
         setProcessDefinitionId(task.getProcessDefinitionId());
+        setScopeDefinitionId(task.getScopeDefinitionId());
+        setScopeId(task.getScopeId());
+        setScopeType(task.getScopeType());
         setTenantId(task.getTenantId());
         setFormKey(task.getFormKey());
     }
@@ -152,7 +159,7 @@ public class TaskResponse {
         this.description = description;
     }
 
-    @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
+    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000")
     public Date getCreateTime() {
         return createTime;
     }
@@ -161,7 +168,7 @@ public class TaskResponse {
         this.createTime = createTime;
     }
 
-    @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
+    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000")
     public Date getDueDate() {
         return dueDate;
     }
@@ -288,8 +295,35 @@ public class TaskResponse {
     public void addVariable(RestVariable variable) {
         variables.add(variable);
     }
+    
+    @ApiModelProperty(example = "12")
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
 
-    @ApiModelProperty(example = "null")
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @ApiModelProperty(example = "14")
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @ApiModelProperty(example = "cmmn")
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @ApiModelProperty(example = "someTenantId")
     public String getTenantId() {
         return tenantId;
     }

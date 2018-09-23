@@ -13,6 +13,16 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,15 +31,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import org.flowable.common.rest.api.DataResponse;
-import org.flowable.common.rest.api.RequestUtil;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -41,8 +42,15 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
     @ApiOperation(value = "List of historic process instances", tags = { "History Process" }, nickname = "listHistoricProcessInstances")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "An id of the historic process instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceName", dataType = "string", value = "A name of the historic process instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceNameLike", dataType = "string", value = "A name of the historic process instance used in a like query.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceNameLikeIgnoreCase", dataType = "string", value = "A name of the historic process instance used in a like query ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "The process definition key of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "The process definition id of the historic process instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionName", dataType = "string", value = "The process definition name of the historic process instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionCategory", dataType = "string", value = "The process definition category of the historic process instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionVersion", dataType = "string", value = "The process definition version of the historic process instance.", paramType = "query"),
+            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "The deployment id of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic process instance is finished.", paramType = "query"),
@@ -54,6 +62,8 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             @ApiImplicitParam(name = "startedBefore", dataType = "string", format="date-time", value = "Return only historic process instances that were started before this date.", paramType = "query"),
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic process instances that were started by this user.", paramType = "query"),
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic process instance variables should be returned as well.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return instances with the given callbackId.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return instances with the given callbackType.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.\n", paramType = "query"),
@@ -69,6 +79,18 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         if (allRequestParams.get("processInstanceId") != null) {
             queryRequest.setProcessInstanceId(allRequestParams.get("processInstanceId"));
         }
+        
+        if (allRequestParams.get("processInstanceName") != null) {
+            queryRequest.setProcessInstanceName(allRequestParams.get("processInstanceName"));
+        }
+        
+        if (allRequestParams.get("processInstanceNameLike") != null) {
+            queryRequest.setProcessInstanceNameLike(allRequestParams.get("processInstanceNameLike"));
+        }
+        
+        if (allRequestParams.get("processInstanceNameLikeIgnoreCase") != null) {
+            queryRequest.setProcessInstanceNameLikeIgnoreCase(allRequestParams.get("processInstanceNameLikeIgnoreCase"));
+        }
 
         if (allRequestParams.get("processDefinitionKey") != null) {
             queryRequest.setProcessDefinitionKey(allRequestParams.get("processDefinitionKey"));
@@ -76,6 +98,22 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
 
         if (allRequestParams.get("processDefinitionId") != null) {
             queryRequest.setProcessDefinitionId(allRequestParams.get("processDefinitionId"));
+        }
+        
+        if (allRequestParams.get("processDefinitionName") != null) {
+            queryRequest.setProcessDefinitionName(allRequestParams.get("processDefinitionName"));
+        }
+        
+        if (allRequestParams.get("processDefinitionCategory") != null) {
+            queryRequest.setProcessDefinitionCategory(allRequestParams.get("processDefinitionCategory"));
+        }
+        
+        if (allRequestParams.get("processDefinitionVersion") != null) {
+            queryRequest.setProcessDefinitionVersion(Integer.valueOf(allRequestParams.get("processDefinitionVersion")));
+        }
+        
+        if (allRequestParams.get("deploymentId") != null) {
+            queryRequest.setDeploymentId(allRequestParams.get("deploymentId"));
         }
 
         if (allRequestParams.get("businessKey") != null) {
@@ -120,6 +158,14 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
 
         if (allRequestParams.get("includeProcessVariables") != null) {
             queryRequest.setIncludeProcessVariables(Boolean.valueOf(allRequestParams.get("includeProcessVariables")));
+        }
+        
+        if (allRequestParams.get("callbackId") != null) {
+            queryRequest.setCallbackId(allRequestParams.get("callbackId"));
+        }
+        
+        if (allRequestParams.get("callbackType") != null) {
+            queryRequest.setCallbackType(allRequestParams.get("callbackType"));
         }
 
         if (allRequestParams.get("tenantId") != null) {
