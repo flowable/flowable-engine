@@ -17,6 +17,7 @@ import java.util.List;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class CallActivity extends Activity {
 
@@ -30,6 +31,7 @@ public class CallActivity extends Activity {
     protected String businessKey;
     protected boolean inheritBusinessKey;
     protected boolean useLocalScopeForOutParameters;
+    protected boolean completeAsync;
 
     public String getCalledElement() {
         return calledElement;
@@ -102,6 +104,14 @@ public class CallActivity extends Activity {
     public void setUseLocalScopeForOutParameters(boolean useLocalScopeForOutParameters) {
         this.useLocalScopeForOutParameters = useLocalScopeForOutParameters;
     }
+    
+    public boolean isCompleteAsync() {
+        return completeAsync;
+    }
+
+    public void setCompleteAsync(boolean completeAsync) {
+        this.completeAsync = completeAsync;
+    }
 
     @Override
     public CallActivity clone() {
@@ -119,6 +129,7 @@ public class CallActivity extends Activity {
         setInheritVariables(otherElement.isInheritVariables());
         setSameDeployment(otherElement.isSameDeployment());
         setUseLocalScopeForOutParameters(otherElement.isUseLocalScopeForOutParameters());
+        setCompleteAsync(otherElement.isCompleteAsync());
 
         inParameters = new ArrayList<>();
         if (otherElement.getInParameters() != null && !otherElement.getInParameters().isEmpty()) {
