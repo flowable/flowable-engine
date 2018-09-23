@@ -253,11 +253,101 @@ Additionally, it's possible to register custom functions that can be used in exp
 
 === Unit testing
 
-Cases are an integral part of software projects and they should be tested in the same way normal application logic is tested: with unit tests. Since Flowable is an embeddable Java engine, writing unit tests for business processes is as simple as writing regular unit tests.
+Cases are an integral part of software projects and they should be tested in the same way normal application logic is tested: with unit tests.
+Since Flowable is an embeddable Java engine, writing unit tests for business cases is as simple as writing regular unit tests.
 
-Flowable supports JUnit versions 3/4/5 styles of unit testing. 
+Flowable supports JUnit versions 4 and 5 styles of unit testing.
 
-The _org.flowable.cmmn.engine.test.FlowableCmmnTestCase_ is available as parent class. It uses a configuration file _flowable.cmmn.cfg.xml_ by default or uses a standard CmmnEngine using an H2 in-memory database if such file is missing.
+In the JUnit 5 style one needs to use the +org.flowable.cmmn.engine.test.FlowableCmmnTest+ annotation or register the +org.flowable.cmmn.engine.test.FlowableCmmnExtension+ manually.
+The +FlowableCmmnTest+ annotation is just a meta annotation and the does the registration of the +FlowableCmmnExtension+ (i.e. it does +@ExtendWith(FlowableCmmnExtension.class)+).
+This will make the CmmnEngine and the services available as parameters into the test and lifecycle methods (+@BeforeAll+, +@BeforeEach+, +@AfterEach+, +@AfterAll+).
+Before each test the cmmnEngine will be initialized by default with the +flowable.cmmn.cfg.xml+ resource on the classpath.
+In order to specify a different configuration file the +org.flowable.cmmn.engine.test.CmmnConfigurationResource+ annotation needs to be used (see second example).
+Cmmn engines are cached statically over multiple unit tests when the configuration resource is the same.
+
+By using +FlowableCmmnExtension+, you can annotate test methods with +org.flowable.cmmn.engine.test.CmmnDeployment+.
+When a test method is annotated with +@CmmnDeployment+, before each test the cmmn files defined in +CmmnDeployment#resources+ will be deployed.
+In case there are no resources defined, a resource file of the form +testClassName.testMethod.cmmn+ in the same package as the test class, will be deployed.
+At the end of the test, the deployment will be deleted, including all related case instances, tasks, and so on.
+See the +CmmnDeployment+ class for more information.
+
+Taking all that in account, a JUnit 5 test looks as follows:
+
+.Junit 5 test with default resource
+[source,java,linenums]
+----
+@FlowableCmmnTest
+class MyTest {
+
+  private CmmnEngine cmmnEngine;
+  private CmmnRuntimeService cmmnRuntimeService;
+  private CmmnTaskService cmmnTaskService;
+
+  @BeforeEach
+  void setUp(CmmnEngine cmmnEngine) {
+    this.cmmnEngine = cmmnEngine;
+    this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
+    this.cmmnTaskService = cmmnEngine.getTaskRuntimeService();
+  }
+
+  @Test
+  @CmmnDeployment
+  void testSingleHumanTask() {
+    CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+	assertNotNull(caseInstance);
+
+    Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+    assertEquals("Task 1", task.getName());
+    assertEquals("JohnDoe", task.getAssignee());
+
+    cmmnTaskService.complete(task.getId());
+    assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+  }
+}
+----
+
+[TIP]
+-----
+With JUnit 5 you can also inject the id of the deployment (with +org.flowable.cmmn.engine.test.CmmnDeploymentId+_) into your test and lifecycle methods.
+-----
+
+.Junit 5 test with custom resource
+[source,java,linenums]
+----
+@FlowableCmmnTest
+@CmmnConfigurationResource("flowable.custom.cmmn.cfg.xml")
+class MyTest {
+
+  private CmmnEngine cmmnEngine;
+  private CmmnRuntimeService cmmnRuntimeService;
+  private CmmnTaskService cmmnTaskService;
+
+  @BeforeEach
+  void setUp(CmmnEngine cmmnEngine) {
+    this.cmmnEngine = cmmnEngine;
+    this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
+    this.cmmnTaskService = cmmnEngine.getTaskRuntimeService();
+  }
+  @Test
+  @CmmnDeployment
+  void testSingleHumanTask() {
+    CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+	assertNotNull(caseInstance);
+
+    Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+    assertEquals("Task 1", task.getName());
+    assertEquals("JohnDoe", task.getAssignee());
+
+    cmmnTaskService.complete(task.getId());
+    assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+  }
+}
+
+In the JUnit 4 style, the _org.flowable.cmmn.engine.test.FlowableCmmnTestCase_ is available as parent class. It uses a configuration file _flowable.cmmn.cfg.xml_ by default or uses a standard CmmnEngine using an H2 in-memory database if such file is missing.
 Behind the scenes, a CmmnTestRunner is used to initialise the CMMN engine. Note in the example below how the _@CmmnDeployment_ annotation is used to automatically deploy the case definition (it will look for a .cmmn file in the same folder as the test class and expects the file to be named <Test class name>.<test method name>.cmmn.
 
 [source,java,linenums]
@@ -285,6 +375,7 @@ public class MyTest extends FlowableCmmnTestCase {
 
 Alternatively, the _FlowableCmmnRule_ is available and allows to set a custom configuration:
 
+.JUnit 4 test with a Rule
 [source,java,linenums]
 ----
 @Rule
