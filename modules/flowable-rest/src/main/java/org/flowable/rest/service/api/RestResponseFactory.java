@@ -548,13 +548,18 @@ public class RestResponseFactory {
     public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         ProcessInstanceResponse result = new ProcessInstanceResponse();
         result.setActivityId(processInstance.getActivityId());
+        result.setStartedBy(processInstance.getStartUserId());
+        result.setStarted(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setEnded(processInstance.isEnded());
         result.setSuspended(processInstance.isSuspended());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
 
         // Added by Ryan Johnston
@@ -583,13 +588,18 @@ public class RestResponseFactory {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         ProcessInstanceResponse result = new ProcessInstanceResponse();
         result.setActivityId(processInstance.getActivityId());
+        result.setStartedBy(processInstance.getStartUserId());
+        result.setStarted(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setEnded(processInstance.isEnded());
         result.setSuspended(processInstance.isSuspended());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId()));
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
 
         // Added by Ryan Johnston
@@ -726,7 +736,6 @@ public class RestResponseFactory {
         return createHistoricProcessInstanceResponse(processInstance, createUrlBuilder());
     }
 
-    @SuppressWarnings("deprecation")
     public HistoricProcessInstanceResponse createHistoricProcessInstanceResponse(HistoricProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         HistoricProcessInstanceResponse result = new HistoricProcessInstanceResponse();
         result.setBusinessKey(processInstance.getBusinessKey());
@@ -735,6 +744,7 @@ public class RestResponseFactory {
         result.setEndActivityId(processInstance.getEndActivityId());
         result.setEndTime(processInstance.getEndTime());
         result.setId(processInstance.getId());
+        result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, processInstance.getProcessDefinitionId()));
         result.setStartActivityId(processInstance.getStartActivityId());
@@ -748,6 +758,8 @@ public class RestResponseFactory {
                 result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_HISTORY_PROCESS, false, urlBuilder));
             }
         }
+        result.setCallbackId(processInstance.getCallbackId());
+        result.setCallbackType(processInstance.getCallbackType());
         result.setTenantId(processInstance.getTenantId());
         return result;
     }
@@ -782,6 +794,9 @@ public class RestResponseFactory {
         result.setParentTaskId(taskInstance.getParentTaskId());
         result.setPriority(taskInstance.getPriority());
         result.setProcessDefinitionId(taskInstance.getProcessDefinitionId());
+        result.setScopeDefinitionId(taskInstance.getScopeDefinitionId());
+        result.setScopeId(taskInstance.getScopeId());
+        result.setScopeType(taskInstance.getScopeType());
         result.setTenantId(taskInstance.getTenantId());
         result.setCategory(taskInstance.getCategory());
         if (taskInstance.getProcessDefinitionId() != null) {

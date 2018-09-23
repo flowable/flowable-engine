@@ -66,9 +66,15 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder callbackType(String callbackType);
 
     /**
-     * Set the tenantId of process instance
+     * Set the tenantId of to lookup the process definition
      **/
     ProcessInstanceBuilder tenantId(String tenantId);
+    
+    /**
+     * Indicator to override the tenant id of the process definition with the provided value.
+     * The tenantId to lookup the process definition should still be provided if needed.
+     */
+    ProcessInstanceBuilder overrideProcessDefinitionTenantId(String tenantId);
 
     /**
      * Sets the process variables

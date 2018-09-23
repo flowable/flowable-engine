@@ -71,6 +71,9 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     private Boolean includeProcessVariables;
     private List<QueryVariable> taskVariables;
     private List<QueryVariable> processVariables;
+    private String scopeDefinitionId;
+    private String scopeId;
+    private String scopeType;
     private String tenantId;
     private String tenantIdLike;
     private Boolean withoutTenantId;
@@ -428,6 +431,30 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessVariables(List<QueryVariable> processVariables) {
         this.processVariables = processVariables;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     public String getTenantId() {

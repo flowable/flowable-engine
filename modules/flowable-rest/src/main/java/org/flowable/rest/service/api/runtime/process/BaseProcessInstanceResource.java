@@ -64,14 +64,59 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessInstanceId() != null) {
             query.processInstanceId(queryRequest.getProcessInstanceId());
         }
+        if (queryRequest.getProcessInstanceIds() != null) {
+            query.processInstanceIds(queryRequest.getProcessInstanceIds());
+        }
+        if (queryRequest.getProcessInstanceName() != null) {
+            query.processInstanceName(queryRequest.getProcessInstanceName());
+        }
+        if (queryRequest.getProcessInstanceNameLike() != null) {
+            query.processInstanceNameLike(queryRequest.getProcessInstanceNameLike());
+        }
+        if (queryRequest.getProcessInstanceNameLikeIgnoreCase() != null) {
+            query.processInstanceNameLikeIgnoreCase(queryRequest.getProcessInstanceNameLikeIgnoreCase());
+        }
         if (queryRequest.getProcessDefinitionKey() != null) {
             query.processDefinitionKey(queryRequest.getProcessDefinitionKey());
+        }
+        if (queryRequest.getProcessDefinitionKeys() != null) {
+            query.processDefinitionKeys(queryRequest.getProcessDefinitionKeys());
         }
         if (queryRequest.getProcessDefinitionId() != null) {
             query.processDefinitionId(queryRequest.getProcessDefinitionId());
         }
+        if (queryRequest.getProcessDefinitionIds() != null) {
+            query.processDefinitionIds(queryRequest.getProcessDefinitionIds());
+        }
+        if (queryRequest.getProcessDefinitionCategory() != null) {
+            query.processDefinitionCategory(queryRequest.getProcessDefinitionCategory());
+        }
+        if (queryRequest.getProcessDefinitionName() != null) {
+            query.processDefinitionName(queryRequest.getProcessDefinitionName());
+        }
+        if (queryRequest.getProcessDefinitionVersion() != null) {
+            query.processDefinitionVersion(queryRequest.getProcessDefinitionVersion());
+        }
+        if (queryRequest.getProcessDefinitionEngineVersion() != null) {
+            query.processDefinitionEngineVersion(queryRequest.getProcessDefinitionEngineVersion());
+        }
+        if (queryRequest.getDeploymentId() != null) {
+            query.deploymentId(queryRequest.getDeploymentId());
+        }
+        if (queryRequest.getDeploymentIdIn() != null) {
+            query.deploymentIdIn(queryRequest.getDeploymentIdIn());
+        }
         if (queryRequest.getProcessBusinessKey() != null) {
             query.processInstanceBusinessKey(queryRequest.getProcessBusinessKey());
+        }
+        if (queryRequest.getStartedBy() != null) {
+            query.startedBy(queryRequest.getStartedBy());
+        }
+        if (queryRequest.getStartedBefore() != null) {
+            query.startedBefore(queryRequest.getStartedBefore());
+        }
+        if (queryRequest.getStartedAfter() != null) {
+            query.startedAfter(queryRequest.getStartedAfter());
         }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());
@@ -100,11 +145,17 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }
+        
+        if (queryRequest.getCallbackId() != null) {
+            query.processInstanceCallbackId(queryRequest.getCallbackId());
+        }
+        if (queryRequest.getCallbackType() != null) {
+            query.processInstanceCallbackType(queryRequest.getCallbackType());
+        }
 
         if (queryRequest.getTenantId() != null) {
             query.processInstanceTenantId(queryRequest.getTenantId());
         }
-
         if (queryRequest.getTenantIdLike() != null) {
             query.processInstanceTenantIdLike(queryRequest.getTenantIdLike());
         }

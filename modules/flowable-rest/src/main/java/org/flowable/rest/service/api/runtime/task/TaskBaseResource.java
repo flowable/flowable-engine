@@ -277,6 +277,18 @@ public class TaskBaseResource {
         if (request.getProcessInstanceVariables() != null) {
             addProcessvariables(taskQuery, request.getProcessInstanceVariables());
         }
+        
+        if (request.getScopeDefinitionId() != null) {
+            taskQuery.scopeDefinitionId(request.getScopeDefinitionId());
+        }
+        
+        if (request.getScopeId() != null) {
+            taskQuery.scopeId(request.getScopeId());
+        }
+        
+        if (request.getScopeType() != null) {
+            taskQuery.scopeType(request.getScopeType());
+        }
 
         if (request.getTenantId() != null) {
             taskQuery.taskTenantId(request.getTenantId());

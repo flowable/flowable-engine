@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
@@ -63,15 +64,26 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
     @ApiOperation(value = "List process instances", nickname ="listProcessInstances", tags = { "Process Instances" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return models like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return models like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "Only return process instances with the given process definition key.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return process instances with the given process definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionCategory", dataType = "string", value = "Only return process instances with the given process definition category.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionVersion", dataType = "integer", value = "Only return process instances with the given process definition version.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionEngineVersion", dataType = "string", value = "Only return process instances with the given process definition engine version.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return process instances with the given businessKey.", paramType = "query"),
+            @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Only return process instances started by the given user.", paramType = "query"),
+            @ApiImplicitParam(name = "startedBefore", dataType = "string", format = "date-time", value = "Only return process instances started before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "startedAfter", dataType = "string", format = "date-time", value = "Only return process instances started after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "Only return process instances in which the given user is involved.", paramType = "query"),
             @ApiImplicitParam(name = "suspended", dataType = "boolean", value = "If true, only return process instance which are suspended. If false, only return process instances which are not suspended (active).", paramType = "query"),
             @ApiImplicitParam(name = "superProcessInstanceId", dataType = "string", value = "Only return process instances which have the given super process-instance id (for processes that have a call-activities).", paramType = "query"),
             @ApiImplicitParam(name = "subProcessInstanceId", dataType = "string", value = "Only return process instances which have the given sub process-instance id (for processes started as a call-activity).", paramType = "query"),
             @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only process instances which aren’t sub processes.", paramType = "query"),
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return process instances with the given callbackId.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return process instances with the given callbackType.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return process instances with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns process instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -89,6 +101,18 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         if (allRequestParams.containsKey("id")) {
             queryRequest.setProcessInstanceId(allRequestParams.get("id"));
         }
+        
+        if (allRequestParams.containsKey("name")) {
+            queryRequest.setProcessInstanceName(allRequestParams.get("name"));
+        }
+        
+        if (allRequestParams.containsKey("nameLike")) {
+            queryRequest.setProcessInstanceNameLike(allRequestParams.get("nameLike"));
+        }
+        
+        if (allRequestParams.containsKey("nameLikeIgnoreCase")) {
+            queryRequest.setProcessInstanceNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
+        }
 
         if (allRequestParams.containsKey("processDefinitionKey")) {
             queryRequest.setProcessDefinitionKey(allRequestParams.get("processDefinitionKey"));
@@ -97,9 +121,33 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         if (allRequestParams.containsKey("processDefinitionId")) {
             queryRequest.setProcessDefinitionId(allRequestParams.get("processDefinitionId"));
         }
+        
+        if (allRequestParams.containsKey("processDefinitionCategory")) {
+            queryRequest.setProcessDefinitionCategory(allRequestParams.get("processDefinitionCategory"));
+        }
+        
+        if (allRequestParams.containsKey("processDefinitionVersion")) {
+            queryRequest.setProcessDefinitionVersion(Integer.valueOf(allRequestParams.get("processDefinitionVersion")));
+        }
+        
+        if (allRequestParams.containsKey("processDefinitionEngineVersion")) {
+            queryRequest.setProcessDefinitionEngineVersion(allRequestParams.get("processDefinitionEngineVersion"));
+        }
 
         if (allRequestParams.containsKey("businessKey")) {
             queryRequest.setProcessBusinessKey(allRequestParams.get("businessKey"));
+        }
+        
+        if (allRequestParams.containsKey("startedBy")) {
+            queryRequest.setStartedBy(allRequestParams.get("startedBy"));
+        }
+        
+        if (allRequestParams.containsKey("startedBefore")) {
+            queryRequest.setStartedBefore(RequestUtil.getDate(allRequestParams, "startedBefore"));
+        }
+        
+        if (allRequestParams.containsKey("startedAfter")) {
+            queryRequest.setStartedAfter(RequestUtil.getDate(allRequestParams, "startedAfter"));
         }
 
         if (allRequestParams.containsKey("involvedUser")) {
@@ -124,6 +172,14 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
         if (allRequestParams.containsKey("includeProcessVariables")) {
             queryRequest.setIncludeProcessVariables(Boolean.valueOf(allRequestParams.get("includeProcessVariables")));
+        }
+        
+        if (allRequestParams.containsKey("callbackId")) {
+            queryRequest.setCallbackId(allRequestParams.get("callbackId"));
+        }
+        
+        if (allRequestParams.containsKey("callbackType")) {
+            queryRequest.setCallbackType(allRequestParams.get("callbackType"));
         }
 
         if (allRequestParams.containsKey("tenantId")) {
@@ -209,11 +265,17 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             if (request.getMessage() != null) {
                 processInstanceBuilder.messageName(request.getMessage());
             }
+            if (request.getName() != null) {
+                processInstanceBuilder.name(request.getName());
+            }
             if (request.getBusinessKey() != null) {
                 processInstanceBuilder.businessKey(request.getBusinessKey());
             }
             if (request.isTenantSet()) {
                 processInstanceBuilder.tenantId(request.getTenantId());
+            }
+            if (request.getOverrideDefinitionTenantId() != null && request.getOverrideDefinitionTenantId().length() > 0) {
+                processInstanceBuilder.overrideProcessDefinitionTenantId(request.getOverrideDefinitionTenantId());
             }
             if (startVariables != null) {
                 processInstanceBuilder.variables(startVariables);

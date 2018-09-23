@@ -13,15 +13,16 @@
 
 package org.flowable.rest.service.api.history;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Tijs Rademakers
@@ -30,6 +31,7 @@ public class HistoricProcessInstanceResponse {
 
     protected String id;
     protected String url;
+    protected String name;
     protected String businessKey;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
@@ -44,6 +46,8 @@ public class HistoricProcessInstanceResponse {
     protected String deleteReason;
     protected String superProcessInstanceId;
     protected List<RestVariable> variables = new ArrayList<>();
+    protected String callbackId;
+    protected String callbackType;
     protected String tenantId;
 
     @ApiModelProperty(example = "5")
@@ -62,6 +66,15 @@ public class HistoricProcessInstanceResponse {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+    
+    @ApiModelProperty(example = "myProcessInstanceName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @ApiModelProperty(example = "myKey")
@@ -174,8 +187,26 @@ public class HistoricProcessInstanceResponse {
     public void addVariable(RestVariable variable) {
         variables.add(variable);
     }
+    
+    @ApiModelProperty(example = "3")
+    public String getCallbackId() {
+        return callbackId;
+    }
 
-    @ApiModelProperty(example = "null")
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+
+    @ApiModelProperty(example = "cmmn")
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+    }
+
+    @ApiModelProperty(example = "someTenantId")
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
