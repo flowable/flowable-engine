@@ -435,7 +435,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             .name(name)
             .addClasspathResource(path)
             .deploy();
-
+        
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
             .deploymentId(deployment.getId()).singleResult();
 

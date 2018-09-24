@@ -28,6 +28,7 @@ import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -76,7 +77,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
             .processDefinitionKey("MP")
-            .processDefinitionWithoutTenantId()
             .list();
 
         assertEquals(2, processDefinitions.size());
@@ -94,6 +94,14 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        
+        ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(version2ProcessDef.getId())
+            .validateMigration(processInstanceToMigrate.getId());
+        
+        assertEquals(false, validationResult.hasErrors());
+        assertEquals(true, validationResult.isMigrationValid());
+        assertEquals(0, validationResult.getValidationMessages().size());
 
         //Migrate process
         runtimeService.createProcessInstanceMigrationBuilder()
@@ -139,7 +147,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
             .processDefinitionKey("MP")
-            .processDefinitionWithoutTenantId()
             .list();
 
         assertEquals(2, processDefinitions.size());
@@ -159,6 +166,15 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        
+        ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(version2ProcessDef.getId())
+            .addActivityMigrationMapping("userTask1Id", "userTask1Id")
+            .validateMigration(processInstanceToMigrate.getId());
+        
+        assertEquals(false, validationResult.hasErrors());
+        assertEquals(true, validationResult.isMigrationValid());
+        assertEquals(0, validationResult.getValidationMessages().size());
 
         //Migrate process - moving the current execution explicitly
         runtimeService.createProcessInstanceMigrationBuilder()
@@ -185,7 +201,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals("userTask2Id", tasks.get(0).getTaskDefinitionKey());
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstanceToMigrate.getId());
-
     }
 
     @Test
@@ -207,7 +222,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
             .processDefinitionKey("MP")
-            .processDefinitionWithoutTenantId()
             .list();
 
         assertEquals(2, processDefinitions.size());
@@ -227,6 +241,24 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         assertEquals(version1ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask1Id", tasks.get(0).getTaskDefinitionKey());
+        
+        ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(version2ProcessDef.getId())
+            .addActivityMigrationMapping("userTask1Id", "userTask3Id")
+            .validateMigration(processInstanceToMigrate.getId());
+        
+        assertEquals(true, validationResult.hasErrors());
+        assertEquals(false, validationResult.isMigrationValid());
+        assertEquals(1, validationResult.getValidationMessages().size());
+        
+        validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+            .migrateToProcessDefinition(version2ProcessDef.getId())
+            .addActivityMigrationMapping("userTask1Id", "userTask2Id")
+            .validateMigration(processInstanceToMigrate.getId());
+        
+        assertEquals(false, validationResult.hasErrors());
+        assertEquals(true, validationResult.isMigrationValid());
+        assertEquals(0, validationResult.getValidationMessages().size());
 
         //Migrate process - moving the current execution explicitly
         runtimeService.createProcessInstanceMigrationBuilder()
@@ -245,7 +277,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertEquals(version2ProcessDef.getId(), tasks.get(0).getProcessDefinitionId());
         assertEquals("userTask2Id", tasks.get(0).getTaskDefinitionKey());
 
-        //This new process definition has two activities, but we have mapped to the last activity explicitely
+        //This new process definition has two activities, but we have mapped to the last activity explicitly
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstanceToMigrate.getId());
 
@@ -270,7 +302,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
             .processDefinitionKey("MP")
-            .processDefinitionWithoutTenantId()
             .list();
 
         assertEquals(2, processDefinitions.size());
@@ -318,7 +349,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         //This new process version only have one activity
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstanceToMigrate.getId());
-
     }
 
     @Test
@@ -336,7 +366,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
             .processDefinitionKey("MP")
-            .processDefinitionWithoutTenantId()
             .list();
 
         assertEquals(2, processDefinitions.size());
@@ -941,7 +970,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(job).isEqualToIgnoringGivenFields(timerJob, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.TIMER_SCHEDULED);
         Optional<FlowableEvent> timerEvent = changeStateEventListener.getEvents().stream().filter(event -> event.getType().equals(FlowableEngineEventType.TIMER_SCHEDULED)).findFirst();
@@ -1087,7 +1115,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(timerJob1).isNotEqualTo(timerJob2).extracting(Job::getExecutionId);
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.TIMER_SCHEDULED);
 
@@ -1170,7 +1197,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertNull(timerJob2);
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.ACTIVITY_CANCELLED);
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
@@ -1243,7 +1269,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
 
@@ -1318,7 +1343,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(timerJob).extracting(Job::getJobHandlerConfiguration).toString().contains("boundaryTimerEvent");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
 
@@ -1399,7 +1423,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertNull(timerJob);
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.JOB_CANCELED, FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_STARTED);
 
@@ -1483,7 +1506,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(timerJob).isEqualToIgnoringGivenFields(timerFromTask, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
 
@@ -1562,7 +1584,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(timerJob).isEqualToIgnoringGivenFields(timerFromTask, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_STARTED, FlowableEngineEventType.TIMER_SCHEDULED);
 
@@ -1639,7 +1660,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
 
@@ -1823,7 +1843,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("signal");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING);
 
@@ -1917,7 +1936,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_CANCELLED, FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
 
@@ -2019,7 +2037,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).isEmpty();
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED, FlowableEngineEventType.ACTIVITY_STARTED);
 
@@ -2107,7 +2124,6 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         assertThat(eventSubscriptions).extracting(EventSubscription::getEventType).containsExactly("message");
 
         // Verify events
-        List<FlowableEvent> events = changeStateEventListener.getEvents();
         assertTrue(changeStateEventListener.hasEvents());
         assertThat(changeStateEventListener.getEvents()).extracting(FlowableEvent::getType).containsExactly(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED, FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
 

@@ -15,6 +15,8 @@ package org.flowable.engine.migration;
 
 import java.util.Map;
 
+import org.flowable.engine.impl.migration.ProcessInstanceMigrationValidationResult;
+
 /**
  * @author Dennis Federico
  */
@@ -37,8 +39,14 @@ public interface ProcessInstanceMigrationBuilder {
     ProcessInstanceMigrationDocument getProcessInstanceMigrationDocument();
 
     void migrate(String processInstanceId);
+    
+    ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId);
+    
+    void migrateProcessInstances(String processDefinitionId);
 
-    void migrateProcessInstancesOf(String processDefinitionId);
+    ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionId);
 
-    void migrateProcessInstancesOf(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
+    void migrateProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
+    
+    ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId);
 }

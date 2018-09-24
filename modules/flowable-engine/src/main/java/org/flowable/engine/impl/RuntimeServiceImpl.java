@@ -694,7 +694,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public ProcessInstanceMigrationValidationResult validateMigrationForProcessInstance(String processInstanceId, ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
-        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessDefinition(processInstanceId, processInstanceMigrationDocument));
+        return commandExecutor.execute(ProcessInstanceMigrationValidationCmd.forProcessInstance(processInstanceId, processInstanceMigrationDocument));
     }
 
     @Override

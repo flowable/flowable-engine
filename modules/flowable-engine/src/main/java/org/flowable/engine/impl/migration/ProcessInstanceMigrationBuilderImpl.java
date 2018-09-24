@@ -87,17 +87,34 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         runtimeService.migrateProcessInstance(processInstanceId, document);
     }
+    
+    @Override
+    public ProcessInstanceMigrationValidationResult validateMigration(String processInstanceId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return runtimeService.validateMigrationForProcessInstance(processInstanceId, document);
+    }
 
     @Override
-    public void migrateProcessInstancesOf(String processDefinitionId) {
+    public void migrateProcessInstances(String processDefinitionId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         runtimeService.migrateProcessInstancesOfProcessDefinition(processDefinitionId, document);
     }
 
     @Override
-    public void migrateProcessInstancesOf(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+    public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return runtimeService.validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionId, document);
+    }
+
+    @Override
+    public void migrateProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
         ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
         runtimeService.migrateProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
     }
 
+    @Override
+    public ProcessInstanceMigrationValidationResult validateMigrationOfProcessInstances(String processDefinitionKey, int processDefinitionVersion, String processDefinitionTenantId) {
+        ProcessInstanceMigrationDocument document = migrationDocumentBuilder.build();
+        return runtimeService.validateMigrationForProcessInstancesOfProcessDefinition(processDefinitionKey, processDefinitionVersion, processDefinitionTenantId, document);
+    }
 }
