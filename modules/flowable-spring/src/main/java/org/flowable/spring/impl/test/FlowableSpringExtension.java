@@ -13,7 +13,6 @@
 package org.flowable.spring.impl.test;
 
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.impl.test.ResourceFlowableExtension;
 import org.flowable.engine.test.FlowableExtension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,6 +20,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 /**
  * An extension that uses {@link SpringExtension} to get the {@link ProcessEngine} from the {@link org.springframework.context.ApplicationContext}
  * and make it available for the {@link FlowableExtension}.
+ *
+ * <b>NB:</b> The {@link org.flowable.engine.test.ConfigurationResource} is ignored
+ * as the {@link ProcessEngine} is taken from the Spring application context
  *
  * @author Filip Hrisafov
  */
