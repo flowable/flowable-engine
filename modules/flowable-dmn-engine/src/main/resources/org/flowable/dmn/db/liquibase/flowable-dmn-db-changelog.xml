@@ -139,5 +139,12 @@
         
     </changeSet>
 
+    <changeSet id="5" author="flowable" dbms="mysql">
+
+        <modifyDataType tableName="ACT_DMN_DEPLOYMENT" columnName="DEPLOY_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_DMN_HI_DECISION_EXECUTION" columnName="START_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_DMN_HI_DECISION_EXECUTION" columnName="END_TIME_" newDataType="datetime(3)" />
+
+    </changeSet>
 
 </databaseChangeLog>
