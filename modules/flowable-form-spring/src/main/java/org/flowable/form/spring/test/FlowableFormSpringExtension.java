@@ -21,6 +21,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * An extension that uses {@link SpringExtension} to get the {@link FormEngine} from the {@link org.springframework.context.ApplicationContext}
  * and make it available for the {@link FlowableFormExtension}.
  *
+ * <b>NB:</b> The {@link org.flowable.form.engine.test.FormConfigurationResource} is ignored
+ * as the {@link FormEngine} is taken from the Spring application context
+ *
  * @author Filip Hrisafov
  */
 public class FlowableFormSpringExtension extends FlowableFormExtension {
